@@ -1,0 +1,80 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+  "sha256": "ba60e1e5c65eca7809dc9bc43c16e64c88280e41e434a90246176b5fcfef747c",
+  "class_count": 8,
+  "unique_class_entries": 8,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb.class": "30ce1574ae6d1d4f9c685528f0101e70b7eafa70cb545f34d1a5e2ac844b7ab0",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap.class": "a7505d594bfb1fc412dcc71752a34a963f2a27cdc435bb403b1c2720b6782e72",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1.class": "f6feb2c23566a0061cce83aec7165207087076338c7f93679327327fd7ed1168",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2.class": "47d7ea70acc8077ecdb3f13e8617180c0339ef2fce8f3c5b95a6545a896ccb9a",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult.class": "33e951b2a82b5a699111661e301b20564c27a7c78fe38592603669143c6c0274",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager.class": "36b079aa7812510e1d98ed95f46936e649c761b6b441afebc5456244a572c07d",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplacePlugin.class": "264ad504e1fb8ad121fdcd9d5f7b172ee1c2dccda2031709d6ca82c3abff21af",
+    "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet.class": "95c35f1fd6106153c7e2fb8a9bec26425c5a320d4987c37f73c4b0a92ef7bae8"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb.class",
+      "occurrence": 0,
+      "sha256": "30ce1574ae6d1d4f9c685528f0101e70b7eafa70cb545f34d1a5e2ac844b7ab0",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap.class",
+      "occurrence": 0,
+      "sha256": "a7505d594bfb1fc412dcc71752a34a963f2a27cdc435bb403b1c2720b6782e72",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1.class",
+      "occurrence": 0,
+      "sha256": "f6feb2c23566a0061cce83aec7165207087076338c7f93679327327fd7ed1168",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2.class",
+      "occurrence": 0,
+      "sha256": "47d7ea70acc8077ecdb3f13e8617180c0339ef2fce8f3c5b95a6545a896ccb9a",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult.class",
+      "occurrence": 0,
+      "sha256": "33e951b2a82b5a699111661e301b20564c27a7c78fe38592603669143c6c0274",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager.class",
+      "occurrence": 0,
+      "sha256": "36b079aa7812510e1d98ed95f46936e649c761b6b441afebc5456244a572c07d",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplacePlugin.class",
+      "occurrence": 0,
+      "sha256": "264ad504e1fb8ad121fdcd9d5f7b172ee1c2dccda2031709d6ca82c3abff21af",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet.class",
+      "occurrence": 0,
+      "sha256": "95c35f1fd6106153c7e2fb8a9bec26425c5a320d4987c37f73c4b0a92ef7bae8",
+      "member_shard": "docs/dev/evidence/sqx145/members/130/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/130/001.json",
+      "sha256": "8f0b0af2eafb83f63e7256975f0ff6d890f395b84211a963712cd46d6b98071d"
+    }
+  ]
+}

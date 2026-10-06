@@ -1,0 +1,374 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+  "archive_sha256": "070932946751314323159f9a5a84d499b1b66924907a093d582f0ce9a7812c54",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartPlugin.class",
+      "occurrence": 0,
+      "sha256": "9839dc45170d510e8ef66db9a0ba8fb678e945734d3b85da80e56fe3573d01ce",
+      "name": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b12ee0a05ad060c8b5c6768f8669c76fe677db4443389cb9314ef30227c66ad",
+          "code_length": 15,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "3d23bef6454453d9649bae707a13f50a8256bd7e37624d6252caf3c7063baa69",
+          "code_length": 76
+        },
+        {
+          "name": "addCrossOrigin",
+          "descriptor": "(Lorg/eclipse/jetty/servlet/ServletContextHandler;)V",
+          "access": 2,
+          "code_sha256": "ecf6b274e2ceb8ae195b1864b9101987e45094b04ff35c06cc75ae1a7cb5265e",
+          "code_length": 48
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "501d9b15609cbcb0b67405aa961abbfcf1577a86010892f94a1596f116bc6951",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "254673f8edf396106974a5c36f95de99a6e442f6441cd95f59c29081b26875e7",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "0a539dd9d22abbcadf9bffed070bec599295365b8f61e0f40e8a5b8aad063f38",
+          "code_length": 63,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartPlugin",
+        "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "jakarta/servlet/DispatcherType",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/util/EnumSet",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/FilterHolder",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/eclipse/jetty/servlets/CrossOriginFilter",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet.class",
+      "occurrence": 0,
+      "sha256": "25b1882bc4b13f1eb4d6a3cd68e80b3dbf433c76fe04a22123e07b3bcef14d1d",
+      "name": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "formaterDate",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_EQUITYCHARTSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/EquityChart;",
+          "access": 2
+        },
+        {
+          "name": "periods",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/Periods;",
+          "access": 2
+        },
+        {
+          "name": "yearMarkers",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/YearMarkers;",
+          "access": 2
+        },
+        {
+          "name": "sampleMarkers",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/SampleMarkers;",
+          "access": 2
+        },
+        {
+          "name": "trendLines",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/TrendLines;",
+          "access": 2
+        },
+        {
+          "name": "points",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/Points;",
+          "access": 2
+        },
+        {
+          "name": "stagnation",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/Stagnation;",
+          "access": 2
+        },
+        {
+          "name": "maxNewHighDuration",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/MaxNewHighDuration;",
+          "access": 2
+        },
+        {
+          "name": "walkForward",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/WalkForward;",
+          "access": 2
+        },
+        {
+          "name": "equity",
+          "descriptor": "Lcom/strategyquant/tradinglib/equitychart/Equity;",
+          "access": 2
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 2
+        },
+        {
+          "name": "comparatorByCloseTime",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Comparator<Lcom/strategyquant/tradinglib/Order;>;"
+        },
+        {
+          "name": "comparatorByOpenTime",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Comparator<Lcom/strategyquant/tradinglib/Order;>;"
+        },
+        {
+          "name": "SettingKey",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rg",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "7ef68a360771442554c08f14a5a4907829e6fa7e28149602704d72e910c6db03",
+          "code_length": 197
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "bd88d499835fc170d1718aa8a25ad6231761b375f0c3673cbb6fccdb7798f586",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "loadLastSettings",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "e720020cd486d6b843362ba8fe3fad77c7c7082aa8f8f9bce41e425497754ce7",
+          "code_length": 264,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "dc17a0ecfa717164a6c54949a9b1352988a24a27a1c0087f0282e487574b1caa",
+          "code_length": 1689,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "saveLastSettings",
+          "descriptor": "(Ljava/lang/String;BBBBLjava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "03e991aa4773e3e6a298c1afaa8a6ed96be7f4246ab45cabb4f96db3df5751e8",
+          "code_length": 155
+        },
+        {
+          "name": "isWFResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "4a08ac356a0c025330b9738a96c985e7a9de94044e85373bbc055fe7cb4c38d7",
+          "code_length": 37,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "parseLong",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 2,
+          "code_sha256": "7a05149d1f33bce6a4bac1813a6f07de6a3f41397f04a250e3ac0a737c50fb84",
+          "code_length": 10
+        },
+        {
+          "name": "parseTime",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 2,
+          "code_sha256": "713f9cf55f2879ccba87d369b5ac68d9df747274fd6b878c18414560584134f3",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c6f479347e34e0635875bbcaba39d1232a4f8551dd9da83b3a90583a76fedfca",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/equitychart/DomainAxisType",
+        "com/strategyquant/tradinglib/equitychart/Equity",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/equitychart/EquityChartUtils",
+        "com/strategyquant/tradinglib/equitychart/MainChartDataset",
+        "com/strategyquant/tradinglib/equitychart/MaxNewHighDuration",
+        "com/strategyquant/tradinglib/equitychart/Periods",
+        "com/strategyquant/tradinglib/equitychart/Points",
+        "com/strategyquant/tradinglib/equitychart/SampleMarkers",
+        "com/strategyquant/tradinglib/equitychart/Stagnation",
+        "com/strategyquant/tradinglib/equitychart/TrendLines",
+        "com/strategyquant/tradinglib/equitychart/WalkForward",
+        "com/strategyquant/tradinglib/equitychart/YearMarkers",
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon",
+        "com/strategyquant/tradinglib/optimization/WalkForwardMatrixResult",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByCloseTime",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByOpenTime",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/joda/time/format/DateTimeFormat",
+        "org/joda/time/format/DateTimeFormatter",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

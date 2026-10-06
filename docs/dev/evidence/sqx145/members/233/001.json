@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletGridControl/ServletGridControl.jar",
+  "archive_sha256": "eb88c3bfc9a8fd1fc45f3556431d5161b48e3a23c29b23150adb02299d320f0d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet.class",
+      "occurrence": 0,
+      "sha256": "1c73a33de3fd436de19622c99e3c8bc0425ac212decfab79e02e0084fc6fa637",
+      "name": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "219ad1f8f335a5dc1d12ca92e77ac05d6bca344a52dd3577a99438ee464e025d",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "998792abb9eec8c5ed92b603a54250715d062c1442f664774a02fefefb5d08ff",
+          "code_length": 49,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1e2d4fabc41e56a226ee6422b803e0c609a8a0bfd1446134fd46ad005b28be45",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "398191dcebd9bc655682c81d857d612d4d3a4fa710b0241722e21b850c4af0dd",
+      "name": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet",
+        "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServletPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

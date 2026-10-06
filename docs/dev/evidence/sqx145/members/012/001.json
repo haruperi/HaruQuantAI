@@ -1,0 +1,2525 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/checker-qual-3.4.1.jar",
+  "archive_sha256": "bce5c887460542d69c0ffce05919fef8f56f9964a1505a99f6ae69a58351507e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKey.class",
+      "occurrence": 0,
+      "sha256": "2c1216bc8ad3a2dfba1a2769b2334f9d8402d9011d50eb2afc9aa9b738f9e6b6",
+      "name": "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKeyBottom.class",
+      "occurrence": 0,
+      "sha256": "17bee2838ae074f2ed6690ef957f207a4d3bf1a11c4179f34cd2b94894fdcb03",
+      "name": "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKeyBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/compilermsgs/qual/CompilerMessageKeyBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/compilermsgs/qual/UnknownCompilerMessageKey.class",
+      "occurrence": 0,
+      "sha256": "ed188175b9890b528faabe4e3948f314e7d682890f13d5bae272d71ff1b59b1d",
+      "name": "org/checkerframework/checker/compilermsgs/qual/UnknownCompilerMessageKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/compilermsgs/qual/UnknownCompilerMessageKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/AwtAlphaCompositingRule.class",
+      "occurrence": 0,
+      "sha256": "819c75137c390d68ceadf76def2f3b26a1ef14e427ca3d29914a7cc75ae4180f",
+      "name": "org/checkerframework/checker/fenum/qual/AwtAlphaCompositingRule",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/AwtAlphaCompositingRule"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/AwtColorSpace.class",
+      "occurrence": 0,
+      "sha256": "7c2cf1f8a16588ed4b4291ce470857b5c4f87c49492a73f49e859cdb1d490cb2",
+      "name": "org/checkerframework/checker/fenum/qual/AwtColorSpace",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/AwtColorSpace"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/AwtCursorType.class",
+      "occurrence": 0,
+      "sha256": "8cfd5387b51377f16a50a72264b948e8ea4b548c2d815043792a498300237a00",
+      "name": "org/checkerframework/checker/fenum/qual/AwtCursorType",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/AwtCursorType"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/AwtFlowLayout.class",
+      "occurrence": 0,
+      "sha256": "f0b3ae802fef7a72d11f631f1030187154125599cf90000df8c46f8349a23c0f",
+      "name": "org/checkerframework/checker/fenum/qual/AwtFlowLayout",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/AwtFlowLayout"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/Fenum.class",
+      "occurrence": 0,
+      "sha256": "18c5958ee058921aa314bac2fb0b5d33721279bea3d62b2aee4a04a8f1566462",
+      "name": "org/checkerframework/checker/fenum/qual/Fenum",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/Fenum"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/FenumBottom.class",
+      "occurrence": 0,
+      "sha256": "96b64da3edd1c2b4401c9ce957d006a7f245c6059399a0534f7f4ad47692b0f8",
+      "name": "org/checkerframework/checker/fenum/qual/FenumBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/FenumBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/FenumTop.class",
+      "occurrence": 0,
+      "sha256": "21fc0ca93274d1e3adddb8d5484c504ea4dcd28acc64b8c4ed2c824dbb7c9564",
+      "name": "org/checkerframework/checker/fenum/qual/FenumTop",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/FenumTop"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/FenumUnqualified.class",
+      "occurrence": 0,
+      "sha256": "fd66cabad634eefe615aaa15f26c19849c29168703cd7dcec3c5760e64f8d2b3",
+      "name": "org/checkerframework/checker/fenum/qual/FenumUnqualified",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/FenumUnqualified"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/PolyFenum.class",
+      "occurrence": 0,
+      "sha256": "d17cb2f530c2f34c65c0515f53eb2dafe76067667f1420f2dca3788da4c40090",
+      "name": "org/checkerframework/checker/fenum/qual/PolyFenum",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/PolyFenum"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingBoxOrientation.class",
+      "occurrence": 0,
+      "sha256": "12261a165a4b86752826d26de03486e17c3895bbb913e34c2b535edd6118c1e3",
+      "name": "org/checkerframework/checker/fenum/qual/SwingBoxOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingBoxOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingCompassDirection.class",
+      "occurrence": 0,
+      "sha256": "6bb8a400cb68288803d3776e1ab6af1a0757904ae81778bc9b906dfd8ee475ff",
+      "name": "org/checkerframework/checker/fenum/qual/SwingCompassDirection",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingCompassDirection"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingElementOrientation.class",
+      "occurrence": 0,
+      "sha256": "caa8203022d0db917becbd137bc7517ada744e697c5277982be18987dc819b75",
+      "name": "org/checkerframework/checker/fenum/qual/SwingElementOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingElementOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingHorizontalOrientation.class",
+      "occurrence": 0,
+      "sha256": "a626639875cd5dac73b863168f045c9cc9ced494ded31ceea4730692f6bb2b66",
+      "name": "org/checkerframework/checker/fenum/qual/SwingHorizontalOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingHorizontalOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingSplitPaneOrientation.class",
+      "occurrence": 0,
+      "sha256": "11a45809232fc0ce85362229b831c75aac488d924ae46acd1389756c1e623740",
+      "name": "org/checkerframework/checker/fenum/qual/SwingSplitPaneOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingSplitPaneOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingTextOrientation.class",
+      "occurrence": 0,
+      "sha256": "6f7532cf3aa4ad8133223a0c42b1830db889d7bf8a88dd40eb629184099e22c1",
+      "name": "org/checkerframework/checker/fenum/qual/SwingTextOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingTextOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingTitleJustification.class",
+      "occurrence": 0,
+      "sha256": "52051e4d1e9640c8b1bfec101cc162b4af32be1e7c0d98bc4eafddb1a387c9de",
+      "name": "org/checkerframework/checker/fenum/qual/SwingTitleJustification",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingTitleJustification"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingTitlePosition.class",
+      "occurrence": 0,
+      "sha256": "4a9696cd340f5b3c2de77624e20b8e9feafd0c3de5a07529a5b9257c5f1636d7",
+      "name": "org/checkerframework/checker/fenum/qual/SwingTitlePosition",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingTitlePosition"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/fenum/qual/SwingVerticalOrientation.class",
+      "occurrence": 0,
+      "sha256": "99975c927cb1d1b42529ef48e991fd509d8be29c147f4f8264bd1f5d17e45cdb",
+      "name": "org/checkerframework/checker/fenum/qual/SwingVerticalOrientation",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/fenum/qual/SwingVerticalOrientation"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/FormatUtil$Conversion.class",
+      "occurrence": 0,
+      "sha256": "e6c86e273663f20cf864dd9054511e3fdf7908a2d1f31f470bb4d72b088243b8",
+      "name": "org/checkerframework/checker/formatter/FormatUtil$Conversion",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "cath",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(CI)V",
+          "access": 1,
+          "code_sha256": "42ec572ad987cea15f73ad1df38afd7f7b402e0e2d96f934b8e7b32a13bf44c1",
+          "code_length": 18
+        },
+        {
+          "name": "index",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "category",
+          "descriptor": "()Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 0,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/checkerframework/checker/formatter/FormatUtil",
+        "org/checkerframework/checker/formatter/FormatUtil$Conversion",
+        "org/checkerframework/checker/formatter/qual/ConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/FormatUtil$ExcessiveOrMissingFormatArgumentException.class",
+      "occurrence": 0,
+      "sha256": "0aaa4289e923ee010ef3b5abdf00b17de511b250bfcfd234d376e699025b1b28",
+      "name": "org/checkerframework/checker/formatter/FormatUtil$ExcessiveOrMissingFormatArgumentException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/MissingFormatArgumentException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "expected",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "found",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "368b7114bb31363651818e12f33878a2aa2e45bc8f1b1ff5991fb0f306517bc9",
+          "code_length": 17
+        },
+        {
+          "name": "getExpected",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getFound",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "05c9c074277594b037ffa8701eaaf94e237f2f90db9d866fc84e83cf554db53a",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/MissingFormatArgumentException",
+        "org/checkerframework/checker/formatter/FormatUtil",
+        "org/checkerframework/checker/formatter/FormatUtil$ExcessiveOrMissingFormatArgumentException"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/FormatUtil$IllegalFormatConversionCategoryException.class",
+      "occurrence": 0,
+      "sha256": "06d0de93102cb2ae4d59ea5afc97e50af9379f02a0bccca65ec032ae21aa9b33",
+      "name": "org/checkerframework/checker/formatter/FormatUtil$IllegalFormatConversionCategoryException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/IllegalFormatConversionException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "expected",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 18
+        },
+        {
+          "name": "found",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/checkerframework/checker/formatter/qual/ConversionCategory;Lorg/checkerframework/checker/formatter/qual/ConversionCategory;)V",
+          "access": 1,
+          "code_sha256": "25a41ddcac1e28dc10725c7f44c9c4d5acc730673d1f6f4a0a1251107ae6583e",
+          "code_length": 56
+        },
+        {
+          "name": "getExpected",
+          "descriptor": "()Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getFound",
+          "descriptor": "()Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f31dd0d4018e3ed483592a1cdda0c34b5f6111d3977811697393e3555d4890a9",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/IllegalFormatConversionException",
+        "org/checkerframework/checker/formatter/FormatUtil",
+        "org/checkerframework/checker/formatter/FormatUtil$IllegalFormatConversionCategoryException",
+        "org/checkerframework/checker/formatter/qual/ConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/FormatUtil.class",
+      "occurrence": 0,
+      "sha256": "992855133ad37d24520d15d49e88ad65bdb91e2c85798a0c7d01453225c70c96",
+      "name": "org/checkerframework/checker/formatter/FormatUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formatSpecifier",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "fsPattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "asFormat",
+          "descriptor": "(Ljava/lang/String;[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;)Ljava/lang/String;",
+          "access": 137,
+          "code_sha256": "024c424a968d931d9366c045c00e689128da656e7bc2cb37cd5341d76f18c161",
+          "code_length": 63,
+          "throws": [
+            "java/util/IllegalFormatException"
+          ]
+        },
+        {
+          "name": "tryFormatSatisfiability",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "05fae9bb27eb866457186f2d8162907da3b4e150c27fd649efaaba3336ca320e",
+          "code_length": 10,
+          "throws": [
+            "java/util/IllegalFormatException"
+          ]
+        },
+        {
+          "name": "formatParameterCategories",
+          "descriptor": "(Ljava/lang/String;)[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "786c08c68026b6a2a2f65a0ff8b97281cea5636ccf8bf484339c1b90d59383c1",
+          "code_length": 237,
+          "throws": [
+            "java/util/IllegalFormatException"
+          ]
+        },
+        {
+          "name": "indexFromFormat",
+          "descriptor": "(Ljava/util/regex/Matcher;)I",
+          "access": 10,
+          "code_sha256": "97e4c83dcc5388397bb2a8499f87b4afea3200c967a37f4bb33bf16063b5daca",
+          "code_length": 61
+        },
+        {
+          "name": "conversionCharFromFormat",
+          "descriptor": "(Ljava/util/regex/Matcher;)C",
+          "access": 10,
+          "code_sha256": "3761012e12d59bab688d56d3a3f9cdce3660b00ce9e5125436158ba6bb77b1c3",
+          "code_length": 27
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)[Lorg/checkerframework/checker/formatter/FormatUtil$Conversion;",
+          "access": 10,
+          "code_sha256": "0107d595fc35d27a97fc29122b2922a7fc109765b75111df1c7b03455db4d6a5",
+          "code_length": 94
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2cc4fefbee10a25dfa5e88df0c03e0bb11155d7a417166a274ff8cdd5008be66",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Lorg/checkerframework/checker/formatter/FormatUtil$Conversion;",
+        "[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/IllegalFormatException",
+        "java/util/Map",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/checkerframework/checker/formatter/FormatUtil",
+        "org/checkerframework/checker/formatter/FormatUtil$Conversion",
+        "org/checkerframework/checker/formatter/FormatUtil$ExcessiveOrMissingFormatArgumentException",
+        "org/checkerframework/checker/formatter/FormatUtil$IllegalFormatConversionCategoryException",
+        "org/checkerframework/checker/formatter/qual/ConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/ConversionCategory.class",
+      "occurrence": 0,
+      "sha256": "5d992756e83ded5ea12753d1fabf9dc64488c0833aee3dfc0347913612f9cc91",
+      "name": "org/checkerframework/checker/formatter/qual/ConversionCategory",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "GENERAL",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "CHAR",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "INT",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "FLOAT",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "TIME",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "CHAR_AND_INT",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "INT_AND_TIME",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "NULL",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "UNUSED",
+          "descriptor": "Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "types",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 17,
+          "generic_signature": "[Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "chars",
+          "descriptor": "Ljava/lang/String;",
+          "access": 17
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I[Ljava/lang/Class;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "6cf457bebb48c09b573c5213b70c9edf979c3368f02657215007e283bed061a2",
+          "code_length": 18,
+          "generic_signature": "([Ljava/lang/Class<*>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "fromConversionChar",
+          "descriptor": "(C)Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "6883d5d79a9b1e5b23da9f18b112ca8827a7a44cd2febd8d2967509eb90e4198",
+          "code_length": 101
+        },
+        {
+          "name": "arrayToSet",
+          "descriptor": "([Ljava/lang/Object;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "dd3f04ce22d4ed21b618e63191910ce4d2921e4af7e5c495fc276e2ac3a110bf",
+          "code_length": 12,
+          "generic_signature": "<E:Ljava/lang/Object;>([TE;)Ljava/util/Set<TE;>;"
+        },
+        {
+          "name": "isSubsetOf",
+          "descriptor": "(Lorg/checkerframework/checker/formatter/qual/ConversionCategory;Lorg/checkerframework/checker/formatter/qual/ConversionCategory;)Z",
+          "access": 9,
+          "code_sha256": "40b8acb0e51eb581cb3dba2f60d9709f74301c642799038dd3dc43f00fb14ddc",
+          "code_length": 15
+        },
+        {
+          "name": "intersect",
+          "descriptor": "(Lorg/checkerframework/checker/formatter/qual/ConversionCategory;Lorg/checkerframework/checker/formatter/qual/ConversionCategory;)Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "99e4976ee484596aa5501bc3d5d8022d42561bcb0cd3868e45298fd74c2f2d90",
+          "code_length": 170
+        },
+        {
+          "name": "union",
+          "descriptor": "(Lorg/checkerframework/checker/formatter/qual/ConversionCategory;Lorg/checkerframework/checker/formatter/qual/ConversionCategory;)Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 9,
+          "code_sha256": "40904ab310f6e174e0fb467bc0ef9bac0d8f1c323f60da886d5ce63c755ea19d",
+          "code_length": 198
+        },
+        {
+          "name": "className",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "16b500f26e2410e2613b931739c8f922c7f32f4b6d454ce2a39ddbf6a9a28e79",
+          "code_length": 77,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "12cf401f5ac8920c045e565ede4054f22a03a4dcfc2bf92a4490f0440b3404a1",
+          "code_length": 88
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ad9d07bce99b96f0e1a4fe4c9bbfea011a5079a3f67fd1e148e0bc99a1b3c087",
+          "code_length": 325
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/checkerframework/checker/formatter/qual/ConversionCategory;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Enum",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/RuntimeException",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/util/Arrays",
+        "java/util/Calendar",
+        "java/util/Date",
+        "java/util/HashSet",
+        "java/util/Set",
+        "org/checkerframework/checker/formatter/qual/ConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/Format.class",
+      "occurrence": 0,
+      "sha256": "bd02d2838b752880beaff21d432d330222b1bbe68d393bba3610164ecaad4264",
+      "name": "org/checkerframework/checker/formatter/qual/Format",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/formatter/qual/ConversionCategory;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/Format"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/FormatBottom.class",
+      "occurrence": 0,
+      "sha256": "117b6139a411d09ca2f6724f0c460b347a29735c1183e13bd391ed9619fdeb7b",
+      "name": "org/checkerframework/checker/formatter/qual/FormatBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/FormatBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/FormatMethod.class",
+      "occurrence": 0,
+      "sha256": "08c54cd6c2e2125dabc8abca89bf3f649b2f49dc37004edd9f25774310a3dc86",
+      "name": "org/checkerframework/checker/formatter/qual/FormatMethod",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/FormatMethod"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/InvalidFormat.class",
+      "occurrence": 0,
+      "sha256": "1fd7f10b6673f06b7562a7faf8d22a0d9f3a8ac4833d0fc8531fd9333156684a",
+      "name": "org/checkerframework/checker/formatter/qual/InvalidFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/InvalidFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/ReturnsFormat.class",
+      "occurrence": 0,
+      "sha256": "58c9119eeff08f04204cecb8988863fc0059bfdfd873710bb6e44d77d37aa610",
+      "name": "org/checkerframework/checker/formatter/qual/ReturnsFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/ReturnsFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/formatter/qual/UnknownFormat.class",
+      "occurrence": 0,
+      "sha256": "47d7754a7b990b0a044027c5c1d5259125241e2d57e498abd93fbd46a22da440",
+      "name": "org/checkerframework/checker/formatter/qual/UnknownFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/formatter/qual/UnknownFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/AlwaysSafe.class",
+      "occurrence": 0,
+      "sha256": "4cf5f0a1c34e7c8fd6cdbd3a392963f735e0825e074d3c5682649471d2139b53",
+      "name": "org/checkerframework/checker/guieffect/qual/AlwaysSafe",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/AlwaysSafe"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/PolyUI.class",
+      "occurrence": 0,
+      "sha256": "1b024ca447c575968643f77b3ec110e76e7f495ea97313adedcad9530323d284",
+      "name": "org/checkerframework/checker/guieffect/qual/PolyUI",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/PolyUI"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/PolyUIEffect.class",
+      "occurrence": 0,
+      "sha256": "82a4ca6f82c30aad4b357b559d7fd4ff9f570f001a0b05131952a6d16b563d25",
+      "name": "org/checkerframework/checker/guieffect/qual/PolyUIEffect",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/PolyUIEffect"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/PolyUIType.class",
+      "occurrence": 0,
+      "sha256": "8a55141de91e56b874076ee7c3e78dfae38b92477c75991f25118dc64ae56eed",
+      "name": "org/checkerframework/checker/guieffect/qual/PolyUIType",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/PolyUIType"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/SafeEffect.class",
+      "occurrence": 0,
+      "sha256": "7d19220e6721f9c5a6fb0e519586300115e8beefb7fc1779f3874614917d97b5",
+      "name": "org/checkerframework/checker/guieffect/qual/SafeEffect",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/SafeEffect"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/SafeType.class",
+      "occurrence": 0,
+      "sha256": "4d5a7d6c9a5d7c75b878f94c04daa9f44a124c6bed2dd05379b5e0baa96bce10",
+      "name": "org/checkerframework/checker/guieffect/qual/SafeType",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/SafeType"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/UI.class",
+      "occurrence": 0,
+      "sha256": "d936737f9a69dbb7c382670d17b7ad7482c13a5d48fc26ace1e5bfe4806890f1",
+      "name": "org/checkerframework/checker/guieffect/qual/UI",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/UI"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/UIEffect.class",
+      "occurrence": 0,
+      "sha256": "74863be0db6b806b3d4c2d431a0ea0a3b4d879f055b5b1110860d7b9cfcef411",
+      "name": "org/checkerframework/checker/guieffect/qual/UIEffect",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/UIEffect"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/UIPackage.class",
+      "occurrence": 0,
+      "sha256": "fc98402b03665025ec6081ccb32242b1cbf7a81be31d0635516da7c006da967b",
+      "name": "org/checkerframework/checker/guieffect/qual/UIPackage",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/UIPackage"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/guieffect/qual/UIType.class",
+      "occurrence": 0,
+      "sha256": "4f5f69e77c3b755442fb061aa2dafc73be912631c121a3a8374235807a3f5c54",
+      "name": "org/checkerframework/checker/guieffect/qual/UIType",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/guieffect/qual/UIType"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18n/qual/LocalizableKey.class",
+      "occurrence": 0,
+      "sha256": "ebc1a58fed7b9a1f40070f9dd30c0d0237c2b0035a64861a26d2cc151d575965",
+      "name": "org/checkerframework/checker/i18n/qual/LocalizableKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18n/qual/LocalizableKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18n/qual/LocalizableKeyBottom.class",
+      "occurrence": 0,
+      "sha256": "ce04f848453b9a9439406b3b52f5f92871a2c01b0db9fc43c42739b8b05f7621",
+      "name": "org/checkerframework/checker/i18n/qual/LocalizableKeyBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18n/qual/LocalizableKeyBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18n/qual/Localized.class",
+      "occurrence": 0,
+      "sha256": "8fe8587aa9db7181be66ff27cc34b5ca017a6b200cce48c744931147d4f9ebd4",
+      "name": "org/checkerframework/checker/i18n/qual/Localized",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18n/qual/Localized"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18n/qual/UnknownLocalizableKey.class",
+      "occurrence": 0,
+      "sha256": "9b2dad21ed717d14d95953fb0e97dd39b1bba6fcdb99591d725e4d2a9d59ab15",
+      "name": "org/checkerframework/checker/i18n/qual/UnknownLocalizableKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18n/qual/UnknownLocalizableKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18n/qual/UnknownLocalized.class",
+      "occurrence": 0,
+      "sha256": "1da599d7848d3c0681621895fec0a6920da15b410f59c6eedcba675883ff11f9",
+      "name": "org/checkerframework/checker/i18n/qual/UnknownLocalized",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18n/qual/UnknownLocalized"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion.class",
+      "occurrence": 0,
+      "sha256": "a9065870afb26664dc1b0170a007b4c963a29191cf9a78bfd76ce11e78d44335",
+      "name": "org/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "category",
+          "descriptor": "Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;)V",
+          "access": 1,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "52f4f8e7b4ab4252812589961fed7831139bdda681f2c4d7940f46c3287a2a2c",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion",
+        "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/I18nFormatUtil$MessageFormatParser.class",
+      "occurrence": 0,
+      "sha256": "9d6b1d71d4f675aca254d2a75cece10e3bf109812898af0ad1f44d50015d68ae",
+      "name": "org/checkerframework/checker/i18nformatter/I18nFormatUtil$MessageFormatParser",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "maxOffset",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "locale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 10
+        },
+        {
+          "name": "categories",
+          "descriptor": "Ljava/util/List;",
+          "access": 10,
+          "generic_signature": "Ljava/util/List<Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;>;"
+        },
+        {
+          "name": "argumentIndices",
+          "descriptor": "Ljava/util/List;",
+          "access": 10,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "numFormat",
+          "descriptor": "I",
+          "access": 10
+        },
+        {
+          "name": "SEG_RAW",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SEG_INDEX",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SEG_TYPE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SEG_MODIFIER",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_NULL",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_NUMBER",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_DATE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_TIME",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_CHOICE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TYPE_KEYWORDS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "MODIFIER_DEFAULT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MODIFIER_CURRENCY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MODIFIER_PERCENT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MODIFIER_INTEGER",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NUMBER_MODIFIER_KEYWORDS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DATE_TIME_MODIFIER_KEYWORDS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)[Lorg/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion;",
+          "access": 9,
+          "code_sha256": "5d49362931e9a746e68322c1ed5cb1b2460a9e2d7e056c0b45e681e91f204f7a",
+          "code_length": 94
+        },
+        {
+          "name": "applyPattern",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "c8c87072a67de91218624b0723ec4abe3cd63b1113e27561a2c66bdf6b94b84d",
+          "code_length": 421
+        },
+        {
+          "name": "makeFormat",
+          "descriptor": "(I[Ljava/lang/StringBuilder;)V",
+          "access": 10,
+          "code_sha256": "04e9b75eea2f6276aab62f0d5a4f3d0fb25aabeb5ac60c537f12503bdcf96250",
+          "code_length": 504
+        },
+        {
+          "name": "findKeyword",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;)I",
+          "access": 26,
+          "code_sha256": "bf1b70fd477eece4670437fe229d027e0db90b859752fa381a648cb22f245a7e",
+          "code_length": 70
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "853707fb4e06614dbe033f63e400cdb06b17bfdfa5594cf5cf1908de07783c49",
+          "code_length": 92
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Ljava/lang/StringBuilder;",
+        "[Lorg/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion;",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/ChoiceFormat",
+        "java/text/DecimalFormat",
+        "java/text/DecimalFormatSymbols",
+        "java/text/SimpleDateFormat",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Locale$Category",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil$MessageFormatParser",
+        "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/I18nFormatUtil.class",
+      "occurrence": 0,
+      "sha256": "68b861293906b9e3368c1adfa85d0582d7f7b8c9d843c625051b2ada40f8aa33",
+      "name": "org/checkerframework/checker/i18nformatter/I18nFormatUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "tryFormatSatisfiability",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "f5850c5cd487bbb6189c726d5f0137ce70aa48081d58df6622502d31e23874ea",
+          "code_length": 10,
+          "throws": [
+            "java/util/IllegalFormatException"
+          ]
+        },
+        {
+          "name": "formatParameterCategories",
+          "descriptor": "(Ljava/lang/String;)[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "12b3896ad38bf36f5f673a3ee587ddbcee888ef93ace01900d468da4bf622f07",
+          "code_length": 183,
+          "throws": [
+            "java/util/IllegalFormatException"
+          ]
+        },
+        {
+          "name": "hasFormat",
+          "descriptor": "(Ljava/lang/String;[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;)Z",
+          "access": 137,
+          "code_sha256": "aba200766345f73d62165902b7a5955698836920acdf3b1dab27e82b22046695",
+          "code_length": 44
+        },
+        {
+          "name": "isFormat",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "38ae42ab1cdcf30695046dbccf30cbb0f0b6a5e00c8c00fcf64cda532eec9afd",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Lorg/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion;",
+        "[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/MessageFormat",
+        "java/util/HashMap",
+        "java/util/IllegalFormatException",
+        "java/util/Map",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil$I18nConversion",
+        "org/checkerframework/checker/i18nformatter/I18nFormatUtil$MessageFormatParser",
+        "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nChecksFormat.class",
+      "occurrence": 0,
+      "sha256": "512bc0b345127f88fb97df231b1a416df7e313240b177c0823ff69e650c1a499",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nChecksFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nChecksFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory.class",
+      "occurrence": 0,
+      "sha256": "10e5f4e74132403e4f5b31d06afd6f7fd2f2e09addb2ca6b75a5bb47d808f672",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNUSED",
+          "descriptor": "Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "GENERAL",
+          "descriptor": "Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "DATE",
+          "descriptor": "Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "NUMBER",
+          "descriptor": "Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 16409
+        },
+        {
+          "name": "types",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 17,
+          "generic_signature": "[Ljava/lang/Class<+Ljava/lang/Object;>;"
+        },
+        {
+          "name": "strings",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 17
+        },
+        {
+          "name": "namedCategories",
+          "descriptor": "[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 8
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I[Ljava/lang/Class;[Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "6cf457bebb48c09b573c5213b70c9edf979c3368f02657215007e283bed061a2",
+          "code_length": 18,
+          "generic_signature": "([Ljava/lang/Class<+Ljava/lang/Object;>;[Ljava/lang/String;)V"
+        },
+        {
+          "name": "stringToI18nConversionCategory",
+          "descriptor": "(Ljava/lang/String;)Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "501d5f94d5693046d39aba909c5e3616ff4a05312ab049d6399ab31bd6381215",
+          "code_length": 104
+        },
+        {
+          "name": "arrayToSet",
+          "descriptor": "([Ljava/lang/Object;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "464a7c0d8c2dd90c1eae2fca13727417aa6372dd4acedf0467560987dbb23fe5",
+          "code_length": 12,
+          "generic_signature": "<E:Ljava/lang/Object;>([TE;)Ljava/util/Set<TE;>;"
+        },
+        {
+          "name": "isSubsetOf",
+          "descriptor": "(Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;)Z",
+          "access": 9,
+          "code_sha256": "df48c526d8e3f7bf8449f88f0cba8a0260d901d70d9d40480832024434c4427c",
+          "code_length": 15
+        },
+        {
+          "name": "intersect",
+          "descriptor": "(Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;)Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "e9d6c2612c744f985ac681f1db054c2950a9b0b20b6edf6719aaceb85970b270",
+          "code_length": 138
+        },
+        {
+          "name": "union",
+          "descriptor": "(Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;)Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 9,
+          "code_sha256": "a7b4e5a9ae88ecd77c9b648fdf3c46a89bac8ead461d0bfc92ef3333670cda87",
+          "code_length": 58
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2324f3e613f2c889918e653e13df8b1d3f705114aa5752b939e18df160eb3bd9",
+          "code_length": 104
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c4954497bfb586ea55477091a10e581d426995bfb962a3f6ea7411af3e9aa03b",
+          "code_length": 158
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/String;",
+        "[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Number",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/Date",
+        "java/util/HashSet",
+        "java/util/Set",
+        "org/checkerframework/checker/i18nformatter/qual/I18nConversionCategory"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nFormat.class",
+      "occurrence": 0,
+      "sha256": "ac7ca6e3433a4240c5834a46a4bfc548a9563b56f3d31049be4e6d17723c526d",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/i18nformatter/qual/I18nConversionCategory;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nFormatBottom.class",
+      "occurrence": 0,
+      "sha256": "5eb70f2bed0937d6b5ffc7e9123eb7415cd9d14404f2fe30910f49f9b43fa715",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nFormatBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nFormatBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nFormatFor.class",
+      "occurrence": 0,
+      "sha256": "95b7e859ebd62cf448e4ea9af0165208de80f4f4c2f9683cbabefed00e6c0cbc",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nFormatFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nFormatFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nInvalidFormat.class",
+      "occurrence": 0,
+      "sha256": "596d67cb2880c21583e70b975f9ee99270eedfb602b01ac87f112646653e29cb",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nInvalidFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nInvalidFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nMakeFormat.class",
+      "occurrence": 0,
+      "sha256": "1bff4d06c92cfbcaf09eb33868b12f83c9b35577afeb8185a614be83472b268a",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nMakeFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nMakeFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nUnknownFormat.class",
+      "occurrence": 0,
+      "sha256": "8c58b21839b3be2d284d3c8c62b533ca5057fe16f95e2732b0c68e75eabe8c1a",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nUnknownFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nUnknownFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/i18nformatter/qual/I18nValidFormat.class",
+      "occurrence": 0,
+      "sha256": "15404478a87a0198d908d1aed285ca36a94614eabb0ebc0bab7901492c848636",
+      "name": "org/checkerframework/checker/i18nformatter/qual/I18nValidFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/i18nformatter/qual/I18nValidFormat"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/EnsuresLTLengthOf$List.class",
+      "occurrence": 0,
+      "sha256": "eb7639c3f3b7c1cc221dba02debce121721bfc67260a3609a5856d723c6244ae",
+      "name": "org/checkerframework/checker/index/qual/EnsuresLTLengthOf$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/index/qual/EnsuresLTLengthOf;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOf",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/EnsuresLTLengthOf.class",
+      "occurrence": 0,
+      "sha256": "9bf12672b603282bf57cd28cb3216b4206cd569c2cf074b15b72171046b2e0f7",
+      "name": "org/checkerframework/checker/index/qual/EnsuresLTLengthOf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "targetValue",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "offset",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOf",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf$List.class",
+      "occurrence": 0,
+      "sha256": "10edc69efe3306e1156c49f3f67097bcfa2678b1cdf0c7b73f9cfd0adc8ad179",
+      "name": "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/index/qual/EnsuresLTLengthOfIf;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf.class",
+      "occurrence": 0,
+      "sha256": "f8239951f05dfa49021fb039bb99dba8f856aee87f8785e779e67549d26c81ef",
+      "name": "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "expression",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "result",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "targetValue",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "offset",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf",
+        "org/checkerframework/checker/index/qual/EnsuresLTLengthOfIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/GTENegativeOne.class",
+      "occurrence": 0,
+      "sha256": "3168b8b248f02458b7cfa2bf767e4041a8d1585174b94f9c647d8b8960ff9ab9",
+      "name": "org/checkerframework/checker/index/qual/GTENegativeOne",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/GTENegativeOne"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/HasSubsequence.class",
+      "occurrence": 0,
+      "sha256": "59a722ee241b9f92143de5efe3ebce38adab7ca70b931f16dd4ee3668dd69cdd",
+      "name": "org/checkerframework/checker/index/qual/HasSubsequence",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "subsequence",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "from",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "to",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/HasSubsequence"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/IndexFor.class",
+      "occurrence": 0,
+      "sha256": "4aab716c0629dc3e6d47a299b19b8d35c1645be3e6ff1a24d4c9d3cd78b44b84",
+      "name": "org/checkerframework/checker/index/qual/IndexFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/IndexFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/IndexOrHigh.class",
+      "occurrence": 0,
+      "sha256": "4fec4b568dbac6c4793d33a7eb26199ee0c499c76738e85183bc4075b1093124",
+      "name": "org/checkerframework/checker/index/qual/IndexOrHigh",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/IndexOrHigh"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/IndexOrLow.class",
+      "occurrence": 0,
+      "sha256": "09bb966cf7b6600cc5d717f4146927830d287fa2b41ac73450c46421fba7460b",
+      "name": "org/checkerframework/checker/index/qual/IndexOrLow",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/IndexOrLow"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LTEqLengthOf.class",
+      "occurrence": 0,
+      "sha256": "80b891c562b9736d1dd2f315b25843d0271c688a230964d5be69a2abd5d091e3",
+      "name": "org/checkerframework/checker/index/qual/LTEqLengthOf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LTEqLengthOf"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LTLengthOf.class",
+      "occurrence": 0,
+      "sha256": "31166b9f5592050d3b20a74ffab6d57776aa3fa7a56f670c08c10f8bd093009b",
+      "name": "org/checkerframework/checker/index/qual/LTLengthOf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "offset",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LTLengthOf"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LTOMLengthOf.class",
+      "occurrence": 0,
+      "sha256": "d0a6eb2f8c2512153ec50246ab592a2036fd27595712c5b2ff030e9259424029",
+      "name": "org/checkerframework/checker/index/qual/LTOMLengthOf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LTOMLengthOf"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LengthOf.class",
+      "occurrence": 0,
+      "sha256": "a2e9fc9a56e3d9519307fdc7dadb57f74952e77543a2ce7025065f39cdce031e",
+      "name": "org/checkerframework/checker/index/qual/LengthOf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LengthOf"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LessThan.class",
+      "occurrence": 0,
+      "sha256": "91afa6d047f2d8e4c09045e1325905db10b0b7fb36791b438a44b8c56c26eea0",
+      "name": "org/checkerframework/checker/index/qual/LessThan",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LessThan"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LessThanBottom.class",
+      "occurrence": 0,
+      "sha256": "8675b45038495f67621cef839c443f45119307efcb50fd68ebc04597f1e95eda",
+      "name": "org/checkerframework/checker/index/qual/LessThanBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LessThanBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LessThanUnknown.class",
+      "occurrence": 0,
+      "sha256": "8a956067bf9114d995a5c0ceabbfc76d8a5cb0782021ba0418d1cd115592b69c",
+      "name": "org/checkerframework/checker/index/qual/LessThanUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LessThanUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LowerBoundBottom.class",
+      "occurrence": 0,
+      "sha256": "2aa1f20fbdf7ad62256ff995c0fde8d1d342452d53b026eaaf680026ab7cf496",
+      "name": "org/checkerframework/checker/index/qual/LowerBoundBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LowerBoundBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/LowerBoundUnknown.class",
+      "occurrence": 0,
+      "sha256": "c92fe106e17ea96eab3bdaf493302dac8092862a9b1881013b2bbb428284cab9",
+      "name": "org/checkerframework/checker/index/qual/LowerBoundUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/LowerBoundUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/NegativeIndexFor.class",
+      "occurrence": 0,
+      "sha256": "88652bac2d8e7a7be63bd1d455e0dd4dc6d36b2896f04a2504864c4e3d576c6d",
+      "name": "org/checkerframework/checker/index/qual/NegativeIndexFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/NegativeIndexFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/NonNegative.class",
+      "occurrence": 0,
+      "sha256": "c184dded39b4a132eb763f498c3c0df0dc2365b709c6fa2d9b7ede74ea8e5338",
+      "name": "org/checkerframework/checker/index/qual/NonNegative",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/NonNegative"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/PolyIndex.class",
+      "occurrence": 0,
+      "sha256": "101aaa5288c0c0dee593d5dda6028a665d0695ef6751acca74c6494273edeec1",
+      "name": "org/checkerframework/checker/index/qual/PolyIndex",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/PolyIndex"
+      ]
+    }
+  ]
+}

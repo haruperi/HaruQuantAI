@@ -1,0 +1,819 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+  "archive_sha256": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels.class",
+      "occurrence": 0,
+      "sha256": "9da86a745177e0ecc30a77d5daa6e6d7bbc5aa208ae4fa0b132b8eb2395654ba",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/Result;Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "e7fe3dfbba9e92f2880a9f92f848d261d7fd76aea091a12f7d280c180b8e7e1d",
+          "code_length": 391
+        },
+        {
+          "name": "writeStats",
+          "descriptor": "(ILcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/databank/DatabankTableView;Lcom/strategyquant/tradinglib/ResultsGroup;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "35238c28668e143877058ed529db56826e3f604d1682fe52d006159d202ddbf6",
+          "code_length": 173
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7820dd5b4a80c8d090c4bdab5db4e7987603812a54654489ae1eab8ccbefcac6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/robustnesstests/RobustnessResults",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart.class",
+      "occurrence": 0,
+      "sha256": "da06adfff72a1da918a0287cab57e4196444053c1e126229a5bec7728a9134da",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Result;Ljava/lang/String;II)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "d6245702dea2290cd7b821b3a95e31f1eb7c5f31a78f4704e3247fa35eb570f9",
+          "code_length": 183
+        },
+        {
+          "name": "createSeries",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/robustnesstests/RobustnessOrdersValues;I)Lcom/strategyquant/tradinglib/equitychart/MainChartDataset;",
+          "access": 2,
+          "code_sha256": "e326d0987b24819fb5c07d6c545b0ce58aa5b1a02b93056d61bf869b55791368",
+          "code_length": 107
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "916d848a1208cda2d8d72654a4639ce2d185442939fd28e9dd743868d3acac53",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/equitychart/EquityChartUtils",
+        "com/strategyquant/tradinglib/equitychart/MainChartDataset",
+        "com/strategyquant/tradinglib/robustnesstests/RobustnessOrdersValues",
+        "com/strategyquant/tradinglib/robustnesstests/RobustnessResults",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins.class",
+      "occurrence": 0,
+      "sha256": "59807e943212d15dfd0556d05c192870aa0d1520af2c271da89bafafc0f622ca",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Result;Ljava/lang/String;ILcom/strategyquant/tradinglib/databank/DatabankTableView;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "f3a1e4a8fac27051c4db64d4cb8d3b21f863ad570bcc53c785d37237eb661762",
+          "code_length": 150
+        },
+        {
+          "name": "writeStats",
+          "descriptor": "(IDDLcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "e31a0f3c4250a56e25488d9191f3d6961320b9a6bb3e95cfa3aa6d1b1dc5bae1",
+          "code_length": 219
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b8c35ac4784a04d1a3771ffd6b85cf6690ca02bcab196022b1708887d6e6699a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[D",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/crosscheck/MonteCarloCrossCheckMethod",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet.class",
+      "occurrence": 0,
+      "sha256": "59abb6fbb1a6ab143180d8e3159372b40e3629ee9f7f2e27644725d9e1dba901",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_ROBTESTSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rtChart",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/RTChart;",
+          "access": 2
+        },
+        {
+          "name": "confidenceLevels",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels;",
+          "access": 2
+        },
+        {
+          "name": "riskOfRuins",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins;",
+          "access": 2
+        },
+        {
+          "name": "rtViews",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews;",
+          "access": 2
+        },
+        {
+          "name": "rtRRViews",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews;",
+          "access": 2
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "1517948495577b2957393b79615caacfaf1eca0af6132d821eb10f3e42a5292a",
+          "code_length": 110
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b8682d03784da78fe95fb2c7803fe91d49112689f21ef231d36c3b1cb747d984",
+          "code_length": 272,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetMethods",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f42c2ae104b46f11f49322ff550f4db37a3f025e842dd05fed9a29de05704deb",
+          "code_length": 229,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrintChart",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "45f6c70da196831a25fc94e91a3ff8c2eee48a88f7f686d959e2f70a2b971012",
+          "code_length": 377,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrintConfLevels",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "27b164d60fb50f4bb0b5cc9b77efe6897823ce93dec12be588f792f5e23b0b6f",
+          "code_length": 639,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrintRiskOfRuinStats",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "005ecd2b765902bb6f62bfc3fafd970c54cc7311c5b8e3fdc9a99cc73fd98cbb",
+          "code_length": 365,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2ee5a888a59d8e1f38b6fd64ac820b23ce27a9373e9f9af73fc14d655c326256",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/crosscheck/MonteCarloCrossCheckMethod",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "a4c952e045b29c499de9852bcb5c252cdaaab4ff6bf528a3da9e10c8e7a8c9c4",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "38c947459c0ea3b41fe74a0d7fae9e213c1e3c3ddb22552f08da055e5cf1207f",
+          "code_length": 88,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1cc962eb2ced24e0152e05c9077a6c0037f88a39e995674981fce147d4cb0b3c",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServletPlugin",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/crosscheck/MonteCarloCrossCheckMethod",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews.class",
+      "occurrence": 0,
+      "sha256": "c19ee7be63dfb499b60f9387821f5d0b54ae7e220db77c938b80fee1e6710d40",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "manager",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager;",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "adcc5853d1abb929bd0a825047c20c1bb523f1cbba34ba28cf79cf1a6ef43ee7",
+          "code_length": 23
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5691f90efdb42cfc1746163f01b000a99627464b9adca5f35d7f5c945f3467d0",
+          "code_length": 232,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetColumns",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c92590d7957ee8e544f8d83afe750f7ae3481402d0807d11b57f28ed34d148aa",
+          "code_length": 130
+        },
+        {
+          "name": "onGetViews",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0e4b733cbde3a29d614c23e234b4119dd8e794f809e789bae4880d2b16634a11",
+          "code_length": 322,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAddView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f3423aa45b81488ddd1e22616d6231ee57d89aa8d4aa5b736382b291c4149988",
+          "code_length": 69,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2e820d5d6a0ece094053aac312244abee73545dc3cf26a01213dd26b46493f53",
+          "code_length": 70,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "86a0dbcc44d83c8d47a234f7ac25302a9cb364f8a2f7ee54aa3724582391314e",
+          "code_length": 72,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "tryGetParam",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "9a534952f84bea6a06b9bfdc5614ce030c869378d12f6ae3e945c54216634cc9",
+          "code_length": 42,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)[Ljava/lang/String;"
+        },
+        {
+          "name": "getViewByName",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "09a9549b455eccff6509c6dd178661a09b616381151d4141c19a4662389756e5",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "91395f8cde7f119ef370e73963e29d1671ec64e344302cd632e991115d81f7b3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager.class",
+      "occurrence": 0,
+      "sha256": "f5ec50799d8f596ba8e196088e58b484fb30140ab87bd6f0528a52f0fcf5a875",
+      "name": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "views",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "viewsFolder",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "fileExtension",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b92e1829907ea6f2debd5e79b063c7482910efe4971a5967e454592423fe779b",
+          "code_length": 36
+        },
+        {
+          "name": "loadViews",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3b52e07da8d8342a6f3a08cac1b2f8fca16f9c89817dc23a8e7dadf2c4b047b6",
+          "code_length": 136
+        },
+        {
+          "name": "getViews",
+          "descriptor": "()Ljava/util/HashMap;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "getView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "c3fd1c6593f66191bae69b53c2b0436e101ea2997b343af9c9b1d46e3e3c3d53",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "addView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c64c862c74abd8a17620a03ca4bfe73554bf88929766ce8ceb1377e1b7f85123",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_addView",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 2,
+          "code_sha256": "cf68d18ed34c03896b079ad6605635e9e725aa85684d0ff6df2148bf3977641d",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "f8230c4be9186ecb7412dbf48f3f9e0f2a16004075f9d9cf7d09448fdfaf8d90",
+          "code_length": 177,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "removeView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d643586e4cf147e5f33316601dbde6a7622da116dfd0e5e8fdad9100f8cb1532",
+          "code_length": 111,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createDefaultView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "cef8d6dc201351df6528cedfac5d6b4f19dd2c3042280b8c912f441367ebacc4",
+          "code_length": 155
+        },
+        {
+          "name": "getTableView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 2,
+          "code_sha256": "318202daddc5f83a7505d00962676725d7a389cc5a03d0851a92a0ef586c2611",
+          "code_length": 23,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getViewFilePath",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6f155e548ac1504109e612a986226c5da420ff96c40e7d4ed61f93f59dd27529",
+          "code_length": 37
+        },
+        {
+          "name": "getSelectedView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "34eb4eb03e84b37b48fad90696d74e3959602b98d2262e1780e5bb03d80ec609",
+          "code_length": 53
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a36c817c632567770036d7781bedb43be690e69715c0033c0e07f3022a6f91bd",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultTypes",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/io/File",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

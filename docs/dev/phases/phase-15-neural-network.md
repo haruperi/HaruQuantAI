@@ -1,8 +1,7 @@
 # P15 — Neural Network Trainer and model resource lifecycle
 
-- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; SHA-256 `9abec0aa2faf6bd78b39e80c2dcfb7dfcae62ae412d9b56a77904de6a7b5a54c`.
+- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; current-only source inventory `docs/dev/evidence/p00-inventory.json`.
 - **Dependencies:** P03,P05,P06,P08,P14.
-- **Scope:** 2 JAR feature tasks, 0 resource tasks, one phase integration task.
 - **State:** proposed checklists; all execution, registrations and target contracts require task-level approval.
 - **File labels:** existing paths are Modify; absent paths are Create; later shared edits name their earlier proposed owner.
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
@@ -10,6 +9,11 @@
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 - **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
 - **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
+
+
+
+- **Donor baseline:** SQX145 Dev 1 only; all source fingerprints and member seeds use `SQX_145_REFERENCE_ROOT`. Missing bodies remain prerequisites.
+- **Scope:** 3 tasks; current archive allocations and resource/integration tasks only.
 
 # 15.1 FEAT-NEURAL-APP-NEURAL-NETWORK - AppNeuralNetwork.jar
 
@@ -20,15 +24,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar`; 1 class declarations; SHA-256 `f20b8d1412bed668ef1b39a3cf1fc5e418b20ee433c65bc021f6afd0a7a2169e`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md`; roadmap allocation `FEAT-NEURAL-APP-NEURAL-NETWORK`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar`; 1 raw class entries; SHA-256 `a9b596747d3b2f47afb2c9a949331708a6c9edf3930316dba1adfab76ffc9256`.
+- **Inspected reference:** [AppNeuralNetwork.md](../../sqx/NeuralNetworkTrainer/AppNeuralNetwork.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar" com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/NeuralNetwork/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Workspace/product registration and backend composition; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar" com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork`; `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork`; `SQX_145_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
 - **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -64,14 +68,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Implement the named neural training/model resource capability; verify feature scaling, seed/split policy, model version and finite inference.
-- [ ] **Step 4:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-CONTRACT` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-GET-PREFERRED-POSITION` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin.getPreferredPosition`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-INIT-PLUGIN` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin.initPlugin`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-CONTRACT` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-GET-NAME` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin.getName()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-NEURAL-APP-NEURAL-NETWORK-NEURAL-NETWORK-APP-PLUGIN-GET-PRODUCT` → `com.strategyquant.plugin.App.impl.NeuralNetwork.NeuralNetworkAppPlugin.getProduct()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -79,6 +85,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-neural-app-neural-network.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-neural-network-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Neural Network for FEAT-NEURAL-APP-NEURAL-NETWORK; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 15.2 FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER - TaskNeuralNetworkTrainer.jar
 
@@ -89,15 +96,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar`; 1 class declarations; SHA-256 `86b5b1a68f20fc9cf2025ce903bfc09f69a7b49b647af061387efd9bc743ae64`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md`; roadmap allocation `FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar`; 1 raw class entries; SHA-256 `ae6ec1406158b23fc416b4e4d3d8e053ae128894aa4ac0c25cb12067920569e5`.
+- **Inspected reference:** [TaskNeuralNetworkTrainer.md](../../sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar" com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/NeuralNetwork/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Neural training task; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar" com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`; `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`. Inspect `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`; `SQX_145_REFERENCE_ROOT/internal/web/NEURALNETWORK`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
 - **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -131,14 +138,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Implement the named neural training/model resource capability; verify feature scaling, seed/split policy, model version and finite inference.
-- [ ] **Step 4:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-CONTRACT` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-GET-TYPE` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask.getType`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-CLONE` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask.clone`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-CONTRACT` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-GET-TYPE` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask.getType()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-NEURAL-TASK-NEURAL-NETWORK-TRAINER-NEURAL-NETWORK-TRAINER-TASK-GET-NAME` → `com.strategyquant.plugin.Task.impl.NeuralNetworkTrainer.NeuralNetworkTrainerTask.getName()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -146,6 +155,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-neural-task-neural-network-trainer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-neural-network-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Neural Network for FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 15.3 P15 integration — Train, persist and consume qualified neural model resources
 
@@ -163,7 +173,7 @@
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_145_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
 - **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 

@@ -1,30 +1,57 @@
 {
-  "referenceRoot": "C:/SQX-145/internal/web/SQAI",
+  "referenceRoot": "SQX_145_REFERENCE_ROOT/internal/web/SQAI",
   "deliveryCohort": "native-ui-only",
   "referenceExecuted": false,
   "sources": [
     {
       "path": "chat/assets/index-DbWeULv9.js",
       "sha256": "cb29e935f851919fd5d6285653d55cce6ce67f447b2f492c87314cf133497ae3",
-      "role": "Compiled component structures and labels"
+      "role": "Compiled component structures and labels",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "path": "chat/assets/index-BfdqFDsP.css",
       "sha256": "9a1abe6d2ae3be4204c4c26482eb31feccdcd9f296f370eea4ddb9caa6ff7cc8",
-      "role": "Header and starter styling evidence"
+      "role": "Header and starter styling evidence",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "path": "features/sqx/en.json",
       "sha256": "52f621f98bbaa6a644bc3c0cded96e77748bd3cb4d1972b1e0b6f9a0acdd44f6",
-      "role": "All eight capability entries and starters; product branding adapted"
+      "role": "All eight capability entries and starters; product branding adapted",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "path": "workspace-panel.js",
-      "role": "Brain presentation and unavailable endpoint boundaries"
+      "role": "Brain presentation and unavailable endpoint boundaries",
+      "sha256": "198ee217481a066ae659f3bb45b68aea3fc0888432c3d56bcfbc867c2f2ea849",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "path": "ai-guide.html",
-      "role": "User flows; catalog overrides stale six-tile count"
+      "role": "User flows; catalog overrides stale six-tile count",
+      "sha256": "161389dd85de7c5ef5ab77077dc0ca1e37dadd8c5d3dd60958cc77fa5eeb4b09",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "unavailableServices": [
@@ -40,6 +67,10 @@
   "limitations": [
     "No donor runtime visual comparison",
     "No AI backend parity",
-    "No cross-workspace docking"
-  ]
+    "No cross-workspace docking",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

@@ -1,0 +1,358 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+  "archive_sha256": "0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoPlugin.class",
+      "occurrence": 0,
+      "sha256": "49537639ca9492b63aa3caf47fd8ef0bc39483772332013287aef91d47e30eff",
+      "name": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoPlugin",
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1.class",
+      "occurrence": 0,
+      "sha256": "91ff2d75570d49f5ade422ea3d83b581ec8a10f5160be759d414308bc61de760",
+      "name": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet",
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet.class",
+      "occurrence": 0,
+      "sha256": "c3b8314c8dcaefa1d19d2b79862eff45b12b6145765dc7dfc46968797e456a4c",
+      "name": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DOWNLOAD_JOB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c17eb3a1b765a40676931f1223b78873d94e2f81399b4ef88ba7c7f47ca9f1de",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "d2b2d2dd406807cb2526e7a624d3edcf3ab622a92ca78ff9364ea3062d54ada7",
+          "code_length": 338,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetExchanges",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "65b3a307b8232f2b3d27ebb8d2b660d5c7695547431ae37be72c111fd8c04487",
+          "code_length": 124,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetSymbols",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c23aaf838f072bd5394fd5a7677438145a426f9a38057d992555e8e8d291e360",
+          "code_length": 103,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "94d6334bd2d41f590136123c18671b51500dd39cfb22c6a38ae11dce41ee65b3",
+          "code_length": 74,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAddCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4eef5f3bde4a97f3172e37dd7a94adc6f946e3a3d19c104d9d6a650adaeabe45",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_onAdd",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "89c43990b471809a2ed151e69a58a161b93fac1347adb48b5c69b5d029c816a1",
+          "code_length": 908,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "addData",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/exchange/IExchange;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b655e527c8edc30be3bda8e8781d23182cc95398cdbcc20ae04aba2b7d0ba109",
+          "code_length": 231,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d4af6d065a08b84f0b226e05a05d0b8310774a9aa8ebb8b8506ac4fcda6cf949",
+          "code_length": 560,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getJobId",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "869cdf0afda10626c088a3ae31d7a2268ad3a32229cae35574a56c216b3bfcd1",
+          "code_length": 21
+        },
+        {
+          "name": "onUpdateAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0bb7a082ba4217bfb538aa99a0473f8d3732630f761f49edbb3b6ecdec524660",
+          "code_length": 347
+        },
+        {
+          "name": "onUpdateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f2ba85f4600909a3e250d3682d90903fc67a3982717c2caac47b17499c91c88e",
+          "code_length": 551,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportDataAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "053b0ced47f19707f447457e8c9432bab81e9523b1667f8907fe00dc8083403e",
+          "code_length": 238,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4ee1a746f48ef3d9e7d4ca73fbe0b8538b04c8fe4cb4acfbd005ac52ff9ef8e9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet",
+        "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/exchange/IExchange",
+        "com/strategyquant/tradinglib/exchange/SymbolInfo",
+        "com/strategyquant/tradinglib/project/console/CLILogger",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

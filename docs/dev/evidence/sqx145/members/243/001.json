@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar",
+  "archive_sha256": "29fab77fa8681e74516379fd4083aa8af33e7cd960cea5c0143614645daf788f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript.class",
+      "occurrence": 0,
+      "sha256": "6f511d87eceb296c28c3a6d151f53dcd22835d15305ff46a2ebf986f8dc00b88",
+      "name": "com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "e0691939f9832b114be893108fb0db74924070c854b59228dee5130042275045",
+          "code_length": 263
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8efa6619ee6908d09912871c08eadc3d1f4b0280c9dc92e445268b0968c13170",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fb5a644f892781c2729db73ae25b67ac0dbed034589e439344d5f4750db3a13d",
+          "code_length": 6
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/jdom2/Element"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,713 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckRetestOnAdditionalMarkets/CrossCheckRetestOnAdditionalMarkets.jar",
+  "archive_sha256": "d351ae03bb2e4c695dcb4a3abb3ca223a8777ae850deb2572c8eb30934d4ddaa",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1.class",
+      "occurrence": 0,
+      "sha256": "6eedd81f5d75ec19274d5c00635a545274ee9dbe987bc3ff1a31008377d12eaa",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/backtestrunner/IBacktestProgressListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "setProgress",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "cc1d4611b596cf3c9861785b9f61d1e68b91bddd8965e98ea13a5abd3250bc15",
+          "code_length": 9
+        },
+        {
+          "name": "increaseProgressStep",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1",
+        "com/strategyquant/tradinglib/backtestrunner/IBacktestProgressListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal.class",
+      "occurrence": 0,
+      "sha256": "af9442732f23ac14072775e96a61044b1313f3640ed7f70fabe21d80e3027908",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "use",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "statsValueName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "weight",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "target",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "valueType",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;)V",
+          "access": 2,
+          "code_sha256": "fd47d0c7fba732c2ad89a9316fa1a76155de77ef7d9b6947b584e38dcb19e3fc",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets.class",
+      "occurrence": 0,
+      "sha256": "e7a2e950a115ad635adbb2072582b8f769ea38adffb5e3cea92b1d4a57e43612",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/crosscheck/CrossCheckMethod",
+      "interfaces": [
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "SETTING_SLIPPAGES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SETTING_MIN_DISTANCES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SETTING_COMMISSIONS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SETTING_SWAPS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SETTING_USE_MAIN_TEST_DATE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ConditionsCheckAdditionalMarkets",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ConditionsMinConds",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ConditionsMinMarkets",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "databankColumnName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "weightedGoals",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a39d387999fd1143dc4a34503fbb1848c37cae9bd0689bb74d796c788d10e1c3",
+          "code_length": 21
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;",
+          "access": 1,
+          "code_sha256": "89f5631a13e7297dc6f5d315b867a779ddb7fc5d69c37fd672fa2693e0b3d4e6",
+          "code_length": 29
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9e77a3544a6ee87efb972b6a402a68c67a65cf3d0f79476f9651c8afc47293c1",
+          "code_length": 4
+        },
+        {
+          "name": "getShortName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "61d669cfab645999c27cf3e21346c0d13156a0a289d5e18a49ed9ba1f67b167f",
+          "code_length": 10
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "99a1e0f62537730bb63ab2d32d8e24de8cf02cd055239c63b507fca99d7901c4",
+          "code_length": 6
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "6ebcc9373e863e9c4e3eb33f9fe52323376487e856c4b7d07a381faab78aa024",
+          "code_length": 56
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e4e45ba54ea28271dd83ab61717fea13fa62a2cde49c819e1072a35c85777c59",
+          "code_length": 3
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "52ee1451bfb3e22506b01369b82951b417d76de8cc59e4b53987604134479a39",
+          "code_length": 4
+        },
+        {
+          "name": "getNumberOfSimulations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "65db93ba816072a6df7a74bacfea149509cc8b51c7049d84747d66b437ced83c",
+          "code_length": 24
+        },
+        {
+          "name": "doesRetest",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "doesForEverySetup",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "86fef43ce6d4e64b80c221253b65aba50363e36aab2429421e5b1681cd228d09",
+          "code_length": 210
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "bb739d1517b5ccf0eb7f93ad1abd7ceb2be7f4d422c5fc9cd46536f81fba6937",
+          "code_length": 271,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runTest",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;IDLcom/strategyquant/gridlib/client/GridJob;ZLcom/strategyquant/tradinglib/project/ILastEventListener;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "e52cf7de27611e03f8d40e7e8ffa1326b6a0c487af469fef1cc8a8690d611930",
+          "code_length": 593,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "testWithThisSetup",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/ChartSetup;Ljava/lang/String;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2,
+          "code_sha256": "af5fc1ae1b868bd6664757628f938db5f357c5424f8d4cd91d2658c4309fcb47",
+          "code_length": 154,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "applyAdditionalChart",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;Lcom/strategyquant/tradinglib/ChartSetup;Ljava/lang/String;)Lcom/strategyquant/tradinglib/ChartSetup;",
+          "access": 2,
+          "code_sha256": "a4ee641751d0e9b10baaa719fcefdec2cf6e450b9ebedc7cbf29ac6f781ddbdf",
+          "code_length": 311,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkHistoryFrom",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;J)J",
+          "access": 2,
+          "code_sha256": "fa4a256b10da88ddd0c5cf77dc6049c6f93e79180cda4bba292d7cebd318c6e1",
+          "code_length": 25
+        },
+        {
+          "name": "checkHistoryTo",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;J)J",
+          "access": 2,
+          "code_sha256": "fed16f561a0d58ab049e3e8685cd56a51d148e1f50bb8f4498e8be65799b1889",
+          "code_length": 25
+        },
+        {
+          "name": "checkConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;I)Z",
+          "access": 4,
+          "code_sha256": "791c7e3790dbbf6e84cf5205930443a16ac80ae616939d466641382fd0869ee4",
+          "code_length": 32
+        },
+        {
+          "name": "checkAdditionalMarketConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;I)Z",
+          "access": 4,
+          "code_sha256": "fa765c18ff2fdc8ad8abad995ed914cbefbba7eb30e9dd4e58f37aa27370e3d3",
+          "code_length": 653
+        },
+        {
+          "name": "getStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)D",
+          "access": 129,
+          "code_sha256": "68885984ce9703c61818050273657e985c72aa248b0a7a5ca1f2f2efa4e5d4b4",
+          "code_length": 120,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getMarketIndex",
+          "descriptor": "(Lorg/jdom2/Element;[Ljava/lang/Object;)I",
+          "access": 130,
+          "code_sha256": "f9438bc70fefd7ec4d842e93b8ad5da6d2e9650d47a6c7960e0c2b6309c2f9f1",
+          "code_length": 70
+        },
+        {
+          "name": "hasStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Z",
+          "access": 129,
+          "code_sha256": "6c7eedf40ab465f671a6d8f69f9f522a3aa4413c43903cb11b2de107d6d3f8cf",
+          "code_length": 122,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printSpecialValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "01d86a501d53feffb2723b7976ebe260b084be0d5508faa501282a81bc63a5d3",
+          "code_length": 120,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getColumnTitle",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "ab049785fd70e94551863a2b3d2b51d42c2ae8abbd171cdfd66e967611100f45",
+          "code_length": 244
+        },
+        {
+          "name": "getColumnTitleTemplate",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e8dd9d48f8c13e83de81d6a5955843a8e4ea911440cc86bda05e509967e39a3c",
+          "code_length": 30
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BB)D",
+          "access": 1,
+          "code_sha256": "b6409caed86960ef3a971b58dff931c6e7a8fc68b766bc943feee23379feb04d",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBZ)D",
+          "access": 1,
+          "code_sha256": "816ed9ab5014f6ad52e72ec14dfd1131941373fdf91a222d60e9b7c72e5725a5",
+          "code_length": 35,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;DB)D",
+          "access": 2,
+          "code_sha256": "dd9d7d61e98388a8e427496382e51e8d0eee9916c38f177f17c8aab43e42a7b0",
+          "code_length": 64,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeWeightedFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BB)D",
+          "access": 2,
+          "code_sha256": "1c041f3caeed8aa6271740986f6a29c73f752628c8983b815056e5a9ca0bbf4d",
+          "code_length": 157,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d2849753c2cf0f93de3ccdad79f271ebfd004db0ded8702969991ee973dbc5ec",
+          "code_length": 5
+        },
+        {
+          "name": "getFitnessName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3d163c281be8242a217ba400f8e99d5bbdfd826723f42d622c637cc2ab87adc0",
+          "code_length": 4
+        },
+        {
+          "name": "initFitnessFromXml",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "fc599f401cba411ae1f0b639387f4d4b6b8ca05748f30fc52abf7b8a4f9452b4",
+          "code_length": 181
+        },
+        {
+          "name": "getFitnessType",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "bf3faf25f2b20ccdefc3849997f051c4fa10f92b1c5322a51db4f3de3e705e22",
+          "code_length": 32,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessDatabankColumnName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "getUsedStatValues",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "11ea30991de45158376de394d841a508a119f256f496dcf36195e4ef737d4368",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/DatabankColumn;>;"
+        },
+        {
+          "name": "getChartSetups",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;)Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 1,
+          "code_sha256": "a074ef703c3f7b294a81f96f75287c4e1f3a22e165ed587104fe79a34de9c79d",
+          "code_length": 52
+        },
+        {
+          "name": "doesCreateSubjobs",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "printSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "eea1b9efa3c198dab5eb4b9c4f129c355e64e4ed900ff9868bacc01027038526",
+          "code_length": 948,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printWeightedGoals",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getMetricsForFitness",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/optimization/MetricForFitness;>;"
+        },
+        {
+          "name": "getMetricValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getBadStrategyReason",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "db90791a4cf924f6b95be5bd4a9fb03918bfe0f3ee0b1e97c33525d409f6364c",
+          "code_length": 4
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/fitnessfunction/IFitnessFunction;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "c72e196c8a07c60a5c6e561f576309e2e319ed0d32707fcfbed07accb4f13198",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets;I)V",
+          "access": 4104,
+          "code_sha256": "f9821433d5ef7143292473b9c97b4bf4777501a0538108c12f53c46183e649c1",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[I",
+        "[Ljava/lang/Object;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataException",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal",
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/SwapMethod",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/conditions/ConditionsChecker",
+        "com/strategyquant/tradinglib/conditions/IConditionValue",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckDataNotExistException",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckMethod",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckTypes",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/engine/AbstractBacktestEngine",
+        "com/strategyquant/tradinglib/engine/BacktestEngine",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/engine/stockpicker/StockpickerBacktestEngine",
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/project/StopPauseEngine",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/simulator/impl/TraderSimulators",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet.class",
+      "occurrence": 0,
+      "sha256": "b2e5b4ad8e0f5e2da3a49af9cbbcdf88e45381a8bb1b384abd1a65b238e2bfc6",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "10e48550fd6f056c5cbb0b686d3daa4ec198e35f4688f4a3e36e4909a80cdb24",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6c58cf85b1a0be19ea813d9e315003d266b4a9822c2cd91b2f6ff803d0ebfaad",
+          "code_length": 4,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0a86f3fdbe07098bd74cb7c6c7b5333d6510a3d88f124fe5bf2f77ae0f4a8325",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet",
+        "com/strategyquant/tradinglib/fitnessfunction/FitnessOptions",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

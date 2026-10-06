@@ -1,0 +1,423 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "j64/lib/jrt-fs.jar",
+  "sha256": "085f7db20ffb6e9f836fc7ffddc85be80ab36adb5eb1debe728913562416a342",
+  "class_count": 57,
+  "unique_class_entries": 57,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "jdk/internal/jimage/BasicImageReader$1.class": "1aefb9bbb5457fc76112625c9d6cd170e38acbc24a89e1c3ca2687e142691e29",
+    "jdk/internal/jimage/BasicImageReader$2.class": "b9c6b34549f9c502607d6cdf9078e0721ed41deb146aec4ee0d04cbc659f9048",
+    "jdk/internal/jimage/BasicImageReader.class": "05e53cd7c95213c31d08f3fde18e69ca2ac38f50a562550450ec1c818f001b5a",
+    "jdk/internal/jimage/ImageBufferCache$1.class": "2e8574a13236f2c455c003ed0ee29a9d68408ab2577077f1d0bad20dd391bc1d",
+    "jdk/internal/jimage/ImageBufferCache$2.class": "a79cf24da21fe93835d484176b2d0d19c78accca93c3a62a20840edeb16e8374",
+    "jdk/internal/jimage/ImageBufferCache.class": "1a43abd380a44779e120b38b4840679f04cbac30ed66bd45c4e605c0858f95d9",
+    "jdk/internal/jimage/ImageHeader.class": "6920172d9bfde5d8579a4a5d1bf59f07dad961d78f7ab2d18d3afbec30e1e8f0",
+    "jdk/internal/jimage/ImageLocation.class": "25e9d7704b722e95f69721b6d1c896f37295fbe822dcbb3e773d7b5bfa4db18b",
+    "jdk/internal/jimage/ImageReader$1.class": "add085edfb225d29f25e8546da3a52002b1cdc4e42032f2f59da17d9ca7eb946",
+    "jdk/internal/jimage/ImageReader$Directory.class": "84b518f976066b937dc0d5b9af9f9d2a1533cece6fb6e55b56c9face7598761e",
+    "jdk/internal/jimage/ImageReader$LinkNode.class": "a987db60e958479704e0d7fb28367793852d78bc0485dfc9246b5cf9deba3ece",
+    "jdk/internal/jimage/ImageReader$Node.class": "3d3d6fc65da1bfe43702576a903a0464ab1d51ab2236974a7c9239b1259b7bed",
+    "jdk/internal/jimage/ImageReader$Resource.class": "f3804e7d1bccc13cf890d2462c269302aaae111525291957b48845471f8e413c",
+    "jdk/internal/jimage/ImageReader$SharedImageReader$LocationVisitor.class": "1894cb8ca80d0f1f47664f27926904be9336b917a761c33aba6d0b89c636da59",
+    "jdk/internal/jimage/ImageReader$SharedImageReader.class": "a5322c669eb5efd7044ad78a95451bb82d43112e1c30f02a5098aeef2d8c45ea",
+    "jdk/internal/jimage/ImageReader.class": "5af6ecd9d57ab5a0143ae5242759e6afd275a9774f62a99bbe982bfdfb12439d",
+    "jdk/internal/jimage/ImageReaderFactory$1.class": "34aa6b3776df720d03140fdc84aeb820aa9555344fa443509a59b3878e7a0dc0",
+    "jdk/internal/jimage/ImageReaderFactory.class": "57f1659b1c91f0e35fc9b40bde3e1f22b6d3230043c5daaa2fedccbc63e15dde",
+    "jdk/internal/jimage/ImageStream.class": "faf620f2475593b5b4bdd2e99e0239e7618b204e30999ad175b1143e5e928286",
+    "jdk/internal/jimage/ImageStrings.class": "6fdf96f15984a7e3e5280f14f4b06b3d2856d6db73603232d0b22dfaa5bb108b",
+    "jdk/internal/jimage/ImageStringsReader.class": "b7ab8b1c2db668e43b6c24cf4fc5ed6481e036069bbb904cbf00f6195d106555",
+    "jdk/internal/jimage/NativeImageBuffer$1.class": "db8a9d7a84d2d4f784f6513bbc72cf2b84cfe27bfb58578f068b17a9a10a5e6c",
+    "jdk/internal/jimage/NativeImageBuffer.class": "dbd71ebc2f1d6b1726993398be23f0ca21008fc3bb57d7873d0deb4308bfcd94",
+    "jdk/internal/jimage/decompressor/CompressIndexes.class": "bfee428feb16d8a9a31941906e483a252b6ee7deec3417b30601b8912f29935c",
+    "jdk/internal/jimage/decompressor/CompressedResourceHeader.class": "54494b420212b017eb81bf7da4172f6c22abc099db35bc9796ac6743e5c50bf2",
+    "jdk/internal/jimage/decompressor/Decompressor.class": "62a2b577cfca0044f70bbc66c2f0db9e614809d468343332b4ff23703ace2a1a",
+    "jdk/internal/jimage/decompressor/ResourceDecompressor$StringsProvider.class": "8c518f1dc348881216b00dc35a55e808b990a707e50eba4c896045bc95284a77",
+    "jdk/internal/jimage/decompressor/ResourceDecompressor.class": "350e4f04ce5fc94ef9316a33ddd9f707d0923da9b64bbd252feec3ac92831fdd",
+    "jdk/internal/jimage/decompressor/ResourceDecompressorFactory.class": "685daa98422b334b7ebaa2205344a075edd629e201c9e89b067fa9d5b02f6b5c",
+    "jdk/internal/jimage/decompressor/ResourceDecompressorRepository.class": "6d00a10fdf6767be57a436d786aa56fb5bcf7bf5e66c2a356decfa49b5d8a383",
+    "jdk/internal/jimage/decompressor/SignatureParser$1.class": "3a434392689ae6d5cb03fc9985de607ae85116cb6f31caf6d81124176621507a",
+    "jdk/internal/jimage/decompressor/SignatureParser$ParseResult.class": "ee2ce698dfd8a85896282ef5a5cdce228415c81d3ffdce337c897939b29595e0",
+    "jdk/internal/jimage/decompressor/SignatureParser.class": "e7cbaa614c0722c311221526c77b94986e8b7a5cd66eee616686ffd35e004a41",
+    "jdk/internal/jimage/decompressor/StringSharingDecompressor.class": "d7a30b8fded16bd67260224a194fa5eb3a4e3aa839501e49529efeeb3ff8e7e0",
+    "jdk/internal/jimage/decompressor/StringSharingDecompressorFactory.class": "91425b458e4450605f114a7475786db7e9418ac8805e9328005d7fe162cc7d3e",
+    "jdk/internal/jimage/decompressor/ZipDecompressor.class": "6396b5b5ce25de3af50cac8a14e5deee38fd84c169fe9d25a4e5bfe11308e7ba",
+    "jdk/internal/jimage/decompressor/ZipDecompressorFactory.class": "1056b639f5fb0e3e8f7d32032bf10ec3f211b2974ac6b132aa06e5fca357e3df",
+    "jdk/internal/jrtfs/ExplodedImage$PathNode.class": "e2bc18d469f550dde8701a4e22798d7d629f4bcf1868d1454b7440c16687376a",
+    "jdk/internal/jrtfs/ExplodedImage.class": "2658b2ad3deb4b5d3e6788b77797c006bf8c2382924adc21e85dad4d7c3ac8a4",
+    "jdk/internal/jrtfs/JrtDirectoryStream$1.class": "46c687339e5b421d4daa951ea40fd485a46cf460c014c2b7a0f5fcae84e7c4ce",
+    "jdk/internal/jrtfs/JrtDirectoryStream.class": "fe655311a30b794e4639326d6819766d2b074f65b0cd06148503f4e2a404ead9",
+    "jdk/internal/jrtfs/JrtFileAttributeView$AttrID.class": "751022e58f1d34333339604d275f57a2381bbdc953f9a37934cc44f1a12b1553",
+    "jdk/internal/jrtfs/JrtFileAttributeView.class": "5ac971519846f7da5a55140ab87411fc6fb98d89e70833dd3478ab0cf9809d95",
+    "jdk/internal/jrtfs/JrtFileAttributes.class": "c6af504c8608da778f89f4b53d0948162b065c00789dcfad9976496acf6a3b2d",
+    "jdk/internal/jrtfs/JrtFileStore.class": "72d0e536e13cb401b86305446fe8d5391b7ed14a6bf422ccf3f44da69f35a95a",
+    "jdk/internal/jrtfs/JrtFileSystem$1.class": "412434132c65a856302db8622f09a3662db43624c1da606018168d1b06c5d63b",
+    "jdk/internal/jrtfs/JrtFileSystem.class": "2cb1ae6593d652c66a0c7e08108d66aaf73adfe0c1595de31191e32c08f6740e",
+    "jdk/internal/jrtfs/JrtFileSystemProvider$1.class": "3c6bfa9174b2a763a22a2c18cceb6432c2d7b00839db89b8802d5244e63eb5bc",
+    "jdk/internal/jrtfs/JrtFileSystemProvider$JrtFsLoader.class": "01362538a71179f9a0e0acbf167b28dd17d8dbefd0e109004a9dac99bab8865c",
+    "jdk/internal/jrtfs/JrtFileSystemProvider.class": "6e91de56a9f0254674687f9fbe6fbdea3deb985af9dd84881bf6f486dac05cac",
+    "jdk/internal/jrtfs/JrtPath$1.class": "001d595404705dfc745e148725ab951efc6b0229bc0106209213422c03a3882d",
+    "jdk/internal/jrtfs/JrtPath$2.class": "808b190afd846b33f8b793370381ce53ad658aa2ad232aafb1f4f5cc9ea2891e",
+    "jdk/internal/jrtfs/JrtPath.class": "21576d7f93f00269ea888d3000919a3d1148e74a7677f6637b0b48bda2c88612",
+    "jdk/internal/jrtfs/JrtUtils.class": "988e164a0967c2fdcc3ffeec60d838f4f9ddc69645a7338b3e25823973500d3b",
+    "jdk/internal/jrtfs/SystemImage$1.class": "8e183dd7ce7a884b463e633c373fb24e7ad1131e3f2f63ace2c86fe97eef5d99",
+    "jdk/internal/jrtfs/SystemImage$2.class": "87940c51e6e50972f78c976206503e5f2ed31db13a1dca17b8b29b739bb6b9ac",
+    "jdk/internal/jrtfs/SystemImage.class": "52cc1ba2443bacbd206b35fc835896bbb88945a4054671811e29cbe1b0e9758b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "9b8c9e900237d0e8dbe984cbfe45c158d477c3d773ec57be065863ecd013ff57",
+    "META-INF/services/java.nio.file.spi.FileSystemProvider": "57bc8681c5525ff907f0ca6bd59fa20e5ed31c36d96bcac299136b54002acb5e"
+  },
+  "class_occurrences": [
+    {
+      "entry": "jdk/internal/jimage/BasicImageReader$1.class",
+      "occurrence": 0,
+      "sha256": "1aefb9bbb5457fc76112625c9d6cd170e38acbc24a89e1c3ca2687e142691e29",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/BasicImageReader$2.class",
+      "occurrence": 0,
+      "sha256": "b9c6b34549f9c502607d6cdf9078e0721ed41deb146aec4ee0d04cbc659f9048",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/BasicImageReader.class",
+      "occurrence": 0,
+      "sha256": "05e53cd7c95213c31d08f3fde18e69ca2ac38f50a562550450ec1c818f001b5a",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageBufferCache$1.class",
+      "occurrence": 0,
+      "sha256": "2e8574a13236f2c455c003ed0ee29a9d68408ab2577077f1d0bad20dd391bc1d",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageBufferCache$2.class",
+      "occurrence": 0,
+      "sha256": "a79cf24da21fe93835d484176b2d0d19c78accca93c3a62a20840edeb16e8374",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageBufferCache.class",
+      "occurrence": 0,
+      "sha256": "1a43abd380a44779e120b38b4840679f04cbac30ed66bd45c4e605c0858f95d9",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageHeader.class",
+      "occurrence": 0,
+      "sha256": "6920172d9bfde5d8579a4a5d1bf59f07dad961d78f7ab2d18d3afbec30e1e8f0",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageLocation.class",
+      "occurrence": 0,
+      "sha256": "25e9d7704b722e95f69721b6d1c896f37295fbe822dcbb3e773d7b5bfa4db18b",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$1.class",
+      "occurrence": 0,
+      "sha256": "add085edfb225d29f25e8546da3a52002b1cdc4e42032f2f59da17d9ca7eb946",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$Directory.class",
+      "occurrence": 0,
+      "sha256": "84b518f976066b937dc0d5b9af9f9d2a1533cece6fb6e55b56c9face7598761e",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$LinkNode.class",
+      "occurrence": 0,
+      "sha256": "a987db60e958479704e0d7fb28367793852d78bc0485dfc9246b5cf9deba3ece",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$Node.class",
+      "occurrence": 0,
+      "sha256": "3d3d6fc65da1bfe43702576a903a0464ab1d51ab2236974a7c9239b1259b7bed",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$Resource.class",
+      "occurrence": 0,
+      "sha256": "f3804e7d1bccc13cf890d2462c269302aaae111525291957b48845471f8e413c",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$SharedImageReader$LocationVisitor.class",
+      "occurrence": 0,
+      "sha256": "1894cb8ca80d0f1f47664f27926904be9336b917a761c33aba6d0b89c636da59",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader$SharedImageReader.class",
+      "occurrence": 0,
+      "sha256": "a5322c669eb5efd7044ad78a95451bb82d43112e1c30f02a5098aeef2d8c45ea",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReader.class",
+      "occurrence": 0,
+      "sha256": "5af6ecd9d57ab5a0143ae5242759e6afd275a9774f62a99bbe982bfdfb12439d",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReaderFactory$1.class",
+      "occurrence": 0,
+      "sha256": "34aa6b3776df720d03140fdc84aeb820aa9555344fa443509a59b3878e7a0dc0",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageReaderFactory.class",
+      "occurrence": 0,
+      "sha256": "57f1659b1c91f0e35fc9b40bde3e1f22b6d3230043c5daaa2fedccbc63e15dde",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageStream.class",
+      "occurrence": 0,
+      "sha256": "faf620f2475593b5b4bdd2e99e0239e7618b204e30999ad175b1143e5e928286",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageStrings.class",
+      "occurrence": 0,
+      "sha256": "6fdf96f15984a7e3e5280f14f4b06b3d2856d6db73603232d0b22dfaa5bb108b",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/ImageStringsReader.class",
+      "occurrence": 0,
+      "sha256": "b7ab8b1c2db668e43b6c24cf4fc5ed6481e036069bbb904cbf00f6195d106555",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/NativeImageBuffer$1.class",
+      "occurrence": 0,
+      "sha256": "db8a9d7a84d2d4f784f6513bbc72cf2b84cfe27bfb58578f068b17a9a10a5e6c",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/NativeImageBuffer.class",
+      "occurrence": 0,
+      "sha256": "dbd71ebc2f1d6b1726993398be23f0ca21008fc3bb57d7873d0deb4308bfcd94",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/CompressIndexes.class",
+      "occurrence": 0,
+      "sha256": "bfee428feb16d8a9a31941906e483a252b6ee7deec3417b30601b8912f29935c",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/CompressedResourceHeader.class",
+      "occurrence": 0,
+      "sha256": "54494b420212b017eb81bf7da4172f6c22abc099db35bc9796ac6743e5c50bf2",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/Decompressor.class",
+      "occurrence": 0,
+      "sha256": "62a2b577cfca0044f70bbc66c2f0db9e614809d468343332b4ff23703ace2a1a",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ResourceDecompressor$StringsProvider.class",
+      "occurrence": 0,
+      "sha256": "8c518f1dc348881216b00dc35a55e808b990a707e50eba4c896045bc95284a77",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ResourceDecompressor.class",
+      "occurrence": 0,
+      "sha256": "350e4f04ce5fc94ef9316a33ddd9f707d0923da9b64bbd252feec3ac92831fdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ResourceDecompressorFactory.class",
+      "occurrence": 0,
+      "sha256": "685daa98422b334b7ebaa2205344a075edd629e201c9e89b067fa9d5b02f6b5c",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ResourceDecompressorRepository.class",
+      "occurrence": 0,
+      "sha256": "6d00a10fdf6767be57a436d786aa56fb5bcf7bf5e66c2a356decfa49b5d8a383",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/SignatureParser$1.class",
+      "occurrence": 0,
+      "sha256": "3a434392689ae6d5cb03fc9985de607ae85116cb6f31caf6d81124176621507a",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/SignatureParser$ParseResult.class",
+      "occurrence": 0,
+      "sha256": "ee2ce698dfd8a85896282ef5a5cdce228415c81d3ffdce337c897939b29595e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/SignatureParser.class",
+      "occurrence": 0,
+      "sha256": "e7cbaa614c0722c311221526c77b94986e8b7a5cd66eee616686ffd35e004a41",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/StringSharingDecompressor.class",
+      "occurrence": 0,
+      "sha256": "d7a30b8fded16bd67260224a194fa5eb3a4e3aa839501e49529efeeb3ff8e7e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/StringSharingDecompressorFactory.class",
+      "occurrence": 0,
+      "sha256": "91425b458e4450605f114a7475786db7e9418ac8805e9328005d7fe162cc7d3e",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ZipDecompressor.class",
+      "occurrence": 0,
+      "sha256": "6396b5b5ce25de3af50cac8a14e5deee38fd84c169fe9d25a4e5bfe11308e7ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jimage/decompressor/ZipDecompressorFactory.class",
+      "occurrence": 0,
+      "sha256": "1056b639f5fb0e3e8f7d32032bf10ec3f211b2974ac6b132aa06e5fca357e3df",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/ExplodedImage$PathNode.class",
+      "occurrence": 0,
+      "sha256": "e2bc18d469f550dde8701a4e22798d7d629f4bcf1868d1454b7440c16687376a",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/ExplodedImage.class",
+      "occurrence": 0,
+      "sha256": "2658b2ad3deb4b5d3e6788b77797c006bf8c2382924adc21e85dad4d7c3ac8a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtDirectoryStream$1.class",
+      "occurrence": 0,
+      "sha256": "46c687339e5b421d4daa951ea40fd485a46cf460c014c2b7a0f5fcae84e7c4ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtDirectoryStream.class",
+      "occurrence": 0,
+      "sha256": "fe655311a30b794e4639326d6819766d2b074f65b0cd06148503f4e2a404ead9",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileAttributeView$AttrID.class",
+      "occurrence": 0,
+      "sha256": "751022e58f1d34333339604d275f57a2381bbdc953f9a37934cc44f1a12b1553",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileAttributeView.class",
+      "occurrence": 0,
+      "sha256": "5ac971519846f7da5a55140ab87411fc6fb98d89e70833dd3478ab0cf9809d95",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileAttributes.class",
+      "occurrence": 0,
+      "sha256": "c6af504c8608da778f89f4b53d0948162b065c00789dcfad9976496acf6a3b2d",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileStore.class",
+      "occurrence": 0,
+      "sha256": "72d0e536e13cb401b86305446fe8d5391b7ed14a6bf422ccf3f44da69f35a95a",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileSystem$1.class",
+      "occurrence": 0,
+      "sha256": "412434132c65a856302db8622f09a3662db43624c1da606018168d1b06c5d63b",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileSystem.class",
+      "occurrence": 0,
+      "sha256": "2cb1ae6593d652c66a0c7e08108d66aaf73adfe0c1595de31191e32c08f6740e",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileSystemProvider$1.class",
+      "occurrence": 0,
+      "sha256": "3c6bfa9174b2a763a22a2c18cceb6432c2d7b00839db89b8802d5244e63eb5bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileSystemProvider$JrtFsLoader.class",
+      "occurrence": 0,
+      "sha256": "01362538a71179f9a0e0acbf167b28dd17d8dbefd0e109004a9dac99bab8865c",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtFileSystemProvider.class",
+      "occurrence": 0,
+      "sha256": "6e91de56a9f0254674687f9fbe6fbdea3deb985af9dd84881bf6f486dac05cac",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtPath$1.class",
+      "occurrence": 0,
+      "sha256": "001d595404705dfc745e148725ab951efc6b0229bc0106209213422c03a3882d",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtPath$2.class",
+      "occurrence": 0,
+      "sha256": "808b190afd846b33f8b793370381ce53ad658aa2ad232aafb1f4f5cc9ea2891e",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtPath.class",
+      "occurrence": 0,
+      "sha256": "21576d7f93f00269ea888d3000919a3d1148e74a7677f6637b0b48bda2c88612",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/JrtUtils.class",
+      "occurrence": 0,
+      "sha256": "988e164a0967c2fdcc3ffeec60d838f4f9ddc69645a7338b3e25823973500d3b",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/SystemImage$1.class",
+      "occurrence": 0,
+      "sha256": "8e183dd7ce7a884b463e633c373fb24e7ad1131e3f2f63ace2c86fe97eef5d99",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/SystemImage$2.class",
+      "occurrence": 0,
+      "sha256": "87940c51e6e50972f78c976206503e5f2ed31db13a1dca17b8b29b739bb6b9ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    },
+    {
+      "entry": "jdk/internal/jrtfs/SystemImage.class",
+      "occurrence": 0,
+      "sha256": "52cc1ba2443bacbd206b35fc835896bbb88945a4054671811e29cbe1b0e9758b",
+      "member_shard": "docs/dev/evidence/sqx145/members/289/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/289/001.json",
+      "sha256": "e8b985abd3dd99cca0604c9927715f77f94c6355854a389adc5c92a26052919b"
+    }
+  ]
+}

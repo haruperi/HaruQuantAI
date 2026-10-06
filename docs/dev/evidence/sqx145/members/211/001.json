@@ -1,0 +1,245 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
+  "archive_sha256": "e68533b22cc2d8d670723f4ffd023cfe2099a44e75abb81ae8e209350ddd9b0f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartPlugin.class",
+      "occurrence": 0,
+      "sha256": "29bab6ade279b75a158d5d9743bc4fd2161f1c3480945c99ffb6e182daa3d7b8",
+      "name": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "6aa3303fb937fe13fe157f7b0f28f6e5ac0f5bef19226e17ce06dc9d300f1a6f",
+          "code_length": 60
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "aac44c66c7fccfcb707db4e22fc426942a93cba22e21c4c6e7897f9c294c690f",
+          "code_length": 36,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a6797cbc87f1a643d7ce9b6fafb70bc98959da91eb7ae23f788d6df31ebdc777",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartPlugin",
+        "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet.class",
+      "occurrence": 0,
+      "sha256": "30aee32fadf133bd305bfdc770705e866ceebfa826f73a83b93794206247c31b",
+      "name": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_PROFILECHART",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "doGet",
+          "descriptor": "(Ljakarta/servlet/http/HttpServletRequest;Ljakarta/servlet/http/HttpServletResponse;)V",
+          "access": 4,
+          "code_sha256": "c3bca7eb143307423b451519719d1011acc61c34581c544445c85b41c398399b",
+          "code_length": 123,
+          "throws": [
+            "jakarta/servlet/ServletException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "d0066301e29448d9960637099a9b4539ffc3b5e744ce34e94edb73d7bfe5658a",
+          "code_length": 87,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "executeBinary",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)[B",
+          "access": 4,
+          "code_sha256": "92b9072a83904f57574a5aeb2a57be4be8526c7ee61e787c09508587f504abf7",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)[B"
+        },
+        {
+          "name": "onPaths",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1fdc3db7530f2ed1583f4678b2c902b40ebf5b43262383457d80c1511f31fe93",
+          "code_length": 337,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onView",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ea9ffa37c2bea4c750132039521e88c64cc3300c9985f473b29e1077751e895f",
+          "code_length": 199,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onFile",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 2,
+          "code_sha256": "f27036b5ee81b8131c60bff9331ddd60d08b6f1a0ea3d650d730faad48c89563",
+          "code_length": 145,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6a0f8a9281b9ab295eb0324ffccdbbc6ed0f0520d3c71f0da2364a5e3657c8dc",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/webguilib/server/AbstractUIWebServer",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "jakarta/servlet/ServletException",
+        "jakarta/servlet/http/HttpServletRequest",
+        "jakarta/servlet/http/HttpServletResponse",
+        "java/io/File",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/net/URLDecoder",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Files",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

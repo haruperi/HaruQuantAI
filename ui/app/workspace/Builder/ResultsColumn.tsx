@@ -1,7 +1,7 @@
 import { bestStrategies, resultRankTitle, type SampleType } from './fixtures';
 /**
- * SQX-parity results column of the Builder Progress tab (donor evidence
- * SQX144-EV-000037). Up to three best-strategy cards; the donor shows only
+ * SQX-style results column of the Builder Progress tab (donor evidence
+ * retained target UI; current donor equivalence unverified). Up to three best-strategy cards; the donor shows only
  * the first card at default zoom (implemented via CSS, siblings hidden).
  * The Sample selector is shared across cards and clicking a card opens the
  * Results tab. Chart and overview values are demo fixture truth.

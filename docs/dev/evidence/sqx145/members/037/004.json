@@ -1,0 +1,1226 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/httpcore-4.4.13.jar",
+  "archive_sha256": "e06e89d40943245fcfa39ec537cdbfce3762aecde8f9c597780d2b00c2b43424",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/http/HttpServerConnection.class",
+      "occurrence": 0,
+      "sha256": "b58138458b7ce9bdebbbcbd9e4dfd024ecedba6a9ca33cd256c808489ab53dd4",
+      "name": "org/apache/http/HttpServerConnection",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/HttpConnection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "receiveRequestHeader",
+          "descriptor": "()Lorg/apache/http/HttpRequest;",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/HttpException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "receiveRequestEntity",
+          "descriptor": "(Lorg/apache/http/HttpEntityEnclosingRequest;)V",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/HttpException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "sendResponseHeader",
+          "descriptor": "(Lorg/apache/http/HttpResponse;)V",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/HttpException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "sendResponseEntity",
+          "descriptor": "(Lorg/apache/http/HttpResponse;)V",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/HttpException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/http/HttpConnection",
+        "org/apache/http/HttpException",
+        "org/apache/http/HttpServerConnection"
+      ]
+    },
+    {
+      "entry": "org/apache/http/util/EntityUtils.class",
+      "occurrence": 0,
+      "sha256": "265573cfc966793afc0d7cd503fa4965b588e7b63fa610579ba6e8625e069cbe",
+      "name": "org/apache/http/util/EntityUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "consumeQuietly",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)V",
+          "access": 9,
+          "code_sha256": "fad84822eace4d14e814da5c04f188da535d2389a76efe5cb8c3a2be2875737e",
+          "code_length": 9
+        },
+        {
+          "name": "consume",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)V",
+          "access": 9,
+          "code_sha256": "4a02f68d43a86b37cd9092e3efd66763ab97789896197abb97f7c459b0914e6f",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "updateEntity",
+          "descriptor": "(Lorg/apache/http/HttpResponse;Lorg/apache/http/HttpEntity;)V",
+          "access": 9,
+          "code_sha256": "a0cb770e485a08283204ffef4510baf425d4dbad7f0db058ce8e8f5f49298ffc",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)[B",
+          "access": 9,
+          "code_sha256": "6d93d15cc38067a46035e73b1a00323c996c9a8d21d98a3b28cdf23c6eecd02f",
+          "code_length": 122,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContentCharSet",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c6cb5cdd59744aa0c42fbfca11afa025aa54b2bfea0f40a12f1c1ac9a5846b1e",
+          "code_length": 59,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "getContentMimeType",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "1563e3aa06b33955b8070367fe9cfb366dcda2671eed6bade70d8ae2f95fabf6",
+          "code_length": 46,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/apache/http/HttpEntity;Lorg/apache/http/entity/ContentType;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "c1ae1729e0feafb8a49178da6e0b557fb832978a541701afeb542e8ccb7de0ad",
+          "code_length": 184,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/apache/http/HttpEntity;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "50944e9a10aa884bdd7c2628c8f7ad8d683763d6708577523a3bb5a7c997540f",
+          "code_length": 68,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/apache/http/HttpEntity;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "6f0b79a23897e0a0b059489cf10db36f1f87e5a3e8711e118a2bedf4bb5b4769",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7845840e77c487265109a4faceff0360044c94d8d3b85cb1be4e9c2dca901d00",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/http/ParseException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[C",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/io/Reader",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/nio/charset/Charset",
+        "java/nio/charset/UnsupportedCharsetException",
+        "org/apache/http/Header",
+        "org/apache/http/HeaderElement",
+        "org/apache/http/HttpEntity",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/NameValuePair",
+        "org/apache/http/ParseException",
+        "org/apache/http/entity/ContentType",
+        "org/apache/http/protocol/HTTP",
+        "org/apache/http/util/Args",
+        "org/apache/http/util/ByteArrayBuffer",
+        "org/apache/http/util/CharArrayBuffer",
+        "org/apache/http/util/EntityUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/http/util/VersionInfo.class",
+      "occurrence": 0,
+      "sha256": "502a6d1c75bdb218dffba4a70633d8ae6cf8244fdb2033af00393311dd78c32a",
+      "name": "org/apache/http/util/VersionInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNAVAILABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "VERSION_PROPERTY_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROPERTY_MODULE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROPERTY_RELEASE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROPERTY_TIMESTAMP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "infoPackage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "infoModule",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "infoRelease",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "infoTimestamp",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "infoClassloader",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "7870fed030888dae41bc31fb7dc20685ee60de6757b0735e33b2448da5f899e6",
+          "code_length": 77
+        },
+        {
+          "name": "getPackage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getModule",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getRelease",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getTimestamp",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getClassloader",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "afdfe2eef982df1646391899391d569118b85ad897771cfe8c5fde725fcf2b3c",
+          "code_length": 166
+        },
+        {
+          "name": "loadVersionInfo",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/ClassLoader;)[Lorg/apache/http/util/VersionInfo;",
+          "access": 9,
+          "code_sha256": "b82381ca95f7be30dc53fe11c457fd9a9550ed8bf195d0c697ecfe8e4713719b",
+          "code_length": 86
+        },
+        {
+          "name": "loadVersionInfo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Lorg/apache/http/util/VersionInfo;",
+          "access": 9,
+          "code_sha256": "51a5617db221de77868f0f613663413ea0dc839c757d3a407415b4a643468411",
+          "code_length": 126
+        },
+        {
+          "name": "fromMap",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/ClassLoader;)Lorg/apache/http/util/VersionInfo;",
+          "access": 12,
+          "code_sha256": "9b877023e7e0125b53a79975faaa88c3ea65358190961e0cb9f2d0c5ba58d066",
+          "code_length": 154,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<**>;Ljava/lang/ClassLoader;)Lorg/apache/http/util/VersionInfo;"
+        },
+        {
+          "name": "getUserAgent",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "62b4faba7c1de2da4f58066e614d83aa16ea3a9039af4e5ad68f23b5599ffac0",
+          "code_length": 55,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class<*>;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lorg/apache/http/util/VersionInfo;",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Properties",
+        "org/apache/http/util/Args",
+        "org/apache/http/util/VersionInfo"
+      ]
+    },
+    {
+      "entry": "org/apache/http/ssl/TrustStrategy.class",
+      "occurrence": 0,
+      "sha256": "b7bfb0ab81566801f2ee62fe03d8ecfac58a4b259bdf028cd0b6e0eaf1eb537c",
+      "name": "org/apache/http/ssl/TrustStrategy",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isTrusted",
+          "descriptor": "([Ljava/security/cert/X509Certificate;Ljava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "java/security/cert/CertificateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/cert/CertificateException",
+        "org/apache/http/ssl/TrustStrategy"
+      ]
+    },
+    {
+      "entry": "org/apache/http/pool/PoolStats.class",
+      "occurrence": 0,
+      "sha256": "abc721e89f0292d7173d9ebf2093bd7a599521c8eb1c5842e98813c9f7e25164",
+      "name": "org/apache/http/pool/PoolStats",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "leased",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "pending",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "available",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "max",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "7c21fa23e95e0bd4106d980d2b8106f3b3a56143ad6572370e79d68971a9e9a9",
+          "code_length": 26
+        },
+        {
+          "name": "getLeased",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getPending",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getAvailable",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getMax",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "787d490d7c5767f8affd0571b3b83764bc2528104ded0f3cfd5f711124b471e7",
+          "code_length": 84
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/http/pool/PoolStats"
+      ]
+    },
+    {
+      "entry": "org/apache/http/HeaderElementIterator.class",
+      "occurrence": 0,
+      "sha256": "08941533646268e9cd72a64cffa8370ae1e4783d5ba6135cbb41db8c5a65fa99",
+      "name": "org/apache/http/HeaderElementIterator",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "nextElement",
+          "descriptor": "()Lorg/apache/http/HeaderElement;",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/http/HeaderElementIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/http/io/EofSensor.class",
+      "occurrence": 0,
+      "sha256": "64c1f1506d630a80375935d5ab3c1b9854556c0313e1a261954483e37075a785",
+      "name": "org/apache/http/io/EofSensor",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isEof",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/http/io/EofSensor"
+      ]
+    },
+    {
+      "entry": "org/apache/http/HeaderElement.class",
+      "occurrence": 0,
+      "sha256": "a1cc05a199cfdbc47fdf519b47da855c862a1684af77e97ffe56cd48ce8f65e4",
+      "name": "org/apache/http/HeaderElement",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()[Lorg/apache/http/NameValuePair;",
+          "access": 1025
+        },
+        {
+          "name": "getParameterByName",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/http/NameValuePair;",
+          "access": 1025
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getParameter",
+          "descriptor": "(I)Lorg/apache/http/NameValuePair;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/http/HeaderElement"
+      ]
+    },
+    {
+      "entry": "org/apache/http/message/LineFormatter.class",
+      "occurrence": 0,
+      "sha256": "501bcbc5111f072557c10359f37f49cb899632919cd8f154573f30c347519c24",
+      "name": "org/apache/http/message/LineFormatter",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "appendProtocolVersion",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/ProtocolVersion;)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "formatRequestLine",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/RequestLine;)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "formatStatusLine",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/StatusLine;)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "formatHeader",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/Header;)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/http/message/LineFormatter"
+      ]
+    },
+    {
+      "entry": "org/apache/http/message/BasicHeaderValueFormatter.class",
+      "occurrence": 0,
+      "sha256": "cef8387d608d2f4fec8c8f3e900f4be576c804f263e824393668cd7ffd7691de",
+      "name": "org/apache/http/message/BasicHeaderValueFormatter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/message/HeaderValueFormatter"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT",
+          "descriptor": "Lorg/apache/http/message/BasicHeaderValueFormatter;",
+          "access": 25
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/apache/http/message/BasicHeaderValueFormatter;",
+          "access": 25
+        },
+        {
+          "name": "SEPARATORS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNSAFE_CHARS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "formatElements",
+          "descriptor": "([Lorg/apache/http/HeaderElement;ZLorg/apache/http/message/HeaderValueFormatter;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a41b8b77f7352f88c1105bfc1bcfb3d809a6fdaaed00fd84c5a044569221ad2c",
+          "code_length": 23
+        },
+        {
+          "name": "formatElements",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;[Lorg/apache/http/HeaderElement;Z)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1,
+          "code_sha256": "f5e384f96d1d1f296b106e5b4cad7c6e2880a7bb272b3360f435295238f585ed",
+          "code_length": 86
+        },
+        {
+          "name": "estimateElementsLen",
+          "descriptor": "([Lorg/apache/http/HeaderElement;)I",
+          "access": 4,
+          "code_sha256": "93633913832a428a9038e7690da3f98c2690ea5995f248b19717595c83632858",
+          "code_length": 58
+        },
+        {
+          "name": "formatHeaderElement",
+          "descriptor": "(Lorg/apache/http/HeaderElement;ZLorg/apache/http/message/HeaderValueFormatter;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c0af335cd8433d9c3fff30ac51f4b3c64371f72d15f1b97acf74cadec32e9834",
+          "code_length": 23
+        },
+        {
+          "name": "formatHeaderElement",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/HeaderElement;Z)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1,
+          "code_sha256": "7314074ee228d39239068d603c5f5e89e7a4205888f148c649419f255b4d5446",
+          "code_length": 138
+        },
+        {
+          "name": "estimateHeaderElementLen",
+          "descriptor": "(Lorg/apache/http/HeaderElement;)I",
+          "access": 4,
+          "code_sha256": "357125251b3558290e4f11f81375c41841644730c9e4e5d0581aff82f39bb9a5",
+          "code_length": 84
+        },
+        {
+          "name": "formatParameters",
+          "descriptor": "([Lorg/apache/http/NameValuePair;ZLorg/apache/http/message/HeaderValueFormatter;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f974ac0cc20ca2e7126f0eb77ce7e9a3d2bb5fb563ca3433a8f6a006c5e8f88f",
+          "code_length": 23
+        },
+        {
+          "name": "formatParameters",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;[Lorg/apache/http/NameValuePair;Z)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1,
+          "code_sha256": "44e677b1056ba62565c601c6bc1f898474ab74ef58301cfe23d07b6ccccc884d",
+          "code_length": 86
+        },
+        {
+          "name": "estimateParametersLen",
+          "descriptor": "([Lorg/apache/http/NameValuePair;)I",
+          "access": 4,
+          "code_sha256": "78e68c506ae42d21b1d4693705c27a03a9117335afa8c099e0f68e1a675875a8",
+          "code_length": 58
+        },
+        {
+          "name": "formatNameValuePair",
+          "descriptor": "(Lorg/apache/http/NameValuePair;ZLorg/apache/http/message/HeaderValueFormatter;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "55fd32191eae0a37ca9583a14b508d83323f3b39bb175e3db4eedd38b6489a4f",
+          "code_length": 23
+        },
+        {
+          "name": "formatNameValuePair",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/NameValuePair;Z)Lorg/apache/http/util/CharArrayBuffer;",
+          "access": 1,
+          "code_sha256": "534d33c35d9e57a55cbbf5d1521a51279fd4a541f965f46faedb9eaab201e484",
+          "code_length": 86
+        },
+        {
+          "name": "estimateNameValuePairLen",
+          "descriptor": "(Lorg/apache/http/NameValuePair;)I",
+          "access": 4,
+          "code_sha256": "dbbcec90f00f703bbed1bcaa30f2d85cc9eb2f7ed3efb5bb6f40fc3cee6656be",
+          "code_length": 38
+        },
+        {
+          "name": "doFormatValue",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Ljava/lang/String;Z)V",
+          "access": 4,
+          "code_sha256": "1995c1fc1daea2451507ba0e1c9ad21ae2e5083f642bb632887b3c1105ae24ad",
+          "code_length": 113
+        },
+        {
+          "name": "isSeparator",
+          "descriptor": "(C)Z",
+          "access": 4,
+          "code_sha256": "4aade8490f501168949986afba1a122a5839990f360865d884de5a8420241286",
+          "code_length": 15
+        },
+        {
+          "name": "isUnsafe",
+          "descriptor": "(C)Z",
+          "access": 4,
+          "code_sha256": "2a8954bf5092adb22cac2399632db793d87cc2458180839b5f687fb047dc2ea7",
+          "code_length": 15
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b102517ef809e99bfacda48291424e77bef6447d53cc15672a9dd9fa52457b2a",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/http/HeaderElement;",
+        "[Lorg/apache/http/NameValuePair;",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/http/HeaderElement",
+        "org/apache/http/NameValuePair",
+        "org/apache/http/message/BasicHeaderValueFormatter",
+        "org/apache/http/message/HeaderValueFormatter",
+        "org/apache/http/util/Args",
+        "org/apache/http/util/CharArrayBuffer"
+      ]
+    },
+    {
+      "entry": "org/apache/http/message/HeaderValueParser.class",
+      "occurrence": 0,
+      "sha256": "8b7989f950b8b32037199e9302db8a8c1bca1bdad69d18d974de00c46315b5c8",
+      "name": "org/apache/http/message/HeaderValueParser",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "parseElements",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)[Lorg/apache/http/HeaderElement;",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseHeaderElement",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)Lorg/apache/http/HeaderElement;",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseParameters",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)[Lorg/apache/http/NameValuePair;",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseNameValuePair",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)Lorg/apache/http/NameValuePair;",
+          "access": 1025,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/http/ParseException",
+        "org/apache/http/message/HeaderValueParser"
+      ]
+    },
+    {
+      "entry": "org/apache/http/message/BasicHttpResponse.class",
+      "occurrence": 0,
+      "sha256": "1af23d7cadf068f306f821be99d44f7e4680f92fc8e750ae408ba4cfbddb7475",
+      "name": "org/apache/http/message/BasicHttpResponse",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/http/message/AbstractHttpMessage",
+      "interfaces": [
+        "org/apache/http/HttpResponse"
+      ],
+      "fields": [
+        {
+          "name": "statusline",
+          "descriptor": "Lorg/apache/http/StatusLine;",
+          "access": 2
+        },
+        {
+          "name": "ver",
+          "descriptor": "Lorg/apache/http/ProtocolVersion;",
+          "access": 2
+        },
+        {
+          "name": "code",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "reasonPhrase",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "entity",
+          "descriptor": "Lorg/apache/http/HttpEntity;",
+          "access": 2
+        },
+        {
+          "name": "reasonCatalog",
+          "descriptor": "Lorg/apache/http/ReasonPhraseCatalog;",
+          "access": 18
+        },
+        {
+          "name": "locale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/StatusLine;Lorg/apache/http/ReasonPhraseCatalog;Ljava/util/Locale;)V",
+          "access": 1,
+          "code_sha256": "0baf69c7dbcb08f2163d3e29489725689659a04c8e320255a1fb7ab4efca5141",
+          "code_length": 58
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/StatusLine;)V",
+          "access": 1,
+          "code_sha256": "44c6b946ab62663cc3c33cd1614e02f872fab8ba8b72a1e2de60ddab488c76b0",
+          "code_length": 58
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/ProtocolVersion;ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e9aab2fc36a73a4efe9a89f0453aab443b5d74444ec56cb36099e5909ceb51bb",
+          "code_length": 42
+        },
+        {
+          "name": "getProtocolVersion",
+          "descriptor": "()Lorg/apache/http/ProtocolVersion;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getStatusLine",
+          "descriptor": "()Lorg/apache/http/StatusLine;",
+          "access": 1,
+          "code_sha256": "e49d82844c3cc7a4814c018feede0e3d267439431418af1fec82799dd7350bcc",
+          "code_length": 66
+        },
+        {
+          "name": "getEntity",
+          "descriptor": "()Lorg/apache/http/HttpEntity;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "setStatusLine",
+          "descriptor": "(Lorg/apache/http/StatusLine;)V",
+          "access": 1,
+          "code_sha256": "a8e916bff496dfe2ad132f157000a77a44d827a8ea4cbc6fa58fdda3543c65b0",
+          "code_length": 44
+        },
+        {
+          "name": "setStatusLine",
+          "descriptor": "(Lorg/apache/http/ProtocolVersion;I)V",
+          "access": 1,
+          "code_sha256": "1505e9ef611cfb447bcd31d7e1154eb077765a2dd52a95252f2199c66536c0fc",
+          "code_length": 28
+        },
+        {
+          "name": "setStatusLine",
+          "descriptor": "(Lorg/apache/http/ProtocolVersion;ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "eb5c5b0ccd308a099e490f555e9af3e9572dbee9308dfeab3af1e824d7ff522e",
+          "code_length": 28
+        },
+        {
+          "name": "setStatusCode",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "309794bc858d24a476132ba950ac906c0c916eb8e93527c6c3e169cbe82765ef",
+          "code_length": 23
+        },
+        {
+          "name": "setReasonPhrase",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4f6f41244c6702e2ebb45bdc39b5c19d71aa6c26a9c169b69b8a63131058b724",
+          "code_length": 22
+        },
+        {
+          "name": "setEntity",
+          "descriptor": "(Lorg/apache/http/HttpEntity;)V",
+          "access": 1,
+          "code_sha256": "9f32e6ee360511d051cfeb97fb6a343ddc7d643bef2ec62aba13bf96a338357d",
+          "code_length": 6
+        },
+        {
+          "name": "setLocale",
+          "descriptor": "(Ljava/util/Locale;)V",
+          "access": 1,
+          "code_sha256": "6ab39cd8b1d085320ce928606a9edf4a846b50303823aad34673062d9d7c4f73",
+          "code_length": 19
+        },
+        {
+          "name": "getReason",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "a6797805edfd5830d343eeb779f3247100ce7eb5234df78ef40c9f53e7f8999e",
+          "code_length": 39
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a2e98e4fbdbc03ed75721eef900a31dd575cbba3d9d499f90d363424142f1d9f",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Locale",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/HttpVersion",
+        "org/apache/http/ProtocolVersion",
+        "org/apache/http/ReasonPhraseCatalog",
+        "org/apache/http/StatusLine",
+        "org/apache/http/message/AbstractHttpMessage",
+        "org/apache/http/message/BasicHttpResponse",
+        "org/apache/http/message/BasicStatusLine",
+        "org/apache/http/util/Args",
+        "org/apache/http/util/TextUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/http/message/BasicHeaderValueParser.class",
+      "occurrence": 0,
+      "sha256": "b48f764ff2bf9419626e681a7dce7da27ec695377d7bd6780f2b146e4b5c5e0d",
+      "name": "org/apache/http/message/BasicHeaderValueParser",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/message/HeaderValueParser"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT",
+          "descriptor": "Lorg/apache/http/message/BasicHeaderValueParser;",
+          "access": 25
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/apache/http/message/BasicHeaderValueParser;",
+          "access": 25
+        },
+        {
+          "name": "PARAM_DELIMITER",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "ELEM_DELIMITER",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "TOKEN_DELIMS",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        },
+        {
+          "name": "VALUE_DELIMS",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        },
+        {
+          "name": "tokenParser",
+          "descriptor": "Lorg/apache/http/message/TokenParser;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40cdbcf9a81bc2a9778f2b521170c3d9a387785017d68688181ae61bb7f893c2",
+          "code_length": 12
+        },
+        {
+          "name": "parseElements",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/http/message/HeaderValueParser;)[Lorg/apache/http/HeaderElement;",
+          "access": 9,
+          "code_sha256": "63a1d371fe07d2c0d7a26e3d75407f090337b40251c425c35e5ba52d8fb28792",
+          "code_length": 56,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseElements",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)[Lorg/apache/http/HeaderElement;",
+          "access": 1,
+          "code_sha256": "7f730c108d0febe0bbf455167e75e81e0837705cdc3db595e92fe3fa98bd7172",
+          "code_length": 91
+        },
+        {
+          "name": "parseHeaderElement",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/http/message/HeaderValueParser;)Lorg/apache/http/HeaderElement;",
+          "access": 9,
+          "code_sha256": "c5b8008b0b2f7d3d039ecc0d808f0c42531bd1e9da5c5f52708226bb54e0ddb5",
+          "code_length": 56,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseHeaderElement",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)Lorg/apache/http/HeaderElement;",
+          "access": 1,
+          "code_sha256": "43440657db044888994b08749bcf9e636fbb8058bc92083d23efad50e8464825",
+          "code_length": 77
+        },
+        {
+          "name": "createHeaderElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;[Lorg/apache/http/NameValuePair;)Lorg/apache/http/HeaderElement;",
+          "access": 4,
+          "code_sha256": "a69d5c0b0bbe7af8509096e2a2a66fe2cfaffb2060636dd3897655b2aeafe852",
+          "code_length": 11
+        },
+        {
+          "name": "parseParameters",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/http/message/HeaderValueParser;)[Lorg/apache/http/NameValuePair;",
+          "access": 9,
+          "code_sha256": "63a7c468aadcc372e974c8d97abea3a49ed3582940292a11137dfb1ee114fbb2",
+          "code_length": 56,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseParameters",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)[Lorg/apache/http/NameValuePair;",
+          "access": 1,
+          "code_sha256": "441441fe1e7835805789eba19c1c50fd77ae34a7039cf39181b818ef27cd866f",
+          "code_length": 99
+        },
+        {
+          "name": "parseNameValuePair",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/http/message/HeaderValueParser;)Lorg/apache/http/NameValuePair;",
+          "access": 9,
+          "code_sha256": "0694823f7b78449301477df2531f3eab6957f9056eb027a54da4343647a878b9",
+          "code_length": 56,
+          "throws": [
+            "org/apache/http/ParseException"
+          ]
+        },
+        {
+          "name": "parseNameValuePair",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;)Lorg/apache/http/NameValuePair;",
+          "access": 1,
+          "code_sha256": "18f2a7034ddd74b82f82dbb5d8d7a16440349cb4a3461d2c32cba5bbf64360f1",
+          "code_length": 117
+        },
+        {
+          "name": "parseNameValuePair",
+          "descriptor": "(Lorg/apache/http/util/CharArrayBuffer;Lorg/apache/http/message/ParserCursor;[C)Lorg/apache/http/NameValuePair;",
+          "access": 1,
+          "code_sha256": "7935d97130c62bc4a0df60a77f9ee1e67517df9ac96930bc91f30eb05ea76c73",
+          "code_length": 184
+        },
+        {
+          "name": "createNameValuePair",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/http/NameValuePair;",
+          "access": 4,
+          "code_sha256": "908e47ac81593a4f4853881af723428c088be0f5fc0497005ab532d5d191939c",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e8ef532e75d86cf63e84541b9ff38f6a2c553bc9a4d41fe1219db894e95af8c8",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "[C",
+        "[Lorg/apache/http/HeaderElement;",
+        "[Lorg/apache/http/NameValuePair;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/BitSet",
+        "java/util/List",
+        "org/apache/http/HeaderElement",
+        "org/apache/http/NameValuePair",
+        "org/apache/http/ParseException",
+        "org/apache/http/message/BasicHeaderElement",
+        "org/apache/http/message/BasicHeaderValueParser",
+        "org/apache/http/message/BasicNameValuePair",
+        "org/apache/http/message/HeaderValueParser",
+        "org/apache/http/message/ParserCursor",
+        "org/apache/http/message/TokenParser",
+        "org/apache/http/util/Args",
+        "org/apache/http/util/CharArrayBuffer"
+      ]
+    }
+  ]
+}

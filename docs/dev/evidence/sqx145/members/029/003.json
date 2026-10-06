@@ -1,0 +1,4912 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/fst-2.57.jar",
+  "archive_sha256": "ba57fdc0673ec3726921e5f113d906587d7f7000ba3981dfb79cc082929af3c1",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$BigBoolTagSer.class",
+      "occurrence": 0,
+      "sha256": "d45ec8a334ceb3d802ba2b1d7598bd41b160f2c20a01827213e2de99c1a353e9",
+      "name": "org/nustaq/serialization/minbin/MBTags$BigBoolTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "48504620b9371630c12221c382650e029e6476db93e59ff7d03a76236c03109b",
+          "code_length": 21
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5bd223d35989709779f884ae9f2de0e607308586a48f10394a2bd7abe5e54b8a",
+          "code_length": 19
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$BigBoolTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$DoubleArrTagSer.class",
+      "occurrence": 0,
+      "sha256": "e2cb278b40499aa086fe44027d737ab7985767fd1a12262b3517ac6f61cf1459",
+      "name": "org/nustaq/serialization/minbin/MBTags$DoubleArrTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "9a3c801f4ae4d9d0b80ad23f92a2b236460923b78aba5251d2e2f2f1caf0d326",
+          "code_length": 60
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6a7ad965edbb7550ba03b790952c8bdd2a25618aae0ae2cb9626db5e5b28f697",
+          "code_length": 60
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[D",
+        "java/lang/Double",
+        "java/lang/String",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$DoubleArrTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$DoubleTagSer.class",
+      "occurrence": 0,
+      "sha256": "767f1315568c349da16b4d1eaf7f981e8a12ae836da7eeca7880072fc3201f43",
+      "name": "org/nustaq/serialization/minbin/MBTags$DoubleTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "d28ad9c082162604ecae49872e6c92cd6e8ed2c8a833a45a92d94cdd0962690c",
+          "code_length": 28
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5b9ce01f86234a6b33fc29a1b1262cbc10d729d9b9288a604e8c5e23cf535b99",
+          "code_length": 30
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/Double",
+        "java/lang/String",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$DoubleTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$FloatArrTagSer.class",
+      "occurrence": 0,
+      "sha256": "996aa7a62c1fd0e9b8b7c87759fea1b7c4e574d7a383669bfa3b51b3315b29a0",
+      "name": "org/nustaq/serialization/minbin/MBTags$FloatArrTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "10042d2dfd7f2e8d8558bc0a13ee2ec26839924047dd405928ca09f430c322aa",
+          "code_length": 60
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "68f61fbc0514e62ce026f6ddfe735fdf6f942975ba6d2464781bdfd25b34224a",
+          "code_length": 60
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[D",
+        "[F",
+        "java/lang/Float",
+        "java/lang/String",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$FloatArrTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$FloatTagSer.class",
+      "occurrence": 0,
+      "sha256": "6052c0e090bd5fa447da82dc5b41e6e5be74985b33a80a69e1043389a07a3d24",
+      "name": "org/nustaq/serialization/minbin/MBTags$FloatTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "ba5829bebd6d62e4ae6da094266ed9b339b330fa3554df7a31a1931e4dda8195",
+          "code_length": 23
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5b9ce01f86234a6b33fc29a1b1262cbc10d729d9b9288a604e8c5e23cf535b99",
+          "code_length": 30
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/Float",
+        "java/lang/String",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$FloatTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$MBObjectTagSer.class",
+      "occurrence": 0,
+      "sha256": "7dbd75f635b4110fbf3c2bf1d15059a779c57747502f27af7e5e13543114fa3e",
+      "name": "org/nustaq/serialization/minbin/MBTags$MBObjectTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "0e669e14dde6102f2e8fe82eac1df4bcdf6bdc70ac0113a94a44a68935fdf2c8",
+          "code_length": 70
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ef909244cd5e3b4b72c76afce6e6587326acf9145484fd951670d2ddc2ac9f8b",
+          "code_length": 79
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Iterator",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBObject",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$MBObjectTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$MBSequenceTagSer.class",
+      "occurrence": 0,
+      "sha256": "271cd77d498c8009aff14d8b4b8c2fa25cbe6232cb0f71c440c157448dc9ebef",
+      "name": "org/nustaq/serialization/minbin/MBTags$MBSequenceTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "6be1d3f7c3b64bb8aeb8ce903a8187bf10561888b0e4e3a86c123a258c4c4495",
+          "code_length": 55
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "728aabfcf427237fa0e0c73a5bf97e4a8cd4eda98f81562a61045beb390e69c2",
+          "code_length": 79
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBSequence",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$MBSequenceTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$NullTagSer.class",
+      "occurrence": 0,
+      "sha256": "8d0f9ccc88d88fa13a8bba01e9a83220dcc42756dbf05c7268b51e0439f226a4",
+      "name": "org/nustaq/serialization/minbin/MBTags$NullTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$NullTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$RefTagSer.class",
+      "occurrence": 0,
+      "sha256": "4258bcf4e7dd8082b4f81a89e15255d88eb10d7bf33366ecaea42aa7d4e4d1a8",
+      "name": "org/nustaq/serialization/minbin/MBTags$RefTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "f58683da6e143ff55e8ab7c7bac382fd42ad38883703d8ce865a8dedb994e52f",
+          "code_length": 14
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8dca3037c844745190710165b90df3008600d33664e368f8a3c39db590c7e1f5",
+          "code_length": 9
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Number",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$RefTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags$StringTagSer.class",
+      "occurrence": 0,
+      "sha256": "cb739d7db84456d2ac37d963a6317866093da8d9fdde7e7d0de9cea48c99c02d",
+      "name": "org/nustaq/serialization/minbin/MBTags$StringTagSer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1,
+          "code_sha256": "a4cb93a41d49f7fd8a8aefe66cf10a7fc6d6114c3e9c75c6350762c416a2d3c4",
+          "code_length": 116
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a9bab429fc0097d27d05beb6f9a62ad928264fc4d1e66e6f0bc4121eeae4eb39",
+          "code_length": 62
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[C",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/nustaq/serialization/minbin/MBIn",
+        "org/nustaq/serialization/minbin/MBOut",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$StringTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MBTags.class",
+      "occurrence": 0,
+      "sha256": "52945e11aebf5c7c55e8f2a1291a9a0332655da2583db17a760bb515b305fea5",
+      "name": "org/nustaq/serialization/minbin/MBTags",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$BigBoolTagSer",
+        "org/nustaq/serialization/minbin/MBTags$DoubleArrTagSer",
+        "org/nustaq/serialization/minbin/MBTags$DoubleTagSer",
+        "org/nustaq/serialization/minbin/MBTags$FloatArrTagSer",
+        "org/nustaq/serialization/minbin/MBTags$FloatTagSer",
+        "org/nustaq/serialization/minbin/MBTags$MBObjectTagSer",
+        "org/nustaq/serialization/minbin/MBTags$MBSequenceTagSer",
+        "org/nustaq/serialization/minbin/MBTags$NullTagSer",
+        "org/nustaq/serialization/minbin/MBTags$RefTagSer",
+        "org/nustaq/serialization/minbin/MBTags$StringTagSer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MinBin$TagSerializer.class",
+      "occurrence": 0,
+      "sha256": "24d19df4ebc06f3edb0cdfd2dd42fd0d239c244adbccf6148370780c3258fab4",
+      "name": "org/nustaq/serialization/minbin/MinBin$TagSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tagId",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTagId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setTagId",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "writeTag",
+          "descriptor": "(Ljava/lang/Object;Lorg/nustaq/serialization/minbin/MBOut;)V",
+          "access": 1025
+        },
+        {
+          "name": "readTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MBIn;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getClassEncoded",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/minbin/MinBin.class",
+      "occurrence": 0,
+      "sha256": "d70d461fcc2503e2447b017594c35778fe0dae7f57070ef272af9ba3660a1f28",
+      "name": "org/nustaq/serialization/minbin/MinBin",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "END_MARKER",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 25
+        },
+        {
+          "name": "DefaultInstance",
+          "descriptor": "Lorg/nustaq/serialization/minbin/MinBin;",
+          "access": 9
+        },
+        {
+          "name": "INT_8",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "INT_16",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "INT_32",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "INT_64",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "TAG",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "END",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "RESERV",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "UNSIGN_MASK",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "ARRAY_MASK",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "CHAR",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "NULL",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "STRING",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OBJECT",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "SEQUENCE",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "DOUBLE",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "DOUBLE_ARR",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "FLOAT",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "FLOAT_ARR",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "BOOL",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "HANDLE",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "clz2Ser",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 0,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Class;Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;>;"
+        },
+        {
+          "name": "tag2Ser",
+          "descriptor": "[Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;",
+          "access": 0
+        },
+        {
+          "name": "tagCount",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "nullTagSer",
+          "descriptor": "Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "isPrimitive",
+          "descriptor": "(B)Z",
+          "access": 9,
+          "code_sha256": "98ba1644721694e375278524b0a225f8974ffffb9ca22f7e56297cf036f515ec",
+          "code_length": 14
+        },
+        {
+          "name": "isTag",
+          "descriptor": "(B)Z",
+          "access": 9,
+          "code_sha256": "e435737e2d0d296315408ddcd114226e503c2f67897e031068629453163fba94",
+          "code_length": 14
+        },
+        {
+          "name": "getTagId",
+          "descriptor": "(B)B",
+          "access": 9,
+          "code_sha256": "e9fbca3ee3aa3b6833dc638c006296e7caba1601b0e9c9899135176192c33a42",
+          "code_length": 5
+        },
+        {
+          "name": "getTagCode",
+          "descriptor": "(B)B",
+          "access": 9,
+          "code_sha256": "9f2b10689fe4a4d4f553a08dc8a217a41dc28995039b056cf1066301982129f5",
+          "code_length": 7
+        },
+        {
+          "name": "isSigned",
+          "descriptor": "(B)Z",
+          "access": 9,
+          "code_sha256": "c5f67884b2b408b36278e00eac4070f840050a80aa5c912b2ae58a98e7f5226c",
+          "code_length": 21
+        },
+        {
+          "name": "isArray",
+          "descriptor": "(B)Z",
+          "access": 9,
+          "code_sha256": "e47cbbf356225a52f5673d15c4bc9fca6eb2855161e8aded1d18cbb7f0e44395",
+          "code_length": 21
+        },
+        {
+          "name": "extractNumBytes",
+          "descriptor": "(B)B",
+          "access": 9,
+          "code_sha256": "c55d9e763b0435799ab16150a54d024d71f7a24abdaeca10786ea36d58a7dff1",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3c21c7f3d7a5695faa5745c9a76029524739942081eea019b61c8decf4fcbc7b",
+          "code_length": 148
+        },
+        {
+          "name": "print",
+          "descriptor": "([B)V",
+          "access": 9,
+          "code_sha256": "03a3d1c72b0b5319bc35985ab6f152ccda05f0e5031f29e9c57f7542a6f7d8ad",
+          "code_length": 8
+        },
+        {
+          "name": "print2String",
+          "descriptor": "([B)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "982e60d4a158afbfe41e11a3b43bea03891603512f03b38e5d2c82263fe6bfac",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "4d4bebe29f69a2d0710f3130ce2a6e3bbcc1ad1fb331baf32f8cfbbad7ed78bb",
+          "code_length": 8
+        },
+        {
+          "name": "registerTag",
+          "descriptor": "(Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;)V",
+          "access": 1,
+          "code_sha256": "f9c15d0e20755ba3b867550ce9682d003ab5a2eb8735284359e8b591f8ea9a24",
+          "code_length": 10
+        },
+        {
+          "name": "registerTag",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;)V",
+          "access": 1,
+          "code_sha256": "eba962fb2ffc58d055ddfd2afbeb8b04bd968cd2d06e8d8d4ba9c91c85ceb60f",
+          "code_length": 40
+        },
+        {
+          "name": "getSerializerForId",
+          "descriptor": "(I)Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;",
+          "access": 1,
+          "code_sha256": "16130c435a3e4096e6b64b3350998b751ec1366b13968d67ba5f1f85166479f0",
+          "code_length": 7
+        },
+        {
+          "name": "getSerializerFor",
+          "descriptor": "(Ljava/lang/Object;)Lorg/nustaq/serialization/minbin/MinBin$TagSerializer;",
+          "access": 1,
+          "code_sha256": "96ba050599db335dfc9f66748de97eb690c67358ab945c1feb353d34b7127279",
+          "code_length": 24
+        },
+        {
+          "name": "getBaseType",
+          "descriptor": "(B)B",
+          "access": 9,
+          "code_sha256": "c261f2620c927769a2e6c1e65e880eb7fccca799e00c54ae98c9116d34a5702b",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2c70364054f4ecbf7c8e5ec1a386e68caf5e1e513ceb79578462f06823775b94",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/HashMap",
+        "org/nustaq/serialization/minbin/MBPrinter",
+        "org/nustaq/serialization/minbin/MBTags",
+        "org/nustaq/serialization/minbin/MBTags$BigBoolTagSer",
+        "org/nustaq/serialization/minbin/MBTags$DoubleArrTagSer",
+        "org/nustaq/serialization/minbin/MBTags$DoubleTagSer",
+        "org/nustaq/serialization/minbin/MBTags$FloatArrTagSer",
+        "org/nustaq/serialization/minbin/MBTags$FloatTagSer",
+        "org/nustaq/serialization/minbin/MBTags$MBObjectTagSer",
+        "org/nustaq/serialization/minbin/MBTags$MBSequenceTagSer",
+        "org/nustaq/serialization/minbin/MBTags$NullTagSer",
+        "org/nustaq/serialization/minbin/MBTags$RefTagSer",
+        "org/nustaq/serialization/minbin/MBTags$StringTagSer",
+        "org/nustaq/serialization/minbin/MinBin",
+        "org/nustaq/serialization/minbin/MinBin$TagSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTArrayListSerializer.class",
+      "occurrence": 0,
+      "sha256": "3f2171f702cf8b6bc000b429982de7dda372cf244e896aa2ee903ce4c32c0d89",
+      "name": "org/nustaq/serialization/serializers/FSTArrayListSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "e8b9112a945d82a26c18fa2b604ff9fd612224ff66aa2ea121a7f1de0614d806",
+          "code_length": 100,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4c0a76e57e36063b4209134f3e5d6787e6ceecfefef46ec47e295ba401ab7870",
+          "code_length": 71,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTArrayListSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigIntegerSerializer.class",
+      "occurrence": 0,
+      "sha256": "7a2a9ca68dca548ef64f4d37aafe1db61002ab7fbaa082cb285b0885b56202bf",
+      "name": "org/nustaq/serialization/serializers/FSTBigIntegerSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "4a56e3c8864832a17fb9e2989db06c9e180b7ed0f3b53f28ba393eff0d7f7cb3",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5cefcdab12d50c062458c3bf72a38b1522645303564604f060f711b1e6f4eda9",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/math/BigInteger",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigIntegerSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTByteSerializer.class",
+      "occurrence": 0,
+      "sha256": "c2f70c77f98f2fb1672dc057a0e0c04c3b7dd08d897f598ea07b7e66d79dcb2c",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTByteSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6c0fc63a35e0fb927ed06b01297cc90cf4f71e698ad7913f83a6da1a5279f688",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTByteSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTCharSerializer.class",
+      "occurrence": 0,
+      "sha256": "345f571cd4fb2cd98b2a847d8c22734fd7acaa65b854d2a24e74c521b8cec211",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTCharSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6c0fc63a35e0fb927ed06b01297cc90cf4f71e698ad7913f83a6da1a5279f688",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Character",
+        "java/lang/Exception",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTCharSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTDoubleSerializer.class",
+      "occurrence": 0,
+      "sha256": "b2896aff0bf8d834f6c3f4404e9b1960bb667958c8ddf3d51f7a97e56fa50cb8",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTDoubleSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7e2cae6572b5f6208d77832927f6ea4bc7f16364bec07c663d555cb8401b47c0",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTDoubleSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTFloatSerializer.class",
+      "occurrence": 0,
+      "sha256": "9952ab58913c722583df3c7728b420c4dcfab866b8f41cb2bb801de5b099f283",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTFloatSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7e2cae6572b5f6208d77832927f6ea4bc7f16364bec07c663d555cb8401b47c0",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTFloatSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTShortSerializer.class",
+      "occurrence": 0,
+      "sha256": "1ed34e4a60e1fae83cd89a37c5595f969edcf0b29bdaa6a4eff939ad07e02a3d",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTShortSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6c0fc63a35e0fb927ed06b01297cc90cf4f71e698ad7913f83a6da1a5279f688",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Short",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTShortSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTBigNumberSerializers.class",
+      "occurrence": 0,
+      "sha256": "05e284a7c71c27b4d07a81f66be2b6cfcfc92d0b4096a8b9b2af306b6baa4dd1",
+      "name": "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTByteSerializer",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTCharSerializer",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTDoubleSerializer",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTFloatSerializer",
+        "org/nustaq/serialization/serializers/FSTBigNumberSerializers$FSTShortSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTCPEnumSetSerializer.class",
+      "occurrence": 0,
+      "sha256": "b2b862fe8f48e013f8c9abcc03885c7095637506acf4590dbaff15f7a6bdeaa2",
+      "name": "org/nustaq/serialization/serializers/FSTCPEnumSetSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "elemType",
+          "descriptor": "Ljava/lang/reflect/Field;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "81e6e3f661f5f5dae26daaf69c14f4417f1b93a94bb36dcbcdf19b889a1cd9c9",
+          "code_length": 121,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ff877c73bea9b9a2bc6b68e8e0700958b71bb2a0b24279d26d2151c9c866054e",
+          "code_length": 75,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/EnumSet",
+        "java/util/Iterator",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTCPEnumSetSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTCPThrowableSerializer.class",
+      "occurrence": 0,
+      "sha256": "de2b5e4bc000159d747a1cab4d287dbb6775f50c1b5457f80fafa4bc4b36fece",
+      "name": "org/nustaq/serialization/serializers/FSTCPThrowableSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "851c9828908802d891a028fe30e8e29d60d22c09f557ca98c8a61b2467d2cce0",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "10c64f4a5afc42a70eb1602200a3f283be5af79f1b0b553b43c0b2cf8db8c3d9",
+          "code_length": 66,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTCPThrowableSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTClassSerializer.class",
+      "occurrence": 0,
+      "sha256": "9e1f14890c1292f03857587c2317504931ade668930ec59833515378ba2d20dc",
+      "name": "org/nustaq/serialization/serializers/FSTClassSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "primitiveMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Class;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5da49c660c121cd8e87e28869bcdaf948471300fef108088256f806a03ad2d7b",
+          "code_length": 122
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "2048b66e50e83fde8fa27ce800330f0cbe1d87f56df751b57faead115ce7d048",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4ec436d73a6fa164e4dbb18e0f8c7755a088fa7ccb0e2a1b8407d0ccfee00cb5",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/Void",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTClassSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTCollectionSerializer.class",
+      "occurrence": 0,
+      "sha256": "8c89041d284b8dc0301bcb694aa0d3adf0a68bccd93e73c4ae170ef1a5fcf3f2",
+      "name": "org/nustaq/serialization/serializers/FSTCollectionSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "da1664f0a39f7c262fe9b9b28cb5a58ea5a1ad0cb4c9d9bfad972cd598cb0e75",
+          "code_length": 204,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8a4c9d3bcbc39b791810a39d74af3c6398f6e4fdd612124727f6e17b808e5763",
+          "code_length": 207,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/AbstractList",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Vector",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTCollectionSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTDateSerializer.class",
+      "occurrence": 0,
+      "sha256": "df32863f58cd92749acd4b405e638902fe911836c476c1164367d1a2f7414687",
+      "name": "org/nustaq/serialization/serializers/FSTDateSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "696d8a045698fe46e1e05ee0e909114659cbe9e9070fef57e40fffdd698d1e3a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7b032794e13ce6c4ca09179f4c586843c328863afe69e8e9dad5199b736b25f8",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/util/Date",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTDateSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTEnumSetSerializer.class",
+      "occurrence": 0,
+      "sha256": "2b4bd0196afca1ecb783651da17134b42912ce42d740cded71ce4a9451361675",
+      "name": "org/nustaq/serialization/serializers/FSTEnumSetSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "elemType",
+          "descriptor": "Ljava/lang/reflect/Field;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "86f6221e42d85c852332c25ba4ede0f1d86f95ae3164d3bbe4cb6a211243de23",
+          "code_length": 123,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5d5492570c03fed6c03ea7416ebd1bdb117a23cc4e5bbacb95a8022e98b04569",
+          "code_length": 74,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/EnumSet",
+        "java/util/Iterator",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTEnumSetSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTJSonSerializers$BigDecSerializer.class",
+      "occurrence": 0,
+      "sha256": "229f3c08287d69c17bee96f7b04dc5a4e834bfe7dc345af39d456f322c414da7",
+      "name": "org/nustaq/serialization/serializers/FSTJSonSerializers$BigDecSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "2a7ed7515bb2d1765ea3cd2ce174315d9aee6952539d47513ccc766622e273e4",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "478ea8333830136b3badd35ba826797761047c6157c19b915cede48786f1a061",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/math/BigDecimal",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTJSonSerializers",
+        "org/nustaq/serialization/serializers/FSTJSonSerializers$BigDecSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTJSonSerializers.class",
+      "occurrence": 0,
+      "sha256": "98f6ccecb9b8f8378a1032048c083e3b969fd0f75b7aeaa0edae4d302323f8a1",
+      "name": "org/nustaq/serialization/serializers/FSTJSonSerializers",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/serializers/FSTJSonSerializers",
+        "org/nustaq/serialization/serializers/FSTJSonSerializers$BigDecSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTJSonUnmodifiableCollectionSerializer.class",
+      "occurrence": 0,
+      "sha256": "b4914d914b277ab7375ed1e5c6be05fb9848080d564c69595c12029a73ccbc48",
+      "name": "org/nustaq/serialization/serializers/FSTJSonUnmodifiableCollectionSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/serializers/FSTCollectionSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNMODIFIABLE_COLLECTION_CLASS",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 25,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "UNMODIFIABLE_RANDOM_ACCESS_LIST_CLASS",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 25,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "UNMODIFIABLE_SET_CLASS",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 25,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "UNMODIFIABLE_LIST_CLASS",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 25,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "f97aae871cbb7acf93dea8f544c21e8b0615f35f62ba2d4c13738ba7a99f2b86",
+          "code_length": 59,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fd04e84f7125438136b9f7872487a5751870fada88ce63d7701aafffd5e16376",
+          "code_length": 206,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "fillArray",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;ILjava/lang/Object;I)V",
+          "access": 2,
+          "code_sha256": "4adb1842d93a6e86c5c2116293814adc8a91f240b155941c636dee9c5c9c3496",
+          "code_length": 68,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/io/IOException",
+            "java/lang/IllegalAccessException",
+            "java/lang/InstantiationException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cab2662fb4efc77759f0fbe021d8d04360f892ede0467ea2a04bb109b30dc90f",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTCollectionSerializer",
+        "org/nustaq/serialization/serializers/FSTJSonUnmodifiableCollectionSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTJSonUnmodifiableMapSerializer.class",
+      "occurrence": 0,
+      "sha256": "6a60390fca2cd40819a198f537f2eb51d077c04c8e7eae68244ac9dc46fa1126",
+      "name": "org/nustaq/serialization/serializers/FSTJSonUnmodifiableMapSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/serializers/FSTMapSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNMODIFIABLE_MAP_CLASS",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 25,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "922912584e104411290995d75157c34b46aee461f8304fced6ca4bfc709bfc06",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "762fb8218466aaacf839534f4f38252f54fca12e955e4138654c47fe3211bf6b",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/serializers/FSTJSonUnmodifiableMapSerializer",
+        "org/nustaq/serialization/serializers/FSTMapSerializer",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTMapSerializer.class",
+      "occurrence": 0,
+      "sha256": "6f207d4be153c4765dc1c0dd8e2909f85e162a943c21986d54a6f7aedf4a79b1",
+      "name": "org/nustaq/serialization/serializers/FSTMapSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "9d6c9dd27f00d44f552fc7aea33d9615f4a5b4130bca1541a24933329d8f98a9",
+          "code_length": 182,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "92b0516e073afe0847e09484cf757a029480c0c9b589c6e571b0831b8c5ff12e",
+          "code_length": 118,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/HashMap",
+        "java/util/Hashtable",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTMapSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTStringBufferSerializer.class",
+      "occurrence": 0,
+      "sha256": "8ef45a35ff8a8e4855ec74dd2cc22ad52c3b2ff49a114897f03be8bfd092fea4",
+      "name": "org/nustaq/serialization/serializers/FSTStringBufferSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "2a7ed7515bb2d1765ea3cd2ce174315d9aee6952539d47513ccc766622e273e4",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "alwaysCopy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "47253d92cbebc93de3848c63d93a92895f89c7b6d469217657b6dff5a49dc4e9",
+          "code_length": 31,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTStringBufferSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTStringBuilderSerializer.class",
+      "occurrence": 0,
+      "sha256": "c04a8ebd4179622fdfe89ee87e437415508dfb07a266ec18099b1ea99887a3b7",
+      "name": "org/nustaq/serialization/serializers/FSTStringBuilderSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/serializers/FSTStringBufferSerializer",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3749bb76a955ca75600c8a921b19963061fa8dfda673ccd81c3ffd056b5717de",
+          "code_length": 31,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/serializers/FSTStringBufferSerializer",
+        "org/nustaq/serialization/serializers/FSTStringBuilderSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTStringSerializer.class",
+      "occurrence": 0,
+      "sha256": "518fa37a308f2830b19d9cb218f77c80800e84330d739f5f9660da1cb06d7a40",
+      "name": "org/nustaq/serialization/serializers/FSTStringSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Instance",
+          "descriptor": "Lorg/nustaq/serialization/serializers/FSTStringSerializer;",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "60f0f95ff276f533f6dd53fe9d5296a8d4b42a30cd89cbe4dee88844cca4d2d3",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6d1c445bd88ed363a6ef01541f4e6e6be627a521474f32fcd21b561436508acf",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "writeTupleEnd",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1e6d95a36527cecbd9ba38ec97bf9c3b6cdd69d4b129aa35bbf18681a8b8b615",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTStringSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/serializers/FSTStructSerializer.class",
+      "occurrence": 0,
+      "sha256": "c31cb7f7d590b9483cd1556ce3bf03b22742647bca4fa1d098da5ed19b192d39",
+      "name": "org/nustaq/serialization/serializers/FSTStructSerializer",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/FSTBasicObjectSerializer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "COMPRESS",
+          "descriptor": "Z",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Lorg/nustaq/serialization/FSTObjectOutput;Ljava/lang/Object;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)V",
+          "access": 1,
+          "code_sha256": "8fb320ba71fb9d7f5de418a44ecef3feb7b4e89903742e05edf380ae8c5385d5",
+          "code_length": 236,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "instantiate",
+          "descriptor": "(Ljava/lang/Class;Lorg/nustaq/serialization/FSTObjectInput;Lorg/nustaq/serialization/FSTClazzInfo;Lorg/nustaq/serialization/FSTClazzInfo$FSTFieldInfo;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d084dafd9a50ac5fa98c322120b9ae5e4c8aad1903721fdb839b99b6fedc27f3",
+          "code_length": 253,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c45f576b76050242cf1010279e739e1783c5cdf9c599565e92143964dc74b7ac",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/nustaq/offheap/bytez/Bytez",
+        "org/nustaq/offheap/bytez/onheap/HeapBytez",
+        "org/nustaq/offheap/structs/FSTStruct",
+        "org/nustaq/offheap/structs/unsafeimpl/FSTStructFactory",
+        "org/nustaq/serialization/FSTBasicObjectSerializer",
+        "org/nustaq/serialization/FSTClazzInfo",
+        "org/nustaq/serialization/FSTClazzInfo$FSTFieldInfo",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/serializers/FSTStructSerializer"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/DefaultCoder.class",
+      "occurrence": 0,
+      "sha256": "150fedf41c572f51cabd54d013a664b90c427aab10be07bf349879b9519216e3",
+      "name": "org/nustaq/serialization/simpleapi/DefaultCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/simpleapi/FSTCoder"
+      ],
+      "fields": [
+        {
+          "name": "conf",
+          "descriptor": "Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 4
+        },
+        {
+          "name": "input",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectInput;",
+          "access": 0
+        },
+        {
+          "name": "output",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectOutput;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z[Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "cdad8a08f58a0db50e70ab56075d6c9edf34d737f485fc97fe37f3817d73f272",
+          "code_length": 104
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "dae33a6cd4c306582f0d6202b72b86f0eb18c97c3f5dc2e53769106b3094a202",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8a6b295992239603995a7d59c05206b53369e9e3203b1b322dcaa82030e7e73a",
+          "code_length": 10
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;[BII)I",
+          "access": 1,
+          "code_sha256": "139dd480d9e8de6a435b94e1181339d63c80ac48fc5d0aa4cc66a826b7dd5b0c",
+          "code_length": 63
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;)[B",
+          "access": 1,
+          "code_sha256": "afbe2334d152283b1afabe0040d9a713d4b0e21689182ccdc20ae687caa3cf0e",
+          "code_length": 31
+        },
+        {
+          "name": "getConf",
+          "descriptor": "()Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "toObject",
+          "descriptor": "([BII)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2ceade13cb71de2cd22d3d626e2279f3280cc690951776fc4f7916f87de1bb4c",
+          "code_length": 42
+        },
+        {
+          "name": "toObject",
+          "descriptor": "([B)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fc0cfaf6556f6feffe8435f10c289252a98318d20bedb0ed1e24c22a87279ab8",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectInputNoShared",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/FSTObjectOutputNoShared",
+        "org/nustaq/serialization/simpleapi/DefaultCoder",
+        "org/nustaq/serialization/simpleapi/FSTBufferTooSmallException",
+        "org/nustaq/serialization/simpleapi/FSTCoder",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/FSTBufferTooSmallException.class",
+      "occurrence": 0,
+      "sha256": "3fe02b33fadda89553e45242de1b71d2f9f78d4875f75f669ab3e1d50fec2fc2",
+      "name": "org/nustaq/serialization/simpleapi/FSTBufferTooSmallException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Instance",
+          "descriptor": "Lorg/nustaq/serialization/simpleapi/FSTBufferTooSmallException;",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "fillInStackTrace",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 33,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6e997edbda1a352330b722d448fa4fe511cd0e8704c1545c2e4cc7878392b576",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/nustaq/serialization/simpleapi/FSTBufferTooSmallException"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/FSTCoder.class",
+      "occurrence": 0,
+      "sha256": "bf1b82a556753ff47d4eca32458eced847206c838e942151d9b57826a8286ce3",
+      "name": "org/nustaq/serialization/simpleapi/FSTCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "toObject",
+          "descriptor": "([BII)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "toObject",
+          "descriptor": "([B)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;[BII)I",
+          "access": 1025
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;)[B",
+          "access": 1025
+        },
+        {
+          "name": "getConf",
+          "descriptor": "()Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/simpleapi/FSTCoder"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/MinBinCoder.class",
+      "occurrence": 0,
+      "sha256": "d1c0f220e943298e12ac5b7e845e1f006f00df356f0af2d2e2d5bc753ed30f57",
+      "name": "org/nustaq/serialization/simpleapi/MinBinCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/nustaq/serialization/simpleapi/DefaultCoder",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z[Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "58bd3d98314f15a8e88c40c01519f668f2fcaee13b8633725a64f855522ebd82",
+          "code_length": 68
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "ccc8dfc321eb6e8137e3d5cc20383757cfba2fa63f4f1dd65ce18a9abd712989",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5cbbf424c607d9cfd1c8cd4c14680697274abca5c32a248c9c9f80d8b40aa2d9",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/lang/Class",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/simpleapi/DefaultCoder",
+        "org/nustaq/serialization/simpleapi/MinBinCoder"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/OffHeapCoder$1.class",
+      "occurrence": 0,
+      "sha256": "4bd766d682fafe93e6e99e2709ac74b17e8cd97254bb6b45e706f07026ee9616",
+      "name": "org/nustaq/serialization/simpleapi/OffHeapCoder$1",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory"
+      ],
+      "fields": [
+        {
+          "name": "input",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 0
+        },
+        {
+          "name": "output",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/nustaq/serialization/simpleapi/OffHeapCoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/nustaq/serialization/simpleapi/OffHeapCoder;)V",
+          "access": 0,
+          "code_sha256": "9768e15bc0fef91386ee1fac81103eee3de3c214ad0e8a68532236daf91b839e",
+          "code_length": 32
+        },
+        {
+          "name": "createStreamEncoder",
+          "descriptor": "()Lorg/nustaq/serialization/FSTEncoder;",
+          "access": 1,
+          "code_sha256": "f4e5c9e93fa54a6266132cfb61548f04d1d81d4f6d8307fea44de7642e274cd1",
+          "code_length": 29
+        },
+        {
+          "name": "createStreamDecoder",
+          "descriptor": "()Lorg/nustaq/serialization/FSTDecoder;",
+          "access": 1,
+          "code_sha256": "1e8f1a09aa9ab9c7117dc860a9bf7df3308df8a880b66a16bcbd54faa4c4194b",
+          "code_length": 22
+        },
+        {
+          "name": "getInput",
+          "descriptor": "()Ljava/lang/ThreadLocal;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getOutput",
+          "descriptor": "()Ljava/lang/ThreadLocal;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/ThreadLocal",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory",
+        "org/nustaq/serialization/coders/FSTBytezDecoder",
+        "org/nustaq/serialization/coders/FSTBytezEncoder",
+        "org/nustaq/serialization/simpleapi/OffHeapCoder",
+        "org/nustaq/serialization/simpleapi/OffHeapCoder$1"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/OffHeapCoder.class",
+      "occurrence": 0,
+      "sha256": "a92047afc8ca51b9c98e1a0a15c6229fa39e8af5d8d237247fb1d6343dfff409",
+      "name": "org/nustaq/serialization/simpleapi/OffHeapCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "conf",
+          "descriptor": "Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 4
+        },
+        {
+          "name": "writeTarget",
+          "descriptor": "Lorg/nustaq/offheap/bytez/malloc/MallocBytez;",
+          "access": 0
+        },
+        {
+          "name": "readTarget",
+          "descriptor": "Lorg/nustaq/offheap/bytez/malloc/MallocBytez;",
+          "access": 0
+        },
+        {
+          "name": "out",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectOutput;",
+          "access": 0
+        },
+        {
+          "name": "in",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectInput;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "f0ff71f98fc4a1b8a5d556e48e59a9c93b3cbcd6c923568fc552c9dca986eafa",
+          "code_length": 120
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z[Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "286adeb9da47fbc547323d4790cdc4fe2d089c42d43bd375df351293f7bff445",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "82e0060238267f2e30e4885e589a71baa4f78c4f6adde71f149e2c2d2aa61a71",
+          "code_length": 14
+        },
+        {
+          "name": "toMemory",
+          "descriptor": "(Ljava/lang/Object;JI)I",
+          "access": 1,
+          "code_sha256": "15f50922464a9e712396771047475517e56e42abe1e3d02e7dba6de91ac81f4c",
+          "code_length": 38,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toObject",
+          "descriptor": "(JI)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3e809ace4e62127396c3fecd6f3839a5f8a533301c68302ef764c99d79ddb06c",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Object",
+        "org/nustaq/offheap/bytez/malloc/MallocBytez",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectInputNoShared",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/FSTObjectOutputNoShared",
+        "org/nustaq/serialization/simpleapi/OffHeapCoder",
+        "org/nustaq/serialization/simpleapi/OffHeapCoder$1"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/OnHeapCoder$1.class",
+      "occurrence": 0,
+      "sha256": "cfbdb3344f96452b93b5f7f574de8195a74a0a997d4f42550c7880e9ab45d0bc",
+      "name": "org/nustaq/serialization/simpleapi/OnHeapCoder$1",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory"
+      ],
+      "fields": [
+        {
+          "name": "input",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 0
+        },
+        {
+          "name": "output",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/nustaq/serialization/simpleapi/OnHeapCoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/nustaq/serialization/simpleapi/OnHeapCoder;)V",
+          "access": 0,
+          "code_sha256": "9768e15bc0fef91386ee1fac81103eee3de3c214ad0e8a68532236daf91b839e",
+          "code_length": 32
+        },
+        {
+          "name": "createStreamEncoder",
+          "descriptor": "()Lorg/nustaq/serialization/FSTEncoder;",
+          "access": 1,
+          "code_sha256": "f4e5c9e93fa54a6266132cfb61548f04d1d81d4f6d8307fea44de7642e274cd1",
+          "code_length": 29
+        },
+        {
+          "name": "createStreamDecoder",
+          "descriptor": "()Lorg/nustaq/serialization/FSTDecoder;",
+          "access": 1,
+          "code_sha256": "1e8f1a09aa9ab9c7117dc860a9bf7df3308df8a880b66a16bcbd54faa4c4194b",
+          "code_length": 22
+        },
+        {
+          "name": "getInput",
+          "descriptor": "()Ljava/lang/ThreadLocal;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getOutput",
+          "descriptor": "()Ljava/lang/ThreadLocal;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/ThreadLocal",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory",
+        "org/nustaq/serialization/coders/FSTBytezDecoder",
+        "org/nustaq/serialization/coders/FSTBytezEncoder",
+        "org/nustaq/serialization/simpleapi/OnHeapCoder",
+        "org/nustaq/serialization/simpleapi/OnHeapCoder$1"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/simpleapi/OnHeapCoder.class",
+      "occurrence": 0,
+      "sha256": "c6b417c53c0273adba57fd5b9d478664b39f5511d857945fce341e2176f87208",
+      "name": "org/nustaq/serialization/simpleapi/OnHeapCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/simpleapi/FSTCoder"
+      ],
+      "fields": [
+        {
+          "name": "conf",
+          "descriptor": "Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 4
+        },
+        {
+          "name": "writeTarget",
+          "descriptor": "Lorg/nustaq/offheap/bytez/onheap/HeapBytez;",
+          "access": 4
+        },
+        {
+          "name": "readTarget",
+          "descriptor": "Lorg/nustaq/offheap/bytez/onheap/HeapBytez;",
+          "access": 4
+        },
+        {
+          "name": "out",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectOutput;",
+          "access": 4
+        },
+        {
+          "name": "in",
+          "descriptor": "Lorg/nustaq/serialization/FSTObjectInput;",
+          "access": 4
+        },
+        {
+          "name": "buff",
+          "descriptor": "[B",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "aea7051348f61e8140d533979aa1d03330a761ac9f50ecdf82b67e9bd9bb0e27",
+          "code_length": 131
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "ec9e59c686a801b7012c4cda876002874996557c4ea67e4b0e4ac58c79c89ec7",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z[Ljava/lang/Class;)V",
+          "access": 129,
+          "code_sha256": "3c2c5291e87b3b3a405c55ac114de0df4403995d4766818aa9f2a384b715b1c7",
+          "code_length": 14
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;[BII)I",
+          "access": 1,
+          "code_sha256": "07ab7644a7f26f887195550ccf3d54764d1608df5a514056f1eb327274c37792",
+          "code_length": 50
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/lang/Object;)[B",
+          "access": 1,
+          "code_sha256": "8ac606cb5256c11f85981eac68a68e9319aabdf7bcf262ddf18021b688e767f1",
+          "code_length": 69
+        },
+        {
+          "name": "getConf",
+          "descriptor": "()Lorg/nustaq/serialization/FSTConfiguration;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "toObject",
+          "descriptor": "([BII)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ce0a92a8575c60db65d1eeb43c816a07b6434034782457486955e6f03ae485a7",
+          "code_length": 41
+        },
+        {
+          "name": "toObject",
+          "descriptor": "([B)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ec56215dd2671f8447a619b92cccaafa52a8529443173b6e51f7677e463d6a06",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/nustaq/offheap/bytez/onheap/HeapBytez",
+        "org/nustaq/serialization/FSTConfiguration",
+        "org/nustaq/serialization/FSTConfiguration$StreamCoderFactory",
+        "org/nustaq/serialization/FSTObjectInput",
+        "org/nustaq/serialization/FSTObjectInputNoShared",
+        "org/nustaq/serialization/FSTObjectOutput",
+        "org/nustaq/serialization/FSTObjectOutputNoShared",
+        "org/nustaq/serialization/simpleapi/FSTBufferTooSmallException",
+        "org/nustaq/serialization/simpleapi/FSTCoder",
+        "org/nustaq/serialization/simpleapi/OnHeapCoder",
+        "org/nustaq/serialization/simpleapi/OnHeapCoder$1",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/DefaultFSTInt2ObjectMap.class",
+      "occurrence": 0,
+      "sha256": "d87ef09883d1481399b96ae4c26c36d5f25b3e1941d6f3112d163c810df4d208",
+      "name": "org/nustaq/serialization/util/DefaultFSTInt2ObjectMap",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/util/FSTInt2ObjectMap"
+      ],
+      "fields": [
+        {
+          "name": "mKeys",
+          "descriptor": "[I",
+          "access": 2
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "mNumberOfElements",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap;",
+          "access": 2,
+          "generic_signature": "Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap<TV;>;"
+        },
+        {
+          "name": "GROWFAC",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f72c621b697997fa15678665d944cbbee7746103c9c915a9773d028b1b8ae49",
+          "code_length": 39
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "90a1b1b404143c1009fd80ea683b7909df7f8ee2b10fe053643e141b6812f673",
+          "code_length": 24
+        },
+        {
+          "name": "put",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "5719123d92da6956241cbc3f7a865c248482422e5e7d0f567686d79c1a3463a8",
+          "code_length": 58,
+          "generic_signature": "(ITV;)V"
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(ILjava/lang/Object;ILorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap;Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap;)V",
+          "access": 26,
+          "code_sha256": "59f97f0a932c17f9a264b5f84f6b4f73456f5da05102a0450a10f9be0351e8d0",
+          "code_length": 250,
+          "generic_signature": "<V:Ljava/lang/Object;>(ITV;ILorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap<TV;>;Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap<TV;>;)V"
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(ILjava/lang/Object;ILorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap;)V",
+          "access": 16,
+          "code_sha256": "9b805585ea55f7420753c861e2bebfdee658a90321c9f04469d01e638316f900",
+          "code_length": 10,
+          "generic_signature": "(ITV;ILorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap<TV;>;)V"
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "fa4e22d9d24c518ced20697c67fc5580924735689cdcb3226ecd8aad65c9db34",
+          "code_length": 12,
+          "generic_signature": "(I)TV;"
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(II)Ljava/lang/Object;",
+          "access": 16,
+          "code_sha256": "655ea866682bb387c8309293fff5e0c09d78ce56a3e580aa0f538fc76891fc1e",
+          "code_length": 64,
+          "generic_signature": "(II)TV;"
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 16,
+          "code_sha256": "87a8d5a156c697743d3bcc8861bf548fb0ac3ff0d6bfff6f2188b722aceb8812",
+          "code_length": 102
+        },
+        {
+          "name": "rePut",
+          "descriptor": "(Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap;)V",
+          "access": 2,
+          "code_sha256": "c17fc7cf0f97d78f6abb07540c41a50e5ea6c8f428831c5a2cf348a99aa852de",
+          "code_length": 64,
+          "generic_signature": "(Lorg/nustaq/serialization/util/DefaultFSTInt2ObjectMap<TV;>;)V"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d7ad5e0d787d7d62b60e14e67f1378f5c8982734457a197f0f5cb025e566c562",
+          "code_length": 100
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lorg/nustaq/serialization/util/FSTInt2ObjectMap<TV;>;",
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Object;",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "org/nustaq/serialization/util/DefaultFSTInt2ObjectMap",
+        "org/nustaq/serialization/util/FSTInt2ObjectMap",
+        "org/nustaq/serialization/util/FSTObject2IntMap",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/DefaultFSTInt2ObjectMapFactory.class",
+      "occurrence": 0,
+      "sha256": "d00ca2e4466869611daff03df4e314536dbd95fe760501cd5387b55d3ce7b5c0",
+      "name": "org/nustaq/serialization/util/DefaultFSTInt2ObjectMapFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/nustaq/serialization/util/FSTInt2ObjectMapFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createMap",
+          "descriptor": "(I)Lorg/nustaq/serialization/util/FSTInt2ObjectMap;",
+          "access": 1,
+          "code_sha256": "da8bae383bc69a0cd36a57a3c6a8d83c1db02541aeb9c1625c2ed452522add2d",
+          "code_length": 9,
+          "generic_signature": "<V:Ljava/lang/Object;>(I)Lorg/nustaq/serialization/util/FSTInt2ObjectMap<TV;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/util/DefaultFSTInt2ObjectMap",
+        "org/nustaq/serialization/util/DefaultFSTInt2ObjectMapFactory",
+        "org/nustaq/serialization/util/FSTInt2ObjectMapFactory"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTIdentity2IdMap.class",
+      "occurrence": 0,
+      "sha256": "bfa711747cabc4242b8615adcfb5e2e10e8afd4aa82d8b8f80008c9138f0aa5a",
+      "name": "org/nustaq/serialization/util/FSTIdentity2IdMap",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RESERVE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MAX_DEPTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "prim",
+          "descriptor": "[I",
+          "access": 8
+        },
+        {
+          "name": "GROFAC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "mask",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "mKeys",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 1
+        },
+        {
+          "name": "klen",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[I",
+          "access": 2
+        },
+        {
+          "name": "mNumberOfElements",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTIdentity2IdMap;",
+          "access": 2
+        },
+        {
+          "name": "linearScanList",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "linearScanVals",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "adjustSize",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "f4aa834994437fe9ce6c3afbb88500eb01cf726bba63324d10be67177460de93",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c656a916e44d4e784f71289bb8a58149c978a647c66d41beefcd41fbca8b7492",
+          "code_length": 58
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c6c2beffdd9c7b2f67031e3ed59c7893f2de4d3326fe0d2bab3d98d152e76fd5",
+          "code_length": 41
+        },
+        {
+          "name": "putOrGet",
+          "descriptor": "(Ljava/lang/Object;I)I",
+          "access": 17,
+          "code_sha256": "6e86997a541b87d7eacbeb092e19d3a77c1c5f0a2fa24cd46f25949d3745b705",
+          "code_length": 15
+        },
+        {
+          "name": "putOrGetHash",
+          "descriptor": "(Ljava/lang/Object;IILorg/nustaq/serialization/util/FSTIdentity2IdMap;I)I",
+          "access": 16,
+          "code_sha256": "2a3e112bddda0f7a59cd44cdc171ea113b58288cdc9aa9855b3e861e89a7372c",
+          "code_length": 383
+        },
+        {
+          "name": "putOrGetNext",
+          "descriptor": "(ILjava/lang/Object;II)I",
+          "access": 16,
+          "code_sha256": "46ff60939716530cfca502325597070ebb0803119c632dc5a6f7b7603489f232",
+          "code_length": 98
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 17,
+          "code_sha256": "53ee3eb53d63ba8b83e5c2d9e6b6037ab29c563723b335a91e5d718c092c216a",
+          "code_length": 15
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(Ljava/lang/Object;IILorg/nustaq/serialization/util/FSTIdentity2IdMap;I)V",
+          "access": 16,
+          "code_sha256": "44e8591767d90125b9d395a34f376c6673f52e74a98e84d9344879d5edc7e331",
+          "code_length": 390
+        },
+        {
+          "name": "putNext",
+          "descriptor": "(ILjava/lang/Object;II)V",
+          "access": 16,
+          "code_sha256": "2891962e35a9d9290f50cc2a49f5255f87c968951347421f15a238ae123c1c73",
+          "code_length": 82
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 17,
+          "code_sha256": "8ee276c8daef077c371a5bf075207f10ee0a8da48eddba34133b4a24bb13070e",
+          "code_length": 12
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(Ljava/lang/Object;I)I",
+          "access": 16,
+          "code_sha256": "f5411c472107bd69daf1ccdcbfe3ca87aa7798f8293d9ded40892911f0643aad",
+          "code_length": 191
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 16,
+          "code_sha256": "a7a11abe0d1dd918360c703af3d57673187840838960abff843a696de95199ec",
+          "code_length": 114
+        },
+        {
+          "name": "rePut",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTIdentity2IdMap;)V",
+          "access": 2,
+          "code_sha256": "8bdbe96ef2d43f45f9c93cbb3e62cc861e476ab46f54382ee85e91149fea8985",
+          "code_length": 124
+        },
+        {
+          "name": "calcIndexFromHash",
+          "descriptor": "(I[Ljava/lang/Object;)I",
+          "access": 16,
+          "code_sha256": "79ee38815ee55078c454c01677f144fd77ab02ed391f5da16cddc3246e71a322",
+          "code_length": 24
+        },
+        {
+          "name": "calcHash",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 10,
+          "code_sha256": "ba250e66cb357bd829fe1e9102eba20f8987185bb761795dcc07c42843cf5b9e",
+          "code_length": 17
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c14c824995640f8ac3baee170368c796eb14a37da7950ace6c5a8c6cb2392293",
+          "code_length": 67
+        },
+        {
+          "name": "dump",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aaade941a835e151fbfd188571b7a586bd547c9fd601fbe435defafd573dc633",
+          "code_length": 82
+        },
+        {
+          "name": "keysLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e913094fe26f65999769e49436880bc62f779aa434fb46306df3241f67768661",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "29f9f8cb8e9d00b2b1de6838ac2296bc9dcf4f645cec19b3172ad38f4ff9e6bc",
+          "code_length": 236
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Object;",
+        "java/io/PrintStream",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/nustaq/serialization/util/FSTIdentity2IdMap",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTInputStream.class",
+      "occurrence": 0,
+      "sha256": "83615efc4d01c605ce0ab0b7eea44ad1eac53472c1f5389984634df537ade9c8",
+      "name": "org/nustaq/serialization/util/FSTInputStream",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "REPORT_READ_FAILS",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/nustaq/logging/FSTLogger;",
+          "access": 26
+        },
+        {
+          "name": "chunk_size",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cachedBuffer",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 9,
+          "generic_signature": "Ljava/lang/ThreadLocal<[B>;"
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "in",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 0
+        },
+        {
+          "name": "fullyRead",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "byteBacked",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "973ba6b8069f6d4ec4f78f8fc22e9196c418cd1c8e9703d8aace6fa392b2523c",
+          "code_length": 27
+        },
+        {
+          "name": "resetForReuse",
+          "descriptor": "([BI)V",
+          "access": 1,
+          "code_sha256": "b4bb14d6e8a5ba36d4ea02c9299e9acdc7a904390dbce389ab6f43892af50e5b",
+          "code_length": 30
+        },
+        {
+          "name": "initFromStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "1ed036b9307821ca4cb7c9ef1846324fe896b06b858fbd08267e13c99c275b07",
+          "code_length": 73
+        },
+        {
+          "name": "isFullyRead",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "648e179bf9a3d94a374c21ffa93a1d7ec20ebeadf063dc578ca47ff440dcd13c",
+          "code_length": 24
+        },
+        {
+          "name": "readNextChunk",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "99d2ec850d2081f6ed51519c46b862216588f1141f187960a835b475808515c0",
+          "code_length": 123
+        },
+        {
+          "name": "ensureCapacity",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4fc3398e0daa0511cd773d3a48234668fc3aa8e11ef62664d0f984e08f5ecd4d",
+          "code_length": 57
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "03773f21e69f3c65850d7a2d51a8f12a9a9de2d2bb664bc69ad8ecae70b5ff37",
+          "code_length": 38
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "0fd92d071ef19b219787c8f82f8202b2debe37640a382d7b6ce4f66511a1ca03",
+          "code_length": 44
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9bbbb278d84e7e8c5b8c4e775c07a9f083acbc96a3c2c8c1d8ca99a36997b83f",
+          "code_length": 51
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "8cfac98d2fb4e212ce63cdb1d7e802aa311030f38227bcde65463f7b1d6f63cb",
+          "code_length": 92
+        },
+        {
+          "name": "skip",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "9276765952cfefda6c34d5480481a968f6e961db10bc077da25bb147ee1b54f9",
+          "code_length": 43
+        },
+        {
+          "name": "available",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bf9d22393d94800528d38ea8d8e693ce2bb8b94ee26292fe30b0e64842fa1133",
+          "code_length": 10
+        },
+        {
+          "name": "markSupported",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "mark",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f030c8fee46d1e672ab6abcd0ccdff3ffb9e5822187d1d7f118a0cd1ebcaf24e",
+          "code_length": 21
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b014d1fe7f6abc5451be511ecf2a3afb88f5fee1206d60162f408258d68e4783",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "ensureReadAhead",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a0a0380cdd113360708327b5d5c8cc7b7ae710f0c9d926b7846962e50d0c9941",
+          "code_length": 42
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "40039b549b258970ad6bd659acb69e438994d3eeb1be415bfefe2f7dec79a8da",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/RuntimeException",
+        "java/lang/System",
+        "java/lang/ThreadLocal",
+        "org/nustaq/logging/FSTLogger",
+        "org/nustaq/logging/FSTLogger$Level",
+        "org/nustaq/serialization/util/FSTInputStream"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTInt2IntMap.class",
+      "occurrence": 0,
+      "sha256": "6a7f53ca2fe7b38035c83caee05cc5026e082f19d09658608a68839e26d6fe43",
+      "name": "org/nustaq/serialization/util/FSTInt2IntMap",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "mKeys",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "mNumberOfElements",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTInt2IntMap;",
+          "access": 0
+        },
+        {
+          "name": "GROWFAC",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f0a7513b1444df4fc53c1befebf3dbf32873ea443c3c306fb8d356b15ec9ccfa",
+          "code_length": 38
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3b774b0340183880d3bc433c389eaab6e08e77b1bbac15919ca9da7e44d70707",
+          "code_length": 24
+        },
+        {
+          "name": "put",
+          "descriptor": "(II)V",
+          "access": 17,
+          "code_sha256": "8f51c2e2a55beada885ffae1ca3a31100ed8c3e759437ed08572632d699465ef",
+          "code_length": 167
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(IIILorg/nustaq/serialization/util/FSTInt2IntMap;)V",
+          "access": 16,
+          "code_sha256": "3b7c4df4722b29cdb56f54e89d294f0003c60fd24c627a2126c22582e8642696",
+          "code_length": 173
+        },
+        {
+          "name": "putNext",
+          "descriptor": "(III)V",
+          "access": 16,
+          "code_sha256": "dc0d88244748487da791518b2d80f44eab9c791610eb7c542eca56848c9d49fd",
+          "code_length": 40
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)I",
+          "access": 17,
+          "code_sha256": "a7cbfa10304550e005dfdcf958b2de10032421290ad4451b77544b026a5dc64d",
+          "code_length": 12
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(II)I",
+          "access": 16,
+          "code_sha256": "465cf00e8d9c03afda8e62cd525b126a8d646384bada23d80452033b9e3b2777",
+          "code_length": 66
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 16,
+          "code_sha256": "fb36832e373c9e5cf78777d743aef22272ffeeff1a05a11eb058665b21a5da3d",
+          "code_length": 101
+        },
+        {
+          "name": "rePut",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTInt2IntMap;)V",
+          "access": 2,
+          "code_sha256": "5bc7182994add557ca3e3e4cba95972111b8f41d156fdca7902479e79f69bfb7",
+          "code_length": 64
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1200c7c472121c57afe5aa9c66b7ec2793744400832882706089b33a4f3a9d3b",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "org/nustaq/serialization/util/FSTInt2IntMap",
+        "org/nustaq/serialization/util/FSTObject2IntMap",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTInt2ObjectMap.class",
+      "occurrence": 0,
+      "sha256": "c59ad6ddb40a3303fd2a980ad031582c2c61435f63d3331ec8a1575d5602e9e8",
+      "name": "org/nustaq/serialization/util/FSTInt2ObjectMap",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "put",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(ITV;)V"
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(I)TV;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/util/FSTInt2ObjectMap"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTInt2ObjectMapFactory.class",
+      "occurrence": 0,
+      "sha256": "99bb2a079eb1e82e04aa17e1e6b2febf21c18ec086cbaa5f67bb73de6e480432",
+      "name": "org/nustaq/serialization/util/FSTInt2ObjectMapFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createMap",
+          "descriptor": "(I)Lorg/nustaq/serialization/util/FSTInt2ObjectMap;",
+          "access": 1025,
+          "generic_signature": "<V:Ljava/lang/Object;>(I)Lorg/nustaq/serialization/util/FSTInt2ObjectMap<TV;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/nustaq/serialization/util/FSTInt2ObjectMapFactory"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTMap.class",
+      "occurrence": 0,
+      "sha256": "47832f17b14159fb07e504d80054c3eb17e6fae7b46c0e0558685ec3d7d2b6f4",
+      "name": "org/nustaq/serialization/util/FSTMap",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "prim",
+          "descriptor": "[I",
+          "access": 8
+        },
+        {
+          "name": "GROFAC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "mKeys",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 1
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 1
+        },
+        {
+          "name": "mNumberOfElements",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTMap;",
+          "access": 0,
+          "generic_signature": "Lorg/nustaq/serialization/util/FSTMap<TK;TV;>;"
+        },
+        {
+          "name": "checkClazzOnEquals",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "miss",
+          "descriptor": "I",
+          "access": 8
+        },
+        {
+          "name": "hit",
+          "descriptor": "I",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "adjustSize",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "906493e23cb8b9f647a4c0556ec1b223f95c58eac1084e47bcb1e0bf9bc1ff21",
+          "code_length": 35
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "eb2423ee63a8e0f1c345cd2dd1d484435f5c5773bbe69cfc66d170bf00a91948",
+          "code_length": 45
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ae38edcf6bc595bccc9e1e5dbeaa92f90d8597e697b2c29c967d75c9be508725",
+          "code_length": 24
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "967bce6f34010855366f85cc467470f25fc6899fbd09d53041de4909078e2f78",
+          "code_length": 17,
+          "generic_signature": "(TK;TV;)V"
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILorg/nustaq/serialization/util/FSTMap;)V",
+          "access": 16,
+          "code_sha256": "1ec112394568869ec844c20916bb1cd69df344813a2436fb9c9e3b468dea9320",
+          "code_length": 191,
+          "generic_signature": "(TK;TV;ILorg/nustaq/serialization/util/FSTMap<TK;TV;>;)V"
+        },
+        {
+          "name": "removeHash",
+          "descriptor": "(Ljava/lang/Object;I)Ljava/lang/Object;",
+          "access": 16,
+          "code_sha256": "cc37604c599150e1a060d1ce3088c34c23d80d697c2548cadfad5a92915dde63",
+          "code_length": 112,
+          "generic_signature": "(TK;I)TK;"
+        },
+        {
+          "name": "putNext",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Object;)V",
+          "access": 16,
+          "code_sha256": "6ed9deacc62e65425042d970ff094345273f535513578e68c916bdf3f2932873",
+          "code_length": 40,
+          "generic_signature": "(ITK;TV;)V"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "a01cc8d8231bc7550bc0a06b7ff023dc09a6c4938d817c5ad2ccf28105ee6bf9",
+          "code_length": 89,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(Ljava/lang/Object;I)Ljava/lang/Object;",
+          "access": 16,
+          "code_sha256": "d499fbb069009fd3cb30ef887d70aad52156f5479b1c2db5fd447b7119b12af9",
+          "code_length": 81,
+          "generic_signature": "(TK;I)TV;"
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 16,
+          "code_sha256": "ff173064f2c148c509c4e3ced0936a48168377e15b36668f26e45677312a8ae7",
+          "code_length": 96
+        },
+        {
+          "name": "rePut",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTMap;)V",
+          "access": 2,
+          "code_sha256": "603853b3bc07c39b06ad29f7dbd4bd8b6304492b359daac173219b8f5a8f076b",
+          "code_length": 55,
+          "generic_signature": "(Lorg/nustaq/serialization/util/FSTMap<TK;TV;>;)V"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7c84586483ae21ef18982f33b807f11530e33166639fd5c91262cab6d13db06e",
+          "code_length": 42
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f8bb4124f1469af7437dadd65ddc2d87a1d01559b3d5b2524733c8da842097cb",
+          "code_length": 15
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/nustaq/serialization/util/FSTMap",
+        "org/nustaq/serialization/util/FSTObject2IntMap",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTObject2IntMap.class",
+      "occurrence": 0,
+      "sha256": "73d284ef742566f88a7954ddad536d8a3277f30f252226a38b71ea85365d93d8",
+      "name": "org/nustaq/serialization/util/FSTObject2IntMap",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "prim",
+          "descriptor": "[I",
+          "access": 8
+        },
+        {
+          "name": "GROFAC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "mKeys",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 1
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "mNumberOfElements",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTObject2IntMap;",
+          "access": 0,
+          "generic_signature": "Lorg/nustaq/serialization/util/FSTObject2IntMap<TK;>;"
+        },
+        {
+          "name": "checkClazzOnEquals",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "miss",
+          "descriptor": "I",
+          "access": 8
+        },
+        {
+          "name": "hit",
+          "descriptor": "I",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "adjustSize",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "906493e23cb8b9f647a4c0556ec1b223f95c58eac1084e47bcb1e0bf9bc1ff21",
+          "code_length": 35
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IZ)V",
+          "access": 1,
+          "code_sha256": "2f33918facfa94f4b44252604bbf5c5df71090aa1589674bf58b0b9e4a86297b",
+          "code_length": 49
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ae38edcf6bc595bccc9e1e5dbeaa92f90d8597e697b2c29c967d75c9be508725",
+          "code_length": 24
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 17,
+          "code_sha256": "76b698011152833769c852891180f48aa8dbc620216aa04f4f041801c1e428ea",
+          "code_length": 17,
+          "generic_signature": "(TK;I)V"
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(Ljava/lang/Object;IILorg/nustaq/serialization/util/FSTObject2IntMap;Lorg/nustaq/serialization/util/FSTObject2IntMap;Z)V",
+          "access": 26,
+          "code_sha256": "f08eeb87c3703627f9d09ee2d4137cdadfd069d7800ae36fdc2e58ff811b03aa",
+          "code_length": 266,
+          "generic_signature": "<K:Ljava/lang/Object;>(TK;IILorg/nustaq/serialization/util/FSTObject2IntMap<TK;>;Lorg/nustaq/serialization/util/FSTObject2IntMap<TK;>;Z)V"
+        },
+        {
+          "name": "putHash",
+          "descriptor": "(Ljava/lang/Object;IILorg/nustaq/serialization/util/FSTObject2IntMap;)V",
+          "access": 16,
+          "code_sha256": "3630686dc1ca861b42356f345aa0f0a0286df7cd17ee82904a19374ee904802c",
+          "code_length": 14,
+          "generic_signature": "(TK;IILorg/nustaq/serialization/util/FSTObject2IntMap<TK;>;)V"
+        },
+        {
+          "name": "removeHash",
+          "descriptor": "(Ljava/lang/Object;I)Ljava/lang/Object;",
+          "access": 16,
+          "code_sha256": "509d2ac8e5f1cd0f4668743a2030549f1604db954766e1d0b0b173b521b132fa",
+          "code_length": 109,
+          "generic_signature": "(TK;I)TK;"
+        },
+        {
+          "name": "putNext",
+          "descriptor": "(ILjava/lang/Object;I)V",
+          "access": 16,
+          "code_sha256": "d4155348fb4295d586dd3053fcb1b74cd39602a4743769b49d00fa7af2a4bf1f",
+          "code_length": 44,
+          "generic_signature": "(ITK;I)V"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 17,
+          "code_sha256": "a40c0b48f5130a142e5b159c1f1f8b3d9ba1ce6acd41cfc0e64c60cc118b041e",
+          "code_length": 91,
+          "generic_signature": "(TK;)I"
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(Ljava/lang/Object;I)I",
+          "access": 16,
+          "code_sha256": "25b1b3eca11dc3053361c560ff6063369c05530323ec0e4a35aef57a807dee96",
+          "code_length": 83,
+          "generic_signature": "(TK;I)I"
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 16,
+          "code_sha256": "a713c9aea03e3d83ed17fef4bd00d7ce1f2b0af41707e944de4da9ad863266c0",
+          "code_length": 95
+        },
+        {
+          "name": "rePut",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTObject2IntMap;)V",
+          "access": 2,
+          "code_sha256": "355620df639b35d6d1f5dc9f6826c1ffe0b426ab23d8a24f2637d7330a48a305",
+          "code_length": 55,
+          "generic_signature": "(Lorg/nustaq/serialization/util/FSTObject2IntMap<TK;>;)V"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "65bb8777a96a65fdafa246f7a67dd9d40f2ad0a56c59b3e812e0ce686829e457",
+          "code_length": 42
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c3f49eff7feb3265d4fd9b92b42c1bf09f373db4e41dfd87cf0d3631ced7acc2",
+          "code_length": 244
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Object;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/nustaq/serialization/util/FSTObject2IntMap",
+        "org/nustaq/serialization/util/FSTUtil"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "923c9ea60711e6642e6643a00ba08090fc855901fd666afebbca2e717b5e3449",
+      "name": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$1",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$sem",
+          "descriptor": "Ljava/util/concurrent/Semaphore;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor;Ljava/util/concurrent/Semaphore;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5532228531aa02eddc7e9274273be84de6773df549433aced382661bb9d58c16",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/Semaphore",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$1"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$2.class",
+      "occurrence": 0,
+      "sha256": "c4b171b03386007b9c434482834027c0b9c4ed03b418783d7160f005ac1d5b95",
+      "name": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$2",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "val$finalI",
+          "descriptor": "I",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "636c9b235fe74cd4b06941ea224c70afb39a516bf556fa66f7154c2fa90ebb40",
+          "code_length": 18
+        },
+        {
+          "name": "runConcurrent",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70f7a1a755c537511f04da91d30bad0f2aa8a73e02d61989b2ec519610ba9035",
+          "code_length": 146
+        },
+        {
+          "name": "runInOrder",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "290645b031e8f828435a0f58fd62145b19b9517c9daaa3446027f7f706211522",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$2",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable.class",
+      "occurrence": 0,
+      "sha256": "57f8662f86fa8fe1ea5671334f731ab1e4b082bb4e023b6d86d2c8aa81c715d5",
+      "name": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "sem",
+          "descriptor": "Ljava/util/concurrent/Semaphore;",
+          "access": 0
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "c06052400623e3dad23e18b0bf99fb23458e71e82ab3b0a3f3120dca98cd4c02",
+          "code_length": 12
+        },
+        {
+          "name": "runConcurrent",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "runInOrder",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/Semaphore",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$OrderedRunnable.class",
+      "occurrence": 0,
+      "sha256": "31fcf63e266932e19955724482a77a879ecd84919ab680112f3239fd0c89e755",
+      "name": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$OrderedRunnable",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "toRun",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable;",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aae965cfd6b1690d5aa67fd507c7cb50b86c449176ea9e1a04c9d7c9ec82f5da",
+          "code_length": 92
+        }
+      ],
+      "class_references": [
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Throwable",
+        "java/util/concurrent/Semaphore",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$OrderedRunnable"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor.class",
+      "occurrence": 0,
+      "sha256": "be1e989625121aac3ea0404967360ec28620c2bef8841ba6bc9fee7a45cb4abd",
+      "name": "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pool",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 0
+        },
+        {
+          "name": "orderedPool",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 0
+        },
+        {
+          "name": "jobs",
+          "descriptor": "[Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable;",
+          "access": 0
+        },
+        {
+          "name": "orderedRunnableCache",
+          "descriptor": "[Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$OrderedRunnable;",
+          "access": 0
+        },
+        {
+          "name": "sems",
+          "descriptor": "[Ljava/util/concurrent/Semaphore;",
+          "access": 0
+        },
+        {
+          "name": "curIdx",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "threads",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "gateway",
+          "descriptor": "Ljava/util/concurrent/Semaphore;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "50676d8fa2d55bd6351e2db6e3178b3c379a98d2673decee8c7efef4cb9b311a",
+          "code_length": 117
+        },
+        {
+          "name": "addCall",
+          "descriptor": "(Lorg/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable;)V",
+          "access": 1,
+          "code_sha256": "6fa0eddc52d112bb4ba7fc4b46e1f218a34df04b33fd32ffd763bd3485bfd0fd",
+          "code_length": 143,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "waitForFinish",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bb8bcabd11be8a06e99921c15f628d11b25378643e88080b4c11f75e429400e2",
+          "code_length": 32,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "getNumThreads",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "54d6195755055992a36371acd3575b9047f5269179dcd0e239edeee71066c518",
+          "code_length": 8
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "c4182e310699f7a0894be02cfec46f62870f0b1ff8fbdf1b918e1221fab0e63c",
+          "code_length": 84,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Semaphore",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$1",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$2",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$FSTRunnable",
+        "org/nustaq/serialization/util/FSTOrderedConcurrentJobExecutor$OrderedRunnable"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTOutputStream.class",
+      "occurrence": 0,
+      "sha256": "57e784e437e1e31b116b2f715401ddb9f68137e7d311175f0fca68636a8e728d",
+      "name": "org/nustaq/serialization/util/FSTOutputStream",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/nustaq/logging/FSTLogger;",
+          "access": 26
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "outstream",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 0
+        },
+        {
+          "name": "off",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "e96ab4b46a1b2610af59dc9ef85caf46a941e7d3e940dc421745ba1771dcf455",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "54cd4f72ef17241d5516f65d3c60827338a06ca486eb0fdb6f3f9b2aae482990",
+          "code_length": 17
+        },
+        {
+          "name": "getOutstream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "setOutstream",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6
+        },
+        {
+          "name": "getBuf",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setBuf",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "ensureFree",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "b603ee4f190a6608604837f4f7f06fd10cd84327b28faa3b788cbab12bd54184",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "ensureCapacity",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "4122e2b8a0f5d532153d611c7bb4b4bddcdbb72ebfa42bae777b6dfca68dfbc1",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "grow",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "2140fd64f24cfae37270c96023e75f1908315d878d81a8e67f142a4fec8c5fba",
+          "code_length": 119
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a0d19125f8cdba166441398dd330b8ba08ca0d42ec9ecf36682fa36ce70ca02d",
+          "code_length": 32,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "fd0364da27a100112a7b6a4b45c26c3041e1f32393bf5184f7db2ae1894cfa5d",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copyTo",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "3c85bf394e02db77a8003f5ac00cdb1647e6e5727d166c62ffe157ac0059e0a3",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "730acdff91c82c98af8c9ca74333cfdd88dabc9842c67ddfe779f74aec32a7f1",
+          "code_length": 11
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "b9ea1bcac2dfe91f811bf34aae071bcccd0a739b8f8067f9c07c34a2ac04e471",
+          "code_length": 12
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "42f0bd990bcba8b09a1d45c76d1e7bebdca9a379376c2743df26d70f8bf6ee65",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8b611424e8cd79da0602236fa76e28d6e55e61f7369c22bf77530212d36adb10",
+          "code_length": 65,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reset",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "09197f0f1f38343b018a6e01b269986312db35398796cfcc14e5d147e9f5d8ef",
+          "code_length": 10
+        },
+        {
+          "name": "getOff",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1303b7a23f14710775099bd675efa4bb2b3b27c255f762d4f4c83b928e86cc02",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7145c095fee0b2a87b08c1c24f0e116cf81456e2ceed400b36377a96bdf2d8fb",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/OutOfMemoryError",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/Arrays",
+        "org/nustaq/logging/FSTLogger",
+        "org/nustaq/logging/FSTLogger$Level",
+        "org/nustaq/serialization/util/FSTOutputStream"
+      ]
+    },
+    {
+      "entry": "org/nustaq/serialization/util/FSTUtil.class",
+      "occurrence": 0,
+      "sha256": "864860a9562e70d4e170859e706b084b7d7d92d340fcecc931117c695cde37f6",
+      "name": "org/nustaq/serialization/util/FSTUtil",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EmptyObjArray",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 8
+        },
+        {
+          "name": "NO_FIELDS",
+          "descriptor": "[Ljava/io/ObjectStreamField;",
+          "access": 8
+        },
+        {
+          "name": "unFlaggedUnsafe",
+          "descriptor": "Lsun/misc/Unsafe;",
+          "access": 9
+        },
+        {
+          "name": "refoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "refscal",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "bufoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "choff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "intoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "longoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "doubleoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "floatoff",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "intscal",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "longscal",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "chscal",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "floatscal",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "doublescal",
+          "descriptor": "J",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "clear",
+          "descriptor": "([I)V",
+          "access": 9,
+          "code_sha256": "efa295aea6dbe51ef03c844ba8e8d4ad1546edc0fb4023ad47b492974e832651",
+          "code_length": 6
+        },
+        {
+          "name": "clear",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "b8427dea8f30d4d8fd39abffcc49b655006c9940460a1436a7076a0d4471b63c",
+          "code_length": 9
+        },
+        {
+          "name": "clear",
+          "descriptor": "([Ljava/lang/Object;I)V",
+          "access": 9,
+          "code_sha256": "3d145e57dc4e36a375e6008974cb813070a125fd17e35991f07ac926978eb3e9",
+          "code_length": 44
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Throwable;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4aa1a7f8decafd65a833aeced67cc601217adb0700f11b7a97fd732cdc8644ec",
+          "code_length": 67
+        },
+        {
+          "name": "rethrow",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 9,
+          "code_sha256": "83e863e416e1aee9f9330bb60e382e85eeb997b95d2bc7654c785d8e62c2ab42",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<T:Ljava/lang/Throwable;>(Ljava/lang/Throwable;)V^TT;"
+        },
+        {
+          "name": "getPackage",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "31e9e93613891f8f88fc38d3be0e03f03f5aae6da5f89e77ccf170003257ee5b",
+          "code_length": 45
+        },
+        {
+          "name": "isPackEq",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Class;)Z",
+          "access": 9,
+          "code_sha256": "10a18cbb13b289b392fa57bc04b4c851e70cc67641be28b1fe4c5983b51cf0be",
+          "code_length": 12
+        },
+        {
+          "name": "findPrivateMethod",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/reflect/Method;",
+          "access": 9,
+          "code_sha256": "349bdbfc089e2c434f69437a469f92f7ca3c30619d70d8b6da56ef2d55f3c12d",
+          "code_length": 54
+        },
+        {
+          "name": "findDerivedMethod",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/reflect/Method;",
+          "access": 9,
+          "code_sha256": "d46c98326f7c39e48493983d8c10ade5f40efe1e93d17bc42ced3bc65ca48ce1",
+          "code_length": 131
+        },
+        {
+          "name": "printEx",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 9,
+          "code_sha256": "499ecf8e596a6c33194e931cf9d332e82a2bf34c1c328535f776e269a9c0ef20",
+          "code_length": 28
+        },
+        {
+          "name": "isPrimitiveArray",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 9,
+          "code_sha256": "db7f375c66d551c1ace3d776e41f4c2b5f86db8f7446728b24511287d4f88877",
+          "code_length": 22
+        },
+        {
+          "name": "getUnsafe",
+          "descriptor": "()Lsun/misc/Unsafe;",
+          "access": 9,
+          "code_sha256": "62e68f8331caa1bbc45927e28d7c628ddf4492d48364f3c677ced77a1e0a22ab",
+          "code_length": 35
+        },
+        {
+          "name": "writeSignedVarInt",
+          "descriptor": "(I[BI)I",
+          "access": 9,
+          "code_sha256": "c6f993ee29e48c846f7532b507b8511bb8f4a8e2e53f418c770be2ed4431abfb",
+          "code_length": 14
+        },
+        {
+          "name": "writeUnsignedVarInt",
+          "descriptor": "(I[BI)I",
+          "access": 9,
+          "code_sha256": "25d74aad7523f90ac7ed376580a1034369cd478d756fd7290c48dfde86254007",
+          "code_length": 46
+        },
+        {
+          "name": "getAllFields",
+          "descriptor": "(Ljava/util/List;Ljava/lang/Class;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "5cdf2d042aca48d1b61a940dcca43b4a4b415835350bd93c46a9a2ea2693dde0",
+          "code_length": 32,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/reflect/Field;>;Ljava/lang/Class<*>;)Ljava/util/List<Ljava/lang/reflect/Field;>;"
+        },
+        {
+          "name": "readAll",
+          "descriptor": "(Ljava/io/InputStream;)[B",
+          "access": 9,
+          "code_sha256": "a8c4e3982860ba713e605e54eccaeb3d5fc7b143bb4ec50a524a82004c897e23",
+          "code_length": 82,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "nextPow2",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "688d45ea47af7f82bdd1554038e2cfcbe927c0b6cbae8547f350f23a8197296b",
+          "code_length": 20
+        },
+        {
+          "name": "getRealEnumClass",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 9,
+          "code_sha256": "d75a04edc1f315645910568631cc1fe142da8d38dda1667fad0062dc5e84a0af",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a3e6954c85068f737a41363a6f8d9642c9c1275e568bacf08a477075dcbe0069",
+          "code_length": 240
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[C",
+        "[D",
+        "[F",
+        "[I",
+        "[J",
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Object;",
+        "java/io/InputStream",
+        "java/io/ObjectStreamField",
+        "java/io/PrintWriter",
+        "java/io/StringWriter",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier",
+        "java/util/Arrays",
+        "java/util/List",
+        "org/nustaq/serialization/util/FSTUtil",
+        "sun/misc/Unsafe"
+      ]
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsDatabankActions/retest subfolder structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/retest",
-  "source_head": "ca545aa12bdea9a8e98006a059749ccf8da1b49f",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_150404_databank-actions-retest-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,49 +28,64 @@
   "source_catalog": [
     {
       "id": "sqx-resultsdatabankactions-retest-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
       "family": "bounded installed retest action frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-retest-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/module.js",
       "relative_path": "module.js",
       "location": "lines 1-47; retest frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "fd1aaf9f51a25edac78067edb343e308c667f869876682208d539250838d66fa",
+      "sha256": "62e5763396a29b3762ce95daab8442b20ca12c92d56df63f4f3d91e44506562a",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-retest-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
       "relative_path": "retestDialog.html",
       "location": "lines 1-27; retest frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "52502987c719091962a033395f02ef1e202cbe7b6364059c08c3aa54eb865f47",
+      "sha256": "c501343fd80654cf28c348955ad8aa5017bb6cc158ea1807385e9d0d6f3d8b5c",
       "target": "retestDialog.tsx",
       "classification": "counterpart",
-      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-retest-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/RetestDialogCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/RetestDialogCtrl.js",
       "relative_path": "RetestDialogCtrl.js",
       "location": "lines 1-63; retest frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "081044660413473b4493448cbb3a94a81b2c4576c72e8f9a8ddcb30f90ddb37b",
+      "sha256": "d907aba8e21941967e9a0939a971fe795c045ad3e5d0699efbcfca28b429db48",
       "target": "RetestDialogCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -78,5 +93,10 @@
       "path": "source-map.json",
       "reason": "Bounded structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

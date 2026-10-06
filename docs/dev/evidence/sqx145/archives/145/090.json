@@ -1,0 +1,212 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.jar",
+  "sha256": "e144b9e11b70d2c0090ab0ccf32432e78f8311910f31b6a304d9cb90a2e02e17",
+  "class_count": 27,
+  "unique_class_entries": 27,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "io/opentelemetry/instrumentation/api/annotation/support/AnnotationReflectionHelper.class": "3c1f92826b7c0746ed8624c22e2ed3f5f4c86e63450318868d3355ef99e2e69c",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding.class": "fafb8ee7ef7d799e410f5b2a9c66e1d9110aae693c5d464f0e3fb9832e689465",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1.class": "27d149d8efde6d119b7060731f78cd7ee3d34fb8f7481829e8a1b7c76de4e4a9",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2.class": "4e3c8e19e20ad12b912f4f2032591ff2e49d8ebebb21293d2cbca6f804a6010e",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3.class": "74e6a93ef6b3294f2ae90d5799549970bea54edda092f9ce187726e9d063ce05",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4.class": "c85ea815d812985b40b3407697a084a9256a60ebf6694824a0301e7f19abb64e",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5.class": "7515f4bff7dd4ffd02ac6c8a33b9244f8258f2b19427c4c102271805a4117adc",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6.class": "bf1e20a224570325eefc04c681f5bf590d5937e78ef8f4dc9b785a699a66f1ea",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7.class": "3e64126fcccd059fa0eefcdfff37104159584431a6ff1caac7930a91474c21f5",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8.class": "8885f14057beb1b028405d17c9b7d614df7ee55148c6c6bec276b4dfd8bfdd88",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9.class": "56ec3fa6b850f483a3482ff01287b1887c2a0c0f949c5ed978c741627872cbbc",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory.class": "d421d0881032ae714cf43fd614058077c5e9bcf1dd644a104a904880b04cf5af",
+    "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings.class": "6841e5896a2852ee87cd6d10378424c8e0444a468a305a5a2ce6f607538a5cf7",
+    "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings.class": "3b7fbca4891c78fda71b76aad1bd6685b0440805de07294249820abfd02be326",
+    "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings.class": "b605b203fe3692b81bd900b5a9365b8ce0996b4b4f3faa2f44a4481329a9498c",
+    "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor.class": "033d5d630ea664841f87f51119e05f69b86b94719e341926693ba5eeb2dad72c",
+    "io/opentelemetry/instrumentation/api/annotation/support/MethodCache.class": "1a865640c15887d436441edb7e30c2b6cae68b3e3fb10349e0bbbd905bf30f94",
+    "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor.class": "fbbaed04a00d153cb889ecf860aca089373873cc342bf8876857f2e96236525a",
+    "io/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor.class": "2e3b1f265e5b1c7d58a01f421b1d6e1b3f79f0536749e0784b9ce68dd70055a3",
+    "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor.class": "adcdfc5a8c9f9619b052f018714dda3accb1688df3c1a22c6e8930bb97f3a408",
+    "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass.class": "474d2bbee0f8cb1bdf53a7f92531b44682943ac66838e799bea6e5238e06431b",
+    "io/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor.class": "55df53809046705f135728b3f71ee2568ad79f3a25e73901a92bae343f84c8c5",
+    "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies.class": "7382b06addd5d20c5ea093e916a1ac78a55f30c3f8c6019d63c81ac89eb40f2e",
+    "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl.class": "b6054a75d23d483ea61ab19e7bd05967b5b9ced1d6d8707fd004266df6d34685",
+    "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy.class": "3d6a0498d7e51d22060562472a3dde9e5872c3098ee81491d8427a7364e74840",
+    "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport.class": "80c12958aa47808565790c525dd920e8322daae034c1fc68346079e2d09ba844",
+    "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy.class": "424b8e3d85079d7f408f83ff9c14bb1c8c65bca0255772da15c4d4ef136e71ba"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "56c3f98db4d523f23ed6d453680a917184f7813ce3076ed7acb825d719c4e755"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AnnotationReflectionHelper.class",
+      "occurrence": 0,
+      "sha256": "3c1f92826b7c0746ed8624c22e2ed3f5f4c86e63450318868d3355ef99e2e69c",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding.class",
+      "occurrence": 0,
+      "sha256": "fafb8ee7ef7d799e410f5b2a9c66e1d9110aae693c5d464f0e3fb9832e689465",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1.class",
+      "occurrence": 0,
+      "sha256": "27d149d8efde6d119b7060731f78cd7ee3d34fb8f7481829e8a1b7c76de4e4a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2.class",
+      "occurrence": 0,
+      "sha256": "4e3c8e19e20ad12b912f4f2032591ff2e49d8ebebb21293d2cbca6f804a6010e",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3.class",
+      "occurrence": 0,
+      "sha256": "74e6a93ef6b3294f2ae90d5799549970bea54edda092f9ce187726e9d063ce05",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4.class",
+      "occurrence": 0,
+      "sha256": "c85ea815d812985b40b3407697a084a9256a60ebf6694824a0301e7f19abb64e",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5.class",
+      "occurrence": 0,
+      "sha256": "7515f4bff7dd4ffd02ac6c8a33b9244f8258f2b19427c4c102271805a4117adc",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6.class",
+      "occurrence": 0,
+      "sha256": "bf1e20a224570325eefc04c681f5bf590d5937e78ef8f4dc9b785a699a66f1ea",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7.class",
+      "occurrence": 0,
+      "sha256": "3e64126fcccd059fa0eefcdfff37104159584431a6ff1caac7930a91474c21f5",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8.class",
+      "occurrence": 0,
+      "sha256": "8885f14057beb1b028405d17c9b7d614df7ee55148c6c6bec276b4dfd8bfdd88",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9.class",
+      "occurrence": 0,
+      "sha256": "56ec3fa6b850f483a3482ff01287b1887c2a0c0f949c5ed978c741627872cbbc",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory.class",
+      "occurrence": 0,
+      "sha256": "d421d0881032ae714cf43fd614058077c5e9bcf1dd644a104a904880b04cf5af",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "6841e5896a2852ee87cd6d10378424c8e0444a468a305a5a2ce6f607538a5cf7",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "3b7fbca4891c78fda71b76aad1bd6685b0440805de07294249820abfd02be326",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "b605b203fe3692b81bd900b5a9365b8ce0996b4b4f3faa2f44a4481329a9498c",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor.class",
+      "occurrence": 0,
+      "sha256": "033d5d630ea664841f87f51119e05f69b86b94719e341926693ba5eeb2dad72c",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodCache.class",
+      "occurrence": 0,
+      "sha256": "1a865640c15887d436441edb7e30c2b6cae68b3e3fb10349e0bbbd905bf30f94",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor.class",
+      "occurrence": 0,
+      "sha256": "fbbaed04a00d153cb889ecf860aca089373873cc342bf8876857f2e96236525a",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "2e3b1f265e5b1c7d58a01f421b1d6e1b3f79f0536749e0784b9ce68dd70055a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor.class",
+      "occurrence": 0,
+      "sha256": "adcdfc5a8c9f9619b052f018714dda3accb1688df3c1a22c6e8930bb97f3a408",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass.class",
+      "occurrence": 0,
+      "sha256": "474d2bbee0f8cb1bdf53a7f92531b44682943ac66838e799bea6e5238e06431b",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "55df53809046705f135728b3f71ee2568ad79f3a25e73901a92bae343f84c8c5",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies.class",
+      "occurrence": 0,
+      "sha256": "7382b06addd5d20c5ea093e916a1ac78a55f30c3f8c6019d63c81ac89eb40f2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl.class",
+      "occurrence": 0,
+      "sha256": "b6054a75d23d483ea61ab19e7bd05967b5b9ced1d6d8707fd004266df6d34685",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy.class",
+      "occurrence": 0,
+      "sha256": "3d6a0498d7e51d22060562472a3dde9e5872c3098ee81491d8427a7364e74840",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport.class",
+      "occurrence": 0,
+      "sha256": "80c12958aa47808565790c525dd920e8322daae034c1fc68346079e2d09ba844",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy.class",
+      "occurrence": 0,
+      "sha256": "424b8e3d85079d7f408f83ff9c14bb1c8c65bca0255772da15c4d4ef136e71ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/090/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/090/001.json",
+      "sha256": "5b14ef3099bff185ece26d3b633acdf0e494e51cda3102849eab810617360c77"
+    }
+  ]
+}

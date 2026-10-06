@@ -1,99 +1,65 @@
-# Shared: SQX JAR references
+# Shared — current donor archives
 
-[All workspaces](../README.md)
+[All archives](../README.md)
 
-This folder groups donor archives for research. Except for inspected App registrations, backend ownership is inferred. Shared components can be consumed by multiple workspaces; these documents do not prescribe HaruQuantAI architecture.
-
-## Canonical JAR documents
-
-| JAR | Class entries | Declaration families |
-| --- | ---: | --- |
-| [SQDataLib.jar](SQDataLib.md) | 195 | `com.strategyquant.datalib`, `com.strategyquant.datalib.bartype`, `com.strategyquant.datalib.bartype.impl`; 23 additional packages |
-| [SQGridLib2.jar](SQGridLib2.md) | 81 | `com.strategyquant.gridlib`, `com.strategyquant.gridlib.classLoader`, `com.strategyquant.gridlib.client`; 12 additional packages |
-| [SQJobsLib.jar](SQJobsLib.md) | 11 | `com.strategyquant.jobslib`, `com.strategyquant.jobslib.databank` |
-| [SQPluginLib.jar](SQPluginLib.md) | 18 | `com.strategyquant.pluginlib`, `com.strategyquant.pluginlib.annotations`, `com.strategyquant.pluginlib.program` |
-| [SQTradingLib.jar](SQTradingLib.md) | 945 | `com.strategyquant.indicatorTester`, `com.strategyquant.tradinglib`, `com.strategyquant.tradinglib.applyMassConfig`; 123 additional packages |
-| [SQWebGUILib.jar](SQWebGUILib.md) | 34 | `com.strategyquant.webguilib`, `com.strategyquant.webguilib.config`, `com.strategyquant.webguilib.init`; 4 additional packages |
-| [SQWizardBusiness.jar](SQWizardBusiness.md) | 24 | `com.strategyquant.wizard.desktop`, `com.strategyquant.wizard.desktop.indicators`, `com.strategyquant.wizard.desktop.loader`; 3 additional packages |
-| [ConnectionLiveTest.jar](ConnectionLiveTest.md) | 3 | `com.strategyquant.plugin.Connection.impl.LiveTest` |
-| [ConnectionMT4.jar](ConnectionMT4.md) | 7 | `com.strategyquant.plugin.Connection.impl.MT4` |
-| [ConnectionTest.jar](ConnectionTest.md) | 3 | `com.strategyquant.plugin.Connection.impl.Test` |
-| [CrossCheckMonteCarloManipulation.jar](CrossCheckMonteCarloManipulation.md) | 2 | `com.strategyquant.plugin.CrossCheck.impl.MonteCarloManipulation` |
-| [CrossCheckMonteCarloRetest.jar](CrossCheckMonteCarloRetest.md) | 7 | `com.strategyquant.plugin.CrossCheck.impl.MonteCarloRetest` |
-| [CrossCheckOptProfileSysParamPermutation.jar](CrossCheckOptProfileSysParamPermutation.md) | 2 | `com.strategyquant.plugin.CrossCheck.impl.OptProfileSysParamPermutation` |
-| [CrossCheckRetestOnAdditionalMarkets.jar](CrossCheckRetestOnAdditionalMarkets.md) | 4 | `com.strategyquant.plugin.CrossCheck.impl.RetestOnAdditionalMarkets` |
-| [CrossCheckRetestWithHigherPrecision.jar](CrossCheckRetestWithHigherPrecision.md) | 4 | `com.strategyquant.plugin.CrossCheck.impl.RetestWithHigherPrecision` |
-| [CrossCheckSequentialOptimization.jar](CrossCheckSequentialOptimization.md) | 2 | `com.strategyquant.plugin.CrossCheck.impl.SequentialOptimization` |
-| [CrossCheckWalkForwardMatrix.jar](CrossCheckWalkForwardMatrix.md) | 1 | `com.strategyquant.plugin.CrossCheck.impl.WalkForwardMatrix` |
-| [CrossCheckWalkForwardOptimization.jar](CrossCheckWalkForwardOptimization.md) | 1 | `com.strategyquant.plugin.CrossCheck.impl.WalkForwardOptimization` |
-| [CrossCheckWhatIf.jar](CrossCheckWhatIf.md) | 2 | `com.strategyquant.plugin.CrossCheck.impl.WhatIf` |
-| [FitnessMethodExistingPortfolio.jar](FitnessMethodExistingPortfolio.md) | 4 | `com.strategyquant.plugin.FitnessMethod.impl.ExistingPortfolio` |
-| [FitnessMethodStrategyResult.jar](FitnessMethodStrategyResult.md) | 4 | `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult` |
-| [FitnessMethodWFResult.jar](FitnessMethodWFResult.md) | 3 | `com.strategyquant.plugin.FitnessMethod.impl.WFResult` |
-| [HomeAbout.jar](HomeAbout.md) | 2 | `com.strategyquant.plugin.Home.impl.About` |
-| [LoaderSQ3.jar](LoaderSQ3.md) | 5 | `com.strategyquant.plugin.Loader.impl.SQ3` |
-| [LoaderSQ4.jar](LoaderSQ4.md) | 1 | `com.strategyquant.plugin.Loader.impl.SQ4` |
-| [ProjectConditionCyclesCount.jar](ProjectConditionCyclesCount.md) | 1 | `com.strategyquant.plugin.ProjectCondition.impl.CyclesCount` |
-| [ProjectConditionDuration.jar](ProjectConditionDuration.md) | 0 | No compiled classes |
-| [ProjectConditionGoToActivated.jar](ProjectConditionGoToActivated.md) | 1 | `com.strategyquant.plugin.ProjectCondition.impl.GoToActivated` |
-| [ProjectConditionGoToEvaluated.jar](ProjectConditionGoToEvaluated.md) | 1 | `com.strategyquant.plugin.ProjectCondition.impl.GoToEvaluated` |
-| [ProjectConditionResultsCount.jar](ProjectConditionResultsCount.md) | 1 | `com.strategyquant.plugin.ProjectCondition.impl.ResultsCount` |
-| [ProjectConditionRunTime.jar](ProjectConditionRunTime.md) | 1 | `com.strategyquant.plugin.ProjectCondition.impl.RunTime` |
-| [ProjectOptimizer.jar](ProjectOptimizer.md) | 0 | No compiled classes |
-| [ProjectRetester.jar](ProjectRetester.md) | 0 | No compiled classes |
-| [SaverHTML.jar](SaverHTML.md) | 1 | `com.strategyquant.plugin.Saver.impl.HTML` |
-| [SaverPDF.jar](SaverPDF.md) | 1 | `com.strategyquant.plugin.Saver.impl.PDF` |
-| [SaverSQ3.jar](SaverSQ3.md) | 2 | `com.strategyquant.plugin.Saver.impl.SQ3` |
-| [SaverStrategyTrades.jar](SaverStrategyTrades.md) | 1 | `com.strategyquant.plugin.Saver.impl.StrategyTrades` |
-| [ServletConnection.jar](ServletConnection.md) | 2 | `com.strategyquant.plugin.Servlet.impl.Connection` |
-| [ServletConstants.jar](ServletConstants.md) | 2 | `com.strategyquant.plugin.Servlet.impl.Constants` |
-| [ServletDatabankViews.jar](ServletDatabankViews.md) | 0 | No compiled classes |
-| [ServletIndicatorTester.jar](ServletIndicatorTester.md) | 0 | No compiled classes |
-| [ServletMCP.jar](ServletMCP.md) | 1 | `com.strategyquant.plugin.Servlet.impl.MCP` |
-| [ServletProjectOld.jar](ServletProjectOld.md) | 0 | No compiled classes |
-| [ServletRenameTool.jar](ServletRenameTool.md) | 4 | `com.strategyquant.plugin.Servlet.impl.RenameTool` |
-| [ServletStrategy.jar](ServletStrategy.md) | 3 | `com.strategyquant.plugin.Servlet.impl.Strategy` |
-| [ServletYahoo.jar](ServletYahoo.md) | 0 | No compiled classes |
-| [SettingsAdvancedTM.jar](SettingsAdvancedTM.md) | 2 | `com.strategyquant.plugin.Settings.impl.AdvancedTM` |
-| [SettingsApplyMassConfig.jar](SettingsApplyMassConfig.md) | 1 | `com.strategyquant.plugin.Settings.impl.ApplyMassConfig` |
-| [SettingsAutoRetestData.jar](SettingsAutoRetestData.md) | 1 | `com.strategyquant.plugin.Settings.impl.AutoRetestData` |
-| [SettingsBlocks.jar](SettingsBlocks.md) | 2 | `com.strategyquant.plugin.Settings.impl.Blocks` |
-| [SettingsCallExternalScript.jar](SettingsCallExternalScript.md) | 1 | `com.strategyquant.plugin.Settings.impl.CallExternalScript` |
-| [SettingsClearDatabanks.jar](SettingsClearDatabanks.md) | 1 | `com.strategyquant.plugin.Settings.impl.ClearDatabanks` |
-| [SettingsCreatePortfolio.jar](SettingsCreatePortfolio.md) | 1 | `com.strategyquant.plugin.Settings.impl.CreatePortfolio` |
-| [SettingsCrossChecks.jar](SettingsCrossChecks.md) | 2 | `com.strategyquant.plugin.Settings.impl.CrossChecks` |
-| [SettingsCustomAnalysis.jar](SettingsCustomAnalysis.md) | 1 | `com.strategyquant.plugin.Settings.impl.CustomAnalysis` |
-| [SettingsData.jar](SettingsData.md) | 1 | `com.strategyquant.plugin.Settings.impl.Data` |
-| [SettingsDatabanks.jar](SettingsDatabanks.md) | 0 | No compiled classes |
-| [SettingsDeleteFile.jar](SettingsDeleteFile.md) | 1 | `com.strategyquant.plugin.Settings.impl.DeleteFile` |
-| [SettingsFiltering.jar](SettingsFiltering.md) | 1 | `com.strategyquant.plugin.Settings.impl.Filtering` |
-| [SettingsGoToTask.jar](SettingsGoToTask.md) | 1 | `com.strategyquant.plugin.Settings.impl.GoToTask` |
-| [SettingsLoadFromFiles.jar](SettingsLoadFromFiles.md) | 1 | `com.strategyquant.plugin.Settings.impl.LoadFromFiles` |
-| [SettingsLogDatabankStats.jar](SettingsLogDatabankStats.md) | 1 | `com.strategyquant.plugin.Settings.impl.LogDatabankStats` |
-| [SettingsMoneyManagement.jar](SettingsMoneyManagement.md) | 1 | `com.strategyquant.plugin.Settings.impl.MoneyManagement` |
-| [SettingsNotes.jar](SettingsNotes.md) | 1 | `com.strategyquant.plugin.Settings.impl.Notes` |
-| [SettingsNotification.jar](SettingsNotification.md) | 3 | `com.strategyquant.plugin.Settings.impl.Notification` |
-| [SettingsOptimization.jar](SettingsOptimization.md) | 2 | `com.strategyquant.plugin.Settings.impl.Optimization` |
-| [SettingsOptions.jar](SettingsOptions.md) | 2 | `com.strategyquant.plugin.Settings.impl.Options` |
-| [SettingsPartsToImprove.jar](SettingsPartsToImprove.md) | 1 | `com.strategyquant.plugin.Settings.impl.PartsToImprove` |
-| [SettingsRankings.jar](SettingsRankings.md) | 2 | `com.strategyquant.plugin.Settings.impl.Rankings` |
-| [SettingsSaveToFiles.jar](SettingsSaveToFiles.md) | 1 | `com.strategyquant.plugin.Settings.impl.SaveToFiles` |
-| [SettingsStopAndStart.jar](SettingsStopAndStart.md) | 1 | `com.strategyquant.plugin.Settings.impl.StopAndStart` |
-| [SettingsUpdateData.jar](SettingsUpdateData.md) | 1 | `com.strategyquant.plugin.Settings.impl.UpdateData` |
-| [SettingsWaitFor.jar](SettingsWaitFor.md) | 1 | `com.strategyquant.plugin.Settings.impl.WaitFor` |
-| [SettingsWhatToBuild.jar](SettingsWhatToBuild.md) | 2 | `com.strategyquant.plugin.Settings.impl.WhatToBuild` |
-| [SettingsWhatToRetest.jar](SettingsWhatToRetest.md) | 1 | `com.strategyquant.plugin.Settings.impl.WhatToRetest` |
-
-## Workspace registration evidence
-
-No App registration assigned here. This is a shared research grouping.
-
-## Referenced archives outside this group
-
-These links are supported by superclass/interface/member-type references in the inspected declarations. They are declaration dependencies, not a runtime call graph.
-
-No cross-group reference resolved within the scoped archives. This is not proof of runtime independence.
-
-## Limits
-
-No method bodies, algorithms, event order, failure behavior or parity are established by a class diagram. Exact behavior needs separate donor inspection and isolated runtime fixtures. Source locators and fingerprints are in each archive document; no ledger IDs are allocated while the authoritative ledger/schema are absent.
+| JAR | Proposed feature | Phase | Raw classes |
+| --- | --- | --- | ---: |
+| [ConnectionLiveTest.md](ConnectionLiveTest.md) | `FEAT-CONNECTION-CONNECTION-LIVE-TEST` | P16 | 3 |
+| [ConnectionMT4.md](ConnectionMT4.md) | `FEAT-CONNECTION-CONNECTION-MT4` | P16 | 7 |
+| [ConnectionTest.md](ConnectionTest.md) | `FEAT-CONNECTION-CONNECTION-TEST` | P16 | 3 |
+| [CrossCheckMonteCarloManipulation.md](CrossCheckMonteCarloManipulation.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION` | P11 | 2 |
+| [CrossCheckMonteCarloRetest.md](CrossCheckMonteCarloRetest.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST` | P11 | 7 |
+| [CrossCheckOptProfileSysParamPermutation.md](CrossCheckOptProfileSysParamPermutation.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION` | P11 | 2 |
+| [CrossCheckRetestOnAdditionalMarkets.md](CrossCheckRetestOnAdditionalMarkets.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS` | P11 | 4 |
+| [CrossCheckRetestWithHigherPrecision.md](CrossCheckRetestWithHigherPrecision.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION` | P11 | 4 |
+| [CrossCheckSequentialOptimization.md](CrossCheckSequentialOptimization.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION` | P11 | 2 |
+| [CrossCheckWalkForwardMatrix.md](CrossCheckWalkForwardMatrix.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX` | P11 | 1 |
+| [CrossCheckWalkForwardOptimization.md](CrossCheckWalkForwardOptimization.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION` | P11 | 1 |
+| [CrossCheckWhatIf.md](CrossCheckWhatIf.md) | `FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF` | P11 | 2 |
+| [FitnessMethodExistingPortfolio.md](FitnessMethodExistingPortfolio.md) | `FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO` | P12 | 4 |
+| [FitnessMethodStrategyResult.md](FitnessMethodStrategyResult.md) | `FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT` | P09 | 4 |
+| [FitnessMethodWFResult.md](FitnessMethodWFResult.md) | `FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT` | P10 | 3 |
+| [HomeAbout.md](HomeAbout.md) | `FEAT-PRODUCT-HOME-ABOUT` | P17 | 2 |
+| [LoaderSQ3.md](LoaderSQ3.md) | `FEAT-AUTHORING-LOADER-SQ3` | P07 | 5 |
+| [LoaderSQ4.md](LoaderSQ4.md) | `FEAT-AUTHORING-LOADER-SQ4` | P07 | 1 |
+| [ProjectConditionCyclesCount.md](ProjectConditionCyclesCount.md) | `FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT` | P13 | 1 |
+| [ProjectConditionGoToActivated.md](ProjectConditionGoToActivated.md) | `FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED` | P13 | 1 |
+| [ProjectConditionGoToEvaluated.md](ProjectConditionGoToEvaluated.md) | `FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED` | P13 | 1 |
+| [ProjectConditionResultsCount.md](ProjectConditionResultsCount.md) | `FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT` | P13 | 1 |
+| [ProjectConditionRunTime.md](ProjectConditionRunTime.md) | `FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME` | P13 | 1 |
+| [SaverHTML.md](SaverHTML.md) | `FEAT-RESULTS-SAVER-HTML` | P08 | 1 |
+| [SaverPDF.md](SaverPDF.md) | `FEAT-RESULTS-SAVER-PDF` | P08 | 1 |
+| [SaverSQ3.md](SaverSQ3.md) | `FEAT-AUTHORING-SAVER-SQ3` | P07 | 2 |
+| [SaverStrategyTrades.md](SaverStrategyTrades.md) | `FEAT-RESULTS-SAVER-STRATEGY-TRADES` | P08 | 1 |
+| [ServletConnection.md](ServletConnection.md) | `FEAT-CONNECTION-SERVLET-CONNECTION` | P16 | 2 |
+| [ServletConstants.md](ServletConstants.md) | `FEAT-STRATEGY-SERVLET-CONSTANTS` | P05 | 2 |
+| [ServletRenameTool.md](ServletRenameTool.md) | `FEAT-RESULTS-SERVLET-RENAME-TOOL` | P08 | 4 |
+| [ServletStrategy.md](ServletStrategy.md) | `FEAT-AUTHORING-SERVLET-STRATEGY` | P07 | 3 |
+| [SettingsAdvancedTM.md](SettingsAdvancedTM.md) | `FEAT-SIMULATOR-SETTINGS-ADVANCED-TM` | P06 | 2 |
+| [SettingsApplyMassConfig.md](SettingsApplyMassConfig.md) | `FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG` | P13 | 1 |
+| [SettingsAutoRetestData.md](SettingsAutoRetestData.md) | `FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA` | P11 | 1 |
+| [SettingsBlocks.md](SettingsBlocks.md) | `FEAT-STRATEGY-SETTINGS-BLOCKS` | P05 | 2 |
+| [SettingsCallExternalScript.md](SettingsCallExternalScript.md) | `FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT` | P13 | 1 |
+| [SettingsClearDatabanks.md](SettingsClearDatabanks.md) | `FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS` | P13 | 1 |
+| [SettingsCreatePortfolio.md](SettingsCreatePortfolio.md) | `FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO` | P12 | 1 |
+| [SettingsCrossChecks.md](SettingsCrossChecks.md) | `FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS` | P11 | 2 |
+| [SettingsCustomAnalysis.md](SettingsCustomAnalysis.md) | `FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS` | P13 | 1 |
+| [SettingsData.md](SettingsData.md) | `FEAT-DATA-SETTINGS-DATA` | P03 | 1 |
+| [SettingsDeleteFile.md](SettingsDeleteFile.md) | `FEAT-PROJECT-SETTINGS-DELETE-FILE` | P13 | 1 |
+| [SettingsFiltering.md](SettingsFiltering.md) | `FEAT-PROJECT-SETTINGS-FILTERING` | P13 | 1 |
+| [SettingsGoToTask.md](SettingsGoToTask.md) | `FEAT-PROJECT-SETTINGS-GO-TO-TASK` | P13 | 1 |
+| [SettingsLoadFromFiles.md](SettingsLoadFromFiles.md) | `FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES` | P13 | 1 |
+| [SettingsLogDatabankStats.md](SettingsLogDatabankStats.md) | `FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS` | P13 | 1 |
+| [SettingsMoneyManagement.md](SettingsMoneyManagement.md) | `FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT` | P06 | 1 |
+| [SettingsNotes.md](SettingsNotes.md) | `FEAT-PROJECT-SETTINGS-NOTES` | P13 | 1 |
+| [SettingsNotification.md](SettingsNotification.md) | `FEAT-PROJECT-SETTINGS-NOTIFICATION` | P13 | 3 |
+| [SettingsOptimization.md](SettingsOptimization.md) | `FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION` | P10 | 2 |
+| [SettingsOptions.md](SettingsOptions.md) | `FEAT-SIMULATOR-SETTINGS-OPTIONS` | P06 | 2 |
+| [SettingsPartsToImprove.md](SettingsPartsToImprove.md) | `FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE` | P09 | 1 |
+| [SettingsRankings.md](SettingsRankings.md) | `FEAT-BUILDER-SETTINGS-RANKINGS` | P09 | 2 |
+| [SettingsSaveToFiles.md](SettingsSaveToFiles.md) | `FEAT-PROJECT-SETTINGS-SAVE-TO-FILES` | P13 | 1 |
+| [SettingsStopAndStart.md](SettingsStopAndStart.md) | `FEAT-PROJECT-SETTINGS-STOP-AND-START` | P13 | 1 |
+| [SettingsUpdateData.md](SettingsUpdateData.md) | `FEAT-PROJECT-SETTINGS-UPDATE-DATA` | P13 | 1 |
+| [SettingsWaitFor.md](SettingsWaitFor.md) | `FEAT-PROJECT-SETTINGS-WAIT-FOR` | P13 | 1 |
+| [SettingsWhatToBuild.md](SettingsWhatToBuild.md) | `FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD` | P09 | 2 |
+| [SettingsWhatToRetest.md](SettingsWhatToRetest.md) | `FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST` | P11 | 1 |

@@ -1,0 +1,4275 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-semconv-incubating-1.40.0-alpha.jar",
+  "archive_sha256": "b73e725e970e3120670d3e64b8ff058fba495b0e8040b259b50dd38e030380e4",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanParentOriginIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "64e0ceae4bb8199e4742a6c1ecb0ab5ad21a20899325e69a975211e71654c0b9",
+      "name": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanParentOriginIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LOCAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "REMOTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanParentOriginIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanSamplingResultIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "a3e42f6b6a2f687512c81e8da2e32bbadfe718f92a1edd031dc19c15f7d75c8c",
+      "name": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanSamplingResultIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DROP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECORD_ONLY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECORD_AND_SAMPLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanSamplingResultIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelStatusCodeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "abc819ff3ded7784dec57e3363e2d04c3941a67ef4413cbb3aa05c1a4942f762",
+      "name": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelStatusCodeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ERROR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelStatusCodeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "e0d3c468cdfcd4d0a63904d5a574b3dfb2feabbea3bd539b2f5491dc9388b79b",
+      "name": "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OTEL_COMPONENT_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_COMPONENT_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_EVENT_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_LIBRARY_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_LIBRARY_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_SCOPE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_SCOPE_SCHEMA_URL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_SCOPE_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_SPAN_PARENT_ORIGIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_SPAN_SAMPLING_RESULT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_STATUS_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "OTEL_STATUS_DESCRIPTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7a6b8037a463db9c256e6f12ef6bbe20a77d16f51940006dceadc5f9935c7784",
+          "code_length": 97
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelComponentTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanParentOriginIncubatingValues",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelSpanSamplingResultIncubatingValues",
+        "io/opentelemetry/semconv/incubating/OtelIncubatingAttributes$OtelStatusCodeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes$StateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3cafa19e25dbac5f2d81228c52cf3b8c9c58de4b820be3e10e4a22a0f6f0f31b",
+      "name": "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes$StateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IDLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "USED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes$StateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "981ab6d418dc0dfc0cf3eed9f0fd086b8192e4a683fb27d91cb7113650b62bc8",
+      "name": "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "949baefa3e88dc0042df74c1c520c6153d660e2a037be0e9574f9713f75d6570",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/OtherIncubatingAttributes$StateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/PeerIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "f94ced5273c4d3ab5bfa96c420ac613e73a129d5c80cf39260f354c76da75fd6",
+      "name": "io/opentelemetry/semconv/incubating/PeerIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PEER_SERVICE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "949baefa3e88dc0042df74c1c520c6153d660e2a037be0e9574f9713f75d6570",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/PeerIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/PoolIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "4d418c0830824612ced82f7961038d87b5a332e6e384e7c42ac1cb4228c19676",
+      "name": "io/opentelemetry/semconv/incubating/PoolIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "POOL_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "949baefa3e88dc0042df74c1c520c6153d660e2a037be0e9574f9713f75d6570",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/PoolIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/PprofIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "9d566eb5abe20046c00a646cdc58dc92970adc4c63669fcf2b5c61eb1c919449",
+      "name": "io/opentelemetry/semconv/incubating/PprofIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PPROF_LOCATION_IS_FOLDED",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PPROF_MAPPING_HAS_FILENAMES",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PPROF_MAPPING_HAS_FUNCTIONS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PPROF_MAPPING_HAS_INLINE_FRAMES",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PPROF_MAPPING_HAS_LINE_NUMBERS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PPROF_PROFILE_COMMENT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "PPROF_PROFILE_DOC_URL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PPROF_PROFILE_DROP_FRAMES",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PPROF_PROFILE_KEEP_FRAMES",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PPROF_SCOPE_DEFAULT_SAMPLE_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PPROF_SCOPE_SAMPLE_TYPE_ORDER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/Long;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "60af5f5f4f0c76969cabbd3782f437c100d19a6c166725bf852b8b4ff5fd0775",
+          "code_length": 89
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/PprofIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessContextSwitchTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "eefbde6f7e22f5c5bfa8ba134eea4c1b5bf0eab476d3a2592039c8edc28cc899",
+      "name": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessContextSwitchTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VOLUNTARY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INVOLUNTARY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessContextSwitchTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessCpuStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "173a5e6b3fbb0725e92dfde0eb65a90418b97502009ebef886fae4b0ee94b219",
+      "name": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessCpuStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SYSTEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "USER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WAIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessCpuStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessPagingFaultTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "7548695dc906c903edd6939d24b3fc6006a8b92dec9adba9aaba456f04ad9612",
+      "name": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessPagingFaultTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAJOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MINOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessPagingFaultTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3c2fd5e49e2d9d609906c2bcb959c6e41e579bb1144a88e17450e94599657cb2",
+      "name": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RUNNING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SLEEPING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "STOPPED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFUNCT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "5a309c8fd3c7ba12bb4d071ec838f9d3272a1592dd14fd44bc80bfe23148f5e5",
+      "name": "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PROCESS_ARGS_COUNT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_COMMAND",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_COMMAND_ARGS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "PROCESS_COMMAND_LINE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_CONTEXT_SWITCH_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_CPU_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_CREATION_TIME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_ENVIRONMENT_VARIABLE",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_BUILD_ID_GNU",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_BUILD_ID_GO",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_BUILD_ID_HTLHASH",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_BUILD_ID_PROFILING",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXECUTABLE_PATH",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_EXIT_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_EXIT_TIME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_GROUP_LEADER_PID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_INTERACTIVE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "PROCESS_LINUX_CGROUP",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_OWNER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_PAGING_FAULT_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_PARENT_PID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_PID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_REAL_USER_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_REAL_USER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_RUNTIME_DESCRIPTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_RUNTIME_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_RUNTIME_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_SAVED_USER_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_SAVED_USER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_SESSION_LEADER_PID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_TITLE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_USER_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_USER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "PROCESS_VPID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "PROCESS_WORKING_DIRECTORY",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "138696712526f9908ef76fc0026da592a5100d1e2d3ef918f2477849f076b12b",
+          "code_length": 297
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/AttributeKeyTemplate",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessContextSwitchTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessCpuStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessPagingFaultTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/ProcessIncubatingAttributes$ProcessStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes$ProfileFrameTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "0236f8a5ee747039c4ff9da3a644fb4cdebe330ec4c1a114f17ab62cffebab40",
+      "name": "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes$ProfileFrameTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DOTNET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JVM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KERNEL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NATIVE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PERL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PHP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CPYTHON",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RUBY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "V8JS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "BEAM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RUST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes$ProfileFrameTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "0673e52eea8d9876bec6f2542cbb01d2e8ae5384085c13a4bb75aaab35f51289",
+      "name": "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PROFILE_FRAME_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "949baefa3e88dc0042df74c1c520c6153d660e2a037be0e9574f9713f75d6570",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ProfileIncubatingAttributes$ProfileFrameTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcConnectRpcErrorCodeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "6b5a3224dc04932d7556636ef5743557b221a43a4e219e5e759f01542efdfc0a",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcConnectRpcErrorCodeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CANCELLED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNKNOWN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INVALID_ARGUMENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEADLINE_EXCEEDED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NOT_FOUND",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ALREADY_EXISTS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PERMISSION_DENIED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_EXHAUSTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FAILED_PRECONDITION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ABORTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "OUT_OF_RANGE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNIMPLEMENTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INTERNAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNAVAILABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DATA_LOSS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNAUTHENTICATED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcConnectRpcErrorCodeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcGrpcStatusCodeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3288a14c3bc9a54d3d28adb6b33bb2ebc9cd127c8710630e9d8cb213fe7d629a",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcGrpcStatusCodeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OK",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "CANCELLED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "UNKNOWN",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "INVALID_ARGUMENT",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "DEADLINE_EXCEEDED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "NOT_FOUND",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "ALREADY_EXISTS",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "PERMISSION_DENIED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_EXHAUSTED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "FAILED_PRECONDITION",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "ABORTED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "OUT_OF_RANGE",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "UNIMPLEMENTED",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "INTERNAL",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "UNAVAILABLE",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "DATA_LOSS",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "UNAUTHENTICATED",
+          "descriptor": "J",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcGrpcStatusCodeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcMessageTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "815f34ba36feb96d2d6c64d268019ed767cfcea37278028bdff76eb8b8a5de06",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcMessageTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECEIVED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcMessageTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3ba71ff7aee413132651bd85bab450398f4522b751d5bf10d22b8986fb4f3901",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "GRPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JAVA_RMI",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DOTNET_WCF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "APACHE_DUBBO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_RPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ONC_RPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JSONRPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemNameIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "fa8140de9d43119eba510ed52231f563f5cfc9a9f5eddbf84d2755fcc654048c",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemNameIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "GRPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DUBBO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CONNECTRPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JSONRPC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "80c4b3361c5dc461f25094d9949915670b53be492ca4c5f83e7fe78b1195a85e",
+      "name": "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RPC_CONNECT_RPC_ERROR_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_CONNECT_RPC_REQUEST_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_CONNECT_RPC_RESPONSE_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_GRPC_REQUEST_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_GRPC_RESPONSE_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_GRPC_STATUS_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "RPC_JSONRPC_ERROR_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "RPC_JSONRPC_ERROR_MESSAGE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_JSONRPC_REQUEST_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_JSONRPC_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_MESSAGE_COMPRESSED_SIZE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "RPC_MESSAGE_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "RPC_MESSAGE_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_MESSAGE_UNCOMPRESSED_SIZE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "RPC_METHOD",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_METHOD_ORIGINAL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_REQUEST_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_RESPONSE_METADATA",
+          "descriptor": "Lio/opentelemetry/semconv/AttributeKeyTemplate;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/semconv/AttributeKeyTemplate<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "RPC_RESPONSE_STATUS_CODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_SERVICE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_SYSTEM",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "RPC_SYSTEM_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d97e6aeec372c7c27b58e7845a4f200ee101aa439731114bd8a5cbedc6db94d5",
+          "code_length": 177
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/AttributeKeyTemplate",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcConnectRpcErrorCodeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcGrpcStatusCodeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcMessageTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemIncubatingValues",
+        "io/opentelemetry/semconv/incubating/RpcIncubatingAttributes$RpcSystemNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SecurityRuleIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "8886cdc1cf587fbb1e162f87879e5ae8bb361347eb55f0863ed82df63074903b",
+      "name": "io/opentelemetry/semconv/incubating/SecurityRuleIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SECURITY_RULE_CATEGORY",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_DESCRIPTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_LICENSE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_REFERENCE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_RULESET_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_UUID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SECURITY_RULE_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1628bbbf5080861f636e0276887622585a11baf862e473f6f2b1e949c54b0e0f",
+          "code_length": 65
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/SecurityRuleIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ServerIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "9f1c73960edd0bccf87c7cb42c8f2b1e0007446757398a7ebea511e764d3b8ad",
+      "name": "io/opentelemetry/semconv/incubating/ServerIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SERVER_ADDRESS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVER_PORT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bc5ed3ec21019c48566a4fad4d4ee3fb3b8c62eb529a49a26c4a9d130d74b393",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/ServerIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes$ServiceCriticalityIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "bc24d96b6dfce6bca5d1132b665a55bece0589fc35e8203f39ca3a91b362a4d4",
+      "name": "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes$ServiceCriticalityIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CRITICAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "HIGH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MEDIUM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LOW",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes$ServiceCriticalityIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "b6696601fba88cd8ba723d296d88f52799aec749ef1485431a30f0befcc7ecad",
+      "name": "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SERVICE_CRITICALITY",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_INSTANCE_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_NAMESPACE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_PEER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_PEER_NAMESPACE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SERVICE_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a9165529efeb416e22ce9d8d3f0356e5fcf0c78fd21d77676ec80ae78686ceae",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/ServiceIncubatingAttributes$ServiceCriticalityIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SessionIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "97f2ddb6097212aadb998821eff717a1da533650e0d554041ec2d3f2b944b7f8",
+      "name": "io/opentelemetry/semconv/incubating/SessionIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SESSION_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SESSION_PREVIOUS_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "61f1c76dccadf2a68aa4d6a956fed8a71125dbde67ff3e096d5bf696bb91c4d5",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/SessionIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SourceIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "df99029cb820044a1e6f1d35ae730a946f5fb2cc6737a8e8df64074633692f13",
+      "name": "io/opentelemetry/semconv/incubating/SourceIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SOURCE_ADDRESS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SOURCE_PORT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bc5ed3ec21019c48566a4fad4d4ee3fb3b8c62eb529a49a26c4a9d130d74b393",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/SourceIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemCpuStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "ff09ffd188e2c6fe7f202e40b23d022c6fac7d7c881754a6b258a2a6d91fd28b",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemCpuStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SYSTEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NICE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IDLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IOWAIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INTERRUPT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "STEAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemCpuStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "d7998935ea038a6df355bf7fb1b2e8da384611175f356a9abdc7a2d4b76c6fb8",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FREE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RESERVED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "935c82b2fb2e13ab4e21a11e44258aa757782138634cc07787c0acb5556465f3",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FAT32",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EXFAT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NTFS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "REFS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "HFSPLUS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EXT4",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryLinuxSlabStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "e995be2736ce4694867d0c7b0351f029aff9b5408340448eae82bad45a3e2ece",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryLinuxSlabStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RECLAIMABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNRECLAIMABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryLinuxSlabStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "84829fd8a12d5b16c5b5ca3bf3b92909e7b92007843dfc4828309b257a0f5753",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FREE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SHARED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "BUFFERS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CACHED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemNetworkStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "b91eba7fa6822bae8c967191ccfea35b323a1714e2cf3e54583924331c1e93ca",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemNetworkStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CLOSE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CLOSE_WAIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CLOSING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DELETE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ESTABLISHED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FIN_WAIT_1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FIN_WAIT_2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LAST_ACK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LISTEN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SYN_RECV",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SYN_SENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TIME_WAIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemNetworkStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingDirectionIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "66ad48acbdb5a402446ddad96e5ab7ed0b455635ec7dfa48c324f8222eb12faf",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingDirectionIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "OUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingDirectionIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingFaultTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "8d320455e4e6809ba9e114e48fdd1d21fb8bdd9871c00e63d1ce05c6e9868505",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingFaultTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAJOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MINOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingFaultTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "42c77ba5d3f9186662cb3a4a2cba6638446a08e80039137143b635f373e9c76e",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FREE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "5fb58114be5a4463309b15905bf46056c11a2aeb73ec6ad7d04e0e5c307e1588",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAJOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MINOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessStatusIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "21564765bdc22b6f774a846680eee1035bdf736254e6a05606a517fed6146680",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessStatusIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RUNNING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SLEEPING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "STOPPED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFUNCT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessesStatusIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "ec13050bae2fd4359aa5c7f84211f380ef6eab557c41a910afbd4e285e55d84e",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessesStatusIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RUNNING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SLEEPING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "STOPPED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFUNCT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessesStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "0cc35e046a2dd69e260d46b00680d9bb37a8f17e6f3b231ac29eb2dba7aa71c0",
+      "name": "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SYSTEM_CPU_LOGICAL_NUMBER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "SYSTEM_CPU_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_DEVICE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_FILESYSTEM_MODE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_FILESYSTEM_MOUNTPOINT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_FILESYSTEM_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_FILESYSTEM_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_MEMORY_LINUX_SLAB_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_MEMORY_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_NETWORK_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PAGING_DIRECTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PAGING_FAULT_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PAGING_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PAGING_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PROCESS_STATUS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SYSTEM_PROCESSES_STATUS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3fb723048bb3cd9185908bf98169f2b357ce7c2d88846df1bd355226a9155a1e",
+          "code_length": 129
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemCpuStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemFilesystemTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryLinuxSlabStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemMemoryStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemNetworkStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingDirectionIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingFaultTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemPagingTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessStatusIncubatingValues",
+        "io/opentelemetry/semconv/incubating/SystemIncubatingAttributes$SystemProcessesStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes$TelemetrySdkLanguageIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "75be917780e23d2aa950cea9cab1edce00d97b4e327ef273095f3db940f499ee",
+      "name": "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes$TelemetrySdkLanguageIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CPP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DOTNET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ERLANG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JAVA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NODEJS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PHP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PYTHON",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RUBY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RUST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SWIFT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WEBJS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes$TelemetrySdkLanguageIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "d4b4c02be9a862c0290668c11d747a9112a36f4a089fe16f097b497602b87304",
+      "name": "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TELEMETRY_DISTRO_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TELEMETRY_DISTRO_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TELEMETRY_SDK_LANGUAGE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TELEMETRY_SDK_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TELEMETRY_SDK_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c0188557886b710dbbb7521df74da69d5f4d4c4354ff46625d8d4c5f72c4f45c",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TelemetryIncubatingAttributes$TelemetrySdkLanguageIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestCaseResultStatusIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "30f6411e3406df067f061209f33fefbc255041e987a9fe0293f29632700095f3",
+      "name": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestCaseResultStatusIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FAIL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestCaseResultStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestSuiteRunStatusIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "a7952982879649d46375ea7387d9be06aab5802ac04463cafdafd312b4f6089c",
+      "name": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestSuiteRunStatusIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SUCCESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FAILURE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SKIPPED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ABORTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TIMED_OUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IN_PROGRESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestSuiteRunStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "01b27ddf7c68b08f15c4435b4ddc3b600c5eeb0547f49bbd7e9006a034129448",
+      "name": "io/opentelemetry/semconv/incubating/TestIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TEST_CASE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TEST_CASE_RESULT_STATUS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TEST_SUITE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TEST_SUITE_RUN_STATUS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "07d25b26c59d94ebaa587e56cce5bf07000f1a46c1141dc13b5f6134e4f37b1b",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestCaseResultStatusIncubatingValues",
+        "io/opentelemetry/semconv/incubating/TestIncubatingAttributes$TestSuiteRunStatusIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ThreadIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "da60e5d78201b932c6446a4f48c33c856fac0d36ce0fbc63b1dfdc96ec49942c",
+      "name": "io/opentelemetry/semconv/incubating/ThreadIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "THREAD_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bc5ed3ec21019c48566a4fad4d4ee3fb3b8c62eb529a49a26c4a9d130d74b393",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/ThreadIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes$TlsProtocolNameIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "af1a18ba8e4284140e82085289033f019347559c7c5f3e7a62c7a692bebce851",
+      "name": "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes$TlsProtocolNameIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SSL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TLS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes$TlsProtocolNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "b1da450fd56d18038b67e1bd9c04c26e172aa1e15c541bc2d2878e3c20764bef",
+      "name": "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TLS_CIPHER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_CERTIFICATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_CERTIFICATE_CHAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "TLS_CLIENT_HASH_MD5",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_HASH_SHA1",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_HASH_SHA256",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_ISSUER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_JA3",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_NOT_AFTER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_NOT_BEFORE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_SERVER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_SUBJECT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_CLIENT_SUPPORTED_CIPHERS",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "TLS_CURVE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_ESTABLISHED",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "TLS_NEXT_PROTOCOL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_PROTOCOL_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_PROTOCOL_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_RESUMED",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "TLS_SERVER_CERTIFICATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_CERTIFICATE_CHAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "TLS_SERVER_HASH_MD5",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_HASH_SHA1",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_HASH_SHA256",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_ISSUER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_JA3S",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_NOT_AFTER",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_NOT_BEFORE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "TLS_SERVER_SUBJECT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a4e5e39ba5810e4d7e60b462b83353c3c090f9dce3e2e409c7bbe07aa5765aac",
+          "code_length": 233
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/TlsIncubatingAttributes$TlsProtocolNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/UrlIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "2cd7f08e601d6a55e959314300a4120cad271ba0f143b4a0f1ebc72dc8635fb4",
+      "name": "io/opentelemetry/semconv/incubating/UrlIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "URL_DOMAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_EXTENSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_FRAGMENT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_FULL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_ORIGINAL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_PATH",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_PORT",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "URL_QUERY",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_REGISTERED_DOMAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_SCHEME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_SUBDOMAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_TEMPLATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "URL_TOP_LEVEL_DOMAIN",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7c5b8ff068ca5bae4ca627c69d11f1aa1361ab375ef803e660ca1e0ed396e3f0",
+          "code_length": 105
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/UrlIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes$UserAgentSyntheticTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "646fc7c628731540a492b8292069831fd4550feeff2cb93bdc42ddeaef10cfd5",
+      "name": "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes$UserAgentSyntheticTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BOT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes$UserAgentSyntheticTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "605f4b1472e71cdc2fb1d012b5f303998a07a9585872bf1de5388c32cf23ba09",
+      "name": "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USER_AGENT_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_AGENT_ORIGINAL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_AGENT_OS_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_AGENT_OS_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_AGENT_SYNTHETIC_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_AGENT_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2852a68e242c7b0f06f7ee3b40322209fa09db95641193f7a8e8df13b2a3fb83",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/UserAgentIncubatingAttributes$UserAgentSyntheticTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/UserIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "1e47156fc71466fda6541f3a51f83ee5cb59b7a72210b36383a8d450381a92c8",
+      "name": "io/opentelemetry/semconv/incubating/UserIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USER_EMAIL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_FULL_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_HASH",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "USER_ROLES",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<Ljava/lang/String;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "130799157f9310993a210f4a10d97d4e9a5e541923a85f448c847dfd3d56f716",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/UserIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsGcTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "d60880821665a21a98f002fcec5a84d444da3077c8f5aaf96d59417b826a2184",
+      "name": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsGcTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAJOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MINOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INCREMENTAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WEAKCB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsGcTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsHeapSpaceNameIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "dd628658b8ed0e50047e8fd848f7ba9888e2a238efefc8719f815516b5f9bb9c",
+      "name": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsHeapSpaceNameIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NEW_SPACE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "OLD_SPACE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CODE_SPACE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAP_SPACE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LARGE_OBJECT_SPACE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsHeapSpaceNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "efd3ecde466f1248991704d4cf03836dcd6e9a34df7c5c2723f4e820c3f92077",
+      "name": "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "V8JS_GC_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "V8JS_HEAP_SPACE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "61f1c76dccadf2a68aa4d6a956fed8a71125dbde67ff3e096d5bf696bb91c4d5",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsGcTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/V8jsIncubatingAttributes$V8jsHeapSpaceNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsChangeStateIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "2ff099c4194f1895bdc4d6ac3770221981d16742d9c94266eb6db483aece7ce1",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsChangeStateIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OPEN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WIP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CLOSED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MERGED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsChangeStateIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsLineChangeTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "e39338fc1f1a4d2de95123610e8c37f6f150a83792ce56733f958bbb0da40000",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsLineChangeTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ADDED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "REMOVED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsLineChangeTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsProviderNameIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "9033b711b9d5e40103b0687570f8b2d6a8d8f305f9a345923f43b91f749c4741",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsProviderNameIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "GITHUB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GITLAB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GITTEA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GITEA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "BITBUCKET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsProviderNameIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefBaseTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "c401e3ebcb2a8a67b2481e00677ad09c1dd90aff4885870c0003b26debdf7201",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefBaseTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BRANCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TAG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefBaseTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefHeadTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3850aaecc9bd5b99975279b6abdedc6a60e6bfb3c4ca2d0b28c3644db6693d7e",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefHeadTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BRANCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TAG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefHeadTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "3fbc17f7696a316c41b5229cb01ee54ff396e0ec6adafc0dc62cad8f1a3621e9",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BRANCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TAG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRepositoryRefTypeIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "70b15154d81f92b0713126e5a5ef4c27c53059cb3ef45e855407082a3f59f446",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRepositoryRefTypeIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BRANCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TAG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRepositoryRefTypeIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRevisionDeltaDirectionIncubatingValues.class",
+      "occurrence": 0,
+      "sha256": "5e59b8a14f21e366d60011c46b150bb227b93a100dbe66c80cf2444bb3dc6812",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRevisionDeltaDirectionIncubatingValues",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BEHIND",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "AHEAD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRevisionDeltaDirectionIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "5a23a7bc3d99143739d414fb4ce5fbf69376abe0b8909f3063cfb4c03e6b98d0",
+      "name": "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VCS_CHANGE_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_CHANGE_STATE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_CHANGE_TITLE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_LINE_CHANGE_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_OWNER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_PROVIDER_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_BASE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_BASE_REVISION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_BASE_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_HEAD_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_HEAD_REVISION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_HEAD_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REF_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_CHANGE_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_CHANGE_TITLE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_REF_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_REF_REVISION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_REF_TYPE",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REPOSITORY_URL_FULL",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "VCS_REVISION_DELTA_DIRECTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7407810501cbfe3bf09cdc48399704d18c0024fdf1637d974734824c373c5e47",
+          "code_length": 169
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsChangeStateIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsLineChangeTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsProviderNameIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefBaseTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefHeadTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRefTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRepositoryRefTypeIncubatingValues",
+        "io/opentelemetry/semconv/incubating/VcsIncubatingAttributes$VcsRevisionDeltaDirectionIncubatingValues",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/WebengineIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "beceba9fd2a73c68ee1a9290e0a19a3896650390af5e85380957fcac2d396b36",
+      "name": "io/opentelemetry/semconv/incubating/WebengineIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WEBENGINE_DESCRIPTION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "WEBENGINE_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "WEBENGINE_VERSION",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2821cec1894eab5ae872b12a76d1cf2de54108859edd840c58f88cb91d09d9d0",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/WebengineIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/semconv/incubating/ZosIncubatingAttributes.class",
+      "occurrence": 0,
+      "sha256": "9e924bf915f4c6eaebda3a605396a0a31bdfb2969ce5d86a6c890bec9d766a6d",
+      "name": "io/opentelemetry/semconv/incubating/ZosIncubatingAttributes",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZOS_SMF_ID",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        },
+        {
+          "name": "ZOS_SYSPLEX_NAME",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 25,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "61f1c76dccadf2a68aa4d6a956fed8a71125dbde67ff3e096d5bf696bb91c4d5",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/semconv/incubating/ZosIncubatingAttributes",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

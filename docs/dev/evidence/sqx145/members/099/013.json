@@ -1,0 +1,4413 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/poi-3.11.jar",
+  "archive_sha256": "1412f527ed0a766a6a3697c81705381fa1c34aecc15c4cdcca12a1e52de24d0e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LogicalFunction$5.class",
+      "occurrence": 0,
+      "sha256": "5a0f9508b950ed98ee63ce42e5e45ca0409a1db2fb903bf8be69308cbfa6e693",
+      "name": "org/apache/poi/ss/formula/functions/LogicalFunction$5",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LogicalFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Z",
+          "access": 4,
+          "code_sha256": "464ff6a84daa34b8bb846d28cbb7defc4d56ec77d19a49dd72dd81d83c156c5a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/BlankEval",
+        "org/apache/poi/ss/formula/functions/LogicalFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$5"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LogicalFunction$6.class",
+      "occurrence": 0,
+      "sha256": "abc35764842f43a2896b3e8eae92ff94de4ff3694ccf5ad07ce395184a07f588",
+      "name": "org/apache/poi/ss/formula/functions/LogicalFunction$6",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LogicalFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Z",
+          "access": 4,
+          "code_sha256": "464ff6a84daa34b8bb846d28cbb7defc4d56ec77d19a49dd72dd81d83c156c5a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/functions/LogicalFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$6"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LogicalFunction$7.class",
+      "occurrence": 0,
+      "sha256": "678c2a6f02fd84fe3c9701e9b7ff090271f5e7e84554f339187590421db6fa00",
+      "name": "org/apache/poi/ss/formula/functions/LogicalFunction$7",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LogicalFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Z",
+          "access": 4,
+          "code_sha256": "7b2682244aea9a75cd774dd43461822e8ccfd30c40980112099c22225ae9d694",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/functions/LogicalFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$7"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LogicalFunction$8.class",
+      "occurrence": 0,
+      "sha256": "3a3c4751ac87cf6fa546f7c0b205da8bd88617b7b3c52baf8819a5e51cdacc63",
+      "name": "org/apache/poi/ss/formula/functions/LogicalFunction$8",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "c8665b435723f0d9bf791bd0d96c9e4ad0a27fea5aa73c6beb4c2ef28863203a",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/AreaEval",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$8"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LogicalFunction.class",
+      "occurrence": 0,
+      "sha256": "af890f6e5cdf5aeeb7082404af9cca222016b12f4c03a62dfe5b5121b020983c",
+      "name": "org/apache/poi/ss/formula/functions/LogicalFunction",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ISLOGICAL",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISNONTEXT",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISNUMBER",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISTEXT",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISBLANK",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISERROR",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISNA",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ISREF",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e7265ee49d4a7e596133a865de5c83b4ca8dcbaadf2aff59710cdcf1878a3a9e",
+          "code_length": 30
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Z",
+          "access": 1028
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f53af96480841c669de4460bfd34d8b44093e0c57b8ab1087787a5169703f7fd",
+          "code_length": 81
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$1",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$2",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$3",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$4",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$5",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$6",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$7",
+        "org/apache/poi/ss/formula/functions/LogicalFunction$8"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Lookup.class",
+      "occurrence": 0,
+      "sha256": "4f4258b21519a7fda0cb23b3bc9582c44c0a54303e6cad277216f0c58fd51d73",
+      "name": "org/apache/poi/ss/formula/functions/Lookup",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/ss/formula/functions/Var2or3ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "f2fefb525e3663ffa348cd132a8f79aeaddc630c89435cc4ad40d663f1f2033c",
+          "code_length": 10
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "6ed9638c2c17844b64eca0b31fee54424985bd74cc6b1fb87a4c3a3827389be0",
+          "code_length": 91
+        },
+        {
+          "name": "createVector",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 10,
+          "code_sha256": "b039994f9f442403123c5e7f16676e85b81082c6b40de8866a3c468f03608d70",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Lookup",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector",
+        "org/apache/poi/ss/formula/functions/Var2or3ArgFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$BinarySearchIndexes.class",
+      "occurrence": 0,
+      "sha256": "ce902f27155de6ab4d88e45cbb25b34165bb7a9a8c9bff6f8690a3c91ef9ce89",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$BinarySearchIndexes",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_lowIx",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_highIx",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "027b8dc0c15f3fad70c9164dbb6e0b649b03860a0f9802f79a081eb6a7bb3ddf",
+          "code_length": 15
+        },
+        {
+          "name": "getMidIx",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d283550d22cb3d869c9b0f9e76db54207d7d13217ad78cfb56ac111e697031f7",
+          "code_length": 26
+        },
+        {
+          "name": "getLowIx",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getHighIx",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "narrowSearch",
+          "descriptor": "(IZ)V",
+          "access": 1,
+          "code_sha256": "cd87b9afc19904ea6715bd5b0441688f1018262b55661847db0cedd402549dc9",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$BinarySearchIndexes"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$BooleanLookupComparer.class",
+      "occurrence": 0,
+      "sha256": "cab6f437fb0600116e4559ba72e98037930f4c5f0eee6f98aeb0673c93261f87",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$BooleanLookupComparer",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_value",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/BoolEval;)V",
+          "access": 4,
+          "code_sha256": "8ebfe6df013b91d57d559989dfc140b5b416b93d56ad0b9f20eaf0243ae6b242",
+          "code_length": 14
+        },
+        {
+          "name": "compareSameType",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 4,
+          "code_sha256": "e6efd5505a8c88bb8cd07c7b683f58a796e0302a894c45f9937ebc35163f3c8d",
+          "code_length": 37
+        },
+        {
+          "name": "getValueAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "90e64d4fc8a6aaf5afc959e34ec9e2ff8fbee266a4a3d4ca9910e1cb1f02dd20",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$BooleanLookupComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$ColumnVector.class",
+      "occurrence": 0,
+      "sha256": "77c6296ec72b853b107c7d5ddd53ddae1293a6885874af3a78f5176122e2ba3f",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$ColumnVector",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ],
+      "fields": [
+        {
+          "name": "_tableArray",
+          "descriptor": "Lorg/apache/poi/ss/formula/TwoDEval;",
+          "access": 18
+        },
+        {
+          "name": "_size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_columnIndex",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;I)V",
+          "access": 1,
+          "code_sha256": "6c4c1a8eb905ef70029ff2237871394152d0efb671b1b4d21573d7369039977f",
+          "code_length": 87
+        },
+        {
+          "name": "getItem",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e788e4f1d120cde095c1ddbfde1d1c9052a5317a1b7ba618490051026db54486",
+          "code_length": 69
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e88f57acb743f9814252b0b6da76241e43852e726e8114d0947084449c5d49e9",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ColumnVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult.class",
+      "occurrence": 0,
+      "sha256": "4922d5968d80868ca7495b3b9227d0379a7c183f0a0a3608c10682b4feb77428",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_isTypeMismatch",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_isLessThan",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_isEqual",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_isGreaterThan",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "TYPE_MISMATCH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25
+        },
+        {
+          "name": "LESS_THAN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25
+        },
+        {
+          "name": "EQUAL",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25
+        },
+        {
+          "name": "GREATER_THAN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 2,
+          "code_sha256": "3ad25f953ee48f0d2ef5ba76a4d871e7d63da9c6f0e30119701940f6f3304c97",
+          "code_length": 76
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25,
+          "code_sha256": "c84630f680ae900dba7c4ae0a7965435b4f119f72ad66351f495805f19eeae95",
+          "code_length": 20
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Z)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 25,
+          "code_sha256": "2a966a3556af788c184db35e02340c3f469f48a9ec80d74fb8745cc98011a435",
+          "code_length": 12
+        },
+        {
+          "name": "isTypeMismatch",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "isLessThan",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "isEqual",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "isGreaterThan",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ea7cee3dbc970185244df572d0a04c75aec078ee342b3fe3de40362155afc2b4",
+          "code_length": 48
+        },
+        {
+          "name": "formatAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c77a46b9834007657bb8c60b1a21a11e6729c2fa689ca4db4b8e676e312f73f9",
+          "code_length": 43
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "67fcdf94d1a096ff295dbdb6258cb87fa85a04dea9534ca7d1c855c34b09214b",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer.class",
+      "occurrence": 0,
+      "sha256": "367ed3e11cbef488006bf4895178a8515052f18ec8908d6bd803c834b18467b2",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase.class",
+      "occurrence": 0,
+      "sha256": "3d4d2e53857ef0940d43d84580f1573f32e7ec06782638752ff9b0e346f43738",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+      "major": 50,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer"
+      ],
+      "fields": [
+        {
+          "name": "_targetClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<+Lorg/apache/poi/ss/formula/eval/ValueEval;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)V",
+          "access": 4,
+          "code_sha256": "11dd9bb6c3251f38dda9fb3c47d5a970db12eb8a318a961388ac638fff2fa49b",
+          "code_length": 27
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 17,
+          "code_sha256": "8afac2fc7a22a99c3783ae9c13817b74e1199ead57edf0feb671b9cfd4ca8ed0",
+          "code_length": 35
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c064ec397f123ee765c6b720e166fa30226db07639b7d646c42cafac199ff761",
+          "code_length": 48
+        },
+        {
+          "name": "compareSameType",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 1028
+        },
+        {
+          "name": "getValueAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuffer",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$NumberLookupComparer.class",
+      "occurrence": 0,
+      "sha256": "ab588aa2421267d2eb0290ad94b19a06f269cecddc4158ad4fd6b241027e65be",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$NumberLookupComparer",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_value",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/NumberEval;)V",
+          "access": 4,
+          "code_sha256": "8ebfe6df013b91d57d559989dfc140b5b416b93d56ad0b9f20eaf0243ae6b242",
+          "code_length": 14
+        },
+        {
+          "name": "compareSameType",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 4,
+          "code_sha256": "37785d606439cc7b8433ec66d669d274863c465e28a080f2e7ef3e1cce62ec29",
+          "code_length": 20
+        },
+        {
+          "name": "getValueAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b8eaf8e372da815b0fd81897943435d90c0f7aff0013ba088f7fe7db70cffa79",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/String",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+        "org/apache/poi/ss/formula/functions/LookupUtils$NumberLookupComparer"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$RowVector.class",
+      "occurrence": 0,
+      "sha256": "5199823e5b1c8e12bc569d5672f5d002cdc5cd109a013f91e47e551c64d6016e",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$RowVector",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ],
+      "fields": [
+        {
+          "name": "_tableArray",
+          "descriptor": "Lorg/apache/poi/ss/formula/TwoDEval;",
+          "access": 18
+        },
+        {
+          "name": "_size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_rowIndex",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;I)V",
+          "access": 1,
+          "code_sha256": "af6061ba27235a591e3a8bb958a7ebec8dd12d92dc88c9c8ba1e6c608a0a95b7",
+          "code_length": 84
+        },
+        {
+          "name": "getItem",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "a6ab4991063634902c0a7022a2346fe4eff481643c8e5c8274767bf3602376f8",
+          "code_length": 69
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e88f57acb743f9814252b0b6da76241e43852e726e8114d0947084449c5d49e9",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$RowVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$SheetVector.class",
+      "occurrence": 0,
+      "sha256": "2638658d287ee67ddbf3356821f3f3a7a71fd90105ab77755574ca10904c11a2",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$SheetVector",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ],
+      "fields": [
+        {
+          "name": "_re",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/RefEval;",
+          "access": 18
+        },
+        {
+          "name": "_size",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/RefEval;)V",
+          "access": 1,
+          "code_sha256": "da4683eb1b91e814c9ef87ae53062159d60bd4101938357b8151949add54f128",
+          "code_length": 20
+        },
+        {
+          "name": "getItem",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "4ac231f641ded87bfb3b37a948740abab9d5f6494b59477316ad83bed14c6370",
+          "code_length": 77
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$SheetVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$StringLookupComparer.class",
+      "occurrence": 0,
+      "sha256": "b1567cad8d935448c36836fbd6d0fc6f6654096ee9590fd815d1481a7f707816",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$StringLookupComparer",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_value",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "_wildCardPattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 18
+        },
+        {
+          "name": "_matchExact",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_isMatchFunction",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/StringEval;ZZ)V",
+          "access": 4,
+          "code_sha256": "ba89d36013211f0065cc66fffea9cd9778f7ae0d9c25ee5c103bda29f5aab762",
+          "code_length": 35
+        },
+        {
+          "name": "compareSameType",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$CompareResult;",
+          "access": 4,
+          "code_sha256": "ce9e7f12318779a9cfc4e12af91dbf88bae363f90a49228ea7a5fb759c0e2d10",
+          "code_length": 66
+        },
+        {
+          "name": "getValueAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/apache/poi/ss/formula/eval/StringEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Countif",
+        "org/apache/poi/ss/formula/functions/Countif$StringMatcher",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+        "org/apache/poi/ss/formula/functions/LookupUtils$StringLookupComparer"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector.class",
+      "occurrence": 0,
+      "sha256": "4a7cf606f5f12c940ae107d3ed00f9d04ff1e21a4b665e5e588f9e7ce3a8b05e",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getItem",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1025
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/LookupUtils.class",
+      "occurrence": 0,
+      "sha256": "8fed7a38133b6ad444bd2aa3bbfc31dc413f21b9141a07f1c97c9c362d52a8d0",
+      "name": "org/apache/poi/ss/formula/functions/LookupUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createRowVector",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;I)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 9,
+          "code_sha256": "e34f3ace6d261dd4c51ea7f3ab7c7e30c5e7963440cc168285e4b5eb08bb7193",
+          "code_length": 10
+        },
+        {
+          "name": "createColumnVector",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;I)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 9,
+          "code_sha256": "14956760309426e3d32631ffc20403c156183ee3a08a0d558f383140a0be8c77",
+          "code_length": 10
+        },
+        {
+          "name": "createVector",
+          "descriptor": "(Lorg/apache/poi/ss/formula/TwoDEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 9,
+          "code_sha256": "4b17f2338a6262bf1befd4584a59d7b6561a4c680b14203cb4b8276ca18e818f",
+          "code_length": 32
+        },
+        {
+          "name": "createVector",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/RefEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 9,
+          "code_sha256": "4141d0b74be02a22e8cca4affc69d01bb71af1d1ebbe3a63c78f131dcd868884",
+          "code_length": 9
+        },
+        {
+          "name": "resolveRowOrColIndexArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;II)I",
+          "access": 9,
+          "code_sha256": "7d3b415c6ad6071ac5bf0581b8842d4433acfa0d4d013e5357f8fec09ac01915",
+          "code_length": 88,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "resolveTableArrayArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/TwoDEval;",
+          "access": 9,
+          "code_sha256": "65ca7458f6664d08e462dbaf79d4665d2a2147269adfd5cbf9ccfb0203f31597",
+          "code_length": 39,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "resolveRangeLookupArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;II)Z",
+          "access": 9,
+          "code_sha256": "1ee38b6f8ef9a523f73b9de530b20ebdf5dc347332cef02e27dc6757d029601b",
+          "code_length": 155,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "lookupIndexOfValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;Z)I",
+          "access": 9,
+          "code_sha256": "ac974020b1f3b819f79bc5ee066e2a12add6ccab28688864b0289ad0e5483e2e",
+          "code_length": 47,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "lookupIndexOfExactValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;)I",
+          "access": 10,
+          "code_sha256": "6c5045978b0b752a98adf64b396b6e26383661fe7a1ae5a7d67aa6ffd92d3900",
+          "code_length": 43
+        },
+        {
+          "name": "performBinarySearch",
+          "descriptor": "(Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;)I",
+          "access": 10,
+          "code_sha256": "00aeec2837da4133130e4914ccbe7809ac17bc086165f77c358f06234669db90",
+          "code_length": 118
+        },
+        {
+          "name": "handleMidValueTypeMismatch",
+          "descriptor": "(Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;Lorg/apache/poi/ss/formula/functions/LookupUtils$BinarySearchIndexes;I)I",
+          "access": 10,
+          "code_sha256": "7a85f115a2b2b6a3ed1dcf4d2404d3be17c8e157d9e4a5154b3aae5d739b8b97",
+          "code_length": 103
+        },
+        {
+          "name": "findLastIndexInRunOfEqualValues",
+          "descriptor": "(Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;II)I",
+          "access": 10,
+          "code_sha256": "101bcd4b55e3f47c2c62fd412d7615bcb9f31d6116ba643e2e8a5149566d1602",
+          "code_length": 46
+        },
+        {
+          "name": "createLookupComparer",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;ZZ)Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;",
+          "access": 9,
+          "code_sha256": "80af7eb04d8af9b8a094f99aada7bd8a707e3a6dd37ce8420aef368bd079c589",
+          "code_length": 115
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/eval/BlankEval",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/NumericValueEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/eval/StringEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Countif",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$BinarySearchIndexes",
+        "org/apache/poi/ss/formula/functions/LookupUtils$BooleanLookupComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ColumnVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparerBase",
+        "org/apache/poi/ss/formula/functions/LookupUtils$NumberLookupComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$RowVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$SheetVector",
+        "org/apache/poi/ss/formula/functions/LookupUtils$StringLookupComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Match$SingleValueVector.class",
+      "occurrence": 0,
+      "sha256": "ffe5bbe29b671c69f45376b06cbe305b021cbb99b40d5c4c941e784c94131b7c",
+      "name": "org/apache/poi/ss/formula/functions/Match$SingleValueVector",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector"
+      ],
+      "fields": [
+        {
+          "name": "_value",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getItem",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "ddcc48227b01d0fe68f7eecaf815fde0cca8b9f3fa8b9ddb9c421c4b57265ed8",
+          "code_length": 41
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector",
+        "org/apache/poi/ss/formula/functions/Match",
+        "org/apache/poi/ss/formula/functions/Match$SingleValueVector"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Match.class",
+      "occurrence": 0,
+      "sha256": "d2da43985b52036190dcfa8def14cd99d7ad884a5a7051a1618c4d1d6e74d2df",
+      "name": "org/apache/poi/ss/formula/functions/Match",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/ss/formula/functions/Var2or3ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "89fd86980781608509dd1012092a29ba98641ae1ad04c393cf019954348efc79",
+          "code_length": 10
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e72435f5c3f64cd76dddadc6e627e688c29d35cbb1ae134eb5859b25f6b1e44d",
+          "code_length": 29
+        },
+        {
+          "name": "eval",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;D)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 10,
+          "code_sha256": "f5431bbacde665efa6e8c7f5a0808e16c4df4424628f7800d4f9298f4b0a2a0f",
+          "code_length": 76
+        },
+        {
+          "name": "evaluateLookupRange",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;",
+          "access": 10,
+          "code_sha256": "9b3b50aa4b2b9edb83f9142596d46e63f1e094026f364a5c8f8fadaeaa065ea6",
+          "code_length": 181,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluateMatchTypeArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;II)D",
+          "access": 10,
+          "code_sha256": "84fea46e8b4b4ec847de9194ca217e9b4780fd54e264c362052a2be35b226ce6",
+          "code_length": 130,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "findIndexOfValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/functions/LookupUtils$ValueVector;ZZ)I",
+          "access": 10,
+          "code_sha256": "0234a32fc85ff34d427b242ad6abd7ac8b7dda6300f7caa24b12fbd99126ba57",
+          "code_length": 226,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "createLookupComparer",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Z)Lorg/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer;",
+          "access": 10,
+          "code_sha256": "0b8822332cf5d11d84a2cb2076c5153ca659084aed0824983d1764052328b719",
+          "code_length": 7
+        },
+        {
+          "name": "isLookupValueWild",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "9004c4b04a5cdc2218a010230f390bd4c3f634c96dd665a0bd68e92729b9c20b",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/NumericValueEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/eval/StringEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/LookupUtils",
+        "org/apache/poi/ss/formula/functions/LookupUtils$CompareResult",
+        "org/apache/poi/ss/formula/functions/LookupUtils$LookupValueComparer",
+        "org/apache/poi/ss/formula/functions/LookupUtils$ValueVector",
+        "org/apache/poi/ss/formula/functions/Match",
+        "org/apache/poi/ss/formula/functions/Match$SingleValueVector",
+        "org/apache/poi/ss/formula/functions/Var2or3ArgFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MathX.class",
+      "occurrence": 0,
+      "sha256": "7f5aa02b65ce84a062936d249092f323321134e34380286f843180f296adac26",
+      "name": "org/apache/poi/ss/formula/functions/MathX",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "round",
+          "descriptor": "(DI)D",
+          "access": 9,
+          "code_sha256": "071869a0f704542f44806160e63820f857fa41a2163ed777c56093f68e40ec41",
+          "code_length": 45
+        },
+        {
+          "name": "roundUp",
+          "descriptor": "(DI)D",
+          "access": 9,
+          "code_sha256": "dde5b664288d769a359fb631bc9f91d88332068825afcc76c586be686f154bad",
+          "code_length": 38
+        },
+        {
+          "name": "roundDown",
+          "descriptor": "(DI)D",
+          "access": 9,
+          "code_sha256": "43bed67d97e8811a6d214d61f68031d35ce18ff0a5ea28629cb5614c780f917c",
+          "code_length": 38
+        },
+        {
+          "name": "sign",
+          "descriptor": "(D)S",
+          "access": 9,
+          "code_sha256": "a81b02db570388542614d4faaa951a77787a7f7b9d63cf601f6caed47c3ac4b3",
+          "code_length": 23
+        },
+        {
+          "name": "average",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "bf65334c0ebb7c4baee527f07743b37c5566a1098a392d3878883feb979d8867",
+          "code_length": 39
+        },
+        {
+          "name": "sum",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "6d84c9fafe6bf1e938b4d8dbd3d4dfea9cae3d183a2aee2f3e79822bcae107bd",
+          "code_length": 28
+        },
+        {
+          "name": "sumsq",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "5ea2faf0aa296e69ca8caa8ed3a3f9bf79f1520fad8998ae02939893cb31ddaf",
+          "code_length": 32
+        },
+        {
+          "name": "product",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "91bf322dd9cdd34b8d82832783835a9dedfb1acf04eee59f0b094829dacb9f31",
+          "code_length": 39
+        },
+        {
+          "name": "min",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "d3c4b11cf100dc80c428c794699cca9b5e21c421497d8a0c35d8e1adb4ccad20",
+          "code_length": 32
+        },
+        {
+          "name": "max",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "091b2120082a6b4f5e12c46c71376d1ea26bf4723cb294e034a485026c9768ba",
+          "code_length": 32
+        },
+        {
+          "name": "floor",
+          "descriptor": "(DD)D",
+          "access": 9,
+          "code_sha256": "401ab41a8b41ae18d7da584fd635184157d7157233924c3d76b08a7720297774",
+          "code_length": 73
+        },
+        {
+          "name": "ceiling",
+          "descriptor": "(DD)D",
+          "access": 9,
+          "code_sha256": "e0e5ae66f87b772af3e50a688fe2962a94488b9b874c6f310d02cc9ba2b79272",
+          "code_length": 61
+        },
+        {
+          "name": "factorial",
+          "descriptor": "(I)D",
+          "access": 9,
+          "code_sha256": "b5f264e871836beb3f64950c8a6ea0c498da5ab8217d2a0d005e831da35e0b66",
+          "code_length": 47
+        },
+        {
+          "name": "mod",
+          "descriptor": "(DD)D",
+          "access": 9,
+          "code_sha256": "8290e54be755343693cde39c5167abce102cde61cc19aa5550653ec678522b86",
+          "code_length": 48
+        },
+        {
+          "name": "acosh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "21a98f1bf540db44722460dfd0273925d9de3234d877ce20ad4b3ae7b788c5ae",
+          "code_length": 18
+        },
+        {
+          "name": "asinh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "7986ab6433a12a64a480730a26c6acf1add5983e4de42a2ffc635d0a6eeb5ac0",
+          "code_length": 14
+        },
+        {
+          "name": "atanh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "c682dd85a3f1419de0122485d8b197d0a8a7991ae8f3d1d581268dc71e59af14",
+          "code_length": 15
+        },
+        {
+          "name": "cosh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "16d494a017831a56091dbf0900e59a5a77d01aaae7ede5c5320efd0e72b337d1",
+          "code_length": 27
+        },
+        {
+          "name": "sinh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "b7267b9dc52ed7f7204c839dcc10ac166d6242b43c7fb238165a9c6a929163e1",
+          "code_length": 27
+        },
+        {
+          "name": "tanh",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "a4d339cfdac78ec0d7572b81503b690fa95fe4abcf987f9bde7d266c82d66e06",
+          "code_length": 28
+        },
+        {
+          "name": "nChooseK",
+          "descriptor": "(II)D",
+          "access": 9,
+          "code_sha256": "fdf585f8a65b41204308321e3aace0e808d0a57819404167687d732552225429",
+          "code_length": 74
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/math/BigDecimal",
+        "java/math/RoundingMode",
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/util/NumberToTextConverter"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MinaMaxa$1.class",
+      "occurrence": 0,
+      "sha256": "be3c4bd02661ecc7f7a32b145411fd7f6a74c931a43b2a9682fe63430c686f7e",
+      "name": "org/apache/poi/ss/formula/functions/MinaMaxa$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/MinaMaxa",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([D)D",
+          "access": 4,
+          "code_sha256": "b7ea4cd0f438297b979ab564736e40188093156be747e673d333669e7279c2c3",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/MinaMaxa",
+        "org/apache/poi/ss/formula/functions/MinaMaxa$1"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MinaMaxa$2.class",
+      "occurrence": 0,
+      "sha256": "2c45960e4cae84ace6ef326c5038ebfe37a8aa79a42b51b9993b4a2efdc16873",
+      "name": "org/apache/poi/ss/formula/functions/MinaMaxa$2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/MinaMaxa",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([D)D",
+          "access": 4,
+          "code_sha256": "b7ea4cd0f438297b979ab564736e40188093156be747e673d333669e7279c2c3",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/MinaMaxa",
+        "org/apache/poi/ss/formula/functions/MinaMaxa$2"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MinaMaxa.class",
+      "occurrence": 0,
+      "sha256": "b0f90c965ab9da21168511282d166526a752ba017c7281a66efeb1b09a5677e2",
+      "name": "org/apache/poi/ss/formula/functions/MinaMaxa",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAXA",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "MINA",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "024d54397d66462cb9cb3b597ef6876bb26401fe5fee8d51f94cdf074215a71f",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "31af3ab03c630acc117f6d93b0400960eabb44f8aa6dd135399b7df4f5138f96",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MinaMaxa",
+        "org/apache/poi/ss/formula/functions/MinaMaxa$1",
+        "org/apache/poi/ss/formula/functions/MinaMaxa$2",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Mirr.class",
+      "occurrence": 0,
+      "sha256": "92d7f03c9850fa7078430ff1a1dfaec15c12c8f3b5d67092e4fbef26f216c71d",
+      "name": "org/apache/poi/ss/formula/functions/Mirr",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6f6fce1357e0ada296be77171f6907c9a083c19b3f5853b24ea9aab77968d23",
+          "code_length": 7
+        },
+        {
+          "name": "getMaxNumOperands",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "2aa3b8c641f9fb2da52054da18aeb7ce8524fd71d21f4ce9d042f43f527cc675",
+          "code_length": 2
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([D)D",
+          "access": 4,
+          "code_sha256": "c6f49a0df442d96664397a48411591cc68a80681827797583591d4e998fa691c",
+          "code_length": 172,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "mirr",
+          "descriptor": "([DDD)D",
+          "access": 10,
+          "code_sha256": "785ca3490546b4ed1a2db904e1f41b758d1df62b082432adc1bbd987b7b08de6",
+          "code_length": 174
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/lang/Math",
+        "java/lang/System",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/functions/Mirr",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Mode.class",
+      "occurrence": 0,
+      "sha256": "eed78e9c98e61826b0d7484b34174dc64ce934a9d69e63694d522f39d01d1bd2",
+      "name": "org/apache/poi/ss/formula/functions/Mode",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([D)D",
+          "access": 9,
+          "code_sha256": "04125f7fe16b804ca69211687cf7392a158aba326f976a5139c62d6f24e88271",
+          "code_length": 147,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "b1e22b19d025da9af3c2251cdbcfeddcd444da99eabaff20f207880c85944414",
+          "code_length": 110
+        },
+        {
+          "name": "collectValues",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Ljava/util/List;)V",
+          "access": 10,
+          "code_sha256": "43450b5b727ea50d561cd84c802e6992a3d80d101ac356b76103910c645b3b0c",
+          "code_length": 133,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ],
+          "generic_signature": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Ljava/util/List<Ljava/lang/Double;>;)V"
+        },
+        {
+          "name": "collectValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Ljava/util/List;Z)V",
+          "access": 10,
+          "code_sha256": "39eed167b5187f038b73b103e36d5b080d5e33aa941dd20137bc63c34734579e",
+          "code_length": 116,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ],
+          "generic_signature": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Ljava/util/List<Ljava/lang/Double;>;Z)V"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[I",
+        "[Lorg/apache/poi/ss/formula/eval/ValueEval;",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/List",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/eval/BlankEval",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/eval/StringEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/Mode"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList.class",
+      "occurrence": 0,
+      "sha256": "9ba63ddcb52df60a085307185125ff9c6178c88b4fad0e9a2fb2ebdc11e16a83",
+      "name": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_array",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "_count",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c554a214a33d635e1198053d3662a514abc53a6e2590ac4befa68a989e181902",
+          "code_length": 18
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[D",
+          "access": 1,
+          "code_sha256": "12ea2a4fd6ceb99d719e4501383a0df849da81c76628c0bc1844b030c738ab0f",
+          "code_length": 35
+        },
+        {
+          "name": "ensureCapacity",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "583bcfc1aa5f4d4d93a0180385ec36c6020a72607fe5bf8435dca332f0b99b2f",
+          "code_length": 39
+        },
+        {
+          "name": "add",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "293819fca56f56393821d79c97b8f932f6af4f52a2593184097e56e4fae925f8",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction.class",
+      "occurrence": 0,
+      "sha256": "288d9e3c2fac12c22d5202fd0f5a9d7c479770566b9c699f337c1c26ecf5423d",
+      "name": "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [
+        {
+          "name": "_isReferenceBoolCounted",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_isBlankCounted",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "EMPTY_DOUBLE_ARRAY",
+          "descriptor": "[D",
+          "access": 24
+        },
+        {
+          "name": "DEFAULT_MAX_NUM_OPERANDS",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZZ)V",
+          "access": 4,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 17,
+          "code_sha256": "22102b16bfe70e438810a37de07452698b0b7010b2d7f046edd8efbd998b3f89",
+          "code_length": 56
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([D)D",
+          "access": 1028,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "getMaxNumOperands",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "e28311ad178db1780ff82ec4dc57012479f9f1121fc5ff7bccdfbaabd013b99c",
+          "code_length": 3
+        },
+        {
+          "name": "getNumberArray",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;)[D",
+          "access": 20,
+          "code_sha256": "b8c3588537552544a730853357dabd79f4f38b91907e0947349e58f3102f2ad8",
+          "code_length": 52,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "isSubtotalCounted",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "collectValues",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList;)V",
+          "access": 2,
+          "code_sha256": "06d662b594a4915050ea84c8828c7a673977fdcdae28a4c81ff00f00280420e5",
+          "code_length": 295,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "collectValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;ZLorg/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList;)V",
+          "access": 2,
+          "code_sha256": "d90c6d9bd9000605f62ba23daf35eff15119241fa01d71bd52175efd2bb1cc43",
+          "code_length": 203,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "598fe9e07e66be0870d2555ae2b3034be835fa40e01db7ad12feaf08fbc2a52f",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/apache/poi/ss/formula/ThreeDEval",
+        "org/apache/poi/ss/formula/TwoDEval",
+        "org/apache/poi/ss/formula/eval/BlankEval",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/NumericValueEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/eval/StringValueEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction",
+        "org/apache/poi/ss/formula/functions/MultiOperandNumericFunction$DoubleList"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Na.class",
+      "occurrence": 0,
+      "sha256": "b7ae10870c61958cf908b6116a4e5349a4fd0f2a8878d77a541c0c38b819c2cb",
+      "name": "org/apache/poi/ss/formula/functions/Na",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+        "org/apache/poi/ss/formula/functions/Na"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NotImplementedFunction.class",
+      "occurrence": 0,
+      "sha256": "b5429401423c68909627b44916dadc3714acc53e97a2ece0256722ba5ec2785f",
+      "name": "org/apache/poi/ss/formula/functions/NotImplementedFunction",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [
+        {
+          "name": "_functionName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d06d080477d5eed897430864159c8b1ac6813eeb3afc6954979ddb2b4adaae2a",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "94d055d9711e9f22b202d00c6a6c79a5a565941422abf562657033edd627b5c3",
+          "code_length": 10
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "cb18a9991f4648d788941222c64596f7846157ab670fadce302f29b0d484cd8b",
+          "code_length": 12
+        },
+        {
+          "name": "getFunctionName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/eval/NotImplementedFunctionException",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/NotImplementedFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Now.class",
+      "occurrence": 0,
+      "sha256": "09d484bf3a5c02245ec115a10311e2628f3436adcbfd79aa428253c60d00163a",
+      "name": "org/apache/poi/ss/formula/functions/Now",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "d7d0b9bed0ddb5d6860ef5e691426057dc179002ceeb51202a0fd6351301bfb3",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/lang/System",
+        "java/util/Date",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+        "org/apache/poi/ss/formula/functions/Now",
+        "org/apache/poi/ss/usermodel/DateUtil"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Npv.class",
+      "occurrence": 0,
+      "sha256": "32bc7b5b8488c5fef134a95f2ca1b847b3b3f07c096aada32a84ae46e847f1d3",
+      "name": "org/apache/poi/ss/formula/functions/Npv",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "dfbcb46b7e11278abeb696bc5df299e0ccd74e68870d44546dd3f702d0ae97ff",
+          "code_length": 83
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/AggregateFunction",
+        "org/apache/poi/ss/formula/functions/AggregateFunction$ValueCollector",
+        "org/apache/poi/ss/formula/functions/FinanceLib",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/Npv",
+        "org/apache/poi/ss/formula/functions/NumericFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$1.class",
+      "occurrence": 0,
+      "sha256": "558dd89b92736b4487e6c04fff61e0f85fff570d3e4af78e17f55236cfd50927",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$1",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$10.class",
+      "occurrence": 0,
+      "sha256": "55156bc6533ed51dff4cd9f7606b4a44346a1e3289db689e24b784c48f50cb48",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$10",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$10",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$11.class",
+      "occurrence": 0,
+      "sha256": "7b1f809f2e89c19eceb6cd1ec3baad321d1605379ad7373ab7f2364935967846",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$11",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Var1or2ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "af9f4d89ab7ffac0f5f407eea3dc1c5ac5928b9add5321b1e450fc79b65353d5",
+          "code_length": 11
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "05ac5d1924c8c3ede4d02c618aadfe8f58809b05127e994c7495d1574176a97b",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$11",
+        "org/apache/poi/ss/formula/functions/Var1or2ArgFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$12.class",
+      "occurrence": 0,
+      "sha256": "fedaca4d1b9b0ab5c9372abb412a8bf4c830948a9e8b310cc55b78f726c2c0ec",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$12",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "7f1a061494308cb3e89f532a1706c3d737dd1929e193a871614fd21905cb85d8",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$12",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$13.class",
+      "occurrence": 0,
+      "sha256": "9f7a40e3189d74ab6055cb5db6af00a0da5c6e5bcb508e971466e38f596be6d2",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$13",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "8d71bfa0eed7f8b0cb6ce9ef70759e941ab67d611100752e486bc1240a0cac3d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$13",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$14.class",
+      "occurrence": 0,
+      "sha256": "51cf4f0a9e6314a66aa1f15f68e52b1e4c9c3adf0f8ad3736429fc3ffa624edd",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$14",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "3e41e94509b28f6209b2699e8c942ae32cd046d06a6fd4267ce0dbd729974f54",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$14",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$15.class",
+      "occurrence": 0,
+      "sha256": "b98e148f5521b6fa1c6edbd354f8d6da214d9876f3aabdb86380dbce9b23189e",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$15",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$15",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$16.class",
+      "occurrence": 0,
+      "sha256": "1f39484153484cee2ca53d323e369202b2d5615f956e89ad74ea4e1a1f9ca9da",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$16",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "4b7c49a738b0302bf4a7dca025bc5e87122456e323ed9d480929520fd4e8c5cf",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$16",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$17.class",
+      "occurrence": 0,
+      "sha256": "1a3a31db4580345d538c87588df2bad2a05b0ef3d693914445a65d4158af3042",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$17",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$17",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$18.class",
+      "occurrence": 0,
+      "sha256": "170bd8a32f000e4e65f74de0e7394457cc795ed964d69fd43005fd3db47d6ed3",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$18",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "4fa0999c883c30bc108ebfc370ccbf072973a09f78e7ebdb77d5b911ddac15d4",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$18",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$19.class",
+      "occurrence": 0,
+      "sha256": "194384808a9567f2f1df6c6218c7a5d1f27441f8f5fc1bd8f6addd376475874c",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$19",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$19",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$2.class",
+      "occurrence": 0,
+      "sha256": "ab85dc22d0540e4906880525bd8467811c8df2f5b777bffeecedf8d8f17ee12a",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$2",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$20.class",
+      "occurrence": 0,
+      "sha256": "0913d4078db21dbeb1ae1a6798f66771e579bc0e19b7e3d8e7a00027c66b0532",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$20",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$20",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$21.class",
+      "occurrence": 0,
+      "sha256": "d2601550ab5bae1a674d903b8020ab8509dd364187ea679d48d10826d6137291",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$21",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$21",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$22.class",
+      "occurrence": 0,
+      "sha256": "f13e9fb4cd89cc4e66729a033e02a0be28c98195384fabb7cccb6e8d662ffd1c",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$22",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$22",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$23.class",
+      "occurrence": 0,
+      "sha256": "7c11f221e568188101795e5fd46a1e34a529360d64f86c47c51ade66e9abdd04",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$23",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$23",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$24.class",
+      "occurrence": 0,
+      "sha256": "81e728f0ff19ae702e5f2f566b7265063840efece1716c86eb5e15f529689ec5",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$24",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "111dd640ab800fe11dd8754f4fedd86341140f615e0768ed58b9b6ddd06dee0a",
+          "code_length": 29,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$24",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$25.class",
+      "occurrence": 0,
+      "sha256": "9f1a610cbd43849c2ded509a22506a4e69cdf2a8e5796978cfb65d6837ce3ae7",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$25",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "ab8aa886253a84059aaa45dfd3be422a6849600a93f88da2a70b288cfaee12d3",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$25",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$26.class",
+      "occurrence": 0,
+      "sha256": "fb44b62ea79295c6310814c01140ea536876f88b9d8fa92a88689618cd3c06af",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$26",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "54695cb9fe47ed6d2800d1fb11f440ac5721ad1252a81bfe3cd4904e82147907",
+          "code_length": 35,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$26",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$27.class",
+      "occurrence": 0,
+      "sha256": "c8a5ffc5abff55ae34894d93f4b75d030313a6b2c67ad9118cec8142f2886972",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$27",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "ca7c6bcd7039745f0844b28338330b7f9591a399012e594ecab947e0976df9e7",
+          "code_length": 31,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$27",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$28.class",
+      "occurrence": 0,
+      "sha256": "3462badb0b2605b216b2e4a74cdc31952fced168f1484123992c74e397eb4a1c",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$28",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "43cf4611520c68dff4b773ad85276dc93d0a363e5a1a7cf71919d057aa5945a9",
+          "code_length": 23,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$28",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$29.class",
+      "occurrence": 0,
+      "sha256": "c31ec5c9a89e2d6fa62d3f3b562788a0f8f618ba6ac7df8a9df26c8b12db4cb3",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$29",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "ab8aa886253a84059aaa45dfd3be422a6849600a93f88da2a70b288cfaee12d3",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$29",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$3.class",
+      "occurrence": 0,
+      "sha256": "c3426a4608cbac783bbb4039eaccb44c3a89b059f0b2e0ec6f48a5e07dbbc920",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$3",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$30.class",
+      "occurrence": 0,
+      "sha256": "fe6a431e3c412e1b0ec39e4f9a93466c8d5d951aa7cdfb5aa87f5cfbe1dc420e",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$30",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "03d0c1a6e36269d00065a7c491fb895d74664d80de16a5cf08832e4fcff004dc",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$30",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$31.class",
+      "occurrence": 0,
+      "sha256": "e3ca0c8fa61fabf59a3fe9abfdf502e7bd7f902b0c83c60db94925f69622db38",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$31",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "03d0c1a6e36269d00065a7c491fb895d74664d80de16a5cf08832e4fcff004dc",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$31",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$32.class",
+      "occurrence": 0,
+      "sha256": "669d38338dc35bd3d35348dc76ad04e4722e6d924e8ab30c9fbbddfc0aa21ed7",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$32",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 4,
+          "code_sha256": "03d0c1a6e36269d00065a7c491fb895d74664d80de16a5cf08832e4fcff004dc",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$32",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$33.class",
+      "occurrence": 0,
+      "sha256": "5a6d9b1db7f96343c8a3494398c740b3379755598699ffe2d82c9ead55c6a676",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$33",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Var1or2ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "af9f4d89ab7ffac0f5f407eea3dc1c5ac5928b9add5321b1e450fc79b65353d5",
+          "code_length": 11
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "be6cb8dd78eb7c4fbb6057659a1803bb656342374a9eb7c26abeb02060a0a811",
+          "code_length": 91
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$33",
+        "org/apache/poi/ss/formula/functions/Var1or2ArgFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$34.class",
+      "occurrence": 0,
+      "sha256": "e452e24190dd722d82e6a88f98a1a73242edbcd4a4b5684433dd1a1e4a9ce6db",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$34",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$34"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$35.class",
+      "occurrence": 0,
+      "sha256": "f0a875f539be487cda450270d47c302c353f78df56897b8730026e24858b4691",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$35",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "9f92f07ffa236c5d2a4252f8c437e8687f4dc12f73120d01b0f8b7aaef5bf6fd",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/Fixed0ArgFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$35"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$36.class",
+      "occurrence": 0,
+      "sha256": "52ff05c7e67036c26ab2477766484c297fdcaca8931a9cc5b28e1e14e483370f",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$36",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed3ArgFunction",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_RETURN_RESULT",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "FACTORIALS",
+          "descriptor": "[J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "df780a428269a95dd42b0bde68fdb82faed204eabb5d378202101eb17f0abf17",
+          "code_length": 150
+        },
+        {
+          "name": "isDefaultResult",
+          "descriptor": "(DD)Z",
+          "access": 2,
+          "code_sha256": "9c4ceb49c5689fd7f5f6e12d66657497537723d3f728269fcbba1901232cb159",
+          "code_length": 16
+        },
+        {
+          "name": "checkArgument",
+          "descriptor": "(D)Z",
+          "access": 2,
+          "code_sha256": "08732a2280693b30590c2abe6c574f46821266a0979d8975fe6ffbb0f7443523",
+          "code_length": 23,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "probability",
+          "descriptor": "(ID)D",
+          "access": 2,
+          "code_sha256": "623b6c8eb5e0fdab4b0cadd224b10988db29c52ca5b02db503675a1a9dcdbbf1",
+          "code_length": 20
+        },
+        {
+          "name": "cumulativeProbability",
+          "descriptor": "(ID)D",
+          "access": 2,
+          "code_sha256": "6b7fbed9e43b8918ebafcb351e1286caecf9cec7ed0272c99ab7eaa35dcec398",
+          "code_length": 33
+        },
+        {
+          "name": "factorial",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "70072d3240f35a4049ed6e32b02ee58844602101be18cb4d0fdf62e3acaebc1f",
+          "code_length": 27
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "44d572dc56c917416b45e52215c8f9a22d3347d2186e32b5ed499bf323cc276b",
+          "code_length": 126
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/eval/BoolEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Fixed3ArgFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$36"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$4.class",
+      "occurrence": 0,
+      "sha256": "7dfad508ffdde3436877ca19920e684cf42ffe9c636861b1fb6f406282804a26",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$4",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$4",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$5.class",
+      "occurrence": 0,
+      "sha256": "0fb2ff6664e1500e35ecb8da3f93f51a23b8ee048eeeae8d27a6bb1162d434a1",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$5",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$5",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$6.class",
+      "occurrence": 0,
+      "sha256": "b600b939b0a658aa3e6649c45bd47a65ab9a9e346431e7c2d08a28d277fd907d",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$6",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$6",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$7.class",
+      "occurrence": 0,
+      "sha256": "4225d9cea3000f1a301fa21326cb7718fd48d6af2982fb8a567fe641e8778608",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$7",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$7",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$8.class",
+      "occurrence": 0,
+      "sha256": "2bd98b517c140f8fd18026134a1364be0856f23cbeebe0202df82b24f1f486c0",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$8",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$8",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$9.class",
+      "occurrence": 0,
+      "sha256": "767216374520c8e028fddf1270d9fce29c3b1f7a971b60dcc36a8456c1f18728",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$9",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "ff45c04b024dd0cc2b60dce1cb176129b1a808daeebceb5e91f04edb995db9b1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/MathX",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$9",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$Log.class",
+      "occurrence": 0,
+      "sha256": "f4305c23e843eed53ef1d1c3d1bfe111b82f0abd3aa3af7d57abae88f9926464",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$Log",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/ss/formula/functions/Var1or2ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "ef7df2e12014a51efe5f5752018fcc86d62715e11ac753f91ea55b744c531869",
+          "code_length": 45
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "05cb70c3f4e5dc6df8db1d86e07ba1966a70d2e15e8547d372c2c0585c19e329",
+          "code_length": 80
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$Log",
+        "org/apache/poi/ss/formula/functions/Var1or2ArgFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg.class",
+      "occurrence": 0,
+      "sha256": "8886717c9ca9852b9f266de5ae8fe55aef00c829f83c569ad42309aeed40e853",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e11b4eda8af5427d380def492161e79dafd0c838ef09a337504dcc3cd856c82f",
+          "code_length": 42
+        },
+        {
+          "name": "eval",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)D",
+          "access": 20,
+          "code_sha256": "25da73d7c7007180250135402eb3d5101071b767bd20ea4185e16fdd0179850c",
+          "code_length": 34,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 1028,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg.class",
+      "occurrence": 0,
+      "sha256": "6efe004dfecad8ac1c9caa4b2fe8f13646d1e2959f6c35e39ca957e2f32527ca",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed2ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "a626b985bca803e7919d276bb4233744d2ca69741ee62106195d7ebec5dbc0aa",
+          "code_length": 53
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(DD)D",
+          "access": 1028,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/functions/Fixed2ArgFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/NumericFunction.class",
+      "occurrence": 0,
+      "sha256": "99abfe95d9fba752041387bd4d15cf29b8921f0335765e744892d8efac66039d",
+      "name": "org/apache/poi/ss/formula/functions/NumericFunction",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "D",
+          "access": 24
+        },
+        {
+          "name": "TEN",
+          "descriptor": "D",
+          "access": 24
+        },
+        {
+          "name": "LOG_10_TO_BASE_e",
+          "descriptor": "D",
+          "access": 24
+        },
+        {
+          "name": "ABS",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ACOS",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ACOSH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ASIN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ASINH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ATAN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ATANH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "COS",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "COSH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "DEGREES",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "DOLLAR_ARG2_DEFAULT",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/NumberEval;",
+          "access": 24
+        },
+        {
+          "name": "DOLLAR",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "EXP",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "FACT",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "INT",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "LN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "LOG10",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "RADIANS",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "SIGN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "SIN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "SINH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "SQRT",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "TAN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "TANH",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ATAN2",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "CEILING",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "COMBIN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "FLOOR",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "MOD",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "POWER",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ROUND",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ROUNDDOWN",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "ROUNDUP",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "TRUNC_ARG2_DEFAULT",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/NumberEval;",
+          "access": 24
+        },
+        {
+          "name": "TRUNC",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "LOG",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "PI_EVAL",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/NumberEval;",
+          "access": 24
+        },
+        {
+          "name": "PI",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "RAND",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        },
+        {
+          "name": "POISSON",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/Function;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "singleOperandEvaluate",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;II)D",
+          "access": 28,
+          "code_sha256": "b5e9313d1e8f8f38eab701eed95fc7619160af59a7f3a482b9138edb7e23736a",
+          "code_length": 35,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "checkValue",
+          "descriptor": "(D)V",
+          "access": 25,
+          "code_sha256": "e3b9c6d379848c9f5180dabf25ff4d0fa2498cef0a8289e7a318a24f1c06928a",
+          "code_length": 26,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 17,
+          "code_sha256": "c32c400da093473f6b9058c5c74178f5a1352eaf725d4b085e00e87bc9bd184c",
+          "code_length": 35
+        },
+        {
+          "name": "eval",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)D",
+          "access": 1028,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a886d7b2c645adc17e84a032d4f42c49cda0b34879c0e330845e8afde7d645b3",
+          "code_length": 417
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$1",
+        "org/apache/poi/ss/formula/functions/NumericFunction$10",
+        "org/apache/poi/ss/formula/functions/NumericFunction$11",
+        "org/apache/poi/ss/formula/functions/NumericFunction$12",
+        "org/apache/poi/ss/formula/functions/NumericFunction$13",
+        "org/apache/poi/ss/formula/functions/NumericFunction$14",
+        "org/apache/poi/ss/formula/functions/NumericFunction$15",
+        "org/apache/poi/ss/formula/functions/NumericFunction$16",
+        "org/apache/poi/ss/formula/functions/NumericFunction$17",
+        "org/apache/poi/ss/formula/functions/NumericFunction$18",
+        "org/apache/poi/ss/formula/functions/NumericFunction$19",
+        "org/apache/poi/ss/formula/functions/NumericFunction$2",
+        "org/apache/poi/ss/formula/functions/NumericFunction$20",
+        "org/apache/poi/ss/formula/functions/NumericFunction$21",
+        "org/apache/poi/ss/formula/functions/NumericFunction$22",
+        "org/apache/poi/ss/formula/functions/NumericFunction$23",
+        "org/apache/poi/ss/formula/functions/NumericFunction$24",
+        "org/apache/poi/ss/formula/functions/NumericFunction$25",
+        "org/apache/poi/ss/formula/functions/NumericFunction$26",
+        "org/apache/poi/ss/formula/functions/NumericFunction$27",
+        "org/apache/poi/ss/formula/functions/NumericFunction$28",
+        "org/apache/poi/ss/formula/functions/NumericFunction$29",
+        "org/apache/poi/ss/formula/functions/NumericFunction$3",
+        "org/apache/poi/ss/formula/functions/NumericFunction$30",
+        "org/apache/poi/ss/formula/functions/NumericFunction$31",
+        "org/apache/poi/ss/formula/functions/NumericFunction$32",
+        "org/apache/poi/ss/formula/functions/NumericFunction$33",
+        "org/apache/poi/ss/formula/functions/NumericFunction$34",
+        "org/apache/poi/ss/formula/functions/NumericFunction$35",
+        "org/apache/poi/ss/formula/functions/NumericFunction$36",
+        "org/apache/poi/ss/formula/functions/NumericFunction$4",
+        "org/apache/poi/ss/formula/functions/NumericFunction$5",
+        "org/apache/poi/ss/formula/functions/NumericFunction$6",
+        "org/apache/poi/ss/formula/functions/NumericFunction$7",
+        "org/apache/poi/ss/formula/functions/NumericFunction$8",
+        "org/apache/poi/ss/formula/functions/NumericFunction$9",
+        "org/apache/poi/ss/formula/functions/NumericFunction$Log",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+        "org/apache/poi/ss/formula/functions/NumericFunction$TwoArg"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Oct2Dec.class",
+      "occurrence": 0,
+      "sha256": "71086f4ec4ce131b4354d11fb3c33e3190b838fdfa7b23fbbf8973dbe00cb730",
+      "name": "org/apache/poi/ss/formula/functions/Oct2Dec",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/FreeRefFunction"
+      ],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/FreeRefFunction;",
+          "access": 25
+        },
+        {
+          "name": "MAX_NUMBER_OF_PLACES",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "OCTAL_BASE",
+          "descriptor": "I",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e4aee2492002e576e5c8beab65fc5c102511d5ae096e823b460276ba073bab9d",
+          "code_length": 29
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/OperationEvaluationContext;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "3a4d86e65811bc33b0a0eb79a12c6860e2bbaf417c2e68dbcb88aeae88c965ad",
+          "code_length": 26
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ce1dd42ad8525c199a9a8f220cd213968d3c96d276f933350bedaa1071cf5de6",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "org/apache/poi/ss/formula/OperationEvaluationContext",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/BaseNumberUtils",
+        "org/apache/poi/ss/formula/functions/Fixed1ArgFunction",
+        "org/apache/poi/ss/formula/functions/FreeRefFunction",
+        "org/apache/poi/ss/formula/functions/Oct2Dec"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Odd.class",
+      "occurrence": 0,
+      "sha256": "d8e1f7f6bbd82f5de8bb7f726fc5133f7442932e711e20446fd41b25d8fd2e54",
+      "name": "org/apache/poi/ss/formula/functions/Odd",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PARITY_MASK",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(D)D",
+          "access": 4,
+          "code_sha256": "b545e8102d1590769ba5241c761e455be085de9b12a700ec09996fe987aa6e31",
+          "code_length": 28
+        },
+        {
+          "name": "calcOdd",
+          "descriptor": "(D)J",
+          "access": 10,
+          "code_sha256": "91d9120b1d7c7ec489dd058d3a0195d2ef66999bab98fab2ecbe58c31aa550fd",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/NumericFunction$OneArg",
+        "org/apache/poi/ss/formula/functions/Odd"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Offset$BaseRef.class",
+      "occurrence": 0,
+      "sha256": "0fc05a8e38e2e00be1209c21aa362aef7551b5aedd2b6ac9ede9b08b6b77f9de",
+      "name": "org/apache/poi/ss/formula/functions/Offset$BaseRef",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_firstRowIndex",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_firstColumnIndex",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_width",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_height",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_refEval",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/RefEval;",
+          "access": 18
+        },
+        {
+          "name": "_areaEval",
+          "descriptor": "Lorg/apache/poi/ss/formula/eval/AreaEval;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/RefEval;)V",
+          "access": 1,
+          "code_sha256": "0e1a6b5c4cb1fcc80d3b8a5a947cb27df74845cebd54d5a249ad7f6a116c0e4a",
+          "code_length": 45
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/AreaEval;)V",
+          "access": 1,
+          "code_sha256": "50a9ce9441f2ebaf5bf68a92b6ec9a1b75e8e76d5354651cae18bc0254ed92f0",
+          "code_length": 73
+        },
+        {
+          "name": "getWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "getFirstRowIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "getFirstColumnIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "offset",
+          "descriptor": "(IIII)Lorg/apache/poi/ss/formula/eval/AreaEval;",
+          "access": 1,
+          "code_sha256": "968ff12f46657717db2114f9a585560517a814ebc5cecd8b8e370063843624b3",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/eval/AreaEval",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/functions/Offset",
+        "org/apache/poi/ss/formula/functions/Offset$BaseRef"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Offset$LinearOffsetRange.class",
+      "occurrence": 0,
+      "sha256": "6134db0f3d6631e1b259b4b6f4171f835546ec3504bb0e21134366f608ddadda",
+      "name": "org/apache/poi/ss/formula/functions/Offset$LinearOffsetRange",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_offset",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_length",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "99271068a94df8aeba74a1b890421bfdddcdf902dc514eeb76c3d9143a884782",
+          "code_length": 29
+        },
+        {
+          "name": "getFirstIndex",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "917faad43de0a60a2a75bfdb87834aba632ebc6210149458e68e84420ae9df50",
+          "code_length": 6
+        },
+        {
+          "name": "getLastIndex",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "86662eba54ad02463a6cafd4210c008113059ca9164eb2371095814e84e49cb4",
+          "code_length": 13
+        },
+        {
+          "name": "normaliseAndTranslate",
+          "descriptor": "(I)Lorg/apache/poi/ss/formula/functions/Offset$LinearOffsetRange;",
+          "access": 1,
+          "code_sha256": "9a40d0ca800b70ee5df23a24ac74de78bed589be904bb5571f00b4e652bf287d",
+          "code_length": 57
+        },
+        {
+          "name": "isOutOfBounds",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "7d5fc92b8941fc5fda82aaa5881819d3e276623bcf45731a247561daa32d7b8d",
+          "code_length": 22
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a1038549c4cd09e5b5c1b34181a8a6374fe27fec1252852264399cae04e89f45",
+          "code_length": 60
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuffer",
+        "org/apache/poi/ss/formula/functions/Offset",
+        "org/apache/poi/ss/formula/functions/Offset$LinearOffsetRange"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Offset.class",
+      "occurrence": 0,
+      "sha256": "4350a4784ff90c75f37731d3b31e453616be5533ee6f68e3d9f90ab75aac0f6e",
+      "name": "org/apache/poi/ss/formula/functions/Offset",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/Function"
+      ],
+      "fields": [
+        {
+          "name": "LAST_VALID_ROW_INDEX",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LAST_VALID_COLUMN_INDEX",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "18c61a8e133b01fceb4d8c307020becca6e45233098c903f8c3277cb9f7d778a",
+          "code_length": 166
+        },
+        {
+          "name": "createOffset",
+          "descriptor": "(Lorg/apache/poi/ss/formula/functions/Offset$BaseRef;Lorg/apache/poi/ss/formula/functions/Offset$LinearOffsetRange;Lorg/apache/poi/ss/formula/functions/Offset$LinearOffsetRange;)Lorg/apache/poi/ss/formula/eval/AreaEval;",
+          "access": 10,
+          "code_sha256": "6135a7141b0308519e5a4d3d6defd3191deae66d4e6acdce9075c42531adecd9",
+          "code_length": 84,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluateBaseRef",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/functions/Offset$BaseRef;",
+          "access": 10,
+          "code_sha256": "fe63432f4c46d31f5af30a789f928ba1a47454704d305a4fd336ec6383429806",
+          "code_length": 68,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        },
+        {
+          "name": "evaluateIntArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;II)I",
+          "access": 8,
+          "code_sha256": "18350e775c5a8db9dd7e092a025f15356eb8170e9fe3d2b7058403fc0e69a788",
+          "code_length": 12,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/poi/ss/formula/eval/ValueEval;",
+        "java/lang/Object",
+        "org/apache/poi/ss/formula/eval/AreaEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/functions/Function",
+        "org/apache/poi/ss/formula/functions/Offset",
+        "org/apache/poi/ss/formula/functions/Offset$BaseRef",
+        "org/apache/poi/ss/formula/functions/Offset$LinearOffsetRange"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/PPMT.class",
+      "occurrence": 0,
+      "sha256": "560a4d3506cc48cc3f1fe5d9489d3bca570b354928f39c6a1cd8622d982912e8",
+      "name": "org/apache/poi/ss/formula/functions/PPMT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/ss/formula/functions/NumericFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "eval",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;II)D",
+          "access": 1,
+          "code_sha256": "b9eb1c6ebeafb8acc749126de70ffcb7f44e07fda81e144dde0c6d7133f906db",
+          "code_length": 106,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/functions/Finance",
+        "org/apache/poi/ss/formula/functions/NumericFunction",
+        "org/apache/poi/ss/formula/functions/PPMT"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Quotient.class",
+      "occurrence": 0,
+      "sha256": "d4f8c7a983e5096807eaa0a169e9774602ae1b7ac490a837992d4b5dc8889b15",
+      "name": "org/apache/poi/ss/formula/functions/Quotient",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/ss/formula/functions/Fixed2ArgFunction",
+      "interfaces": [
+        "org/apache/poi/ss/formula/functions/FreeRefFunction"
+      ],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lorg/apache/poi/ss/formula/functions/FreeRefFunction;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e84eced34745034ff6c075c2c6e4cde7c96bb23ed9ff40e5ae0b196631302f6d",
+          "code_length": 63
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "([Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/OperationEvaluationContext;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "4d351598d014e61ac6054b0a65d508d20a14b1edbb9f0fe74ba5247952b71c52",
+          "code_length": 29
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8d8c62531bfc82a646a38f4e86dc67f6df0b7c34aa36762723c7621742ed5c01",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/ss/formula/OperationEvaluationContext",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Fixed2ArgFunction",
+        "org/apache/poi/ss/formula/functions/FreeRefFunction",
+        "org/apache/poi/ss/formula/functions/Quotient"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/ss/formula/functions/Rank.class",
+      "occurrence": 0,
+      "sha256": "4d0f9d49409e44d0c978600dd6ab51ef2e13dc091f9817455d851a87d58d0d91",
+      "name": "org/apache/poi/ss/formula/functions/Rank",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/ss/formula/functions/Var2or3ArgFunction",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "2a06d97893a691a934fffe80b34aad82056e1405027be3e926edbf240b78e77c",
+          "code_length": 71
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(IILorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 1,
+          "code_sha256": "e4cd2558d8028c93ea5e996cec95bd6fc7edef73bc461dc479e70bbaf03884ac",
+          "code_length": 125
+        },
+        {
+          "name": "eval",
+          "descriptor": "(IIDLorg/apache/poi/ss/formula/eval/AreaEval;Z)Lorg/apache/poi/ss/formula/eval/ValueEval;",
+          "access": 10,
+          "code_sha256": "8f08e5c2741e9d40a41b66fa55c491c33555d36b25ff1085c0327fede9af3d96",
+          "code_length": 116
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/AreaEval;II)Ljava/lang/Double;",
+          "access": 10,
+          "code_sha256": "c2aa848601c5b9a8a54e621d6fcd55e8ef847fca3611a874601f4713addca761",
+          "code_length": 29
+        },
+        {
+          "name": "convertRangeArg",
+          "descriptor": "(Lorg/apache/poi/ss/formula/eval/ValueEval;)Lorg/apache/poi/ss/formula/eval/AreaEval;",
+          "access": 10,
+          "code_sha256": "81238caa204d3a14b97e642feb75d453cfe234da7ca35e762d29f8abad74595f",
+          "code_length": 44,
+          "throws": [
+            "org/apache/poi/ss/formula/eval/EvaluationException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "org/apache/poi/ss/formula/eval/AreaEval",
+        "org/apache/poi/ss/formula/eval/ErrorEval",
+        "org/apache/poi/ss/formula/eval/EvaluationException",
+        "org/apache/poi/ss/formula/eval/NumberEval",
+        "org/apache/poi/ss/formula/eval/OperandResolver",
+        "org/apache/poi/ss/formula/eval/RefEval",
+        "org/apache/poi/ss/formula/eval/ValueEval",
+        "org/apache/poi/ss/formula/functions/Rank",
+        "org/apache/poi/ss/formula/functions/Var2or3ArgFunction"
+      ]
+    }
+  ]
+}

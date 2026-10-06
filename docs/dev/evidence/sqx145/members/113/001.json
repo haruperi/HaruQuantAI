@@ -1,0 +1,3399 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/tree-sitter-0.24.4.jar",
+  "archive_sha256": "1dfebefc616049956ade6c4e85534d8c656a391da2a3a56a610f8d345e715745",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/treesitter/AnonymousLanguage.class",
+      "occurrence": 0,
+      "sha256": "a0af6e6244f5aac542d8f08d972119d1c57e16650dc1b1939772a39987f1f3fd",
+      "name": "org/treesitter/AnonymousLanguage",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/treesitter/TSLanguage",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "35115a4eccc1ba14f1ee3064c86c3b130c99b7dd8d2b57f59d5d730c347b915d",
+          "code_length": 6
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/treesitter/TSLanguage;",
+          "access": 1,
+          "code_sha256": "4f271264a8280b00cbb91cfe1b203db3436bc8a4cee982c8678f908dac961312",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "org/treesitter/AnonymousLanguage",
+        "org/treesitter/TSLanguage"
+      ]
+    },
+    {
+      "entry": "org/treesitter/CleanerRunner.class",
+      "occurrence": 0,
+      "sha256": "224e677d2e91631427ab7a31c420eb52da44364e37716e6189c2a1b7cc6dafa3",
+      "name": "org/treesitter/CleanerRunner",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cleaner",
+          "descriptor": "Ljava/lang/ref/Cleaner;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "register",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Runnable;)V",
+          "access": 9,
+          "code_sha256": "9568df1c4b279dd78f80be15f3620c31afa41a94c6e69e86abe6bc82d518bcad",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "52cbcabfc31b77c12c862d54d566799f8d934469f6f6e2c23e33c590fdd17101",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/ref/Cleaner",
+        "java/lang/ref/Cleaner$Cleanable",
+        "org/treesitter/CleanerRunner"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSException.class",
+      "occurrence": 0,
+      "sha256": "6b73d85b9a852d209e7cf578faa9708ac3e086baa601665f51b5a12743738d63",
+      "name": "org/treesitter/TSException",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/treesitter/TSException"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSInputEdit.class",
+      "occurrence": 0,
+      "sha256": "5b4787bcb6ecde03287c2ab349e395c634c228c09fbaa30841214d3be8cca7f7",
+      "name": "org/treesitter/TSInputEdit",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "startByte",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "oldEndByte",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "newEndByte",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "startPoint",
+          "descriptor": "Lorg/treesitter/TSPoint;",
+          "access": 18
+        },
+        {
+          "name": "oldEndPoint",
+          "descriptor": "Lorg/treesitter/TSPoint;",
+          "access": 18
+        },
+        {
+          "name": "newEndPoint",
+          "descriptor": "Lorg/treesitter/TSPoint;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IIILorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)V",
+          "access": 1,
+          "code_sha256": "9cba2b1cdf58e4c6496e6dae33f1087a9989fafc74b79c9fb7951fedf96ac4b5",
+          "code_length": 38
+        },
+        {
+          "name": "getStartByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getOldEndByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getNewEndByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getStartPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getOldEndPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getNewEndPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSInputEdit"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSInputEncoding.class",
+      "occurrence": 0,
+      "sha256": "9572d394f50e232e0f86631aa581000af1c566abcb80d62cca2d11cacbc7cbae",
+      "name": "org/treesitter/TSInputEncoding",
+      "major": 55,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TSInputEncodingUTF8",
+          "descriptor": "Lorg/treesitter/TSInputEncoding;",
+          "access": 16409
+        },
+        {
+          "name": "TSInputEncodingUTF16",
+          "descriptor": "Lorg/treesitter/TSInputEncoding;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/treesitter/TSInputEncoding;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/treesitter/TSInputEncoding;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSInputEncoding;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/treesitter/TSInputEncoding;>;",
+      "class_references": [
+        "[Lorg/treesitter/TSInputEncoding;",
+        "java/lang/Enum",
+        "org/treesitter/TSInputEncoding"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSLanguage$TSLanguageCleanAction.class",
+      "occurrence": 0,
+      "sha256": "10dbbb474f9e0f6420b6af233372db051c8189cda2a4d1b8b8a9ec6865a7d963",
+      "name": "org/treesitter/TSLanguage$TSLanguageCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4244c1d22ba41e52099ac589429bec1375c0a170b82135535fa554ef400418a9",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSLanguage",
+        "org/treesitter/TSLanguage$TSLanguageCleanAction",
+        "org/treesitter/TSParser"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSLanguage.class",
+      "occurrence": 0,
+      "sha256": "82d767b75f522a1f97d3ef7d53dc5ca26c38eccd86ea4b08686d00d233073084",
+      "name": "org/treesitter/TSLanguage",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "bff2bea401541baeba374c4c32cf7b1e337d4aab600df7663cb9b2ab1d2e49ed",
+          "code_length": 22
+        },
+        {
+          "name": "getPtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "version",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f9618cb5159ecf1dd5b8c22a4b17cec7944f4cb5339aa4578092abad3807b4c8",
+          "code_length": 8
+        },
+        {
+          "name": "fieldCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d3cb97bd9a6b8933a2cd05dd7d689e9ce12006972793e185841238de01833975",
+          "code_length": 8
+        },
+        {
+          "name": "fieldNameForId",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b54ab3e30989764b4166daa9e46730dcdda3304d19c480cb32d719bdb50d462d",
+          "code_length": 9
+        },
+        {
+          "name": "fieldIdForName",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1,
+          "code_sha256": "04d30aeae0ef96fd58f1b8aea8fda98d1e215d5e463944f0645aa4c4279ff925",
+          "code_length": 9
+        },
+        {
+          "name": "symbolType",
+          "descriptor": "(I)Lorg/treesitter/TSSymbolType;",
+          "access": 1,
+          "code_sha256": "6688bd81bc8520523c01f229cc1d7b3eff022235913c9d98738f89040b30d8f3",
+          "code_length": 70
+        },
+        {
+          "name": "symbolCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fe91c1e74c932de985abc531b92155a30157b08f627dec558a2230822737c937",
+          "code_length": 8
+        },
+        {
+          "name": "symbolName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7f13052feba52a2e358be8d0a22328e4d941022176862288965c6a6d501e6bdc",
+          "code_length": 9
+        },
+        {
+          "name": "symbolForName",
+          "descriptor": "(Ljava/lang/String;Z)I",
+          "access": 1,
+          "code_sha256": "a3f0e038d5bd95597d8844757926f9514c62ea43b31d6ee32a7edcbe6dd1e633",
+          "code_length": 10
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/treesitter/TSLanguage;",
+          "access": 1025
+        },
+        {
+          "name": "copyPtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "2dacdb47b6f07a1ecf14b8cf370ddc20317ea863e31df260d8ae25c468ba3a22",
+          "code_length": 8
+        },
+        {
+          "name": "nextState",
+          "descriptor": "(II)I",
+          "access": 1,
+          "code_sha256": "f29971415a35e7d22007cc32c5ac12badb7c59c4ba1bbbf84005969f4cc84475",
+          "code_length": 10
+        },
+        {
+          "name": "stateCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "30e0d1e58552d32a88ee0af60c8a90e81c168ec10a3f2d883b865c62c8dc475e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSException",
+        "org/treesitter/TSLanguage",
+        "org/treesitter/TSLanguage$TSLanguageCleanAction",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSSymbolType"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSLogger.class",
+      "occurrence": 0,
+      "sha256": "3f99bfc9a8f37ec7418743198518c07c7a717858fd27359ac42e0a0f870aece5",
+      "name": "org/treesitter/TSLogger",
+      "major": 55,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "log",
+          "descriptor": "(Lorg/treesitter/TSLogType;Ljava/lang/String;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSLogger"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSLogType.class",
+      "occurrence": 0,
+      "sha256": "e9c5ee631e61c16ab0853c8b78b67ad2e66952f0b693ecda8a07f1e34761e58e",
+      "name": "org/treesitter/TSLogType",
+      "major": 55,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TSLogTypeParse",
+          "descriptor": "Lorg/treesitter/TSLogType;",
+          "access": 16409
+        },
+        {
+          "name": "TSLogTypeLex",
+          "descriptor": "Lorg/treesitter/TSLogType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/treesitter/TSLogType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/treesitter/TSLogType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSLogType;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/treesitter/TSLogType;>;",
+      "class_references": [
+        "[Lorg/treesitter/TSLogType;",
+        "java/lang/Enum",
+        "org/treesitter/TSLogType"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TsLookAheadIterator$TsLookAheadIteratorCleanAction.class",
+      "occurrence": 0,
+      "sha256": "ab36e9167e931a22db3b5a60fb0a06d0dd046c4f6bdc7cac6f83af75a85be0d4",
+      "name": "org/treesitter/TsLookAheadIterator$TsLookAheadIteratorCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4244c1d22ba41e52099ac589429bec1375c0a170b82135535fa554ef400418a9",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TsLookAheadIterator",
+        "org/treesitter/TsLookAheadIterator$TsLookAheadIteratorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TsLookAheadIterator.class",
+      "occurrence": 0,
+      "sha256": "be75658d1061492a4bca88b2cc0e578c9b535b1822f9b06914d2770ea6bd059f",
+      "name": "org/treesitter/TsLookAheadIterator",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/treesitter/TSLanguage;I)V",
+          "access": 1,
+          "code_sha256": "b1ceeaa6ab247376840cec65f357ee985d29e058f230ed2ee267ff48198a2261",
+          "code_length": 51
+        },
+        {
+          "name": "resetState",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "d6d07ea0c7885bf70af45a06e17f9d4bf6764ea2c9d8a1ce5143c2c17acae0ce",
+          "code_length": 9
+        },
+        {
+          "name": "reset",
+          "descriptor": "(Lorg/treesitter/TSLanguage;I)Z",
+          "access": 1,
+          "code_sha256": "2bdcffbf3dd907bde7cfc160d4d53a82f26113b12499fb6db268909ce9cfc924",
+          "code_length": 13
+        },
+        {
+          "name": "getLanguage",
+          "descriptor": "()Lorg/treesitter/TSLanguage;",
+          "access": 1,
+          "code_sha256": "f47299899d50865a3ceb11131dbcc28c1a298f54bbab98ba3f108ccabbc7ac50",
+          "code_length": 15
+        },
+        {
+          "name": "next",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f828c4cb0fa523bfa0e30dea9e88ddb53aeb3cc78f4c45491b1b997c888ffe0f",
+          "code_length": 8
+        },
+        {
+          "name": "currentSymbol",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e066801ede52f79deef45e27da733b89c3f0463c9fbcd7e69af6224ddafa8692",
+          "code_length": 8
+        },
+        {
+          "name": "currentSymbolName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0a0ba2cdaec5ece9eb9d4612e78f55be1fa49eb1362116f234e89a7dc948f28b",
+          "code_length": 8
+        },
+        {
+          "name": "getPtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "4f93aa121928940bdb8d3bafd3c34f970dcbc955ea8c8749a45ef4f5d1004767",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/AnonymousLanguage",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSException",
+        "org/treesitter/TSLanguage",
+        "org/treesitter/TSParser",
+        "org/treesitter/TsLookAheadIterator",
+        "org/treesitter/TsLookAheadIterator$TsLookAheadIteratorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSNode.class",
+      "occurrence": 0,
+      "sha256": "e69aeb39903032d5c8f0e9d5bc3bb62428351ffcc7e73dc802fa4ec33f05074b",
+      "name": "org/treesitter/TSNode",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "context0",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "context1",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "context2",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "context3",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "idPtr",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "treePtr",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "tree",
+          "descriptor": "Lorg/treesitter/TSTree;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTreePtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "getTree",
+          "descriptor": "()Lorg/treesitter/TSTree;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setTree",
+          "descriptor": "(Lorg/treesitter/TSTree;)V",
+          "access": 4,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "asserNotNull",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b5b3411cf0d48541d40d40ae585c003c528ee0ba2f1900e8b87e10490889209e",
+          "code_length": 18
+        },
+        {
+          "name": "getChildCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a1ca80724d2d12a3a0b568378fea8fb1e5805dfddacd06fb835e890c740ab816",
+          "code_length": 9
+        },
+        {
+          "name": "getNamedChildCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "dc2ff12bed17c3e28c9ec7219723bb07857e2b87bfb8280581366572a5034c38",
+          "code_length": 9
+        },
+        {
+          "name": "getNamedChild",
+          "descriptor": "(I)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "88f1ffcbd04cf80d842af62d83c975d4c00e68d8e44ac32dcc102df1892f682b",
+          "code_length": 10
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7046e6f7b892059b65a26a19c0d379418b60415b268538bb1249b5d08fd170a5",
+          "code_length": 9
+        },
+        {
+          "name": "getSymbol",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "32735c355898b131235ae4910fdbc96431d930539c09fe2abccba10880d21bf3",
+          "code_length": 9
+        },
+        {
+          "name": "isNull",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3320a42f25c5b4936b245f50838cd681c4318a0b197c583842cda67b3b5bcfc5",
+          "code_length": 5
+        },
+        {
+          "name": "isNamed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "522e50d1e4fee0290e9edc5da5218f5d4c8696c1d7ce393240281c12232426f0",
+          "code_length": 9
+        },
+        {
+          "name": "isMissing",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f686397778c02f4ceb69945c89a463e85ac13942eb1b56e2fdacf8a4769befc9",
+          "code_length": 9
+        },
+        {
+          "name": "isExtra",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "24b3f2712b9ffe2639ee4678b7bce853113a8d0b1a1dd212c5a0531940c8076d",
+          "code_length": 9
+        },
+        {
+          "name": "hasChanges",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "54758a43b3aaa704241280589e1c51f1dfb9f8dc303b01661c3fc1a04a8465ee",
+          "code_length": 9
+        },
+        {
+          "name": "hasError",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "79bd670c6b95591095274ba20ce0dd78ea6c9302ef3e8e2b28772751dcc1247b",
+          "code_length": 9
+        },
+        {
+          "name": "isError",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fa3593e14f19fd7eb34cfef3d7e355fd72308c35eb3dd033df80f84ef5ee27bc",
+          "code_length": 9
+        },
+        {
+          "name": "getParserState",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "971d9c80bedf5f7b01cbfd4ed9033a6023abc154c30f534e03203bc5aeba61c5",
+          "code_length": 9
+        },
+        {
+          "name": "getNextParserState",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bba2d1e5352a0d0c6af6499cee365e3fa4479478ac96207580308da74f242cf0",
+          "code_length": 9
+        },
+        {
+          "name": "getStartByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "915184479c26417be6cfe00897833d336fa9be3d6a30c2c9a7a454b884199019",
+          "code_length": 9
+        },
+        {
+          "name": "getEndByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a3c2a8659640ca279169a501b8c4bfa13fdd54da4b6b386488584b9422fe186f",
+          "code_length": 9
+        },
+        {
+          "name": "getStartPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "47ceab7ff9a0093879e57472fd6fcd877076b8c696160faa42d2c876fa64632a",
+          "code_length": 9
+        },
+        {
+          "name": "getEndPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "8ab0bef37634e27d8cbcf861f603952b4665e1071062acc9e3f41386a42c228f",
+          "code_length": 9
+        },
+        {
+          "name": "getParent",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "5842e4532c9ea4d5107b4be407fe9f386a9ea04a9dca9201618f54d42dc66ba5",
+          "code_length": 9
+        },
+        {
+          "name": "getChildContainingDescendant",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "c04c806eb0cfb30a0d7629aa5f1f09c957757f64cc3bc75fb316b01e1589be5f",
+          "code_length": 10
+        },
+        {
+          "name": "getChildWithDescendant",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "c82ce29fa995fbe4ba97795943492cf54df426166f5f0c89d9b76f1f386e0531",
+          "code_length": 10
+        },
+        {
+          "name": "getChild",
+          "descriptor": "(I)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "bbea6bb3a1ad54b0c5f68387aba0e57fcb86f2aeab85575d4f28db877e83a0c8",
+          "code_length": 10
+        },
+        {
+          "name": "getFieldNameForChild",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0a0d3d29158fafdae1ba5eedc69a094e0dc7c39deca0cec2f9e045eafc891878",
+          "code_length": 10
+        },
+        {
+          "name": "getFieldNameForNamedChild",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "371ccd3ade5bfd120e520bdac4c392b862f8b1711a7a6882a5e64ba8b741c0a4",
+          "code_length": 11
+        },
+        {
+          "name": "getNextNamedSibling",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "fa11bf65b1892c560b7c1be8bc16acd05244bebc7fe72986af154c845681e2d3",
+          "code_length": 9
+        },
+        {
+          "name": "getPrevNamedSibling",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "527ac78c942d7191864a87b5dd2d0a03faed472c58f3774651a56e23c445cd3e",
+          "code_length": 9
+        },
+        {
+          "name": "getNextSibling",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "d2eee832884264b2a8d536e4ecd82e7f695a3876c6edf8bc99366ae0cf4bd1ac",
+          "code_length": 9
+        },
+        {
+          "name": "getPrevSibling",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "3ed4bcd0fef5995b8a573c87cdf0ef89d2f9de2f10032b9c5865731891f388cc",
+          "code_length": 9
+        },
+        {
+          "name": "getChildByFieldName",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "0d0cbfdc87f7dc9d528c4094476a5eeceed72a230d58ad61ed02c9e7dc0423e4",
+          "code_length": 10
+        },
+        {
+          "name": "getChildByFieldId",
+          "descriptor": "(I)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "fc1ff0921cd04a227e510f2ab520ca7390bfb6c651a7586e9773cd4dd6477fb1",
+          "code_length": 10
+        },
+        {
+          "name": "getFirstChildForByte",
+          "descriptor": "(I)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "abc500935f2cc7c7e16a9e3e6eb5e73149a72a5a121205efa783daf82fdfe97a",
+          "code_length": 10
+        },
+        {
+          "name": "getFirstNamedChildForByte",
+          "descriptor": "(I)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "13154e5a4b3ceb60af3243ad548ed0b9c064023b69e9e15b6d4924453db3ceed",
+          "code_length": 10
+        },
+        {
+          "name": "getDescendantForByteRange",
+          "descriptor": "(II)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "293adce50331562d9ab35c39da5a9f5717e066b02339e6510930c3ceb8058b76",
+          "code_length": 11
+        },
+        {
+          "name": "getDescendantForPointRange",
+          "descriptor": "(Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "24b6e1e2e1bdf267c37ac57989b8b9fc213a3360dbe0151e18307012560c6ff6",
+          "code_length": 11
+        },
+        {
+          "name": "getNamedDescendantForByteRange",
+          "descriptor": "(II)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "4000648f21ee8d1f201025e810091010b1a3a4ee44681e9e8e113eda1b22036a",
+          "code_length": 11
+        },
+        {
+          "name": "getNamedDescendantForPointRange",
+          "descriptor": "(Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "fa3f7d14636577dc5a5133e29605723a1dec28b54542347ca13dfe58e0fb093c",
+          "code_length": 11
+        },
+        {
+          "name": "edit",
+          "descriptor": "(Lorg/treesitter/TSInputEdit;)V",
+          "access": 1,
+          "code_sha256": "2cd2fdd8309c86312c6db5797d4844901b7b3cc51bbf71b72798a9d5394b373b",
+          "code_length": 59
+        },
+        {
+          "name": "eq",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSNode;)Z",
+          "access": 9,
+          "code_sha256": "2a995e83198284a42c9f37a18ebb51522f3b2e6d7e404ba780d59891e32802f0",
+          "code_length": 22
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b4b0010d17433b3bedbdef72422431b864b7a221d4f32792f8b931461d50281",
+          "code_length": 15
+        },
+        {
+          "name": "getGrammarType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6d21fb8ee44067ffb3ed2b586f91a8760ac8168b62062c66a25ad0e9cde8162f",
+          "code_length": 9
+        },
+        {
+          "name": "getGrammarSymbol",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bdbc6883680fe80fc9fb8344cdd9f2b101164e164eec137d50cce23964ef0994",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSException",
+        "org/treesitter/TSNode",
+        "org/treesitter/TSParser"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSParser$TSParserCleanAction.class",
+      "occurrence": 0,
+      "sha256": "ee2ff8d42dfff7324b6580df8f6bf5c65b21ccdcb1a3ba68f3f4d2fea51e77f7",
+      "name": "org/treesitter/TSParser$TSParserCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "555eef589aa1249d0fae3bb8c67c86a48d489fc956d94600e170d8d038098f07",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSParser$TSParserCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSParser.class",
+      "occurrence": 0,
+      "sha256": "2b8c9c21e96a56e1442d6dd240141142240e67be0fcb770237a71cf99c9aeea5",
+      "name": "org/treesitter/TSParser",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TREE_SITTER_LANGUAGE_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "language",
+          "descriptor": "Lorg/treesitter/TSLanguage;",
+          "access": 2
+        },
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "logger",
+          "descriptor": "Lorg/treesitter/TSLogger;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "ts_parser_new",
+          "descriptor": "()J",
+          "access": 265
+        },
+        {
+          "name": "ts_parser_delete",
+          "descriptor": "(J)V",
+          "access": 265
+        },
+        {
+          "name": "ts_parser_set_language",
+          "descriptor": "(JJ)Z",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_language",
+          "descriptor": "(J)J",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_set_included_ranges",
+          "descriptor": "(J[Lorg/treesitter/TSRange;)Z",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_included_ranges",
+          "descriptor": "(J)[Lorg/treesitter/TSRange;",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_parse",
+          "descriptor": "(J[BJLorg/treesitter/TSReader;I)J",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_parse_string",
+          "descriptor": "(JJLjava/lang/String;)J",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_parse_string_encoding",
+          "descriptor": "(JJLjava/lang/String;I)J",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_reset",
+          "descriptor": "(J)V",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_set_timeout_micros",
+          "descriptor": "(JJ)V",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_timeout_micros",
+          "descriptor": "(J)J",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_set_cancellation_flag",
+          "descriptor": "(JJ)V",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_cancellation_flag",
+          "descriptor": "(J)J",
+          "access": 266
+        },
+        {
+          "name": "alloc_cancellation_flag",
+          "descriptor": "()J",
+          "access": 266
+        },
+        {
+          "name": "get_cancellation_flag_value",
+          "descriptor": "(J)J",
+          "access": 266
+        },
+        {
+          "name": "free_cancellation_flag",
+          "descriptor": "(J)V",
+          "access": 266
+        },
+        {
+          "name": "write_cancellation_flag",
+          "descriptor": "(JJ)V",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_set_logger",
+          "descriptor": "(JLorg/treesitter/TSLogger;)V",
+          "access": 266
+        },
+        {
+          "name": "free_logger",
+          "descriptor": "(J)V",
+          "access": 266
+        },
+        {
+          "name": "ts_parser_print_dot_graphs",
+          "descriptor": "(JLjava/io/FileDescriptor;)V",
+          "access": 266
+        },
+        {
+          "name": "ts_tree_copy",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_root_node",
+          "descriptor": "(J)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_root_node_with_offset",
+          "descriptor": "(JILorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_language",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_included_ranges",
+          "descriptor": "(J)[Lorg/treesitter/TSRange;",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_edit",
+          "descriptor": "(JLorg/treesitter/TSInputEdit;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_get_changed_ranges",
+          "descriptor": "(JJ)[Lorg/treesitter/TSRange;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_type",
+          "descriptor": "(Lorg/treesitter/TSNode;)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_symbol",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_grammar_type",
+          "descriptor": "(Lorg/treesitter/TSNode;)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_grammar_symbol",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_start_byte",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_start_point",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSPoint;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_end_byte",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_end_point",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSPoint;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_string",
+          "descriptor": "(Lorg/treesitter/TSNode;)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_is_null",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_is_named",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_is_missing",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_is_extra",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_has_changes",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_has_error",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_is_error",
+          "descriptor": "(Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_node_parse_state",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_next_parse_state",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_parent",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child_containing_descendant",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_field_name_for_child",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child_count",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_named_child",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_named_child_count",
+          "descriptor": "(Lorg/treesitter/TSNode;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child_by_field_name",
+          "descriptor": "(Lorg/treesitter/TSNode;Ljava/lang/String;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child_by_field_id",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_next_sibling",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_prev_sibling",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_next_named_sibling",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_prev_named_sibling",
+          "descriptor": "(Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_first_child_for_byte",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_first_named_child_for_byte",
+          "descriptor": "(Lorg/treesitter/TSNode;I)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_descendant_for_byte_range",
+          "descriptor": "(Lorg/treesitter/TSNode;II)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_descendant_for_point_range",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_named_descendant_for_byte_range",
+          "descriptor": "(Lorg/treesitter/TSNode;II)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_named_descendant_for_point_range",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_edit",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSInputEdit;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_eq",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSNode;)Z",
+          "access": 268
+        },
+        {
+          "name": "free_cursor",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_new",
+          "descriptor": "(Lorg/treesitter/TSNode;)J",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_reset",
+          "descriptor": "(JLorg/treesitter/TSNode;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_current_node",
+          "descriptor": "(J)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_current_field_name",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_current_field_id",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_goto_parent",
+          "descriptor": "(J)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_goto_next_sibling",
+          "descriptor": "(J)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_goto_first_child",
+          "descriptor": "(J)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_goto_first_child_for_byte",
+          "descriptor": "(JI)I",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_goto_first_child_for_point",
+          "descriptor": "(JLorg/treesitter/TSPoint;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_cursor_copy",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "ts_query_new",
+          "descriptor": "(JLjava/lang/String;)J",
+          "access": 268
+        },
+        {
+          "name": "ts_query_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_pattern_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_capture_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_string_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_start_byte_for_pattern",
+          "descriptor": "(JI)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_end_byte_for_pattern",
+          "descriptor": "(JI)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_predicates_for_pattern",
+          "descriptor": "(JI)[Lorg/treesitter/TSQueryPredicateStep;",
+          "access": 268
+        },
+        {
+          "name": "ts_query_is_pattern_rooted",
+          "descriptor": "(JI)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_query_is_pattern_non_local",
+          "descriptor": "(JI)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_query_is_pattern_guaranteed_at_step",
+          "descriptor": "(JI)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_query_capture_name_for_id",
+          "descriptor": "(JI)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_query_capture_quantifier_for_id",
+          "descriptor": "(JII)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_string_value_for_id",
+          "descriptor": "(JI)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_query_disable_capture",
+          "descriptor": "(JLjava/lang/String;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_disable_pattern",
+          "descriptor": "(JI)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_new",
+          "descriptor": "()J",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_exec",
+          "descriptor": "(JJLorg/treesitter/TSNode;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_did_exceed_match_limit",
+          "descriptor": "(J)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_match_limit",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_set_match_limit",
+          "descriptor": "(JI)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_set_byte_range",
+          "descriptor": "(JII)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_set_point_range",
+          "descriptor": "(JLorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_next_match",
+          "descriptor": "(JLorg/treesitter/TSQueryMatch;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_remove_match",
+          "descriptor": "(JI)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_next_capture",
+          "descriptor": "(JLorg/treesitter/TSQueryMatch;)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_tree_print_dot_graph",
+          "descriptor": "(JLjava/io/FileDescriptor;)V",
+          "access": 268
+        },
+        {
+          "name": "ts_language_copy",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "ts_language_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_language_state_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_next_state",
+          "descriptor": "(JII)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_field_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_field_name_for_id",
+          "descriptor": "(JI)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_language_field_id_for_name",
+          "descriptor": "(JLjava/lang/String;)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_symbol_type",
+          "descriptor": "(JI)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_symbol_count",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_symbol_name",
+          "descriptor": "(JI)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_language_symbol_for_name",
+          "descriptor": "(JLjava/lang/String;Z)I",
+          "access": 268
+        },
+        {
+          "name": "ts_language_version",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_new",
+          "descriptor": "(JI)J",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_delete",
+          "descriptor": "(J)V",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_reset_state",
+          "descriptor": "(JI)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_reset",
+          "descriptor": "(JJI)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_language",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_next",
+          "descriptor": "(J)Z",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_current_symbol",
+          "descriptor": "(J)I",
+          "access": 268
+        },
+        {
+          "name": "ts_lookahead_iterator_current_symbol_name",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_child_with_descendant",
+          "descriptor": "(Lorg/treesitter/TSNode;Lorg/treesitter/TSNode;)Lorg/treesitter/TSNode;",
+          "access": 268
+        },
+        {
+          "name": "ts_node_field_name_for_named_child",
+          "descriptor": "(Lorg/treesitter/TSNode;J)Ljava/lang/String;",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_set_timeout_micros",
+          "descriptor": "(JJ)V",
+          "access": 268
+        },
+        {
+          "name": "ts_query_cursor_timeout_micros",
+          "descriptor": "(J)J",
+          "access": 268
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fcf600a9eefd4bb0bd872f5339a72e68e6c6efbc6c9c38dc4c0a1eace3e8305d",
+          "code_length": 44
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Lorg/treesitter/TSLogger;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "setLogger",
+          "descriptor": "(Lorg/treesitter/TSLogger;)V",
+          "access": 1,
+          "code_sha256": "532d1724818eb6095664e41592c419e62ac5822280ac49e25d894ed400d18492",
+          "code_length": 14
+        },
+        {
+          "name": "setLanguage",
+          "descriptor": "(Lorg/treesitter/TSLanguage;)Z",
+          "access": 1,
+          "code_sha256": "b171d5634e9adbd8754ff5c0c42b299e272a475ec2278fc626297688d15a86ba",
+          "code_length": 23
+        },
+        {
+          "name": "parseString",
+          "descriptor": "(Lorg/treesitter/TSTree;Ljava/lang/String;)Lorg/treesitter/TSTree;",
+          "access": 1,
+          "code_sha256": "69f93892935166f7b360101b5ab50fe43b3e1a165e161619fd5e09108562b426",
+          "code_length": 38
+        },
+        {
+          "name": "parseStringEncoding",
+          "descriptor": "(Lorg/treesitter/TSTree;Ljava/lang/String;Lorg/treesitter/TSInputEncoding;)Lorg/treesitter/TSTree;",
+          "access": 1,
+          "code_sha256": "1f1ce1e1876162e99698e0c3950bc863f6aadb70f75f0cc724cd722ad057cca5",
+          "code_length": 44
+        },
+        {
+          "name": "parse",
+          "descriptor": "([BLorg/treesitter/TSTree;Lorg/treesitter/TSReader;Lorg/treesitter/TSInputEncoding;)Lorg/treesitter/TSTree;",
+          "access": 1,
+          "code_sha256": "548f2409492f39a35035c8544bf0527071a7cb77523d913c7a6ba94aa8bfb9cd",
+          "code_length": 55
+        },
+        {
+          "name": "getLanguage",
+          "descriptor": "()Lorg/treesitter/TSLanguage;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "setIncludedRanges",
+          "descriptor": "([Lorg/treesitter/TSRange;)Z",
+          "access": 1,
+          "code_sha256": "9e32dcf185b51b56fa0ce8065c1360f6a5636b530267fbb1afd730b6603795b8",
+          "code_length": 9
+        },
+        {
+          "name": "getIncludedRanges",
+          "descriptor": "()[Lorg/treesitter/TSRange;",
+          "access": 1,
+          "code_sha256": "9f9c112c2f4949c4cc35bf61c12c4b51841b6e47f0cc2ee198229d270823587d",
+          "code_length": 8
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f234041f9edc5000460134271355b68568468419a030735d7eeeb5e6fa995511",
+          "code_length": 8
+        },
+        {
+          "name": "setTimeoutMicros",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "a7c43430d57507fc65375c8c4389ea6a00b340ece83f7539d6646087fa398e17",
+          "code_length": 9
+        },
+        {
+          "name": "getTimeoutMicros",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c367bd04c8275ca9f03b76b08c7ed2d20f78e262ae5cb6c495a3081b2427a4e1",
+          "code_length": 8
+        },
+        {
+          "name": "setCancellationFlag",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "fc6e47bcbdc0c60c24f4bd51db66915ddfdc5b26d425ad8f53627d9d1ce55231",
+          "code_length": 12
+        },
+        {
+          "name": "getCancellationFlag",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c1a7fbce0bbbe539a9f19b0609396cef52ea9c848eb89053353843a71b252457",
+          "code_length": 11
+        },
+        {
+          "name": "printDotGraphs",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "61fafc426ec7413ec8a1de1b1e5c1614b75ff100f0c8c0a0c86d5616e44e4b19",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b3f6df5145596f35f65762dead7da3fa97c988d39e8b4935d650ca0d54d6a9f5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSInputEncoding",
+        "org/treesitter/TSLanguage",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSParser$TSParserCleanAction",
+        "org/treesitter/TSTree",
+        "org/treesitter/utils/NativeUtils"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSPoint.class",
+      "occurrence": 0,
+      "sha256": "aad2663510491a37b51dbd60d174c0412f7a448724ba983e03aafee2a091e6a0",
+      "name": "org/treesitter/TSPoint",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "row",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "column",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "getRow",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getColumn",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSPoint"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQuantifier.class",
+      "occurrence": 0,
+      "sha256": "225fa0df47a32b6a576c85e2660fc8cee9f7e6b37d295cd4d5c28b4390dd8bc4",
+      "name": "org/treesitter/TSQuantifier",
+      "major": 55,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TSQuantifierZero",
+          "descriptor": "Lorg/treesitter/TSQuantifier;",
+          "access": 16409
+        },
+        {
+          "name": "TSQuantifierZeroOrOne",
+          "descriptor": "Lorg/treesitter/TSQuantifier;",
+          "access": 16409
+        },
+        {
+          "name": "TSQuantifierZeroOrMore",
+          "descriptor": "Lorg/treesitter/TSQuantifier;",
+          "access": 16409
+        },
+        {
+          "name": "TSQuantifierOne",
+          "descriptor": "Lorg/treesitter/TSQuantifier;",
+          "access": 16409
+        },
+        {
+          "name": "TSQuantifierOneOrMore",
+          "descriptor": "Lorg/treesitter/TSQuantifier;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/treesitter/TSQuantifier;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/treesitter/TSQuantifier;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSQuantifier;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "dbea9c37e077f601ef6fcf03ddf52070813be3e8100cbad66592e44d175e7556",
+          "code_length": 103
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/treesitter/TSQuantifier;>;",
+      "class_references": [
+        "[Lorg/treesitter/TSQuantifier;",
+        "java/lang/Enum",
+        "org/treesitter/TSQuantifier"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQuery$TSQueryCleanRunner.class",
+      "occurrence": 0,
+      "sha256": "ea9554f6315ccdafa92e806404a45b190cefec5cb883bd9e0665150fed909b4d",
+      "name": "org/treesitter/TSQuery$TSQueryCleanRunner",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4244c1d22ba41e52099ac589429bec1375c0a170b82135535fa554ef400418a9",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSQuery",
+        "org/treesitter/TSQuery$TSQueryCleanRunner"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQuery.class",
+      "occurrence": 0,
+      "sha256": "a9f359ab9311e0df174459427acd886c05a35bf3dd467ad512eac446de07db54",
+      "name": "org/treesitter/TSQuery",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "bff2bea401541baeba374c4c32cf7b1e337d4aab600df7663cb9b2ab1d2e49ed",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/treesitter/TSLanguage;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "68bc07f516361700bacb8d4c4d301ce38d1fcf430bee79c250555ae3d7a87112",
+          "code_length": 13
+        },
+        {
+          "name": "getPtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "getPatternCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "dd0db866b03e55c6f8445dbe38779ae31427778bcd30be14cf68a497afaeda55",
+          "code_length": 8
+        },
+        {
+          "name": "getCaptureCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f6b1246097143977e81c1aefb3e3af492b1478e76a839e6785d2719ffb98c475",
+          "code_length": 8
+        },
+        {
+          "name": "getStringCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "97ace3746bb69c1dee8fe2a3ea43da1337c3f44ec5ca51777907cacc72451cbe",
+          "code_length": 8
+        },
+        {
+          "name": "getStartByteForPattern",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "1319be7bc5596d1a5db091146bb569205e96d3022d6831bc774e7d8c1cd15016",
+          "code_length": 9
+        },
+        {
+          "name": "getEndByteForPattern",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "9f2802bf2c460c0b61a1f552847db650c6f67d36e50d0efc561ae87aadfb77f5",
+          "code_length": 9
+        },
+        {
+          "name": "getPredicateForPattern",
+          "descriptor": "(I)[Lorg/treesitter/TSQueryPredicateStep;",
+          "access": 1,
+          "code_sha256": "4ea78b6c78ccd98fcf9a98393630c346fc1110c9660067ba58d6af85ff1affcc",
+          "code_length": 9
+        },
+        {
+          "name": "isPatternRooted",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "49ab22dc55e5809c7736877813ed8058dee5789a9daf90c77c1cb24b76520f1a",
+          "code_length": 9
+        },
+        {
+          "name": "isPatterNonLocal",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "3a90e7ef050d08908a924055cf85643a5dfd540eccacb0e19b3d1cb1566c6cf3",
+          "code_length": 9
+        },
+        {
+          "name": "isPatternGuaranteedAtStep",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "86411c5274b69b0b76d9571639a6a3cfa8a61c8fc3a699f07a8eabb745048136",
+          "code_length": 9
+        },
+        {
+          "name": "getCaptureNameForId",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d39948a7e6570331192b0130612a66a2c80cb68d613f0d5c135b48794bc02262",
+          "code_length": 33
+        },
+        {
+          "name": "getCaptureQuantifierForId",
+          "descriptor": "(II)Lorg/treesitter/TSQuantifier;",
+          "access": 1,
+          "code_sha256": "e466984385703832800b247e4d5132386bfc8976a32556c468470450f18725ab",
+          "code_length": 78
+        },
+        {
+          "name": "getStringValueForId",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5ca0086d0bca12684d226b1070cf3c7f23fd27e9523d201fb4dd023f56492769",
+          "code_length": 96
+        },
+        {
+          "name": "disableCapture",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "33b2030316ecdeb41bff45c701578ce82efdcf0bc029c7dba756e15904b1d20f",
+          "code_length": 9
+        },
+        {
+          "name": "disablePattern",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f62f8090143fb271c5e71ae54e95eed47b33f8b10f91e99005e614034fdcf7c7",
+          "code_length": 9
+        },
+        {
+          "name": "setTimeoutMicros",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "5a04707493229a76455fc5d1b9e67ecdfb5e2c30701e72850039b67fdc5eb6d0",
+          "code_length": 9
+        },
+        {
+          "name": "getTimeoutMicros",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c01da2fdb995540c011950060414b9cf65d57205b94d495e86c05701dc205c9d",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[Lorg/treesitter/TSQueryPredicateStep;",
+        "java/lang/Object",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSException",
+        "org/treesitter/TSLanguage",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSQuantifier",
+        "org/treesitter/TSQuery",
+        "org/treesitter/TSQuery$TSQueryCleanRunner",
+        "org/treesitter/TSQueryPredicateStep",
+        "org/treesitter/TSQueryPredicateStepType"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryCapture.class",
+      "occurrence": 0,
+      "sha256": "2fae5ba202e9a326b2aebfcf0a4014422b57214444f726094fb8b2b31dd9f2ef",
+      "name": "org/treesitter/TSQueryCapture",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "node",
+          "descriptor": "Lorg/treesitter/TSNode;",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getNode",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSQueryCapture"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryCursor$TSMatchIterator.class",
+      "occurrence": 0,
+      "sha256": "9c57a0bfed0d2db4c1090ba5555cd3f15b791a1dbbc44f3d8ba740e51f767b35",
+      "name": "org/treesitter/TSQueryCursor$TSMatchIterator",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "tempMatch",
+          "descriptor": "Lorg/treesitter/TSQueryMatch;",
+          "access": 2
+        },
+        {
+          "name": "lastMatch",
+          "descriptor": "Lorg/treesitter/TSQueryMatch;",
+          "access": 2
+        },
+        {
+          "name": "nextFunction",
+          "descriptor": "Ljava/util/function/BiFunction;",
+          "access": 2,
+          "generic_signature": "Ljava/util/function/BiFunction<Ljava/lang/Long;Lorg/treesitter/TSQueryMatch;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/treesitter/TSQueryCursor;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/treesitter/TSQueryCursor;Ljava/util/function/BiFunction;)V",
+          "access": 1,
+          "code_sha256": "2e9b01a9ad0742dffe2efe53da766ec1ae516f8b10cc3478f95cbd83908414a5",
+          "code_length": 25,
+          "generic_signature": "(Ljava/util/function/BiFunction<Ljava/lang/Long;Lorg/treesitter/TSQueryMatch;Ljava/lang/Boolean;>;)V"
+        },
+        {
+          "name": "nextMatch",
+          "descriptor": "()Lorg/treesitter/TSQueryMatch;",
+          "access": 2,
+          "code_sha256": "9f1a863a201f879bb86b1184ef0fa93d6043133bb5aa4a84fc065d652ab06f52",
+          "code_length": 50
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8e10a667e57a7cf6e43c936b8c917170bdf31f51f864c610e90e019f62a75806",
+          "code_length": 18
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lorg/treesitter/TSQueryMatch;",
+          "access": 1,
+          "code_sha256": "fcc218f13fd4dfbf9f9c55a2b1194e71ea6cb8df5acdfb137828868352f8eeae",
+          "code_length": 43
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "51cc05a4d142c1354372804c8758b1abc1f0750dccc012c07fa3baa92213ca4a",
+          "code_length": 33
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "6ce8336204e5bdb31dcaf40133771a186a3c413b7a7a875064349ab58ec20a1a",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Lorg/treesitter/TSQueryMatch;>;",
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/IllegalStateException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "java/util/function/BiFunction",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSQueryCursor",
+        "org/treesitter/TSQueryCursor$TSMatchIterator",
+        "org/treesitter/TSQueryMatch"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryCursor$TSQueryCursorCleanAction.class",
+      "occurrence": 0,
+      "sha256": "785c89af03aab58cfa1fe3527249e66af95a3cbb7d07c93ea681e5ab8bcc479f",
+      "name": "org/treesitter/TSQueryCursor$TSQueryCursorCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4244c1d22ba41e52099ac589429bec1375c0a170b82135535fa554ef400418a9",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSQueryCursor",
+        "org/treesitter/TSQueryCursor$TSQueryCursorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryCursor.class",
+      "occurrence": 0,
+      "sha256": "a6cd662b77dde573067ca7c45741771eab718079e5f97847eaa39f0814ddd301",
+      "name": "org/treesitter/TSQueryCursor",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "executed",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "2208ecab00f2c3e5519ccbf1dd18cdb4c8b70ab57590ae79897002ea4f25023c",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4fb7149a6b3d6fad815fc60a21d74dac4fbaa4a3344d8284b768e0b4d4a11d55",
+          "code_length": 8
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/treesitter/TSQuery;Lorg/treesitter/TSNode;)V",
+          "access": 1,
+          "code_sha256": "616e9961ca4bf6cde7f7dec2bbac3cc0ff3410fdc5533ff40749d90aa484f923",
+          "code_length": 18
+        },
+        {
+          "name": "didExceedMatchLimit",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ed5bb0fb212b0892d1395cdafefa2c72f54e4a8045e16332781510c30ce940f3",
+          "code_length": 8
+        },
+        {
+          "name": "getMatchLimit",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ae9c2382b9fa63a6929ac72e5da41bfd52e54984d5fef483db39b314096855ee",
+          "code_length": 8
+        },
+        {
+          "name": "setMatchLimit",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "379a67551cc82a10776dbec25769652c3c55400267bcc1c92793371c5c471fa3",
+          "code_length": 9
+        },
+        {
+          "name": "setByteRange",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "724de1facf28186a49620191146e80adb0f2479237ec77d082f731c38d9e80e1",
+          "code_length": 10
+        },
+        {
+          "name": "setPointRange",
+          "descriptor": "(Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;)V",
+          "access": 1,
+          "code_sha256": "433f34f5e7d0dfe0c0cea7d9a8dd0c47e41733461888cbb23982c719d46a2b61",
+          "code_length": 10
+        },
+        {
+          "name": "nextMatch",
+          "descriptor": "(Lorg/treesitter/TSQueryMatch;)Z",
+          "access": 1,
+          "code_sha256": "6ad4d8de6677e9f8f36dd21010cf3c43f3e15e1503188855e712f970fc0eeda8",
+          "code_length": 13
+        },
+        {
+          "name": "removeMatch",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4b99d2844bb1e4b08f66c5aa3b21d1af4a9db5971a1c7ee7305534896dee67bd",
+          "code_length": 9
+        },
+        {
+          "name": "nextCapture",
+          "descriptor": "(Lorg/treesitter/TSQueryMatch;)Z",
+          "access": 1,
+          "code_sha256": "7341a1cb7a4c7fdba5482ab95519930ac1f5d56f4d7e58f085743b14dd554cd6",
+          "code_length": 13
+        },
+        {
+          "name": "assertExecuted",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e9d39b0d91ddd2f3a658ef40880c834b08c63aab16221a907792186e6293d9e5",
+          "code_length": 18
+        },
+        {
+          "name": "getMatches",
+          "descriptor": "()Lorg/treesitter/TSQueryCursor$TSMatchIterator;",
+          "access": 1,
+          "code_sha256": "1e3f1e01df2030309586a7d1a66cceacfac2e3eacc27bbee044c16458d3cb351",
+          "code_length": 14
+        },
+        {
+          "name": "getCaptures",
+          "descriptor": "()Lorg/treesitter/TSQueryCursor$TSMatchIterator;",
+          "access": 1,
+          "code_sha256": "c25d9f971e54b4d978c5aeacf19c47f4b5e3ac753e44cd5754afa502000687e2",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSException",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSQuery",
+        "org/treesitter/TSQueryCursor",
+        "org/treesitter/TSQueryCursor$TSMatchIterator",
+        "org/treesitter/TSQueryCursor$TSQueryCursorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryException.class",
+      "occurrence": 0,
+      "sha256": "be3b66793410712c29eb0372ce80eb2b68f49beebfd0540eceb612580de360a0",
+      "name": "org/treesitter/TSQueryException",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/treesitter/TSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/treesitter/TSException",
+        "org/treesitter/TSQueryException"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryMatch.class",
+      "occurrence": 0,
+      "sha256": "18b973c0f1232e12aaf42408339ff4fdce23836cbde198e4d3a037f3bcffc5dd",
+      "name": "org/treesitter/TSQueryMatch",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "id",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "patternIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "captureIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "captures",
+          "descriptor": "[Lorg/treesitter/TSQueryCapture;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getPatternIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getCaptureIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getCaptures",
+          "descriptor": "()[Lorg/treesitter/TSQueryCapture;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSQueryMatch"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryPredicateStep.class",
+      "occurrence": 0,
+      "sha256": "649e4b99f6c74a35dfcf95e3196546aed08d82db616fc4ca903a11ad00e27cd1",
+      "name": "org/treesitter/TSQueryPredicateStep",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 2
+        },
+        {
+          "name": "valueId",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getValueId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSQueryPredicateStep"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSQueryPredicateStepType.class",
+      "occurrence": 0,
+      "sha256": "c5fd6b65ad061f2de28c5627b9e4278af84a19e6dd834adbc4a320ae9a9bf069",
+      "name": "org/treesitter/TSQueryPredicateStepType",
+      "major": 55,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TSQueryPredicateStepTypeDone",
+          "descriptor": "Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 16409
+        },
+        {
+          "name": "TSQueryPredicateStepTypeCapture",
+          "descriptor": "Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 16409
+        },
+        {
+          "name": "TSQueryPredicateStepTypeString",
+          "descriptor": "Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSQueryPredicateStepType;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/treesitter/TSQueryPredicateStepType;>;",
+      "class_references": [
+        "[Lorg/treesitter/TSQueryPredicateStepType;",
+        "java/lang/Enum",
+        "org/treesitter/TSQueryPredicateStepType"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSRange.class",
+      "occurrence": 0,
+      "sha256": "9737e57cef9d971fdccea77c59bdf7cc4f5c241d3ea123a5521cb2250e899bc7",
+      "name": "org/treesitter/TSRange",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "startPoint",
+          "descriptor": "Lorg/treesitter/TSPoint;",
+          "access": 2
+        },
+        {
+          "name": "endPoint",
+          "descriptor": "Lorg/treesitter/TSPoint;",
+          "access": 2
+        },
+        {
+          "name": "startByte",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "endByte",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/treesitter/TSPoint;Lorg/treesitter/TSPoint;II)V",
+          "access": 1,
+          "code_sha256": "4b00592cc8478813d5dd7144b0dc1a45d2291a570551380737b30aa72c7a5500",
+          "code_length": 26
+        },
+        {
+          "name": "getStartPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getEndPoint",
+          "descriptor": "()Lorg/treesitter/TSPoint;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getStartByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getEndByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSRange"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSReader.class",
+      "occurrence": 0,
+      "sha256": "c9acdf1fd5861e7c7216990cc82c2fe4c2ad2c29a2c65b36426ba977ab9df4fa",
+      "name": "org/treesitter/TSReader",
+      "major": 55,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "read",
+          "descriptor": "([BILorg/treesitter/TSPoint;)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/TSReader"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSSymbolType.class",
+      "occurrence": 0,
+      "sha256": "f330fa99ebf4c837e23dc8322510014b71ef03c90ee43de1035a2425885c26e0",
+      "name": "org/treesitter/TSSymbolType",
+      "major": 55,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TSSymbolTypeRegular",
+          "descriptor": "Lorg/treesitter/TSSymbolType;",
+          "access": 16409
+        },
+        {
+          "name": "TSSymbolTypeAnonymous",
+          "descriptor": "Lorg/treesitter/TSSymbolType;",
+          "access": 16409
+        },
+        {
+          "name": "TSSymbolTypeSupertype",
+          "descriptor": "Lorg/treesitter/TSSymbolType;",
+          "access": 16409
+        },
+        {
+          "name": "TSSymbolTypeAuxiliary",
+          "descriptor": "Lorg/treesitter/TSSymbolType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/treesitter/TSSymbolType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/treesitter/TSSymbolType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/treesitter/TSSymbolType;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/treesitter/TSSymbolType;>;",
+      "class_references": [
+        "[Lorg/treesitter/TSSymbolType;",
+        "java/lang/Enum",
+        "org/treesitter/TSSymbolType"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSTree$TSTreeCleanAction.class",
+      "occurrence": 0,
+      "sha256": "90f08271e84151453a15d2d77dd0cda559e55d547f59ad58cbb56233c8d0db50",
+      "name": "org/treesitter/TSTree$TSTreeCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4244c1d22ba41e52099ac589429bec1375c0a170b82135535fa554ef400418a9",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSTree",
+        "org/treesitter/TSTree$TSTreeCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSTree.class",
+      "occurrence": 0,
+      "sha256": "b0a57f3d02b7d758fb75c29ba5025d7427f515c3e3927f8b61d01164018fd20e",
+      "name": "org/treesitter/TSTree",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "language",
+          "descriptor": "Lorg/treesitter/TSLanguage;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JLorg/treesitter/TSLanguage;)V",
+          "access": 0,
+          "code_sha256": "d3a075171b2f6e40547530688f7488cd7a3593041951e3f048578fbbf3d6e5a2",
+          "code_length": 27
+        },
+        {
+          "name": "setLanguage",
+          "descriptor": "(Lorg/treesitter/TSLanguage;)V",
+          "access": 4,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "getPtr",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/treesitter/TSTree;",
+          "access": 1,
+          "code_sha256": "84b85668d0d33eaa1f2114e88385bfe46984d6f5f69e5af7f21b5e421b785840",
+          "code_length": 19
+        },
+        {
+          "name": "getRootNode",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "6932ad7dbabd7fe34dc905b692d45ca477f3e20e2890195b4faf9359a498b8d0",
+          "code_length": 15
+        },
+        {
+          "name": "getRootNodeWithOffset",
+          "descriptor": "(ILorg/treesitter/TSPoint;)Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "2f1562513f6f12b66986d5b90fd3548178e15beccf9adb424ffeb864cc8b42d4",
+          "code_length": 17
+        },
+        {
+          "name": "getLanguage",
+          "descriptor": "()Lorg/treesitter/TSLanguage;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getIncludedRanges",
+          "descriptor": "()[Lorg/treesitter/TSRange;",
+          "access": 1,
+          "code_sha256": "3767f64be6c3243d3b829acd896236504ab400b486594282c77a77ac2c980587",
+          "code_length": 8
+        },
+        {
+          "name": "edit",
+          "descriptor": "(Lorg/treesitter/TSInputEdit;)V",
+          "access": 1,
+          "code_sha256": "a5da30ca5ae4858fcefb8f7b88c1faffc1167b3cdd2fccbe98536910e8f17a46",
+          "code_length": 9
+        },
+        {
+          "name": "getChangedRanges",
+          "descriptor": "(Lorg/treesitter/TSTree;Lorg/treesitter/TSTree;)[Lorg/treesitter/TSRange;",
+          "access": 9,
+          "code_sha256": "16b71e6f1d5387fd0a05fc57891b35b948572a7d88b182a9ccbdf90042cb5c15",
+          "code_length": 12
+        },
+        {
+          "name": "printDotGraphs",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "8a7a6d015f0f8cc6243a233e75bd24f53163e9dccfa689769a57598b956d3321",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSNode",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSTree",
+        "org/treesitter/TSTree$TSTreeCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSTreeCursor$TSTreeCursorCleanAction.class",
+      "occurrence": 0,
+      "sha256": "fc4c80417dac8ae9e47b6c7a702cefee198ab4d9213631b360384aa55c11b35d",
+      "name": "org/treesitter/TSTreeCursor$TSTreeCursorCleanAction",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a092025828f708a8c78716fcca8ddea5f6a02ca718ab2568cd8376236b56f896",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSTreeCursor",
+        "org/treesitter/TSTreeCursor$TSTreeCursorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/TSTreeCursor.class",
+      "occurrence": 0,
+      "sha256": "95ff78cd7487432280eb2066ad97e04016dbef88c49d3b88d0a3c0d28deab6cc",
+      "name": "org/treesitter/TSTreeCursor",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ptr",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "node",
+          "descriptor": "Lorg/treesitter/TSNode;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "bff2bea401541baeba374c4c32cf7b1e337d4aab600df7663cb9b2ab1d2e49ed",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/treesitter/TSNode;)V",
+          "access": 1,
+          "code_sha256": "a8e8f58d7599cbefa322a8c8e26d3074f676bf8b1357d8d661c4562dbeb4792f",
+          "code_length": 14
+        },
+        {
+          "name": "reset",
+          "descriptor": "(Lorg/treesitter/TSNode;)V",
+          "access": 1,
+          "code_sha256": "791ab0af43154b61a6aab5acf0af0a286b5e00825875a92acba6ec34b54e4ca5",
+          "code_length": 14
+        },
+        {
+          "name": "currentNode",
+          "descriptor": "()Lorg/treesitter/TSNode;",
+          "access": 1,
+          "code_sha256": "2c1b0c29dfec837b0ad5a9d4963470b2d8d1122a36e11b7b03459698fd509c29",
+          "code_length": 21
+        },
+        {
+          "name": "currentFieldName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3767f64be6c3243d3b829acd896236504ab400b486594282c77a77ac2c980587",
+          "code_length": 8
+        },
+        {
+          "name": "currentFieldId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "389fdc2d79271d3bf3b40184e518569a1b01b7a9b77ee1144a5b4f75be844ce2",
+          "code_length": 8
+        },
+        {
+          "name": "gotoParent",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d750fc09613f064aebcd6052a294345c6ce7b54e30fce01c7bce182344843499",
+          "code_length": 8
+        },
+        {
+          "name": "gotoNextSibling",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f6f21b37c8c91bea26f9dcbf4cae2221cb95fda28ffad3236a693bffe32788e1",
+          "code_length": 8
+        },
+        {
+          "name": "gotoFirstChild",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e06b970b6c200db9a048636f2234d9a5650c2569722e28f730b09b039ebc6e24",
+          "code_length": 8
+        },
+        {
+          "name": "gotoFirstChildForByte",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "8fcc945982ca693ca0b91674bdf66b7b3ebad6c530b2efd7f5e6107482523035",
+          "code_length": 9
+        },
+        {
+          "name": "gotoFirstChildForPoint",
+          "descriptor": "(Lorg/treesitter/TSPoint;)I",
+          "access": 1,
+          "code_sha256": "5945807dc66429bdd21709adb0ee08f1e734317d7a19d6c42986f9b6c226f77b",
+          "code_length": 9
+        },
+        {
+          "name": "setNode",
+          "descriptor": "(Lorg/treesitter/TSNode;)V",
+          "access": 4,
+          "code_sha256": "3187f710dcb01652de862560cc7782b805f200c9af0d7b1df750b2924081e43c",
+          "code_length": 6
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/treesitter/TSTreeCursor;",
+          "access": 1,
+          "code_sha256": "29bd8e4cb7b934eda11e9606735b735c061dd4eeca6ede56cda9f6b1764866ce",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/treesitter/CleanerRunner",
+        "org/treesitter/TSNode",
+        "org/treesitter/TSParser",
+        "org/treesitter/TSTreeCursor",
+        "org/treesitter/TSTreeCursor$TSTreeCursorCleanAction"
+      ]
+    },
+    {
+      "entry": "org/treesitter/utils/NativeUtils.class",
+      "occurrence": 0,
+      "sha256": "02997ecad7df70564252e77f6fc6bad68938706138dc18a4aa49228f2df651f5",
+      "name": "org/treesitter/utils/NativeUtils",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getFullLibName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "6aa8658f84b459443fdc83969ded68772d832c740812e7f45d97b4061d1ae7a9",
+          "code_length": 267
+        },
+        {
+          "name": "getLibStorePath",
+          "descriptor": "()Ljava/nio/file/Path;",
+          "access": 10,
+          "code_sha256": "37a558ee26e4eb27a2ebebe2978af624c447c32eeebe3c8695e995aab34fdb19",
+          "code_length": 37
+        },
+        {
+          "name": "crc32",
+          "descriptor": "([B)J",
+          "access": 10,
+          "code_sha256": "45995dece46cb2a7504716a4b0d1f695f934b027150cc5651e62b0a030ed528d",
+          "code_length": 25
+        },
+        {
+          "name": "readFile",
+          "descriptor": "(Ljava/io/File;)[B",
+          "access": 10,
+          "code_sha256": "dcf040a3c4b98832d83acb4b32bbaeca0b011cbf17371e9aae42586d934471d5",
+          "code_length": 82
+        },
+        {
+          "name": "readInputStream",
+          "descriptor": "(Ljava/io/InputStream;)[B",
+          "access": 10,
+          "code_sha256": "c6cc75037306831b7ff6869e08eb23ba60e2969a8dab98bb15b9317d6a66025d",
+          "code_length": 51
+        },
+        {
+          "name": "readLib",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 10,
+          "code_sha256": "83e0fa55b19ed2ecf7efa35c82c426caa53a1b54d868ffeb5066fd0a781b17bc",
+          "code_length": 45
+        },
+        {
+          "name": "loadLib",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "8a25cc0c2092a943db7f4cfee9cd39cbf08ef57e927973e2a1b69be86cf91b15",
+          "code_length": 172
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/lang/String;",
+        "java/io/ByteArrayInputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/nio/file/Path",
+        "java/util/zip/CRC32",
+        "java/util/zip/Checksum",
+        "org/treesitter/utils/NativeUtils"
+      ]
+    }
+  ]
+}

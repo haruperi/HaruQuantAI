@@ -1,0 +1,327 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/objenesis-2.5.1.jar",
+  "sha256": "b043f03e466752f7f03e2326a3b13a49b7c649f8f2a2dc87715827e24f73d9c6",
+  "class_count": 43,
+  "unique_class_entries": 43,
+  "resource_count": 4,
+  "duplicate_entries": [],
+  "classes": {
+    "org/objenesis/instantiator/basic/AccessibleInstantiator.class": "0f8a80552ce2ecdb3661448291beea5499c872073b93475aa1528e029e72245c",
+    "org/objenesis/instantiator/basic/ClassDefinitionUtils$1.class": "3c65ac2b648abe708eadda34518fae75fcde4ce73db025f9003f7f5cd1fb392a",
+    "org/objenesis/instantiator/basic/ClassDefinitionUtils$2.class": "6e1c2fc33d048166525cc82434648ac0835ec9880a96c0d13841a096e2ffadde",
+    "org/objenesis/instantiator/basic/ClassDefinitionUtils.class": "62d0e26002acc1fec3819928825c499e19708ab1d3cbac92074b501bee22edbf",
+    "org/objenesis/instantiator/gcj/GCJSerializationInstantiator.class": "6cf980c189fb1e24dbb2e9f863d82ff02e141bc7a01424c253971bcff03e1ad6",
+    "org/objenesis/ObjenesisSerializer.class": "78b2f7de0b3d1df31a63a716a569330ea4e17eea961bc6ddb91ae80e2504296d",
+    "org/objenesis/instantiator/basic/ConstructorInstantiator.class": "ec2465a06db588e9f8c26b95c762023f6b1a4016956ac283a46656be2246cf23",
+    "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream.class": "46620d9a817878b938cf6dffaf277d0e1f593f0d468686c9249c2258821db988",
+    "org/objenesis/instantiator/ObjectInstantiator.class": "cf802a3dc1696d0d1fedcfff2bf0f5d99b4f6a437c3af9c3164e20378ed9289d",
+    "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator.class": "e44dbb47f49ecc0e4cd5c0373cb7f16de35854e3fcd2d0749eab5d7d37837466",
+    "org/objenesis/strategy/InstantiatorStrategy.class": "ea3e2cd9285283a83d30619c6f60d7217d4dcbb80adb129f8acb15d5c7f13fcc",
+    "org/objenesis/instantiator/android/Android18Instantiator.class": "0ccdc30da0fd26c31a217ac323cd4d7bb262fc5f8814a677fd1275123b56f9c4",
+    "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator.class": "5f00e1ff74b433a788a561cfd2492ca9b58270260c3ca582ae83d6e8404c8f86",
+    "org/objenesis/instantiator/perc/PercSerializationInstantiator.class": "631503ada814e68d3393619125b4cbf00fcc9776555bf1eb11f54c3d4fccb5a6",
+    "org/objenesis/ObjenesisException.class": "39de71b23a1f9ce933d6c9dcc40c7ea567d87c77c395eee6defd92fa581ccbf0",
+    "org/objenesis/strategy/SingleInstantiatorStrategy.class": "369f7ccae6b4d7f430aebcb978f34d126da9ff8690ec00c9be70044192cf05da",
+    "org/objenesis/instantiator/annotations/Instantiator.class": "74368d0439c3ea40a13e51e92a3374b15bc81c6c65f050d7dd2e331633ba7003",
+    "org/objenesis/instantiator/basic/FailingInstantiator.class": "ce69ac664e828a654f9b0f6d36a38d78154b999f9764b52906ac042a12097a43",
+    "org/objenesis/instantiator/basic/ProxyingInstantiator.class": "fd658da636547d3c6d1aed48a6be640d5d3c1ff02719efd8ca066160f550edfd",
+    "org/objenesis/Objenesis.class": "734aa7eaf10e5e9e46d63b882455d281b4369d8efb57c29f8393a3fe9fdf9180",
+    "org/objenesis/strategy/PlatformDescription.class": "9e25ea579edee5dca42f4dface12a88b9952b8990156cc847dad660a3bcf7535",
+    "org/objenesis/strategy/StdInstantiatorStrategy.class": "ffdbf2875a6cda3e89cb1606ae9f14bd1898d5bcfd074491a0ec06f622d652a5",
+    "org/objenesis/instantiator/android/AndroidSerializationInstantiator.class": "43679bd990bcddf72b7636a0431442a8975cb9696a14f5b36d413de469b1624d",
+    "org/objenesis/instantiator/basic/NewInstanceInstantiator.class": "a9722f125c5391c1850132b1ef714dd9766afe3a400133379e2b6167b9dada41",
+    "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream.class": "7832d3734f1651ca597da5b444222d1248a7a0bf6903c3ddf95ed4aad29e196f",
+    "org/objenesis/instantiator/sun/SunReflectionFactoryHelper.class": "653a9427491f61311c76775b6eecd2c1077bd3202628c5b715a1aa573b541a48",
+    "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator.class": "7ec4ab547baa6aadd434a8e18430b2bc6486eb4c7c9e228eaba1bda81140c35e",
+    "org/objenesis/strategy/BaseInstantiatorStrategy.class": "2c19f1196b62f064409ab12b66e7099011349014bac4c4e21119a1a28a32c116",
+    "org/objenesis/instantiator/android/Android17Instantiator.class": "fae6b70b35557fab8f2efcde69c5ec560a213ab0dcf4f1779df3250dfae6979c",
+    "org/objenesis/instantiator/basic/NullInstantiator.class": "f184d4d9a36202c2f8617a74e4893e378a9876571dcab5989b002f4bbf308ace",
+    "org/objenesis/instantiator/gcj/GCJInstantiatorBase.class": "996edf45e0f1f99a38189a665188577ddb71f1f8c1e2ebee67c6d98fe7b124f1",
+    "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator.class": "e6f36d19335cf29822b73285b704b87d56f60e5090b4babf49d2d33cd642de90",
+    "org/objenesis/ObjenesisStd.class": "aaf8432fdad5b4845c22767d920e5dc49d1c9926e78c369d791a64410aa0a55d",
+    "org/objenesis/instantiator/android/Android10Instantiator.class": "28174d32a3e47a3f19b4c5309b4aef8adf2bbabc715a47b94a3b0c2736426b6d",
+    "org/objenesis/instantiator/gcj/GCJInstantiator.class": "17074af8ae092a0b8b426a1f7448af11dc116a35c370728a2441195ed13cc1c4",
+    "org/objenesis/instantiator/sun/MagicInstantiator.class": "c3db960f32338bad7f6c184ab3942902f582ab80f136f344c3691625d75158de",
+    "org/objenesis/strategy/SerializingInstantiatorStrategy.class": "e10f05710c10e12934ded4581ad6f8ac868c51fc3c499145478130727e1c8c3e",
+    "org/objenesis/instantiator/annotations/Typology.class": "847a10da073b9846c15c3c728ea4cc337526f8bb2f09cdb70a09807df8873853",
+    "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator.class": "e24a03ca6085b83b837d9ee5bc5a6ddc33e80ab4d461e9f58df7a925cd96514d",
+    "org/objenesis/instantiator/perc/PercInstantiator.class": "c4ea68c190c6735b124e62d8b84d3dbe8441094531631b0494bc4d1664651fd2",
+    "org/objenesis/instantiator/SerializationInstantiatorHelper.class": "5675505c63b287117409443372ec88f04da2f3e3d355cea3f143d525bd4ed2d5",
+    "org/objenesis/ObjenesisBase.class": "3ad4c7d80a5ee79f9ee7dc38ae68da674b9acd54225788405ea5e1a742398721",
+    "org/objenesis/ObjenesisHelper.class": "26cfe73cb9833cc03ec00bc0d8a435bb27faf3b3d5b11ae70107348462532d8d"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "5eeeb804825dd13a0a145b7119d0b8dfda9da33c7f5dbd3a56c48a6d59abace9",
+    "META-INF/LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "META-INF/INDEX.LIST": "e0e6dcabaad7a9fc3377bcc47a9559a4e00eb96e58fa697112d0f7feacc78ff9",
+    "META-INF/NOTICE": "dcd39bbf2d733f31d89f6e5dccbfc6d259f9e2ae925501d3c11377fe0ae2f5e0"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/objenesis/instantiator/basic/AccessibleInstantiator.class",
+      "occurrence": 0,
+      "sha256": "0f8a80552ce2ecdb3661448291beea5499c872073b93475aa1528e029e72245c",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils$1.class",
+      "occurrence": 0,
+      "sha256": "3c65ac2b648abe708eadda34518fae75fcde4ce73db025f9003f7f5cd1fb392a",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils$2.class",
+      "occurrence": 0,
+      "sha256": "6e1c2fc33d048166525cc82434648ac0835ec9880a96c0d13841a096e2ffadde",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils.class",
+      "occurrence": 0,
+      "sha256": "62d0e26002acc1fec3819928825c499e19708ab1d3cbac92074b501bee22edbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "6cf980c189fb1e24dbb2e9f863d82ff02e141bc7a01424c253971bcff03e1ad6",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/ObjenesisSerializer.class",
+      "occurrence": 0,
+      "sha256": "78b2f7de0b3d1df31a63a716a569330ea4e17eea961bc6ddb91ae80e2504296d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ConstructorInstantiator.class",
+      "occurrence": 0,
+      "sha256": "ec2465a06db588e9f8c26b95c762023f6b1a4016956ac283a46656be2246cf23",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream.class",
+      "occurrence": 0,
+      "sha256": "46620d9a817878b938cf6dffaf277d0e1f593f0d468686c9249c2258821db988",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/ObjectInstantiator.class",
+      "occurrence": 0,
+      "sha256": "cf802a3dc1696d0d1fedcfff2bf0f5d99b4f6a437c3af9c3164e20378ed9289d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e44dbb47f49ecc0e4cd5c0373cb7f16de35854e3fcd2d0749eab5d7d37837466",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/InstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "ea3e2cd9285283a83d30619c6f60d7217d4dcbb80adb129f8acb15d5c7f13fcc",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android18Instantiator.class",
+      "occurrence": 0,
+      "sha256": "0ccdc30da0fd26c31a217ac323cd4d7bb262fc5f8814a677fd1275123b56f9c4",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator.class",
+      "occurrence": 0,
+      "sha256": "5f00e1ff74b433a788a561cfd2492ca9b58270260c3ca582ae83d6e8404c8f86",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/perc/PercSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "631503ada814e68d3393619125b4cbf00fcc9776555bf1eb11f54c3d4fccb5a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/ObjenesisException.class",
+      "occurrence": 0,
+      "sha256": "39de71b23a1f9ce933d6c9dcc40c7ea567d87c77c395eee6defd92fa581ccbf0",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/SingleInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "369f7ccae6b4d7f430aebcb978f34d126da9ff8690ec00c9be70044192cf05da",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/annotations/Instantiator.class",
+      "occurrence": 0,
+      "sha256": "74368d0439c3ea40a13e51e92a3374b15bc81c6c65f050d7dd2e331633ba7003",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/FailingInstantiator.class",
+      "occurrence": 0,
+      "sha256": "ce69ac664e828a654f9b0f6d36a38d78154b999f9764b52906ac042a12097a43",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ProxyingInstantiator.class",
+      "occurrence": 0,
+      "sha256": "fd658da636547d3c6d1aed48a6be640d5d3c1ff02719efd8ca066160f550edfd",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/Objenesis.class",
+      "occurrence": 0,
+      "sha256": "734aa7eaf10e5e9e46d63b882455d281b4369d8efb57c29f8393a3fe9fdf9180",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/PlatformDescription.class",
+      "occurrence": 0,
+      "sha256": "9e25ea579edee5dca42f4dface12a88b9952b8990156cc847dad660a3bcf7535",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/StdInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "ffdbf2875a6cda3e89cb1606ae9f14bd1898d5bcfd074491a0ec06f622d652a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/AndroidSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "43679bd990bcddf72b7636a0431442a8975cb9696a14f5b36d413de469b1624d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/NewInstanceInstantiator.class",
+      "occurrence": 0,
+      "sha256": "a9722f125c5391c1850132b1ef714dd9766afe3a400133379e2b6167b9dada41",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream.class",
+      "occurrence": 0,
+      "sha256": "7832d3734f1651ca597da5b444222d1248a7a0bf6903c3ddf95ed4aad29e196f",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactoryHelper.class",
+      "occurrence": 0,
+      "sha256": "653a9427491f61311c76775b6eecd2c1077bd3202628c5b715a1aa573b541a48",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "7ec4ab547baa6aadd434a8e18430b2bc6486eb4c7c9e228eaba1bda81140c35e",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/BaseInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "2c19f1196b62f064409ab12b66e7099011349014bac4c4e21119a1a28a32c116",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android17Instantiator.class",
+      "occurrence": 0,
+      "sha256": "fae6b70b35557fab8f2efcde69c5ec560a213ab0dcf4f1779df3250dfae6979c",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/NullInstantiator.class",
+      "occurrence": 0,
+      "sha256": "f184d4d9a36202c2f8617a74e4893e378a9876571dcab5989b002f4bbf308ace",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiatorBase.class",
+      "occurrence": 0,
+      "sha256": "996edf45e0f1f99a38189a665188577ddb71f1f8c1e2ebee67c6d98fe7b124f1",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e6f36d19335cf29822b73285b704b87d56f60e5090b4babf49d2d33cd642de90",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/ObjenesisStd.class",
+      "occurrence": 0,
+      "sha256": "aaf8432fdad5b4845c22767d920e5dc49d1c9926e78c369d791a64410aa0a55d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android10Instantiator.class",
+      "occurrence": 0,
+      "sha256": "28174d32a3e47a3f19b4c5309b4aef8adf2bbabc715a47b94a3b0c2736426b6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiator.class",
+      "occurrence": 0,
+      "sha256": "17074af8ae092a0b8b426a1f7448af11dc116a35c370728a2441195ed13cc1c4",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/MagicInstantiator.class",
+      "occurrence": 0,
+      "sha256": "c3db960f32338bad7f6c184ab3942902f582ab80f136f344c3691625d75158de",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/strategy/SerializingInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "e10f05710c10e12934ded4581ad6f8ac868c51fc3c499145478130727e1c8c3e",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/annotations/Typology.class",
+      "occurrence": 0,
+      "sha256": "847a10da073b9846c15c3c728ea4cc337526f8bb2f09cdb70a09807df8873853",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e24a03ca6085b83b837d9ee5bc5a6ddc33e80ab4d461e9f58df7a925cd96514d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/perc/PercInstantiator.class",
+      "occurrence": 0,
+      "sha256": "c4ea68c190c6735b124e62d8b84d3dbe8441094531631b0494bc4d1664651fd2",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/instantiator/SerializationInstantiatorHelper.class",
+      "occurrence": 0,
+      "sha256": "5675505c63b287117409443372ec88f04da2f3e3d355cea3f143d525bd4ed2d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/ObjenesisBase.class",
+      "occurrence": 0,
+      "sha256": "3ad4c7d80a5ee79f9ee7dc38ae68da674b9acd54225788405ea5e1a742398721",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    },
+    {
+      "entry": "org/objenesis/ObjenesisHelper.class",
+      "occurrence": 0,
+      "sha256": "26cfe73cb9833cc03ec00bc0d8a435bb27faf3b3d5b11ae70107348462532d8d",
+      "member_shard": "docs/dev/evidence/sqx145/members/083/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/083/001.json",
+      "sha256": "91325e1c14a28a5a61849a99500fe4fec464ebf0766a9454dd0cada61601fbe2"
+    }
+  ]
+}

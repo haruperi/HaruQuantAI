@@ -1,0 +1,1162 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+  "archive_sha256": "ba60e1e5c65eca7809dc9bc43c16e64c88280e41e434a90246176b5fcfef747c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb.class",
+      "occurrence": 0,
+      "sha256": "30ce1574ae6d1d4f9c685528f0101e70b7eafa70cb545f34d1a5e2ac844b7ab0",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/lib/db/DbBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb;",
+          "access": 41,
+          "code_sha256": "1e94135139ec16486ff488e65e913efbd43b6b3d2dc6e3ab2a0679d9efbc861b",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "3da5905dc91fb5abcdbe28df43a0e2bba1af3bb5797613e65426b84530da31ff",
+          "code_length": 14
+        },
+        {
+          "name": "initDatabase",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0194df8a327edd9ea76ec69848eb871713ecf8b18bc2262dc3de2b7377f22181",
+          "code_length": 45
+        },
+        {
+          "name": "recordInstall",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "569361d4557452c16d1ddf908b3e040958958b5c96c9db14bc1dc3aff704bd04",
+          "code_length": 146,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getInstalledFiles",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "c793c93f90d571907621c37fde23ae1e5128496b3da85a98510c94053df3831d",
+          "code_length": 185
+        },
+        {
+          "name": "deleteInstall",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "ef4d2ccf24fb85cb3b1f0d35f21f8a339aa6df8368413264d0654f9b4a36594d",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "listInstalled",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "eea9387127a6ebfd150309b0d469db25a0997d45871defc8a9d66990a459da28",
+          "code_length": 192
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "11017ce3def949e0f5e87ba852d79a998806ecf8ed4d5a5a7856c78ccbe82a3c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/lib/db/DbBase",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/sql/Connection",
+        "java/sql/PreparedStatement",
+        "java/sql/ResultSet",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap.class",
+      "occurrence": 0,
+      "sha256": "a7505d594bfb1fc412dcc71752a34a963f2a27cdc435bb403b1c2720b6782e72",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "KEY_CONTENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_USERDATA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "userRootPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "EXCLUDED_TOP_DIRS",
+          "descriptor": "Ljava/util/Set;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "95a46536ef546dbcc885f5bd4514963f0e82681086d6055e811e8b9101ae8fe7",
+          "code_length": 36
+        },
+        {
+          "name": "generateTree",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "1b83a6b9749a5a6f800758667cc2b71a5184ad1366b1811383153e1db77c7a11",
+          "code_length": 118,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;I)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "parseFolder",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONArray;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "f1459f86388ed6069dca7d274cdaeec83b018e82a7036090a835f20dde34abc2",
+          "code_length": 38
+        },
+        {
+          "name": "prvParse",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;Lorg/json/JSONArray;ZLjava/lang/String;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "614a46744c7b54ba520daf1d14de1adea90b21f97df8058335b449c234e22455",
+          "code_length": 353
+        },
+        {
+          "name": "checkFile",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "e3324bedf63fcb8a59b0c675b88715287e49fc20c5077788f3895e0bc9bab586",
+          "code_length": 67
+        },
+        {
+          "name": "excludedTopDirs",
+          "descriptor": "()Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "48401b91ffbfafaaf3363a9468368eb67bbbef3ea8b069296d618cce1b85bb5c",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "isExcludedFromShare",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 9,
+          "code_sha256": "3a590a1c7277a15d22a8a60c121f318f14ee21a591fb1a16ddc8bb763a259397",
+          "code_length": 115
+        },
+        {
+          "name": "containsFileByFilter",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "f1826f36b9d62f17f7ffe72a1b97dfe731e66a0af5816aa074d6cd11bc2bfc79",
+          "code_length": 88
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "885f4759b126e445ef2183b051c862a59d5f850d10015affb7d8b36989059d24",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap",
+        "java/io/File",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/apache/commons/io/comparator/NameFileComparator",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1.class",
+      "occurrence": 0,
+      "sha256": "f6feb2c23566a0061cce83aec7165207087076338c7f93679327327fd7ed1168",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$slug",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$downloadUrl",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$tmpZip",
+          "descriptor": "Ljava/io/File;",
+          "access": 4112
+        },
+        {
+          "name": "val$expectedSha256",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$title",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$version",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$fileName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "3e5a4eb33784847fc0ad8d51d1d750772cb504e847859fe04faabfc67cf199f1",
+          "code_length": 44,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "125c017d59cf75ad4c418d75c5be397d037d9682e6acc34e580153d356cc4bf5",
+          "code_length": 288
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "org/apache/commons/io/FileUtils",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2.class",
+      "occurrence": 0,
+      "sha256": "47d7ea70acc8077ecdb3f13e8617180c0339ef2fce8f3c5b95a6545a896ccb9a",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$zipId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$uploadUrl",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$zipFile",
+          "descriptor": "Ljava/io/File;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)V",
+          "access": 0,
+          "code_sha256": "c845c17a8447c7b2b3a057078582a2a3627dc1eee3d235de6ca14ff9c17f2809",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "325cd17ec88ae2533073c844570a34d16d834042a11db39b8b78ece0d118c4dc",
+          "code_length": 280
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/StatusLine",
+        "org/apache/http/client/HttpClient",
+        "org/apache/http/client/methods/HttpPut",
+        "org/apache/http/entity/ContentType",
+        "org/apache/http/entity/FileEntity",
+        "org/apache/http/impl/client/HttpClientBuilder",
+        "org/apache/http/util/EntityUtils",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult.class",
+      "occurrence": 0,
+      "sha256": "33e951b2a82b5a699111661e301b20564c27a7c78fe38592603669143c6c0274",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "installedFiles",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 16
+        },
+        {
+          "name": "skippedFiles",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 16
+        },
+        {
+          "name": "restartRequired",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b3b7d9b39a5cb02e7b1a4a6f982f622acfcab461dadba49f2688825c838b97a2",
+          "code_length": 32
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult",
+        "java/lang/Object",
+        "org/json/JSONArray"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager.class",
+      "occurrence": 0,
+      "sha256": "36b079aa7812510e1d98ed95f46936e649c761b6b441afebc5456244a572c07d",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "EVENT_INSTALL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "EVENT_UPLOAD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "RESTART_REQUIRED_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CUSTOM_INDICATORS_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "MANIFEST_ENTRY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "installRunning",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 26
+        },
+        {
+          "name": "uploadRunning",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 26
+        },
+        {
+          "name": "tmpSwept",
+          "descriptor": "Z",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "7b53b3b25bf0fcbda48fc3b3dab288279b9913fddfe8f3f195d441b3b7148f02",
+          "code_length": 5
+        },
+        {
+          "name": "installAsync",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "b3ac0dbbe5721007152510c5140e47c418c63a48dc19875806b37de3c59d56b5",
+          "code_length": 123,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "uninstall",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "13796afe7f46945593575cdba6d408912b77e0bc9551e6ffceb9f437f5858e51",
+          "code_length": 281,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "deleteEmptyParents",
+          "descriptor": "(Ljava/io/File;Ljava/io/File;)V",
+          "access": 10,
+          "code_sha256": "22b256d829927ca948603bc5c8e0089b2dc050545f8a461f11942097c1e15cf2",
+          "code_length": 86,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "download",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)V",
+          "access": 10,
+          "code_sha256": "268ee8dee84c2798ca1a348acef263ad365c668023e6f66075486a0f3b32f257",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "verifyChecksum",
+          "descriptor": "(Ljava/lang/String;Ljava/io/File;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "9a1e2e78cdff3a126362b4b028a660a6144913ee0ba123c125977429dda57e86",
+          "code_length": 42,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "unzipToUserDir",
+          "descriptor": "(Ljava/io/File;)Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult;",
+          "access": 10,
+          "code_sha256": "a4a62c731e8789c8cc975f3696174701d49d52d2e11ba08029a52b40fd31e786",
+          "code_length": 345,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "writeToFile",
+          "descriptor": "(Ljava/io/File;Ljava/util/zip/ZipInputStream;)V",
+          "access": 10,
+          "code_sha256": "7f38a9b53066f74e3281f2a938b75e278d2a963f999a51a1d58831186fbcf898",
+          "code_length": 123,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "normalizeEntryName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "45ea08fe04e2940924977c4397263ee28a23702fd79b310f6113a80f5b7882e8",
+          "code_length": 32
+        },
+        {
+          "name": "isCustomIndicatorsEntry",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "e0fa6692c1a361a730b068fccce86e62b417080c144954bdf2ef1b84c327f860",
+          "code_length": 8
+        },
+        {
+          "name": "getCustomIndicatorsRoot",
+          "descriptor": "()Ljava/io/File;",
+          "access": 10,
+          "code_sha256": "255016702222bfd761dab9c7e34632e17ae78fc0ad1560d522b78d586e7cec93",
+          "code_length": 30
+        },
+        {
+          "name": "entryRoot",
+          "descriptor": "(Ljava/lang/String;Ljava/io/File;Ljava/io/File;)Ljava/io/File;",
+          "access": 10,
+          "code_sha256": "b71c369e765c232d1b16f145ea16eb6e43ac4e26925df70576174a43e4b72c08",
+          "code_length": 13
+        },
+        {
+          "name": "entryLocalPath",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "4a8722bdde7ed9f85a2cdeadd70487b851cfac030152909c4cd05260d6b7526c",
+          "code_length": 22
+        },
+        {
+          "name": "buildZip",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "84a30d2abb9dc118375d0701d8898f1b2a1b4bdd5bb76cdb2bf38e3036fa3408",
+          "code_length": 477,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "exportZip",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "9ae7c4b19274e2815fc281d3a498742fea8df2f272d70a97278a3e84a2fa9940",
+          "code_length": 202,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "toEntryName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "3aac4b072b7f52c0b5511c3b8235274b954afb72004bb6e519323bd5dba8ecdb",
+          "code_length": 31
+        },
+        {
+          "name": "buildManifest",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "8a78f9bf4dbcd24d603fddeb3f885d1551b6d46cfd31a66c6fd1b9dcd32ec2ef",
+          "code_length": 379
+        },
+        {
+          "name": "collectFiles",
+          "descriptor": "(Ljava/io/File;Ljava/util/ArrayList;)V",
+          "access": 10,
+          "code_sha256": "e7c8acb822757b817c9717fcad78a6546c93f3103d5f43fff4a95b9e947b40c4",
+          "code_length": 64,
+          "generic_signature": "(Ljava/io/File;Ljava/util/ArrayList<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "uploadAsync",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "8487a781cce4754ae129ef155af9ecf9683a8c80fb33027ec5970ea04eb3c218",
+          "code_length": 82,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "cleanup",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "4482784c57eae25e548446b021a091e4d1ece890a2cbe5ea5f1c9ceccdbec56c",
+          "code_length": 21,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "findZip",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/File;",
+          "access": 10,
+          "code_sha256": "36bd52e8050f54a7892bd56ddc93fdf400eeb75ec6b60335839f415f597aedff",
+          "code_length": 101,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "validateZipId",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "65f502b8c738822ccb8116f7ecf4d9668ca1017e32d7e07d3e5db3fe216f02ff",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sha256",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "485d6b693b18ee300a5a73e58c00c35ba4c28b67addd74b555e20f2551e6fa0b",
+          "code_length": 37,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getTmpRoot",
+          "descriptor": "()Ljava/io/File;",
+          "access": 42,
+          "code_sha256": "0fb239a5c200ab13b4e16aa650ad4ed0563e5f54f4e71441d2ebc9294eb6d64f",
+          "code_length": 120
+        },
+        {
+          "name": "sendInstallEvent",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)V",
+          "access": 10,
+          "code_sha256": "65bfa85f322804a6f4a5a1e79319a979dd43d41d5f929642ccd3074815b3248b",
+          "code_length": 58
+        },
+        {
+          "name": "sendUploadEvent",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)V",
+          "access": 10,
+          "code_sha256": "a5391ba7cd7dd39087fcf24b5742620db126b36e0d208ff3a5bf0483bad04286",
+          "code_length": 59
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/File;)V",
+          "access": 4104,
+          "code_sha256": "8783cb6b15bf33f641f7d6bfa7e8459859cf4872521b73a80750e84cfd133c48",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Ljava/lang/String;Ljava/io/File;Ljava/lang/String;)V",
+          "access": 4104,
+          "code_sha256": "12b819ce4b343aceff41c2245e4772830a9524299a385779076ab24af593a7da",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)V",
+          "access": 4104,
+          "code_sha256": "0e6ca2b0e6c2f2f939dbb645836a74b5e87e6751165e41d47068ba868139d906",
+          "code_length": 7
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Ljava/io/File;)Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult;",
+          "access": 4104,
+          "code_sha256": "0eb42e625767ec67c968edbd2381139b02d88c754e6373fdef03ea96152d5291",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$400",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "865924416eedbed0c4508bd7a7361d9b65aeb9b6f2b3ef539ddfe2c3e11735ba",
+          "code_length": 4
+        },
+        {
+          "name": "access$500",
+          "descriptor": "()Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 4104,
+          "code_sha256": "30964dee0d5291b07f18e5d16c6504139b196b31bb6bd5dfae8317382ab4874b",
+          "code_length": 4
+        },
+        {
+          "name": "access$700",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONObject;)V",
+          "access": 4104,
+          "code_sha256": "83c6c99e10afcd407b0145a16f127aa282ce667e44cbc6a0082de77421f4ce96",
+          "code_length": 7
+        },
+        {
+          "name": "access$800",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "46244573c32d6a50702a0aaa354038b03d87d304cbedaa24bce7dba9dbb335f9",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$900",
+          "descriptor": "()Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "lambda$download$0",
+          "descriptor": "([JLjava/lang/String;IJJJ)V",
+          "access": 4106,
+          "code_sha256": "37c34e71d357e590935939eba248c6a31889175c5ca006bef34b7f777dc328fd",
+          "code_length": 61
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "16777e32b80c023327e7c2cbb60a43152ece034b488cb103607dc1922c789aa5",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/lib/utils/network/DataDownloader",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$2",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$InstallResult",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/time/Instant",
+        "java/util/ArrayList",
+        "java/util/UUID",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "java/util/zip/ZipEntry",
+        "java/util/zip/ZipInputStream",
+        "java/util/zip/ZipOutputStream",
+        "org/apache/commons/codec/digest/DigestUtils",
+        "org/apache/commons/io/FileUtils",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplacePlugin.class",
+      "occurrence": 0,
+      "sha256": "264ad504e1fb8ad121fdcd9d5f7b172ee1c2dccda2031709d6ca82c3abff21af",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplacePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a64a8a44451bbbef9c9ef4f6e888906c4538b5f0bc923a16a586ade9d3ec10fa",
+          "code_length": 4
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getContextPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getAppCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getTooltip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "8e43bcddab396774c97bcd1ce325cd9b2920781e596fc16b6a1070ca7fe51f74",
+          "code_length": 56
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bff51aa4e05db5b9660954fb2f3cc8a5992b2af466b9d93c26911588d0a08a4e",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplacePlugin",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet.class",
+      "occurrence": 0,
+      "sha256": "95c35f1fd6106153c7e2fb8a9bec26425c5a320d4987c37f73c4b0a92ef7bae8",
+      "name": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "fileMap",
+          "descriptor": "Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "8766612412b4bcb86d6fdd0f989a6e839b0fab13c33467727ee40ad636e05e1d",
+          "code_length": 329,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onInstalled",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8daa45e9bad6653731667cdfd5bb971e6d0ad3325d950bcda3c9cbc5896d8b89",
+          "code_length": 35,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onInstall",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "331b7d5161766bcb6cd4c44d68d14b498b7539fa453b5d66bff2055835f9f193",
+          "code_length": 150,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRecordShare",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5055cd3ee891266247876f9f68d290ff6296b380b13811a86f60fe74d1a70e89",
+          "code_length": 151,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUninstall",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d941049ce32b716b85cfdb4d2136eed68ddb3d0a930a564184ed7356bf23a7df",
+          "code_length": 81,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onListShareable",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dbd4306db78a2a5cd9b98c809bd7083bead935ae3f168084e302634e26ddcf00",
+          "code_length": 245,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getFileMapInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap;",
+          "access": 42,
+          "code_sha256": "ed0a443cbf3d2b0d6067166789194294cd372c171a0c4e4a10b9a436c1aeb96f",
+          "code_length": 20
+        },
+        {
+          "name": "onBuildZip",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9cfed55b1c776ea818c008794a71c2b334010dddd9c1af8ae75445063875d2a5",
+          "code_length": 118,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpload",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "442739309f59a4059dc21830afb10b5d168ebb6e7b98632a650e96050ed6467f",
+          "code_length": 78,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCleanup",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "311d911c63e6756fa841220a5fa98ed793eea338644856a7544c038226a4beec",
+          "code_length": 64,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "47d3588d6549d5f909f788bc72f9f83c1d674a81ba9e466f743659dc2b454b6b",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceDb",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceFileMap",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager",
+        "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

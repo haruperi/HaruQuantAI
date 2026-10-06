@@ -1,0 +1,5074 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/WMI4Java-1.6.3.jar",
+  "archive_sha256": "7b9955ac56dcef6731961588f037b56d3e27f36222a3ec4ead2cd315059eea72",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/profesorfalken/wmi4java/WMI4Java.class",
+      "occurrence": 0,
+      "sha256": "e5758501c9683f62e6db3f675d7192cb119fc4bc9446fcb03222f607c0c16f8b",
+      "name": "com/profesorfalken/wmi4java/WMI4Java",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NEWLINE_REGEX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SPACE_REGEX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "GENERIC_ERROR_MSG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "namespace",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "computerName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "forceVBEngine",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "properties",
+          "descriptor": "Ljava/util/List;",
+          "access": 0,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "filters",
+          "descriptor": "Ljava/util/List;",
+          "access": 0,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "955901ad40dd9955678b27134ed6aefba9b820c4bead486c67a0fd6d2045fea1",
+          "code_length": 32
+        },
+        {
+          "name": "getWMIStub",
+          "descriptor": "()Lcom/profesorfalken/wmi4java/WMIStub;",
+          "access": 2,
+          "code_sha256": "0e575689054b1562652bcc2d9b81ab27ee930eaddec2ee12bcb4ab3c88926f8d",
+          "code_length": 23
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 9,
+          "code_sha256": "cb3b6c01a27fd96e66229e41ef5f06aeb92784327281287fbb40eb05c5a64caf",
+          "code_length": 8
+        },
+        {
+          "name": "namespace",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "c3cbd5ce5fd8549dbca474859d787ed0ef6b0bea82538d7f636bb0fc6c2d9a50",
+          "code_length": 7
+        },
+        {
+          "name": "computerName",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "df83593a4c4029b099c6a8ae8a0696a80f3e7902fc34f5c8727cb5165072eccc",
+          "code_length": 7
+        },
+        {
+          "name": "PowerShellEngine",
+          "descriptor": "()Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "3b283fa7d297d9cb8bfef4fd02290e16edde13bd2cf31079c4a120f1b8ce155a",
+          "code_length": 7
+        },
+        {
+          "name": "VBSEngine",
+          "descriptor": "()Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "92a3e130803dcdb0f15bf0e9387ad2eb92df7e522f18af35a76f198504987b1b",
+          "code_length": 7
+        },
+        {
+          "name": "properties",
+          "descriptor": "(Ljava/util/List;)Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "d004b449336b4a7b47b277e2cc85759b00adfd8df8cabb8d3e52cfe2bf753fa0",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lcom/profesorfalken/wmi4java/WMI4Java;"
+        },
+        {
+          "name": "filters",
+          "descriptor": "(Ljava/util/List;)Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "61597c14466e016d095385a6ea38902a8731ca6191d709c63395f7b812ec9c04",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lcom/profesorfalken/wmi4java/WMI4Java;"
+        },
+        {
+          "name": "listClasses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "3c6ca62ccc314a595c2e25f19d33272de0641ffff647a886553113f70b225a41",
+          "code_length": 168,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listProperties",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d70d73ba9afa7bf777278c7547ea1ca1f8c8bfabeb482d015e0c54428c60daef",
+          "code_length": 157,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getWMIObject",
+          "descriptor": "(Lcom/profesorfalken/wmi4java/WMIClass;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "e848ea3d712d75db316df6b4faaab67f800e7dfb562d220cf9196d1ed502f351",
+          "code_length": 9,
+          "generic_signature": "(Lcom/profesorfalken/wmi4java/WMIClass;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "getWMIObject",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "3754947c5ec44e92d1fb10f72ae1fbde139bf9205f2d9def2aacfa884ec829c5",
+          "code_length": 193,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "getWMIObjectList",
+          "descriptor": "(Lcom/profesorfalken/wmi4java/WMIClass;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c9917757d9b3fec4ff363179704df398b5bb8c4e384ba09f47b926bfaabb1b98",
+          "code_length": 9,
+          "generic_signature": "(Lcom/profesorfalken/wmi4java/WMIClass;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "getWMIObjectList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c40f1cd6c2780a22374936cca69541fba5791fc69354c81034a03ff9a6653686",
+          "code_length": 248,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "getRawWMIObjectOutput",
+          "descriptor": "(Lcom/profesorfalken/wmi4java/WMIClass;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "899d195e632bfd3a7da3c34060b7298a5090e1ad7e01d6fb65ca928b80c3dae8",
+          "code_length": 9
+        },
+        {
+          "name": "getRawWMIObjectOutput",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fd5f7f1528e7e3bd3cbb2ca341eece53ec529a729ab891b3397d0c12b9e8c85f",
+          "code_length": 95,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/wmi4java/WMI4Java",
+        "com/profesorfalken/wmi4java/WMIClass",
+        "com/profesorfalken/wmi4java/WMIException",
+        "com/profesorfalken/wmi4java/WMIPowerShell",
+        "com/profesorfalken/wmi4java/WMIStub",
+        "com/profesorfalken/wmi4java/WMIVBScript",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMI4JavaUtil.class",
+      "occurrence": 0,
+      "sha256": "06c61d30f3ba2f940a98663547d505d89dd9955918e752376bc2fd05dac84dcd",
+      "name": "com/profesorfalken/wmi4java/WMI4JavaUtil",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "join",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Iterable;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "0350161fdd80bc4976d655c663fc049ba5ae4f7a1e38f2ff3bc629d8435046a4",
+          "code_length": 71,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Iterable<*>;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/wmi4java/WMI4JavaUtil",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIClass.class",
+      "occurrence": 0,
+      "sha256": "2c1cec64a8a575b7162cde51c6a303ebdfb8240311f0f9e97760950ce8b5b8c8",
+      "name": "com/profesorfalken/wmi4java/WMIClass",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CIM_ACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ACTIONSEQUENCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ACTSASSPARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ADJACENTSLOTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_AGGREGATEPEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_AGGREGATEPSEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_AGGREGATEREDUNDANCYCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ALARMDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ALLOCATEDRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_APPLICATIONSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_APPLICATIONSYSTEMSOFTWAREFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDALARM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDBATTERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDCOOLING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDPROCESSORMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDSUPPLYCURRENTSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ASSOCIATEDSUPPLYVOLTAGESENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BIOSELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BIOSFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BIOSFEATUREBIOSELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BIOSLOADEDINNV",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BASEDON",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BATTERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BINARYSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BOOTOSFROMFS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BOOTSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BOOTSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_BOOTSERVICEACCESSBYSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CDROMDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CACHEMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CARDINSLOT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CARDONCARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CHASSIS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CHASSISINRACK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CHIP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CLUSTERSERVICEACCESSBYSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CLUSTERINGSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CLUSTERINGSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COLLECTEDCOLLECTIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COLLECTEDMSES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COLLECTIONOFMSES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COLLECTIONOFSENSORS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COLLECTIONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPATIBLEPRODUCT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEMDMA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEMIRQ",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEMMAPPEDIO",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEMPACKAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COMPUTERSYSTEMRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONNECTEDTO",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONNECTORONPACKAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONTAINER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONTROLLEDBY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COOLINGDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_COPYFILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CREATEDIRECTORYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_CURRENTSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DMA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DATAFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEPENDENCYCONTEXT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DESKTOPMONITOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICEACCESSEDBYFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICECONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICEERRORCOUNTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICEFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICESAPIMPLEMENTATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICESERVICEIMPLEMENTATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DEVICESOFTWARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DIRECTORYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DIRECTORYCONTAINSFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DIRECTORYSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DIRECTORYSPECIFICATIONFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISCRETESENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISKDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISKPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISKSPACECHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISKETTEDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DISPLAY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_DOCKED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ELEMENTCAPACITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ELEMENTCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ELEMENTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ELEMENTSLINKED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_ERRORCOUNTERSFORDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_EXECUTEPROGRAM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_EXPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_EXTRACAPACITYGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FRU",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FRUINCLUDESPRODUCT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FRUPHYSICALELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FAN",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FILESPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FILESTORAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FILESYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FLATPANEL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FROMDIRECTORYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_FROMDIRECTORYSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HEATPIPE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDACCESSPOINT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDBOOTSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDBOOTSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDFILESYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDJOBDESTINATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_HOSTEDSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_IRQ",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_INFRAREDCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_INSTALLEDOS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_INSTALLEDSOFTWAREELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_JOB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_JOBDESTINATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_JOBDESTINATIONJOBS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_KEYBOARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LINKHASCONNECTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOCALFILESYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOCATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALDISKBASEDONPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALDISKBASEDONVOLUMESET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_LOGICALIDENTITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MAGNETOOPTICALDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MANAGEDSYSTEMELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MANAGEMENTCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEDIAACCESSDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEDIAPRESENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORYCAPACITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORYCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORYMAPPEDIO",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORYONCARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MEMORYWITHMEDIA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MODIFYSETTINGACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MONITORRESOLUTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MONITORSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_MULTISTATESENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_NFS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_NETWORKADAPTER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_NONVOLATILESTORAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_NUMERICSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_OSPROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_OSVERSIONCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_OPERATINGSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_OPERATINGSYSTEMSOFTWAREFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PCICONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PCMCIACONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PCVIDEOCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PEXTENTREDUNDANCYCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PSEXTENTBASEDONPEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGEALARM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGECOOLING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGEINCHASSIS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGEINSLOT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGETEMPSENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PACKAGEDCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PARALLELCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PARTICIPATESINSET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALCAPACITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALCONNECTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALELEMENTLOCATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALFRAME",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALLINK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALMEDIA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PHYSICALPACKAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_POINTINGDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_POTSMODEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_POWERSUPPLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRINTER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PROCESSEXECUTABLE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PROCESSTHREAD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PROCESSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTFRU",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTPARENTCHILD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTPHYSICALELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTPRODUCTDEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTSOFTWAREFEATURES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PRODUCTSUPPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_PROTECTEDSPACEEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_RACK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REALIZES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REALIZESAGGREGATEPEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REALIZESDISKPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REALIZESPEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REBOOTACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REDUNDANCYCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REDUNDANCYGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REFRIGERATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_RELATEDSTATISTICS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REMOTEFILESYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REMOVEDIRECTORYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REMOVEFILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_REPLACEMENTSET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_RESIDESONEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_RUNNINGOS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SAPSAPDEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SCSICONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SCSIINTERFACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SCANNER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERIALCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERIALINTERFACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERVICEACCESSBYSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERVICEACCESSPOINT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERVICESAPDEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SERVICESERVICEDEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SETTINGCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SETTINGCONTEXT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SLOT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SLOTINSLOT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREELEMENTACTIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREELEMENTCHECKS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREELEMENTVERSIONCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREFEATURESAPIMPLEMENTATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREFEATURESERVICEIMPLEMENTATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SOFTWAREFEATURESOFTWAREELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SPAREGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STATISTICALINFORMATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STATISTICS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STORAGEDEFECT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STORAGEERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STORAGEEXTENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_STORAGEREDUNDANCYGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SUPPORTACCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SWAPSPACECHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SYSTEMCOMPONENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SYSTEMDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_SYSTEMRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_TACHOMETER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_TAPEDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_TEMPERATURESENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_THREAD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_TODIRECTORYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_TODIRECTORYSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_USBCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_USBCONTROLLERHASHUB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_UNINTERRUPTIBLEPOWERSUPPLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_UNITARYCOMPUTERSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_USERDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VERSIONCOMPATIBILITYCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOBIOSELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOBIOSFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOBIOSFEATUREVIDEOBIOSELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOCONTROLLERRESOLUTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VIDEOSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VOLATILESTORAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VOLTAGESENSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_VOLUMESET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CIM_WORMDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "CMDTRIGGERCONSUMER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_FORWARDEDEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_FORWARDEDMESSAGEEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NCPROVACCESSCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NCPROVCANCELQUERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NCPROVCLIENTCONNECTED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NCPROVEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NCPROVNEWQUERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETBADACCOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETBADSERVICESTATE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETBOOTSYSTEMDRIVERSFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETCALLTOFUNCTIONFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETCALLTOFUNCTIONFAILEDII",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETCIRCULARDEPENDENCYAUTO",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETCIRCULARDEPENDENCYDEMAND",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETCONNECTIONTIMEOUT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETDEPENDONLATERGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETDEPENDONLATERSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETFIRSTLOGONFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETFIRSTLOGONFAILEDII",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETINVALIDDRIVERDEPENDENCY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETREADFILETIMEOUT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETREVERTEDTOLASTKNOWNGOOD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICECONFIGBACKOUTFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICECONTROLSUCCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICECRASH",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICECRASHNOACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICEEXITFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICEEXITFAILEDSPECIFIC",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICENOTINTERACTIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICERECOVERYFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTARTFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTARTFAILEDGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTARTFAILEDII",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTARTFAILEDNONE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTARTHUNG",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSERVICESTATUSSUCCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETSEVERESERVICEFAILED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETTAKEOWNERSHIP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETTRANSACTINVALID",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_NETTRANSACTTIMEOUT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_SCMEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_SCMEVENTLOGEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMI_GENERICNONCOMEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICANCELNOTIFICATIONSINK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICONSUMERPROVIDEREVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICONSUMERPROVIDERLOADED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICONSUMERPROVIDERSINKLOADED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICONSUMERPROVIDERSINKUNLOADED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICONSUMERPROVIDERUNLOADED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICOREEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICORELOGOFFEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICORELOGONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICORESTATUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMICORETASKFAILURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIESSEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIFILTERACTIVATED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIFILTERDEACTIVATED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIFILTEREVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDEREVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIREGISTERNOTIFICATIONSINK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMISELFEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMITHREADPOOLEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMITHREADPOOLTHREADCREATED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMITHREADPOOLTHREADDELETED",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_PROVIDERS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_ACCESSCHECK_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_ACCESSCHECK_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CANCELQUERY_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CANCELQUERY_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_COMSERVERLOADOPERATIONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_COMSERVERLOADOPERATIONFAILUREEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_COUNTERS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CREATECLASSENUMASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CREATECLASSENUMASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CREATEINSTANCEENUMASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_CREATEINSTANCEENUMASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_DELETECLASSASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_DELETECLASSASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_DELETEINSTANCEASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_DELETEINSTANCEASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_EXECMETHODASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_EXECMETHODASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_EXECQUERYASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_EXECQUERYASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_GETOBJECTASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_GETOBJECTASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_INITIALIZATIONOPERATIONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_INITIALIZATIONOPERATIONFAILUREEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_LOADOPERATIONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_LOADOPERATIONFAILUREEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_NEWQUERY_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_NEWQUERY_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_OPERATIONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_OPERATIONEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_OPERATIONEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PROVIDEEVENTS_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PROVIDEEVENTS_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PUTCLASSASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PUTCLASSASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PUTINSTANCEASYNCEVENT_POST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_PUTINSTANCEASYNCEVENT_PRE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "MSFT_WMIPROVIDER_UNLOADOPERATIONEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "NTEVENTLOGPROVIDERCONFIG",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "NETDIAGNOSTICS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "SCRIPTINGSTANDARDCONSUMERSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_1394CONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_1394CONTROLLERDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ACCOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ACCOUNTSID",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ACTIONCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ACTIVEROUTE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ALLOCATEDRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_APPLICATIONCOMMANDLINE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_APPLICATIONSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ASSOCIATEDBATTERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ASSOCIATEDPROCESSORMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_AUTOCHKSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BIOS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BASEBOARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BASESERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BATTERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BINARY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BINDIMAGEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BOOTCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_BUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CDROMDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CIMLOGICALDEVICECIMDATAFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMAPPLICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMAPPLICATIONCLASSES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMAPPLICATIONSETTINGS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMCLASS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CACHEMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CHECKCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLASSINFOACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLASSICCOMAPPLICATIONCLASSES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLASSICCOMCLASS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLASSICCOMCLASSSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLASSICCOMCLASSSETTINGS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CLIENTAPPLICATIONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CODECFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COLLECTIONSTATISTICS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMCLASSAUTOEMULATOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMCLASSEMULATOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMMANDLINEACCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPONENTCATEGORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSHUTDOWNEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSYSTEMEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSYSTEMPROCESSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSYSTEMPRODUCT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_COMPUTERSYSTEMWINDOWSPRODUCTACTIVATIONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CONDITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CONNECTIONSHARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CONTROLLERHASHUB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CREATEFOLDERACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CURRENTPROBE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_CURRENTTIME",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DCOMAPPLICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DCOMAPPLICATIONACCESSALLOWEDSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DCOMAPPLICATIONLAUNCHALLOWEDSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DCOMAPPLICATIONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DMACHANNEL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DEPENDENTSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DESKTOP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DESKTOPMONITOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DEVICEBUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DEVICECHANGEEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DEVICEMEMORYADDRESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DEVICESETTINGS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DIRECTORYSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISKDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISKDRIVEPHYSICALMEDIA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISKDRIVETODISKPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISKPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISKQUOTA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISPLAYCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DISPLAYCONTROLLERCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DRIVERFORDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DRIVERVXD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_DUPLICATEFILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ENVIRONMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ENVIRONMENTSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_EXTENSIONINFOACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_FAN",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_FILESPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_FLOPPYCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_FLOPPYDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_FONTINFOACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_GROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_GROUPINDOMAIN",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_GROUPUSER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_HEATPIPE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IDECONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IDECONTROLLERDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IP4PERSISTEDROUTETABLE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IP4ROUTETABLE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IP4ROUTETABLEEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IRQRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_IMPLEMENTEDCATEGORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_INFRAREDDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_INIFILESPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_INSTALLEDSOFTWAREELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_JOBOBJECTSTATUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_KEYBOARD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LUID",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LUIDANDATTRIBUTES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LAUNCHCONDITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOADORDERGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOADORDERGROUPSERVICEDEPENDENCIES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOADORDERGROUPSERVICEMEMBERS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOCALTIME",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGGEDONUSER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALDISKROOTDIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALDISKTOPARTITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALFILEACCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALFILEAUDITING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALFILEGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALFILEOWNER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALFILESECURITYSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALMEMORYCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALPROGRAMGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALPROGRAMGROUPDIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALPROGRAMGROUPITEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALPROGRAMGROUPITEMDATAFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALSHAREACCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALSHAREAUDITING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGICALSHARESECURITYSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGONSESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_LOGONSESSIONMAPPEDDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MIMEINFOACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MSIRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MANAGEDSYSTEMELEMENTRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MAPPEDLOGICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MEMORYARRAY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MEMORYARRAYLOCATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MEMORYDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MEMORYDEVICEARRAY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MEMORYDEVICELOCATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_METHODPARAMETERCLASS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MODULELOADTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MODULETRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MOTHERBOARDDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_MOVEFILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTDOMAIN",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTEVENTLOGFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTLOGEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTLOGEVENTCOMPUTER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTLOGEVENTLOG",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NTLOGEVENTUSER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTACTGINFO",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTLIMIT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTLIMITSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTPROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTSECLIMIT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTSECLIMITSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NAMEDJOBOBJECTSTATISTICS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKADAPTER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKADAPTERCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKADAPTERSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKCLIENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKCONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKLOGINPROFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_NETWORKPROTOCOL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCATTRIBUTE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCDATASOURCEATTRIBUTE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCDATASOURCESPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCDRIVERATTRIBUTE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCDRIVERSOFTWAREELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCDRIVERSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCSOURCEATTRIBUTE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ODBCTRANSLATORSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_OSRECOVERYCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_ONBOARDDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_OPERATINGSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_OPERATINGSYSTEMAUTOCHKSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_OPERATINGSYSTEMQFE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PCMCIACONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PNPALLOCATEDRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_POTSMODEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_POTSMODEMTOSERIALPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PAGEFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PAGEFILEELEMENTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PAGEFILESETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PAGEFILEUSAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PARALLELPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PATCH",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PATCHFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PATCHPACKAGE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERF",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_2050727_ASPNETAPPSV2050727",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_2050727_ASPNETV2050727",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_4030319_ASPNETAPPSV4030319",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_4030319_ASPNETV4030319",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_ASPNET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_ASPNETAPPLICATIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_MSDTCBRIDGE4000_MSDTCBRIDGE4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_MSDTC_DISTRIBUTEDTRANSACTIONCOORDINATOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETCLRNETWORKING4000_NETCLRNETWORKING4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETCLRNETWORKING_NETCLRNETWORKING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETDATAPROVIDERFORORACLE_NETDATAPROVIDERFORORACLE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETDATAPROVIDERFORSQLSERVER_NETDATAPROVIDERFORSQLSERVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLREXCEPTIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRINTEROP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRJIT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRLOADING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRLOCKSANDTHREADS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRREMOTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETFRAMEWORK_NETCLRSECURITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_NETMEMORYCACHE40_NETMEMORYCACHE40",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PSCHED_PSCHEDFLOW",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PSCHED_PSCHEDPIPE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFDISK_LOGICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFDISK_PHYSICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFNET_BROWSER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFNET_REDIRECTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFNET_SERVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFNET_SERVERWORKQUEUES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_CACHE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_MEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_OBJECTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_PAGINGFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_PROCESSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFOS_SYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_FULLIMAGE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_IMAGE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_JOBOBJECT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_JOBOBJECTDETAILS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_PROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_PROCESSADDRESSSPACE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_THREAD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_PERFPROC_THREADDETAILS_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_RSVP_RSVPINTERFACES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_RSVP_RSVPSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SMSVCHOST3000_SMSVCHOST3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SMSVCHOST4000_SMSVCHOST4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELENDPOINT3000_SERVICEMODELENDPOINT3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELENDPOINT4000_SERVICEMODELENDPOINT4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELOPERATION3000_SERVICEMODELOPERATION3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELOPERATION4000_SERVICEMODELOPERATION4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELSERVICE3000_SERVICEMODELSERVICE3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SERVICEMODELSERVICE4000_SERVICEMODELSERVICE4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_SPOOLER_PRINTQUEUE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TAPISRV_TELEPHONY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_ICMP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_IP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_NBTCONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_NETWORKINTERFACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_TCP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TCPIP_UDP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TERMSERVICE_TERMINALSERVICES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_TERMSERVICE_TERMINALSERVICESSESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_WINDOWSWORKFLOWFOUNDATION3000_WINDOWSWORKFLOWFOUNDATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_WINDOWSWORKFLOWFOUNDATION4000_WFSYSTEMWORKFLOW4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFFORMATTEDDATA_ASPNET_STATE_ASPNETSTATESERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_2050727_ASPNETAPPSV2050727",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_2050727_ASPNETV2050727",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_4030319_ASPNETAPPSV4030319",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_4030319_ASPNETV4030319",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_ASPNET",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_ASPNETAPPLICATIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_MSDTCBRIDGE4000_MSDTCBRIDGE4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_MSDTC_DISTRIBUTEDTRANSACTIONCOORDINATOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETCLRNETWORKING4000_NETCLRNETWORKING4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETCLRNETWORKING_NETCLRNETWORKING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETDATAPROVIDERFORORACLE_NETDATAPROVIDERFORORACLE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETDATAPROVIDERFORSQLSERVER_NETDATAPROVIDERFORSQLSERVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLREXCEPTIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRINTEROP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRJIT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRLOADING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRLOCKSANDTHREADS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRREMOTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETFRAMEWORK_NETCLRSECURITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_NETMEMORYCACHE40_NETMEMORYCACHE40",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PSCHED_PSCHEDFLOW",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PSCHED_PSCHEDPIPE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFDISK_LOGICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFDISK_PHYSICALDISK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFNET_BROWSER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFNET_REDIRECTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFNET_SERVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFNET_SERVERWORKQUEUES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_CACHE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_MEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_OBJECTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_PAGINGFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_PROCESSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFOS_SYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_FULLIMAGE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_IMAGE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_JOBOBJECT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_JOBOBJECTDETAILS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_PROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_PROCESSADDRESSSPACE_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_THREAD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_PERFPROC_THREADDETAILS_COSTLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_RSVP_RSVPINTERFACES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_RSVP_RSVPSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SMSVCHOST3000_SMSVCHOST3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SMSVCHOST4000_SMSVCHOST4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELENDPOINT3000_SERVICEMODELENDPOINT3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELENDPOINT4000_SERVICEMODELENDPOINT4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELOPERATION3000_SERVICEMODELOPERATION3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELOPERATION4000_SERVICEMODELOPERATION4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELSERVICE3000_SERVICEMODELSERVICE3000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SERVICEMODELSERVICE4000_SERVICEMODELSERVICE4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_SPOOLER_PRINTQUEUE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TAPISRV_TELEPHONY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_ICMP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_IP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_NBTCONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_NETWORKINTERFACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_TCP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TCPIP_UDP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TERMSERVICE_TERMINALSERVICES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_TERMSERVICE_TERMINALSERVICESSESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_WINDOWSWORKFLOWFOUNDATION3000_WINDOWSWORKFLOWFOUNDATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_WINDOWSWORKFLOWFOUNDATION4000_WFSYSTEMWORKFLOW4000",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PERFRAWDATA_ASPNET_STATE_ASPNETSTATESERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PHYSICALMEDIA",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PHYSICALMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PHYSICALMEMORYARRAY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PHYSICALMEMORYLOCATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PINGSTATUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PNPDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PNPENTITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PNPSIGNEDDRIVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PNPSIGNEDDRIVERCIMDATAFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_POINTINGDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PORTCONNECTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PORTRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PORTABLEBATTERY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_POWERMANAGEMENTEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTJOB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERDRIVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERDRIVERDLL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRINTERSHARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRIVILEGESSTATUS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESSSTARTTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESSSTARTUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESSSTOPTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESSTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROCESSOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRODUCT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRODUCTCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRODUCTRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PRODUCTSOFTWAREFEATURES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROGIDSPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROGRAMGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROGRAMGROUPCONTENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROGRAMGROUPORITEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROPERTY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROTOCOLBINDING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PROXY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_PUBLISHCOMPONENTACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_QUICKFIXENGINEERING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_QUOTASETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_REFRIGERATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_REGISTRY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_REGISTRYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_REMOVEFILEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_REMOVEINIACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_RESERVECOST",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SCSICONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SCSICONTROLLERDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SID",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SIDANDATTRIBUTES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SMBIOSMEMORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SCHEDULEDJOB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYDESCRIPTOR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGACCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGAUDITING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGGROUP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGOFLOGICALFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGOFLOGICALSHARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGOFOBJECT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SECURITYSETTINGOWNER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SELFREGMODULEACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERIALPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERIALPORTCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERIALPORTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVERCONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVERSESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVICECONTROL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVICESPECIFICATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SERVICESPECIFICATIONSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SESSIONCONNECTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SESSIONPROCESS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SESSIONRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SETTINGCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SHARE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SHARETODIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SHORTCUTACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SHORTCUTFILE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SHORTCUTSAP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREELEMENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREELEMENTACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREELEMENTCHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREELEMENTCONDITION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREELEMENTRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREFEATURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREFEATUREACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREFEATURECHECK",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREFEATUREPARENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOFTWAREFEATURESOFTWAREELEMENTS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SOUNDDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_STARTUPCOMMAND",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SUBDIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SUBSESSION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMACCOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMBIOS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMBOOTCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMCONFIGURATIONCHANGEEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMDESKTOP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMDEVICES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMDRIVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMDRIVERPNPENTITY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMENCLOSURE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMLOADORDERGROUPS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMLOGICALMEMORYCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMMEMORYRESOURCE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMNETWORKCONNECTIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMOPERATINGSYSTEM",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMPARTITIONS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMPROCESSES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMPROGRAMGROUPS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMRESOURCES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMSERVICES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMSLOT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMSYSTEMDRIVER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMTIMEZONE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_SYSTEMUSERS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TCPIPPRINTERPORT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSACCOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSCLIENTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSCLIENTSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSENVIRONMENTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSENVIRONMENTSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSGENERALSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSGENERALSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSLOGONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSLOGONSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSNETWORKADAPTERLISTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSNETWORKADAPTERSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSNETWORKADAPTERSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSPERMISSIONSSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSPERMISSIONSSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSREMOTECONTROLSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSREMOTECONTROLSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSSESSIONDIRECTORY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSSESSIONDIRECTORYERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSSESSIONDIRECTORYSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSSESSIONSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TSSESSIONSETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TAPEDRIVE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TEMPERATUREPROBE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINAL",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALSERVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALSERVICESETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALSERVICESETTINGERROR",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALSERVICETOSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TERMINALTERMINALSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_THREAD",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_THREADSTARTTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_THREADSTOPTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_THREADTRACE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TIMEZONE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TOKENGROUPS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TOKENPRIVILEGES",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TRUSTEE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_TYPELIBRARYACTION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USBCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USBCONTROLLERDEVICE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USBHUB",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_UTCTIME",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_UNINTERRUPTIBLEPOWERSUPPLY",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USERACCOUNT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USERDESKTOP",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_USERINDOMAIN",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VIDEOCONFIGURATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VIDEOCONTROLLER",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VIDEOSETTINGS",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VOLTAGEPROBE",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VOLUMECHANGEEVENT",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_VOLUMEQUOTASETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_WMIELEMENTSETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_WMISETTING",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "WIN32_WINDOWSPRODUCTACTIVATION",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 16409
+        },
+        {
+          "name": "wmiClassName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/wmi4java/WMIClass;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "e878f07e1e5b66f607f84167ef96d734ddafbe409d1d0c271b5c0a640780e0c1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9bafb0a2cb29eefaa134ff3dc0477c408abddf96094e9e05c4c695d1b160162e",
+          "code_length": 23417
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/profesorfalken/wmi4java/WMIClass;>;",
+      "class_references": [
+        "[Lcom/profesorfalken/wmi4java/WMIClass;",
+        "com/profesorfalken/wmi4java/WMIClass",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIException.class",
+      "occurrence": 0,
+      "sha256": "c46d6583f8f5d36cb3cf1927b443b69be1c209f7512ba9af2e6a75d4d060b39d",
+      "name": "com/profesorfalken/wmi4java/WMIException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/wmi4java/WMIException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIPowerShell.class",
+      "occurrence": 0,
+      "sha256": "d4cfd5b8d68cf429fae67b9e71493dab9f76c0761e4eef2ea7167604c577d052",
+      "name": "com/profesorfalken/wmi4java/WMIPowerShell",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/profesorfalken/wmi4java/WMIStub"
+      ],
+      "fields": [
+        {
+          "name": "NAMESPACE_PARAM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "COMPUTERNAME_PARAM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "GETWMIOBJECT_COMMAND",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "executeCommand",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "ff9a3984d108e14915e812eb3924ca0b71a864179a532ec22ec51710d53456b2",
+          "code_length": 130,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listClasses",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f0155de091f976ad9785dfda5b44008bdffdff7876b841f115179f1079a3169c",
+          "code_length": 64,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listProperties",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "14f0be28597089a46d1f329a1c9ccce30809ae872d009a5d7f2d91d79e3ae2b9",
+          "code_length": 81,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listObject",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5de6793b0e8c308aaafdf93f5444ea73055d5eca788fea0faba1a2e98c794a35",
+          "code_length": 81,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "queryObject",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0d097d49601b91f07f1722187e2dc79cd48f5c6a0d5ff339ad534f7fd721ebed",
+          "code_length": 202,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "initCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5c9cdd32bc02357166d2e44282a5e41686bae91e55ef115c07ca2b91f0225a2f",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShell",
+        "com/profesorfalken/jpowershell/PowerShellNotAvailableException",
+        "com/profesorfalken/jpowershell/PowerShellResponse",
+        "com/profesorfalken/wmi4java/WMI4JavaUtil",
+        "com/profesorfalken/wmi4java/WMIException",
+        "com/profesorfalken/wmi4java/WMIPowerShell",
+        "com/profesorfalken/wmi4java/WMIStub",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIStub.class",
+      "occurrence": 0,
+      "sha256": "f8c25030661f6cfa2f9828cbfd0211cdb92d1a06d6a822b447988bf0fb7680ae",
+      "name": "com/profesorfalken/wmi4java/WMIStub",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "listClasses",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listObject",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "queryObject",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "listProperties",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/wmi4java/WMIException",
+        "com/profesorfalken/wmi4java/WMIStub",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIVBScript.class",
+      "occurrence": 0,
+      "sha256": "41c0d2046c0735b12fbe99789b55f434e669de1d25d58e55badc51b20e0c42dd",
+      "name": "com/profesorfalken/wmi4java/WMIVBScript",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/profesorfalken/wmi4java/WMIStub"
+      ],
+      "fields": [
+        {
+          "name": "ROOT_CIMV2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "IMPERSONATION_VARIABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CRLF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "705308d0c9b61b9ba6f37834cf9f72cf243f9bfdc7fc4de2ac37c7d868a052ef",
+          "code_length": 420,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listClasses",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e11997af6bc110c4a1b161bd1b87287e29428521ea66f5d16a64324dd0a7fd6f",
+          "code_length": 152,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listProperties",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d62d7ef9b1405937e9ca16120df7c1fd6facd331317f0dfa7a82f89ac1962385",
+          "code_length": 134,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "listObject",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ddb97d2ea5204388891254b291ed663c5e24363a33c0894218b41e320d519d09",
+          "code_length": 10,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ]
+        },
+        {
+          "name": "queryObject",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2c9a8b6a717aeb0f0386d9419ded08bc486c45d61be84208ace8393c9c86d0ad",
+          "code_length": 352,
+          "throws": [
+            "com/profesorfalken/wmi4java/WMIException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/wmi4java/WMI4Java",
+        "com/profesorfalken/wmi4java/WMI4JavaUtil",
+        "com/profesorfalken/wmi4java/WMIException",
+        "com/profesorfalken/wmi4java/WMIStub",
+        "com/profesorfalken/wmi4java/WMIVBScript",
+        "java/io/BufferedReader",
+        "java/io/File",
+        "java/io/FileWriter",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Date",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    }
+  ]
+}

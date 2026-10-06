@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
+  "sha256": "e820bd7438ff1482c3233b12bb47454b4e57e3dfa3482f3904f1c67e0815a223",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet$1.class": "11a3d4815fb48d37edb8faa215613824e123a68598810383b7d9a20d7967457e",
+    "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet.class": "0474448a1a98d6342249241045b83f265962de872399a46c9bf9f10fb9bf0408",
+    "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServletPlugin.class": "71b9d4eade97301b0b4d1ac875255106bc38e5ed35bbf1485bd135340f24d880"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet$1.class",
+      "occurrence": 0,
+      "sha256": "11a3d4815fb48d37edb8faa215613824e123a68598810383b7d9a20d7967457e",
+      "member_shard": "docs/dev/evidence/sqx145/members/171/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet.class",
+      "occurrence": 0,
+      "sha256": "0474448a1a98d6342249241045b83f265962de872399a46c9bf9f10fb9bf0408",
+      "member_shard": "docs/dev/evidence/sqx145/members/171/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "71b9d4eade97301b0b4d1ac875255106bc38e5ed35bbf1485bd135340f24d880",
+      "member_shard": "docs/dev/evidence/sqx145/members/171/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/171/001.json",
+      "sha256": "341920b3ce08c51e42e1c2b4e37ed38fe7c21ef2f0643137abb336de2999be27"
+    }
+  ]
+}

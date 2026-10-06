@@ -1,0 +1,4071 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/agentscope-core-2.0.3.jar",
+  "archive_sha256": "7f1ec0f9c5afd1388554275efc78f58cb05692b634453695cf404eb79f7cfda4",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/agentscope/core/tool/ToolParam.class",
+      "occurrence": 0,
+      "sha256": "303ee0eb1c4d84f0c54d4df19351953c8fefebe64b09e58ea3200d2f21592970",
+      "name": "io/agentscope/core/tool/ToolParam",
+      "major": 61,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "name",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "required",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "description",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolParam",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/MetaToolFactory.class",
+      "occurrence": 0,
+      "sha256": "96eca3444e5dad854364051edea531d94acfd5d625919fd93b9ce602860e71a5",
+      "name": "io/agentscope/core/tool/MetaToolFactory",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "groupManager",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupManager;",
+          "access": 18
+        },
+        {
+          "name": "toolRegistry",
+          "descriptor": "Lio/agentscope/core/tool/ToolRegistry;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/ToolGroupManager;Lio/agentscope/core/tool/ToolRegistry;)V",
+          "access": 0,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15
+        },
+        {
+          "name": "createResetEquippedToolsAgentTool",
+          "descriptor": "()Lio/agentscope/core/tool/AgentTool;",
+          "access": 0,
+          "code_sha256": "8de6ddef14d6c721343f576779906a39261a4318e6b08384c1fa3ebb4d393d49",
+          "code_length": 9
+        },
+        {
+          "name": "resetEquippedToolsImpl",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2fc13893a43599eb93ab0676684c4463c86c48522f9d11e0ce69b67a518789db",
+          "code_length": 323,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "lambda$resetEquippedToolsImpl$0",
+          "descriptor": "(Lio/agentscope/core/tool/ToolGroup;)Z",
+          "access": 4106,
+          "code_sha256": "781d76e86e3254c6ce095e839d490135ee42e752b4712a0129390b8b306cb701",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/MetaToolFactory",
+        "io/agentscope/core/tool/MetaToolFactory$1",
+        "io/agentscope/core/tool/ToolGroup",
+        "io/agentscope/core/tool/ToolGroupManager",
+        "io/agentscope/core/tool/ToolGroupScope",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolRegistry.class",
+      "occurrence": 0,
+      "sha256": "247e90a03dcae5c5937397106d76bdcb27a3e0f70d5aa504f49bc7b99284d7bf",
+      "name": "io/agentscope/core/tool/ToolRegistry",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tools",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lio/agentscope/core/tool/AgentTool;>;"
+        },
+        {
+          "name": "registeredTools",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lio/agentscope/core/tool/RegisteredToolFunction;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8b8f88346986c93b2619ca852e8d190feb05bd9dbe9822f52b56f276f28c0b0c",
+          "code_length": 27
+        },
+        {
+          "name": "registerTool",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/tool/AgentTool;Lio/agentscope/core/tool/RegisteredToolFunction;)V",
+          "access": 0,
+          "code_sha256": "07b5a406f01cf06b3f019e845afd24804874bcad6760cc621ba6b0f09eb45837",
+          "code_length": 46
+        },
+        {
+          "name": "getTool",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/AgentTool;",
+          "access": 0,
+          "code_sha256": "f3ac765dbd2cc02cab014cf0ddeea9d6d045bfd379b6e5b794eaf226d18016d0",
+          "code_length": 27
+        },
+        {
+          "name": "getRegisteredTool",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/RegisteredToolFunction;",
+          "access": 0,
+          "code_sha256": "b2231758c99cbceff33d9814e574b56bd2f2b459c8769d38535ad70895b330a0",
+          "code_length": 27
+        },
+        {
+          "name": "getToolNames",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 0,
+          "code_sha256": "a1ffc4a47ebdb832d286039f78da2dfc933b40d2929175018a35527048eb1073",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getAllRegisteredTools",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 0,
+          "code_sha256": "fb4a9c5441c54cc9a4a57f4c2286bda7791b5ab297d274c88b791f24ab916060",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Lio/agentscope/core/tool/RegisteredToolFunction;>;"
+        },
+        {
+          "name": "removeTool",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "581b03b0e8e74d6ad67fc23cdfda68afb89748cf6e7e0c56266d67cf0642f4e5",
+          "code_length": 44
+        },
+        {
+          "name": "removeToolIfSame",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/tool/AgentTool;)Z",
+          "access": 0,
+          "code_sha256": "84411034d7cda48957dd75535e74677bd990ce505bb3e80ee8dd23bbf4a8edf4",
+          "code_length": 29
+        },
+        {
+          "name": "removeTools",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 0,
+          "code_sha256": "64e3a882bd8f257612bafd80eb1026d1d50bb033e65dea868035ce4dbf41d62b",
+          "code_length": 13,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "copyTo",
+          "descriptor": "(Lio/agentscope/core/tool/ToolRegistry;)V",
+          "access": 0,
+          "code_sha256": "25f56a5c7f6f80c11fa933cebfeb54fedd0467a70493485b98c23a2bc24fce15",
+          "code_length": 86
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/RegisteredToolFunction",
+        "io/agentscope/core/tool/ToolRegistry",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolSchemaGenerator.class",
+      "occurrence": 0,
+      "sha256": "30ebbcb697537de336cc33de01d1a8de6396c9e209d5cbec368f7b0bfec94f38",
+      "name": "io/agentscope/core/tool/ToolSchemaGenerator",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "generateParameterSchema",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/util/Set;)Ljava/util/Map;",
+          "access": 0,
+          "code_sha256": "2c2c9d86e05e80408eccd7246cc3b8efebed5d112fef47167fdfb2a414393512",
+          "code_length": 255,
+          "generic_signature": "(Ljava/lang/reflect/Method;Ljava/util/Set<Ljava/lang/String;>;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "hoistDefs",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "45ef1c02d78dbbad95059f3a530115f8a3ae9d2ec8b019646170c68ac9b3e93f",
+          "code_length": 153,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "extractParameterInfo",
+          "descriptor": "(Ljava/lang/reflect/Parameter;Lio/agentscope/core/tool/ToolParam;)Lio/agentscope/core/tool/ToolSchemaGenerator$ParameterInfo;",
+          "access": 2,
+          "code_sha256": "a9daf3e7688452fbd8d8124a094399f5c7ec330eef1b2d5a41273574766ff443",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/reflect/Parameter;",
+        "io/agentscope/core/tool/ToolParam",
+        "io/agentscope/core/tool/ToolSchemaGenerator",
+        "io/agentscope/core/tool/ToolSchemaGenerator$ParameterInfo",
+        "io/agentscope/core/util/JsonSchemaUtils",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Parameter",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Objects",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolBase$Builder.class",
+      "occurrence": 0,
+      "sha256": "c6a14361aded73f38ef8f16abe110ee832a93e6460188aeffc6038f6f05860ca",
+      "name": "io/agentscope/core/tool/ToolBase$Builder",
+      "major": 61,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "inputSchema",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "readOnly",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "concurrencySafe",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "externalTool",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "stateInjected",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "mcp",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "mcpName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "dangerousFiles",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "dangerousDirectories",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aa426fb0b191f8e71d2ac1a5675cf4186800192bc59677a7f062a02ccb7f90a4",
+          "code_length": 30
+        },
+        {
+          "name": "name",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "92c3371e2ce85fb20f0caef59dd6a1f0636550417f39bce7d67160cb448f9ba0",
+          "code_length": 7
+        },
+        {
+          "name": "description",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "2cb558750716437c26c6adb36219b6be6a5fdfcf2e923bbf1d4fa58bda95080a",
+          "code_length": 7
+        },
+        {
+          "name": "inputSchema",
+          "descriptor": "(Ljava/util/Map;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "5814c042440ee7196455df3cfa821c72239f9b33d90d15609c59346863900950",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lio/agentscope/core/tool/ToolBase$Builder;"
+        },
+        {
+          "name": "readOnly",
+          "descriptor": "(Z)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "350cf897d56f63a4e8e8d5036956074d674f60c75e163de0f4f3a1c9f170445b",
+          "code_length": 7
+        },
+        {
+          "name": "concurrencySafe",
+          "descriptor": "(Z)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "72ab8e123f7b94333da89f6a6c9efd70d47cab0b2530fb2adcfd3d47c58340ac",
+          "code_length": 7
+        },
+        {
+          "name": "externalTool",
+          "descriptor": "(Z)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "b12c6a4d43d06a011bbd9e459e78c281e026a34777c44c5de565d494263b1af5",
+          "code_length": 7
+        },
+        {
+          "name": "stateInjected",
+          "descriptor": "(Z)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "dc25ab451f4d864871272f84e3335b2040a956ae1db25d7ce6691b9ba333f26b",
+          "code_length": 7
+        },
+        {
+          "name": "mcp",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "6cd08030b6230f15ccc6b790a0b674ec6946228e4fac597dbbd61e2743721dac",
+          "code_length": 12
+        },
+        {
+          "name": "dangerousFiles",
+          "descriptor": "(Ljava/util/List;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "7e9303bde8570285298d5c7ad1a2da6c5e15ca55a67b11723b05d386babb1613",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lio/agentscope/core/tool/ToolBase$Builder;"
+        },
+        {
+          "name": "dangerousDirectories",
+          "descriptor": "(Ljava/util/List;)Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 1,
+          "code_sha256": "12aa242d36c7b8a6311b274e1c7673a92119da7b183b5e9cd01cdb5ebc333186",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lio/agentscope/core/tool/ToolBase$Builder;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolBase",
+        "io/agentscope/core/tool/ToolBase$Builder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolResultConverter.class",
+      "occurrence": 0,
+      "sha256": "c172acf75c84c63d9baf8a9e8bf3ff3e59e10a6f51bd56ccec002cf7f2dee91a",
+      "name": "io/agentscope/core/tool/ToolResultConverter",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "convert",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/reflect/Type;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolResultConverter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolSchemaGenerator$ParameterInfo.class",
+      "occurrence": 0,
+      "sha256": "62748a54681c093f06cee34ad5bbef84bb2657e3c53f04728f6c30e336b3f16c",
+      "name": "io/agentscope/core/tool/ToolSchemaGenerator$ParameterInfo",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 16
+        },
+        {
+          "name": "schema",
+          "descriptor": "Ljava/util/Map;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "required",
+          "descriptor": "Z",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Z)V",
+          "access": 0,
+          "code_sha256": "cdf96d1190dc12e1d4a3d5ec39bf65f841b3ba64af9b011f3412b618dd18f32a",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Z)V"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolSchemaGenerator",
+        "io/agentscope/core/tool/ToolSchemaGenerator$ParameterInfo",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolValidator.class",
+      "occurrence": 0,
+      "sha256": "a4462af185933c7b77b6f8632a7a4a58ba27a7b2e88f68af0261ebd4da65ffaa",
+      "name": "io/agentscope/core/tool/ToolValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SCHEMA_REGISTRY",
+          "descriptor": "Lcom/networknt/schema/SchemaRegistry;",
+          "access": 26
+        },
+        {
+          "name": "OBJECT_MAPPER",
+          "descriptor": "Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "validateInput",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "cdbf7ad0dfde4d886cc18816321ae6569e5e43e38c63c7b2e29e210bb17a70b0",
+          "code_length": 105,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "normalizeOptionalNullFields",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "0c5d13cc0522906cb433a7e25ecc6058f661234929a8ab21db6c57f3059519cf",
+          "code_length": 43,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "pruneOptionalNullObjectFields",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/JsonNode;Lcom/fasterxml/jackson/databind/JsonNode;Lcom/fasterxml/jackson/databind/JsonNode;)V",
+          "access": 10,
+          "code_sha256": "280fd628b113395712cca9ce0c59276ea23bb90e3017d3977475d3cbf0ea4956",
+          "code_length": 175
+        },
+        {
+          "name": "resolveSchemaNode",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/JsonNode;Lcom/fasterxml/jackson/databind/JsonNode;)Lcom/fasterxml/jackson/databind/JsonNode;",
+          "access": 10,
+          "code_sha256": "02c77687ad7024022cb0b7d8995509113db357762c217e31323957ca86f35632",
+          "code_length": 51
+        },
+        {
+          "name": "getRequiredFields",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/JsonNode;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "a9ce6de27a30e6d22b5d051ff249113c1b982b0f0e56579b0ec31acb09d0a88b",
+          "code_length": 42,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/JsonNode;)Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "validateToolResultMatch",
+          "descriptor": "(Lio/agentscope/core/message/Msg;Ljava/util/List;)V",
+          "access": 9,
+          "code_sha256": "0e9252bb2c96ad99bfc075e46fa3c427af7cc8d61b8ccb94fff6681bcd0cafa9",
+          "code_length": 191,
+          "generic_signature": "(Lio/agentscope/core/message/Msg;Ljava/util/List<Lio/agentscope/core/message/Msg;>;)V"
+        },
+        {
+          "name": "lambda$validateToolResultMatch$3",
+          "descriptor": "(Lio/agentscope/core/message/Msg;)Ljava/util/stream/Stream;",
+          "access": 4106,
+          "code_sha256": "708ed4e6e4ec9698c0ed4158921c0d7c4daf6fc22dfeca50bb2307b4d7a6eda0",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$getRequiredFields$2",
+          "descriptor": "(Ljava/util/Set;Lcom/fasterxml/jackson/databind/JsonNode;)V",
+          "access": 4106,
+          "code_sha256": "388fa71aaa06c99c21eeb1deb3c336721de2b0630a9d20807d6a39b022022ddb",
+          "code_length": 12
+        },
+        {
+          "name": "lambda$pruneOptionalNullObjectFields$1",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/JsonNode;Ljava/util/Set;Ljava/util/List;Lcom/fasterxml/jackson/databind/JsonNode;Lcom/fasterxml/jackson/databind/JsonNode;Ljava/util/Map$Entry;)V",
+          "access": 4106,
+          "code_sha256": "2412666a9a7343e4a96b87edde70a67a8e96db8c7f9bcde0103c9812c73db5cc",
+          "code_length": 127
+        },
+        {
+          "name": "lambda$validateInput$0",
+          "descriptor": "(Lcom/networknt/schema/Error;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "23440e22109588d7d8fa26f857aa5593e89af2515ff8d4e76377a36fbc390538",
+          "code_length": 17
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "aa2dff70d6025934684ce2322779ab68f0c506495e2b13fcefd0ff63e532669b",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/JsonNode",
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "com/fasterxml/jackson/databind/node/ArrayNode",
+        "com/fasterxml/jackson/databind/node/ObjectNode",
+        "com/networknt/schema/Error",
+        "com/networknt/schema/InputFormat",
+        "com/networknt/schema/Schema",
+        "com/networknt/schema/SchemaRegistry",
+        "com/networknt/schema/SpecificationVersion",
+        "io/agentscope/core/message/Msg",
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/message/ToolUseBlock",
+        "io/agentscope/core/tool/ToolValidator",
+        "io/agentscope/core/util/JsonCodec",
+        "io/agentscope/core/util/JsonUtils",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Objects",
+        "java/util/Set",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/SkillToolGroup.class",
+      "occurrence": 0,
+      "sha256": "7e7e58139960dd9fcb5aa5a0482d4a13e1ce54eaf886fb8b1362302abe0de5f3",
+      "name": "io/agentscope/core/tool/SkillToolGroup",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "io/agentscope/core/tool/ToolGroup",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "activateOnSkill",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "rawDescription",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/SkillToolGroup$Builder;)V",
+          "access": 2,
+          "code_sha256": "8acb12a206a0c1f8e047c8cf234550f7be8f4532406657101c0a1e1216fcbbea",
+          "code_length": 60
+        },
+        {
+          "name": "getActivateOnSkill",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a91d890976fe2c888e0abca7a49d2153194d61007974b138f321f40f2d006787",
+          "code_length": 5
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e95507fdc6ef131b640d1a9a78fc6783aaf69188adb969a833d9121f4ddd2edc",
+          "code_length": 14
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lio/agentscope/core/tool/ToolGroup;",
+          "access": 1,
+          "code_sha256": "1ce23b670dfadd29e307b5d9b155743abfaddf8e84e13de1613b1aa594a4da19",
+          "code_length": 44
+        },
+        {
+          "name": "skillBuilder",
+          "descriptor": "()Lio/agentscope/core/tool/SkillToolGroup$Builder;",
+          "access": 9,
+          "code_sha256": "acba1f6398e0485c519ad8bc276f1c27531e0552dd47cd3d8625ebfc75fe96b5",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/SkillToolGroup",
+        "io/agentscope/core/tool/SkillToolGroup$Builder",
+        "io/agentscope/core/tool/ToolGroup",
+        "io/agentscope/core/tool/ToolGroupScope",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolExecutionContextProvider.class",
+      "occurrence": 0,
+      "sha256": "4c866e976479d8225092e53283a03c90286447f9d16839e3bcd7db7aefc58e7a",
+      "name": "io/agentscope/core/tool/ToolExecutionContextProvider",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "resolveContext",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolExecutionContextProvider",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/DefaultContextStore.class",
+      "occurrence": 0,
+      "sha256": "0c81dfa925849b08ecbf77180eee432ab47bb02d47a969690fd190f26afd12a0",
+      "name": "io/agentscope/core/tool/DefaultContextStore",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/ContextStore"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_KEY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "objectMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/DefaultContextStore$Builder;)V",
+          "access": 2,
+          "code_sha256": "1c78cce02955e9f839f2558db4ae6f7b1a37dd2ebd2fbe52c2e7541096befb10",
+          "code_length": 113
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "08f9fe7e9a0a7d3245054a24a72b639134195678210c1cd2dac59798522eb0c9",
+          "code_length": 48,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "150a5443e1161ab0354dc94be5a0e7ced481af97576db22b43776a5a0cc24e78",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "ee66b12b2e305150b92c12b53c2aa67e06ff266c5ff5b8c5bdc866c63e889610",
+          "code_length": 34,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d1e902e22f089bfc0dc390ce10dcc7d4af743c2fc6a943dc3a7ed53896fea51c",
+          "code_length": 33,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "getObjectMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "5145c5ffc5fe542a91648db2a2131b4f4236e4aab74fa075fe55d0fff1f650d0",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/Class<*>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/agentscope/core/tool/DefaultContextStore$Builder;",
+          "access": 9,
+          "code_sha256": "96c9bf7902ed32bb9aeb6e77b683c958efd4909b73f250acc363f1ae6e364917",
+          "code_length": 8
+        },
+        {
+          "name": "empty",
+          "descriptor": "()Lio/agentscope/core/tool/DefaultContextStore;",
+          "access": 9,
+          "code_sha256": "af68ceec2f5c8d1b52d14d98a9c49a7d19f4fd46517e1dfe1edf8dbbb6419a14",
+          "code_length": 11
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3ccd9936e025fea252b27525904dc47113a668d4a2446ce82a1656afdb08a0ba",
+          "code_length": 41
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b095e9d00056df8f30ed72e1eb418469f8c9c9a4752016ccff39f6c3f58854d8",
+          "code_length": 15
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1a9199d66cf646fb66f68ec075bd457b2a4b3d445cc7121e4799f051cc74f1d2",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ContextStore",
+        "io/agentscope/core/tool/DefaultContextStore",
+        "io/agentscope/core/tool/DefaultContextStore$Builder",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Objects",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ExtendedModel.class",
+      "occurrence": 0,
+      "sha256": "7ec5c543c656c4b2b4dc82e722f1109db59d2f5cc32b9e9974983aba76f0bcac",
+      "name": "io/agentscope/core/tool/ExtendedModel",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getAdditionalProperties",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getAdditionalRequired",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "mergeWithBaseSchema",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "5cff9bee8f6ac99b987366d2e47b0077ef788df6438eb071790bf3e3b354165d",
+          "code_length": 234,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ExtendedModel",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/ShellCommandTool.class",
+      "occurrence": 0,
+      "sha256": "32f8f9e16f4c6ff918d7a82b70dc029bd71c2e6481788cb11346cc12582d102d",
+      "name": "io/agentscope/core/tool/coding/ShellCommandTool",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/AgentTool"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_TIMEOUT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "STREAM_READER_POOL",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 26
+        },
+        {
+          "name": "allowedCommands",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "approvalCallback",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 18,
+          "generic_signature": "Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "commandValidator",
+          "descriptor": "Lio/agentscope/core/tool/coding/CommandValidator;",
+          "access": 18
+        },
+        {
+          "name": "baseDir",
+          "descriptor": "Ljava/nio/file/Path;",
+          "access": 18
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cfb228c98ae785018a3e399cea586ade5fb4ea7e5665938ce6ee6a75f2e9abb6",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "ad035566653c3fd23e760810227e8115575f5fc41a3239147f058192ae9327a3",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/util/function/Function;)V",
+          "access": 1,
+          "code_sha256": "7503761587b681d14d0558126f7bb2c67a68c514b99d26539a182b7f8a823336",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;Ljava/util/function/Function;)V",
+          "access": 1,
+          "code_sha256": "2920fc24d5b4470006d5b7e400f15ee756da5e52d785d353d7ccdd2ed37064a2",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/util/function/Function;Lio/agentscope/core/tool/coding/CommandValidator;)V",
+          "access": 1,
+          "code_sha256": "8046137ec7d7b2a8d6c914c773a8291c44124573ac1b56478b4521de73237c88",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;Lio/agentscope/core/tool/coding/CommandValidator;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;Ljava/util/function/Function;Lio/agentscope/core/tool/coding/CommandValidator;)V",
+          "access": 1,
+          "code_sha256": "afde73e32e498f7e812344472bc62668170a12b3ec3d430ee5d9d23355974ce6",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;Lio/agentscope/core/tool/coding/CommandValidator;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;Ljava/util/function/Function;Lio/agentscope/core/tool/coding/CommandValidator;Ljava/nio/charset/Charset;)V",
+          "access": 1,
+          "code_sha256": "ef96cd782f1d01b0a463ed78ad50004361ec6ff6496a517479c99d4357020cba",
+          "code_length": 159,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;Lio/agentscope/core/tool/coding/CommandValidator;Ljava/nio/charset/Charset;)V"
+        },
+        {
+          "name": "createDefaultValidator",
+          "descriptor": "()Lio/agentscope/core/tool/coding/CommandValidator;",
+          "access": 10,
+          "code_sha256": "6cefe34e8fdf3885c62a80d9582636c7f42bc582fab8d5b21a6b2af8e71e9ec4",
+          "code_length": 34
+        },
+        {
+          "name": "getAllowedCommands",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "c16511ebd62c95509fc143833862e84abb7379c9b163b81a3d6cbc470038af71",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "addAllowedCommand",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "9b760a3f10bbd7fadf0b57fb25236db28d9687a551bff20ba834276902aa3948",
+          "code_length": 52
+        },
+        {
+          "name": "removeAllowedCommand",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "9a4b899f956d6100de2a1c7a8e518935a5ce3992b728cebcc32b6f807efd211d",
+          "code_length": 28
+        },
+        {
+          "name": "clearAllowedCommands",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9eb481cc2347add905ad225f6f2a48abcb9ca858e04e9d2af85cfb2bbf0c7ad9",
+          "code_length": 20
+        },
+        {
+          "name": "isCommandAllowed",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "20727050bbd204f11ac5837042ad8aaec6eac643c05dd92fd430572aa3b3f2a8",
+          "code_length": 11
+        },
+        {
+          "name": "getApprovalCallback",
+          "descriptor": "()Ljava/util/function/Function;",
+          "access": 1,
+          "code_sha256": "5da6e334e36bda837ba180438bd217523b5eafd4a06ee7083400188ca9cf62dc",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/function/Function<Ljava/lang/String;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "getCommandValidator",
+          "descriptor": "()Lio/agentscope/core/tool/coding/CommandValidator;",
+          "access": 1,
+          "code_sha256": "0add6ddfe7f18839c5edf7cc21e5b3fa10317ab332e34787946474ca003329dc",
+          "code_length": 5
+        },
+        {
+          "name": "getBaseDir",
+          "descriptor": "()Ljava/nio/file/Path;",
+          "access": 1,
+          "code_sha256": "5306029e83e64272ba62c7c5f2899934ea6c94d747c087a80685dab03c7198b0",
+          "code_length": 5
+        },
+        {
+          "name": "getCharset",
+          "descriptor": "()Ljava/nio/charset/Charset;",
+          "access": 1,
+          "code_sha256": "8bd3174a8697f7a4741b428870688d4beb431b866fa68752e1645c0744e244f8",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6020dd85562b9d75b9a5482b6122649bf306c92c17b0e7e62007effc9e4351be",
+          "code_length": 3
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "033787b8302683565f0675c376e0529b22673d2c7188e7c74f74251316c714d1",
+          "code_length": 167
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "9d4b7446eaccbc4bb49bcb254193fe58c1d5a9a48b0c6af9088ec74aed110af3",
+          "code_length": 70,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "41d48312cddb91b257cc12d17285390e37bed381ffc85bad189b9da9dd405799",
+          "code_length": 128,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeShellCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Integer;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "843e508772eafbcfafba3cf163964af7215fb379b90cbee8cdec60e52b4bd2f3",
+          "code_length": 8,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Integer;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeShellCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Integer;Ljava/nio/charset/Charset;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "99f26c16944f5f706c88fe215d5172ea7dd3fa67a12835132d394642a656203c",
+          "code_length": 237,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Integer;Ljava/nio/charset/Charset;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeCommand",
+          "descriptor": "(Ljava/lang/String;ILjava/nio/charset/Charset;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 2,
+          "code_sha256": "c3a1d6f1da3a292f3c4140ecc4630486b5c8d631345779566ade4f8f19321c6e",
+          "code_length": 706
+        },
+        {
+          "name": "getOutputWithTimeout",
+          "descriptor": "(Ljava/util/concurrent/Future;JLjava/util/concurrent/TimeUnit;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5d20d576b63a8c635d266018731240bf3225ba2b49282bebdf411d937f577f84",
+          "code_length": 99,
+          "generic_signature": "(Ljava/util/concurrent/Future<Ljava/lang/String;>;JLjava/util/concurrent/TimeUnit;)Ljava/lang/String;"
+        },
+        {
+          "name": "formatResult",
+          "descriptor": "(ILjava/lang/String;Ljava/lang/String;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 2,
+          "code_sha256": "fab4c9e457590dcdc3ab7dd96e96a38d02dac4a2ca8a07e2383e532320631dc2",
+          "code_length": 42
+        },
+        {
+          "name": "requestUserApproval",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "1d973b4287ca778fd96d2b0afed1ff8473b5cb27f653e398e0c978bac54de7d3",
+          "code_length": 107
+        },
+        {
+          "name": "lambda$executeShellCommand$1",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/Throwable;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "dfe9c0fdf95e5ccc114e8b8545557863209f66bbb1a2a67a669a465d4c34dfff",
+          "code_length": 87
+        },
+        {
+          "name": "lambda$executeShellCommand$0",
+          "descriptor": "(Ljava/lang/String;ILjava/nio/charset/Charset;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 4098,
+          "code_sha256": "3c6023d23ec678ae41515c3770c909450369a17e85efb7cdb7ccbcc40b870142",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3543c4f786d1585d92a85146b81fc8a5f9df667d06ef2104b1ec54091cb814a9",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/message/TextBlock",
+        "io/agentscope/core/message/TextBlock$Builder",
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/ToolCallParam",
+        "io/agentscope/core/tool/coding/CommandValidator",
+        "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+        "io/agentscope/core/tool/coding/ShellCommandTool",
+        "io/agentscope/core/tool/coding/ShellCommandTool$1",
+        "io/agentscope/core/tool/coding/ShellCommandTool$StreamReader",
+        "io/agentscope/core/tool/coding/UnixCommandValidator",
+        "io/agentscope/core/tool/coding/WindowsCommandValidator",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Long",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/ProcessBuilder",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/nio/charset/Charset",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Path",
+        "java/nio/file/Paths",
+        "java/time/Duration",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentHashMap$KeySetView",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "java/util/concurrent/TimeUnit",
+        "java/util/concurrent/TimeoutException",
+        "java/util/function/Function",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "reactor/core/publisher/Mono",
+        "reactor/core/scheduler/Schedulers"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/CommandValidator.class",
+      "occurrence": 0,
+      "sha256": "0e4c4201203915d172d8be3675419c77d55bd4b1fba67e0b4ea7549b3f6ce12d",
+      "name": "io/agentscope/core/tool/coding/CommandValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;"
+        },
+        {
+          "name": "extractExecutable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "containsMultipleCommands",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "isPathWithinCurrentDirectory",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "20a9a5eefcc16eb8affbebff6ec1764f14cbf746878dfbbd1e7b68c26b317828",
+          "code_length": 111
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "io/agentscope/core/tool/coding/CommandValidator",
+        "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/WindowsCommandValidator.class",
+      "occurrence": 0,
+      "sha256": "fda4eec4c088a191eb6eb1a3fc6bfb9d0935ad4c60e61833c98635fc6e67e38b",
+      "name": "io/agentscope/core/tool/coding/WindowsCommandValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/coding/CommandValidator"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;",
+          "access": 1,
+          "code_sha256": "24eea8225720f98ba16e6080f16f4f8f1a2f96476864730b44a0a1b19668bae6",
+          "code_length": 180,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;"
+        },
+        {
+          "name": "extractExecutable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "72fe2dbef8771cba2f1fde595eb5f3f7f59580bb7a943a06ec7480f5ba4bff5e",
+          "code_length": 178
+        },
+        {
+          "name": "extractFirstToken",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "cf7f5c3176c60cda624585e2aee978335d0d83ca7dd5e99ea38dd51553e626b6",
+          "code_length": 69
+        },
+        {
+          "name": "extractPathFromCommand",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fe21364137a9267a70884fb318c9ed37daefdec312b1467b960bc62c545cfac3",
+          "code_length": 136
+        },
+        {
+          "name": "containsMultipleCommands",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "bef3fcaa4182b983c74723fde837568b685ecf2279f016d0f20b8e6759a74b50",
+          "code_length": 113
+        },
+        {
+          "name": "lambda$validate$0",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "6408f583bb908918c90610b1ee06f349a6cd648050c8d680f2ee63da4caeabb2",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "80870ad25a59346415397fba8d3d23f8868cad1ffb0f1e40a1d5a9080a4c41b6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/coding/CommandValidator",
+        "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+        "io/agentscope/core/tool/coding/WindowsCommandValidator",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/Set",
+        "java/util/stream/Stream",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/ShellCommandTool$1.class",
+      "occurrence": 0,
+      "sha256": "d5c1bb0ce1cef1d45d662f0133e9060f578dc9815eb050f3b8e04949f163708f",
+      "name": "io/agentscope/core/tool/coding/ShellCommandTool$1",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ThreadFactory"
+      ],
+      "fields": [
+        {
+          "name": "counter",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "9d908de34c0c75a0c32e31fc3471df264b2be32a794df7425b166d3aeb08f8f6",
+          "code_length": 17
+        },
+        {
+          "name": "newThread",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "2b37ad6d87830f90d463921f9edbcf8eae043b1f513534fdaea157ed8ea23ed9",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/coding/ShellCommandTool",
+        "io/agentscope/core/tool/coding/ShellCommandTool$1",
+        "java/lang/Object",
+        "java/lang/Thread",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/concurrent/ThreadFactory",
+        "java/util/concurrent/atomic/AtomicInteger"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/ShellCommandTool$StreamReader.class",
+      "occurrence": 0,
+      "sha256": "b59a485f2b14d00bbf75e745f5c816be1cee9557c472d33b5e0f594ba1759b1f",
+      "name": "io/agentscope/core/tool/coding/ShellCommandTool$StreamReader",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "inputStream",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        },
+        {
+          "name": "streamType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/lang/String;Ljava/nio/charset/Charset;)V",
+          "access": 0,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8f32a7e768e4084c2ff48f106eac21c5a8688cd5d640fdde8c93728f149c785b",
+          "code_length": 183,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "722e21f087ea1cc0b4c1aecde22e4ea270c8934b3b306a5c63909f40a58669dd",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/concurrent/Callable<Ljava/lang/String;>;",
+      "class_references": [
+        "io/agentscope/core/tool/coding/ShellCommandTool",
+        "io/agentscope/core/tool/coding/ShellCommandTool$StreamReader",
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/nio/charset/Charset",
+        "java/util/concurrent/Callable",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/CommandValidator$ValidationResult.class",
+      "occurrence": 0,
+      "sha256": "5621a74fb3599ca7f98a3c4458da55252a6dbbf79636f5270ac245dddd3fa13c",
+      "name": "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "allowed",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "reason",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "executable",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLjava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d25d5b87c2bcc299e32b119527330de2ffa31356d07fe61b9c9168f8d955b439",
+          "code_length": 20
+        },
+        {
+          "name": "isAllowed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getReason",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "getExecutable",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        },
+        {
+          "name": "allowed",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;",
+          "access": 9,
+          "code_sha256": "5c4a7fe49fa094bdeebd331303f731f601b5ae4242816a2b6d4dbc8c31f7ced3",
+          "code_length": 12
+        },
+        {
+          "name": "rejected",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;",
+          "access": 9,
+          "code_sha256": "df1395a0adf80b76870034d79104994ce3450714b7fefc8bed02b9779785ac30",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/coding/CommandValidator",
+        "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/coding/UnixCommandValidator.class",
+      "occurrence": 0,
+      "sha256": "da3b3747f5746fceb91b6d50aeb5f705c0a32bc525e6f1d69d28645fd9b1a12f",
+      "name": "io/agentscope/core/tool/coding/UnixCommandValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/coding/CommandValidator"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;",
+          "access": 1,
+          "code_sha256": "b47a743ec44b453819150c476daec7acc333c7e821d6f09e674474da6eb9f3cd",
+          "code_length": 161,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;)Lio/agentscope/core/tool/coding/CommandValidator$ValidationResult;"
+        },
+        {
+          "name": "extractExecutable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "71585ac42e5c131d24511f2302fea54d1d298067018506ae02cf53eefe9a0fad",
+          "code_length": 183
+        },
+        {
+          "name": "extractFirstToken",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1d9cde8816fb39826cb366d832553a79b07612c345488b4e63c3b3914e41b086",
+          "code_length": 69
+        },
+        {
+          "name": "containsMultipleCommands",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "b76f8e4fe7f96a3d8a0764dc6d92dbfb2e8f8a1817661ba22e8bb41921692576",
+          "code_length": 158
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b1f19ad36b2c4069b4cdd195c07f3b0a99670609620a88c3277f8f14d0999ce4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/coding/CommandValidator",
+        "io/agentscope/core/tool/coding/CommandValidator$ValidationResult",
+        "io/agentscope/core/tool/coding/UnixCommandValidator",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/Set",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolkitAware.class",
+      "occurrence": 0,
+      "sha256": "d2423386f63713d2f22138f8eb29728057aada0c1c719222b2b54b62faca70ad",
+      "name": "io/agentscope/core/tool/ToolkitAware",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "rebindToolkit",
+          "descriptor": "(Lio/agentscope/core/tool/Toolkit;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolkitAware",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/SimpleExtendedModel.class",
+      "occurrence": 0,
+      "sha256": "c901b46eb798a1669e87abb3190c0d21babf516ee339ace5fb42fa459cd3f85a",
+      "name": "io/agentscope/core/tool/SimpleExtendedModel",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/ExtendedModel"
+      ],
+      "fields": [
+        {
+          "name": "additionalProperties",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "additionalRequired",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "getAdditionalProperties",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getAdditionalRequired",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ExtendedModel",
+        "io/agentscope/core/tool/SimpleExtendedModel",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolkitConfig.class",
+      "occurrence": 0,
+      "sha256": "6f6ef73d1f25b14de2f00c6c195c850f07ae8af8162c00fd780d05cbd90c800d",
+      "name": "io/agentscope/core/tool/ToolkitConfig",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "parallel",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "executorService",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        },
+        {
+          "name": "executionConfig",
+          "descriptor": "Lio/agentscope/core/model/ExecutionConfig;",
+          "access": 18
+        },
+        {
+          "name": "allowToolDeletion",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "defaultContext",
+          "descriptor": "Lio/agentscope/core/tool/ToolExecutionContext;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/ToolkitConfig$Builder;)V",
+          "access": 2,
+          "code_sha256": "2fdff35b394e8d8664d22d18333ef5c358af7d335808d0c17a9f93e204b6953f",
+          "code_length": 45
+        },
+        {
+          "name": "isParallel",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "getExecutorService",
+          "descriptor": "()Ljava/util/concurrent/ExecutorService;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "hasCustomExecutor",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fd7aba190b8eff6762d332e769999a6bc000995ecc1b66815b5ed65433ae167e",
+          "code_length": 13
+        },
+        {
+          "name": "getExecutionConfig",
+          "descriptor": "()Lio/agentscope/core/model/ExecutionConfig;",
+          "access": 1,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5
+        },
+        {
+          "name": "isAllowToolDeletion",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "98f08abfaa5e29d510b4b9008b2c8103533d7c2b5ef5634014c88fff93542cf3",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultContext",
+          "descriptor": "()Lio/agentscope/core/tool/ToolExecutionContext;",
+          "access": 1,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/agentscope/core/tool/ToolkitConfig$Builder;",
+          "access": 9,
+          "code_sha256": "682cc4f1875aeef420d4b5ae75e52abaabd9ca3255f0bb37d0da0456f5c1891d",
+          "code_length": 8
+        },
+        {
+          "name": "defaultConfig",
+          "descriptor": "()Lio/agentscope/core/tool/ToolkitConfig;",
+          "access": 9,
+          "code_sha256": "9d3ab73d26b63f39d3a6fb00b4f9331121d8411092bf79ed4573ebbb31868c0a",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolkitConfig",
+        "io/agentscope/core/tool/ToolkitConfig$Builder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolGroup$Builder.class",
+      "occurrence": 0,
+      "sha256": "83161f59a33803f34346362836a293d2f29abd503ba1c148d8c1c3d420b7fb53",
+      "name": "io/agentscope/core/tool/ToolGroup$Builder",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "active",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "scope",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 2
+        },
+        {
+          "name": "tools",
+          "descriptor": "Ljava/util/Set;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2ea258f066bc80ac5e859e272b27c2e0d3104e719b28aa3e08547f7395039946",
+          "code_length": 34
+        },
+        {
+          "name": "name",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolGroup$Builder;",
+          "access": 1,
+          "code_sha256": "7512c66ce155c23925537074b4a2263d614d357b9151f17fae516ac780bc7552",
+          "code_length": 7
+        },
+        {
+          "name": "description",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolGroup$Builder;",
+          "access": 1,
+          "code_sha256": "87bf85d0355ac78130445e6350675a6e86f6efeb58b509f11ca0270d69336d6a",
+          "code_length": 7
+        },
+        {
+          "name": "active",
+          "descriptor": "(Z)Lio/agentscope/core/tool/ToolGroup$Builder;",
+          "access": 1,
+          "code_sha256": "4e7114dbfc74832651e01db926728783083ee2f9cf5ecf8cbd51c39d26032b10",
+          "code_length": 7
+        },
+        {
+          "name": "scope",
+          "descriptor": "(Lio/agentscope/core/tool/ToolGroupScope;)Lio/agentscope/core/tool/ToolGroup$Builder;",
+          "access": 1,
+          "code_sha256": "92c3371e2ce85fb20f0caef59dd6a1f0636550417f39bce7d67160cb448f9ba0",
+          "code_length": 7
+        },
+        {
+          "name": "tools",
+          "descriptor": "(Ljava/util/Set;)Lio/agentscope/core/tool/ToolGroup$Builder;",
+          "access": 1,
+          "code_sha256": "68072b11dcd468dd4675c4d54d338a2e9fe71f4860b2f1ec7359b6043828f47b",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)Lio/agentscope/core/tool/ToolGroup$Builder;"
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/agentscope/core/tool/ToolGroup;",
+          "access": 1,
+          "code_sha256": "b5eba222a463cd768993f3136fc4028cd996ca1ca4eea7d02dcf6a542b8da722",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/ToolGroup",
+        "io/agentscope/core/tool/ToolGroup$Builder",
+        "io/agentscope/core/tool/ToolGroupScope",
+        "java/lang/Object",
+        "java/util/HashSet"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/McpClientManager$ToolRegistrationCallback.class",
+      "occurrence": 0,
+      "sha256": "ca8e496153fd00a9c1b86d3f52507cff5f2242f054b87a3d5ecf1fa95a2cbd17",
+      "name": "io/agentscope/core/tool/McpClientManager$ToolRegistrationCallback",
+      "major": 61,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "registerAgentToolWithMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/AgentTool;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 1025,
+          "generic_signature": "(Lio/agentscope/core/tool/AgentTool;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/McpClientManager",
+        "io/agentscope/core/tool/McpClientManager$ToolRegistrationCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/AgentTool.class",
+      "occurrence": 0,
+      "sha256": "5ced5ef81f1440e9f26ffba29ce82877b36944b252084b1928ac3e688e814262",
+      "name": "io/agentscope/core/tool/AgentTool",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getStrict",
+          "descriptor": "()Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputSchema",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "isReadOnly",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1025,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/AgentTool",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/builtin/TodoTools.class",
+      "occurrence": 0,
+      "sha256": "24f904245769177d9af111fc5d455a83ed0a0d731faa4370c542f05eb8a19629",
+      "name": "io/agentscope/core/tool/builtin/TodoTools",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DESCRIPTION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "todoWrite",
+          "descriptor": "(Ljava/util/List;Lio/agentscope/core/state/AgentState;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5139a4e25e496d235e197033be226bb200218b2b29282543bfea1ee50c589e6b",
+          "code_length": 451,
+          "generic_signature": "(Ljava/util/List<Lio/agentscope/core/tool/builtin/TodoTools$TodoItem;>;Lio/agentscope/core/state/AgentState;)Ljava/lang/String;"
+        },
+        {
+          "name": "render",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "d0b3bbc279ea720a04ec1a7f63d12ad99f4d3ce67d5d9aec3a16a030f437ac77",
+          "code_length": 175,
+          "generic_signature": "(Ljava/util/List<Lio/agentscope/core/state/Task;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "marker",
+          "descriptor": "(Lio/agentscope/core/state/Task$State;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "2b4d225910e251773b620efa6c7c60eeeb85f5f8a1835b150c38e69a2d22489d",
+          "code_length": 57
+        },
+        {
+          "name": "parseState",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/state/Task$State;",
+          "access": 10,
+          "code_sha256": "309628ebe3c0e69fc18a80fe3c62bddcc6c071e19e5c1726d72af7df15313f90",
+          "code_length": 26
+        },
+        {
+          "name": "normalizePriority",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "a8955f7a9470de7386cc7599cc25e124b7ddbbe5f4beb5de50116c80a938fc45",
+          "code_length": 138
+        },
+        {
+          "name": "safe",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "421256fff1a837e5e76a9ea96157070718174472ca4c932d7007c53071608100",
+          "code_length": 12
+        },
+        {
+          "name": "lambda$render$0",
+          "descriptor": "(Lio/agentscope/core/state/Task;)Z",
+          "access": 4106,
+          "code_sha256": "ce27c6697be16e53d7743bb59ccdf5c6756ee271ada0c2b2660ebf8cae13ffa2",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/state/AgentState",
+        "io/agentscope/core/state/Task",
+        "io/agentscope/core/state/Task$Builder",
+        "io/agentscope/core/state/Task$State",
+        "io/agentscope/core/state/TaskContextState",
+        "io/agentscope/core/tool/builtin/TodoTools",
+        "io/agentscope/core/tool/builtin/TodoTools$1",
+        "io/agentscope/core/tool/builtin/TodoTools$TodoItem",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IncompatibleClassChangeError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/builtin/TodoTools$1.class",
+      "occurrence": 0,
+      "sha256": "20875947ed37c747b2ce68f52a5389315ebecf533496680e54f88ce38e9f0e8e",
+      "name": "io/agentscope/core/tool/builtin/TodoTools$1",
+      "major": 61,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$io$agentscope$core$state$Task$State",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f16671fa89b0633776cc94788c287c67742a22b59e6af4dc83aa06f9c5f82ebd",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/state/Task",
+        "io/agentscope/core/state/Task$State",
+        "io/agentscope/core/tool/builtin/TodoTools",
+        "io/agentscope/core/tool/builtin/TodoTools$1",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/builtin/TodoTools$TodoItem.class",
+      "occurrence": 0,
+      "sha256": "b76c1fd684e0ade01228d2f6d8720d64b70a27f00da1177e9cdb7ee44acab3a9",
+      "name": "io/agentscope/core/tool/builtin/TodoTools$TodoItem",
+      "major": 61,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "content",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "status",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "priority",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8e28a00291cf997e23e20bcbf0398aa73a50d7af2e2a4b87f5abd53fe971b9a8",
+          "code_length": 20
+        },
+        {
+          "name": "getContent",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getStatus",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "getPriority",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/builtin/TodoTools",
+        "io/agentscope/core/tool/builtin/TodoTools$TodoItem",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/subagent/SubAgentConfig.class",
+      "occurrence": 0,
+      "sha256": "00a79e3c91caac31eb7f00473c6d213c71d5084f5477b64d3075976c533165e5",
+      "name": "io/agentscope/core/tool/subagent/SubAgentConfig",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "toolName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "forwardEvents",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "streamOptions",
+          "descriptor": "Lio/agentscope/core/agent/StreamOptions;",
+          "access": 18
+        },
+        {
+          "name": "stateStore",
+          "descriptor": "Lio/agentscope/core/state/AgentStateStore;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;)V",
+          "access": 2,
+          "code_sha256": "a0bb02831ae8b3bbbcbc276d26f7a963a8ceed2c370d9fbba68f01018a599dc1",
+          "code_length": 62
+        },
+        {
+          "name": "defaults",
+          "descriptor": "()Lio/agentscope/core/tool/subagent/SubAgentConfig;",
+          "access": 9,
+          "code_sha256": "88b6babfedb05af679638a35bc85c875b5c06713250fbd6bee549e8b4c89060a",
+          "code_length": 7
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 9,
+          "code_sha256": "24617853d6c8e8c531809f03388873e8cca2a4fb2405f7e63265a643803ef21d",
+          "code_length": 8
+        },
+        {
+          "name": "getToolName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "215514a3ba98d8863bce9e3203285417c77ecd99a4bbfb9b8e6245b3f27a5c82",
+          "code_length": 5
+        },
+        {
+          "name": "isForwardEvents",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f33eb3645199a92a72da61be7b282d9a17a50e0648b912834e99f6b271d78e9e",
+          "code_length": 5
+        },
+        {
+          "name": "getStreamOptions",
+          "descriptor": "()Lio/agentscope/core/agent/StreamOptions;",
+          "access": 1,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "getStateStore",
+          "descriptor": "()Lio/agentscope/core/state/AgentStateStore;",
+          "access": 1,
+          "code_sha256": "5136ec714e63e3c9e21a7f5cdd62b8fed5a8e8258758f9ed53f72e624491087b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/state/AgentStateStore",
+        "io/agentscope/core/state/InMemoryAgentStateStore",
+        "io/agentscope/core/tool/subagent/SubAgentConfig",
+        "io/agentscope/core/tool/subagent/SubAgentConfig$Builder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/subagent/SubAgentProvider.class",
+      "occurrence": 0,
+      "sha256": "a215ad4f105462ce0de3274707098aba1db2cf86b82ea847ff5cd392d917bce1",
+      "name": "io/agentscope/core/tool/subagent/SubAgentProvider",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "provide",
+          "descriptor": "()Lio/agentscope/core/agent/Agent;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T::Lio/agentscope/core/agent/Agent;>Ljava/lang/Object;",
+      "class_references": [
+        "io/agentscope/core/tool/subagent/SubAgentProvider",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/subagent/SubAgentTool.class",
+      "occurrence": 0,
+      "sha256": "95892492fe4671f713edefe8888be0c39969d9f5a19058dfd70e6f00d96fb11c",
+      "name": "io/agentscope/core/tool/subagent/SubAgentTool",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/AgentTool"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "PARAM_SESSION_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PARAM_MESSAGE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "agentProvider",
+          "descriptor": "Lio/agentscope/core/tool/subagent/SubAgentProvider;",
+          "access": 18,
+          "generic_signature": "Lio/agentscope/core/tool/subagent/SubAgentProvider<*>;"
+        },
+        {
+          "name": "config",
+          "descriptor": "Lio/agentscope/core/tool/subagent/SubAgentConfig;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/subagent/SubAgentProvider;Lio/agentscope/core/tool/subagent/SubAgentConfig;)V",
+          "access": 1,
+          "code_sha256": "de66514aa2b7cbdaab262f845fd4eb10baaef39f83f35073d2ed47547bde276c",
+          "code_length": 76,
+          "generic_signature": "(Lio/agentscope/core/tool/subagent/SubAgentProvider<*>;Lio/agentscope/core/tool/subagent/SubAgentConfig;)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7e0bb919657973bf0959e14569eb267b15bb4e98602248480db68213179c69da",
+          "code_length": 5
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bc149cd245ca2c98020664c7cf3a3b0f9c0927b50df6a56a8d67de1a7e037964",
+          "code_length": 5
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "126f2fb9665edf4fab6d638c3cdffbf0e5e385a5f3e564bd2f8efd5d0f2984a7",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "d6a06d3baa6f05c728ad80747cebb6f0dfec91d7e97cccc427bf71084d2939b7",
+          "code_length": 6,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeConversation",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "fb977d863e19d127a9adc67a79efe36a3b0a1ca723411427d41103bc5ce200f3",
+          "code_length": 11,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "interruptAgent",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;)V",
+          "access": 2,
+          "code_sha256": "921145de5f86a531e2bf5b21da37a0f1efc551309f49087ba88c862bae31ab12",
+          "code_length": 36
+        },
+        {
+          "name": "loadAgentState",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/agent/Agent;)V",
+          "access": 2,
+          "code_sha256": "785cffcc3bc6efdcde923d50a94251b484389b6095baa3db7e776b423551b163",
+          "code_length": 86
+        },
+        {
+          "name": "saveAgentState",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/agent/Agent;)V",
+          "access": 2,
+          "code_sha256": "83fd554bc98bdd2f23281c08401b93795a166beb59dd09e3ba253372e434f2a2",
+          "code_length": 79
+        },
+        {
+          "name": "applyLoadedState",
+          "descriptor": "(Lio/agentscope/core/ReActAgent;Lio/agentscope/core/state/AgentState;)V",
+          "access": 10,
+          "code_sha256": "f823df68f01a059f33b0e23003856ff6092ddbffd2cd5989ed43557c38a79773",
+          "code_length": 80
+        },
+        {
+          "name": "executeWithStreaming",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Ljava/lang/String;Lio/agentscope/core/tool/ToolEmitter;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "de2e79393a9adc0f3a437857da0368dc418efd2ccef0a27125dc751d16b0461a",
+          "code_length": 44,
+          "generic_signature": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Ljava/lang/String;Lio/agentscope/core/tool/ToolEmitter;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeWithoutStreaming",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Ljava/lang/String;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "09d65c31d61e3fd513ac13ac8f9c1598bccd9d0bf722fac1c7d4f167df94bc38",
+          "code_length": 15,
+          "generic_signature": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Ljava/lang/String;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "streamWithContext",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/StreamOptions;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Flux;",
+          "access": 2,
+          "code_sha256": "2e8a0a020f2a054f274031735f1a3c82fb401bf23548aea3a6df57585b864a8f",
+          "code_length": 43,
+          "generic_signature": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/StreamOptions;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Flux<Lio/agentscope/core/agent/Event;>;"
+        },
+        {
+          "name": "callWithContext",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "af569c9b69458c608c17176f56034f057afe8eb61486904a1ff9464580408827",
+          "code_length": 39,
+          "generic_signature": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/Msg;>;"
+        },
+        {
+          "name": "forwardEvent",
+          "descriptor": "(Lio/agentscope/core/agent/Event;Lio/agentscope/core/tool/ToolEmitter;Lio/agentscope/core/agent/Agent;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "76f0ad805fbfea10942984dc9fe30a51bc2f8918c93e3dd44e2fa2133bd9fa40",
+          "code_length": 178
+        },
+        {
+          "name": "buildResult",
+          "descriptor": "(Lio/agentscope/core/message/Msg;Ljava/lang/String;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 2,
+          "code_sha256": "6614a4cc73e414497653e69f307781d946119c06ebdec9705bb475767addc5d8",
+          "code_length": 37
+        },
+        {
+          "name": "buildSchema",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "da93d8551f40e69b8fafa8ecaaf3fae62698aba0985690aa0f7a2f4c19ade141",
+          "code_length": 152,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "resolveToolName",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/tool/subagent/SubAgentConfig;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "341e71df453aa09f827eb1b1edbd266c34cde1dffa3ad2f6922d584cac1b3c30",
+          "code_length": 73
+        },
+        {
+          "name": "sanitizeName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fb05fedd4864bf0c251884a2bca5488dd17d07855e1eb732edcd1b2f8948be09",
+          "code_length": 259
+        },
+        {
+          "name": "resolveDescription",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/tool/subagent/SubAgentConfig;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7d741bea0eec14c12918a605b6982dcfe890c2eb0bd07e29da13d9a4c09ac2c2",
+          "code_length": 54
+        },
+        {
+          "name": "lambda$executeWithoutStreaming$12",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/RuntimeContext;Ljava/lang/String;Lreactor/util/context/ContextView;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "1bc03600f6e19da99adfd76088719179db2cf67421b532e43775e7941a587cd7",
+          "code_length": 37
+        },
+        {
+          "name": "lambda$executeWithoutStreaming$11",
+          "descriptor": "(Lreactor/util/context/ContextView;Lreactor/util/context/Context;)Lreactor/util/context/Context;",
+          "access": 4106,
+          "code_sha256": "81e806f7dadb63238168434347f41509f9351134093027de7bd51ed139be1dc5",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$executeWithoutStreaming$10",
+          "descriptor": "(Ljava/lang/Throwable;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "7407cb5ce9446fb185b17a1692fc015e2396a02cdf23369f8f9d458f8c731ec8",
+          "code_length": 32
+        },
+        {
+          "name": "lambda$executeWithoutStreaming$9",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/message/Msg;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 4098,
+          "code_sha256": "7d0733c0983ec3ab62f1e8bc3e9a819bde5ce5c5830604ae83bb4497a7ce40dd",
+          "code_length": 7
+        },
+        {
+          "name": "lambda$executeWithStreaming$8",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/Msg;Lio/agentscope/core/agent/StreamOptions;Lio/agentscope/core/agent/RuntimeContext;Lio/agentscope/core/tool/ToolEmitter;Ljava/lang/String;Lreactor/util/context/ContextView;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "803490c747377478c9e43e64bcb282bf0370d4a84b2598755c890f1d59ee7f88",
+          "code_length": 64
+        },
+        {
+          "name": "lambda$executeWithStreaming$7",
+          "descriptor": "(Ljava/lang/Throwable;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "f53b6e3ddd0924faef7637c8dd20ad63d244c6f6c2eedba1e17210cf68fdaa62",
+          "code_length": 32
+        },
+        {
+          "name": "lambda$executeWithStreaming$6",
+          "descriptor": "(Lreactor/util/context/ContextView;Lreactor/util/context/Context;)Lreactor/util/context/Context;",
+          "access": 4106,
+          "code_sha256": "81e806f7dadb63238168434347f41509f9351134093027de7bd51ed139be1dc5",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$executeWithStreaming$5",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/agent/Event;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 4098,
+          "code_sha256": "81c31c4799ea5df28cf37051f963a70f7c96ade46dc1d872a3bf8f66a2c7ad44",
+          "code_length": 12
+        },
+        {
+          "name": "lambda$executeWithStreaming$4",
+          "descriptor": "(Lio/agentscope/core/tool/ToolEmitter;Lio/agentscope/core/agent/Agent;Ljava/lang/String;Lio/agentscope/core/agent/Event;)V",
+          "access": 4098,
+          "code_sha256": "59fb01f13fb32ccf51cfeb72c763e47649cd6fb84e28cfab308e134166841c22",
+          "code_length": 10
+        },
+        {
+          "name": "lambda$loadAgentState$3",
+          "descriptor": "(Lio/agentscope/core/ReActAgent;Lio/agentscope/core/state/AgentState;)V",
+          "access": 4106,
+          "code_sha256": "76e485d9f0342efe20a6cb25d31d4a4ab54a1fa84b859ae1a18c5a0b16edd203",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$executeConversation$2",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;Lreactor/util/context/ContextView;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "bee1e7b425c2b0b9a8ecee9f2e01d51dfa1e4274413ca2a148d59a44d49f5cc6",
+          "code_length": 319
+        },
+        {
+          "name": "lambda$executeConversation$1",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 4098,
+          "code_sha256": "676d58da64329be7d22e03e8b6c51bd8cc2378be3977ed0d76a3e1cc2e4106a5",
+          "code_length": 7
+        },
+        {
+          "name": "lambda$executeConversation$0",
+          "descriptor": "(Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;Lreactor/core/publisher/SignalType;)V",
+          "access": 4098,
+          "code_sha256": "d1e51b502f03fb4af34c630f9a8dfe119035f2157fb5744a85b2022d50d05cb1",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "58335b385a1770c759c2f8e11c43d044e24a42d15747369403f7a912e01138f0",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "io/agentscope/core/ReActAgent",
+        "io/agentscope/core/agent/Agent",
+        "io/agentscope/core/agent/Event",
+        "io/agentscope/core/agent/RuntimeContext",
+        "io/agentscope/core/agent/StreamOptions",
+        "io/agentscope/core/message/Msg",
+        "io/agentscope/core/message/Msg$Builder",
+        "io/agentscope/core/message/MsgRole",
+        "io/agentscope/core/message/TextBlock",
+        "io/agentscope/core/message/TextBlock$Builder",
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/state/AgentState",
+        "io/agentscope/core/state/AgentStateStore",
+        "io/agentscope/core/state/ToolContextState",
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/ToolCallParam",
+        "io/agentscope/core/tool/ToolEmitter",
+        "io/agentscope/core/tool/subagent/SubAgentConfig",
+        "io/agentscope/core/tool/subagent/SubAgentProvider",
+        "io/agentscope/core/tool/subagent/SubAgentTool",
+        "io/agentscope/core/util/JsonCodec",
+        "io/agentscope/core/util/JsonUtils",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/nio/charset/StandardCharsets",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Optional",
+        "java/util/UUID",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "reactor/core/publisher/Flux",
+        "reactor/core/publisher/Mono",
+        "reactor/core/publisher/SignalType",
+        "reactor/util/context/Context",
+        "reactor/util/context/ContextView"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/subagent/SubAgentConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "5262869bfb48b10f89ce9fcc3d2a83021a249c165e2db900d45e5b8f08fadbd6",
+      "name": "io/agentscope/core/tool/subagent/SubAgentConfig$Builder",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "toolName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "forwardEvents",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "streamOptions",
+          "descriptor": "Lio/agentscope/core/agent/StreamOptions;",
+          "access": 2
+        },
+        {
+          "name": "stateStore",
+          "descriptor": "Lio/agentscope/core/state/AgentStateStore;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c83cc0eb47b3ecac1802ca2a4b360e21722101f5cf3a9a0289d123ca71ed747c",
+          "code_length": 10
+        },
+        {
+          "name": "toolName",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 1,
+          "code_sha256": "3ec2e0965d8385879045dc915e8c59105146bf9d19525905bba478a553341875",
+          "code_length": 7
+        },
+        {
+          "name": "description",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 1,
+          "code_sha256": "b2109c281905e22843c65504e2171f9e45315c0b5c355049fa1eec49d57ded96",
+          "code_length": 7
+        },
+        {
+          "name": "forwardEvents",
+          "descriptor": "(Z)Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 1,
+          "code_sha256": "350cf897d56f63a4e8e8d5036956074d674f60c75e163de0f4f3a1c9f170445b",
+          "code_length": 7
+        },
+        {
+          "name": "streamOptions",
+          "descriptor": "(Lio/agentscope/core/agent/StreamOptions;)Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 1,
+          "code_sha256": "10acbfa241d0f96723dd5ef78d218b4489187ccc48f7a7ff5693423f8f087ee0",
+          "code_length": 7
+        },
+        {
+          "name": "stateStore",
+          "descriptor": "(Lio/agentscope/core/state/AgentStateStore;)Lio/agentscope/core/tool/subagent/SubAgentConfig$Builder;",
+          "access": 1,
+          "code_sha256": "02fb64a32f712fde330cf54b00e9ea4df604e6c1e37a8700076ef2aaa0645560",
+          "code_length": 7
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/agentscope/core/tool/subagent/SubAgentConfig;",
+          "access": 1,
+          "code_sha256": "aac759a1f3620f72a161e28e324b99909aaf244c0d1461586ad769ae08dfa71a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/subagent/SubAgentConfig",
+        "io/agentscope/core/tool/subagent/SubAgentConfig$Builder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/MetaToolFactory$1.class",
+      "occurrence": 0,
+      "sha256": "cd9ac5b139198f9ceed93cb61cbb0afa48f057ea73ab7f18f41ace973489cf92",
+      "name": "io/agentscope/core/tool/MetaToolFactory$1",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/AgentTool"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lio/agentscope/core/tool/MetaToolFactory;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/MetaToolFactory;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3a19e59dd2c42eb4664f8581b2d84bfaaa33bc6891c68e8e4c247194b2588c88",
+          "code_length": 16
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "03fd6a458f3f87a5b6ac675759458e25a852ec57d49088f722c64c98d11a2f25",
+          "code_length": 166,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "eafd93eff81766c057bfd2360ec6f78fb363dab73a070add44bcb044a82be5f1",
+          "code_length": 57,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/MetaToolFactory",
+        "io/agentscope/core/tool/MetaToolFactory$1",
+        "io/agentscope/core/tool/ToolCallParam",
+        "io/agentscope/core/tool/ToolGroupManager",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/McpClientManager.class",
+      "occurrence": 0,
+      "sha256": "174c850feec53fcf05579112eae9fee26c6c105de022dfd656cc6db71d4c3f68",
+      "name": "io/agentscope/core/tool/McpClientManager",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "mcpClients",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lio/agentscope/core/tool/mcp/McpClientWrapper;>;"
+        },
+        {
+          "name": "toolRegistry",
+          "descriptor": "Lio/agentscope/core/tool/ToolRegistry;",
+          "access": 18
+        },
+        {
+          "name": "groupManager",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupManager;",
+          "access": 18
+        },
+        {
+          "name": "registrationCallback",
+          "descriptor": "Lio/agentscope/core/tool/McpClientManager$ToolRegistrationCallback;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/ToolRegistry;Lio/agentscope/core/tool/ToolGroupManager;Lio/agentscope/core/tool/McpClientManager$ToolRegistrationCallback;)V",
+          "access": 0,
+          "code_sha256": "5b308742a8477bfa1f0ae8aea1f6392734df43b875cd1a3172caa37e34f30297",
+          "code_length": 31
+        },
+        {
+          "name": "registerMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "22f320683fb37353ac7be0c650bf31eaf7bb624a1ff6c51e53cdc29169fc9cd0",
+          "code_length": 9,
+          "generic_signature": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "registerMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "9968dc2093194169e9539abc6a47baf1414f436e849a1830dbbc86b19eb19aa8",
+          "code_length": 9,
+          "generic_signature": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List<Ljava/lang/String;>;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "registerMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List;Ljava/util/List;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "c785565530ea00941fc6b769d2d2e5581e8ec5c6ca4115522ac68a7a6746e90c",
+          "code_length": 9,
+          "generic_signature": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "registerMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List;Ljava/util/List;Ljava/lang/String;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "a2b2fd6883df125ffde193e11237e7fe5d57de2f173eee4c8b55a3f841578ed4",
+          "code_length": 11,
+          "generic_signature": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "registerMcpClient",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "9acdf47428384116b255a342f40f8fa4b16b4ea04343ec0dfe97f77cf3e98378",
+          "code_length": 133,
+          "generic_signature": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;>;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "removeMcpClient",
+          "descriptor": "(Ljava/lang/String;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "b0ba655b74a1911a99a5e2380f4e526c01fa5fb9cab4921a9d0d3a1cab2fb8f0",
+          "code_length": 133,
+          "generic_signature": "(Ljava/lang/String;)Lreactor/core/publisher/Mono<Ljava/lang/Void;>;"
+        },
+        {
+          "name": "getMcpClientNames",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 0,
+          "code_sha256": "635ab8d0816931bd2d74532a5091abb6aa3b3c3a87ddc77538ff9202bb964bc1",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getMcpClient",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/mcp/McpClientWrapper;",
+          "access": 0,
+          "code_sha256": "2562e4d764e483c69ce7a3078c78e50ef3776b9d88863d7e25938151edee702c",
+          "code_length": 14
+        },
+        {
+          "name": "shouldRegisterTool",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;Ljava/util/List;)Z",
+          "access": 2,
+          "code_sha256": "e4f6c8111f0282ed84c5ba653f9702f10035467271de1f9ee4123af42d9c0a3f",
+          "code_length": 58,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;)Z"
+        },
+        {
+          "name": "lambda$removeMcpClient$7",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Void;)V",
+          "access": 4106,
+          "code_sha256": "28b58932acc73f96b042b685af2780b134d3d87854aa381e8b10787a2a21769e",
+          "code_length": 12
+        },
+        {
+          "name": "lambda$removeMcpClient$6",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4098,
+          "code_sha256": "f034f2360f8d43bc6c0107f277b08ae97db2ecadbe7b8a971a82ba20e193e94c",
+          "code_length": 20
+        },
+        {
+          "name": "lambda$removeMcpClient$5",
+          "descriptor": "(Lio/agentscope/core/tool/RegisteredToolFunction;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "703def64d7ed11a7d43c84b8d6a04956a50b8e81a3eba64f690d07d9715b7a26",
+          "code_length": 10
+        },
+        {
+          "name": "lambda$removeMcpClient$4",
+          "descriptor": "(Ljava/lang/String;Lio/agentscope/core/tool/RegisteredToolFunction;)Z",
+          "access": 4106,
+          "code_sha256": "664cb2702b33af56a7c9b79ab621c8a02e5e172862e9e54e4be89586631fec15",
+          "code_length": 9
+        },
+        {
+          "name": "lambda$registerMcpClient$3",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/lang/Throwable;)V",
+          "access": 4106,
+          "code_sha256": "f8520481dd59c01a7dced207256b81f1fa905b2d0b8235b57a8d1fbb375ee865",
+          "code_length": 16
+        },
+        {
+          "name": "lambda$registerMcpClient$2",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/lang/Void;)V",
+          "access": 4098,
+          "code_sha256": "07f1174116026444841ec36fbc4c64ce052cb09f92d2568313cdc39b69f1751c",
+          "code_length": 31
+        },
+        {
+          "name": "lambda$registerMcpClient$1",
+          "descriptor": "(Lio/agentscope/core/tool/mcp/McpClientWrapper;Ljava/lang/String;Ljava/util/Map;Lio/modelcontextprotocol/spec/McpSchema$Tool;)V",
+          "access": 4098,
+          "code_sha256": "5d732cc30ecd53a7627a5b888a3998bf62e5730b6d734a8e17433c2dd5955fed",
+          "code_length": 200
+        },
+        {
+          "name": "lambda$registerMcpClient$0",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;Lio/modelcontextprotocol/spec/McpSchema$Tool;)Z",
+          "access": 4098,
+          "code_sha256": "3f22d1ede613501dfe07dd3464cd0ff859b3774a03ec14f4ff8b176bb4800d6b",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "281260e7d88364a5d7f509c2dfc5a99b4a6c09afaa9a2ab0aeaa8e62ae7a871b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/McpClientManager",
+        "io/agentscope/core/tool/McpClientManager$ToolRegistrationCallback",
+        "io/agentscope/core/tool/RegisteredToolFunction",
+        "io/agentscope/core/tool/ToolGroupManager",
+        "io/agentscope/core/tool/ToolRegistry",
+        "io/agentscope/core/tool/mcp/McpClientWrapper",
+        "io/agentscope/core/tool/mcp/McpTool",
+        "io/modelcontextprotocol/spec/McpSchema",
+        "io/modelcontextprotocol/spec/McpSchema$JsonSchema",
+        "io/modelcontextprotocol/spec/McpSchema$Tool",
+        "io/modelcontextprotocol/spec/McpSchema$ToolAnnotations",
+        "java/lang/Boolean",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Objects",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "reactor/core/publisher/Flux",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolGroupScope.class",
+      "occurrence": 0,
+      "sha256": "65c378eff1fbfe2491d7a361731c65b697c7d66353b72f72effc0dacae67953c",
+      "name": "io/agentscope/core/tool/ToolGroupScope",
+      "major": 61,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "META",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 16409
+        },
+        {
+          "name": "EXTERNAL",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 9,
+          "code_sha256": "8547ef66abe523ee50334d80579e6125e1dda5c36cd3ced1a090dc4a05fec496",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 9,
+          "code_sha256": "30896760d5ea0700de3cb03f719ec8ef065f7fbdcee6782c737d301c4a3cace2",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "901d55f3170c432d6f94cb0559c02c41600ebecc32d98162acbf846ed3a77daa",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/agentscope/core/tool/ToolGroupScope;",
+          "access": 4106,
+          "code_sha256": "da5a4f2e2946b6c1dbad2614526139db1d4e287f16d6acf9a049f912d4b0a56f",
+          "code_length": 17
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ae7686cb60cdbdbafc043896617105fb218437d1e9d1dd2ed09bfe8a8c8cdaff",
+          "code_length": 33
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/agentscope/core/tool/ToolGroupScope;>;",
+      "class_references": [
+        "[Lio/agentscope/core/tool/ToolGroupScope;",
+        "io/agentscope/core/tool/ToolGroupScope",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolBase.class",
+      "occurrence": 0,
+      "sha256": "0086e05d4fe0a62cea8af5288296d718d651c3c3ede87cc3f84797af0d99b5cf",
+      "name": "io/agentscope/core/tool/ToolBase",
+      "major": 61,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/AgentTool"
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "inputSchema",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "concurrencySafe",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "readOnly",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "externalTool",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "stateInjected",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "mcp",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "mcpName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "dangerousFiles",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "dangerousDirectories",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/ToolBase$Builder;)V",
+          "access": 4,
+          "code_sha256": "f993230281c2a7da0d34d26f995d1715cecbba389e16e1ab8511374df59da6a1",
+          "code_length": 77
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;ZZZLjava/lang/String;ZZ)V",
+          "access": 4,
+          "code_sha256": "44fffc559bc0b2fd721d5be96872c014e87d49c719a315a36cd6f6f4d9b3fd3b",
+          "code_length": 122,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;ZZZLjava/lang/String;ZZ)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "60db55391a6466ebc49545e902b0d9ac996bb19340987f0dec9887cf3b5384c4",
+          "code_length": 5
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "91bbc71edb2c5c07183fb585ba46ecad83c60e1ce1a67eb3d82bffaec3f11b18",
+          "code_length": 5
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 17,
+          "code_sha256": "1df40cb171728960f43ee5a7c0a342ff63690354cfb58e9742b3b6293d3c3671",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "isConcurrencySafe",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "1cbf4731952fac7ebd0a40ef2cf69c84fea3f3e428c902383582795c5128e73e",
+          "code_length": 5
+        },
+        {
+          "name": "isReadOnly",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "6561e05b37d5656005cbb3f897bbaacc33010a477a28150705fd9c17632abb7f",
+          "code_length": 5
+        },
+        {
+          "name": "isExternalTool",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "294fb7bb983f2c802c9c450b21512520787ac6e4a8cdb76ebd515833117394fb",
+          "code_length": 5
+        },
+        {
+          "name": "isStateInjected",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "ac42d4d45c53fba404f9d1021075f0ad71fc9552d36786efd5f035cfff1129fe",
+          "code_length": 5
+        },
+        {
+          "name": "isMcp",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "81fe47582541695e774770cf32709c0865aabf1bd35e02dea3f3a32e2b7e5eed",
+          "code_length": 5
+        },
+        {
+          "name": "getMcpName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "79582f09215f882ad043bb3ab5a500fd8be3e5c223b9a8d24907bb6221897d8c",
+          "code_length": 5
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "83a82162cf3504e428d8bd5166e92aae090ae07ac708472ff18c0a37345e52cb",
+          "code_length": 53,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "checkPermissions",
+          "descriptor": "(Ljava/util/Map;Lio/agentscope/core/permission/PermissionContextState;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "f20c8a2ef6aae6e2829af8334595c349be2f0ed7fca075f63f0cfd9d1cb3fae9",
+          "code_length": 11,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Lio/agentscope/core/permission/PermissionContextState;)Lreactor/core/publisher/Mono<Lio/agentscope/core/permission/PermissionDecision;>;"
+        },
+        {
+          "name": "matchRule",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Z",
+          "access": 1,
+          "code_sha256": "338bed31c341e43ad978018418d46b32b16f6f46e283c47c181087091c4b4a0d",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Z"
+        },
+        {
+          "name": "generateSuggestions",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "82f66869352ffba57cf5b4cdbf60ba3b01a31e04309e8cab021d6c480957cac7",
+          "code_length": 21,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/util/List<Lio/agentscope/core/permission/PermissionRule;>;"
+        },
+        {
+          "name": "isDangerousPath",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "37ac3f4f24f9882998399db9eeb810af6bfc2bb1aa5e97fbd59407be451ecf78",
+          "code_length": 97
+        },
+        {
+          "name": "isDangerousAbsolute",
+          "descriptor": "(Ljava/nio/file/Path;)Z",
+          "access": 2,
+          "code_sha256": "c222fea163e9f26774c781e0989d0fa4fcd5c914958ec3b6e4ad321cd123cd32",
+          "code_length": 162
+        },
+        {
+          "name": "expandTilde",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "dd2e7610b12040a7d77e5fca478bcde52bd1f4e4b7c02e4caa70f0d1251d4cba",
+          "code_length": 27
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/agentscope/core/tool/ToolBase$Builder;",
+          "access": 9,
+          "code_sha256": "94ab83f50d837c37ab3a72f7c8c9af79a7677332a0b2dd2fd343977a67350995",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$isDangerousAbsolute$0",
+          "descriptor": "(Ljava/util/Set;Ljava/nio/file/Path;)V",
+          "access": 4106,
+          "code_sha256": "c2b5e1340831650de35a362e8a78ce8d62a78374ed6009e2f4d3ea536d0858be",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/permission/PermissionBehavior",
+        "io/agentscope/core/permission/PermissionDecision",
+        "io/agentscope/core/permission/PermissionRule",
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/ToolBase",
+        "io/agentscope/core/tool/ToolBase$Builder",
+        "io/agentscope/core/tool/ToolDangerousPathConstants",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/nio/file/Files",
+        "java/nio/file/LinkOption",
+        "java/nio/file/Path",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Objects",
+        "java/util/Set",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/DefaultToolEmitter.class",
+      "occurrence": 0,
+      "sha256": "47f582280e0374be33da18845fb85632c4bed1a8bab261af66ff33adc336e803",
+      "name": "io/agentscope/core/tool/DefaultToolEmitter",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/agentscope/core/tool/ToolEmitter"
+      ],
+      "fields": [
+        {
+          "name": "toolUseBlock",
+          "descriptor": "Lio/agentscope/core/message/ToolUseBlock;",
+          "access": 18
+        },
+        {
+          "name": "chunkCallback",
+          "descriptor": "Ljava/util/function/BiConsumer;",
+          "access": 18,
+          "generic_signature": "Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Ljava/util/function/BiConsumer;)V",
+          "access": 0,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Lio/agentscope/core/message/ToolUseBlock;Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;)V"
+        },
+        {
+          "name": "emit",
+          "descriptor": "(Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 1,
+          "code_sha256": "aab9cd938f5dc368a220e1922ea8ea1c40c1e47cbf8908a9067fbe15806e6aa7",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/DefaultToolEmitter",
+        "io/agentscope/core/tool/ToolEmitter",
+        "java/lang/Object",
+        "java/util/function/BiConsumer"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/SchemaOnlyTool.class",
+      "occurrence": 0,
+      "sha256": "a160bcf0932d151fd3ae4741bf89033b405dd1aabd41ed9f93f25eb588e698c2",
+      "name": "io/agentscope/core/tool/SchemaOnlyTool",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "io/agentscope/core/tool/ToolBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "strict",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/model/ToolSchema;)V",
+          "access": 1,
+          "code_sha256": "6147ad71b44c46a02c92aa306372e3e9ef9e2ee46a5c9379dc04210b5bf4fcca",
+          "code_length": 29
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "3f8ce5dbf064c19c228d322068d5eff8c60178f11fc8dcd70bb028ef06921095",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;Ljava/lang/Boolean;)V",
+          "access": 1,
+          "code_sha256": "ff362b50472d1275a285e09fec174f0d339734e67b5b9a49eb0ab897b6c2ca1c",
+          "code_length": 74,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/Boolean;)V"
+        },
+        {
+          "name": "getStrict",
+          "descriptor": "()Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "16abc18563a310689132d8459df051d895b032c940cdf98da6dad50c331efd6e",
+          "code_length": 5
+        },
+        {
+          "name": "callAsync",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 1,
+          "code_sha256": "4a0c5a50c6f2bf8a5291cba8f72924a985ccdb17fed3a5012867ad9964994e35",
+          "code_length": 11,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/model/ToolSchema",
+        "io/agentscope/core/tool/SchemaOnlyTool",
+        "io/agentscope/core/tool/ToolBase",
+        "io/agentscope/core/tool/ToolBase$Builder",
+        "io/agentscope/core/tool/ToolSuspendException",
+        "java/lang/Boolean",
+        "java/lang/String",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/Objects",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolExecutor.class",
+      "occurrence": 0,
+      "sha256": "5d76d1c7448915112a008cb79a10a37bbc6631bc50bff68f5eeb87c75ba548aa",
+      "name": "io/agentscope/core/tool/ToolExecutor",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "toolkit",
+          "descriptor": "Lio/agentscope/core/tool/Toolkit;",
+          "access": 18
+        },
+        {
+          "name": "toolRegistry",
+          "descriptor": "Lio/agentscope/core/tool/ToolRegistry;",
+          "access": 18
+        },
+        {
+          "name": "groupManager",
+          "descriptor": "Lio/agentscope/core/tool/ToolGroupManager;",
+          "access": 18
+        },
+        {
+          "name": "config",
+          "descriptor": "Lio/agentscope/core/tool/ToolkitConfig;",
+          "access": 18
+        },
+        {
+          "name": "executorService",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        },
+        {
+          "name": "userChunkCallback",
+          "descriptor": "Ljava/util/function/BiConsumer;",
+          "access": 2,
+          "generic_signature": "Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "internalChunkCallback",
+          "descriptor": "Ljava/util/function/BiConsumer;",
+          "access": 2,
+          "generic_signature": "Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/Toolkit;Lio/agentscope/core/tool/ToolRegistry;Lio/agentscope/core/tool/ToolGroupManager;Lio/agentscope/core/tool/ToolkitConfig;)V",
+          "access": 0,
+          "code_sha256": "ca7c033e20bfd12a5007eb5e2ff7d50ce3816581edb5745aca9dd28632804ec1",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/Toolkit;Lio/agentscope/core/tool/ToolRegistry;Lio/agentscope/core/tool/ToolGroupManager;Lio/agentscope/core/tool/ToolkitConfig;Ljava/util/concurrent/ExecutorService;)V",
+          "access": 0,
+          "code_sha256": "69d49832afed433478928383d109e8a0061bd253eca1959395898bcb2753a527",
+          "code_length": 32
+        },
+        {
+          "name": "setChunkCallback",
+          "descriptor": "(Ljava/util/function/BiConsumer;)V",
+          "access": 0,
+          "code_sha256": "0a638d09d13b47bef6194332295b8993ea42abeaae63f10efd66f9ca789ff751",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;)V"
+        },
+        {
+          "name": "setInternalChunkCallback",
+          "descriptor": "(Ljava/util/function/BiConsumer;)V",
+          "access": 0,
+          "code_sha256": "e718ceabc32f50b68e2272be58f5f16d853e95ac455ae4e78e4fdf789ca9d658",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;)V"
+        },
+        {
+          "name": "getChunkCallback",
+          "descriptor": "()Ljava/util/function/BiConsumer;",
+          "access": 0,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "getEffectiveChunkCallback",
+          "descriptor": "()Ljava/util/function/BiConsumer;",
+          "access": 2,
+          "code_sha256": "c2c8031fa950d1784d0cbfb16c649abda5970dbfe54d4fde84563a73ea0d9f09",
+          "code_length": 46,
+          "generic_signature": "()Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "invokeChunkCallback",
+          "descriptor": "(Ljava/lang/String;Ljava/util/function/BiConsumer;Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 2,
+          "code_sha256": "90fa297f19b7baef35c070fb0bca989d65bae45a4aa06c88bc4ad849590ec1f4",
+          "code_length": 72,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/function/BiConsumer<Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;>;Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)V"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "95c22c07dcf5d80e000b5510389285dc7e343f6ed332392aa239876513823c34",
+          "code_length": 21,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeCore",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "2d3536f1f9babe9b077a152212b14302399dfa3652f7bc8cdb7ff97afb306b55",
+          "code_length": 449,
+          "generic_signature": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "executeAll",
+          "descriptor": "(Ljava/util/List;ZLio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono;",
+          "access": 0,
+          "code_sha256": "2632bfd1aaeb1f17b5b5590cb15df53faae341b415ac8fb1007c177939cd90ad",
+          "code_length": 249,
+          "generic_signature": "(Ljava/util/List<Lio/agentscope/core/message/ToolUseBlock;>;ZLio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono<Ljava/util/List<Lio/agentscope/core/message/ToolResultBlock;>;>;"
+        },
+        {
+          "name": "isConcurrencySafe",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;)Z",
+          "access": 2,
+          "code_sha256": "640da38528ee3698c29f0924f771e7b9ae96cd7baee15ea26fe3ffbab632b425",
+          "code_length": 31
+        },
+        {
+          "name": "executeWithInfrastructure",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "f075fdc387d279a7cd22b4788640b7cae9fb9ae63f3a4695bf96a26646068c6d",
+          "code_length": 86,
+          "generic_signature": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "applyScheduling",
+          "descriptor": "(Lreactor/core/publisher/Mono;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "3ff74a12afdd83e87722533b5b0e11e303b209b4f989d87ca6986315cd07f48f",
+          "code_length": 27,
+          "generic_signature": "(Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "applyTimeout",
+          "descriptor": "(Lreactor/core/publisher/Mono;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/message/ToolUseBlock;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "7280b31103e1c31d612f4da61e190c939c419d229e76d5c1a704568ea03faac0",
+          "code_length": 63,
+          "generic_signature": "(Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/message/ToolUseBlock;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "applyRetry",
+          "descriptor": "(Lreactor/core/publisher/Mono;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/message/ToolUseBlock;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "c0f097a8728beee0c913983e2a45a3090ae50a74b3953212e9777cfb8d269e5c",
+          "code_length": 159,
+          "generic_signature": "(Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/message/ToolUseBlock;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "applyShutdownGuard",
+          "descriptor": "(Lreactor/core/publisher/Mono;)Lreactor/core/publisher/Mono;",
+          "access": 2,
+          "code_sha256": "c77c6d97516890d2ad5e8951ce1dbe0274e35bb0af16d896620a4e320c5f95e6",
+          "code_length": 39,
+          "generic_signature": "(Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;)Lreactor/core/publisher/Mono<Lio/agentscope/core/message/ToolResultBlock;>;"
+        },
+        {
+          "name": "lambda$applyRetry$10",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Ljava/lang/Integer;Lreactor/util/retry/Retry$RetrySignal;)V",
+          "access": 4106,
+          "code_sha256": "44050201d1bf60c55ce61bf1baf09dfeef337cc8940b6cfa1c18fa6043f41b9e",
+          "code_length": 70
+        },
+        {
+          "name": "lambda$applyRetry$9",
+          "descriptor": "(Ljava/lang/Throwable;)Z",
+          "access": 4106,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "lambda$executeWithInfrastructure$8",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Ljava/lang/Throwable;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "4805b6cc2524e397c5bd3f3d3d1a912b3fdb20029dad647c5e19140c41323c9a",
+          "code_length": 45
+        },
+        {
+          "name": "lambda$executeWithInfrastructure$7",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)Lio/agentscope/core/message/ToolResultBlock;",
+          "access": 4106,
+          "code_sha256": "b01a797447231b777adf26afc473141a88eba7354dbd77f1b81214c2c4480b92",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$executeAll$6",
+          "descriptor": "(Lio/agentscope/core/model/ExecutionConfig;Lio/agentscope/core/agent/Agent;Lio/agentscope/core/agent/RuntimeContext;Lio/agentscope/core/message/ToolUseBlock;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "2281b0f11333dc0ec340fb8cf60f7871b23f7bfe60fbdc37d7af92900a4c3b7d",
+          "code_length": 10
+        },
+        {
+          "name": "lambda$executeCore$5",
+          "descriptor": "(Ljava/lang/Throwable;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "47bcef4eb4eb50d60da499aab831cd49f47e3d96f426eb9eedbfe06fa369365b",
+          "code_length": 35
+        },
+        {
+          "name": "lambda$executeCore$4",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/tool/ToolSuspendException;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "bc86b5de403a88382522079c8d31c5408bff5de09d06b90adfda72e31c3e6169",
+          "code_length": 41
+        },
+        {
+          "name": "lambda$execute$3",
+          "descriptor": "(Lio/agentscope/core/tool/ToolCallParam;)Lreactor/core/publisher/Mono;",
+          "access": 4098,
+          "code_sha256": "dfae59e2bbe5dc40f961522a910d357ad0cc612e743e5396c1b8c85613abd088",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$getEffectiveChunkCallback$2",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 4098,
+          "code_sha256": "1c9e983791ccbc357d6222fe8cac25f694bbf9514439c52e7efd51d23bec3382",
+          "code_length": 27
+        },
+        {
+          "name": "lambda$getEffectiveChunkCallback$1",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 4098,
+          "code_sha256": "f9531c408d2ca4c8b9875f87ac17d9ac122f3fe5df5dee217cfa08f4529775a8",
+          "code_length": 14
+        },
+        {
+          "name": "lambda$getEffectiveChunkCallback$0",
+          "descriptor": "(Lio/agentscope/core/message/ToolUseBlock;Lio/agentscope/core/message/ToolResultBlock;)V",
+          "access": 4098,
+          "code_sha256": "fd5312dcaf8e1c3c8b5f1d2e0d3dba26cd53bd3d68c032ced1111d86bfa12c13",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c39eeda51403d68bc5bc1c75dfaf0bca681b9f8c99f0fc06d1753c41e350abd3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "io/agentscope/core/agent/RuntimeContext",
+        "io/agentscope/core/agent/RuntimeContext$Builder",
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/message/ToolUseBlock",
+        "io/agentscope/core/model/ExecutionConfig",
+        "io/agentscope/core/shutdown/GracefulShutdownManager",
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/DefaultToolEmitter",
+        "io/agentscope/core/tool/RegisteredToolFunction",
+        "io/agentscope/core/tool/ToolBase",
+        "io/agentscope/core/tool/ToolCallParam",
+        "io/agentscope/core/tool/ToolCallParam$Builder",
+        "io/agentscope/core/tool/ToolEmitter",
+        "io/agentscope/core/tool/ToolExecutionContext",
+        "io/agentscope/core/tool/ToolExecutor",
+        "io/agentscope/core/tool/ToolGroupManager",
+        "io/agentscope/core/tool/ToolRegistry",
+        "io/agentscope/core/tool/ToolSuspendException",
+        "io/agentscope/core/tool/ToolValidator",
+        "io/agentscope/core/tool/ToolkitConfig",
+        "io/agentscope/core/tracing/Tracer",
+        "io/agentscope/core/tracing/TracerRegistry",
+        "io/agentscope/core/util/ExceptionUtils",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/time/Duration",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/function/BiConsumer",
+        "java/util/function/Predicate",
+        "java/util/stream/Stream",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "reactor/core/publisher/Flux",
+        "reactor/core/publisher/Mono",
+        "reactor/core/scheduler/Schedulers",
+        "reactor/util/retry/Retry",
+        "reactor/util/retry/Retry$RetrySignal",
+        "reactor/util/retry/RetryBackoffSpec"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/ToolResultMessageBuilder.class",
+      "occurrence": 0,
+      "sha256": "09bde22eaace0e66222ec2b70d30a3f23742e25aa64e2277121f6a7a74356591",
+      "name": "io/agentscope/core/tool/ToolResultMessageBuilder",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "buildToolResultMsg",
+          "descriptor": "(Lio/agentscope/core/message/ToolResultBlock;Lio/agentscope/core/message/ToolUseBlock;Ljava/lang/String;)Lio/agentscope/core/message/Msg;",
+          "access": 9,
+          "code_sha256": "6824911fadc3b4fde8dad8f9c26273b50f5e77a9dee5522f2cc6a0b9e326e536",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/message/Msg",
+        "io/agentscope/core/message/Msg$Builder",
+        "io/agentscope/core/message/MsgRole",
+        "io/agentscope/core/message/ToolResultBlock",
+        "io/agentscope/core/message/ToolUseBlock",
+        "io/agentscope/core/tool/ToolResultMessageBuilder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/agentscope/core/tool/RegisteredToolFunction.class",
+      "occurrence": 0,
+      "sha256": "2b930d8e1d72fd9337a3abe85d69d8889dab74bae486b0cb097d674bd9ff7584",
+      "name": "io/agentscope/core/tool/RegisteredToolFunction",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tool",
+          "descriptor": "Lio/agentscope/core/tool/AgentTool;",
+          "access": 18
+        },
+        {
+          "name": "extendedModel",
+          "descriptor": "Lio/agentscope/core/tool/ExtendedModel;",
+          "access": 18
+        },
+        {
+          "name": "mcpClientName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "presetParameters",
+          "descriptor": "Ljava/util/Map;",
+          "access": 66,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "normalizePresetParameters",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "57cf54e4404f5767f92fd0fb5f5b34ff4401bd047f20383384d2a5bb3429df3f",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/AgentTool;Lio/agentscope/core/tool/ExtendedModel;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e6c688e9ed4bab8fa36edca0aed8d7bb23671d61a475bff15710eaf316b1d983",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/agentscope/core/tool/AgentTool;Lio/agentscope/core/tool/ExtendedModel;Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "5d222b818f715d2a4884da9a6bd5d5d90d44478776e9e3527fd8b0c3b63851c5",
+          "code_length": 29,
+          "generic_signature": "(Lio/agentscope/core/tool/AgentTool;Lio/agentscope/core/tool/ExtendedModel;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "getTool",
+          "descriptor": "()Lio/agentscope/core/tool/AgentTool;",
+          "access": 1,
+          "code_sha256": "8d2aec6788db2b05a70890264c04f2cdb831396ab355947b95b7e2e0e5946927",
+          "code_length": 5
+        },
+        {
+          "name": "getExtendedModel",
+          "descriptor": "()Lio/agentscope/core/tool/ExtendedModel;",
+          "access": 1,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "getMcpClientName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b805b19adbf9630ba86303593ac47fadafc3c658e98ceda51257cda42504f784",
+          "code_length": 5
+        },
+        {
+          "name": "getPresetParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "e2b36ae891d8a99b72c97bb67f1369bbeb2246961b266a7c7e7dcbff8e39832e",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "updatePresetParameters",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "dbb777f1297d848702f592f40221fe78e19d79929098de49e5d45690554480a3",
+          "code_length": 9,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "getExtendedParameters",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "04ebcbf2d644f4328f031a7a0e35fb7406730bcd6011ef4ba12fc9022702ac47",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        }
+      ],
+      "class_references": [
+        "io/agentscope/core/tool/AgentTool",
+        "io/agentscope/core/tool/ExtendedModel",
+        "io/agentscope/core/tool/RegisteredToolFunction",
+        "java/lang/Object",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map"
+      ]
+    }
+  ]
+}

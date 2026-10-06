@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckRetestWithHigherPrecision/CrossCheckRetestWithHigherPrecision.jar",
+  "sha256": "a62e26f3efe6e7a087cc78203c49d038a1e90c96ed69037bcec70d01f73eb5ec",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision$1.class": "8aa26f85cfed125d6504aa0e6e6680b4485a53f63f39ef2a807e06ffcbbc94a5",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision$Goal.class": "a7d3d1fb3a99c2bdf315a75594fc429977e049251dcef620e84f3223aabd2d4d",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision.class": "5ada99d1486de4d71ee2ce40d3eb78b7100fe9c3d3a04ac92aeae16e3d872384",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecisionServlet.class": "a9a6235e2de0ec3683252fb67f45a710c862b707d6a923a7292d167deb29f157"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision$1.class",
+      "occurrence": 0,
+      "sha256": "8aa26f85cfed125d6504aa0e6e6680b4485a53f63f39ef2a807e06ffcbbc94a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/151/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision$Goal.class",
+      "occurrence": 0,
+      "sha256": "a7d3d1fb3a99c2bdf315a75594fc429977e049251dcef620e84f3223aabd2d4d",
+      "member_shard": "docs/dev/evidence/sqx145/members/151/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecision.class",
+      "occurrence": 0,
+      "sha256": "5ada99d1486de4d71ee2ce40d3eb78b7100fe9c3d3a04ac92aeae16e3d872384",
+      "member_shard": "docs/dev/evidence/sqx145/members/151/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestWithHigherPrecision/RetestWithHigherPrecisionServlet.class",
+      "occurrence": 0,
+      "sha256": "a9a6235e2de0ec3683252fb67f45a710c862b707d6a923a7292d167deb29f157",
+      "member_shard": "docs/dev/evidence/sqx145/members/151/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/151/001.json",
+      "sha256": "df8e08e4f42b4155b6f43ab4aeccdbbcd152fdb9783b4ca8c40edaa2c68bd873"
+    }
+  ]
+}

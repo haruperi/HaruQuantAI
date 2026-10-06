@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+  "sha256": "4339edcc665b0b9b540cfc2802c8ef207a8e3180931a314c70a7d0ebccdae316",
+  "class_count": 6,
+  "unique_class_entries": 6,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet$1.class": "5dee27308491b3b09636f4657a0e938e35438cc245167186da58107907becc50",
+    "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet.class": "b9fe4265df58550f5eb9d128d3339db5e3b8ddd69d3a9e6ef7dd5505d5284ffc",
+    "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServletPlugin.class": "ffcdde1d26fcade0e94d6b086411500321d862778720472ae56a07d758f87578",
+    "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataCsvLoader.class": "a5dfb72e4e3c4d24dc045514e65c4e4a050ff2290ecf750b0790d921252351da",
+    "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataImporter.class": "c75d4824dccb64a57743f9569730e422765cbffa4fbaafc0b7ae9387d110399e",
+    "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataImporterJob.class": "3e82c4280fdf1ec3ad9d90912f9fdf686891b1fa448a86d95299c2504321491b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet$1.class",
+      "occurrence": 0,
+      "sha256": "5dee27308491b3b09636f4657a0e938e35438cc245167186da58107907becc50",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet.class",
+      "occurrence": 0,
+      "sha256": "b9fe4265df58550f5eb9d128d3339db5e3b8ddd69d3a9e6ef7dd5505d5284ffc",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "ffcdde1d26fcade0e94d6b086411500321d862778720472ae56a07d758f87578",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataCsvLoader.class",
+      "occurrence": 0,
+      "sha256": "a5dfb72e4e3c4d24dc045514e65c4e4a050ff2290ecf750b0790d921252351da",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataImporter.class",
+      "occurrence": 0,
+      "sha256": "c75d4824dccb64a57743f9569730e422765cbffa4fbaafc0b7ae9387d110399e",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/CustomData/job/CustomDataImporterJob.class",
+      "occurrence": 0,
+      "sha256": "3e82c4280fdf1ec3ad9d90912f9fdf686891b1fa448a86d95299c2504321491b",
+      "member_shard": "docs/dev/evidence/sqx145/members/168/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/168/001.json",
+      "sha256": "d6b5fb93774fec80c7e88ebb60dd821054b78ba338d89d9e173209a2ad7d19ab"
+    }
+  ]
+}

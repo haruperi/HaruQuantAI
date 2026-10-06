@@ -1,0 +1,390 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/mcp-json-jackson2-0.17.2.jar",
+  "archive_sha256": "dbe542c16244de30872ce5edcf1795ef4101acd4ac400e8c8081b0048feac0a7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/JacksonJsonSchemaValidatorSupplier.class",
+      "occurrence": 0,
+      "sha256": "31ca6fd4f919bf8a819be885d4cd6f395d95424eab4043b67ffb452ad9fc7628",
+      "name": "io/modelcontextprotocol/json/schema/jackson/JacksonJsonSchemaValidatorSupplier",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 1,
+          "code_sha256": "73e40e814ff7272e1b735faea0e40f8009d2c8a4abd92a228bdb0575518d8e75",
+          "code_length": 8
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier",
+        "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/jackson/JacksonJsonSchemaValidatorSupplier",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1.class",
+      "occurrence": 0,
+      "sha256": "382fe7bf61f74d05cafbf316524cb6b394cd24c665c9d3ceff3c070a0c3637bc",
+      "name": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1",
+      "major": 61,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/fasterxml/jackson/core/JsonProcessingException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lio/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "f86c7d26acebccdde7d4076d3ebe88c62a46217011b20ff0ebba6ecd64d42bbd",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonProcessingException",
+        "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator.class",
+      "occurrence": 0,
+      "sha256": "67404101a6736e431c5cf61ff3337e8987ae51fe0a6794beccf6ac2d55584c42",
+      "name": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "objectMapper",
+          "descriptor": "Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 18
+        },
+        {
+          "name": "schemaFactory",
+          "descriptor": "Lcom/networknt/schema/SchemaRegistry;",
+          "access": 18
+        },
+        {
+          "name": "schemaCache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Ljava/lang/String;Lcom/networknt/schema/Schema;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8be36d6241481f2aa744705cb8bf58543a3d2d603628b0a2626b73949973458c",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/ObjectMapper;)V",
+          "access": 1,
+          "code_sha256": "1bc8d035f16c79a186b49adba61d60cd1d57ebe46616bed3300ce80706f9efac",
+          "code_length": 31
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Object;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;",
+          "access": 1,
+          "code_sha256": "5fc712db6685f3cb5a2dd6a3e6643d59dd82f89ba36327b932b1461c2f16116c",
+          "code_length": 151,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/Object;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;"
+        },
+        {
+          "name": "getOrCreateJsonSchema",
+          "descriptor": "(Ljava/util/Map;)Lcom/networknt/schema/Schema;",
+          "access": 2,
+          "code_sha256": "1a8743161eedd05e6dd9ee201be2bf3b0f77f1fdcd4fc20aa0d0a49caa0f9243",
+          "code_length": 59,
+          "throws": [
+            "com/fasterxml/jackson/core/JsonProcessingException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lcom/networknt/schema/Schema;"
+        },
+        {
+          "name": "createJsonSchema",
+          "descriptor": "(Ljava/util/Map;)Lcom/networknt/schema/Schema;",
+          "access": 2,
+          "code_sha256": "e34e372aed510345a6fba098261c27613f3f055a290bc0d4320fb7a6074fe786",
+          "code_length": 33,
+          "throws": [
+            "com/fasterxml/jackson/core/JsonProcessingException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lcom/networknt/schema/Schema;"
+        },
+        {
+          "name": "generateCacheKey",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c604241bd592afb0a7602d1eecad926957554438cd19c0ef390ad8cf6a7778bb",
+          "code_length": 38,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "clearCache",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "be3a546cb69a31a0975ce0fd965d5715f2319ca965139cb4a0500203379b0e60",
+          "code_length": 8
+        },
+        {
+          "name": "getCacheSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "51b2cf517258019de5907d49bcec068ae924f2bc865588e81ec3d07abe4314d0",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d1eb1ca108bdcbe1444234f685b75b7b16ac94a481937585df99211b960a28cf",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonProcessingException",
+        "com/fasterxml/jackson/databind/JsonNode",
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "com/networknt/schema/Schema",
+        "com/networknt/schema/SchemaRegistry",
+        "com/networknt/schema/dialect/Dialects",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse",
+        "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/concurrent/ConcurrentHashMap",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapperSupplier.class",
+      "occurrence": 0,
+      "sha256": "02ca74e62ec03430cfcd5c8ba1c17027779b3ad1f7a0d92686561ab54deb8d6e",
+      "name": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapperSupplier",
+      "major": 61,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/modelcontextprotocol/json/McpJsonMapperSupplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 1,
+          "code_sha256": "abc67eb563a05c80204b2d7aa84913d0675559b4c65c1258e59e3e6b40b70897",
+          "code_length": 15
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "6cfa028ac65f30ccc477487d520b028bb6dac4c20320a066f887ba2b61e7d67b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "io/modelcontextprotocol/json/McpJsonMapperSupplier",
+        "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper",
+        "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapperSupplier",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper.class",
+      "occurrence": 0,
+      "sha256": "40387b14013114b6c4041425ec9ef4c44e44221c38068144645f5d67f126da5e",
+      "name": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper",
+      "major": 61,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/modelcontextprotocol/json/McpJsonMapper"
+      ],
+      "fields": [
+        {
+          "name": "objectMapper",
+          "descriptor": "Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/ObjectMapper;)V",
+          "access": 1,
+          "code_sha256": "058be4837038bec003febaa20b339242dbd8e12dd3d700627c88972ea7c94b6c",
+          "code_length": 24
+        },
+        {
+          "name": "getObjectMapper",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "readValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "19fb82a691bf1bf7eacaa86b6203d96198ad56a0aa5efe42890446aec7631d3a",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "([BLjava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "49d61859e102897793c47cdc9990906812c03eafd2e18c6387b1bb776e6afcd9",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>([BLjava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "(Ljava/lang/String;Lio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a03e0fdd5b91b91f00dbf6ea50ceac382af6dab9010117dec6a83d354e61e608",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "([BLio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "551411d1496238e0b7b36d863684d4a453e4584f3275feb6b10fbb35d5bfe1a5",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>([BLio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "convertValue",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "34178836a446e2160e739aa5fd65e1d6ba009d0927cd4aa3801a2994ba4cf481",
+          "code_length": 10,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Object;Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "convertValue",
+          "descriptor": "(Ljava/lang/Object;Lio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0af83d51c97d61518dc8ab38fbfc3e95653fdeff0ad59b9ba60f295a924aea03",
+          "code_length": 25,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Object;Lio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "writeValueAsString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79021516f625fc7c9ec7c5abb20773a2c6226d54ec70427433e0f0584c4c89c8",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeValueAsBytes",
+          "descriptor": "(Ljava/lang/Object;)[B",
+          "access": 1,
+          "code_sha256": "5105e0efdb74a90e368761e321917b0b762967a919f1d3420e8693323b045500",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "com/fasterxml/jackson/databind/type/TypeFactory",
+        "io/modelcontextprotocol/json/McpJsonMapper",
+        "io/modelcontextprotocol/json/TypeRef",
+        "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper",
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

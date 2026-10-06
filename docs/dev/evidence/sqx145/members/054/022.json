@@ -1,0 +1,1900 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jetty-all-uber.jar",
+  "archive_sha256": "7ce8b3a1ed9852b9d7b16ba10a9db9a4fb42151845fd3fa3f9f45ac2ee416a98",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/eclipse/jetty/util/InetAddressPattern$LegacyInetAddressRange.class",
+      "occurrence": 0,
+      "sha256": "1076332fb19c2306e8f7e4d82714bd4b7987471bf92adbe3c7f430d2904e5cf3",
+      "name": "org/eclipse/jetty/util/InetAddressPattern$LegacyInetAddressRange",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/eclipse/jetty/util/InetAddressPattern",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_min",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "_max",
+          "descriptor": "[I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "fc0d6a8d8fffc5f27f9696dce96966ee2133d2be8e3bfc1908d948e1122618d2",
+          "code_length": 207
+        },
+        {
+          "name": "test",
+          "descriptor": "(Ljava/net/InetAddress;)Z",
+          "access": 1,
+          "code_sha256": "b98093c53e083cbb357277489f36b227a91d5693a1da621d4ada0174044c9194",
+          "code_length": 62
+        },
+        {
+          "name": "test",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "5111fd8be8260c17b2dcd24cce1e1884b729fbcaaaf0a16e27ede4ff37b3bad5",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[I",
+        "[Ljava/lang/String;",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/net/InetAddress",
+        "org/eclipse/jetty/util/InetAddressPattern",
+        "org/eclipse/jetty/util/InetAddressPattern$LegacyInetAddressRange",
+        "org/eclipse/jetty/util/StringUtil"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/util/InetAddressSet.class",
+      "occurrence": 0,
+      "sha256": "2a146c08b1861a6e480961e53201be1933f70da9ae3411040847759b47ecd898",
+      "name": "org/eclipse/jetty/util/InetAddressSet",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [
+        "java/util/Set",
+        "java/util/function/Predicate"
+      ],
+      "fields": [
+        {
+          "name": "_patterns",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/eclipse/jetty/util/InetAddressPattern;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "a97163cccc02352081db45f540abfd34bc839fe0d48763108ff63f35ba5bf596",
+          "code_length": 23
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f50bce691d1a488771f4850581aac814627a66906d1aa08e5e9b0228f53c896a",
+          "code_length": 19
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "8edcee65b93d9e57f823f211173adb309b1a2c1596217c1d0c6ed15b77abc859",
+          "code_length": 15,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/String;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ca8ce43c803a164e29af982afd4f391031543a99a7236e431952a865c71e5445",
+          "code_length": 10
+        },
+        {
+          "name": "test",
+          "descriptor": "(Ljava/net/InetAddress;)Z",
+          "access": 1,
+          "code_sha256": "a616c8140788d220c0b917070134c95e6ba49c4cd8c8e32e79c63460b0b20f13",
+          "code_length": 55
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "dafbefeb7372405dd110f78b922b9d59c072d6e6c6afa17bde04bb6b9369fec6",
+          "code_length": 9
+        },
+        {
+          "name": "test",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "b0745cff0e92fbd314e5e6ef133afee1099e5b592a95a32d32db91b5c29df58f",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractSet<Ljava/lang/String;>;Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Predicate<Ljava/net/InetAddress;>;",
+      "class_references": [
+        "java/lang/String",
+        "java/net/InetAddress",
+        "java/util/AbstractSet",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/function/Predicate",
+        "org/eclipse/jetty/util/InetAddressPattern",
+        "org/eclipse/jetty/util/InetAddressSet"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/util/Promise$Completable.class",
+      "occurrence": 0,
+      "sha256": "e4ef27652793db05b445fa61942b144ca18e7a18d6ad4aeca681feca9cfc65a8",
+      "name": "org/eclipse/jetty/util/Promise$Completable",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/concurrent/CompletableFuture",
+      "interfaces": [
+        "org/eclipse/jetty/util/Promise"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "succeeded",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "2fa3b99bb956aabc695ff59eec24c0eaa5d0664451b3e995e183d4f4ec9f8563",
+          "code_length": 7,
+          "generic_signature": "(TS;)V"
+        },
+        {
+          "name": "failed",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "4b03900322ff9a980816634ecd84370bd8910b1b272f2d1c187b9328048a6ab0",
+          "code_length": 7
+        }
+      ],
+      "generic_signature": "<S:Ljava/lang/Object;>Ljava/util/concurrent/CompletableFuture<TS;>;Lorg/eclipse/jetty/util/Promise<TS;>;",
+      "class_references": [
+        "java/util/concurrent/CompletableFuture",
+        "org/eclipse/jetty/util/Promise",
+        "org/eclipse/jetty/util/Promise$Completable"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/util/LeakDetector$LeakInfo.class",
+      "occurrence": 0,
+      "sha256": "bb2285c3f21f0462b487816106f7b1e3b85796233eab1f090e4d7917c6b10a32",
+      "name": "org/eclipse/jetty/util/LeakDetector$LeakInfo",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/ref/PhantomReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "id",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "stackFrames",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/eclipse/jetty/util/LeakDetector;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/util/LeakDetector;Ljava/lang/Object;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "d495b2ccb3d3ca0ee08f994924d088db1f343e5a7ec721a760d6aa8e32947c1b",
+          "code_length": 39,
+          "generic_signature": "(TT;Ljava/lang/String;)V"
+        },
+        {
+          "name": "getResourceDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "getStackFrames",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "5136ec714e63e3c9e21a7f5cdd62b8fed5a8e8258758f9ed53f72e624491087b",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/ref/PhantomReference<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/ref/PhantomReference",
+        "org/eclipse/jetty/util/LeakDetector",
+        "org/eclipse/jetty/util/LeakDetector$LeakInfo"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/util/IncludeExclude.class",
+      "occurrence": 0,
+      "sha256": "c4860885f8920676715fd79b814024de1c12621cb4271c772a48f4c8dfdffa5a",
+      "name": "org/eclipse/jetty/util/IncludeExclude",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/util/IncludeExcludeSet",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "ffdde2c0cd5acd083e3102d935aceaa0a77ca01ed92d9bb824e792167a0a2489",
+          "code_length": 6,
+          "generic_signature": "<SET::Ljava/util/Set<TITEM;>;>(Ljava/lang/Class<TSET;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/util/function/Predicate;Ljava/util/Set;Ljava/util/function/Predicate;)V",
+          "access": 1,
+          "code_sha256": "1e4a2eb919fab6d4e53768bdd4ec126cd70a97514589bcedd455cbdb398e56b9",
+          "code_length": 10,
+          "generic_signature": "<SET::Ljava/util/Set<TITEM;>;>(Ljava/util/Set<TITEM;>;Ljava/util/function/Predicate<TITEM;>;Ljava/util/Set<TITEM;>;Ljava/util/function/Predicate<TITEM;>;)V"
+        }
+      ],
+      "generic_signature": "<ITEM:Ljava/lang/Object;>Lorg/eclipse/jetty/util/IncludeExcludeSet<TITEM;TITEM;>;",
+      "class_references": [
+        "org/eclipse/jetty/util/IncludeExclude",
+        "org/eclipse/jetty/util/IncludeExcludeSet"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/util/Promise$Wrapper.class",
+      "occurrence": 0,
+      "sha256": "2bcb41bfebc5041bbfde074b908b6240af22f680185d800a3cce9eb365d3c539",
+      "name": "org/eclipse/jetty/util/Promise$Wrapper",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/eclipse/jetty/util/Promise"
+      ],
+      "fields": [
+        {
+          "name": "promise",
+          "descriptor": "Lorg/eclipse/jetty/util/Promise;",
+          "access": 18,
+          "generic_signature": "Lorg/eclipse/jetty/util/Promise<TW;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/util/Promise;)V",
+          "access": 1,
+          "code_sha256": "c88f02be3587f287aeb55acfdba73e07c65d079a947359f607cddfcf9eda5d6b",
+          "code_length": 16,
+          "generic_signature": "(Lorg/eclipse/jetty/util/Promise<TW;>;)V"
+        },
+        {
+          "name": "succeeded",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "0c58d690ecbf32b32c1eb171910c57114bd295e11eff7cd265c0bc7841fc5903",
+          "code_length": 11,
+          "generic_signature": "(TW;)V"
+        },
+        {
+          "name": "failed",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "86eb465a0b7c7fbf764a00c16ac9589ecbfe4ea3cafa7992157f93d328de3709",
+          "code_length": 11
+        },
+        {
+          "name": "getPromise",
+          "descriptor": "()Lorg/eclipse/jetty/util/Promise;",
+          "access": 1,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Lorg/eclipse/jetty/util/Promise<TW;>;"
+        },
+        {
+          "name": "unwrap",
+          "descriptor": "()Lorg/eclipse/jetty/util/Promise;",
+          "access": 1,
+          "code_sha256": "3fd7de886a9fddf499146dedb140bb623319e12e9e44ccdd1e2a6856963f4168",
+          "code_length": 25,
+          "generic_signature": "()Lorg/eclipse/jetty/util/Promise<TW;>;"
+        }
+      ],
+      "generic_signature": "<W:Ljava/lang/Object;>Ljava/lang/Object;Lorg/eclipse/jetty/util/Promise<TW;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Objects",
+        "org/eclipse/jetty/util/Promise",
+        "org/eclipse/jetty/util/Promise$Wrapper"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackContext$DynamicTable.class",
+      "occurrence": 0,
+      "sha256": "e8bf58ea64e3a6f2e37f1e668c8d66615fdb8b09914e9a9edd01686ae30c7d59",
+      "name": "org/eclipse/jetty/http2/hpack/HpackContext$DynamicTable",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_entries",
+          "descriptor": "[Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 2
+        },
+        {
+          "name": "_growby",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_offset",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/HpackContext;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/http2/hpack/HpackContext;I)V",
+          "access": 2,
+          "code_sha256": "4298cc73e9a5373383d4e928c02ffa07358869fa433dc58bed2da02e0a3affd5",
+          "code_length": 23
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;)V",
+          "access": 1,
+          "code_sha256": "db4d3e76d8163fd536a67d71cfb79f6c0182e682d6bc475affd7360705889417",
+          "code_length": 119
+        },
+        {
+          "name": "index",
+          "descriptor": "(Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;)I",
+          "access": 1,
+          "code_sha256": "b469b7c579518b9e31093a7a7798ded046ea60a4de62b75b261a0ac8dc1de130",
+          "code_length": 31
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "b3dccb4dac0b7badc2d91c5d4bbad841e3a27ff191f3673d3a1c5ea9797e451b",
+          "code_length": 49
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8217be20328da627bba017940d5ad267e4b75c5cfc8603457f0e6207b3a1b416",
+          "code_length": 5
+        },
+        {
+          "name": "evict",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f4f23b2a672211c8fc654c6901915e5844db4d2b18a6ff79c8751e5e0a1ae94b",
+          "code_length": 272
+        },
+        {
+          "name": "evictAll",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "97424d68b4bcacaac3ff1ca0264538dd644fb298103ee3c66327f399b8cc0449",
+          "code_length": 99
+        }
+      ],
+      "class_references": [
+        "[Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Arrays",
+        "java/util/Map",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$DynamicTable",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/AuthorityHttpField.class",
+      "occurrence": 0,
+      "sha256": "bb6ba22e766b806ba072c9c183ff8bfacc694bebe313adc21e640c93ee012917",
+      "name": "org/eclipse/jetty/http2/hpack/AuthorityHttpField",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http/HostPortHttpField",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "AUTHORITY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f93ea418dd64fecef1631d39c8d2de3d1e02d0b3d73ac4b50987b9291569fb3d",
+          "code_length": 12
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "75fc8663c3022b264f7c8b37c6f3af7850fd602aa5c7b71a5e44185f3f951993",
+          "code_length": 34
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8bd60d5ff8cd2f83c9c405d5ffdbf6bed642dc79557d059299e19baa90fedbba",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/eclipse/jetty/http/HostPortHttpField",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http2/hpack/AuthorityHttpField",
+        "org/eclipse/jetty/http2/hpack/HpackContext"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackException$CompressionException.class",
+      "occurrence": 0,
+      "sha256": "6ff7cea58532728dd05b153ac9d9a11df4e184eb3920635198faa4a01e9b0ee4",
+      "name": "org/eclipse/jetty/http2/hpack/HpackException$CompressionException",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 129,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$CompressionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackContext$Entry.class",
+      "occurrence": 0,
+      "sha256": "bb406f113479b542a778dbc56133b6580c43ded4ba743f1370e1f4ca4d328b5c",
+      "name": "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_field",
+          "descriptor": "Lorg/eclipse/jetty/http/HttpField;",
+          "access": 16
+        },
+        {
+          "name": "_slot",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "4723733a67d745575324cd5d2baa9d4ec9b54c053476543d2bff2a0c186dfaba",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpField;)V",
+          "access": 0,
+          "code_sha256": "07038b75162ce9e7b4db0484b6eccd4bd2caec12adf8f4c7da9d0621e37d0a86",
+          "code_length": 10
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c6b8afa06d35f5c43c60366ef8dc306667ebee9a81bce84bbb8582a1997ec9a4",
+          "code_length": 35
+        },
+        {
+          "name": "getHttpField",
+          "descriptor": "()Lorg/eclipse/jetty/http/HttpField;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "isStatic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getStaticHuffmanValue",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4564208a8f3a0e8642145de21a3a73d3a705af2b2915e82feef9239d6a1a754f",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/MetaDataBuilder.class",
+      "occurrence": 0,
+      "sha256": "3b63ee745db0f0e37169ff0e79f36c5fe95c0d18cbb05816aed7899a609a4250",
+      "name": "org/eclipse/jetty/http2/hpack/MetaDataBuilder",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_fields",
+          "descriptor": "Lorg/eclipse/jetty/http/HttpFields$Mutable;",
+          "access": 18
+        },
+        {
+          "name": "_maxSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_status",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 2
+        },
+        {
+          "name": "_method",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "_scheme",
+          "descriptor": "Lorg/eclipse/jetty/http/HttpScheme;",
+          "access": 2
+        },
+        {
+          "name": "_authority",
+          "descriptor": "Lorg/eclipse/jetty/http/HostPortHttpField;",
+          "access": 2
+        },
+        {
+          "name": "_path",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "_protocol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "_contentLength",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "_streamException",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/HpackException$StreamException;",
+          "access": 2
+        },
+        {
+          "name": "_request",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_response",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_beginNanoTime",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "ad8c80834d56c8363b37ff9f67bdf40ef6df69c008e59dce16b3fccad2819320",
+          "code_length": 31
+        },
+        {
+          "name": "getMaxSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9bcb244defc50bbabfd2dd1d7b5d2d56007edc817c09fae83f8cc4ce6c06a85d",
+          "code_length": 5
+        },
+        {
+          "name": "setMaxSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ad9d03fab4d1f3973b43941bc2f3118757650d2677dc1c5ce20affe4408d5bd1",
+          "code_length": 6
+        },
+        {
+          "name": "setBeginNanoTime",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "b22f8e9605e3e59e8240219cb9cba6bc9f15ffea8e4fe95cd44998b78bfe4299",
+          "code_length": 18
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7e99de3c85c595453b2b2f98f49c7ea90a030841500e6d37b987653cbc16e933",
+          "code_length": 5
+        },
+        {
+          "name": "emit",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpField;)V",
+          "access": 1,
+          "code_sha256": "de7df0b94a020ddef8dbb49c609a8babb0073990dfa5feb478ea751d50f5ac6e",
+          "code_length": 764,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException$SessionException"
+          ]
+        },
+        {
+          "name": "streamException",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 129,
+          "code_sha256": "7d216633e968db5dd85cfeba6128e29dd212f3656ffedb1888725e10c5134fb1",
+          "code_length": 34
+        },
+        {
+          "name": "checkPseudoHeader",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;Ljava/lang/Object;)Z",
+          "access": 4,
+          "code_sha256": "6ff7440e5c038f6fef89e2098e567eca8016549cc09d1c4ac0da3a032e499ba2",
+          "code_length": 54
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lorg/eclipse/jetty/http/MetaData;",
+          "access": 1,
+          "code_sha256": "d04650802aa4c29a0e421d3d82723f3478b8858315ea58837ca90dfc2e90609f",
+          "code_length": 630,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException$StreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "org/eclipse/jetty/http/HostPortHttpField",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/HttpFields",
+        "org/eclipse/jetty/http/HttpFields$Mutable",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpMethod",
+        "org/eclipse/jetty/http/HttpScheme",
+        "org/eclipse/jetty/http/HttpVersion",
+        "org/eclipse/jetty/http/MetaData",
+        "org/eclipse/jetty/http/MetaData$ConnectRequest",
+        "org/eclipse/jetty/http/MetaData$Request",
+        "org/eclipse/jetty/http/MetaData$Response",
+        "org/eclipse/jetty/http2/hpack/AuthorityHttpField",
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$StreamException",
+        "org/eclipse/jetty/http2/hpack/MetaDataBuilder",
+        "org/eclipse/jetty/http2/hpack/MetaDataBuilder$1",
+        "org/eclipse/jetty/http2/hpack/StaticTableHttpField",
+        "org/eclipse/jetty/util/Index",
+        "org/eclipse/jetty/util/NanoTime"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/StaticTableHttpField.class",
+      "occurrence": 0,
+      "sha256": "55a09fb92f042f6d1f60b089bdcd19df9c0ddd0196f165889c993c4d0fffce48",
+      "name": "org/eclipse/jetty/http2/hpack/StaticTableHttpField",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http/HttpField",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e27e8d9700989eda397887b6594ffb62ce4f9d4772a0acf4bd936f5554d67ebb",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "a37d9d7950cd2c4e0150f0f35f35dda7b5dd6ee8ebb1bdf421897aed075c6a6b",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "44f1bc48065d06acea2d27bc1ca6be2656f1157bc019dfba7e7dffcf472f1323",
+          "code_length": 24
+        },
+        {
+          "name": "getStaticValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f75e739bda9bab2f811ed640740b6f5302155c7c2390a782992f09bfaec73a93",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http2/hpack/StaticTableHttpField"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackException.class",
+      "occurrence": 0,
+      "sha256": "94ac256ab52100b773da5a69c751f04b618a6a74b8c1a1e63c5df9f99fbda90d",
+      "name": "org/eclipse/jetty/http2/hpack/HpackException",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 128,
+          "code_sha256": "bb6329ac05104c82915433eacbf2ea43eecdd12dd3d49ce7edeb496539082e44",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$CompressionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$StreamException"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackEncoder.class",
+      "occurrence": 0,
+      "sha256": "55625327e02b74a029b7b47f3acfd5f4b5a8a17423f63303a55ed37655527e25",
+      "name": "org/eclipse/jetty/http2/hpack/HpackEncoder",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOG",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "STATUSES",
+          "descriptor": "[Lorg/eclipse/jetty/http/HttpField;",
+          "access": 26
+        },
+        {
+          "name": "DO_NOT_HUFFMAN",
+          "descriptor": "Ljava/util/EnumSet;",
+          "access": 24,
+          "generic_signature": "Ljava/util/EnumSet<Lorg/eclipse/jetty/http/HttpHeader;>;"
+        },
+        {
+          "name": "DO_NOT_INDEX",
+          "descriptor": "Ljava/util/EnumSet;",
+          "access": 24,
+          "generic_signature": "Ljava/util/EnumSet<Lorg/eclipse/jetty/http/HttpHeader;>;"
+        },
+        {
+          "name": "NEVER_INDEX",
+          "descriptor": "Ljava/util/EnumSet;",
+          "access": 24,
+          "generic_signature": "Ljava/util/EnumSet<Lorg/eclipse/jetty/http/HttpHeader;>;"
+        },
+        {
+          "name": "IGNORED_HEADERS",
+          "descriptor": "Ljava/util/EnumSet;",
+          "access": 26,
+          "generic_signature": "Ljava/util/EnumSet<Lorg/eclipse/jetty/http/HttpHeader;>;"
+        },
+        {
+          "name": "TE_TRAILERS",
+          "descriptor": "Lorg/eclipse/jetty/http/PreEncodedHttpField;",
+          "access": 26
+        },
+        {
+          "name": "C_SCHEME_HTTP",
+          "descriptor": "Lorg/eclipse/jetty/http/PreEncodedHttpField;",
+          "access": 26
+        },
+        {
+          "name": "C_SCHEME_HTTPS",
+          "descriptor": "Lorg/eclipse/jetty/http/PreEncodedHttpField;",
+          "access": 26
+        },
+        {
+          "name": "C_METHODS",
+          "descriptor": "Ljava/util/EnumMap;",
+          "access": 26,
+          "generic_signature": "Ljava/util/EnumMap<Lorg/eclipse/jetty/http/HttpMethod;Lorg/eclipse/jetty/http/PreEncodedHttpField;>;"
+        },
+        {
+          "name": "_context",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/HpackContext;",
+          "access": 18
+        },
+        {
+          "name": "_debug",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_maxTableCapacity",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_tableCapacity",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_maxHeaderListSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_headerListSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_validateEncoding",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1f223d1b34f51cf52baa2b41b2578f2ef5435cc954c8a0ba4896fe2039ee3fad",
+          "code_length": 48
+        },
+        {
+          "name": "getMaxTableCapacity",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2196c2dabeb49c63203780985ee90d795cd5fc629012796f2a935446f3e04de1",
+          "code_length": 5
+        },
+        {
+          "name": "setMaxTableCapacity",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "9f016b3bad01d29c503481ff58c80ea0800341e79933642b12335c25c4d8b95f",
+          "code_length": 6
+        },
+        {
+          "name": "getTableCapacity",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f0fb57c4cc335bde003a0c815e12f055f038368d7a87ece6c277c279cf11d9c2",
+          "code_length": 5
+        },
+        {
+          "name": "setTableCapacity",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "85004dde1c55dfb53934615705e705f387c7fe125b74036b687f5bfdebdbfd21",
+          "code_length": 24
+        },
+        {
+          "name": "getMaxHeaderListSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "cc1e7a7dbe46157b724d743080752af2d01e076ae5b1d3b9cead19a1c1ee73ff",
+          "code_length": 5
+        },
+        {
+          "name": "setMaxHeaderListSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f562555075b1ed1fb83ba209d3c0df40da3ed9253a616e11f212bcec2342c529",
+          "code_length": 6
+        },
+        {
+          "name": "getHpackContext",
+          "descriptor": "()Lorg/eclipse/jetty/http2/hpack/HpackContext;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "setRemoteMaxDynamicTableSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "acd5c97655a0e855689e387673c8398ac4e39a1118cf8640445f0690806a415a",
+          "code_length": 6
+        },
+        {
+          "name": "setLocalMaxDynamicTableSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6fad647cdfc543140181283a359a5ecce1563c2821b3d6cbcbb50084da1fc9b8",
+          "code_length": 6
+        },
+        {
+          "name": "isValidateEncoding",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setValidateEncoding",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/nio/ByteBuffer;Lorg/eclipse/jetty/http/MetaData;)V",
+          "access": 1,
+          "code_sha256": "10a3f08e7a6e8e79d4fde815fbc6db0d08dcc846bff0fbc74389f811fda084d9",
+          "code_length": 856,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException"
+          ]
+        },
+        {
+          "name": "encodeMaxDynamicTableSize",
+          "descriptor": "(Ljava/nio/ByteBuffer;I)V",
+          "access": 1,
+          "code_sha256": "c51d59365cd280731d119650f67786add0c47e47796cf417bfb8cdefaaf68380",
+          "code_length": 23
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/nio/ByteBuffer;Lorg/eclipse/jetty/http/HttpField;)V",
+          "access": 1,
+          "code_sha256": "909f5f813890222dff0744d29eb85a8c2d51457375837de492adad7e5e4a2396",
+          "code_length": 935
+        },
+        {
+          "name": "encodeName",
+          "descriptor": "(Ljava/nio/ByteBuffer;BILjava/lang/String;Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;)V",
+          "access": 2,
+          "code_sha256": "5a030df38da8c9af07468d2051288b11b7b0d2d3d4822b57c108d8a99a7e59aa",
+          "code_length": 55
+        },
+        {
+          "name": "encodeValue",
+          "descriptor": "(Ljava/nio/ByteBuffer;ZLjava/lang/String;)V",
+          "access": 8,
+          "code_sha256": "20b6d0b0ddfcedd86f3c310e70ff7e4699e8136f10b18aadd1627fc8f2d88ffe",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "33c694b7b16ec3001dd944fb4624ad91c466d2b565645ae3822540a730e2799a",
+          "code_length": 333
+        }
+      ],
+      "class_references": [
+        "[Lorg/eclipse/jetty/http/HttpMethod;",
+        "[Lorg/eclipse/jetty/http/HttpStatus$Code;",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/nio/ByteBuffer",
+        "java/util/EnumMap",
+        "java/util/EnumSet",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/HttpField$IntValueHttpField",
+        "org/eclipse/jetty/http/HttpFields",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpMethod",
+        "org/eclipse/jetty/http/HttpScheme",
+        "org/eclipse/jetty/http/HttpStatus",
+        "org/eclipse/jetty/http/HttpStatus$Code",
+        "org/eclipse/jetty/http/HttpURI",
+        "org/eclipse/jetty/http/HttpVersion",
+        "org/eclipse/jetty/http/MetaData",
+        "org/eclipse/jetty/http/MetaData$Request",
+        "org/eclipse/jetty/http/MetaData$Response",
+        "org/eclipse/jetty/http/PreEncodedHttpField",
+        "org/eclipse/jetty/http/compression/HuffmanEncoder",
+        "org/eclipse/jetty/http/compression/NBitIntegerEncoder",
+        "org/eclipse/jetty/http/compression/NBitStringEncoder",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+        "org/eclipse/jetty/http2/hpack/HpackContext$StaticEntry",
+        "org/eclipse/jetty/http2/hpack/HpackEncoder",
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$StreamException",
+        "org/eclipse/jetty/util/BufferUtil",
+        "org/eclipse/jetty/util/StringUtil",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackException$StreamException.class",
+      "occurrence": 0,
+      "sha256": "d4ac00baf05a9dab4df0154cb0e3ad29b892e46910845d9893b64684ac890009",
+      "name": "org/eclipse/jetty/http2/hpack/HpackException$StreamException",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http2/hpack/HpackException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 129,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$StreamException"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackContext.class",
+      "occurrence": 0,
+      "sha256": "774061e52c41943d23587a553ab889ad251b2cadaf9d5cff63d4872ddaf77db2",
+      "name": "org/eclipse/jetty/http2/hpack/HpackContext",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOG",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "EMPTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "STATIC_TABLE",
+          "descriptor": "[[Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "__staticFieldMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Lorg/eclipse/jetty/http/HttpField;Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;>;"
+        },
+        {
+          "name": "__staticNameMap",
+          "descriptor": "Lorg/eclipse/jetty/util/Index;",
+          "access": 26,
+          "generic_signature": "Lorg/eclipse/jetty/util/Index<Lorg/eclipse/jetty/http2/hpack/HpackContext$StaticEntry;>;"
+        },
+        {
+          "name": "__staticTableByHeader",
+          "descriptor": "[Lorg/eclipse/jetty/http2/hpack/HpackContext$StaticEntry;",
+          "access": 26
+        },
+        {
+          "name": "__staticTable",
+          "descriptor": "[Lorg/eclipse/jetty/http2/hpack/HpackContext$StaticEntry;",
+          "access": 26
+        },
+        {
+          "name": "STATIC_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_MAX_TABLE_CAPACITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "_dynamicTable",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/HpackContext$DynamicTable;",
+          "access": 18
+        },
+        {
+          "name": "_fieldMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Lorg/eclipse/jetty/http/HttpField;Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;>;"
+        },
+        {
+          "name": "_nameMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;>;"
+        },
+        {
+          "name": "_maxTableSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_tableSize",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "57cda30e1b7afd2a3f1e18e19e9930284241bf95d0bcb0bda6034d6f47e9dac7",
+          "code_length": 98
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a792859a0676c1ac972e9991288c16d3e7a74e1555dd99d70865e4899a574d43",
+          "code_length": 68
+        },
+        {
+          "name": "get",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpField;)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "20b78ff57bfca0c78576b679076cb068161983a20dbecddb4c69869b8b5dcc8f",
+          "code_length": 33
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "43df0b012be5d42dcfd1a97c5331bb87f24cd7b93fa04de17757c8cdad80abab",
+          "code_length": 36
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "e9375e789eca317e08a1c72919f355b5827c1f1c8585ea2bfe81d2ca438ccf45",
+          "code_length": 22
+        },
+        {
+          "name": "get",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "d64a8be6a1c2201dfdb79bf35b5876a68a078b81d7e65aeebfd892fbc2434494",
+          "code_length": 24
+        },
+        {
+          "name": "getStatic",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 9,
+          "code_sha256": "8c7c0611f5a449113eb80dd4ecf142f7eb68470d21bb971818e471367adf4e81",
+          "code_length": 9
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpField;)Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;",
+          "access": 1,
+          "code_sha256": "1de59a5f73aa895ae3ece999aea8602dcb069b395d3620d0bcf0bedaf6deb192",
+          "code_length": 182
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e3676d47216881fa80dcce9f0904c6705d1f9fdbff5e22a20888605710207aae",
+          "code_length": 8
+        },
+        {
+          "name": "getDynamicTableSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c83b423faa5a123ee84d5b29c4c15f79d504fba10e5721da9ff02c2f57fe4b71",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxDynamicTableSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4cd7596f3f9ecdc28dab0ea226a415307717e5905327759aaf103abfcbb2c4cd",
+          "code_length": 5
+        },
+        {
+          "name": "index",
+          "descriptor": "(Lorg/eclipse/jetty/http2/hpack/HpackContext$Entry;)I",
+          "access": 1,
+          "code_sha256": "910b05d594843070a80dec0029f737291f5c92431de3af2b0d0f1559797dae83",
+          "code_length": 30
+        },
+        {
+          "name": "staticIndex",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;)I",
+          "access": 9,
+          "code_sha256": "a24d11924c668640cebcc18cd7c6546f5f810da798881eb5778dbd0c9d1a8036",
+          "code_length": 33
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b6ef42cfa16e27920241873ea0ebf90588efa086b081ee6e8022103c895e3b9e",
+          "code_length": 53
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "df02274d4650cc67d108f5287d12834c9ad171a7167dd57a11a55095d6e85f1e",
+          "code_length": 1620
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lorg/eclipse/jetty/http/HttpHeader;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Map",
+        "java/util/Set",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpMethod",
+        "org/eclipse/jetty/http/HttpScheme",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$1",
+        "org/eclipse/jetty/http2/hpack/HpackContext$DynamicTable",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+        "org/eclipse/jetty/http2/hpack/HpackContext$StaticEntry",
+        "org/eclipse/jetty/http2/hpack/StaticTableHttpField",
+        "org/eclipse/jetty/util/Index",
+        "org/eclipse/jetty/util/Index$Builder",
+        "org/eclipse/jetty/util/StringUtil",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackContext$StaticEntry.class",
+      "occurrence": 0,
+      "sha256": "99430f7570c75eae2f8042c84db104b51006f8ede5743100e7a2fe19b1606c80",
+      "name": "org/eclipse/jetty/http2/hpack/HpackContext$StaticEntry",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_huffmanValue",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "_encodedField",
+          "descriptor": "B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/eclipse/jetty/http/HttpField;)V",
+          "access": 0,
+          "code_sha256": "9150a1cb4fc7cf35363f19b3fb135028d623d48e3aeac9292f4af03b7ff80b81",
+          "code_length": 120
+        },
+        {
+          "name": "isStatic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getStaticHuffmanValue",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "a91d890976fe2c888e0abca7a49d2153194d61007974b138f321f40f2d006787",
+          "code_length": 5
+        },
+        {
+          "name": "getEncodedField",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "61b5963abeebba19fb6aae545cf603785c4566abaac79525636b8c6e3bb06a7e",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/String",
+        "java/nio/ByteBuffer",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/compression/HuffmanEncoder",
+        "org/eclipse/jetty/http/compression/NBitIntegerEncoder",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+        "org/eclipse/jetty/http2/hpack/HpackContext$StaticEntry"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackFieldPreEncoder.class",
+      "occurrence": 0,
+      "sha256": "8c6ed6ac8ff0404b283ec3d4fdfa8608fa9096ba61fd28de1260d9519c97f405",
+      "name": "org/eclipse/jetty/http2/hpack/HpackFieldPreEncoder",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/eclipse/jetty/http/HttpFieldPreEncoder"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHttpVersion",
+          "descriptor": "()Lorg/eclipse/jetty/http/HttpVersion;",
+          "access": 1,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "getEncodedField",
+          "descriptor": "(Lorg/eclipse/jetty/http/HttpHeader;Ljava/lang/String;Ljava/lang/String;)[B",
+          "access": 1,
+          "code_sha256": "64b39e3d72fe3bab11c45cced933a4423cb694ac0ff0085da4fd5fd5b2453bd0",
+          "code_length": 215
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/nio/ByteBuffer",
+        "java/util/EnumSet",
+        "org/eclipse/jetty/http/HttpFieldPreEncoder",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpVersion",
+        "org/eclipse/jetty/http/compression/HuffmanEncoder",
+        "org/eclipse/jetty/http/compression/NBitIntegerEncoder",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackEncoder",
+        "org/eclipse/jetty/http2/hpack/HpackFieldPreEncoder",
+        "org/eclipse/jetty/util/BufferUtil"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackDecoder.class",
+      "occurrence": 0,
+      "sha256": "b0a7cd8734ced42ca1973876ec40580bcbc187c89865d51ea5b7828fd9a6bc5e",
+      "name": "org/eclipse/jetty/http2/hpack/HpackDecoder",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOG",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "CONTENT_LENGTH_0",
+          "descriptor": "Lorg/eclipse/jetty/http/HttpField$LongValueHttpField;",
+          "access": 25
+        },
+        {
+          "name": "_context",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/HpackContext;",
+          "access": 18
+        },
+        {
+          "name": "_builder",
+          "descriptor": "Lorg/eclipse/jetty/http2/hpack/MetaDataBuilder;",
+          "access": 18
+        },
+        {
+          "name": "_huffmanDecoder",
+          "descriptor": "Lorg/eclipse/jetty/http/compression/HuffmanDecoder;",
+          "access": 18
+        },
+        {
+          "name": "_integerDecoder",
+          "descriptor": "Lorg/eclipse/jetty/http/compression/NBitIntegerDecoder;",
+          "access": 18
+        },
+        {
+          "name": "_beginNanoTimeSupplier",
+          "descriptor": "Ljava/util/function/LongSupplier;",
+          "access": 18
+        },
+        {
+          "name": "_maxTableCapacity",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/util/function/LongSupplier;)V",
+          "access": 1,
+          "code_sha256": "f3f53fea8d6863ee9a74421e1f2865ea05f5b6a168920734b6db9ff6c006cbff",
+          "code_length": 65
+        },
+        {
+          "name": "getHpackContext",
+          "descriptor": "()Lorg/eclipse/jetty/http2/hpack/HpackContext;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxTableCapacity",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e8dc54e0c5c74dd73652e110a37cc68649a173291f5744210a3b58c9a6d5b621",
+          "code_length": 5
+        },
+        {
+          "name": "setMaxTableCapacity",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c1427358266646e9ae986c0705a73636df3f7033b0d54bd404ff4f910c4efb72",
+          "code_length": 6
+        },
+        {
+          "name": "setLocalMaxDynamicTableSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "962e49549cfb85eb2597185ca6e9d50e8c91fefe64ce82f2ee05505dc8ced446",
+          "code_length": 6
+        },
+        {
+          "name": "getMaxHeaderListSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8a755fdd277eba24e9139d46f2b0bb23aef46beb0918b8e76c5c773906541830",
+          "code_length": 8
+        },
+        {
+          "name": "setMaxHeaderListSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6ab160bf242bdbee745734a8c70b2e6f371a4f697d1de0765354f4a40d13fd77",
+          "code_length": 9
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/nio/ByteBuffer;)Lorg/eclipse/jetty/http/MetaData;",
+          "access": 1,
+          "code_sha256": "0a0ca6f4ddd57297f19789d2b128a49baa5cefc9e531cfa42fa873f9554320e6",
+          "code_length": 1091,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+            "org/eclipse/jetty/http2/hpack/HpackException$StreamException"
+          ]
+        },
+        {
+          "name": "integerDecode",
+          "descriptor": "(Ljava/nio/ByteBuffer;I)I",
+          "access": 2,
+          "code_sha256": "e7185fbb7a4e98786c0fefb2f5b5ff991f3070b39b09e006b66a5259f19ac290",
+          "code_length": 102,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException$CompressionException"
+          ]
+        },
+        {
+          "name": "huffmanDecode",
+          "descriptor": "(Ljava/nio/ByteBuffer;I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "33ad21916fe25bdc34c13538d28a8560aa71b7679c946669c1e3f7e1d3d1be3c",
+          "code_length": 89,
+          "throws": [
+            "org/eclipse/jetty/http2/hpack/HpackException$CompressionException"
+          ]
+        },
+        {
+          "name": "toISO88591String",
+          "descriptor": "(Ljava/nio/ByteBuffer;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "fb7ede332642775ccba32b0953e9824c4035623a98b69d6f43b7f6e165803eaf",
+          "code_length": 38
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e590ffbd4598971339ef0fcb7c278fa6754a998acc39084ebf96ca0a357ca278",
+          "code_length": 28
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "86f7d1a32af95a5cc7a8636441c4587350e7e6d68339a47917108989f19d3845",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/nio/ByteBuffer",
+        "java/util/function/LongSupplier",
+        "org/eclipse/jetty/http/HttpField",
+        "org/eclipse/jetty/http/HttpField$IntValueHttpField",
+        "org/eclipse/jetty/http/HttpField$LongValueHttpField",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpTokens",
+        "org/eclipse/jetty/http/HttpTokens$Token",
+        "org/eclipse/jetty/http/HttpTokens$Type",
+        "org/eclipse/jetty/http/compression/EncodingException",
+        "org/eclipse/jetty/http/compression/HuffmanDecoder",
+        "org/eclipse/jetty/http/compression/NBitIntegerDecoder",
+        "org/eclipse/jetty/http2/hpack/AuthorityHttpField",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$Entry",
+        "org/eclipse/jetty/http2/hpack/HpackDecoder",
+        "org/eclipse/jetty/http2/hpack/HpackDecoder$1",
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$CompressionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+        "org/eclipse/jetty/http2/hpack/HpackException$StreamException",
+        "org/eclipse/jetty/http2/hpack/MetaDataBuilder",
+        "org/eclipse/jetty/util/BufferUtil",
+        "org/eclipse/jetty/util/CharsetStringBuilder",
+        "org/eclipse/jetty/util/CharsetStringBuilder$Iso88591StringBuilder",
+        "org/eclipse/jetty/util/Index",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackContext$1.class",
+      "occurrence": 0,
+      "sha256": "de4e5f14ab919cd68d3726eb03e4651bd18645153d958c59052fdb15af61e33b",
+      "name": "org/eclipse/jetty/http2/hpack/HpackContext$1",
+      "major": 55,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$eclipse$jetty$http$HttpHeader",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f16671fa89b0633776cc94788c287c67742a22b59e6af4dc83aa06f9c5f82ebd",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http2/hpack/HpackContext",
+        "org/eclipse/jetty/http2/hpack/HpackContext$1"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/MetaDataBuilder$1.class",
+      "occurrence": 0,
+      "sha256": "0ff8af8a3257de7f059bb6984ba2fb13d74249c0e5de50f1fe0b222d0d131fd6",
+      "name": "org/eclipse/jetty/http2/hpack/MetaDataBuilder$1",
+      "major": 55,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$eclipse$jetty$http$HttpHeader",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a4b40dcea1087ceba0f9ee2bf0eed66409787081315d83818d74e25039b7feaa",
+          "code_length": 165
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http2/hpack/MetaDataBuilder",
+        "org/eclipse/jetty/http2/hpack/MetaDataBuilder$1"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackDecoder$1.class",
+      "occurrence": 0,
+      "sha256": "503a02f7d33d026d567b5ea5cdaa75b031e063a59efdc30af3460c5ceb0bb405",
+      "name": "org/eclipse/jetty/http2/hpack/HpackDecoder$1",
+      "major": 55,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$eclipse$jetty$http$HttpTokens$Type",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$org$eclipse$jetty$http$HttpHeader",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cca2f6c75b33a4a4a9811476d3d1baa0a179fd3e5b2be239419bb7b630c731d7",
+          "code_length": 124
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/eclipse/jetty/http/HttpHeader",
+        "org/eclipse/jetty/http/HttpTokens",
+        "org/eclipse/jetty/http/HttpTokens$Type",
+        "org/eclipse/jetty/http2/hpack/HpackDecoder",
+        "org/eclipse/jetty/http2/hpack/HpackDecoder$1"
+      ]
+    },
+    {
+      "entry": "org/eclipse/jetty/http2/hpack/HpackException$SessionException.class",
+      "occurrence": 0,
+      "sha256": "3f1e95491b7863687d383b75eb69eda24fb6f3832e445598d6693963b0215762",
+      "name": "org/eclipse/jetty/http2/hpack/HpackException$SessionException",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/eclipse/jetty/http2/hpack/HpackException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 129,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "org/eclipse/jetty/http2/hpack/HpackException",
+        "org/eclipse/jetty/http2/hpack/HpackException$SessionException"
+      ]
+    }
+  ]
+}

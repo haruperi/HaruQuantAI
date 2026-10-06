@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskDeleteFile/TaskDeleteFile.jar",
+  "sha256": "a82d1c7287df6f5802679862c54a1dc5bd0c37640e1dc178d0ca995439fc904f",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/DeleteFile/DeleteFileTask.class": "fb04a79dccf96658b6ee13c05191028b3de94e78b5af25e5f168cdbd44e96eb2"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/DeleteFile/DeleteFileTask.class",
+      "occurrence": 0,
+      "sha256": "fb04a79dccf96658b6ee13c05191028b3de94e78b5af25e5f168cdbd44e96eb2",
+      "member_shard": "docs/dev/evidence/sqx145/members/275/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/275/001.json",
+      "sha256": "626ccd9124b733d274170e69d9e1ea5f32b9771260cdf6cd37061be65fee8024"
+    }
+  ]
+}

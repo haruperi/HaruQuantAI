@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EquityChartDrawdown/EquityChartDrawdown.jar",
+  "archive_sha256": "8c0dc8ff1eb76f703912cd2a26e553522422d5a03c672e7404a04a1dbd45a530",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Drawdown/EquityChartDrawdown.class",
+      "occurrence": 0,
+      "sha256": "5e084cbc1f5976e277d403dab874119308863f38a08669ad4bb8c45337775b5b",
+      "name": "com/strategyquant/plugin/EquityChart/impl/Drawdown/EquityChartDrawdown",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "73a203f1e5c259cdc456d83c66eb1eac13f06ecb97e35d5427fe0aa8a36eaf0a",
+          "code_length": 822,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "generateDailyEquityMap",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;",
+          "access": 2,
+          "code_sha256": "6171d571f7d8d7ac544fd04c87e097ed04a88c1fabb0ff3fd3ccdb047ccdc018",
+          "code_length": 176
+        },
+        {
+          "name": "specialSubtraction",
+          "descriptor": "(DD)D",
+          "access": 10,
+          "code_sha256": "4b99415b9feb475eb3b34e82da71affbe9172d2c3d088c0ee7a318a8c21e55c4",
+          "code_length": 22
+        },
+        {
+          "name": "getPercentageDD",
+          "descriptor": "(DD)D",
+          "access": 2,
+          "code_sha256": "e34bfdc5de50250ace384c7fd6dfe45d897d012677667e0b61420fdf9629b917",
+          "code_length": 24
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7a7a67753b3824536512981300eef9a2b5a60547aa8a68aeac31d54ec41dacdb",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[J",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/EquityChart/impl/Drawdown/EquityChartDrawdown",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/equitychart/ChartDataset",
+        "com/strategyquant/tradinglib/equitychart/DomainAxisType",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/equitychart/EquityChartUtils",
+        "com/strategyquant/tradinglib/equitychart/SubChart",
+        "com/strategyquant/tradinglib/equitychart/SubChartDataset",
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleMap",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleMap$Entry",
+        "it/unimi/dsi/fastutil/longs/Long2FloatMap",
+        "it/unimi/dsi/fastutil/longs/Long2FloatMap$Entry",
+        "it/unimi/dsi/fastutil/longs/Long2FloatRBTreeMap",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/Map"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskSaveToFiles/TaskSaveToFiles.jar",
+  "archive_sha256": "3ee328b7c850f82783a49835a81add1023f162c3660b8bb6678cebcc675046f9",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/SaveToFiles/SaveToFiles.class",
+      "occurrence": 0,
+      "sha256": "4606995f954eb67066daf70e3123deac69c6aeeb830b31722b549b7d35de9047",
+      "name": "com/strategyquant/plugin/Task/impl/SaveToFiles/SaveToFiles",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "overwriteFiles",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "destDirectorySqx",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectoryStr",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectoryDatabank",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectoryTrades",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectoryHtml",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectoryPdf",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "destDirectorySC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "saveInSqxFormat",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "saveInStrFormat",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "exportDatabank",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "exportTrades",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "saveInHtmlFormat",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "saveInPdfFormat",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "saveSourceCode",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "databankSource",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "savedStr",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedSqx",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedDatabank",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedTrades",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedHtml",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedPdf",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "savedSc",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "MNActive",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "MNValue",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "format",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "useComma",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "setNoteActive",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "setNoteType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "setNoteCustom",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "sourceCodeType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "generator",
+          "descriptor": "Lcom/strategyquant/lib/sourcecode/SourceCodeGenerator;",
+          "access": 2
+        },
+        {
+          "name": "sourceCodeFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7fce864c935c1f0675d85837784c990626fdadfc0da9107239929de73b26de2e",
+          "code_length": 87,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "ddea999601a1cbe34fcbbcdbd51ff0dd800abcc3bb9f8d47bd4ee5544cbe289b",
+          "code_length": 87,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "2ec91ad4b3a314f93d9df4796eae9de5751cb9be7537380d7cd3ede37213b21e",
+          "code_length": 608,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "de4c2ab65b9c25066bfe9948dfa1e2e116d83d7dd544c3fc5d99096a73fb313a",
+          "code_length": 2114,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "generateUniqueName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "76765cb1aaec77899d4345f7ad5c94e206ed47b7b7b55a69438bdec36e55ca81",
+          "code_length": 199
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4527c3cc10f27d8f636efe69b25b89d8b1380824bc6d69084e1d417258d9d836",
+          "code_length": 4
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "31f00b31c258d2ea72c4b251676d195664fe518fb063c273dbbe6c19e3a21da2",
+          "code_length": 4
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b1bb4bef32614d3db052d8d935ceecb6bc3ef8a05ff7aef292de1a2bae937cfa",
+          "code_length": 7
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "c220f09f7bb91d12e89cd54b6bac1b9c42528a0ccb4c0057d587bf736f59faa3",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1a4bb1dfebdd449147860640b6ec6e0e3337504edd9331d62c5160148ace44e4",
+          "code_length": 11
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "ffafeefc8d2e96621c66eb8b06cada06d2f35f2c1b93ee062f71d4bf8f298095",
+          "code_length": 12
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "a578bcfca98f16c8def5181452bf4041e3b6d6b30656862cd9a9111461cf5d65",
+          "code_length": 286
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/settings/ParametrizationSettings",
+        "com/strategyquant/lib/sourcecode/MissingBlockMessage",
+        "com/strategyquant/lib/sourcecode/SourceCodeGenerator",
+        "com/strategyquant/lib/sourcecode/SourceCodeGenerators",
+        "com/strategyquant/plugin/Task/impl/SaveToFiles/SaveToFiles",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/databank/DatabankExport",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/StrategySaver",
+        "com/strategyquant/tradinglib/project/TaskStat",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/io/File",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/OutOfMemoryError",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/slf4j/Logger"
+      ]
+    }
+  ]
+}

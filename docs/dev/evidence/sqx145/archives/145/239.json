@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsApplyMassConfig/SettingsApplyMassConfig.jar",
+  "sha256": "c6ce1b92dae7d4dd00f3bc495978230628bacd0b81c004b85c083eb48f492e6f",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/ApplyMassConfig/SettingsApplyMassConfig.class": "dcc8d25f55cd96e1d6961bb8051a8729a7b8b70a2f0430932072b531828be8f4"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/ApplyMassConfig/SettingsApplyMassConfig.class",
+      "occurrence": 0,
+      "sha256": "dcc8d25f55cd96e1d6961bb8051a8729a7b8b70a2f0430932072b531828be8f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/239/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/239/001.json",
+      "sha256": "63aac6efc8c524cbe3dc7d77b87e5d145eb5a48f407e19d37f5c3884a44a87a0"
+    }
+  ]
+}

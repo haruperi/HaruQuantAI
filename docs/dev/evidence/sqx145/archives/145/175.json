@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+  "sha256": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c",
+  "class_count": 6,
+  "unique_class_entries": 6,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport.class": "d4b1e76279e8221d556621dc68a4c2bf609c627d2bff50e38826ed80ca34e696",
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1.class": "6c1ddffc04ad1100bce2bdb7f5ec3d00c96324770bd5ee28359b138a5057d041",
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2.class": "428219651a4184b12aaa4ff7d59d3290c72185557af9fdb61468199f9b95a02b",
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class": "0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3",
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin.class": "afa0ac47340cca2c01534ce9d702203f11c677065fc5edcb47834ac71167e363",
+    "com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates.class": "8538e185f97b7c6951f4135267bf69fce247ed3d8d5de4eb2c2a4ea4b25482e4"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport.class",
+      "occurrence": 0,
+      "sha256": "d4b1e76279e8221d556621dc68a4c2bf609c627d2bff50e38826ed80ca34e696",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1.class",
+      "occurrence": 0,
+      "sha256": "6c1ddffc04ad1100bce2bdb7f5ec3d00c96324770bd5ee28359b138a5057d041",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2.class",
+      "occurrence": 0,
+      "sha256": "428219651a4184b12aaa4ff7d59d3290c72185557af9fdb61468199f9b95a02b",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class",
+      "occurrence": 0,
+      "sha256": "0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "afa0ac47340cca2c01534ce9d702203f11c677065fc5edcb47834ac71167e363",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates.class",
+      "occurrence": 0,
+      "sha256": "8538e185f97b7c6951f4135267bf69fce247ed3d8d5de4eb2c2a4ea4b25482e4",
+      "member_shard": "docs/dev/evidence/sqx145/members/175/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/175/001.json",
+      "sha256": "e9d553c9fb7c23dc54f774dfd939019243bd04fee9f1fbe39dbaa054a8abf5f6"
+    }
+  ]
+}

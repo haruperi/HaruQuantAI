@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ProjectConditionGoToEvaluated/ProjectConditionGoToEvaluated.jar",
+  "archive_sha256": "519f150819c222c443ffef6678eeb201a5114579db0aaf8c4dfda88cc058def8",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/ProjectCondition/impl/GoToEvaluated/GoToEvaluatedConditionPlugin.class",
+      "occurrence": 0,
+      "sha256": "85ba96ac33d9ee5f35462b0664f775e431ad27cc45829236cbbec1ccb82926c3",
+      "name": "com/strategyquant/plugin/ProjectCondition/impl/GoToEvaluated/GoToEvaluatedConditionPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/project/IProjectCondition"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "fields",
+          "descriptor": "[Lcom/strategyquant/tradinglib/project/ProjectConditionField;",
+          "access": 26
+        },
+        {
+          "name": "comparator",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastCheckedValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70e8411ed87192ad55eaaf582299ae93aae251f70e9c737839e631b2d4e4d677",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "924b9351301104321ec4d728c78fc2944d918364e82f310cd2245f649c059f33",
+          "code_length": 6
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f100eb3ebcc13f84cac04aeecaf40ad8ec2ddf4336f7331696a53b2a6841d25a",
+          "code_length": 29
+        },
+        {
+          "name": "getDescriptionFormat",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f8ec77056117e654df938edd84dae0db42fbc53c6469b32366270ab2129ff6f8",
+          "code_length": 10
+        },
+        {
+          "name": "getLastCheckedValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getFields",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/project/ProjectConditionField;",
+          "access": 1,
+          "code_sha256": "291045d98800e8c1ceb02b0238d8d90f4cec29e4c129c642ea7fa8627f06948c",
+          "code_length": 4
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "fa51500fc105a6cac2079dbfc2a4c5118d07d9d275ca3f98c7af580f764d1180",
+          "code_length": 175,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isMet",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;)Z",
+          "access": 1,
+          "code_sha256": "7d0ae7a77f9b6b55d7f05bbc01d455ab535e0a208ff5e6b9853354288ae22f16",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8cff1f563ab6c890000365f8beee1765c0440f3d2bf8528c5bcc20bde30a1a88",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/IProjectCondition;",
+          "access": 1,
+          "code_sha256": "905df0d601ad9ff9b1ea75a430f30ae3aac373b42c6f8851c442f38aae7427bd",
+          "code_length": 26
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "d0b4bc0d5ea1ef607d066ac5143ea7571c6a89caa939d46cc6690addca1ddab7",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1d1a1f848ed0c8dc7a657c841a68182f7c695b2e1071d918465a55b62d38faec",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/ProjectCondition/impl/GoToEvaluated/GoToEvaluatedConditionPlugin",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/project/IProjectCondition",
+        "com/strategyquant/tradinglib/project/ProjectConditionField",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

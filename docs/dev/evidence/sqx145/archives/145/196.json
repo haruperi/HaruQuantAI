@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ProjectConditionGoToActivated/ProjectConditionGoToActivated.jar",
+  "sha256": "c33c5c93ee9ed6790eebd354ea632699431b77d5708305e196af8432582acdfe",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/ProjectCondition/impl/GoToActivated/GoToActivatedConditionPlugin.class": "9ee6f53400e1ccb1264fb0987be893371abbbd99260ee773b08601d0286c92aa"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/ProjectCondition/impl/GoToActivated/GoToActivatedConditionPlugin.class",
+      "occurrence": 0,
+      "sha256": "9ee6f53400e1ccb1264fb0987be893371abbbd99260ee773b08601d0286c92aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/196/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/196/001.json",
+      "sha256": "18083a501b4e0e9628019339ff86ec2351873f9b6e9d785e80a69f97b9ce7654"
+    }
+  ]
+}

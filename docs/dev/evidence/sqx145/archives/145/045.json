@@ -1,0 +1,197 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jackson-dataformat-yaml-2.21.1.jar",
+  "sha256": "5c94fa55d4b93bd4ea9ac6f2cf4928ff50822d1c43e521e715d3abf23031a06d",
+  "class_count": 24,
+  "unique_class_entries": 24,
+  "resource_count": 7,
+  "duplicate_entries": [],
+  "classes": {
+    "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException.class": "8c96569f43a85915941f2c9cfa8693ca36086a19f4a9929e4d8389808203bff8",
+    "com/fasterxml/jackson/dataformat/yaml/PackageVersion.class": "e150ac30e507aa7b459dcd2d17eb421c4292f2e5eab86cae7ad5aea302381b4c",
+    "com/fasterxml/jackson/dataformat/yaml/UTF8Reader.class": "83159ebade72fdd0b908dcaa18ea3e4776748efe88e0acbce0bab9854b15c97a",
+    "com/fasterxml/jackson/dataformat/yaml/UTF8Writer.class": "94168d9321e752873956f9323afaff6091c5795d72fc07baa0791b13bbe4b8fa",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory.class": "a616704c00b8ff4e011346d71dbede6ff6a4301460cbf9b56858d4e05fd283cd",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext.class": "503a7d196693481784ee267c092da1c319a234b3e0692ec93462f205c4aed5c6",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser.class": "60f60d1876783431ac4f0653895e6d68f23e97cb1f8711e3f40014bf7e8a9751",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLFactory.class": "f8982c5ba482a06405acf5f88d7f227c7214722a407fc0d39c3018db42bd9367",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder.class": "b59d303a0e39a0dc70c328a4b4755e7a42a2a54c261d9e387982629a10bb1215",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature.class": "0e55bf7b7e5202f47c919e6692f17851ddb3877b293780ff3cd6aa37f1835381",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator.class": "bd914bcc9d02f579e3296156471cc21549f3066744f4a56e36c1b9bab46c86ea",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder.class": "cd126766d0e915868475caa1ff04a6b60e809a79a938de2a025d607f640b63d8",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLMapper.class": "0ad0cf5223fd9b76850557ea97268d00aba3a5127240669a8c9dd609a34daddc",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature.class": "35a816af4db24eba773aaabda81667a901f7d1ef5e3fbd00f9914fce26435600",
+    "com/fasterxml/jackson/dataformat/yaml/YAMLParser.class": "6305cc9b09650ede2855fdbd03265f2e34eb698cb4425d57663e97c3e697749d",
+    "com/fasterxml/jackson/dataformat/yaml/package-info.class": "482e0b7397bb0b10f0f4a94ccb3a762fb3aeb753954864bae89a75c8fa6a54fa",
+    "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark.class": "3d12a692a1c086a5af1098bcba826b0a001045d1904dd28b93f27b5371e3a5b5",
+    "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException.class": "ae6369fc8809b1cf9cc2ec453fee6aec5f7ab12e27898ff62d03b7f1958593fa",
+    "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException.class": "ccf93008811730f5de9ca85bf266069c2e84f8678fbd4d5869467264490bc35e",
+    "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/package-info.class": "ec0962f1481d6ffbeca40ce34c95858f8d4907c7d1c41c391ef5b17ed4af51d6",
+    "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default.class": "7c2f7808c09bc2875df38172ebeded9a9c9e8cc0a97c213ed274575f7079c0c4",
+    "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker.class": "a05c916d5d2e55748d5e2fbe6aaad68d5f761381989ec8b41913e4bd9181927d",
+    "com/fasterxml/jackson/dataformat/yaml/util/package-info.class": "9e3422b84e91366d758ae91789c971ab3700b6cba4e448fb57d44d46724f87b6",
+    "META-INF/versions/9/module-info.class": "c058f4a066d01d392c521b96b8b1ff6816112be613f6f3727f6dac4955fa0a9f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "bd15e44a3427cd8ab50c70dd1bd06c25a87583feaf677ec0ad4dcd850d6264ff",
+    "META-INF/LICENSE": "9e255394eb9f8cfdcdf599dd150d9ca3e922ab4d31cb5e83519479a91e1d3072",
+    "META-INF/NOTICE": "5828ffe74ea0ee4bf896654026f05fed1ead1d22acd577cc1eec9be0bc0de1ed",
+    "META-INF/services/com.fasterxml.jackson.core.JsonFactory": "6d4681a7e931eb8682e37b404762decb4f2d2872c065137665d064cae5793034",
+    "META-INF/services/com.fasterxml.jackson.core.ObjectCodec": "d52dd5e1e07abdc4ea3ece5de02e0a47032a70919c95ae04d6062c3cf5af3915",
+    "META-INF/maven/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/pom.xml": "eadb9e9450522b3004aa1d78ff56981bd0ecfd057686ad612d1e281f4d78e670",
+    "META-INF/maven/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/pom.properties": "b960be8073c5c5f917d9c87f46ba903f8b8d16431d519b4c9a2c50ad74d977da"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException.class",
+      "occurrence": 0,
+      "sha256": "8c96569f43a85915941f2c9cfa8693ca36086a19f4a9929e4d8389808203bff8",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/PackageVersion.class",
+      "occurrence": 0,
+      "sha256": "e150ac30e507aa7b459dcd2d17eb421c4292f2e5eab86cae7ad5aea302381b4c",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/UTF8Reader.class",
+      "occurrence": 0,
+      "sha256": "83159ebade72fdd0b908dcaa18ea3e4776748efe88e0acbce0bab9854b15c97a",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/UTF8Writer.class",
+      "occurrence": 0,
+      "sha256": "94168d9321e752873956f9323afaff6091c5795d72fc07baa0791b13bbe4b8fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory.class",
+      "occurrence": 0,
+      "sha256": "a616704c00b8ff4e011346d71dbede6ff6a4301460cbf9b56858d4e05fd283cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext.class",
+      "occurrence": 0,
+      "sha256": "503a7d196693481784ee267c092da1c319a234b3e0692ec93462f205c4aed5c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser.class",
+      "occurrence": 0,
+      "sha256": "60f60d1876783431ac4f0653895e6d68f23e97cb1f8711e3f40014bf7e8a9751",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLFactory.class",
+      "occurrence": 0,
+      "sha256": "f8982c5ba482a06405acf5f88d7f227c7214722a407fc0d39c3018db42bd9367",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder.class",
+      "occurrence": 0,
+      "sha256": "b59d303a0e39a0dc70c328a4b4755e7a42a2a54c261d9e387982629a10bb1215",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature.class",
+      "occurrence": 0,
+      "sha256": "0e55bf7b7e5202f47c919e6692f17851ddb3877b293780ff3cd6aa37f1835381",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator.class",
+      "occurrence": 0,
+      "sha256": "bd914bcc9d02f579e3296156471cc21549f3066744f4a56e36c1b9bab46c86ea",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder.class",
+      "occurrence": 0,
+      "sha256": "cd126766d0e915868475caa1ff04a6b60e809a79a938de2a025d607f640b63d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper.class",
+      "occurrence": 0,
+      "sha256": "0ad0cf5223fd9b76850557ea97268d00aba3a5127240669a8c9dd609a34daddc",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature.class",
+      "occurrence": 0,
+      "sha256": "35a816af4db24eba773aaabda81667a901f7d1ef5e3fbd00f9914fce26435600",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLParser.class",
+      "occurrence": 0,
+      "sha256": "6305cc9b09650ede2855fdbd03265f2e34eb698cb4425d57663e97c3e697749d",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/package-info.class",
+      "occurrence": 0,
+      "sha256": "482e0b7397bb0b10f0f4a94ccb3a762fb3aeb753954864bae89a75c8fa6a54fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark.class",
+      "occurrence": 0,
+      "sha256": "3d12a692a1c086a5af1098bcba826b0a001045d1904dd28b93f27b5371e3a5b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException.class",
+      "occurrence": 0,
+      "sha256": "ae6369fc8809b1cf9cc2ec453fee6aec5f7ab12e27898ff62d03b7f1958593fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException.class",
+      "occurrence": 0,
+      "sha256": "ccf93008811730f5de9ca85bf266069c2e84f8678fbd4d5869467264490bc35e",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/package-info.class",
+      "occurrence": 0,
+      "sha256": "ec0962f1481d6ffbeca40ce34c95858f8d4907c7d1c41c391ef5b17ed4af51d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default.class",
+      "occurrence": 0,
+      "sha256": "7c2f7808c09bc2875df38172ebeded9a9c9e8cc0a97c213ed274575f7079c0c4",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker.class",
+      "occurrence": 0,
+      "sha256": "a05c916d5d2e55748d5e2fbe6aaad68d5f761381989ec8b41913e4bd9181927d",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "9e3422b84e91366d758ae91789c971ab3700b6cba4e448fb57d44d46724f87b6",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "c058f4a066d01d392c521b96b8b1ff6816112be613f6f3727f6dac4955fa0a9f",
+      "member_shard": "docs/dev/evidence/sqx145/members/045/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/045/001.json",
+      "sha256": "0b665186f73f130a56c970a0b6eca41b95873b6187f07dafc68a30fef1706901"
+    }
+  ]
+}

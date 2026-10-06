@@ -20,7 +20,7 @@ export function validateSourceMapping(
     !path.split('/').some((part) => part === '..' || part === '.' || part === '');
   if (mapping.schema_version !== 1) fail('Unsupported mapping version');
   if (
-    mapping.donor_root !== 'SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto' ||
+    mapping.donor_root !== 'SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceCrypto' ||
     mapping.target_root !== 'HARUQUANTAI_ROOT/ui/app/plugins/data_source/Crypto'
   )
     fail('Invalid logical roots');

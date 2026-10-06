@@ -1,0 +1,292 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/activation-1.1.1.jar",
+  "sha256": "ae475120e9fcd99b4b00b38329bd61cdc5eb754eee03fe66c01f50e137724f99",
+  "class_count": 38,
+  "unique_class_entries": 38,
+  "resource_count": 4,
+  "duplicate_entries": [],
+  "classes": {
+    "com/sun/activation/registries/LineTokenizer.class": "8bc05cf99192d7002e4f003523352e091924b66ea90cc07b71c59363156c34b5",
+    "com/sun/activation/registries/LogSupport.class": "b1503911bfa31b89a0eae58be7484dc7f70354ef055b90833b4ec9263012b66b",
+    "com/sun/activation/registries/MailcapFile.class": "2a7be6fb9f795542558d71dbce4f7adec60b1d52f46b227e124d6c41b9c797ba",
+    "com/sun/activation/registries/MailcapParseException.class": "0e6b930d20b92056d56cfa640124900edace398ab19c017ab85bb6c9b88430d7",
+    "com/sun/activation/registries/MailcapTokenizer.class": "15c9cebe18b30608d29474ff010bf49bc69723db31a9829191a22bc13274158a",
+    "com/sun/activation/registries/MimeTypeEntry.class": "72b1537846277997cd28a140023b2d436aeb8910eac7b39b9940ac465121b007",
+    "com/sun/activation/registries/MimeTypeFile.class": "dce4cecdbc7c689cfb761deb9428dc84b0465ee11ce07106bc82abf7ec05d497",
+    "com/sun/activation/viewers/ImageViewer.class": "c84918127b00b227e95463fad4a1473ce48bcd43ccd00ca2a6cbe676c04cf54a",
+    "com/sun/activation/viewers/ImageViewerCanvas.class": "6f7261a6072bbcce41b44c19de4fd25ec943d61b00034fe39d787af93542716c",
+    "com/sun/activation/viewers/TextEditor.class": "40a9f0cefd3735a9e377ca553f3948098e2e2163d920d84730691db229871bc9",
+    "com/sun/activation/viewers/TextViewer.class": "0cf5dca57ed782d90d5a039e0cdeabd5ccaac839e4d532d589c95b9ad480e652",
+    "javax/activation/ActivationDataFlavor.class": "13be8cbd37d0e5594c68f159be4259e4c412087f874984dab7ce87a663610209",
+    "javax/activation/CommandInfo.class": "8e1aecc124cc1e0d34bad702f9924f18e98ca8c1ad7d61d8e3534dcda170d25b",
+    "javax/activation/CommandMap.class": "91a58a53aaf908e9430c9d89402ba972daafeb74d54e915406bbd6034a881ad6",
+    "javax/activation/CommandObject.class": "424031852715a2a2abac4d5834fa5582feb1441bf5366e307e831f7755bb8f5e",
+    "javax/activation/DataContentHandler.class": "7dd9e99167d025b3ff6130021f5baf7319dbed7dbd502bc5eddcdf7db6ae09ec",
+    "javax/activation/DataContentHandlerFactory.class": "c52adaeb77b3a19e075db53b8c23dbf24cc96e69b66718137ab11adaf99992cd",
+    "javax/activation/DataHandler$1.class": "f8f0339f4828b7c60fed734598e9a945f1b311514b976acf7615171a7cff464a",
+    "javax/activation/DataHandler.class": "ed4bd18b3fb348e838ae55d29ecbb49377972e708f4cbe7b6e63989a4b3114ce",
+    "javax/activation/DataHandlerDataSource.class": "c94d04fc865951ea001cd3903837ae4ade54e88f758b567c033178f04dbd8751",
+    "javax/activation/DataSource.class": "b82277efa549dab655608a7154582b93ca9434b8291b11cd98d7ffcc950c774f",
+    "javax/activation/DataSourceDataContentHandler.class": "7ce160862409628be14b4aa9c7249d74260e4eab6beeec65fe4b9d541a019cbf",
+    "javax/activation/FileDataSource.class": "d188891b5047ffbb0db120824a68b475a3b655b9a2396f72588709413af0dd0d",
+    "javax/activation/FileTypeMap.class": "a9e656b2bd6c91a83a70be98e6a3eae7e7598fe7f25667f30d3d5788d25949d1",
+    "javax/activation/MailcapCommandMap.class": "19ad1f18e034a9393498c23c9995b891c03f8c631adf5bdbc8f6a40e703f9af5",
+    "javax/activation/MimeType.class": "3801744b32f8abd18e62a3659e3503bc04822469619d717d7f26a90c53f3e3b5",
+    "javax/activation/MimeTypeParameterList.class": "c04f3967ceadab43c94acf19dff5162e9c654cf04f8f8ea976b00182891d3dc3",
+    "javax/activation/MimeTypeParseException.class": "248a31e4f13b614ad6daefcd37a6e53c7c376ab353121f33e38f2751ba6df4d8",
+    "javax/activation/MimetypesFileTypeMap.class": "d162f5028f329337abf7ab5bc0c70edc42f045d01f57568f906df39fd0517241",
+    "javax/activation/ObjectDataContentHandler.class": "e126abff9c1fa67bedcfeb89cfe7b7f36237dba3fc09317892e9d3fab03e9cd5",
+    "javax/activation/SecuritySupport$1.class": "3ab0a6185d8ae2ef2e9f47f94d1edb4a48c4cab0ed8d7983ca518fe0e334b353",
+    "javax/activation/SecuritySupport$2.class": "4ef8e871e55b541ae8b6f620bce437b904c7c722e943262bef0123f7ae345186",
+    "javax/activation/SecuritySupport$3.class": "8800317d9399d13c0ea2ddbec86da061e284b2c335bf5e201c42bbe1cc119e90",
+    "javax/activation/SecuritySupport$4.class": "c6bdb5409491dcdcf35271ed387018c0f8d929c5f975c9af77fe3b014d380ab2",
+    "javax/activation/SecuritySupport$5.class": "349eb229801e3ccfcc27b133cc6ac671c3ca8c917791a162357befcb3120d194",
+    "javax/activation/SecuritySupport.class": "ec2ddcc6813255dfd179c08a4daba216a769830c05cb6d347eaac81804a2647e",
+    "javax/activation/URLDataSource.class": "15959ba53474fbfd410bddfea42d19e92aba3a8aca0a682b4fd9e182a3048811",
+    "javax/activation/UnsupportedDataTypeException.class": "f9a0d1a8c59a37ca137dd7a074b72a02fbda1c089ce49168d334aa21291ffd90"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "6edc228c740f2521cb5ba59256b255adb484c5f9bbb01c0c440e228f511d0b36",
+    "META-INF/LICENSE.txt": "10f3b2b1bbdbba01667bfb3bee47ec989e7c577c244ba74846d55f31d8e2093c",
+    "META-INF/mailcap.default": "fc55453719bc94f8b831c4faf43080e2d47fa4e84206e02325a56cc68864c013",
+    "META-INF/mimetypes.default": "19e63e40440517b8383e3670649ddab6d227b4e5d17e071d760ea6d1a66f45c2"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/sun/activation/registries/LineTokenizer.class",
+      "occurrence": 0,
+      "sha256": "8bc05cf99192d7002e4f003523352e091924b66ea90cc07b71c59363156c34b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/LogSupport.class",
+      "occurrence": 0,
+      "sha256": "b1503911bfa31b89a0eae58be7484dc7f70354ef055b90833b4ec9263012b66b",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapFile.class",
+      "occurrence": 0,
+      "sha256": "2a7be6fb9f795542558d71dbce4f7adec60b1d52f46b227e124d6c41b9c797ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapParseException.class",
+      "occurrence": 0,
+      "sha256": "0e6b930d20b92056d56cfa640124900edace398ab19c017ab85bb6c9b88430d7",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapTokenizer.class",
+      "occurrence": 0,
+      "sha256": "15c9cebe18b30608d29474ff010bf49bc69723db31a9829191a22bc13274158a",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/MimeTypeEntry.class",
+      "occurrence": 0,
+      "sha256": "72b1537846277997cd28a140023b2d436aeb8910eac7b39b9940ac465121b007",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/registries/MimeTypeFile.class",
+      "occurrence": 0,
+      "sha256": "dce4cecdbc7c689cfb761deb9428dc84b0465ee11ce07106bc82abf7ec05d497",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/viewers/ImageViewer.class",
+      "occurrence": 0,
+      "sha256": "c84918127b00b227e95463fad4a1473ce48bcd43ccd00ca2a6cbe676c04cf54a",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/viewers/ImageViewerCanvas.class",
+      "occurrence": 0,
+      "sha256": "6f7261a6072bbcce41b44c19de4fd25ec943d61b00034fe39d787af93542716c",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/viewers/TextEditor.class",
+      "occurrence": 0,
+      "sha256": "40a9f0cefd3735a9e377ca553f3948098e2e2163d920d84730691db229871bc9",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "com/sun/activation/viewers/TextViewer.class",
+      "occurrence": 0,
+      "sha256": "0cf5dca57ed782d90d5a039e0cdeabd5ccaac839e4d532d589c95b9ad480e652",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/ActivationDataFlavor.class",
+      "occurrence": 0,
+      "sha256": "13be8cbd37d0e5594c68f159be4259e4c412087f874984dab7ce87a663610209",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/CommandInfo.class",
+      "occurrence": 0,
+      "sha256": "8e1aecc124cc1e0d34bad702f9924f18e98ca8c1ad7d61d8e3534dcda170d25b",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/CommandMap.class",
+      "occurrence": 0,
+      "sha256": "91a58a53aaf908e9430c9d89402ba972daafeb74d54e915406bbd6034a881ad6",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/CommandObject.class",
+      "occurrence": 0,
+      "sha256": "424031852715a2a2abac4d5834fa5582feb1441bf5366e307e831f7755bb8f5e",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "7dd9e99167d025b3ff6130021f5baf7319dbed7dbd502bc5eddcdf7db6ae09ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataContentHandlerFactory.class",
+      "occurrence": 0,
+      "sha256": "c52adaeb77b3a19e075db53b8c23dbf24cc96e69b66718137ab11adaf99992cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataHandler$1.class",
+      "occurrence": 0,
+      "sha256": "f8f0339f4828b7c60fed734598e9a945f1b311514b976acf7615171a7cff464a",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataHandler.class",
+      "occurrence": 0,
+      "sha256": "ed4bd18b3fb348e838ae55d29ecbb49377972e708f4cbe7b6e63989a4b3114ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataHandlerDataSource.class",
+      "occurrence": 0,
+      "sha256": "c94d04fc865951ea001cd3903837ae4ade54e88f758b567c033178f04dbd8751",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataSource.class",
+      "occurrence": 0,
+      "sha256": "b82277efa549dab655608a7154582b93ca9434b8291b11cd98d7ffcc950c774f",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/DataSourceDataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "7ce160862409628be14b4aa9c7249d74260e4eab6beeec65fe4b9d541a019cbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/FileDataSource.class",
+      "occurrence": 0,
+      "sha256": "d188891b5047ffbb0db120824a68b475a3b655b9a2396f72588709413af0dd0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/FileTypeMap.class",
+      "occurrence": 0,
+      "sha256": "a9e656b2bd6c91a83a70be98e6a3eae7e7598fe7f25667f30d3d5788d25949d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/MailcapCommandMap.class",
+      "occurrence": 0,
+      "sha256": "19ad1f18e034a9393498c23c9995b891c03f8c631adf5bdbc8f6a40e703f9af5",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/MimeType.class",
+      "occurrence": 0,
+      "sha256": "3801744b32f8abd18e62a3659e3503bc04822469619d717d7f26a90c53f3e3b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/MimeTypeParameterList.class",
+      "occurrence": 0,
+      "sha256": "c04f3967ceadab43c94acf19dff5162e9c654cf04f8f8ea976b00182891d3dc3",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/MimeTypeParseException.class",
+      "occurrence": 0,
+      "sha256": "248a31e4f13b614ad6daefcd37a6e53c7c376ab353121f33e38f2751ba6df4d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/MimetypesFileTypeMap.class",
+      "occurrence": 0,
+      "sha256": "d162f5028f329337abf7ab5bc0c70edc42f045d01f57568f906df39fd0517241",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/ObjectDataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "e126abff9c1fa67bedcfeb89cfe7b7f36237dba3fc09317892e9d3fab03e9cd5",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$1.class",
+      "occurrence": 0,
+      "sha256": "3ab0a6185d8ae2ef2e9f47f94d1edb4a48c4cab0ed8d7983ca518fe0e334b353",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$2.class",
+      "occurrence": 0,
+      "sha256": "4ef8e871e55b541ae8b6f620bce437b904c7c722e943262bef0123f7ae345186",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$3.class",
+      "occurrence": 0,
+      "sha256": "8800317d9399d13c0ea2ddbec86da061e284b2c335bf5e201c42bbe1cc119e90",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$4.class",
+      "occurrence": 0,
+      "sha256": "c6bdb5409491dcdcf35271ed387018c0f8d929c5f975c9af77fe3b014d380ab2",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$5.class",
+      "occurrence": 0,
+      "sha256": "349eb229801e3ccfcc27b133cc6ac671c3ca8c917791a162357befcb3120d194",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/SecuritySupport.class",
+      "occurrence": 0,
+      "sha256": "ec2ddcc6813255dfd179c08a4daba216a769830c05cb6d347eaac81804a2647e",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/URLDataSource.class",
+      "occurrence": 0,
+      "sha256": "15959ba53474fbfd410bddfea42d19e92aba3a8aca0a682b4fd9e182a3048811",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    },
+    {
+      "entry": "javax/activation/UnsupportedDataTypeException.class",
+      "occurrence": 0,
+      "sha256": "f9a0d1a8c59a37ca137dd7a074b72a02fbda1c089ce49168d334aa21291ffd90",
+      "member_shard": "docs/dev/evidence/sqx145/members/001/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/001/001.json",
+      "sha256": "9434a8790e5805a83f6f8833bacf2df08ca1f2d83bd080312e6433b9462daf6f"
+    }
+  ]
+}

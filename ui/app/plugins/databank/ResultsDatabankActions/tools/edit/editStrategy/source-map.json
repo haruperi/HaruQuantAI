@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only Tools/edit/editStrategy bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editStrategy",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-    "version": 1,
-    "state": "owner-approved-plan"
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
   },
   "owner": {
     "decision": "DEC-UI-DATABANK-COMPARE-EDITING-STRUCTURAL-OWNERSHIP",
@@ -29,35 +29,45 @@
     {
       "id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
       "family": "bounded installed Tools artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy"
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/EditStrategyCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/EditStrategyCtrl.js",
       "relative_path": "EditStrategyCtrl.js",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Independent existing mock frontend counterpart or justified exclusion",
       "access_date": "2026-10-06",
-      "sha256": "49472c1b3e5fbe01ce135c5f39ea0fdf3be8cb355802b37bd69029a87a95e5d1",
+      "sha256": "6bc0bbff02bff18a9b6393c3ede44803cb9dbe30d2ca634b06622f9fa2e941e2",
       "target": "EditStrategyCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Independent existing mock frontend counterpart or justified exclusion",
       "access_date": "2026-10-06",
-      "sha256": "9e10e3a19f584d3c2a30281a72fe63ee23850fca52c52c63b9cc21875cf83886",
+      "sha256": "26baa15ee746a6f0ce64bc5825ad54403db9755d9f49fb14f21f21e920e47987",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -65,5 +75,10 @@
       "reason": "Structural manifest, not behavioral ledger",
       "path": "source-map.json"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

@@ -1,0 +1,4731 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jcommon-1.0.12.jar",
+  "archive_sha256": "34dd367ad34ae0baa5d5430fc9a13db1d12d66e29477cbb453ca92f5084a4e7b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener.class",
+      "occurrence": 0,
+      "sha256": "5896779d3cf1bd332a9fed529b1ec2198c2a4e5cedb0271ebec278f0eea259e0",
+      "name": "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener",
+      "major": 47,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/beans/PropertyChangeListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/jfree/ui/tabbedui/TabbedFrame;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jfree/ui/tabbedui/TabbedFrame;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "propertyChange",
+          "descriptor": "(Ljava/beans/PropertyChangeEvent;)V",
+          "access": 1,
+          "code_sha256": "a22ae0223406062580535a9593534d737051671400a562b8a240ac16cec5038d",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "java/beans/PropertyChangeEvent",
+        "java/beans/PropertyChangeListener",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/ui/tabbedui/AbstractTabbedUI",
+        "org/jfree/ui/tabbedui/TabbedFrame",
+        "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedFrame.class",
+      "occurrence": 0,
+      "sha256": "121d2cd03396e9ccf30ebf3f435886df2052f9bdf2f1760592438f058601fcb6",
+      "name": "org/jfree/ui/tabbedui/TabbedFrame",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/JFrame",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tabbedUI",
+          "descriptor": "Lorg/jfree/ui/tabbedui/AbstractTabbedUI;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getTabbedUI",
+          "descriptor": "()Lorg/jfree/ui/tabbedui/AbstractTabbedUI;",
+          "access": 20,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lorg/jfree/ui/tabbedui/AbstractTabbedUI;)V",
+          "access": 1,
+          "code_sha256": "c2ad94a75f2173f2b8b73f8cf46f69e6df84db3c7357ed30821f1f9ea20a1f0f",
+          "code_length": 74
+        }
+      ],
+      "class_references": [
+        "java/awt/BorderLayout",
+        "javax/swing/JFrame",
+        "javax/swing/JPanel",
+        "org/jfree/ui/tabbedui/AbstractTabbedUI",
+        "org/jfree/ui/tabbedui/TabbedFrame",
+        "org/jfree/ui/tabbedui/TabbedFrame$1",
+        "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/VerticalLayout.class",
+      "occurrence": 0,
+      "sha256": "f8f2f0b0cd28e1311efa300077b906cc161db343a8b5addfdff384e3d2794bbb",
+      "name": "org/jfree/ui/tabbedui/VerticalLayout",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/LayoutManager"
+      ],
+      "fields": [
+        {
+          "name": "useSizeFromParent",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        },
+        {
+          "name": "addLayoutComponent",
+          "descriptor": "(Ljava/lang/String;Ljava/awt/Component;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "removeLayoutComponent",
+          "descriptor": "(Ljava/awt/Component;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "preferredLayoutSize",
+          "descriptor": "(Ljava/awt/Container;)Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "a0f3b2b30b5e7bdbf6f0ee10ba1d5e4cc5be35ea6535de76a4464137304211aa",
+          "code_length": 149
+        },
+        {
+          "name": "minimumLayoutSize",
+          "descriptor": "(Ljava/awt/Container;)Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "732b546b59b096f28370d0e136e9de2395994f676d1a0ee4d83e9553875a5c70",
+          "code_length": 149
+        },
+        {
+          "name": "isUseSizeFromParent",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "layoutContainer",
+          "descriptor": "(Ljava/awt/Container;)V",
+          "access": 1,
+          "code_sha256": "622cefd38aecedaf266d79cb1853d39a364b43b50dc11c735768de24270a5ac8",
+          "code_length": 157
+        }
+      ],
+      "class_references": [
+        "java/awt/Component",
+        "java/awt/Container",
+        "java/awt/Dimension",
+        "java/awt/Insets",
+        "java/awt/LayoutManager",
+        "java/awt/Rectangle",
+        "java/lang/Object",
+        "org/jfree/ui/tabbedui/VerticalLayout"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/TextAnchor.class",
+      "occurrence": 0,
+      "sha256": "fd185d2e1daec0abd40b29aa6d944268e13362901124a7a103117cda8e57c0f4",
+      "name": "org/jfree/ui/TextAnchor",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "TOP_LEFT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "TOP_CENTER",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "TOP_RIGHT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "HALF_ASCENT_LEFT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "HALF_ASCENT_CENTER",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "HALF_ASCENT_RIGHT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "CENTER_LEFT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "CENTER",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "CENTER_RIGHT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BASELINE_LEFT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BASELINE_CENTER",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BASELINE_RIGHT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BOTTOM_LEFT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BOTTOM_CENTER",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "BOTTOM_RIGHT",
+          "descriptor": "Lorg/jfree/ui/TextAnchor;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0a8fb7d0494dce518a0b697de34211e96fb7e7d8c08f007bc0313ed83fbc9ed4",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "23035b19404bec5a4f613e4f77cf206e7d112e5a176f3a8a5fbab926d82a8693",
+          "code_length": 8
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "0ff0a1177a85c570457ab567fded007b635924e930f9e7aae3c9a5a99e451ba1",
+          "code_length": 256,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8685befa09b8e290eebd0184d18fe75dce3ec65792866dcfddccde213fe803b",
+          "code_length": 181
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/ui/TextAnchor"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/UIUtilities.class",
+      "occurrence": 0,
+      "sha256": "3579af7c90f32ec933987cb2a9ae9d3090609c67d5c5e650a4bb6b41eb8e6687",
+      "name": "org/jfree/ui/UIUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setupUI",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "5e364026f6763623ced3f0e18df7df36b6a062a25e402731f8e4af5a02a9360e",
+          "code_length": 163
+        }
+      ],
+      "class_references": [
+        "java/awt/Color",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "javax/swing/UIDefaults",
+        "javax/swing/UIManager",
+        "javax/swing/border/MatteBorder",
+        "javax/swing/plaf/BorderUIResource",
+        "javax/swing/plaf/BorderUIResource$CompoundBorderUIResource",
+        "javax/swing/plaf/BorderUIResource$EmptyBorderUIResource",
+        "javax/swing/plaf/BorderUIResource$EtchedBorderUIResource",
+        "org/jfree/ui/UIUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/VerticalAlignment.class",
+      "occurrence": 0,
+      "sha256": "2504ed0fa5f6a96a988fffdc4aa46e0b3cc600a6ea2b3cd17272d87a4ae3656d",
+      "name": "org/jfree/ui/VerticalAlignment",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "TOP",
+          "descriptor": "Lorg/jfree/ui/VerticalAlignment;",
+          "access": 25
+        },
+        {
+          "name": "BOTTOM",
+          "descriptor": "Lorg/jfree/ui/VerticalAlignment;",
+          "access": 25
+        },
+        {
+          "name": "CENTER",
+          "descriptor": "Lorg/jfree/ui/VerticalAlignment;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0a8fb7d0494dce518a0b697de34211e96fb7e7d8c08f007bc0313ed83fbc9ed4",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "23035b19404bec5a4f613e4f77cf206e7d112e5a176f3a8a5fbab926d82a8693",
+          "code_length": 8
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "ead78022ed4285e0d29408fa0a60f55b3ef8532f93b71b764022865d12e9297c",
+          "code_length": 44,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1978424ae56d9dbe517bac1060327a2e0b40b5b16fdeddf4722efa12d25f3a4b",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/ui/VerticalAlignment"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/WizardDialog.class",
+      "occurrence": 0,
+      "sha256": "b8a9b0216b30654cb115ce4390519329b540284efb3405cc4ff53967d72a36f9",
+      "name": "org/jfree/ui/WizardDialog",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/JDialog",
+      "interfaces": [
+        "java/awt/event/ActionListener"
+      ],
+      "fields": [
+        {
+          "name": "result",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "step",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "currentPanel",
+          "descriptor": "Lorg/jfree/ui/WizardPanel;",
+          "access": 2
+        },
+        {
+          "name": "panels",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "previousButton",
+          "descriptor": "Ljavax/swing/JButton;",
+          "access": 2
+        },
+        {
+          "name": "nextButton",
+          "descriptor": "Ljavax/swing/JButton;",
+          "access": 2
+        },
+        {
+          "name": "finishButton",
+          "descriptor": "Ljavax/swing/JButton;",
+          "access": 2
+        },
+        {
+          "name": "helpButton",
+          "descriptor": "Ljavax/swing/JButton;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/swing/JDialog;ZLjava/lang/String;Lorg/jfree/ui/WizardPanel;)V",
+          "access": 1,
+          "code_sha256": "fec7fdbe5d4a71cb5a856692402e9cad2ad41de5c84180e10e28c5db9bf71d28",
+          "code_length": 73
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/swing/JFrame;ZLjava/lang/String;Lorg/jfree/ui/WizardPanel;)V",
+          "access": 1,
+          "code_sha256": "22ed7a2ba057776b3b7bd11b445bc3b793f55b858f74dd58a9b720631cada190",
+          "code_length": 73
+        },
+        {
+          "name": "getResult",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getStepCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "canDoPreviousPanel",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "645248f5ff0d05dffcec618c2a4b9e607161da81b950ac89f63c4f6479fb534b",
+          "code_length": 13
+        },
+        {
+          "name": "canDoNextPanel",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cfa28f49bd5cdeab8dc56b8d50f49103eda8a3a6d4b65c0f35339a7a379f7dc9",
+          "code_length": 8
+        },
+        {
+          "name": "canFinish",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6fc63b2e3824f57bc4e6025844628ea2ae3b3c39a9d6f139525b6f97ff22e0d9",
+          "code_length": 8
+        },
+        {
+          "name": "getWizardPanel",
+          "descriptor": "(I)Lorg/jfree/ui/WizardPanel;",
+          "access": 1,
+          "code_sha256": "041eebedfeffd9aee8a1a5050dff1fff850f56e4ae672776627ba157129b2008",
+          "code_length": 29
+        },
+        {
+          "name": "actionPerformed",
+          "descriptor": "(Ljava/awt/event/ActionEvent;)V",
+          "access": 1,
+          "code_sha256": "67680b1037d37971fe097c03549a28bac1974628f62fd1be35bb498580113cc8",
+          "code_length": 51
+        },
+        {
+          "name": "previous",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bcf656d9eee1715f40624af4df624d75ef8c5be33cde291eaa1a8dc0727dd8d1",
+          "code_length": 93
+        },
+        {
+          "name": "next",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "298db49defb56d8c7e72c433689927a3f0ba01b2954ec6e45336a2e0c4bae441",
+          "code_length": 160
+        },
+        {
+          "name": "finish",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d696f384899daa9da3ab608878136e153ddf66a9c8e92703bdc1deda29b4902e",
+          "code_length": 17
+        },
+        {
+          "name": "enableButtons",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "db57a40688002b34efeed46947ec3fa80806701737b2e2a54949b8fa739eea66",
+          "code_length": 50
+        },
+        {
+          "name": "isCancelled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "createContent",
+          "descriptor": "()Ljavax/swing/JPanel;",
+          "access": 1,
+          "code_sha256": "eed324c02d607cabe4fcd6b724f3b5446dc8119ed331666a809ce4fe95116134",
+          "code_length": 195
+        }
+      ],
+      "class_references": [
+        "java/awt/BorderLayout",
+        "java/awt/Container",
+        "java/awt/event/ActionEvent",
+        "java/awt/event/ActionListener",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/ArrayList",
+        "java/util/List",
+        "javax/swing/BorderFactory",
+        "javax/swing/JButton",
+        "javax/swing/JDialog",
+        "javax/swing/JPanel",
+        "org/jfree/ui/L1R3ButtonPanel",
+        "org/jfree/ui/WizardDialog",
+        "org/jfree/ui/WizardPanel"
+      ]
+    },
+    {
+      "entry": "org/jfree/ui/WizardPanel.class",
+      "occurrence": 0,
+      "sha256": "c78c73280c3ee81076c50ea35dd883d749d287f3f94dc35d1d600a57985f7e2f",
+      "name": "org/jfree/ui/WizardPanel",
+      "major": 47,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "javax/swing/JPanel",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "owner",
+          "descriptor": "Lorg/jfree/ui/WizardDialog;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/LayoutManager;)V",
+          "access": 4,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getOwner",
+          "descriptor": "()Lorg/jfree/ui/WizardDialog;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setOwner",
+          "descriptor": "(Lorg/jfree/ui/WizardDialog;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getResult",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "returnFromLaterStep",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "canRedisplayNextPanel",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "hasNextPanel",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "canFinish",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getNextPanel",
+          "descriptor": "()Lorg/jfree/ui/WizardPanel;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "javax/swing/JPanel",
+        "org/jfree/ui/WizardPanel"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/AbstractObjectList.class",
+      "occurrence": 0,
+      "sha256": "a61756af828e77b656e72ff106078e723edf49425c2b25fed7f234d86e927911",
+      "name": "org/jfree/util/AbstractObjectList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_INITIAL_CAPACITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "objects",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 130
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "increment",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "f63e22d3d0aaa9e5dbe5dbbf268d1b7b58398960146239c106e707fcdb8ccabd",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "ec3d9ad545bbf7c52b2261e3035dc54811a305c1cb7f0b2cf3ce2c1fb98a5848",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 4,
+          "code_sha256": "7c5b6f65366744ff3e24fa50aa8c71f4a882b3adfb4be1b9822fe2b7fc9e7689",
+          "code_length": 29
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "9c009eaff84505befd5d62af1a8c842e5139c88a792623b11c279bf1f9c81b4d",
+          "code_length": 23
+        },
+        {
+          "name": "set",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "5915e7f7592010989b6d8b2f262193786fd5227946e336ba015449089a4bf93d",
+          "code_length": 75
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8449a3370fa18dda2c4490ff586b5c18b022d19de217786d7ade0ecd123c4f63",
+          "code_length": 14
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "indexOf",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4,
+          "code_sha256": "6be72317f51770d753b57498d12c46965022e84fc1f89431b8a5adae340f8498",
+          "code_length": 30
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "863a956bef0227bf58e0330fe04e2b01a5478d4592f900fd2f35430319cbde29",
+          "code_length": 69
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f84565dd687a2e6829d006c47d0211d5ab913e2bb6c6139e93c393f67db4fc21",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f8a95a162969f5b8e2b58f234607c0915118b0500bd8547b284a78a9eec5c9eb",
+          "code_length": 47,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "05696f79f92137088c1700a1c74b51f05588023d8eeb9ec753240e0621d075a7",
+          "code_length": 67,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "0213661b5c246d94287af7a62c92a987d5fe74f1fee2063c46849d7c6fc8046c",
+          "code_length": 56,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Arrays",
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/ObjectUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ArrayUtilities.class",
+      "occurrence": 0,
+      "sha256": "89786e724bfd3fe8491538e7e0a52bed54ba8b5baa426cb1265f6a9f4a737250",
+      "name": "org/jfree/util/ArrayUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "([[F)[[F",
+          "access": 9,
+          "code_sha256": "af89546532db865920e9443a5b05408b12d062da1c8f9291e5047df39ad532cb",
+          "code_length": 65
+        },
+        {
+          "name": "equalReferencesInArrays",
+          "descriptor": "([Ljava/lang/Object;[Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "03c75e2f633a354d1953c24dc3fd547021401e7e461b7f9e7b39000cc040d5e8",
+          "code_length": 84
+        },
+        {
+          "name": "equal",
+          "descriptor": "([[F[[F)Z",
+          "access": 9,
+          "code_sha256": "8436b861ed96d1f9c30922a71c7b29e57420301d70f6194ba4fc3a066abe1db5",
+          "code_length": 59
+        },
+        {
+          "name": "hasDuplicateItems",
+          "descriptor": "([Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "a950a4e9b01c8082e16204edc202eb1cef7c8ba13dfae6a9103ebf79aa5133db",
+          "code_length": 58
+        },
+        {
+          "name": "compareVersionArrays",
+          "descriptor": "([Ljava/lang/Comparable;[Ljava/lang/Comparable;)I",
+          "access": 9,
+          "code_sha256": "c9ce90195e31a81385ac843fb913dd427f34ecd37db8ba198efc119b668b72f5",
+          "code_length": 79
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[[F",
+        "java/lang/Comparable",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Arrays",
+        "org/jfree/util/ArrayUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/AttributedStringUtilities.class",
+      "occurrence": 0,
+      "sha256": "292f04b984d0659239a912e9b216f872a1f8df7cc48c2dbf5e7cf857fbcdb744",
+      "name": "org/jfree/util/AttributedStringUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/text/AttributedString;Ljava/text/AttributedString;)Z",
+          "access": 9,
+          "code_sha256": "5a940d3b629160a7e5b19d1afddec0d030b578de3146c870d5e612cd2054ffb4",
+          "code_length": 171
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/text/AttributedCharacterIterator",
+        "java/text/AttributedString",
+        "org/jfree/util/AttributedStringUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/BooleanList.class",
+      "occurrence": 0,
+      "sha256": "bb8cceb90aab03069672011d76091a1d8d757425fe7dd67cc45bbd97200abb97",
+      "name": "org/jfree/util/BooleanList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jfree/util/AbstractObjectList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(I)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "a472cb86baf62c5078fad78171cc704d18b6e8d4048beca6026d1dcc3ebc0cb6",
+          "code_length": 9
+        },
+        {
+          "name": "setBoolean",
+          "descriptor": "(ILjava/lang/Boolean;)V",
+          "access": 1,
+          "code_sha256": "d41d6de027a3269952a923f03c33b66dd8a77e75daabcdf3e4d373dc36641212",
+          "code_length": 7
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "405453d150c16ec6358128a75ea0744b6a0f004f62831ec6876c8c44f32a564d",
+          "code_length": 15
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a9fe8228e987f1b67ab6e190f28a60cd950ff2666af2821f291346d52e13db3d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/BooleanList"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/BooleanUtilities.class",
+      "occurrence": 0,
+      "sha256": "1a9acc218f87f3b7b916e5ab086f63241b6deb951292ee38881ca43e4e01fd91",
+      "name": "org/jfree/util/BooleanUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Z)Ljava/lang/Boolean;",
+          "access": 9,
+          "code_sha256": "07bbd453753f0541dd00b9a48cdcd1618e5fbb1f811fff053c629c50a1391c83",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "org/jfree/util/BooleanUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ClassComparator.class",
+      "occurrence": 0,
+      "sha256": "a6d86dd3947370808d0f282c12513188f9fbe57203bea3bc1f4f80568e2daf70",
+      "name": "org/jfree/util/ClassComparator",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "7c23e90e40878951f8499959cd31fecfbb72a9e20e7414ce9e8be6c39b4428e0",
+          "code_length": 54
+        },
+        {
+          "name": "isComparable",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "648ed6e8b129981b919a750b138a0ebb86ebb1962316ca552014aa291ba0818e",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/jfree/util/ClassComparator"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/Configuration.class",
+      "occurrence": 0,
+      "sha256": "e9a6dcddb1ac0078b87db9b38eb82ef472c87bdd46a589375c263f436d626c78",
+      "name": "org/jfree/util/Configuration",
+      "major": 47,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable",
+        "java/lang/Cloneable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "findPropertyKeys",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigProperties",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1025
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "org/jfree/util/Configuration"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/DefaultConfiguration.class",
+      "occurrence": 0,
+      "sha256": "6059f8b97e4f02133a540dcc36096fc1eefc5c39a5efac4ec5cd4ae45086565f",
+      "name": "org/jfree/util/DefaultConfiguration",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Properties",
+      "interfaces": [
+        "org/jfree/base/config/ModifiableConfiguration"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9af061bfdb759c15baf8d9bfb8a6468f71d8cbf809b0da001649b845f56e5625",
+          "code_length": 6
+        },
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ad43b7cda99db8a19424207741a15c376b38931d6468b0d48d5aaf308472d0a2",
+          "code_length": 7
+        },
+        {
+          "name": "findPropertyKeys",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "1313b27aac69e939946e55c645b9724c7a7fefa9e8a90572625c775c1d46485f",
+          "code_length": 71
+        },
+        {
+          "name": "getConfigProperties",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1,
+          "code_sha256": "495d99a50c7dffd00228c709f22f1804da54eb358843e8b3ed7f88df9eb0ec6f",
+          "code_length": 5
+        },
+        {
+          "name": "setConfigProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "925db9b848e40782c7dcd15f0d4869d1de6a8305c0dd30ab7d94e163f0871024",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/util/Collections",
+        "java/util/Enumeration",
+        "java/util/Properties",
+        "java/util/Set",
+        "java/util/TreeSet",
+        "org/jfree/base/config/ModifiableConfiguration",
+        "org/jfree/util/DefaultConfiguration"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ExtendedConfiguration.class",
+      "occurrence": 0,
+      "sha256": "89bd8130dd2252bfb531441de898fa36b0db4a8482a0ee34dd4467a8aab53700",
+      "name": "org/jfree/util/ExtendedConfiguration",
+      "major": 47,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jfree/util/Configuration"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isPropertySet",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "getBoolProperty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getBoolProperty",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jfree/util/Configuration",
+        "org/jfree/util/ExtendedConfiguration"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ExtendedConfigurationWrapper.class",
+      "occurrence": 0,
+      "sha256": "3fd9a40ec8919061efaa1cd4eab5950ad5a88a67ac6bb83bddcf507a802f5d2f",
+      "name": "org/jfree/util/ExtendedConfigurationWrapper",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jfree/util/ExtendedConfiguration"
+      ],
+      "fields": [
+        {
+          "name": "parent",
+          "descriptor": "Lorg/jfree/util/Configuration;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jfree/util/Configuration;)V",
+          "access": 1,
+          "code_sha256": "15eea417065c9c1ba532d33e17eee8ffde3447d920af433a885f30657e1dfd77",
+          "code_length": 24
+        },
+        {
+          "name": "getBoolProperty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "5b3c31e4fda19a643ff216473840a96cb5208ded97af2fac3ce58c1833585540",
+          "code_length": 7
+        },
+        {
+          "name": "getBoolProperty",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 1,
+          "code_sha256": "83bd024f3d5bed583a3e52313fbad598649d924cca9125e6bd95b4eded9b094d",
+          "code_length": 20
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1,
+          "code_sha256": "6a9f811b08a7fd70010443c3819f144f07a184412623790f9df345047b663fda",
+          "code_length": 7
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1,
+          "code_sha256": "3d52f8eba371b1d1696dec6a9ebe51c85c5490cbb5f27fcb357fa8fdfada8cc2",
+          "code_length": 26
+        },
+        {
+          "name": "isPropertySet",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "db1c691c4cceea452fcf91ee88e463379261c92fe691f8cd57992fd16df8a38d",
+          "code_length": 19
+        },
+        {
+          "name": "findPropertyKeys",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "766739c4e1a9546aff5eeeee5214afcd7c348ff066cb01f6d95cc934267ce917",
+          "code_length": 11
+        },
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "45b45ae2cb873a44cdc9b8e4cc1a60aa19a32bc55b8728ff69e78dc0631eb47b",
+          "code_length": 11
+        },
+        {
+          "name": "getConfigProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9903d27cc03b234d1b7c5b079d82bd69f76c97250828145d7ddc65a573747e1b",
+          "code_length": 12
+        },
+        {
+          "name": "getConfigProperties",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1,
+          "code_sha256": "012dd40228feab0a8e1b9307e09ba284c50ab96f4af356a61b9fdd5734d7004e",
+          "code_length": 10
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "bc62e927dd0bb5d6dfb95c73fab1811db27e3179a67111ae037da52fdb46faf6",
+          "code_length": 29,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/Configuration",
+        "org/jfree/util/ExtendedConfiguration",
+        "org/jfree/util/ExtendedConfigurationWrapper"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/FastStack.class",
+      "occurrence": 0,
+      "sha256": "e705425a3f490be566307d25f156af0a2ab19494e9d6d21dac7b703e0db5fb4f",
+      "name": "org/jfree/util/FastStack",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable",
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "contents",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "initialSize",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "15f6033f0fca754f75a3f7df686b76d6324bc605f41d68fc1c00e28adef9b023",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "45e9c033728550581ddd1c66018b6cbc20701e8c0a4ae5d2cde2d3007c683d8c",
+          "code_length": 14
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "076574c4e422cabd0354433bb598654577a3b83cb418aedb0cfe8a8b077e2250",
+          "code_length": 13
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "push",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cbc52f34185461b5d47480248e55c75fbaa32d114047ace0418b8c462d312d0d",
+          "code_length": 98
+        },
+        {
+          "name": "peek",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d66575080b87056347dda70ea2174097bb4d0eade62151092b5aef1830c1ab8c",
+          "code_length": 27
+        },
+        {
+          "name": "pop",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be89b69a6670f36598b0c0ef6db3867d89dd34bae48a91f40a632a965bee8e69",
+          "code_length": 47
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1b379f0b109ad5d65c01562bf74f0c164b40850137df36ac757533cec3bef411",
+          "code_length": 42
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cedd801b9d27e743028ec7cf96c6593ff2ffa83c591f361fa3b3cb91ecfbce23",
+          "code_length": 21
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "10b27d0ee0001296a3e17bc1df08768fa3dcaa11e8ff408fe2450ac7d41ae152",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/IllegalStateException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Arrays",
+        "java/util/EmptyStackException",
+        "org/jfree/util/FastStack"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/HashNMap$1.class",
+      "occurrence": 0,
+      "sha256": "2020643bd3bf9e3eb5ea267c28751b8d3606a345ba1c452b22ce9ec84418935a",
+      "name": "org/jfree/util/HashNMap$1",
+      "major": 47,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/jfree/util/HashNMap",
+        "org/jfree/util/HashNMap$1"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/HashNMap$EmptyIterator.class",
+      "occurrence": 0,
+      "sha256": "e679454a6fc3424b5a2c92b4376cddfddb038771513e56c5e0836f3da6ae7c34",
+      "name": "org/jfree/util/HashNMap$EmptyIterator",
+      "major": 47,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6aa108a3066cd17f6b2daf7f64322880af1157b4c8087d353d21b556b0faeea1",
+          "code_length": 10
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e05c32ee6b7aa337748bd72743152da6452f963e9f5ee176c80aeb93d16f91d6",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jfree/util/HashNMap$1;)V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/jfree/util/HashNMap",
+        "org/jfree/util/HashNMap$1",
+        "org/jfree/util/HashNMap$EmptyIterator"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/HashNMap.class",
+      "occurrence": 0,
+      "sha256": "1273a647880437f238e8fdd8b2ce215e41f246a4e222e11a4d58af9fb307e162",
+      "name": "org/jfree/util/HashNMap",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable",
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "EMPTY_ITERATOR",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 26
+        },
+        {
+          "name": "table",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2
+        },
+        {
+          "name": "EMPTY_ARRAY",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "createList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "86cab20a34d8489520db9f990c5f3f979eca8916b21a41df8aa8e32e8385e577",
+          "code_length": 8
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d4baf888c1058b9248584d33a5e6197cd74723d4174c98c45579e2f4de512093",
+          "code_length": 58
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "c83f9beb4681fbf96d462c37b91ef681ffa2afbe6b14c1bb800aa065db10678d",
+          "code_length": 33
+        },
+        {
+          "name": "getFirst",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "86e966b6ebf0725078c000cc45f8a5ec12596422cd8ad19c25bd88e0f70bfdcd",
+          "code_length": 7
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "cef1d39bebc8a118ad3185ea4baa5bbbef3479e6b572962dcf9d1db39951b62a",
+          "code_length": 26
+        },
+        {
+          "name": "getAll",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "1963ba53d3b69708661239e7a0c61f4243460181da651dc0ead8d699d9bb16dd",
+          "code_length": 27
+        },
+        {
+          "name": "keys",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "ae904c12850df557e8e9ddbc1e150e40a07a360be437709af3d6e990bc48f1b0",
+          "code_length": 13
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "c533236574371fb365e1254c45beb9f4e6ee9d46c18120a88c054cb3737f037c",
+          "code_length": 8
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2e638c4a927c1049acbc6739ff7b7c77ad7a246723ff15172027fe00d87fdd80",
+          "code_length": 50
+        },
+        {
+          "name": "removeAll",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "9ce5f1119ae81c7dd4fe7f3c75b92d5885ee35d097ea261ac92fe6db567806dc",
+          "code_length": 10
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "49cbe4204a1cb837903b64f992583ad1ff736eee960ee4e9b46bb2e8e8671c2a",
+          "code_length": 8
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "1d340f3e1da8d5732daade0b30e7da4c735034ec37f13aa7cedf2de734eb0d65",
+          "code_length": 9
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f834a467ffec2b0be249965d2593a756e27e88f3c90116f25cf2de1a1200a7db",
+          "code_length": 53
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "c255610f47a12a2756a2cdf94c9f1441fab9cba68264e0f19fb3b9bc3052229f",
+          "code_length": 26
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "c25d26c90e8e2f18d2bb532f976bd0f877fcb8eeaeaf51e3e9e187ee552f0cb5",
+          "code_length": 16
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b715a6a02f8c50485af69d2a27594056f92f2c18ab530e7a42104c8f8426997d",
+          "code_length": 77,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "toArray",
+          "descriptor": "(Ljava/lang/Object;[Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "da039fc72876d24387d588503dc4f50d00fa0426d8161d2cb342e6196948f488",
+          "code_length": 49
+        },
+        {
+          "name": "toArray",
+          "descriptor": "(Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9afa0ebaf2bb63c06f50f9683a47ce9304d1cc161aae957d7f04bb806cd91340",
+          "code_length": 41
+        },
+        {
+          "name": "getValueCount",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "2f61dbac25dc2133dfede7d99030ea6e038f64e3798b3a058c6d61d37fd0f3d2",
+          "code_length": 39
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9433b45037bbfd36e2bb2e215ca7a819a506a7a145d5bf9b85222cf53f4825e2",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/jfree/util/HashNMap",
+        "org/jfree/util/HashNMap$1",
+        "org/jfree/util/HashNMap$EmptyIterator",
+        "org/jfree/util/ObjectUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/LineBreakIterator.class",
+      "occurrence": 0,
+      "sha256": "526d943037f52fadaee3813ed4c1623e69939638b0ded974e6853243f31299d1",
+      "name": "org/jfree/util/LineBreakIterator",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "DONE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "text",
+          "descriptor": "[C",
+          "access": 2
+        },
+        {
+          "name": "position",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "43ee9ba84331741c16c59249ce19e8e96e88eef028ec96bf5fe9b39e5f8537e3",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "ca0a47c7d668eca2be1b9a15cf56724e3e054ed908defe4c7c41a5ac2b4ef8be",
+          "code_length": 10
+        },
+        {
+          "name": "nextPosition",
+          "descriptor": "()I",
+          "access": 33,
+          "code_sha256": "0890569bd55168fc74c800e029557de3254da4045317e3dddb89910d5353fa4d",
+          "code_length": 139
+        },
+        {
+          "name": "nextWithEnd",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "0c8590a5be3585637320ec6d89daa76cf2087b21bc41259d4609175dbe1b62af",
+          "code_length": 46
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e33bd9d5d2de4d8574391fc00c67a4de47d0f2de2a030d43b41c0dc14425cdaf",
+          "code_length": 12
+        },
+        {
+          "name": "setText",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0496e3e47741d7fd8d1cbe66bbd1eff748d8f293aa28d7ff5309d01a8d687bdc",
+          "code_length": 14
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "bd443f8018b7f93b92ff96ac7ffd7ccd4b66117055721e9e2ca0734197b14c07",
+          "code_length": 14
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "db8f166cb143c2325c995dd01044336eec39653e1835d24143f884a6f0ddd275",
+          "code_length": 104
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a4a71a278a7c337ad2baf95a93cfa316e6bf818b19363bfffdd9884d88644ad5",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "org/jfree/util/LineBreakIterator"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/Log$SimpleMessage.class",
+      "occurrence": 0,
+      "sha256": "b914fc9cabd83e749b7ea124e9ae1b030a2d0f00af8a02dc230974ff133d8a8d",
+      "name": "org/jfree/util/Log$SimpleMessage",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "message",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "param",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c3babb6dbd1595491e07e12774d93e7480acafc16e93fa37fe2c1f9c7da64c3c",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "ec40c9150475c91c543d433976232468dceb58ef6dcd63b7d36ccc6f62da147b",
+          "code_length": 26
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "ae9ba552d72b997e2b2a47ff0a62daf003a00771379a012e5b8edc5f7763ce4e",
+          "code_length": 31
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "ca4a989b74792607af4ddcc2a66c12c81d42054bfaf292dc729b22f0260cf303",
+          "code_length": 36
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "20b7d0a7429d7a5496c59457ba618382f45847b6baf9971f6f8bd1257b654e27",
+          "code_length": 15
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5f7be88b0eaadf545a78d174c73f8cc1585baf4eb0c848410ea616a3e28e91a8",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "org/jfree/util/Log",
+        "org/jfree/util/Log$SimpleMessage"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/Log.class",
+      "occurrence": 0,
+      "sha256": "6f01fd400e904f2c76e44318e1d54d079706be0a1d694827171440d462ac223a",
+      "name": "org/jfree/util/Log",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "debuglevel",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "logTargets",
+          "descriptor": "[Lorg/jfree/util/LogTarget;",
+          "access": 2
+        },
+        {
+          "name": "logContexts",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2
+        },
+        {
+          "name": "singleton",
+          "descriptor": "Lorg/jfree/util/Log;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "a16fe938276f4e345dad1e7f2d281dfc49238b9b43e5c53ffedc032fb0f41a1a",
+          "code_length": 30
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lorg/jfree/util/Log;",
+          "access": 41,
+          "code_sha256": "bfc7548f235b79c4c69bc0a8658fa0b3b91d554f4079006c7ff935764d5ab10e",
+          "code_length": 20
+        },
+        {
+          "name": "defineLog",
+          "descriptor": "(Lorg/jfree/util/Log;)V",
+          "access": 44,
+          "code_sha256": "9fea713c55a313991e67e7b9e6407ae9ad770a9a8f5fc78ed02b357603549a04",
+          "code_length": 5
+        },
+        {
+          "name": "getDebuglevel",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setDebuglevel",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "addTarget",
+          "descriptor": "(Lorg/jfree/util/LogTarget;)V",
+          "access": 33,
+          "code_sha256": "5bbb226d1680a2c7617f3ad81316cc34fc11a3a86d9653d85f85d88b8f21d682",
+          "code_length": 52
+        },
+        {
+          "name": "removeTarget",
+          "descriptor": "(Lorg/jfree/util/LogTarget;)V",
+          "access": 33,
+          "code_sha256": "3db8a4583ec486f8458b87a21c8cb998d990bd0d7e7d823a7f3620aaefef75aa",
+          "code_length": 59
+        },
+        {
+          "name": "getTargets",
+          "descriptor": "()[Lorg/jfree/util/LogTarget;",
+          "access": 1,
+          "code_sha256": "40cdd0f00a9198a26bed5181c121fd31bb01f2e4e3d84631ad0f67b507bcf92b",
+          "code_length": 11
+        },
+        {
+          "name": "replaceTargets",
+          "descriptor": "(Lorg/jfree/util/LogTarget;)V",
+          "access": 33,
+          "code_sha256": "0f4ef4aa6257c00f69ce315a7d35ebe4dbc40b4764af547e96010dd2f34d6881",
+          "code_length": 25
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "0ccce9f5381e2fac76a7545e62ed058941b4a0e673c3e4c857960865b03be8d9",
+          "code_length": 6
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "42369da795094f58c8f1fbd4766cbe2bd7fbac1816b1f7c622ce9a452d7fcf17",
+          "code_length": 7
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "9261806d894fc67728d310cc688c5cb27ad0ca548b8bd14b96f0dc2c0e61f749",
+          "code_length": 6
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "621c1c8735e926c4a784b0573672fe26c0472092c9ee89a082bcf54f30604434",
+          "code_length": 7
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "3e448ffbd745b1f642ca687978337db05cc56dbdb7316843226d1c02d0c1214b",
+          "code_length": 6
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "f1d6317cd6be9417cbe4e452cab362d89bb0a41088289409c8e3557192c90775",
+          "code_length": 7
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "e199d22b31933bcd13e13051a226095020fdb58fdf3f49e2718e2d858700659b",
+          "code_length": 6
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "a53cf81840924fc0a5166cab810e9f5da2be5b3d5da7028e388e3f279a2a7f43",
+          "code_length": 7
+        },
+        {
+          "name": "doLog",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "2a36b0d5d667dc1fbd0b3e164abd17d6ee23ccbaebf9356dad2cddefc1a4397c",
+          "code_length": 50
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "f9832e72827ca9f03b325789ebc8db1e8e1d53113626473fd407c55c98be73f8",
+          "code_length": 9
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "74a6509afca7d1d2ec19aac426598a718a6338982f8e56eced118219f7964238",
+          "code_length": 10
+        },
+        {
+          "name": "doLog",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 4,
+          "code_sha256": "3217c5d88c9dc455d5af9bf0923c70710948595e722a8dcfc10236a6298583f6",
+          "code_length": 54
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "fdf9eebf36e4eea247449d15f8d593b2dfc671ca57a8ef1611ca7f1b01bd9ee5",
+          "code_length": 16
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "7da876397659397a4d09e9762d2a139db6f66c642ac6011a15347df12f7b84bf",
+          "code_length": 16
+        },
+        {
+          "name": "isWarningEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "b1798c5fd2e8d642badc4371cfd4d70d0b4e4805993413bd8a9351f171095205",
+          "code_length": 16
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "266983a79c9ddd697f8f80dd53e5ec7663159f0f42ec6154a954e0b4cec06afc",
+          "code_length": 15
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/lang/Class;)Lorg/jfree/util/LogContext;",
+          "access": 9,
+          "code_sha256": "d7501e4bdc09451b3961c6dcc80656d02e04bc13d808b336bcc1642b16df77d5",
+          "code_length": 8
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/lang/String;)Lorg/jfree/util/LogContext;",
+          "access": 9,
+          "code_sha256": "5cf47650b07cad9bf2937512078fab23978ae64d4fbbd5430a058da3944bf31f",
+          "code_length": 8
+        },
+        {
+          "name": "internalCreateContext",
+          "descriptor": "(Ljava/lang/String;)Lorg/jfree/util/LogContext;",
+          "access": 4,
+          "code_sha256": "6db8f0abf69665d8c2e5bc7ba0e7f02567a3199468b489b5a240e1475d1fdf1e",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "[Lorg/jfree/util/LogTarget;",
+        "java/lang/Class",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/HashMap",
+        "org/jfree/util/Log",
+        "org/jfree/util/Log$SimpleMessage",
+        "org/jfree/util/LogContext",
+        "org/jfree/util/LogTarget"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/LogContext.class",
+      "occurrence": 0,
+      "sha256": "3fe10ec7e92dc5d88446dacec9b4469083c4ca0f3b6e404c0c02cd177586a123",
+      "name": "org/jfree/util/LogContext",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "contextPrefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "29cf267889b4dc17f2ac4dfc89fcdbcd88cfc52c2c16206fcffa28b082c8d9f0",
+          "code_length": 4
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7ba538ba88dea9dfad4049f467eeaa17cf8b3bfa17015c2c537d44b7db6a7b1b",
+          "code_length": 4
+        },
+        {
+          "name": "isWarningEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3133a5bb6d3e608ccbcfb108cfa4e273f121fe1bd6b19cb91bb740bbea79e56d",
+          "code_length": 4
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e02cd652cd6bafd0bb41bd4915467e9c666131548629bd1dac6f9ef3f8778834",
+          "code_length": 4
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "b3f6c158d1ec3aeb12ff0db3b04adbbcd269ba05f5052ac804ad5cdd4de7299e",
+          "code_length": 7
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "c3be7c711897c25417228e1d371f435427654aca118eeac025e02df7267a5b9a",
+          "code_length": 8
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "0e61c6645860b6b8834c516ec9ad2960b33311c92925f335f207e84345c0e7d7",
+          "code_length": 7
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "28b5b21eb680f349e6111b9b75486fa7bda1136ec1da29837d5ccdd43984a1bb",
+          "code_length": 8
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "254214160989725f513accd60644bf2677f48a98df972c857497acab2705095e",
+          "code_length": 7
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "65d407070bcd44b18eb0fd380491992c73cdb1cb0822bf195ef953f134c77ee1",
+          "code_length": 8
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "f7b2fe009222e40ef53648596e98c96ab3379d70dd9151d87cd6e014e5660143",
+          "code_length": 7
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "8e82712ab01d635900e920edbc6c43b9f87df0752311d1197c0b934189589ac5",
+          "code_length": 8
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "caf457b549995b8c8e9b2ef118e76bf91f593b8e95210a67a38e63735ed30750",
+          "code_length": 40
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "c252fb81f35c1c8e9ca06f825796dec8d23d76d99053e31168f407f4fa466302",
+          "code_length": 42
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "5e78b20dc0aa04da19ee2464bbc3d6ab5279586100a37e637898f31d1ccb56a0",
+          "code_length": 55
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d77c419844fc8a9405f06ccc636f8dd0c54d7e66d121f62b5c8456c3ed86870d",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/Log",
+        "org/jfree/util/Log$SimpleMessage",
+        "org/jfree/util/LogContext"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/LogTarget.class",
+      "occurrence": 0,
+      "sha256": "5bb6c45cbae26fc7d77a896910a01e8b738221892c60392eb9c9e3d11f56cbb5",
+      "name": "org/jfree/util/LogTarget",
+      "major": 47,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WARN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEBUG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LEVELS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e8046e5ffb19dc7c659705e94bfd7d2ccb945d05f2a9f7575067fa7333d4db70",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/LogTarget"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ObjectList.class",
+      "occurrence": 0,
+      "sha256": "e1cdfe3be81c68d068d70db540212ca51c5711fb53ff9ea6451fe7e510bb148e",
+      "name": "org/jfree/util/ObjectList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jfree/util/AbstractObjectList",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ea5530d72072366f6b017d21693f8618be625170c48749728efe3959e95bfbf9",
+          "code_length": 6
+        },
+        {
+          "name": "set",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "2156d326316c5488ef904bc13a4a9f88cd6d7c2f7b103d5d3c7dbaa10eaedbcb",
+          "code_length": 7
+        },
+        {
+          "name": "indexOf",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "a32c1a0cefaf3c2a9e2c0739a36daf3e6493f865def278aa5ec2dc21fc0e0fb4",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/ObjectList"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ObjectTable.class",
+      "occurrence": 0,
+      "sha256": "b65391a5b34b8f9c459fa26bb81cb499a0548d60556aad51d414febfa96660c7",
+      "name": "org/jfree/util/ObjectTable",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "rows",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "columns",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "[[Ljava/lang/Object;",
+          "access": 130
+        },
+        {
+          "name": "rowIncrement",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "columnIncrement",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d9af05f2cde03e844d9765f2324c164e131bc5506b579af93e5e7226c2f5c810",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "64a5d83c4739fffa80e12816e91c5218fbd34e84677f38fbb4254f9d51cb9784",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "0fefd8245f7687f03c6b7e43eb56c463d23f3ac7001083116bf28e496522df67",
+          "code_length": 63
+        },
+        {
+          "name": "getColumnIncrement",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getRowIncrement",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "ensureRowCapacity",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "e4554dcc3d3a1b4d91bdb96884ec2a531f18365d485d633c765cf3ef75a21938",
+          "code_length": 40
+        },
+        {
+          "name": "ensureCapacity",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "de1f2169dba1adba106f71772932f1685bb6f187ff3a1b361c9290bbbd9d901c",
+          "code_length": 140
+        },
+        {
+          "name": "getRowCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "getColumnCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getObject",
+          "descriptor": "(II)Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "eb250307ebebbbe3f107275e393e9eccc95a8c6be0461655857cf5ac67912cb9",
+          "code_length": 34
+        },
+        {
+          "name": "setObject",
+          "descriptor": "(IILjava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "cedd0f5d688a381969102cee903ececc945f19c8e769bbbb051cc822cdf5808b",
+          "code_length": 44
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "00be1bc626750515488ecffce81b65d334609e73a901cd3eb65e5e065e7995ef",
+          "code_length": 111
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f92ad5f396147831d93274d00ae35374cf5e173d156008e9f8d016dba2d0e88e",
+          "code_length": 17
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "e5fcd5717e005579f8b03c10863a5a41b0a6640667b9cda569785f7812a0e2f4",
+          "code_length": 93,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeSerializedData",
+          "descriptor": "(Ljava/io/ObjectOutputStream;Ljava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "ea613d17791f58c593f962a1eb720697a92ac1bb25019e7168f7a056896d088e",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "e4dbf58d815835e288c43515d1042fc11e45dc848839b2e2360b77f9381e3500",
+          "code_length": 89,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "readSerializedData",
+          "descriptor": "(Ljava/io/ObjectInputStream;)Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "c7828c4813d8223325f8cea753f615894955b675376d1ace1a7dea499aa7281b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fec9ece9f2521bcd8ca9b1c3d67d6ce2778ff7a07d47631eeba89b1a621c7cd4",
+          "code_length": 47
+        },
+        {
+          "name": "copyColumn",
+          "descriptor": "(II)V",
+          "access": 4,
+          "code_sha256": "d234c74a72e4ca5c3314c3ebe335bbf875b3453706f4ac8267286b8c3db3b66d",
+          "code_length": 29
+        },
+        {
+          "name": "copyRow",
+          "descriptor": "(II)V",
+          "access": 4,
+          "code_sha256": "e925780e4cf952ceeb58e5bc71d30cff34e6f079f972287027fc1d6018bbb834",
+          "code_length": 56
+        },
+        {
+          "name": "setData",
+          "descriptor": "([[Ljava/lang/Object;I)V",
+          "access": 4,
+          "code_sha256": "8520ee5466daa8c501f071ec3e34d002cb11fef52bf1585cb766059a806d5397",
+          "code_length": 41
+        },
+        {
+          "name": "getData",
+          "descriptor": "()[[Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Math",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/util/Arrays",
+        "org/jfree/util/ObjectTable",
+        "org/jfree/util/ObjectUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ObjectUtilities.class",
+      "occurrence": 0,
+      "sha256": "3c1b6cfdce7debcf8f198caaabddf8e6687e2462ca0d6caefddad83d7749ec0f",
+      "name": "org/jfree/util/ObjectUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "THREAD_CONTEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CLASS_CONTEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "classLoaderSource",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "classLoader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 10
+        },
+        {
+          "name": "class$org$jfree$util$ObjectUtilities",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "getClassLoaderSource",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "setClassLoaderSource",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "7efa1e765e2a8b7ce877a3590d980f8e496196375baa4e7e4262fddd19103c01",
+          "code_length": 5
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "1376b19872c7d690fa95c4b86364dcd14e1b25c80b658e047e4507a18f60a137",
+          "code_length": 19
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 9,
+          "code_sha256": "f4e0977f18ffa65c658f9cd15ca3f84e667bcec4412905fbd95ec86ea6febf4f",
+          "code_length": 13
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "7061c0a601b8a72833cf139f1a527058cd03f656943f1a3e328647a2e8b242e4",
+          "code_length": 104,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "deepClone",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/Collection;",
+          "access": 9,
+          "code_sha256": "609416bddedcb409fb02381b5cee8a6f5e18c6825e60ef927e3eae3a966ef0ba",
+          "code_length": 82,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "setClassLoader",
+          "descriptor": "(Ljava/lang/ClassLoader;)V",
+          "access": 41,
+          "code_sha256": "12ce42a22fb98c145f85997fa970b824acfdfeecf355bf1acbe6f4f7206472ee",
+          "code_length": 5
+        },
+        {
+          "name": "getClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 9,
+          "code_sha256": "696b5dbfb16f6ae9378047570c5fb15ed0b3d37b1ea4c29d808b5a4d25133475",
+          "code_length": 4
+        },
+        {
+          "name": "getClassLoader",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/ClassLoader;",
+          "access": 9,
+          "code_sha256": "900912d3db4f71923bed99481ab4dad3d043c2a967d17943c9b2ce6b5c58e889",
+          "code_length": 87
+        },
+        {
+          "name": "getResource",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "47f235ba38b41a3e74d294ef174525678838a478f0c49159e7fa86a131e0f8c5",
+          "code_length": 17
+        },
+        {
+          "name": "getResourceRelative",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "4dd8700d81160a0c1f2137e9f138897df3e1f4f271fd45419d94c39f6c7ad3e0",
+          "code_length": 23
+        },
+        {
+          "name": "convertName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "208375de182ecb4184085664db086eec6401e6778e83a8088bc3f2c60b26a827",
+          "code_length": 89
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/io/InputStream;",
+          "access": 9,
+          "code_sha256": "08a8e1accc74a5f1060387a21c9b7a772a55745577edab6fd5608a3254548cfd",
+          "code_length": 20
+        },
+        {
+          "name": "getResourceRelativeAsStream",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/io/InputStream;",
+          "access": 9,
+          "code_sha256": "dfd9e841e1565c36d2a79746e9301f281d741ee683c712e3136483ff2ba23f5f",
+          "code_length": 20
+        },
+        {
+          "name": "loadAndInstantiate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "490cbd497d52c34b6213030982713b1dd5877543599adf7336e40192d805017b",
+          "code_length": 19
+        },
+        {
+          "name": "loadAndInstantiate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "38717e9b76645a8e7ae452fb5681c0c7c1c2a19b6a8be6165724f6748ae43ff7",
+          "code_length": 35
+        },
+        {
+          "name": "isJDK14",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "5cbb967a0aac83034b0dfab1c93b44e15566f626fde9b95a21c6e571569c378e",
+          "code_length": 91
+        },
+        {
+          "name": "parseVersions",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "3c90ede398a7e423b183d0a61fef69ff89eea1e13b3119a98fa7ce0670262935",
+          "code_length": 62
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f527f5de224aba1dcde316abe8e7370f89218aa590503e931f791ec6e580a71c",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier",
+        "java/net/URL",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/StringTokenizer",
+        "org/jfree/util/ArrayUtilities",
+        "org/jfree/util/Log",
+        "org/jfree/util/ObjectUtilities",
+        "org/jfree/util/PublicCloneable"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/PaintList.class",
+      "occurrence": 0,
+      "sha256": "7b3b21bb0b8485cd244ac0d6b135322f1e465c79f5de707920b45b607bf62cc3",
+      "name": "org/jfree/util/PaintList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jfree/util/AbstractObjectList",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getPaint",
+          "descriptor": "(I)Ljava/awt/Paint;",
+          "access": 1,
+          "code_sha256": "a472cb86baf62c5078fad78171cc704d18b6e8d4048beca6026d1dcc3ebc0cb6",
+          "code_length": 9
+        },
+        {
+          "name": "setPaint",
+          "descriptor": "(ILjava/awt/Paint;)V",
+          "access": 1,
+          "code_sha256": "d41d6de027a3269952a923f03c33b66dd8a77e75daabcdf3e4d373dc36641212",
+          "code_length": 7
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3bf10e0c779044e3297eb34cb2a632a3cb74ad0ad831aa1d890115c7b094029b",
+          "code_length": 67
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c207b129b88d843e3627a1a11a330044ec62d9bf0a7cd9b503d67c80b530977a",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "b7cc2be1d97c82508769c8cd9f6051f8e0515dc0ce42c9802973bd87d0a4a9d8",
+          "code_length": 59,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "57edfa751336ca162035c5d484380b83f824fdaf38676457ab1f97e6401b222a",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/awt/Paint",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/ClassNotFoundException",
+        "org/jfree/io/SerialUtilities",
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/PaintList",
+        "org/jfree/util/PaintUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/PaintUtilities.class",
+      "occurrence": 0,
+      "sha256": "75ddfacc03c1d8c1d6630e8c392037e94dd18694595812334427ac8464d08895",
+      "name": "org/jfree/util/PaintUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "class$java$awt$Color",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/Paint;Ljava/awt/Paint;)Z",
+          "access": 9,
+          "code_sha256": "c40bfafe962ca03bc405236cfa64beb8d95184fd03d6bf9cadba1eaeb09544bf",
+          "code_length": 147
+        },
+        {
+          "name": "colorToString",
+          "descriptor": "(Ljava/awt/Color;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f4ba89673cc831b7ca68004d0980489419119854b3c974cdda2a92df113974a9",
+          "code_length": 179
+        },
+        {
+          "name": "stringToColor",
+          "descriptor": "(Ljava/lang/String;)Ljava/awt/Color;",
+          "access": 9,
+          "code_sha256": "7d1c8b92a3dd80cd39544406a776cc97cbc5db163d0d19e35092f85bd75d937f",
+          "code_length": 76
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "java/awt/Color",
+        "java/awt/GradientPaint",
+        "java/awt/geom/Point2D",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Modifier",
+        "org/jfree/util/Log",
+        "org/jfree/util/PaintUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/PrintStreamLogTarget.class",
+      "occurrence": 0,
+      "sha256": "bf87b9076fc8eea5038d47669229f4a397978d8ecef62ad21cd31955946cf8e8",
+      "name": "org/jfree/util/PrintStreamLogTarget",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jfree/util/LogTarget",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "printStream",
+          "descriptor": "Ljava/io/PrintStream;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/PrintStream;)V",
+          "access": 1,
+          "code_sha256": "05c2b6f73a6bd9412e4bb72221aeb9ba3ae2c2834afc38b4944bd32a9da970f7",
+          "code_length": 22
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "308399d48a7f7763c2177b3d85523b09b54fe8114a5efe0515c3fa89bf02d280",
+          "code_length": 39
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "8c3de2c7961402c927be54e759c7f6400ad4b09049de79a04c8addd55873da7d",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/io/Serializable",
+        "java/lang/Exception",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/jfree/util/LogTarget",
+        "org/jfree/util/PrintStreamLogTarget"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/PublicCloneable.class",
+      "occurrence": 0,
+      "sha256": "a60f78d6c57333b724af163491ef3b0940e78382613c686782b9a00290fd1684",
+      "name": "org/jfree/util/PublicCloneable",
+      "major": 47,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "org/jfree/util/PublicCloneable"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ReadOnlyIterator.class",
+      "occurrence": 0,
+      "sha256": "1b083a2474af18fc892f41771ebf83e81c1c559606f8909782d5f03ae1787c3d",
+      "name": "org/jfree/util/ReadOnlyIterator",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "base",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;)V",
+          "access": 1,
+          "code_sha256": "15eea417065c9c1ba532d33e17eee8ffde3447d920af433a885f30657e1dfd77",
+          "code_length": 24
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "de15e26b8cf6ce3f20437cb468fe9f7e281f1721c60fd27605875cab8b49d55b",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0c2229f1219417a821087aeb1226ff2e86df5044bd87c5f5bcd6ff48ea325b52",
+          "code_length": 10
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "org/jfree/util/ReadOnlyIterator"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ResourceBundleSupport.class",
+      "occurrence": 0,
+      "sha256": "fb876bcf533e7d3ff8caeecc8b5c53950440fd7bf77d3586071ebd1ab4f4eaa7",
+      "name": "org/jfree/util/ResourceBundleSupport",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "resources",
+          "descriptor": "Ljava/util/ResourceBundle;",
+          "access": 2
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/TreeMap;",
+          "access": 2
+        },
+        {
+          "name": "lookupPath",
+          "descriptor": "Ljava/util/TreeSet;",
+          "access": 2
+        },
+        {
+          "name": "resourceBase",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "locale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 2
+        },
+        {
+          "name": "class$org$jfree$util$ResourceBundleSupport",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$java$awt$event$KeyEvent",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Locale;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "639a54f786562b5a7b4ec5cc4c223bae13b5e1eb2e8d0543e428b64d62a55fcb",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Locale;Ljava/util/ResourceBundle;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "b931ff24f76c009d25b07b274c8cc759071f80a291fe4b5afccaa70cfcf5d2b1",
+          "code_length": 84
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Locale;Ljava/util/ResourceBundle;)V",
+          "access": 1,
+          "code_sha256": "99fa6cdf29b1e164ae4ca520b7512cdf3f599dfdfdff7eac87b032a314eb5493",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "fe95b3f98c4dd21fc2599a25c15bc3ad9bd1edae55923ba64c31719de8f552be",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/ResourceBundle;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "4364027665dac1a43b32b161120503f5b70ebad13e2bfe68e16c321b96954e48",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/ResourceBundle;)V",
+          "access": 1,
+          "code_sha256": "92713ead7d898b8998139cc8d6e9048ef0ba2c440d6c4b235f0a828b26486268",
+          "code_length": 13
+        },
+        {
+          "name": "getResourceBase",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 20,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "20d8a1efdd4d806e0cf9940dc9508e051e445323fe112364655a6d8e1d261cd1",
+          "code_length": 31
+        },
+        {
+          "name": "internalGetString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "2dfa56c01205ded53281681876317cb94caf3a9f27765cad7abcd9cdd9bd5917",
+          "code_length": 183
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/swing/Icon;",
+          "access": 1,
+          "code_sha256": "30a4e671123f6a8fb2c1ce4ec39da9791024e66558f6b6e0ceb6a5be843eb414",
+          "code_length": 14
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljava/lang/String;)Ljavax/swing/Icon;",
+          "access": 1,
+          "code_sha256": "6256f985b73898ea336bf7a1dfdd814e839b01ff622125c0ca5aef21d3992dc8",
+          "code_length": 14
+        },
+        {
+          "name": "getMnemonic",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "16f1763c2b3d0f6397b11b3cc0a28e42f6b7feefc5c803c5a56c5070b9d4243d",
+          "code_length": 12
+        },
+        {
+          "name": "getOptionalMnemonic",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "edb94f4cc35fc88e0ef8fb2f95c9985cb2d583ab662ddbbb2d9698f64d788b58",
+          "code_length": 25
+        },
+        {
+          "name": "getKeyStroke",
+          "descriptor": "(Ljava/lang/String;)Ljavax/swing/KeyStroke;",
+          "access": 1,
+          "code_sha256": "25018a4ea1a5261bcfdbd27a5d0314d6ad624558862049e58f720150765c63c4",
+          "code_length": 10
+        },
+        {
+          "name": "getOptionalKeyStroke",
+          "descriptor": "(Ljava/lang/String;)Ljavax/swing/KeyStroke;",
+          "access": 1,
+          "code_sha256": "2c0a86f8488eedc28da76f38acffad12a9125a722e61fd637e4addaf89ae74ec",
+          "code_length": 10
+        },
+        {
+          "name": "getKeyStroke",
+          "descriptor": "(Ljava/lang/String;I)Ljavax/swing/KeyStroke;",
+          "access": 1,
+          "code_sha256": "72c34fdae5c4b1ffb9c48f0bbb52ab4c8a92224f30f7d9d1374ca40879e27454",
+          "code_length": 19
+        },
+        {
+          "name": "getOptionalKeyStroke",
+          "descriptor": "(Ljava/lang/String;I)Ljavax/swing/KeyStroke;",
+          "access": 1,
+          "code_sha256": "73a579fb1415e707fa472c64b669fc11d0125e7d326a1dee53ee31c81d9c0ad7",
+          "code_length": 32
+        },
+        {
+          "name": "createMenu",
+          "descriptor": "(Ljava/lang/String;)Ljavax/swing/JMenu;",
+          "access": 1,
+          "code_sha256": "f923de0a4cdb4968b826799246f77ad6fe067a3a04d363fd9a023a6a8ecef062",
+          "code_length": 67
+        },
+        {
+          "name": "getResourceURL",
+          "descriptor": "(Ljava/lang/String;)Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "6ba2cd94ca91802bcb894e041a78d78515a62e08a87d521150a2c6286a78bf48",
+          "code_length": 69
+        },
+        {
+          "name": "createIcon",
+          "descriptor": "(Ljava/lang/String;ZZ)Ljavax/swing/ImageIcon;",
+          "access": 2,
+          "code_sha256": "49791044a2ef5541a5396fe1eba979c05f553e628f3fc9e4a2b94152ff25e032",
+          "code_length": 173
+        },
+        {
+          "name": "createMnemonic",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Integer;",
+          "access": 2,
+          "code_sha256": "3bead56eb1831ff569abfe2fb3fca594896102d56984e2e9fe3519db17daeaf9",
+          "code_length": 101
+        },
+        {
+          "name": "getMenuKeyMask",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "a92a87c8ced4f77b018eaa148a32bbb8efd797107eb69687a037d376d55508f7",
+          "code_length": 10
+        },
+        {
+          "name": "createTransparentImage",
+          "descriptor": "(II)Ljava/awt/image/BufferedImage;",
+          "access": 2,
+          "code_sha256": "bf0001de7331d87cc78a3933ecc5e8fd0ffd35bdeff110e247d58f14b03e83be",
+          "code_length": 44
+        },
+        {
+          "name": "createTransparentIcon",
+          "descriptor": "(II)Ljavax/swing/Icon;",
+          "access": 1,
+          "code_sha256": "6cec1850b7a166c6f07af2fc9afda506139e8949ac4666dce2527e625d1aca3a",
+          "code_length": 14
+        },
+        {
+          "name": "formatMessage",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "379767f4321f47b2cafc3153b46021b4704a2628515e535d24765b3e875fdcbd",
+          "code_length": 14
+        },
+        {
+          "name": "formatMessage",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a8c41b5ee0ab8d6b8882ff603a1a58ef44b4c3e23c93a6397fc1787f4c77bd8b",
+          "code_length": 18
+        },
+        {
+          "name": "formatMessage",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a33b5d9bc09e6422af76af4acbd5daabe876fac3a47c88a0a6a0194cd1d6f5e2",
+          "code_length": 27
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "java/awt/Image",
+        "java/awt/Toolkit",
+        "java/awt/image/BufferedImage",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/reflect/Field",
+        "java/text/MessageFormat",
+        "java/util/Arrays",
+        "java/util/Locale",
+        "java/util/MissingResourceException",
+        "java/util/ResourceBundle",
+        "java/util/TreeMap",
+        "java/util/TreeSet",
+        "javax/swing/ImageIcon",
+        "javax/swing/JMenu",
+        "javax/swing/KeyStroke",
+        "org/jfree/util/Log",
+        "org/jfree/util/ObjectUtilities",
+        "org/jfree/util/ResourceBundleSupport"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/Rotation.class",
+      "occurrence": 0,
+      "sha256": "5086a2b4ef2e38fb057fb76349dc649b87d229e750771881f828191eed1fec2d",
+      "name": "org/jfree/util/Rotation",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "CLOCKWISE",
+          "descriptor": "Lorg/jfree/util/Rotation;",
+          "access": 25
+        },
+        {
+          "name": "ANTICLOCKWISE",
+          "descriptor": "Lorg/jfree/util/Rotation;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "factor",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;D)V",
+          "access": 2,
+          "code_sha256": "2c4dd98ecea0846e0046cd23c3d611d3738a92e2cb41f10941e602569fa3d05d",
+          "code_length": 15
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getFactor",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "6e41223bc0dac49176e0b6b316d4922afc6d2168c97a9bd8c2f9942eb2161984",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "226f7e99aedc3c91a70a559cec11388fd46675efaad52980b86e0938096b7a00",
+          "code_length": 37
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "67cf596b9c7e21ea4c47c6b5dcc03a4aacc5cbba81602ec3d95fe5d40ad903e4",
+          "code_length": 16
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "b4ca7f53d9c639021513f9f4f0cd8c5f3a8625ea5fcf5b6b2a1dee1425dd45c8",
+          "code_length": 30,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6b45e0b148bf9b2a0a42582da35d6ff8e6e5280e91fc0c2c985ddf72fcefac69",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Double",
+        "java/lang/Object",
+        "org/jfree/util/Rotation"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ShapeList.class",
+      "occurrence": 0,
+      "sha256": "b7be3769c16346a7b090955425e0082c1d506b42a25682a1bf7daa6d6f06cb86",
+      "name": "org/jfree/util/ShapeList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jfree/util/AbstractObjectList",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getShape",
+          "descriptor": "(I)Ljava/awt/Shape;",
+          "access": 1,
+          "code_sha256": "a472cb86baf62c5078fad78171cc704d18b6e8d4048beca6026d1dcc3ebc0cb6",
+          "code_length": 9
+        },
+        {
+          "name": "setShape",
+          "descriptor": "(ILjava/awt/Shape;)V",
+          "access": 1,
+          "code_sha256": "d41d6de027a3269952a923f03c33b66dd8a77e75daabcdf3e4d373dc36641212",
+          "code_length": 7
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c063faa421a004010b02f8393dd715915382ef4fee2445a421a83ec841dad3f",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2a60c08494e8df107600d1e728131ea329b2f2ab4c839eff0769d4435e0b4f45",
+          "code_length": 28
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "305df467147f6bc27a844cb58076944612aa68afe503de67ceaf1979198d8f95",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "e970dad46dbde5554eed17c4971a1bd42c18245727570cb448958e78e8442b5b",
+          "code_length": 59,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "f55888d773acbb1e0b799faf7a3aaecc324c0ac5308e161c3b1c6fe716be2719",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/awt/Shape",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/ClassNotFoundException",
+        "java/lang/CloneNotSupportedException",
+        "org/jfree/io/SerialUtilities",
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/ShapeList"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/ShapeUtilities.class",
+      "occurrence": 0,
+      "sha256": "1c45fd2ab360c6dcc73eded560e81b4fe94c0977b6406dbd21decd75fa1b18a8",
+      "name": "org/jfree/util/ShapeUtilities",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SQRT2",
+          "descriptor": "F",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/awt/Shape;)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "b9e116bd1c0a58a8429b41a8e8fe5c79a6c04c098ab436d341727f21efe305d6",
+          "code_length": 20
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/Shape;Ljava/awt/Shape;)Z",
+          "access": 9,
+          "code_sha256": "bbe829777dfcb72e181f122ba363437118f41949b5015b69de2d6c2dd331e314",
+          "code_length": 136
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/geom/Line2D;Ljava/awt/geom/Line2D;)Z",
+          "access": 9,
+          "code_sha256": "22b3ad23bfe00060e8039c13ab02bfcbd3441ca04c1a2d50aa7c55a3892284c0",
+          "code_length": 54
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/geom/Ellipse2D;Ljava/awt/geom/Ellipse2D;)Z",
+          "access": 9,
+          "code_sha256": "9a61a1aa951a5b25cd74cfc3b6617ce70fb78ef637d92df21e4699a1c6091d67",
+          "code_length": 38
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/geom/Arc2D;Ljava/awt/geom/Arc2D;)Z",
+          "access": 9,
+          "code_sha256": "bfcea56d4cb8cc200fb6f02712a9be36fde20cff1bff13067bd5190f68391dfb",
+          "code_length": 79
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/Polygon;Ljava/awt/Polygon;)Z",
+          "access": 9,
+          "code_sha256": "fdd12522e7a42d7e437daf210abbc3a85693fccd0bbd744879b7dbf6c05d8239",
+          "code_length": 67
+        },
+        {
+          "name": "equal",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Ljava/awt/geom/GeneralPath;)Z",
+          "access": 9,
+          "code_sha256": "764b634bc93a7f2ec59a8b628072a7e6153779b63320a2acfd64979396b611d3",
+          "code_length": 187
+        },
+        {
+          "name": "createTranslatedShape",
+          "descriptor": "(Ljava/awt/Shape;DD)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "2a65b00ada0dc403ab6ccac970bf79583f8a72697300af5284e80d027cb2f8a4",
+          "code_length": 28
+        },
+        {
+          "name": "createTranslatedShape",
+          "descriptor": "(Ljava/awt/Shape;Lorg/jfree/ui/RectangleAnchor;DD)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "dc12835b40627501d746ddcb98359fdbc51a7f0b9432bd97c31d727c63ad8d4d",
+          "code_length": 67
+        },
+        {
+          "name": "rotateShape",
+          "descriptor": "(Ljava/awt/Shape;DFF)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "f89d0b1d737d776cf63116de899a935c34af9a81b578b93d1fb565ff0997b4d1",
+          "code_length": 28
+        },
+        {
+          "name": "drawRotatedShape",
+          "descriptor": "(Ljava/awt/Graphics2D;Ljava/awt/Shape;DFF)V",
+          "access": 9,
+          "code_sha256": "4655f8332d020426eb48974b987665fd6cc61cb9773b445d35fcc5ea57fdfd3e",
+          "code_length": 36
+        },
+        {
+          "name": "createDiagonalCross",
+          "descriptor": "(FF)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "ae3d222c15589fcd40fdb7b4e12bad3f9df1764a04b8249c7701e0385eee1b15",
+          "code_length": 144
+        },
+        {
+          "name": "createRegularCross",
+          "descriptor": "(FF)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "4e5c641cc606d89669f81c922bd0403897e06c82ac9b4499032d1543f564a5d3",
+          "code_length": 98
+        },
+        {
+          "name": "createDiamond",
+          "descriptor": "(F)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "1f04277b90723baa042c8786a2e05c9777a2b8ec1893919e7d2efac1a4e15f88",
+          "code_length": 40
+        },
+        {
+          "name": "createUpTriangle",
+          "descriptor": "(F)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "e2ba422102282fb74bed89586612880b44194756e5b9b036dce61fba4f3dc4e7",
+          "code_length": 34
+        },
+        {
+          "name": "createDownTriangle",
+          "descriptor": "(F)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "5612c38b1799e75c04732f7a64b849c99db97797d4d20a87026951f36e2b11fb",
+          "code_length": 35
+        },
+        {
+          "name": "createLineRegion",
+          "descriptor": "(Ljava/awt/geom/Line2D;F)Ljava/awt/Shape;",
+          "access": 9,
+          "code_sha256": "008170f70a3a7f82134f06091219ece759ed751f2476233e6bf1e24087ed2932",
+          "code_length": 194
+        },
+        {
+          "name": "getPointInRectangle",
+          "descriptor": "(DDLjava/awt/geom/Rectangle2D;)Ljava/awt/geom/Point2D;",
+          "access": 9,
+          "code_sha256": "6e048f9142749a2404efacf65cea41e9748645509dc1f9d0b02eacfb3255c582",
+          "code_length": 46
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/awt/geom/Rectangle2D;Ljava/awt/geom/Rectangle2D;)Z",
+          "access": 9,
+          "code_sha256": "e40714a49c0fbeb533c4a898f381f241255a2826e7458a121384ad35b301c547",
+          "code_length": 87
+        },
+        {
+          "name": "intersects",
+          "descriptor": "(Ljava/awt/geom/Rectangle2D;Ljava/awt/geom/Rectangle2D;)Z",
+          "access": 9,
+          "code_sha256": "fc247e46dc79353bba7ba941f81a13057ef2474f6959d5ba1f76b001116e8922",
+          "code_length": 87
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "69e9bc9332ffd7f071804f22fc8d09b432bd7748570c12d90c7383850dc2cd97",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/awt/Graphics2D",
+        "java/awt/Polygon",
+        "java/awt/Shape",
+        "java/awt/geom/AffineTransform",
+        "java/awt/geom/Arc2D",
+        "java/awt/geom/Ellipse2D",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Line2D",
+        "java/awt/geom/PathIterator",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/geom/Rectangle2D",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Arrays",
+        "org/jfree/ui/RectangleAnchor",
+        "org/jfree/util/ObjectUtilities",
+        "org/jfree/util/ShapeUtilities"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/SortedConfigurationWriter.class",
+      "occurrence": 0,
+      "sha256": "b64b35ba2fdaae914e5bbe755112542bb0346119117f9fa4fc58db0d34a396dd",
+      "name": "org/jfree/util/SortedConfigurationWriter",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ESCAPE_KEY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ESCAPE_VALUE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ESCAPE_COMMENT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "END_OF_LINE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HEX_CHARS",
+          "descriptor": "[C",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "save",
+          "descriptor": "(Ljava/lang/String;Lorg/jfree/util/Configuration;)V",
+          "access": 1,
+          "code_sha256": "212b5f8288f50bbc62a403f9829c2ac8ab78c69f1b0b3e210589a70c8f980768",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "save",
+          "descriptor": "(Ljava/io/File;Lorg/jfree/util/Configuration;)V",
+          "access": 1,
+          "code_sha256": "b95ef9ab5bb2209899299e33fcb94d6772d9f73f5dbb1b5ca6adde188117be9f",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "save",
+          "descriptor": "(Ljava/io/OutputStream;Lorg/jfree/util/Configuration;)V",
+          "access": 1,
+          "code_sha256": "e00603199683568356b2cc69e49bfd450a9785ad3eaefb97180219dcce8de30d",
+          "code_length": 165,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeDescription",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Writer;)V",
+          "access": 2,
+          "code_sha256": "080667204b911f8f01895813bc9cab41c7e10f4c5c7f3ed43d63d03562b37ef2",
+          "code_length": 67,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "saveConvert",
+          "descriptor": "(Ljava/lang/String;ILjava/io/Writer;)V",
+          "access": 2,
+          "code_sha256": "eba8699a9bd86d00102be9a211ef84faac950108dce8ef832d703175ae249a35",
+          "code_length": 387,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6418657232b868fc629d5f74d70ff1bd40a1288d24a2a2d6235d8214f6aa4d25",
+          "code_length": 104
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStreamWriter",
+        "java/io/Writer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "org/jfree/util/Configuration",
+        "org/jfree/util/LineBreakIterator",
+        "org/jfree/util/SortedConfigurationWriter",
+        "org/jfree/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/SortOrder.class",
+      "occurrence": 0,
+      "sha256": "d77080d7d950ef1c7a37a4987fea52a8a5418e62757d4ebbdfd586e360ea66cf",
+      "name": "org/jfree/util/SortOrder",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "ASCENDING",
+          "descriptor": "Lorg/jfree/util/SortOrder;",
+          "access": 25
+        },
+        {
+          "name": "DESCENDING",
+          "descriptor": "Lorg/jfree/util/SortOrder;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ec69abde24c554a156e54485dfc5bff4e7719d6c89f9fa2deff8ac260517fe58",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "51fbcef7b03ad1fd1c46b4d0fd2a76e7f5a1faaa81d3bbd80e2e5c7c5da529ae",
+          "code_length": 8
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "811c61d2ce10e0d445445cc68a062bd349846d616e02e4d670c86a0e18a31fdd",
+          "code_length": 30,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a9f6a7d7f4dcbfba4dbfa88b11ad18ad06bd82cc68a5ba0c8f6b53881162f408",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/SortOrder"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/StackableException.class",
+      "occurrence": 0,
+      "sha256": "4c5cb560411d259c907e47ca9bfcaa8c646f409e44a5134879100b1c15f9f23b",
+      "name": "org/jfree/util/StackableException",
+      "major": 47,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "parent",
+          "descriptor": "Ljava/lang/Exception;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "15d7a8c03dce8ac355e69421b098e6d3703f08669f3360a17b596c5b4d308c44",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getParent",
+          "descriptor": "()Ljava/lang/Exception;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintStream;)V",
+          "access": 1,
+          "code_sha256": "eba3bebfcf26cd3546e1507d32721d5c8810f2c40f9f8d41936edf3e3319d20c",
+          "code_length": 27
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintWriter;)V",
+          "access": 1,
+          "code_sha256": "68c5738066e8be5a62ec11ecc960337e346443c5e30c88c6ea8d1b61c5fcfaf5",
+          "code_length": 27
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "018851232eda566925ac5a784bea5323e24a7673650f02deac726e67f121de5d",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/System",
+        "org/jfree/util/StackableException"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/StackableRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "62dcfdb166a8b0b192a7c709dcf4c8c025c26cbbdca89d20db07bc96c9df4a3d",
+      "name": "org/jfree/util/StackableRuntimeException",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "parent",
+          "descriptor": "Ljava/lang/Exception;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "15d7a8c03dce8ac355e69421b098e6d3703f08669f3360a17b596c5b4d308c44",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getParent",
+          "descriptor": "()Ljava/lang/Exception;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintStream;)V",
+          "access": 1,
+          "code_sha256": "94128f03cee974dfd512e536eb879b75155fdb69612ef759a7cf354b4b2f4674",
+          "code_length": 27
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintWriter;)V",
+          "access": 1,
+          "code_sha256": "3f6009e522916e7736b594f032d8a5837b99d13430e6a41d6fca995652076098",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/RuntimeException",
+        "org/jfree/util/StackableRuntimeException"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/StringUtils.class",
+      "occurrence": 0,
+      "sha256": "39bf6939aa7c0e260e9163ab03f655db225361ec1cbd48fb20df6daca4d65d38",
+      "name": "org/jfree/util/StringUtils",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "startsWithIgnoreCase",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "4b789c4408426f40a3fb36367311626921f9d7203d296ea9423a408d975b1057",
+          "code_length": 26
+        },
+        {
+          "name": "endsWithIgnoreCase",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "c2f7854372ea0c0b297436e51f73c8fe09c37b8ee82fc1f202fb51eea92572e2",
+          "code_length": 34
+        },
+        {
+          "name": "getLineSeparator",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8f9216a447131b3791c1fcf513f132bcb3f38f15eba88d2876c10d0dd4c50008",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "org/jfree/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/StrokeList.class",
+      "occurrence": 0,
+      "sha256": "9a0e39bb8e08e674e03df834d00c02d28513b40f97a68a9be99ebf6f398a1a92",
+      "name": "org/jfree/util/StrokeList",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jfree/util/AbstractObjectList",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getStroke",
+          "descriptor": "(I)Ljava/awt/Stroke;",
+          "access": 1,
+          "code_sha256": "a472cb86baf62c5078fad78171cc704d18b6e8d4048beca6026d1dcc3ebc0cb6",
+          "code_length": 9
+        },
+        {
+          "name": "setStroke",
+          "descriptor": "(ILjava/awt/Stroke;)V",
+          "access": 1,
+          "code_sha256": "d41d6de027a3269952a923f03c33b66dd8a77e75daabcdf3e4d373dc36641212",
+          "code_length": 7
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c063faa421a004010b02f8393dd715915382ef4fee2445a421a83ec841dad3f",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2a60c08494e8df107600d1e728131ea329b2f2ab4c839eff0769d4435e0b4f45",
+          "code_length": 28
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "305df467147f6bc27a844cb58076944612aa68afe503de67ceaf1979198d8f95",
+          "code_length": 5
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "e970dad46dbde5554eed17c4971a1bd42c18245727570cb448958e78e8442b5b",
+          "code_length": 59,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "f55888d773acbb1e0b799faf7a3aaecc324c0ac5308e161c3b1c6fe716be2719",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/awt/Stroke",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/ClassNotFoundException",
+        "java/lang/CloneNotSupportedException",
+        "org/jfree/io/SerialUtilities",
+        "org/jfree/util/AbstractObjectList",
+        "org/jfree/util/StrokeList"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/TableOrder.class",
+      "occurrence": 0,
+      "sha256": "7b86736751cba71eb851a13a833d7385bc16f91cf1039717bc4e73d208934b88",
+      "name": "org/jfree/util/TableOrder",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "BY_ROW",
+          "descriptor": "Lorg/jfree/util/TableOrder;",
+          "access": 25
+        },
+        {
+          "name": "BY_COLUMN",
+          "descriptor": "Lorg/jfree/util/TableOrder;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0a8fb7d0494dce518a0b697de34211e96fb7e7d8c08f007bc0313ed83fbc9ed4",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "23035b19404bec5a4f613e4f77cf206e7d112e5a176f3a8a5fbab926d82a8693",
+          "code_length": 8
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "b4ca7f53d9c639021513f9f4f0cd8c5f3a8625ea5fcf5b6b2a1dee1425dd45c8",
+          "code_length": 30,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e8f7a6acc357cab5bb3a1723aca0745a31f4f99af97555d0649f333eeb60a705",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/TableOrder"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/UnitType.class",
+      "occurrence": 0,
+      "sha256": "c0315cac49c444ea74dffdc8ebcc66a7a36091f80b04bdd6322038c17b667155",
+      "name": "org/jfree/util/UnitType",
+      "major": 47,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "ABSOLUTE",
+          "descriptor": "Lorg/jfree/util/UnitType;",
+          "access": 25
+        },
+        {
+          "name": "RELATIVE",
+          "descriptor": "Lorg/jfree/util/UnitType;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "a9c2838d6ad3f9529a5fc184d4226fa8e4b8976bed6798f1891d484b2d0e17f1",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "23035b19404bec5a4f613e4f77cf206e7d112e5a176f3a8a5fbab926d82a8693",
+          "code_length": 8
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "b4ca7f53d9c639021513f9f4f0cd8c5f3a8625ea5fcf5b6b2a1dee1425dd45c8",
+          "code_length": 30,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e8f7a6acc357cab5bb3a1723aca0745a31f4f99af97555d0649f333eeb60a705",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/jfree/util/UnitType"
+      ]
+    },
+    {
+      "entry": "org/jfree/util/WaitingImageObserver.class",
+      "occurrence": 0,
+      "sha256": "82055b6dde68483f92405a6c6fd59951f381e8e7b98e149e115912e62ce45274",
+      "name": "org/jfree/util/WaitingImageObserver",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/image/ImageObserver",
+        "java/io/Serializable",
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "lock",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "image",
+          "descriptor": "Ljava/awt/Image;",
+          "access": 2
+        },
+        {
+          "name": "error",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/Image;)V",
+          "access": 1,
+          "code_sha256": "a10706f04ebfdbaaaee0b05ff4de6d6c251578c803edf784c58077690c96a1eb",
+          "code_length": 27
+        },
+        {
+          "name": "imageUpdate",
+          "descriptor": "(Ljava/awt/Image;IIIII)Z",
+          "access": 33,
+          "code_sha256": "c5c0490cfd9dcfa185a538aaee2fb353e2537cf5fc192cce4c173219e81b84ad",
+          "code_length": 63
+        },
+        {
+          "name": "waitImageLoaded",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "97a86a0431cb74471bc734f0ba03409c762a0572be4e9cc7f74ccf9b2162d2b2",
+          "code_length": 77
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "03a75dad654e0f29fcabea206469e71421cfeeba8ef53e56ca2233896df765c6",
+          "code_length": 8,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "isLoadingComplete",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c79168bfb894475296aeffb0351ba43d3a4d3cac057980282f5ca9611ef8c4c1",
+          "code_length": 13
+        },
+        {
+          "name": "isError",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/awt/Graphics",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ImageObserver",
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/InterruptedException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "org/jfree/util/Log",
+        "org/jfree/util/WaitingImageObserver"
+      ]
+    }
+  ]
+}

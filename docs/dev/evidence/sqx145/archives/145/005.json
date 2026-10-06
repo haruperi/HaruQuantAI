@@ -1,0 +1,32 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/animal-sniffer-annotations-1.14.jar",
+  "sha256": "2068320bd6bad744c3673ab048f67e30bef8f518996fa380033556600669905d",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "org/codehaus/mojo/animal_sniffer/IgnoreJRERequirement.class": "4bf035981108344316103d7e72ca4a5a8f340701af8142102ef82c688caf785f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "f83ca96996b79c7ccd3f04d60fd6089fee810345275b4da1b8a3b6c1b215224b",
+    "META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.xml": "1879f19a05991e3ed95910b96689333396b0c467a215dc4d1f90018404b72a26",
+    "META-INF/maven/org.codehaus.mojo/animal-sniffer-annotations/pom.properties": "1b343ecc798472cf017dcccc2520ea464afb931337c51eba3158f72bddd40d3c"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/codehaus/mojo/animal_sniffer/IgnoreJRERequirement.class",
+      "occurrence": 0,
+      "sha256": "4bf035981108344316103d7e72ca4a5a8f340701af8142102ef82c688caf785f",
+      "member_shard": "docs/dev/evidence/sqx145/members/005/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/005/001.json",
+      "sha256": "ae3bde0e9ad046d0e4e816a8c13f4be6d66888f3970437c0369faf3786a026db"
+    }
+  ]
+}

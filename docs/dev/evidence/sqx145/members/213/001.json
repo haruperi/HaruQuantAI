@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimization.jar",
+  "archive_sha256": "7d5039a1c9d0868b8ed2e64913b46a0329bd79f8bc01d4546e899a7a26c6ee7e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationPlugin.class",
+      "occurrence": 0,
+      "sha256": "35a3a053f93b6f04120ec795f701f98ffd3c86c0f03e3d6bfe72f6c3da4dfd6a",
+      "name": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "14e4e5f3f76a84aaee17c42bef92c12a5beaad6502afca0b10e42f9c6d4ec754",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d775afee5b09d52c2d596c6042b8c7e4f32e956070bc9a6a04129459251078fc",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationPlugin",
+        "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet.class",
+      "occurrence": 0,
+      "sha256": "e845c418debb6cadaa8a86b951844f73823f089e029fffdce47c1e0bf8afea24",
+      "name": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_SEQOPTSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b5c531a95557356e206cef489e50137f8cccefbd49d6eb6ae7c70aca413b709c",
+          "code_length": 125,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3a09cbd3da79149c513bf1879b565a276d0725fd8a93a949a4181f0d3c0f4bb1",
+          "code_length": 216,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getChartData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/robustnesstests/FitnessData;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "4b68dee1da2948507d5e1df9f0a2d52708cafef5ef8e89b52799e233ada5e736",
+          "code_length": 185
+        },
+        {
+          "name": "onApplyParams",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "01dd1931abd0720096398452c077cdeb85737305b31744ad44fdfe2eeefad56a",
+          "code_length": 292,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9d6e03775c7cf8b89bb42f81eca37cee27caeebcef6b5724e3dec7bf2fd7ced9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet",
+        "com/strategyquant/tradinglib/BarChart",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Variable",
+        "com/strategyquant/tradinglib/Variables",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/robustnesstests/FitnessData",
+        "com/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

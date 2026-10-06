@@ -13,7 +13,7 @@ What to retest is Custom Projects-only in the inspected registration and is not
 added as a standalone tab. Runtime/license visibility and complete parity remain
 unverified. Local settings reset when this workspace is unmounted.
 
-Evidence SQX144-EV-000066/067/071 covers settings eligibility and the progress
+Evidence retained target UI; current donor equivalence unverified/071 covers settings eligibility and the progress
 statistics branch. Copy/overwrite labels describe a preview routing choice; runs
 do not move, copy or replace databank records. Selected-only mode requires a
 selection before Start. The selected result remains a fixture result and is not
@@ -23,3 +23,7 @@ the approximation limits documented by ProjectWorkbench.
 Browser checks cover run/pause/resume/stop/completion, running settings lock,
 notes retention, source/target routing labels, direct settings links, log export,
 databank activation and narrow/expanded layouts. No runtime SQX parity claim.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

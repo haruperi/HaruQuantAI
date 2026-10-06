@@ -1,6 +1,6 @@
 # FileImport UI
 
-Donor: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles`.
+Donor: `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles`.
 Target: `HARUQUANTAI_ROOT/ui/app/plugins/data_source/FileImport`.
 Outer names intentionally differ. Donor informs; specification owns.
 
@@ -45,3 +45,7 @@ unsupported: appImport/appImportPopup.html, appImport/DataSourceFilesAppImportCt
 and appImport/module.js are explicitly excluded. Backend import and donor runtime
 semantics remain separate gaps. Canonical behavioral ledger/schema were absent;
 no new behavioral record is asserted and this manifest does not replace the ledger.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

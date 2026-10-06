@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskWaitFor/TaskWaitFor.jar",
+  "sha256": "46957acd37eca2a2feb6b322230f323955380e952ab45d626dc47f52436ce7f8",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1.class": "9bebd6a1f71b1d5b84c8f69c6d9258416d0754c8084aa38c2b067509a1e21ab2",
+    "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask.class": "a9bd2d1856b4a3863869d683d20278fe69dda4dc56dcd167a0f2eadaaa8bebb8"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1.class",
+      "occurrence": 0,
+      "sha256": "9bebd6a1f71b1d5b84c8f69c6d9258416d0754c8084aa38c2b067509a1e21ab2",
+      "member_shard": "docs/dev/evidence/sqx145/members/288/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask.class",
+      "occurrence": 0,
+      "sha256": "a9bd2d1856b4a3863869d683d20278fe69dda4dc56dcd167a0f2eadaaa8bebb8",
+      "member_shard": "docs/dev/evidence/sqx145/members/288/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/288/001.json",
+      "sha256": "be6f222f01bb940400f5a4fef03f256b0a0a724628e49c866861104b75791660"
+    }
+  ]
+}

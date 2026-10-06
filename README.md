@@ -32,13 +32,13 @@ uv run python scripts/ci_check.py
 The first command checks offline evidence lineage, inventory/ownership proposals,
 and fixtures. The second also qualifies typed Python tooling, reference tests and
 branch coverage, plus UI typecheck/tests/build. Actual donor inventory comparison
-requires an explicitly configured `SQX_REFERENCE_ROOT` and runs read-only:
+requires an explicitly configured `SQX_145_REFERENCE_ROOT` and runs read-only:
 
 ```powershell
 uv run python -m tests.reference.validate --check-donor
 ```
 
-[Evidence procedure](docs/dev/evidence/README.md) preserves historical records and
+[Evidence procedure](docs/dev/evidence/README.md) binds current records and
 separates static observations from donor runtime validation. SQLib/MainApp/
 AppSettings implementations, actual installed product build/activation and runtime
 output fixtures remain unavailable. P00 baseline delivery does not complete those

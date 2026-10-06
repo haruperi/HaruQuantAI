@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar",
+  "sha256": "29fab77fa8681e74516379fd4083aa8af33e7cd960cea5c0143614645daf788f",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript.class": "6f511d87eceb296c28c3a6d151f53dcd22835d15305ff46a2ebf986f8dc00b88"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript.class",
+      "occurrence": 0,
+      "sha256": "6f511d87eceb296c28c3a6d151f53dcd22835d15305ff46a2ebf986f8dc00b88",
+      "member_shard": "docs/dev/evidence/sqx145/members/243/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/243/001.json",
+      "sha256": "d6fd5d60ecdb7cf0d96841efb42de4c8d288fb6c2fcd3a4a6ec1c2edc7c22527"
+    }
+  ]
+}

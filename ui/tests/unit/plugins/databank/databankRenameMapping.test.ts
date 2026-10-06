@@ -7,7 +7,7 @@ import { useDatabankRenamePopup } from '../../../../app/plugins/databank/Databan
 import { validateSourceMapping } from './sourceMappingValidation';
 const prefix = '../../../../app/plugins/databank/DatabankRename/';
 const files = Object.keys(import.meta.glob('../../../../app/plugins/databank/DatabankRename/**/*', { eager: true, query: '?raw', import: 'default' })).map(path => path.slice(prefix.length));
-const scope = { plugin: 'DatabankRename', html: 1, js: 2, css: 1, excluded: 6 };
+const scope = { plugin: 'DatabankRename', html: 1, js: 2, css: 1, excluded: 3 };
 describe('DatabankRename structural mapping', () => {
   it('accounts for all counterparts, binary exclusion and target exception', () => {
     expect(validateSourceMapping(manifest, files, registry, scope)).toEqual([]);

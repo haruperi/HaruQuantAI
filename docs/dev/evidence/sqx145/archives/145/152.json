@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckSequentialOptimization/CrossCheckSequentialOptimization.jar",
+  "sha256": "d1b45af45898fbb7c875b9b670a5d423eac1386ad13953be08c7dabcfc93cec0",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1.class": "a54ae8077f1879e01f5e2405b015a93364ad58bd395e8f12d3fd813e356bd05b",
+    "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization.class": "e1f218fbaa3080b0efa10d8f040dfbc6a23152fecf8535aaad096bcd643b58e0"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1.class",
+      "occurrence": 0,
+      "sha256": "a54ae8077f1879e01f5e2405b015a93364ad58bd395e8f12d3fd813e356bd05b",
+      "member_shard": "docs/dev/evidence/sqx145/members/152/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization.class",
+      "occurrence": 0,
+      "sha256": "e1f218fbaa3080b0efa10d8f040dfbc6a23152fecf8535aaad096bcd643b58e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/152/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/152/001.json",
+      "sha256": "6400da690b0cf9d7ef434d813d14c6be0b5469c7cf33c3e5513bafd9f5051c19"
+    }
+  ]
+}

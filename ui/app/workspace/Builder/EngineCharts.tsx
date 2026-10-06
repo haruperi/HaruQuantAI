@@ -8,7 +8,7 @@ import {
 
 /**
  * The two engine chart cards of the Builder Progress engine column
- * (donor evidence SQX144-EV-000035). Each card centers a borderless type
+ * (donor evidence retained target UI; current donor equivalence unverified). Each card centers a borderless type
  * select that gains a border on hover and renders the matching demo chart.
  * The donor type list is engine-fed; only the two observed types ship here.
  */

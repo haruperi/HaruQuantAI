@@ -1,0 +1,62 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/mcp-json-jackson2-0.17.2.jar",
+  "sha256": "dbe542c16244de30872ce5edcf1795ef4101acd4ac400e8c8081b0048feac0a7",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "io/modelcontextprotocol/json/schema/jackson/JacksonJsonSchemaValidatorSupplier.class": "31ca6fd4f919bf8a819be885d4cd6f395d95424eab4043b67ffb452ad9fc7628",
+    "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1.class": "382fe7bf61f74d05cafbf316524cb6b394cd24c665c9d3ceff3c070a0c3637bc",
+    "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator.class": "67404101a6736e431c5cf61ff3337e8987ae51fe0a6794beccf6ac2d55584c42",
+    "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapperSupplier.class": "02ca74e62ec03430cfcd5c8ba1c17027779b3ad1f7a0d92686561ab54deb8d6e",
+    "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper.class": "40387b14013114b6c4041425ec9ef4c44e44221c38068144645f5d67f126da5e"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "4d940d7cf962e00a9826e862dd1371f6f860e5fe088e34710f7dbeac269ca79b",
+    "META-INF/services/io.modelcontextprotocol.json.McpJsonMapperSupplier": "f375d87e61e46e3cf0987845d65046220e1e102f33ad24f27e53fdc5c1a23a79",
+    "META-INF/services/io.modelcontextprotocol.json.schema.JsonSchemaValidatorSupplier": "b33371684beda39ae9fe43c304da335e2ac3e6c519c0f8e0a7677e35706bb0ef",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp-json-jackson2/pom.xml": "f4a3d90013fa1a9d7e505f3df6739ee1fe477e4eb4f568712c4b8bb9b6ddf2b5",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp-json-jackson2/pom.properties": "18856b234a574ca9535a24d6b2a2e487e95412137fbba00d7e834d93264b21b3"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/JacksonJsonSchemaValidatorSupplier.class",
+      "occurrence": 0,
+      "sha256": "31ca6fd4f919bf8a819be885d4cd6f395d95424eab4043b67ffb452ad9fc7628",
+      "member_shard": "docs/dev/evidence/sqx145/members/080/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator$1.class",
+      "occurrence": 0,
+      "sha256": "382fe7bf61f74d05cafbf316524cb6b394cd24c665c9d3ceff3c070a0c3637bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/080/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/jackson/DefaultJsonSchemaValidator.class",
+      "occurrence": 0,
+      "sha256": "67404101a6736e431c5cf61ff3337e8987ae51fe0a6794beccf6ac2d55584c42",
+      "member_shard": "docs/dev/evidence/sqx145/members/080/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapperSupplier.class",
+      "occurrence": 0,
+      "sha256": "02ca74e62ec03430cfcd5c8ba1c17027779b3ad1f7a0d92686561ab54deb8d6e",
+      "member_shard": "docs/dev/evidence/sqx145/members/080/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/jackson/JacksonMcpJsonMapper.class",
+      "occurrence": 0,
+      "sha256": "40387b14013114b6c4041425ec9ef4c44e44221c38068144645f5d67f126da5e",
+      "member_shard": "docs/dev/evidence/sqx145/members/080/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/080/001.json",
+      "sha256": "cb00b31a2b4a79828abb5fb066f1d70c7fc019eb72f5ffde4c1ffa20b4a45628"
+    }
+  ]
+}

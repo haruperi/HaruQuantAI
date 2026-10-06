@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletStrategy/ServletStrategy.jar",
+  "sha256": "ad58850406ffb2bcdf01773459b48bae65a95737a30d023f0442f7fb35bbb5e6",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy.class": "a16a8ea83c68e4d7e168aff738903a0e46096de36a70f50839ca708076b2d33f",
+    "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet.class": "b4ef6c5bfc2889c994a5ed4d99cb9325d87d83dac8e453bc89b7f3d23854bab9",
+    "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServletPlugin.class": "3e7f99857d68dabb2c0a580fb5ac58aa961bd73149862ba94cf6742a1db60ba0"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy.class",
+      "occurrence": 0,
+      "sha256": "a16a8ea83c68e4d7e168aff738903a0e46096de36a70f50839ca708076b2d33f",
+      "member_shard": "docs/dev/evidence/sqx145/members/237/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet.class",
+      "occurrence": 0,
+      "sha256": "b4ef6c5bfc2889c994a5ed4d99cb9325d87d83dac8e453bc89b7f3d23854bab9",
+      "member_shard": "docs/dev/evidence/sqx145/members/237/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "3e7f99857d68dabb2c0a580fb5ac58aa961bd73149862ba94cf6742a1db60ba0",
+      "member_shard": "docs/dev/evidence/sqx145/members/237/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/237/001.json",
+      "sha256": "520d521b3a0a8af2afc9734d5ecd16062e9c409d42148db05c57647b3d796f5e"
+    }
+  ]
+}

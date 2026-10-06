@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jfreechart-1.0.8a.jar",
+  "archive_sha256": "ca4266fb63ebbc0523a1ff413a0c0fc09e7d4822386ff1b6834e69eff748521d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/jfree/data/xy/YWithXInterval.class",
+      "occurrence": 0,
+      "sha256": "aebc10f310316e564d25068b9574132ccf9acd709c588804df2de3feeb82c120",
+      "name": "org/jfree/data/xy/YWithXInterval",
+      "major": 47,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "y",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "xLow",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "xHigh",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDD)V",
+          "access": 1,
+          "code_sha256": "1d298fd94e6b53879ad892ac2c4fd07c5af5f2b30eb17433d8dfb6d024bd72c6",
+          "code_length": 21
+        },
+        {
+          "name": "getY",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "c76899d02dbcf516752264315c6c2f699213a16172bf525692f8e7d62932ac9a",
+          "code_length": 5
+        },
+        {
+          "name": "getXLow",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "6e41223bc0dac49176e0b6b316d4922afc6d2168c97a9bd8c2f9942eb2161984",
+          "code_length": 5
+        },
+        {
+          "name": "getXHigh",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "d597389f2e9fe5026d1e931d1bab67f79df11355c373758e804456fcf8d76bfa",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "54627646aa5e4daf71f38ec62becba9314ebda390d08d11de8b3cc0675b44282",
+          "code_length": 65
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/jfree/data/xy/YWithXInterval"
+      ]
+    },
+    {
+      "entry": "org/jfree/data/xy/YisSymbolic.class",
+      "occurrence": 0,
+      "sha256": "e4ebe6a0821e0494d160a65f849fe30f494f80ebdf4ebc95b206945253be5838",
+      "name": "org/jfree/data/xy/YisSymbolic",
+      "major": 47,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getYSymbolicValues",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getYSymbolicValue",
+          "descriptor": "(II)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getYSymbolicValue",
+          "descriptor": "(Ljava/lang/Integer;)Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jfree/data/xy/YisSymbolic"
+      ]
+    }
+  ]
+}

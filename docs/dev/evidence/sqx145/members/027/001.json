@@ -1,0 +1,5763 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/filters-2.0.235.jar",
+  "archive_sha256": "be6a1d54ebb043495e31e25e72b440f69156a5624cdd7e1c55c47e30d4fae308",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/jhlabs/composite/AddComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "3dfe30a7425370342099b13b6af1e1a5aa5ce3ca0f9c3e1ecdb046289342393d",
+      "name": "com/jhlabs/composite/AddComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "d26b856d81feee7f64907905b58709a7b66306d072d45145fbd328f96047cfb7",
+          "code_length": 234
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/AddComposite",
+        "com/jhlabs/composite/AddComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/AddComposite.class",
+      "occurrence": 0,
+      "sha256": "6644fc99b1fa84449af4a04f6bbfbe534f6ecf615ea712ab704fd0ba97768257",
+      "name": "com/jhlabs/composite/AddComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/AddComposite",
+        "com/jhlabs/composite/AddComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/AverageComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "a6e04e581baca1b2e072a83698c4e36d2fab17944d0cdcdb4d396db97932d8b4",
+      "name": "com/jhlabs/composite/AverageComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "ee680de1512acef40f8912b5f5f6be37d5a4afb140160b2d11e4d97cd015bbd9",
+          "code_length": 201
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/AverageComposite",
+        "com/jhlabs/composite/AverageComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/AverageComposite.class",
+      "occurrence": 0,
+      "sha256": "0cc7bbcbcb843d7035daa96b77ac702b4735581f4a060243d4e704388edbb3c4",
+      "name": "com/jhlabs/composite/AverageComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/AverageComposite",
+        "com/jhlabs/composite/AverageComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/BurnComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "0426eb70d224430b499fa7e3d0ac2360bbf2684a8dc794d22c199e7aac8441d0",
+      "name": "com/jhlabs/composite/BurnComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "6e321c98c813c9b59a993c1cbabb582908dc462ea0e3a52b1f7e3eced9ec52c4",
+          "code_length": 288
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/BurnComposite",
+        "com/jhlabs/composite/BurnComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/BurnComposite.class",
+      "occurrence": 0,
+      "sha256": "e8678ebff04314dc0dac31105d8e3c604853b14baf58bda2a6dd7b091b04ef8d",
+      "name": "com/jhlabs/composite/BurnComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/BurnComposite",
+        "com/jhlabs/composite/BurnComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorBurnComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "cde1125fa59be9cdadd4f77493f69e2c0a6b0efb11036a5bc167902e05a92fb5",
+      "name": "com/jhlabs/composite/ColorBurnComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "7d481a883f499cb18b7c3493bcbfb50a28716d47280c41923d1c7f6cabe16ec2",
+          "code_length": 276
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorBurnComposite",
+        "com/jhlabs/composite/ColorBurnComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorBurnComposite.class",
+      "occurrence": 0,
+      "sha256": "75921646f38f3a1427efa62af6117eac2ad42198fca7ec5995c245a9bfc05519",
+      "name": "com/jhlabs/composite/ColorBurnComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorBurnComposite",
+        "com/jhlabs/composite/ColorBurnComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "9d26d8d266a9f91fa6dd9fde5d9c895bf4708600095742f8e9e5bf99acbff183",
+      "name": "com/jhlabs/composite/ColorComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sHSB",
+          "descriptor": "[F",
+          "access": 2
+        },
+        {
+          "name": "dHSB",
+          "descriptor": "[F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "471a763ceec8e4a1918b497f61d5c9997c054093565969ba93edf42072869905",
+          "code_length": 22
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "05d6f2662a534c16d129f0b0b7c8c65c0ea7f107fd3ab2289d80ab8b24e3649e",
+          "code_length": 277
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorComposite",
+        "com/jhlabs/composite/ColorComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/awt/Color"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorComposite.class",
+      "occurrence": 0,
+      "sha256": "ce318f0f0cbddc62bc1f2be5e914d113b2a2957e2af3c69e437b0fd622bccc4d",
+      "name": "com/jhlabs/composite/ColorComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorComposite",
+        "com/jhlabs/composite/ColorComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorDodgeComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "670261a78cf8fa65d527fbed25187177c61ccf1397fa8fdda0174ea299c346e7",
+      "name": "com/jhlabs/composite/ColorDodgeComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "f0950f5a9ec212c88893ac0a4bf32dec91db42169ed4a372032151f0168f442a",
+          "code_length": 279
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorDodgeComposite",
+        "com/jhlabs/composite/ColorDodgeComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ColorDodgeComposite.class",
+      "occurrence": 0,
+      "sha256": "8d635d53ade1ddd9d4c949cf1ed46d19cb1928fba6aa62369a94b6216f0a1007",
+      "name": "com/jhlabs/composite/ColorDodgeComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ColorDodgeComposite",
+        "com/jhlabs/composite/ColorDodgeComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ContourComposite.class",
+      "occurrence": 0,
+      "sha256": "b0e1d1cefadd866b41232e1ea0f9c2c6c98d78cef6987e41382ddf9a33d87790",
+      "name": "com/jhlabs/composite/ContourComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/Composite"
+      ],
+      "fields": [
+        {
+          "name": "offset",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "f98d6d44b94e64fe7fe557eedb5e8b5079e54064c89d29ce517db9d627148e05",
+          "code_length": 14
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b629ca59558bbd911c667902ac8ae267767d78ad8b1f960b1962c0aba2e8c823",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ContourComposite",
+        "com/jhlabs/composite/ContourCompositeContext",
+        "java/awt/Composite",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ContourCompositeContext.class",
+      "occurrence": 0,
+      "sha256": "215b61fa98a5054d7fb14b88d3c1bd61f1c5d0a8ddb54885fccc8668f1f7fc4d",
+      "name": "com/jhlabs/composite/ContourCompositeContext",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/CompositeContext"
+      ],
+      "fields": [
+        {
+          "name": "offset",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "compose",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;)V",
+          "access": 1,
+          "code_sha256": "81d26f1dbd1a6e467310e11ac11536031ed73ebe6bac5444d48ff48aea30ca4d",
+          "code_length": 359
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ContourCompositeContext",
+        "java/awt/CompositeContext",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DarkenComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "daaf5a357ab9313aa2c4e1737bfda66703bfe48220c94f6e1fe4b70ee995efe9",
+      "name": "com/jhlabs/composite/DarkenComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "c662986661b1205cc1e0416d701af867c23ff2f83953271f3b6cda8e73ba123b",
+          "code_length": 222
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DarkenComposite",
+        "com/jhlabs/composite/DarkenComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DarkenComposite.class",
+      "occurrence": 0,
+      "sha256": "abb4d3a78167ab7de0664724ec9e95c872d53a19db17d9de474d929d5d0e24ea",
+      "name": "com/jhlabs/composite/DarkenComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DarkenComposite",
+        "com/jhlabs/composite/DarkenComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DifferenceComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "be3148eafb16a46c06bfbcdc37269acd9a9403a47d6457edb83c60c9ec7451a6",
+      "name": "com/jhlabs/composite/DifferenceComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "e7ff2aea91f02c8248a3932193d059cff190afb526f4afd7142670dc56897873",
+          "code_length": 225
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DifferenceComposite",
+        "com/jhlabs/composite/DifferenceComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DifferenceComposite.class",
+      "occurrence": 0,
+      "sha256": "6fc39b914fb7fb8ed8cd2bc1f71dd4ceafa22a9a479582a4e8152f84b6ef8882",
+      "name": "com/jhlabs/composite/DifferenceComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DifferenceComposite",
+        "com/jhlabs/composite/DifferenceComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DodgeComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "8512efd9e821182ff5a3e10ea32ed42cf2bccce796ee05810ffc3f32ed05f0cd",
+      "name": "com/jhlabs/composite/DodgeComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "e8ecf1a2df013e528ea92f0477fbcedfcf19fcac561acf88702c6e024ad8122b",
+          "code_length": 225
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DodgeComposite",
+        "com/jhlabs/composite/DodgeComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/DodgeComposite.class",
+      "occurrence": 0,
+      "sha256": "f947cd0f0d1a88e2213da8307ab79bfae1a46ff03d2e0dde7d2c9847ade746b5",
+      "name": "com/jhlabs/composite/DodgeComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/DodgeComposite",
+        "com/jhlabs/composite/DodgeComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ExclusionComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "c98e9f58e2aa7283b9071380db3f7aba2acff39cfe0768d07f7aecb5af9c273f",
+      "name": "com/jhlabs/composite/ExclusionComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "0b0c4ce072dc9df197848d3916793868773bdc24c985beab09ae3b52516c3754",
+          "code_length": 231
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ExclusionComposite",
+        "com/jhlabs/composite/ExclusionComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ExclusionComposite.class",
+      "occurrence": 0,
+      "sha256": "75dae24d6186f7153d7068b5ef26a9f040393a81cea2431026091cc122904ec9",
+      "name": "com/jhlabs/composite/ExclusionComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/ExclusionComposite",
+        "com/jhlabs/composite/ExclusionComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/HardLightComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "c96f55c88fe402811bc10f02d4b33eb62bd7d9d52a57abf1a2503418becd5dcd",
+      "name": "com/jhlabs/composite/HardLightComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "4bbbd6db6a1a15d577970c15b7429373b25314559203d8eab1402f6ee2cdfb83",
+          "code_length": 306
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/HardLightComposite",
+        "com/jhlabs/composite/HardLightComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/HardLightComposite.class",
+      "occurrence": 0,
+      "sha256": "55a8c2175401b9da4507837a44a7d1af80297c767c55101b620f7a2ee1d85824",
+      "name": "com/jhlabs/composite/HardLightComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/HardLightComposite",
+        "com/jhlabs/composite/HardLightComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/HueComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "6814d20cdcbfdec45170f2bd37d64ff34af4fd65aed90fc96077a5b2aa00b43e",
+      "name": "com/jhlabs/composite/HueComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sHSB",
+          "descriptor": "[F",
+          "access": 2
+        },
+        {
+          "name": "dHSB",
+          "descriptor": "[F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "471a763ceec8e4a1918b497f61d5c9997c054093565969ba93edf42072869905",
+          "code_length": 22
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "9de1706410c8f98f89e7dcf8185d2e368ffb66a58861b7fc3224c01f178148c0",
+          "code_length": 265
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/HueComposite",
+        "com/jhlabs/composite/HueComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/awt/Color"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/HueComposite.class",
+      "occurrence": 0,
+      "sha256": "5894d77b1f7adc6255b77bdb5c96ec569027c277386cdbf7b6ca5082c7ab47d0",
+      "name": "com/jhlabs/composite/HueComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/HueComposite",
+        "com/jhlabs/composite/HueComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/LightenComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "86ecf1a721b02fbe51312f00c5051098b86e5573ec9edcf42e5ef34bae3093f1",
+      "name": "com/jhlabs/composite/LightenComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "e6d1cc36c88e4b86e0349eea8d51143d62a2b1386618239c7c63ba8b41ab9c3f",
+          "code_length": 222
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/LightenComposite",
+        "com/jhlabs/composite/LightenComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/LightenComposite.class",
+      "occurrence": 0,
+      "sha256": "78863c3a529ad12f57ef0bf22411dc8209a64c0e3a820b1e739bdb9fc1d2e24a",
+      "name": "com/jhlabs/composite/LightenComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/LightenComposite",
+        "com/jhlabs/composite/LightenComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/MiscComposite.class",
+      "occurrence": 0,
+      "sha256": "8916816188b06c522e1948dfe5bafcb90ce492fd2a601b66c19dc6a7862811c9",
+      "name": "com/jhlabs/composite/MiscComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/Composite"
+      ],
+      "fields": [
+        {
+          "name": "BLEND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ADD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SUBTRACT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIFFERENCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MULTIPLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DARKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BURN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR_BURN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SCREEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LIGHTEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DODGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR_DODGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SATURATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OVERLAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SOFT_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HARD_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIN_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EXCLUSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NEGATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "AVERAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STENCIL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SILHOUETTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MIN_RULE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MAX_RULE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "RULE_NAMES",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 9
+        },
+        {
+          "name": "extraAlpha",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "rule",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "e708a56477440b946a532445ddb474cfa9ee9f2c10f1dcdea5cb503f899f8d28",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IF)V",
+          "access": 2,
+          "code_sha256": "ee86204a88546fd7e7fc126e1b8eefc45047ec0faaa8ae8d16983ccc949d9ae9",
+          "code_length": 57
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(IF)Ljava/awt/Composite;",
+          "access": 9,
+          "code_sha256": "ee50d02223a55bd932428b89745a0627bc76c839400d1e72509dca1f8a445095",
+          "code_length": 344
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "631bc0d466930ea25b2997fe56682d66c30a3ca14030abea68dc771650f35c99",
+          "code_length": 18
+        },
+        {
+          "name": "getAlpha",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "30552b6e3b44a0dcafea9fb27c0853b6924a01713a1b6008853078c51a22f701",
+          "code_length": 5
+        },
+        {
+          "name": "getRule",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "009aa227f0687210e5be5153ad0907cc339ff451bf20a5dc7d6e8ddad25d996b",
+          "code_length": 16
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "40743496015f9f783fd795301ae6561461193b880575af40681d9dade3bcb0bd",
+          "code_length": 43
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7e036fecdbb0d0b0181b7b0a19b4506872389b84a5b4937d81de3bbb0d22c62f",
+          "code_length": 153
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/AddComposite",
+        "com/jhlabs/composite/AverageComposite",
+        "com/jhlabs/composite/BurnComposite",
+        "com/jhlabs/composite/ColorBurnComposite",
+        "com/jhlabs/composite/ColorComposite",
+        "com/jhlabs/composite/ColorDodgeComposite",
+        "com/jhlabs/composite/DarkenComposite",
+        "com/jhlabs/composite/DifferenceComposite",
+        "com/jhlabs/composite/DodgeComposite",
+        "com/jhlabs/composite/ExclusionComposite",
+        "com/jhlabs/composite/HardLightComposite",
+        "com/jhlabs/composite/HueComposite",
+        "com/jhlabs/composite/LightenComposite",
+        "com/jhlabs/composite/MiscComposite",
+        "com/jhlabs/composite/MiscCompositeContext",
+        "com/jhlabs/composite/MultiplyComposite",
+        "com/jhlabs/composite/NegationComposite",
+        "com/jhlabs/composite/OverlayComposite",
+        "com/jhlabs/composite/PinLightComposite",
+        "com/jhlabs/composite/SaturationComposite",
+        "com/jhlabs/composite/ScreenComposite",
+        "com/jhlabs/composite/SoftLightComposite",
+        "com/jhlabs/composite/SubtractComposite",
+        "com/jhlabs/composite/ValueComposite",
+        "java/awt/AlphaComposite",
+        "java/awt/Composite",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/MiscCompositeContext.class",
+      "occurrence": 0,
+      "sha256": "a52402635ab286a198d7da48a6b5fe6d3d4db3998fbb001f29a2462b56134a19",
+      "name": "com/jhlabs/composite/MiscCompositeContext",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/CompositeContext"
+      ],
+      "fields": [
+        {
+          "name": "rule",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "alpha",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "srcColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 2
+        },
+        {
+          "name": "dstColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 2
+        },
+        {
+          "name": "srcColorSpace",
+          "descriptor": "Ljava/awt/color/ColorSpace;",
+          "access": 2
+        },
+        {
+          "name": "dstColorSpace",
+          "descriptor": "Ljava/awt/color/ColorSpace;",
+          "access": 2
+        },
+        {
+          "name": "srcNeedsConverting",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "dstNeedsConverting",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IFLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "ff4476abf177baa5619cc6aaf44e8034652a25785609ebd6bcf2c6e868fb35c7",
+          "code_length": 48
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "multiply255",
+          "descriptor": "(II)I",
+          "access": 8,
+          "code_sha256": "17c721766a2e2042ecd19f5a5ae8f1035180fc12111f4b1db86cc23ebb9af8f3",
+          "code_length": 18
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "224146c6bdcf09d83b647535b91526810a1660559e821abfcc38f9d95c558dbd",
+          "code_length": 23
+        },
+        {
+          "name": "compose",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;)V",
+          "access": 1,
+          "code_sha256": "9835e62dd135fc94d75683024bd1c0b687ad77ec264f6a49766b9e91515c15e1",
+          "code_length": 2222
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/MiscCompositeContext",
+        "java/awt/Color",
+        "java/awt/CompositeContext",
+        "java/awt/image/ColorModel",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/lang/Math",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/MultiplyComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "b33c89a495a57a1d84b56134fa465ba375c013d858f891d8f7eca1ff58aac904",
+      "name": "com/jhlabs/composite/MultiplyComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "d83d4c20584809ac56b51f1b789b558dccd1be64ef6ae439c43c4d0e51363bba",
+          "code_length": 246
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/MultiplyComposite",
+        "com/jhlabs/composite/MultiplyComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/MultiplyComposite.class",
+      "occurrence": 0,
+      "sha256": "aa7cce9144f7e54b7eac238720351076eebeaeaa6d3caba1a056577edf4212ff",
+      "name": "com/jhlabs/composite/MultiplyComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/MultiplyComposite",
+        "com/jhlabs/composite/MultiplyComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/NegationComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "c692f5e1bc58cc1c741dcd5b62c6ded7538b9c3b017651c63cf4fd9f7b47ada1",
+      "name": "com/jhlabs/composite/NegationComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "fc43c4df47b90ad8edf0a08d27800752a6ec8c5b94f28cac66090bbdfe9b1a9b",
+          "code_length": 228
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/NegationComposite",
+        "com/jhlabs/composite/NegationComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/NegationComposite.class",
+      "occurrence": 0,
+      "sha256": "b7020f67c51d03c6737c11f4668d791d9b365b17b2472eb848393a1232abf6f4",
+      "name": "com/jhlabs/composite/NegationComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/NegationComposite",
+        "com/jhlabs/composite/NegationComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/OverlayComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "dcea6ce7b359c59644117cbd79fb83f2bf10a48871c1010ae9129b8bda6b4f6c",
+      "name": "com/jhlabs/composite/OverlayComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "23c799d0ad4e98e6c6b864f8815d06a162e944fa2f51d7877977900344f4a2be",
+          "code_length": 399
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/OverlayComposite",
+        "com/jhlabs/composite/OverlayComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/OverlayComposite.class",
+      "occurrence": 0,
+      "sha256": "49d033455c3fcfe0e8977ad21a8f7a4313172b0d4523f523f9c555bdd5072960",
+      "name": "com/jhlabs/composite/OverlayComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/OverlayComposite",
+        "com/jhlabs/composite/OverlayComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/PinLightComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "eb4f467ad78ef0e0f0c2f7f3e3082323113794d24dce476fe16c3a693d420e96",
+      "name": "com/jhlabs/composite/PinLightComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "a52661ee88b5cf1979a5492d96288ba528ac0ebaf845a848b14008aac1a0ee50",
+          "code_length": 252
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/PinLightComposite",
+        "com/jhlabs/composite/PinLightComposite$Context",
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/PinLightComposite.class",
+      "occurrence": 0,
+      "sha256": "0426d129b5bcb4fd10fb648e6ca578675e1fbf2534df8d9f4f6b2def27229fb8",
+      "name": "com/jhlabs/composite/PinLightComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/PinLightComposite",
+        "com/jhlabs/composite/PinLightComposite$Context",
+        "com/jhlabs/composite/RGBComposite"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/RGBComposite$RGBCompositeContext.class",
+      "occurrence": 0,
+      "sha256": "8f2faa680a10f3fb404dd280822582fa091d8ec3e9efe82c50c2be129823babb",
+      "name": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "major": 45,
+      "minor": 3,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/CompositeContext"
+      ],
+      "fields": [
+        {
+          "name": "alpha",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "srcColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 2
+        },
+        {
+          "name": "dstColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "07e1030821b2c07f500d6ba924632b25514f6ff7ce07293f97138bcf7171d3f4",
+          "code_length": 20
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "multiply255",
+          "descriptor": "(II)I",
+          "access": 8,
+          "code_sha256": "17c721766a2e2042ecd19f5a5ae8f1035180fc12111f4b1db86cc23ebb9af8f3",
+          "code_length": 18
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "224146c6bdcf09d83b647535b91526810a1660559e821abfcc38f9d95c558dbd",
+          "code_length": 23
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1025
+        },
+        {
+          "name": "compose",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;)V",
+          "access": 1,
+          "code_sha256": "4b4ec35fce441e0d5cd6fadf09c8f7c48a066274f4110ed64d8eec0785a236c6",
+          "code_length": 110
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/awt/CompositeContext",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/RGBComposite.class",
+      "occurrence": 0,
+      "sha256": "f1a4fb163a0ed6da750f629290cad151623e50acf9ca7ddd41385c38e356bd71",
+      "name": "com/jhlabs/composite/RGBComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/Composite"
+      ],
+      "fields": [
+        {
+          "name": "extraAlpha",
+          "descriptor": "F",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3d24505e3f43c3dc31bc042ea6d13d684d36d8beb209d5daa40054b1addcb526",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "ec42505b062fa08076c745449e6ee5d81f4619ba1d7442d6eef620f539ef6df7",
+          "code_length": 32
+        },
+        {
+          "name": "getAlpha",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "151f99b4ac4650249d4cdb9d8c78a5563cff4adc252645bbbfb00596dbf72e04",
+          "code_length": 5
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2e9cc9ee1c2dc9f63ff8a70f7094416e4575c2f357d4a95bac9d11ed4294afaa",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "5e29f103cbc90f9c918da8745b40aa085b7b44769a1a2e6ff73df48303e42d1a",
+          "code_length": 30
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "java/awt/Composite",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SaturationComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "42fa439bfb55a0bb2b4a0153516741111531a808659e10984c179782c7001c91",
+      "name": "com/jhlabs/composite/SaturationComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sHSB",
+          "descriptor": "[F",
+          "access": 2
+        },
+        {
+          "name": "dHSB",
+          "descriptor": "[F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "471a763ceec8e4a1918b497f61d5c9997c054093565969ba93edf42072869905",
+          "code_length": 22
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "1ab4cb14f337b12ddc1d4073ad6aaf6a0c1e46d3dc187e57fc3913e309788cf6",
+          "code_length": 265
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "com/jhlabs/composite/SaturationComposite",
+        "com/jhlabs/composite/SaturationComposite$Context",
+        "java/awt/Color"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SaturationComposite.class",
+      "occurrence": 0,
+      "sha256": "70eb0dc633a5c54d32f9e539ac6f5d81d755c832553dd50011c446b7cb63a627",
+      "name": "com/jhlabs/composite/SaturationComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/SaturationComposite",
+        "com/jhlabs/composite/SaturationComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ScreenComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "3bc4ce6307f681bcf9014e8c50fd7fb5e3f9bf0444bc90eb83c5339b37e52675",
+      "name": "com/jhlabs/composite/ScreenComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "fe0479d556457fb40f51e36c7baeff6bc41190d8e4b92a77246a70281bae1d14",
+          "code_length": 282
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "com/jhlabs/composite/ScreenComposite",
+        "com/jhlabs/composite/ScreenComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ScreenComposite.class",
+      "occurrence": 0,
+      "sha256": "dcee3e0f853d00bfeeb9e396c26c0a8a5d1f2b24d3f0a8c689aa80e55998eceb",
+      "name": "com/jhlabs/composite/ScreenComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/ScreenComposite",
+        "com/jhlabs/composite/ScreenComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SoftLightComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "d50a433e9355d7c1e7e383d89140385a521b32e08747df44cf7a6974cc8370f7",
+      "name": "com/jhlabs/composite/SoftLightComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "bfdb2d4e0b6f7b126ce50de20acd86e2d0a08315367bda79e95cb87da0706f84",
+          "code_length": 297
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "com/jhlabs/composite/SoftLightComposite",
+        "com/jhlabs/composite/SoftLightComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SoftLightComposite.class",
+      "occurrence": 0,
+      "sha256": "91f582c46e659561bdabfadd41a1b245980d928020538123712d3ce0ad432a6c",
+      "name": "com/jhlabs/composite/SoftLightComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/SoftLightComposite",
+        "com/jhlabs/composite/SoftLightComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SubtractComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "e12501eec732a68398cb7a0c091ec00c983c14e0c7f22021dae06df466460dbf",
+      "name": "com/jhlabs/composite/SubtractComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "fc2924f89788e38b03b77216c80d493b6ecc7a98f2b4efaa807e5e4aa72c0550",
+          "code_length": 8
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "a9a59cc06cbda1c963dc4ece893baf480064c27c653933a803b65f62b4592b5c",
+          "code_length": 219
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "com/jhlabs/composite/SubtractComposite",
+        "com/jhlabs/composite/SubtractComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/SubtractComposite.class",
+      "occurrence": 0,
+      "sha256": "5a5ccbebb0880279929d6ff4307ddda214ca257b2578073d7733513527b0291f",
+      "name": "com/jhlabs/composite/SubtractComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/SubtractComposite",
+        "com/jhlabs/composite/SubtractComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ValueComposite$Context.class",
+      "occurrence": 0,
+      "sha256": "d8ede02a23a67e55334ed2bb338468075ae46a88c3caa5998b0d910e09aa3053",
+      "name": "com/jhlabs/composite/ValueComposite$Context",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sHSB",
+          "descriptor": "[F",
+          "access": 2
+        },
+        {
+          "name": "dHSB",
+          "descriptor": "[F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(FLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "471a763ceec8e4a1918b497f61d5c9997c054093565969ba93edf42072869905",
+          "code_length": 22
+        },
+        {
+          "name": "composeRGB",
+          "descriptor": "([I[IF)V",
+          "access": 1,
+          "code_sha256": "f9bb301b1dd0213238865754e41eea3c9a96cb8aadb525893f54b768bf439411",
+          "code_length": 265
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/RGBComposite$RGBCompositeContext",
+        "com/jhlabs/composite/ValueComposite",
+        "com/jhlabs/composite/ValueComposite$Context",
+        "java/awt/Color"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/composite/ValueComposite.class",
+      "occurrence": 0,
+      "sha256": "7cb8a926b361de32b94402050e61db15136b6883b946c33fba7608e9d707a696",
+      "name": "com/jhlabs/composite/ValueComposite",
+      "major": 45,
+      "minor": 3,
+      "access": 49,
+      "superclass": "com/jhlabs/composite/RGBComposite",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "973408b99a4542a826927d3ddb348dbc48271cb290a5f961f7c5710eb643f5d6",
+          "code_length": 6
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "752de714edd7aafb1626b8c51990aa9e2f9e0b643b85bf275acf539da9f3bea5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/composite/RGBComposite",
+        "com/jhlabs/composite/ValueComposite",
+        "com/jhlabs/composite/ValueComposite$Context"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/AbstractBufferedImageOp.class",
+      "occurrence": 0,
+      "sha256": "5df87bfc8b0fc6f149f39d550c5623cd6832052097b2ab4fe5c1daf6def327b3",
+      "name": "com/jhlabs/image/AbstractBufferedImageOp",
+      "major": 45,
+      "minor": 3,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/image/BufferedImageOp",
+        "java/lang/Cloneable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createCompatibleDestImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/ColorModel;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "9d2fd6476137c2643b246afa1e2b2816c9ae117cd3fde3efb8ed2d1e8ee0dcc8",
+          "code_length": 35
+        },
+        {
+          "name": "getBounds2D",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "827b9e13a0d0bfd4d8a23f472135a25d6cb0c90ed61f53265ce335873a86e616",
+          "code_length": 18
+        },
+        {
+          "name": "getPoint2D",
+          "descriptor": "(Ljava/awt/geom/Point2D;Ljava/awt/geom/Point2D;)Ljava/awt/geom/Point2D;",
+          "access": 1,
+          "code_sha256": "d544c413e113935ab5d6e78a79281b849c5cd98c53d66429baffee8d8406a2cc",
+          "code_length": 26
+        },
+        {
+          "name": "getRenderingHints",
+          "descriptor": "()Ljava/awt/RenderingHints;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getRGB",
+          "descriptor": "(Ljava/awt/image/BufferedImage;IIII[I)[I",
+          "access": 1,
+          "code_sha256": "721097910aee62c7fcb593e8aaea4a57311b48936364c3d81bbe373a83f670dd",
+          "code_length": 56
+        },
+        {
+          "name": "setRGB",
+          "descriptor": "(Ljava/awt/image/BufferedImage;IIII[I)V",
+          "access": 1,
+          "code_sha256": "6865bcaa0956b7dd69ea8ff11e5457b43df53d104e9ccbc1d1a810711829852a",
+          "code_length": 52
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c8243019e55681e5afc4808c231ef1bdf02165351a5aec6c3944641cdbd4b069",
+          "code_length": 8
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "java/awt/Rectangle",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/BufferedImageOp",
+        "java/awt/image/ColorModel",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ApplyMaskFilter.class",
+      "occurrence": 0,
+      "sha256": "c9e8f95a649a1b28c1a757266e00eeab154d17aa5723445bc5f26689051c9c10",
+      "name": "com/jhlabs/image/ApplyMaskFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "destination",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 2
+        },
+        {
+          "name": "maskImage",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setDestination",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getDestination",
+          "descriptor": "()Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setMaskImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "getMaskImage",
+          "descriptor": "()Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "composeThroughMask",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;Ljava/awt/image/Raster;)V",
+          "access": 9,
+          "code_sha256": "6eb18761d05d5544774879b9820a5fab1a5eec996daaa5c66f6955fa45ea68eb",
+          "code_length": 297
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "afb0a8430058ad8b9f9258b44ab0a4016b1786ee28b644a33850fcf3b587f73d",
+          "code_length": 74
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/ApplyMaskFilter",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ArrayColormap.class",
+      "occurrence": 0,
+      "sha256": "ef5e79830c54974b53f7f7f5b61b8aa85da1165835eb54e1b017e1f06b2d0d95",
+      "name": "com/jhlabs/image/ArrayColormap",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/jhlabs/image/Colormap",
+        "java/lang/Cloneable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "map",
+          "descriptor": "[I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b729284c6af9bafe87854bc12448c5f46a99504f0a4946a7c6a67622da2c9918",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b91a3c001b9c14ea2dc8b7d7547e575a1dbc8b4d20aee6a358f69168ec5ed3a7",
+          "code_length": 30
+        },
+        {
+          "name": "setMap",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getMap",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getColor",
+          "descriptor": "(F)I",
+          "access": 1,
+          "code_sha256": "9ca8a7a54cd1e75baa6fb31fe05532242e12db80a57204bb4bbfe537e88940b0",
+          "code_length": 33
+        },
+        {
+          "name": "setColorInterpolated",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "c555d558b305bc923fc8b8a387fb241f11ca6daf44ce6f3bd1f53c07e72eb174",
+          "code_length": 95
+        },
+        {
+          "name": "setColorRange",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "143754ad3af59950e2c497922e9b62cb943a735eee5c519db31cbfe26fab81a6",
+          "code_length": 39
+        },
+        {
+          "name": "setColorRange",
+          "descriptor": "(III)V",
+          "access": 1,
+          "code_sha256": "7377c9368b91c89923deca8c14c0a3a06e521365a79cce1b5171b9f231ed9bde",
+          "code_length": 24
+        },
+        {
+          "name": "setColor",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "b0fbd742e0caa50aa5594d4db132ca2e994f260c3729ddd4bfc9a5c0eb491d15",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/jhlabs/image/ArrayColormap",
+        "com/jhlabs/image/Colormap",
+        "com/jhlabs/image/ImageMath",
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/AverageFilter.class",
+      "occurrence": 0,
+      "sha256": "01aacd8e74997639c74907775f9e14b8b99ee09900f629390755a9891df64066",
+      "name": "com/jhlabs/image/AverageFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/ConvolveFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "theMatrix",
+          "descriptor": "[F",
+          "access": 12
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5b9ff44c692be436b54cbc040865448acaf5a07d039aa425cfcca6419f30191a",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AverageFilter",
+        "com/jhlabs/image/ConvolveFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BicubicScaleFilter.class",
+      "occurrence": 0,
+      "sha256": "407b3b00aa88d19533fb01221b1a8ab0d61bdafc40135e7c065035d21d688a33",
+      "name": "com/jhlabs/image/BicubicScaleFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "width",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "height",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "38818808bdcca3dcefa14c39e61b091d012598b41f1074c0aeedf40cbdc079a6",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "114fa2e4869f19a799b72316ef5b4f8ed5d724df982db0f42ea29a121462bc2d",
+          "code_length": 15
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "bfa212b9593d35f24ad46a202be41554db2c6f7b51ec16751374dc12d99d27f1",
+          "code_length": 92
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c720e486c1a0f9f51f3cf99fe968623a963afb24c1e69c66287d3bd71e932b2",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/BicubicScaleFilter",
+        "java/awt/Graphics",
+        "java/awt/Graphics2D",
+        "java/awt/RenderingHints",
+        "java/awt/RenderingHints$Key",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BinaryFilter.class",
+      "occurrence": 0,
+      "sha256": "210ded47cb8654fcf73ea1ac232a4c45aa9dc9194e66377bf9f77dd013cbbd55",
+      "name": "com/jhlabs/image/BinaryFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 1057,
+      "superclass": "com/jhlabs/image/WholeImageFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "newColor",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "blackFunction",
+          "descriptor": "Lcom/jhlabs/math/BinaryFunction;",
+          "access": 4
+        },
+        {
+          "name": "iterations",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "colormap",
+          "descriptor": "Lcom/jhlabs/image/Colormap;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b6111f853bcf7a357fa1599e9946c28e5ce00c41a014a1789dced24837940f66",
+          "code_length": 27
+        },
+        {
+          "name": "setIterations",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "getIterations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setColormap",
+          "descriptor": "(Lcom/jhlabs/image/Colormap;)V",
+          "access": 1,
+          "code_sha256": "3187f710dcb01652de862560cc7782b805f200c9af0d7b1df750b2924081e43c",
+          "code_length": 6
+        },
+        {
+          "name": "getColormap",
+          "descriptor": "()Lcom/jhlabs/image/Colormap;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "setNewColor",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getNewColor",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setBlackFunction",
+          "descriptor": "(Lcom/jhlabs/math/BinaryFunction;)V",
+          "access": 1,
+          "code_sha256": "48fb720aa2a9b68dfbb952c6e9e11d36348ceb48bf0fec91e3294ba5ac037a6d",
+          "code_length": 6
+        },
+        {
+          "name": "getBlackFunction",
+          "descriptor": "()Lcom/jhlabs/math/BinaryFunction;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/BinaryFilter",
+        "com/jhlabs/image/WholeImageFilter",
+        "com/jhlabs/math/BlackFunction"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BlockFilter.class",
+      "occurrence": 0,
+      "sha256": "938ea949af742b1178ecb826d3e96965864b810df1e154c5985b1d7f32cbf5a5",
+      "name": "com/jhlabs/image/BlockFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/TransformFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "blockSize",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "setBlockSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7a852869cec692082e60784e6136a317a55fb903885f37812a9be1e06b034437",
+          "code_length": 6
+        },
+        {
+          "name": "getBlockSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ebbd22a961564489d875db5269db35fe4f04f086855dc5ae674a208627b38a97",
+          "code_length": 10
+        },
+        {
+          "name": "transform",
+          "descriptor": "(IILjava/awt/Point;)V",
+          "access": 4,
+          "code_sha256": "76493da68dfeef6cc298b3818fa54a59b90be07fecdf0db602cdd29a11dc6913",
+          "code_length": 31
+        },
+        {
+          "name": "transformInverse",
+          "descriptor": "(II[F)V",
+          "access": 4,
+          "code_sha256": "5c03d69801d0928c56bce3dff9fec03cd0f45b1d52a7589d1472dd2591584ba5",
+          "code_length": 31
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dc20e511568208b0ddf7e00244f9f5e5eae0787efab1c7fd15e8952b203dffca",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/BlockFilter",
+        "com/jhlabs/image/TransformFilter",
+        "java/awt/Point"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BlurFilter.class",
+      "occurrence": 0,
+      "sha256": "37a05f3a8c39deb963260659bcbe7605ed78576c673db223264ab765825cc9bf",
+      "name": "com/jhlabs/image/BlurFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/ConvolveFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "blurMatrix",
+          "descriptor": "[F",
+          "access": 12
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8cde6f04e83c33653ef296522896e124c5f7794c1a0f680c9053067f1f964a7",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/BlurFilter",
+        "com/jhlabs/image/ConvolveFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BorderFilter.class",
+      "occurrence": 0,
+      "sha256": "252c6e482ef3ff40a4c11fc2c1d3a6410e860656d196707d01958350e1240fcf",
+      "name": "com/jhlabs/image/BorderFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "leftBorder",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "rightBorder",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "topBorder",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "bottomBorder",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "borderPaint",
+          "descriptor": "Ljava/awt/Paint;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIIILjava/awt/Paint;)V",
+          "access": 1,
+          "code_sha256": "caeaa3f448ff889c01ce242d412661d36c115b54d70cf15e365f02bd897f0cc0",
+          "code_length": 32
+        },
+        {
+          "name": "setLeftBorder",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getLeftBorder",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setRightBorder",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getRightBorder",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setTopBorder",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getTopBorder",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setBottomBorder",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "59a70dcd638befe150432fa942f77d6dfd336b826c12bbb8826a287c9394b27d",
+          "code_length": 6
+        },
+        {
+          "name": "getBottomBorder",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "3e07278549eb7d9e04dda4a1cb4b4b95044fea50968eeaeb7b8f19f1b9fe6d2b",
+          "code_length": 213
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c720e486c1a0f9f51f3cf99fe968623a963afb24c1e69c66287d3bd71e932b2",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/BorderFilter",
+        "java/awt/Graphics",
+        "java/awt/Graphics2D",
+        "java/awt/geom/AffineTransform",
+        "java/awt/image/BufferedImage"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BoxBlurFilter.class",
+      "occurrence": 0,
+      "sha256": "839d40ebe2a85d3afd104225fa513f4194eafa8930942cc78e2fe26b22b54582",
+      "name": "com/jhlabs/image/BoxBlurFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hRadius",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "vRadius",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "iterations",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6dfd9151d175f6d5c847bc8793d934584313c3e490b1150ae2f2310696f99a96",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(III)V",
+          "access": 1,
+          "code_sha256": "489c03014e5156ab95d46ea7635757918ee7d26174ca3ef3c660cc47b7c30bdd",
+          "code_length": 25
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "70b00729f743a6d3e6797f728e5343363d59f0b9d6c1a5f5f0904087972c4b4b",
+          "code_length": 111
+        },
+        {
+          "name": "blur",
+          "descriptor": "([I[IIII)V",
+          "access": 9,
+          "code_sha256": "e842e4193c2e0e9945267dad9353fe8fcd5c572e7f7f4d0cb4b526c2cf5d305a",
+          "code_length": 371
+        },
+        {
+          "name": "setHRadius",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getHRadius",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setVRadius",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getVRadius",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setRadius",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ce2ed6230235be141876e12df469ae7626a660be4bd2f7cf64c2312d29f75a57",
+          "code_length": 11
+        },
+        {
+          "name": "getRadius",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setIterations",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getIterations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b10489192f3e926b805eb8f2c43e2f2095247895ed04fc68bd872b8ee0ba681",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/BoxBlurFilter",
+        "com/jhlabs/image/ImageMath",
+        "java/awt/image/BufferedImage"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BrushedMetalFilter.class",
+      "occurrence": 0,
+      "sha256": "81dc63566ef7f4198551c103b95142a14478a1a2d524237231d8900790faf385",
+      "name": "com/jhlabs/image/BrushedMetalFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/image/BufferedImageOp"
+      ],
+      "fields": [
+        {
+          "name": "radius",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "amount",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "color",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "shine",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "monochrome",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "randomNumbers",
+          "descriptor": "Ljava/util/Random;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8445a9aae42d17d7ed9ae45e1a7617cc8c11b76671baab7960368bb583ad8b7e",
+          "code_length": 34
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIFZF)V",
+          "access": 1,
+          "code_sha256": "ec85e8972cc935277c19f823edd1624672398060bbb72036a2deef32f4112310",
+          "code_length": 61
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "04d1cd82b9859fe466237e3c2b78fcf916be3e67dd6ffb2414fe95d515af48dc",
+          "code_length": 342
+        },
+        {
+          "name": "random",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "4b3846c844dcab858bf45f7227d191d89f9099c113c5948afb984deadfdb6eb5",
+          "code_length": 45
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(I)I",
+          "access": 10,
+          "code_sha256": "c8c8c2f68f90ab2ee2028da77d91e0a3976d0ddbe5edf864be2f0daf812b5244",
+          "code_length": 19
+        },
+        {
+          "name": "mod",
+          "descriptor": "(II)I",
+          "access": 10,
+          "code_sha256": "6a458e7a42ee143b229a7ddb92336065c351dea3096f2813b95a1331d11f61ae",
+          "code_length": 20
+        },
+        {
+          "name": "blur",
+          "descriptor": "([I[III)V",
+          "access": 1,
+          "code_sha256": "5197d8e63876fd86798c93b471d85f8551953bca9816b909052d2eac9ca992d4",
+          "code_length": 247
+        },
+        {
+          "name": "setRadius",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getRadius",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setAmount",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "d71ab2bfbd0563168895ec88893b7d437897de38a3fdcd13521a3ca542b9f136",
+          "code_length": 6
+        },
+        {
+          "name": "getAmount",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "8ba26bba96d4f02fc69ac1a67580cf30d5eaff1b7962dfda7a90d996a6341928",
+          "code_length": 5
+        },
+        {
+          "name": "setColor",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "getColor",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "setMonochrome",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c8c4752ca68104796797c33b65753bc9f43eed000b98189a2bfcc9110a8c39a9",
+          "code_length": 6
+        },
+        {
+          "name": "getMonochrome",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "setShine",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "a59ed612caa07c9afa04f54a3464ad7865cd4cf617a51670ec18f8640a2b5d99",
+          "code_length": 6
+        },
+        {
+          "name": "getShine",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "17e80d5f4d8083444528775e0ecef874725e931583b0b8edb63466b815f85c4e",
+          "code_length": 5
+        },
+        {
+          "name": "createCompatibleDestImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/ColorModel;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "472724ef5fe9442b368ff25976a7bf0faf1403a39811b66d7574317b3862c250",
+          "code_length": 35
+        },
+        {
+          "name": "getBounds2D",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "9f9c85648e87f86e6abfd2447e7591226373ab48045fadeab7045e0a5dd199e4",
+          "code_length": 18
+        },
+        {
+          "name": "getPoint2D",
+          "descriptor": "(Ljava/awt/geom/Point2D;Ljava/awt/geom/Point2D;)Ljava/awt/geom/Point2D;",
+          "access": 1,
+          "code_sha256": "d6b0f7fb5ed62e76c5876869d8ba281f93d49d8eaefb7d21878e7d23bbc352a8",
+          "code_length": 26
+        },
+        {
+          "name": "getRenderingHints",
+          "descriptor": "()Ljava/awt/RenderingHints;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "setRGB",
+          "descriptor": "(Ljava/awt/image/BufferedImage;IIII[I)V",
+          "access": 1,
+          "code_sha256": "8ef4b028f27b0586a9686d17d352323a0cd0243da80e4bcc6616213f9c5c956f",
+          "code_length": 52
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "403d3e8dd35e53075d24ae58bb64e523fdfc8cf579bb1c8d808b70800c6df414",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/BrushedMetalFilter",
+        "java/awt/Rectangle",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/BufferedImageOp",
+        "java/awt/image/ColorModel",
+        "java/awt/image/WritableRaster",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Random"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/BumpFilter.class",
+      "occurrence": 0,
+      "sha256": "9807a13491066da3d3afbe6f4424c4692ec1439e3e04b40a6a8cd2b3f332d3a0",
+      "name": "com/jhlabs/image/BumpFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/ConvolveFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "embossMatrix",
+          "descriptor": "[F",
+          "access": 12
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3474b83210db54272975aa06ba189050f6fe2c66e900e81ea74aaaeafc69c4ea",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/BumpFilter",
+        "com/jhlabs/image/ConvolveFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CausticsFilter.class",
+      "occurrence": 0,
+      "sha256": "f7ba6efab3aee0c5de9a076362efcdae808026a254696885cad1f6c5a6bbb42a",
+      "name": "com/jhlabs/image/CausticsFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/WholeImageFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "scale",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "angle",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "brightness",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "amount",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "turbulence",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "dispersion",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "time",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "samples",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "bgColor",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "s",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "c",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4a260cff7f80219e6778e416db95b20c76f76021c0ffb066962ee5bc850e2761",
+          "code_length": 53
+        },
+        {
+          "name": "setScale",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setBrightness",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "59a70dcd638befe150432fa942f77d6dfd336b826c12bbb8826a287c9394b27d",
+          "code_length": 6
+        },
+        {
+          "name": "getBrightness",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "setTurbulence",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "a59ed612caa07c9afa04f54a3464ad7865cd4cf617a51670ec18f8640a2b5d99",
+          "code_length": 6
+        },
+        {
+          "name": "getTurbulence",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "17e80d5f4d8083444528775e0ecef874725e931583b0b8edb63466b815f85c4e",
+          "code_length": 5
+        },
+        {
+          "name": "setAmount",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "46ab9af519a21a0f0611bccdafac1b5f0cf9ab98dd19c641beac4718d811fd04",
+          "code_length": 6
+        },
+        {
+          "name": "getAmount",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "151f99b4ac4650249d4cdb9d8c78a5563cff4adc252645bbbfb00596dbf72e04",
+          "code_length": 5
+        },
+        {
+          "name": "setDispersion",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "c5291b8459d52cc9ca011cd8b603ef93ccbb177f89be6650bad0e530e18a28c0",
+          "code_length": 6
+        },
+        {
+          "name": "getDispersion",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "30552b6e3b44a0dcafea9fb27c0853b6924a01713a1b6008853078c51a22f701",
+          "code_length": 5
+        },
+        {
+          "name": "setTime",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "07958a848e6a9cae535bad4e6db4abbe711b40f3fc4ca9398813d6e96d38ca49",
+          "code_length": 6
+        },
+        {
+          "name": "getTime",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "77cbcb4925d5ffb95ed02674707e926d149b7482d28d3f75fa640866b1ed05ee",
+          "code_length": 5
+        },
+        {
+          "name": "setSamples",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e07b26bc84cb04399f939d9b1dcecf2d6e991d8f9d2200e8f6be20389f064821",
+          "code_length": 6
+        },
+        {
+          "name": "getSamples",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "setBgColor",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "0acba6b145f96d875790d77e0b9b550787e5d7a81c980f0683eea76036b53120",
+          "code_length": 6
+        },
+        {
+          "name": "getBgColor",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c4be5d4e2bc69b8b56edcc530b23f83be000df4423c40efe0643a11c4f79b40",
+          "code_length": 5
+        },
+        {
+          "name": "filterPixels",
+          "descriptor": "(II[ILjava/awt/Rectangle;)[I",
+          "access": 4,
+          "code_sha256": "41e5ea0e4ac5206ce06ee800d61f845ae946578fcf9f7733c5d46de2ea69c244",
+          "code_length": 765
+        },
+        {
+          "name": "add",
+          "descriptor": "(IF)I",
+          "access": 10,
+          "code_sha256": "e4b8f4a26650ef357c4c4946eccbea5528118d13b2542c745fe8600dc84205e5",
+          "code_length": 96
+        },
+        {
+          "name": "add",
+          "descriptor": "(IFI)I",
+          "access": 10,
+          "code_sha256": "b9003ca4e47c1a9a8bd98997f840c6455a5d421317789006bb7f5b1d8bc1b51a",
+          "code_length": 118
+        },
+        {
+          "name": "turbulence2",
+          "descriptor": "(FFFF)F",
+          "access": 9,
+          "code_sha256": "b2fbcf8f748860123f041d93664558f4f02ed73243b9adfdececf0c94744a832",
+          "code_length": 99
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(FF)F",
+          "access": 4,
+          "code_sha256": "6c7c1e314a3287c5fbf1a1fce94ebe39aa3b5d0e4eb4645943276ee31a511d74",
+          "code_length": 71
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "220a355322a6bb9d63048b1df2d8b292ea9cff9def50804c808918e1b2c516a0",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CausticsFilter",
+        "com/jhlabs/image/WholeImageFilter",
+        "com/jhlabs/math/Noise",
+        "java/awt/Rectangle",
+        "java/lang/Math",
+        "java/util/Random"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CellularFilter$Point.class",
+      "occurrence": 0,
+      "sha256": "7bb82589b551cc97a47f2537ec65e52e37baa81b7041f895bdb234c9267cb429",
+      "name": "com/jhlabs/image/CellularFilter$Point",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "dx",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "dy",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "cubeX",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "cubeY",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "distance",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/jhlabs/image/CellularFilter;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jhlabs/image/CellularFilter;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CellularFilter",
+        "com/jhlabs/image/CellularFilter$Point",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CellularFilter.class",
+      "occurrence": 0,
+      "sha256": "c3db8c138d00ee0c7c5da1dccac7a7469f45325ca0f0c7a6bcf95b7117d2e7f7",
+      "name": "com/jhlabs/image/CellularFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/WholeImageFilter",
+      "interfaces": [
+        "com/jhlabs/math/Function2D",
+        "com/jhlabs/image/MutatableFilter",
+        "java/lang/Cloneable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "scale",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "stretch",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "angle",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "amount",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "turbulence",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "gain",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "bias",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "distancePower",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "useColor",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "colormap",
+          "descriptor": "Lcom/jhlabs/image/Colormap;",
+          "access": 4
+        },
+        {
+          "name": "coefficients",
+          "descriptor": "[F",
+          "access": 4
+        },
+        {
+          "name": "angleCoefficient",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "random",
+          "descriptor": "Ljava/util/Random;",
+          "access": 4
+        },
+        {
+          "name": "m00",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "m01",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "m10",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "m11",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "results",
+          "descriptor": "[Lcom/jhlabs/image/CellularFilter$Point;",
+          "access": 4
+        },
+        {
+          "name": "randomness",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "gridType",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "min",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "max",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "probabilities",
+          "descriptor": "[B",
+          "access": 10
+        },
+        {
+          "name": "gradientCoefficient",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "RANDOM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SQUARE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HEXAGONAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OCTAGONAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TRIANGULAR",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "64973c8b3d054fabc4662ce89f1ac6ad4942a585403b6e60e752bda8c53aee5e",
+          "code_length": 287
+        },
+        {
+          "name": "setScale",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setStretch",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "d71ab2bfbd0563168895ec88893b7d437897de38a3fdcd13521a3ca542b9f136",
+          "code_length": 6
+        },
+        {
+          "name": "getStretch",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "8ba26bba96d4f02fc69ac1a67580cf30d5eaff1b7962dfda7a90d996a6341928",
+          "code_length": 5
+        },
+        {
+          "name": "setAngle",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "b1e1e1e2c068a5eeab22adcbc95434a502044143a414e91a68d6718846216259",
+          "code_length": 41
+        },
+        {
+          "name": "getAngle",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "9cc75dea5f9202116f9aa186a1c20ad7515d7906805eeecda611fc2f82f7185c",
+          "code_length": 5
+        },
+        {
+          "name": "setCoefficient",
+          "descriptor": "(IF)V",
+          "access": 1,
+          "code_sha256": "765e46835960599464048206a4a5cbd659d4740331e4268246e9b758d4540a44",
+          "code_length": 8
+        },
+        {
+          "name": "getCoefficient",
+          "descriptor": "(I)F",
+          "access": 1,
+          "code_sha256": "16ad3bbce0c23836e640fab64681ae3d72f91fed3c7a097dd069b20e3e3ad8c6",
+          "code_length": 7
+        },
+        {
+          "name": "setAngleCoefficient",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "d5f659c5b041513e5ba83261854264bd7205aef64137f54fe45bf45148a2501c",
+          "code_length": 6
+        },
+        {
+          "name": "getAngleCoefficient",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "ef92037388ca0bb16e6e542bd07fac3cf25e2fd97f29cc51632adfbae4d09ecb",
+          "code_length": 5
+        },
+        {
+          "name": "setGradientCoefficient",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "cfa0b81e0ab22315e0432f34e0adbd139aaf2878982052e6e4d05101d82c0060",
+          "code_length": 6
+        },
+        {
+          "name": "getGradientCoefficient",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "2304b021a2f525e36bd044f3c29338eeaa061883b5920ff15e74eeb319795b1b",
+          "code_length": 5
+        },
+        {
+          "name": "setF1",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "b172e8f2f8e8ade89acb2afb21a3dc6a0ed81364cd57c691c0a2dfa3b8899f84",
+          "code_length": 8
+        },
+        {
+          "name": "getF1",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "cdb88fb3a90a7d0ca6afe46ca78ed5d0995c2e7f6599a95549fdda2172ac0c35",
+          "code_length": 7
+        },
+        {
+          "name": "setF2",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "ddd82f783c7b7847578c9fe6671629bedbb6e63be749267d9996626e77d2796b",
+          "code_length": 8
+        },
+        {
+          "name": "getF2",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "d8c118bd97e77cd68d8bfa9330e6047bcb9dce77b6897b69d1b63cf3d11848c1",
+          "code_length": 7
+        },
+        {
+          "name": "setF3",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "257625c239c26d1045cc85f05f1c5de0b8e9de0df92ce2c86503c22e9d882b80",
+          "code_length": 8
+        },
+        {
+          "name": "getF3",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "e485d311b8cfa9b5982453bee1215f4735f70cd7fa6cecd473e35ab9fb00998e",
+          "code_length": 7
+        },
+        {
+          "name": "setF4",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "55f1090607f577611baacaf006f339a4518841344848c10c46ede214927a1337",
+          "code_length": 8
+        },
+        {
+          "name": "getF4",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "13db103521d75a15210383d1be32cb41daa39ec4895035ad0d7929ff9f29643a",
+          "code_length": 7
+        },
+        {
+          "name": "setColormap",
+          "descriptor": "(Lcom/jhlabs/image/Colormap;)V",
+          "access": 1,
+          "code_sha256": "0278ccd7d3178be6eeb3789ab8e1ec9d116386a4a4eb9f4f472679058235f235",
+          "code_length": 6
+        },
+        {
+          "name": "getColormap",
+          "descriptor": "()Lcom/jhlabs/image/Colormap;",
+          "access": 1,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5
+        },
+        {
+          "name": "setRandomness",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "c9d0e9eef8d5a0f2dd84f60ac1bc35d51b7e90c6445000ddb2ead4b1b42526da",
+          "code_length": 6
+        },
+        {
+          "name": "getRandomness",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "c957fceceb625adecd8993a36722190f48f2ca0a97a3b83667a0c849e204b914",
+          "code_length": 5
+        },
+        {
+          "name": "setGridType",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6cff898b2dda560cd709887ecfc8f322750d301dd74e22091026f4f45f8838fd",
+          "code_length": 6
+        },
+        {
+          "name": "getGridType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d552d13807b271628d872c674ff149a9cdc140fb15c1a26a3fe346b558e7795c",
+          "code_length": 5
+        },
+        {
+          "name": "setDistancePower",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "b5000418679d301355bfb6bdabeeeab3712889bb6eaed57791b442735b2cedda",
+          "code_length": 6
+        },
+        {
+          "name": "getDistancePower",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "645819269acb8a92bd8f635f9eddb744de60dd4bb2d4b368cedc68c5d4f370fc",
+          "code_length": 5
+        },
+        {
+          "name": "setTurbulence",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "a59ed612caa07c9afa04f54a3464ad7865cd4cf617a51670ec18f8640a2b5d99",
+          "code_length": 6
+        },
+        {
+          "name": "getTurbulence",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "17e80d5f4d8083444528775e0ecef874725e931583b0b8edb63466b815f85c4e",
+          "code_length": 5
+        },
+        {
+          "name": "setAmount",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "46ab9af519a21a0f0611bccdafac1b5f0cf9ab98dd19c641beac4718d811fd04",
+          "code_length": 6
+        },
+        {
+          "name": "getAmount",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "151f99b4ac4650249d4cdb9d8c78a5563cff4adc252645bbbfb00596dbf72e04",
+          "code_length": 5
+        },
+        {
+          "name": "checkCube",
+          "descriptor": "(FFII[Lcom/jhlabs/image/CellularFilter$Point;)F",
+          "access": 2,
+          "code_sha256": "19417ccb8bf72456b1bcdf9954f965b80567f2f8889270fc7c7ad926577e1381",
+          "code_length": 969
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(FF)F",
+          "access": 1,
+          "code_sha256": "da869795066a96c13fb838c3861ee9a0a53a486b29da0834f6dea5b059a2ba4f",
+          "code_length": 480
+        },
+        {
+          "name": "turbulence2",
+          "descriptor": "(FFF)F",
+          "access": 1,
+          "code_sha256": "e59e908b01a5855bdb8abc57e26d646848bf602f53c05062fafb2cfa41d56178",
+          "code_length": 45
+        },
+        {
+          "name": "getPixel",
+          "descriptor": "(II[III)I",
+          "access": 1,
+          "code_sha256": "77f7ca947e4b65683c7b32f424ac7f2519a00f2916a5f088dba87dacd47613c2",
+          "code_length": 343
+        },
+        {
+          "name": "filterPixels",
+          "descriptor": "(II[ILjava/awt/Rectangle;)[I",
+          "access": 4,
+          "code_sha256": "05e78085c2f6fb5f7ad55dd53fdee2a4d4542bbd751da4b5c509233c366276c9",
+          "code_length": 62
+        },
+        {
+          "name": "mutate",
+          "descriptor": "(FLjava/awt/image/BufferedImageOp;ZZ)V",
+          "access": 1,
+          "code_sha256": "b2671825c7b025c79699d522cd8238f74f8d0a12d2eb663a15d04aa937531a25",
+          "code_length": 465
+        },
+        {
+          "name": "mutate",
+          "descriptor": "(FFFFFF)F",
+          "access": 2,
+          "code_sha256": "1740ba33176602887613ef88fec072973b71d3d91d0e56e290df6bf1d1ef528c",
+          "code_length": 39
+        },
+        {
+          "name": "mutate",
+          "descriptor": "(FFFF)F",
+          "access": 2,
+          "code_sha256": "16d00c538c4be6d0c70a569fbb9f695ee1a39b463c88f1bb6c2641a3e6290ea6",
+          "code_length": 32
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d374a93e73c3704f4b6bde01bff1f21caf7af096885e1c1301833da989828972",
+          "code_length": 55
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "36a2e33e9858e862d2e679cef28b16622955ce6cdfc11cb1ae60e3eb6ffdd534",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[Lcom/jhlabs/image/CellularFilter$Point;",
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/CellularFilter",
+        "com/jhlabs/image/CellularFilter$Point",
+        "com/jhlabs/image/Colormap",
+        "com/jhlabs/image/Gradient",
+        "com/jhlabs/image/ImageMath",
+        "com/jhlabs/image/MutatableFilter",
+        "com/jhlabs/image/PixelUtils",
+        "com/jhlabs/image/WholeImageFilter",
+        "com/jhlabs/math/Function2D",
+        "com/jhlabs/math/Noise",
+        "java/io/Serializable",
+        "java/lang/Cloneable",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/Random"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ChannelMixFilter.class",
+      "occurrence": 0,
+      "sha256": "bfa9d21831c268fb287a8d42ea7ad418b0ea8498cb1c17432a73fe4285da907c",
+      "name": "com/jhlabs/image/ChannelMixFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/PointFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "blueGreen",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "redBlue",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "greenRed",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "intoR",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "intoG",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "intoB",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6dfd9151d175f6d5c847bc8793d934584313c3e490b1150ae2f2310696f99a96",
+          "code_length": 10
+        },
+        {
+          "name": "setBlueGreen",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getBlueGreen",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setRedBlue",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getRedBlue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setGreenRed",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "59a70dcd638befe150432fa942f77d6dfd336b826c12bbb8826a287c9394b27d",
+          "code_length": 6
+        },
+        {
+          "name": "getGreenRed",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "setIntoR",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "getIntoR",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "setIntoG",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "getIntoG",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setIntoB",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c8c4752ca68104796797c33b65753bc9f43eed000b98189a2bfcc9110a8c39a9",
+          "code_length": 6
+        },
+        {
+          "name": "getIntoB",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "filterRGB",
+          "descriptor": "(III)I",
+          "access": 1,
+          "code_sha256": "be3d5b25b88132ea3d95b615047cbb5525ff961ad21bd009892aedd51e6534bf",
+          "code_length": 198
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/ChannelMixFilter",
+        "com/jhlabs/image/PixelUtils",
+        "com/jhlabs/image/PointFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CheckFilter.class",
+      "occurrence": 0,
+      "sha256": "b1116eb141eafc3102bef0a2e604aba474e85d41f85a2c1d506762a03abf3068",
+      "name": "com/jhlabs/image/CheckFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/PointFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "xScale",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "yScale",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "foreground",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "background",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "fuzziness",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "angle",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "operation",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "m00",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "m01",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "m10",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "m11",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "94513ce2aa6bd0999613c4a83b9642777f932abb2d6c42ee953871c4c1ccc1d0",
+          "code_length": 58
+        },
+        {
+          "name": "setForeground",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getForeground",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setBackground",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "getBackground",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "setXScale",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getXScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setYScale",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getYScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setFuzziness",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "getFuzziness",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setOperation",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "86b4733a3587c10a3fae65207b13ec07fd794aa774c8b8c1b85ffc55e889bb83",
+          "code_length": 6
+        },
+        {
+          "name": "getOperation",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "setAngle",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "714a58508612ae0e431ac28a00730addf04bc2176a953d434871f29f3559c79a",
+          "code_length": 41
+        },
+        {
+          "name": "getAngle",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "30552b6e3b44a0dcafea9fb27c0853b6924a01713a1b6008853078c51a22f701",
+          "code_length": 5
+        },
+        {
+          "name": "filterRGB",
+          "descriptor": "(III)I",
+          "access": 1,
+          "code_sha256": "f413a621a27b5191258dc636a77d7bb2247135c145aae1be68357cf5f0e23b56",
+          "code_length": 151
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a29e49df37936bdd15bb93decd6418849cc3eddffa952a9b0a48d8200a1224c1",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CheckFilter",
+        "com/jhlabs/image/ImageMath",
+        "com/jhlabs/image/PointFilter",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ChromeFilter$1.class",
+      "occurrence": 0,
+      "sha256": "c2051bb92f2dcee96c4e57f96ab4c8ad5dae4fe23776829541d69e4a08645cda",
+      "name": "com/jhlabs/image/ChromeFilter$1",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "com/jhlabs/image/TransferFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/jhlabs/image/ChromeFilter;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jhlabs/image/ChromeFilter;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "transferFunction",
+          "descriptor": "(F)F",
+          "access": 4,
+          "code_sha256": "c19772c734591db46c0522a7b905a379dd654183fc8ba2d9035a81eb421df22c",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/ChromeFilter",
+        "com/jhlabs/image/ChromeFilter$1",
+        "com/jhlabs/image/TransferFilter",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ChromeFilter.class",
+      "occurrence": 0,
+      "sha256": "25875955bc821be01169040187bf040eed99a8b7f13335dc2ccabd942a31613c",
+      "name": "com/jhlabs/image/ChromeFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/LightFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "amount",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "exposure",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "95dfe2b26c3e630448dd9dc616da5f538c0ed341cb8227d8c28bc837d7bc7ff6",
+          "code_length": 16
+        },
+        {
+          "name": "setAmount",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "407d139087337f5186ec9dbc36907ceb19cf962fd80f2056d5b2ea7f7592d6ef",
+          "code_length": 6
+        },
+        {
+          "name": "getAmount",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "setExposure",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "d419513ad290d1a24afd7b50f3e618c2a7bb62c04540d2f6bfa81d0235cc80fe",
+          "code_length": 6
+        },
+        {
+          "name": "getExposure",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "35cba5266e53f097c88d983a5068aff719b2ac6f626a7eed35fa2ef49b49a4c4",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "03eea833319e0122d5cad0a5c04898dc13f5b6367137e847eab6029290790b47",
+          "code_length": 28
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "83e424e5d40b4d8d14d99d90e3986a9021a55f073b843c457573f68aa101ce74",
+          "code_length": 3
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/jhlabs/image/ChromeFilter;)F",
+          "access": 8,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/jhlabs/image/ChromeFilter;)F",
+          "access": 8,
+          "code_sha256": "35cba5266e53f097c88d983a5068aff719b2ac6f626a7eed35fa2ef49b49a4c4",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/ChromeFilter",
+        "com/jhlabs/image/ChromeFilter$1",
+        "com/jhlabs/image/LightFilter",
+        "com/jhlabs/image/TransferFilter",
+        "com/jhlabs/image/WholeImageFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CircleFilter.class",
+      "occurrence": 0,
+      "sha256": "4239fcbad71e962780929e20480e2762bd4c5b87d83894843f39fcd5be677d31",
+      "name": "com/jhlabs/image/CircleFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/TransformFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "radius",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "height",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "angle",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "spreadAngle",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "centreX",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "centreY",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "icentreX",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "icentreY",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "iWidth",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "iHeight",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0bc92ae2e745d870ec89314e72d2e1ccba3430d4f85412818f4e7e9c37913a4e",
+          "code_length": 45
+        },
+        {
+          "name": "setHeight",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4e9775b17d7e2253cbe009a6a87dda14800e0e1546f3d3d771e565bebcafabc3",
+          "code_length": 6
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "9cc75dea5f9202116f9aa186a1c20ad7515d7906805eeecda611fc2f82f7185c",
+          "code_length": 5
+        },
+        {
+          "name": "setAngle",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "46ab9af519a21a0f0611bccdafac1b5f0cf9ab98dd19c641beac4718d811fd04",
+          "code_length": 6
+        },
+        {
+          "name": "getAngle",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "151f99b4ac4650249d4cdb9d8c78a5563cff4adc252645bbbfb00596dbf72e04",
+          "code_length": 5
+        },
+        {
+          "name": "setSpreadAngle",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "c5291b8459d52cc9ca011cd8b603ef93ccbb177f89be6650bad0e530e18a28c0",
+          "code_length": 6
+        },
+        {
+          "name": "getSpreadAngle",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "30552b6e3b44a0dcafea9fb27c0853b6924a01713a1b6008853078c51a22f701",
+          "code_length": 5
+        },
+        {
+          "name": "setRadius",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getRadius",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setCentreX",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "b863b31f7500bbc1283776c383897a7e7da05151cd4d896879ecb9afafe56b35",
+          "code_length": 6
+        },
+        {
+          "name": "getCentreX",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "a46c3e5891ce2c198cb5036a40fd6efd228c4cd2cd4e7cb9219efc27f8b9933c",
+          "code_length": 5
+        },
+        {
+          "name": "setCentreY",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "b5000418679d301355bfb6bdabeeeab3712889bb6eaed57791b442735b2cedda",
+          "code_length": 6
+        },
+        {
+          "name": "getCentreY",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "645819269acb8a92bd8f635f9eddb744de60dd4bb2d4b368cedc68c5d4f370fc",
+          "code_length": 5
+        },
+        {
+          "name": "setCentre",
+          "descriptor": "(Ljava/awt/geom/Point2D;)V",
+          "access": 1,
+          "code_sha256": "b19f46555ec1139fcb1104ef236b2188e84b084fce02783586b34b547ab12585",
+          "code_length": 19
+        },
+        {
+          "name": "getCentre",
+          "descriptor": "()Ljava/awt/geom/Point2D;",
+          "access": 1,
+          "code_sha256": "f9b1fc6251c004cee15ef6d5fd9fd2e24082e3f188c48429dfd19b6c42727665",
+          "code_length": 16
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "0bf2ecf90b57d2121bf576dde9a4075ca1d73679200e09a06f57c0e5317a1a3c",
+          "code_length": 61
+        },
+        {
+          "name": "transformInverse",
+          "descriptor": "(II[F)V",
+          "access": 4,
+          "code_sha256": "d5ef5d2473b663463b1ea1f514ff37443f7401210e98bca7f7dac9334c52f683",
+          "code_length": 108
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7a7a67753b3824536512981300eef9a2b5a60547aa8a68aeac31d54ec41dacdb",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CircleFilter",
+        "com/jhlabs/image/ImageMath",
+        "com/jhlabs/image/TransformFilter",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float",
+        "java/awt/image/BufferedImage",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/Colormap.class",
+      "occurrence": 0,
+      "sha256": "507860b4efd21da59e13ddb34866d43ca11f2a3f3ff7b9459e98318495d830f7",
+      "name": "com/jhlabs/image/Colormap",
+      "major": 45,
+      "minor": 3,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getColor",
+          "descriptor": "(F)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/Colormap",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CompositeFilter.class",
+      "occurrence": 0,
+      "sha256": "47a5980d1e6e02c79395a6f9f44dcaba6a22bc0ad6b039cb078fac5dc90eb11f",
+      "name": "com/jhlabs/image/CompositeFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "composite",
+          "descriptor": "Ljava/awt/Composite;",
+          "access": 2
+        },
+        {
+          "name": "transform",
+          "descriptor": "Ljava/awt/geom/AffineTransform;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/Composite;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/Composite;Ljava/awt/geom/AffineTransform;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "setComposite",
+          "descriptor": "(Ljava/awt/Composite;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getComposite",
+          "descriptor": "()Ljava/awt/Composite;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "8ba85d853a0fe6327ae1b8f98592eaf7d523feab3e5c4335e57ef7ee816def7f",
+          "code_length": 59
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b10489192f3e926b805eb8f2c43e2f2095247895ed04fc68bd872b8ee0ba681",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/CompositeFilter",
+        "java/awt/Graphics",
+        "java/awt/Graphics2D",
+        "java/awt/RenderingHints",
+        "java/awt/RenderingHints$Key",
+        "java/awt/image/BufferedImage"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CompoundFilter.class",
+      "occurrence": 0,
+      "sha256": "7a9e2dcd10ad9a9a2126f5b5ac748e6ae1aa925b2e8bd8283ec38736f5002f6a",
+      "name": "com/jhlabs/image/CompoundFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "filter1",
+          "descriptor": "Ljava/awt/image/BufferedImageOp;",
+          "access": 2
+        },
+        {
+          "name": "filter2",
+          "descriptor": "Ljava/awt/image/BufferedImageOp;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImageOp;Ljava/awt/image/BufferedImageOp;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "8d43d311c63a2d4ae12e991336dd6d6f832a8c405469894c95b9c1f400eb1659",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/CompoundFilter",
+        "java/awt/image/BufferedImageOp"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ContourFilter.class",
+      "occurrence": 0,
+      "sha256": "e6235739044ce14df900b71d4af7aeacd0ed6e2e33f6d84d122e353851b72410",
+      "name": "com/jhlabs/image/ContourFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/WholeImageFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "levels",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "scale",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "offset",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "contourColor",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "32797a15abdf742e9bf7605b7dafc1e3cf0079658b69ef9d1f173ac6d3938376",
+          "code_length": 27
+        },
+        {
+          "name": "setLevels",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getLevels",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setScale",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "d71ab2bfbd0563168895ec88893b7d437897de38a3fdcd13521a3ca542b9f136",
+          "code_length": 6
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "8ba26bba96d4f02fc69ac1a67580cf30d5eaff1b7962dfda7a90d996a6341928",
+          "code_length": 5
+        },
+        {
+          "name": "setOffset",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4e9775b17d7e2253cbe009a6a87dda14800e0e1546f3d3d771e565bebcafabc3",
+          "code_length": 6
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "9cc75dea5f9202116f9aa186a1c20ad7515d7906805eeecda611fc2f82f7185c",
+          "code_length": 5
+        },
+        {
+          "name": "filterPixels",
+          "descriptor": "(II[ILjava/awt/Rectangle;)[I",
+          "access": 4,
+          "code_sha256": "cec458f250d698e0d45292b7516d7cf25e3d36987e8d36ec69a680e3dd5be940",
+          "code_length": 500
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[[S",
+        "com/jhlabs/image/ContourFilter",
+        "com/jhlabs/image/PixelUtils",
+        "com/jhlabs/image/WholeImageFilter",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ContrastFilter.class",
+      "occurrence": 0,
+      "sha256": "b0b9bd1f35d481da20210a43f78c9b8086f5f2268b3cb7e2165039782eb2e69a",
+      "name": "com/jhlabs/image/ContrastFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/TransferFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "brightness",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "contrast",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "79cdfb517fc1d1863c433ed7359921f5d5d97c8238231115402502c4a2caf51f",
+          "code_length": 15
+        },
+        {
+          "name": "transferFunction",
+          "descriptor": "(F)F",
+          "access": 4,
+          "code_sha256": "29bed67a5f3a61460865a6b091a0cc00048eeb931458a53578108d78ac7236b5",
+          "code_length": 22
+        },
+        {
+          "name": "setBrightness",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "fa6829f45bb350d7b3e4659006a7dccea8e03cf3d95b9725cf02957752182de8",
+          "code_length": 11
+        },
+        {
+          "name": "getBrightness",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "setContrast",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "5497e346a2fde75b19b90ed2a767b6e2a978b97594135ec333fe6d5915ccc36a",
+          "code_length": 11
+        },
+        {
+          "name": "getContrast",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e9afd6fe6ede669a58cb6fca1daca4e1262f5736e367033f8d323b11d75158b0",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/ContrastFilter",
+        "com/jhlabs/image/TransferFilter"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/ConvolveFilter.class",
+      "occurrence": 0,
+      "sha256": "c25ff0708829ff5b62980389506e2082c27a3975d25270cc1f78b885be2c1e11",
+      "name": "com/jhlabs/image/ConvolveFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "ZERO_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "CLAMP_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "WRAP_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "kernel",
+          "descriptor": "Ljava/awt/image/Kernel;",
+          "access": 4
+        },
+        {
+          "name": "alpha",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "edgeAction",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dbb7c1081126a83321e29bfdf33d298545d0dc63581ec432baf785d19a43d6c2",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([F)V",
+          "access": 1,
+          "code_sha256": "f22eda9500430ba14195492deb9ab87367053b57240325c5903ae1804a3bd5ad",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II[F)V",
+          "access": 1,
+          "code_sha256": "1e41e95a987a800a63fcfaf2b7e0b65036137cb2a0cf1f2bc538aeeeba241350",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/Kernel;)V",
+          "access": 1,
+          "code_sha256": "cdf1746a22a8b22960631a68dc995e01d58f0d58e8a72b897d1a23b38fae04d5",
+          "code_length": 27
+        },
+        {
+          "name": "setKernel",
+          "descriptor": "(Ljava/awt/image/Kernel;)V",
+          "access": 1,
+          "code_sha256": "48fb720aa2a9b68dfbb952c6e9e11d36348ceb48bf0fec91e3294ba5ac037a6d",
+          "code_length": 6
+        },
+        {
+          "name": "getKernel",
+          "descriptor": "()Ljava/awt/image/Kernel;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "setEdgeAction",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c7062452efbc8119e6431ccc80d9a89050da832ed7c1ec8d596b49a13c3326c6",
+          "code_length": 6
+        },
+        {
+          "name": "getEdgeAction",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "setUseAlpha",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "getUseAlpha",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "c9f729ee751fe63c409a2d20c279d3eb01af728be7b2dfa5a6c1cb991f57b30a",
+          "code_length": 87
+        },
+        {
+          "name": "createCompatibleDestImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/ColorModel;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "51a10dc4f684d3220b8a77540bdda5bac3fc272501ab539430deeaeb57f44f75",
+          "code_length": 35
+        },
+        {
+          "name": "getBounds2D",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "9b80d4df90dcb69ba9b67b484fda689438611e99a4480e336362342b62602cd1",
+          "code_length": 18
+        },
+        {
+          "name": "getPoint2D",
+          "descriptor": "(Ljava/awt/geom/Point2D;Ljava/awt/geom/Point2D;)Ljava/awt/geom/Point2D;",
+          "access": 1,
+          "code_sha256": "3130614b1631d3c9607a9943ddcc795cdd653ccee879b5c8052a4c4173cc8aa7",
+          "code_length": 26
+        },
+        {
+          "name": "getRenderingHints",
+          "descriptor": "()Ljava/awt/RenderingHints;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "convolve",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIII)V",
+          "access": 9,
+          "code_sha256": "57f4444605c80197257bd82ad0178e8a4b96d7d1358464399a61422350723bfd",
+          "code_length": 13
+        },
+        {
+          "name": "convolve",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "ad0d3abb5e48fbe64f0227a0b57616c37948c911d8d71c3157d083099ba8e15c",
+          "code_length": 62
+        },
+        {
+          "name": "convolveHV",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "ee17324bcdddc258f4f01db2605039e453ebe5f5d2a899d4845e787cc459c96f",
+          "code_length": 428
+        },
+        {
+          "name": "convolveH",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "9ebb27aff4acb684a8bdfbe35e776eff0db6086e6ac9bfd5c7935d58c40160fd",
+          "code_length": 362
+        },
+        {
+          "name": "convolveV",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "f1359b5c4b61160fc1d8217c779e893e2cf4badd3a0b0a5026917239581096e4",
+          "code_length": 391
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8f48e4f3b33bfbe8fa16fc1b49fc029dc08bd2b1d6b4f21a5ec290416498bebc",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "92ace700bb08623250fd66f6c10724e553b98a03dc5920af743e7b732fb2e10a",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/ConvolveFilter",
+        "com/jhlabs/image/PixelUtils",
+        "java/awt/Rectangle",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/awt/image/Kernel"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CropFilter.class",
+      "occurrence": 0,
+      "sha256": "8d63eb5f70fb67aea4388a3d91d908fa6eac5a5950319550bd5c21b5cf65ccd9",
+      "name": "com/jhlabs/image/CropFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "y",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "width",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "height",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e185f23f2f016cfd45be97661c988b37d4615e5e0f7639162a55fa182a693ad1",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "8874860ed904a9e63f42b74ec70c939b573634d81b534c82719d7a7f88b635b4",
+          "code_length": 26
+        },
+        {
+          "name": "setX",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getX",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setY",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getY",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setWidth",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "59a70dcd638befe150432fa942f77d6dfd336b826c12bbb8826a287c9394b27d",
+          "code_length": 6
+        },
+        {
+          "name": "getWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "setHeight",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "4723d6b0525b93a195266021bd643b95246a88abcb78a416144784ce8a8a72a7",
+          "code_length": 84
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c720e486c1a0f9f51f3cf99fe968623a963afb24c1e69c66287d3bd71e932b2",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/CropFilter",
+        "java/awt/Graphics",
+        "java/awt/Graphics2D",
+        "java/awt/geom/AffineTransform",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CrystallizeFilter.class",
+      "occurrence": 0,
+      "sha256": "0dfe07eb523380e3da3dd37821bc285e18b24f173ec0cdb56f83e991ea236df4",
+      "name": "com/jhlabs/image/CrystallizeFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/CellularFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "edgeThickness",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "fadeEdges",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "edgeColor",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4a4c2ef7458cbb4f2e9f1c7cdad5e0d60666ebe6c9917531d6a9be9146eba644",
+          "code_length": 33
+        },
+        {
+          "name": "setEdgeThickness",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getEdgeThickness",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setFadeEdges",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        },
+        {
+          "name": "getFadeEdges",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setEdgeColor",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "getEdgeColor",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "getPixel",
+          "descriptor": "(II[III)I",
+          "access": 1,
+          "code_sha256": "4a459fd84a2caa63ce79e30596edbab854ac1e487ead7a9261779ab48d3ac9b1",
+          "code_length": 311
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "85d0dcf45c60a01d5fe91a7b60f05e62e84bf9dc5d4f2d2fb8596c7e37b813b4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CellularFilter",
+        "com/jhlabs/image/CellularFilter$Point",
+        "com/jhlabs/image/CrystallizeFilter",
+        "com/jhlabs/image/ImageMath"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CurlFilter$Sampler.class",
+      "occurrence": 0,
+      "sha256": "153488375a5b494ea96d9703df6ce9a8f851cc52545dd807d6fb4bdba9fb10cd",
+      "name": "com/jhlabs/image/CurlFilter$Sampler",
+      "major": 45,
+      "minor": 3,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "edgeAction",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "width",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "height",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "inPixels",
+          "descriptor": "[I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)V",
+          "access": 1,
+          "code_sha256": "bc7ed310aa0b72a074c09600d487f50d5402974b885ee60e559ec369a1921a3f",
+          "code_length": 34
+        },
+        {
+          "name": "sample",
+          "descriptor": "(FF)I",
+          "access": 1,
+          "code_sha256": "5d6fa74b77c5e9fbdcca89c61ffe44d6eeb3704636bcb40286f0317f5b00ce95",
+          "code_length": 230
+        },
+        {
+          "name": "getPixel",
+          "descriptor": "([IIIII)I",
+          "access": 18,
+          "code_sha256": "50f09d05e3cc3bba15592b80650a84735ada8a0324b2b0e00c5d47232776a785",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/CurlFilter",
+        "com/jhlabs/image/CurlFilter$Sampler",
+        "com/jhlabs/image/ImageMath",
+        "com/jhlabs/image/ImageUtils",
+        "java/awt/image/BufferedImage",
+        "java/lang/Math",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jhlabs/image/CurlFilter.class",
+      "occurrence": 0,
+      "sha256": "2981222609707088ed6238f10a14a65c0adfdba6c33e20ede739ffc074e953f0",
+      "name": "com/jhlabs/image/CurlFilter",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/image/TransformFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "angle",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "transition",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "width",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "height",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "radius",
+          "descriptor": "F",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2681537a4a9cb70141ed9231a0ce3f050f7e52459553f3ee35a8fe710f2faf79",
+          "code_length": 20
+        },
+        {
+          "name": "setTransition",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4b7c025f5f579f99659db2e6cfd2e0516e84924803666b5faa76e877f84b174e",
+          "code_length": 6
+        },
+        {
+          "name": "getTransition",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5db51897a7ae6e52853b3a4317b312747e52376915a9b7e0a0cb15b4cbf17ae5",
+          "code_length": 5
+        },
+        {
+          "name": "setAngle",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "407d139087337f5186ec9dbc36907ceb19cf962fd80f2056d5b2ea7f7592d6ef",
+          "code_length": 6
+        },
+        {
+          "name": "getAngle",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "setRadius",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "4e9775b17d7e2253cbe009a6a87dda14800e0e1546f3d3d771e565bebcafabc3",
+          "code_length": 6
+        },
+        {
+          "name": "getRadius",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "9cc75dea5f9202116f9aa186a1c20ad7515d7906805eeecda611fc2f82f7185c",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "6315ce0c6bd3d979e04c09918eb6ba6d1b02bd37258ae7baf880c7898235ebe3",
+          "code_length": 629
+        },
+        {
+          "name": "getPixel",
+          "descriptor": "([IIIII)I",
+          "access": 18,
+          "code_sha256": "3fd5dbd7c70c1e9ff20a9c1ec947dae9f8cca589918ed4c4b72f1af1539c0377",
+          "code_length": 107
+        },
+        {
+          "name": "transformInverse",
+          "descriptor": "(II[F)V",
+          "access": 4,
+          "code_sha256": "b59e3bfda5a96a9297b26031609337e0b9cb5e38e985a1ad5b307db443565286",
+          "code_length": 413
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "af41f71bc48f65acc5cb7e864d189b48e5745e633d286bd2812de31536526e3b",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/image/AbstractBufferedImageOp",
+        "com/jhlabs/image/CurlFilter",
+        "com/jhlabs/image/CurlFilter$Sampler",
+        "com/jhlabs/image/ImageMath",
+        "com/jhlabs/image/PixelUtils",
+        "com/jhlabs/image/TransformFilter",
+        "java/awt/Rectangle",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/lang/Math"
+      ]
+    }
+  ]
+}

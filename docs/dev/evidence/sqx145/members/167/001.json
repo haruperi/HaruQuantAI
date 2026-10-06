@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerConnections/DataManagerConnections.jar",
+  "archive_sha256": "4272999e7250c713361be4ccce7f02ba7040478a6b1c608e31f9e7b4f965e713",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender.class",
+      "occurrence": 0,
+      "sha256": "99c92568933dee2653113fc0aff04eeae7f5c18f68d12e7ce68314e1df7e1fc5",
+      "name": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender;",
+          "access": 10
+        },
+        {
+          "name": "stop",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "36f5e8047025d63649c6f11167aede64ab2d1122999c01f3aa61c179062e81ff",
+          "code_length": 23
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender;",
+          "access": 9,
+          "code_sha256": "83288db0a9b3e50a63458ddaea106ed91cc0b579ff44805f6c8881540ad9181b",
+          "code_length": 18
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c2bab0dc021a3e3234f3a6f683dc1010cddf2d5ba2ced5da38b161d5367fa610",
+          "code_length": 6
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e4693fdbaee017d2277f03e1d816e967536d561ec2fc519d3209748ef948b53e",
+          "code_length": 6
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "987b3087149c3687192dd80b176f32c5a3e433f765797b0ba713ee9817695b3a",
+          "code_length": 13
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "795d3266ce32d4daf04a876c64315140425a359a8d6a58f9222b80a081e5faa3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet.class",
+      "occurrence": 0,
+      "sha256": "c6b97fcb23750184c14cfa8a1a56abe95fb4e63c7d5674806ff535b37411cda6",
+      "name": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "connManager",
+          "descriptor": "Lcom/strategyquant/tradinglib/connection/ConnectionManager;",
+          "access": 2
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5d6a27b5e782bb663f8febf43414cd971441b8d373e12786a2f3adba49bb0981",
+          "code_length": 9
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "e110d2622258c9fd7cf4f3f57b9236d1a9797af3bda312191e0c145b71c0aa2a",
+          "code_length": 218,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "45132dbb623fb068c2d9f7a6c9c9104b67f58da1e7799acc9debba587f29ea3c",
+          "code_length": 109,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "25e4a637a4790406d0f270c65fe1a1e83f279827763126dd4f1c42822d753f30",
+          "code_length": 39
+        },
+        {
+          "name": "onListPlugins",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "89983bb51d9b9387bf37d560a596b9016392903c004bf569e511da50e5c239ec",
+          "code_length": 122
+        },
+        {
+          "name": "onRemove",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "cf5196da9d223c8fdb9b8c1db69e3e64b47976b598c6ade37d2381ecd3b1b3cd",
+          "code_length": 99,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onEdit",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "995e3939d93f2ad241a8d67ea9e3eff7b1b03fa9d32a5b09299eca06ee88db0f",
+          "code_length": 122,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "isConnectionActive",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "f6d2d2bb695af4c350052cf7eef737f46485e1bd857db29755d317e8b29e7ef4",
+          "code_length": 133
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3b8b91d2688b66c355ace1ac7f433837bdebe9e1075ff805afea15265ddcc0a7",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/ValuesMap",
+        "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/connection/ConnectionManager",
+        "com/strategyquant/tradinglib/connection/ConnectionPluginManager",
+        "com/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/WebAppManager",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "e03cbdce91c816ac8aba96946af8e380e1e04c634140d50e2b20f6acf6964b34",
+      "name": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "connectionContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet",
+        "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServletPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

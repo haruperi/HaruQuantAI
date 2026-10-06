@@ -1,0 +1,3306 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/stax-api-1.0.1.jar",
+  "archive_sha256": "d1968436fc216c901fb9b82c7e878b50fd1d30091676da95b2edd3a9c0ccf92e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "javax/xml/stream/events/StartElement.class",
+      "occurrence": 0,
+      "sha256": "8ec96e43a64e7044bc8b3dbb0ec4cddbf011469c8fb3f6a137b3c73ebecedfa6",
+      "name": "javax/xml/stream/events/StartElement",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributes",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaces",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeByName",
+          "descriptor": "(Ljavax/xml/namespace/QName;)Ljavax/xml/stream/events/Attribute;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceContext",
+          "descriptor": "()Ljavax/xml/namespace/NamespaceContext;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/StartElement",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/XMLEvent.class",
+      "occurrence": 0,
+      "sha256": "5e70be545137864365f2a6510d759bf53803b88ca897cabb4514acd495bbb109",
+      "name": "javax/xml/stream/events/XMLEvent",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/XMLStreamConstants"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getEventType",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/xml/stream/Location;",
+          "access": 1025
+        },
+        {
+          "name": "isStartElement",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isAttribute",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isNamespace",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isEndElement",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isEntityReference",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isProcessingInstruction",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isCharacters",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isStartDocument",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isEndDocument",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "asStartElement",
+          "descriptor": "()Ljavax/xml/stream/events/StartElement;",
+          "access": 1025
+        },
+        {
+          "name": "asEndElement",
+          "descriptor": "()Ljavax/xml/stream/events/EndElement;",
+          "access": 1025
+        },
+        {
+          "name": "asCharacters",
+          "descriptor": "()Ljavax/xml/stream/events/Characters;",
+          "access": 1025
+        },
+        {
+          "name": "getSchemaType",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "writeAsEncodedUnicode",
+          "descriptor": "(Ljava/io/Writer;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamConstants",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/Attribute.class",
+      "occurrence": 0,
+      "sha256": "8cc013b509820ef5ffc495aa81d85c8278048f34fdd610dd333276854b4e82d4",
+      "name": "javax/xml/stream/events/Attribute",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getDTDType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isSpecified",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/Attribute",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/EndElement.class",
+      "occurrence": 0,
+      "sha256": "ecd03d4b469d9eb9f367dd4a923d87275b6c769c0e1ff774d3b04b3dc6fd7908",
+      "name": "javax/xml/stream/events/EndElement",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaces",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/EndElement",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/Characters.class",
+      "occurrence": 0,
+      "sha256": "fc750e475867becd6f658872818e69ab3d043f1ca4b31a9d03fbae3062ac0fe9",
+      "name": "javax/xml/stream/events/Characters",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isWhiteSpace",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isCData",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isIgnorableWhiteSpace",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/Characters",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/Comment.class",
+      "occurrence": 0,
+      "sha256": "2cbf4867766960fcc3502b392eb5913c1a3c2bdaeb871d391ad488129791d0b6",
+      "name": "javax/xml/stream/events/Comment",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/Comment",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/DTD.class",
+      "occurrence": 0,
+      "sha256": "07f1eb403a86bfcd419ec58d1830a208e3604eb57579772f12545ab0dca262e3",
+      "name": "javax/xml/stream/events/DTD",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getDocumentTypeDeclaration",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getProcessedDTD",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getNotations",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025
+        },
+        {
+          "name": "getEntities",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/DTD",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/NotationDeclaration.class",
+      "occurrence": 0,
+      "sha256": "d8609e3ebdc838e543d871e470ff9e2ad49321a7f942acb90a0525f64ca7fd9c",
+      "name": "javax/xml/stream/events/NotationDeclaration",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPublicId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getSystemId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/NotationDeclaration",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/EntityDeclaration.class",
+      "occurrence": 0,
+      "sha256": "0bb542fd96d41e0ac65b9c344808bb227e55acf1ff51752acea1f32827e6d361",
+      "name": "javax/xml/stream/events/EntityDeclaration",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPublicId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getSystemId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getNotationName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getReplacementText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getBaseURI",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/EntityDeclaration",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/EndDocument.class",
+      "occurrence": 0,
+      "sha256": "c1e39a4c92cc51c6e86834bbe91a1a1ceec2ab5bee5b8fa61118dd19b7bb21e2",
+      "name": "javax/xml/stream/events/EndDocument",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/EndDocument",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/EntityReference.class",
+      "occurrence": 0,
+      "sha256": "30f7bf5a6166dbc44b06b3ad316b64409d15447a198492624c905db54a29c85d",
+      "name": "javax/xml/stream/events/EntityReference",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getDeclaration",
+          "descriptor": "()Ljavax/xml/stream/events/EntityDeclaration;",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/EntityReference",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/Namespace.class",
+      "occurrence": 0,
+      "sha256": "1b100a2c8f4b9474c96c36273bb014a38a78d6521b3cdf5d847baeedad517037",
+      "name": "javax/xml/stream/events/Namespace",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/Attribute"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isDefaultNamespaceDeclaration",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/Attribute",
+        "javax/xml/stream/events/Namespace"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/StartDocument.class",
+      "occurrence": 0,
+      "sha256": "ba8e78884d4837a2e04894f5b588f5031ba533dc138a6fef0a15868ff1e628a6",
+      "name": "javax/xml/stream/events/StartDocument",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSystemId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getCharacterEncodingScheme",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "encodingSet",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isStandalone",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "standaloneSet",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/StartDocument",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/events/ProcessingInstruction.class",
+      "occurrence": 0,
+      "sha256": "b13a9825e3c9a523aabe92127a59e5750a7476013b484a4ec9c329de8c5702d4",
+      "name": "javax/xml/stream/events/ProcessingInstruction",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/events/XMLEvent"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTarget",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/events/ProcessingInstruction",
+        "javax/xml/stream/events/XMLEvent"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLStreamConstants.class",
+      "occurrence": 0,
+      "sha256": "9f5d69f050f51a58a731fd97b434664bb956b8fb421380e149ccec1debd47722",
+      "name": "javax/xml/stream/XMLStreamConstants",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "START_ELEMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "END_ELEMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROCESSING_INSTRUCTION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CHARACTERS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COMMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "START_DOCUMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "END_DOCUMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ENTITY_REFERENCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ATTRIBUTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DTD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CDATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NAMESPACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NOTATION_DECLARATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ENTITY_DECLARATION",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamConstants"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/Location.class",
+      "occurrence": 0,
+      "sha256": "ac152f0857e89a0706d62ce6396bf55369040e20cdcf6e57315a54527ae87282",
+      "name": "javax/xml/stream/Location",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getLineNumber",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getColumnNumber",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getCharacterOffset",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getPublicId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getSystemId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/Location"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLStreamException.class",
+      "occurrence": 0,
+      "sha256": "5b436d98730c4f575656ed640ed4c4c34383baf15b41c15c6dc559bb6acb45e0",
+      "name": "javax/xml/stream/XMLStreamException",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "nested",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 4
+        },
+        {
+          "name": "location",
+          "descriptor": "Ljavax/xml/stream/Location;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "2c0919b65a16ff8667f841be1070b3fab955e399c56a010fd452abd0aef9c046",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "15d7a8c03dce8ac355e69421b098e6d3703f08669f3360a17b596c5b4d308c44",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljavax/xml/stream/Location;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "396593aee04048d2693d081d2537d2dfaaa2590af0b002ffd8b4a6129bc0e766",
+          "code_length": 67
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljavax/xml/stream/Location;)V",
+          "access": 1,
+          "code_sha256": "47e0e6424f980d604517229b30b8ecb55cecf184517f403b6e05dd88eddc45f8",
+          "code_length": 62
+        },
+        {
+          "name": "getNestedException",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/xml/stream/Location;",
+          "access": 1,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/StringBuffer",
+        "javax/xml/stream/Location",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/util/StreamReaderDelegate.class",
+      "occurrence": 0,
+      "sha256": "a0c2ee5347db61dbb7f3e6f70422371342e2edca87b4651a3ae27daa4962dfc6",
+      "name": "javax/xml/stream/util/StreamReaderDelegate",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/XMLStreamReader"
+      ],
+      "fields": [
+        {
+          "name": "reader",
+          "descriptor": "Ljavax/xml/stream/XMLStreamReader;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "setParent",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getParent",
+          "descriptor": "()Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "next",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2f56b73133f9ffdb96c980cbf94cd26807b779cd38d0feb2ff35a8b5de7ac20f",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "nextTag",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "897e605dced5b54e12efb75964b156982b89ce9157d7d6cf53267e7a93285dcc",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getElementText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cf0fce18a93ed929003aad73746c8d5f986b7621823f12f5872a7424e1fd66ff",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "require",
+          "descriptor": "(ILjava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "09ce7f4f64521e71514bc21b47e86a5da3de6efb638437cc070ce903aad3b4fa",
+          "code_length": 13,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c39d05c5427f8a547c132ebdfd01042351202f930c66a6076e0b7434f2673b98",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10880dd60a7dbe22f2ea126c5141373188cb4500e0e418b654594c950a3cb265",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2a125834f40f5601c338f9f8fe64870f62ea3c0e4454f7ca974acf70608c174f",
+          "code_length": 11
+        },
+        {
+          "name": "getNamespaceContext",
+          "descriptor": "()Ljavax/xml/namespace/NamespaceContext;",
+          "access": 1,
+          "code_sha256": "35771598f41ffb8362da713a56629d23c3761ddcbd8777dd43fd7d33b61e645f",
+          "code_length": 10
+        },
+        {
+          "name": "isStartElement",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c152707e171f95d36ce2ea8b5aa371e3faf0a3155aad1c7ee87727ca68da156c",
+          "code_length": 10
+        },
+        {
+          "name": "isEndElement",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c2d69ec73897729c6ae93a2ac6c80298d7fe64555066ca502c2325e630c7285f",
+          "code_length": 10
+        },
+        {
+          "name": "isCharacters",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e6ac78af9d472e80f375cce06c13d36734b9e0d828b943e05353ef41f495d3e7",
+          "code_length": 10
+        },
+        {
+          "name": "isWhiteSpace",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "82ec874b2bdc2e9d87481ffec3a6afdae2386ee197d1424d7e5e77469eb26d12",
+          "code_length": 10
+        },
+        {
+          "name": "getAttributeValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "944cf0afef84213eb894356bbd39b65f6ef7e75062e1ba07c7b70254724a1f07",
+          "code_length": 12
+        },
+        {
+          "name": "getAttributeCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fcbdbe97d7818f902e07f8a0dc7fc621f7c75b28d3a23eafef034b1581072f0c",
+          "code_length": 10
+        },
+        {
+          "name": "getAttributeName",
+          "descriptor": "(I)Ljavax/xml/namespace/QName;",
+          "access": 1,
+          "code_sha256": "b733baaf2db73bc414d812b2214fae7de533f90c93c030530a2145300605d6ba",
+          "code_length": 11
+        },
+        {
+          "name": "getAttributePrefix",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6f7dd22f249cd57f74bde6503d18ad09a98cc502ddeef672654218c915e3a3cf",
+          "code_length": 11
+        },
+        {
+          "name": "getAttributeNamespace",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8c471d0130dc993843291b541fd4d913fe7a2a6c04e7ffee73aa95f5ab774c46",
+          "code_length": 11
+        },
+        {
+          "name": "getAttributeLocalName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "484b8c0de17aa0d97aa4be5a33298cc35860c1555a1a61bb9b65056d9ac1d912",
+          "code_length": 11
+        },
+        {
+          "name": "getAttributeType",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a0bf622727246f98c725ce94590cfb28109112c409b60cfcc7a984be7ee49c53",
+          "code_length": 11
+        },
+        {
+          "name": "getAttributeValue",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "10434accbc715e06e746c3ac6519fe6fa92d2de88a3d07972ed19606c4faed71",
+          "code_length": 11
+        },
+        {
+          "name": "isAttributeSpecified",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "46e9111e46c81d3352331e139862492e7202e72267509feea9fad99e792ce236",
+          "code_length": 11
+        },
+        {
+          "name": "getNamespaceCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1971e002e1238fb3e9f122b0f51825796856a5b07e1086c799fc6e5135e3d3d7",
+          "code_length": 10
+        },
+        {
+          "name": "getNamespacePrefix",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f6e8e16f6a096a1708d69decd216e6fe24822e9e39ed644c7008b991503a54a3",
+          "code_length": 11
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "704768f5ac26cc29677de82904d8ca9958e1c77a805bd1d8f0b1485883804b8a",
+          "code_length": 11
+        },
+        {
+          "name": "getEventType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "dd1fa99433921c7d1476da5823431044a7e05407c9591a7c5ed8ab5f483ee8c2",
+          "code_length": 10
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9586340fc2fecd0e732ff1fb3eab9b85f1dd36133965c13f23309782cabddae3",
+          "code_length": 10
+        },
+        {
+          "name": "getTextCharacters",
+          "descriptor": "(I[CII)I",
+          "access": 1,
+          "code_sha256": "72f28583105e63c914a9851c60666f1e00966d5f18af836d1229e2106f0adb2d",
+          "code_length": 15,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getTextCharacters",
+          "descriptor": "()[C",
+          "access": 1,
+          "code_sha256": "b40b140009df110c6eceff539a94364a83ed9caecc8f4ef9a5b545f36f71159d",
+          "code_length": 10
+        },
+        {
+          "name": "getTextStart",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2dd065c6c65b499b0e60e0a46285a1b034caa195475e6905015fbbfbfd38597a",
+          "code_length": 10
+        },
+        {
+          "name": "getTextLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c40f4f63489522481c5d1ebcde1dbc0a20e16f6aff57f74b48d1874e8b674c78",
+          "code_length": 10
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d8256c0ff75aa48fafe3ef5a8210c6eaccc4fe80b8e11e9b85e1537f9b6c05b8",
+          "code_length": 10
+        },
+        {
+          "name": "hasText",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "06412948ac0f42b38d779bb013108e3cf7b1685da54c4e4de1908b3cedfa484a",
+          "code_length": 10
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/xml/stream/Location;",
+          "access": 1,
+          "code_sha256": "adcbb41c41aace70a9c072b18e40f9449def5605af2a626eee1160b8d6ef3956",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1,
+          "code_sha256": "ee859e75d8999f356f16ad453bcd147791e838f3610e05cc40ed13264e8bb788",
+          "code_length": 10
+        },
+        {
+          "name": "getLocalName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "26979676c5164175618bd4d73157bf0715642670cbb9433ceaa757e61e78b6a6",
+          "code_length": 10
+        },
+        {
+          "name": "hasName",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "740c5d1cc6784ebb5db1a86ce4c7a39d3444a81e2ccefee5b2cf4c995eeafaf6",
+          "code_length": 10
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "209755d79f36be4a8159323ab94d426ee30c35ef57ffa2ca91975e3da2ae64db",
+          "code_length": 10
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7670a157e7f1c8ab3f5aa15b2b4fc13a256205f9d9851ed42cdbe9adfabca523",
+          "code_length": 10
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8a986adaa10d04a1ad5a8b9ea4f0aabbe507afcb0a84279c0296d28a2d3279ba",
+          "code_length": 10
+        },
+        {
+          "name": "isStandalone",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0b5df34ae769ef670d296c7a515b6316c6a95a457729facdeec22068d5a24f63",
+          "code_length": 10
+        },
+        {
+          "name": "standaloneSet",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aaec158450ab678c001d0ad16e4caf93bd9a2748026bcb9ddff6374a02e8dcc8",
+          "code_length": 10
+        },
+        {
+          "name": "getCharacterEncodingScheme",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "16157e1a096eaf65a1181b29427d1be33ccf7f763f2a67adf35ea75329cdc343",
+          "code_length": 10
+        },
+        {
+          "name": "getPITarget",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "20faaa8c388fdd4ffc2565deb405a2d5eb1e4517e011518024f0d66b947df3a6",
+          "code_length": 10
+        },
+        {
+          "name": "getPIData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8fcc1e5b314903fb36b682b15d79cbcac374c5a6d2f4064b0d4cc9851e2dfdfd",
+          "code_length": 10
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e9950dc7d28d5c7fcb92d7b16870973c489ca0e7a9d41c578c88bc61f9e9b5e1",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/XMLStreamReader",
+        "javax/xml/stream/util/StreamReaderDelegate"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/util/EventReaderDelegate.class",
+      "occurrence": 0,
+      "sha256": "5905754fdd22e1a2e1f554600d23e0085afd7fd7bfb16578becf61307f08f544",
+      "name": "javax/xml/stream/util/EventReaderDelegate",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/XMLEventReader"
+      ],
+      "fields": [
+        {
+          "name": "reader",
+          "descriptor": "Ljavax/xml/stream/XMLEventReader;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/xml/stream/XMLEventReader;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "setParent",
+          "descriptor": "(Ljavax/xml/stream/XMLEventReader;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getParent",
+          "descriptor": "()Ljavax/xml/stream/XMLEventReader;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "nextEvent",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1,
+          "code_sha256": "3fb1df2ba234aac81302c30da0ce8601f5a77d1b4aba3a2fa3729100b29448ca",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6368d92afe43aad42f79f961d98e99a03c86729c616cd7d8f326ad28d3c75b21",
+          "code_length": 10
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b68aeb5852e85ebc67e29f7b684c2aad44ffe44cf3f32c4ef9d6793fc7f4fa1e",
+          "code_length": 10
+        },
+        {
+          "name": "peek",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1,
+          "code_sha256": "9e2d92a1e0087ac0ee9d1f37e2fe6f27827ddbba120843a3d8d8420c8e9cf4cb",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b9aedd58ac486b318f0ff7dbc6f725483cf9f31bf888f325c28fdd42b716a4b7",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getElementText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bf6a615e9afe09424b25e51d1d97d3b1641639d555089aee505de876937a4498",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "nextTag",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1,
+          "code_sha256": "2a6a2b6adb5e91cbd6346fea842f32b172adfa18e9814878222b505631f586b4",
+          "code_length": 10,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "eb034abab9ea76b0b1075bdef845b542b752f3c81fd9109eb03e89775a991afd",
+          "code_length": 11,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8a87bec274b59e8a151db3645b31a3f33f927666222a0d0c2d4342e52ea02488",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "javax/xml/stream/XMLEventReader",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/util/EventReaderDelegate"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/util/XMLEventAllocator.class",
+      "occurrence": 0,
+      "sha256": "54b6e45f6328a12c170d814e5d4367ad54574ed8252c3fe3995d8b661aac966a",
+      "name": "javax/xml/stream/util/XMLEventAllocator",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljavax/xml/stream/util/XMLEventAllocator;",
+          "access": 1025
+        },
+        {
+          "name": "allocate",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;)Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "allocate",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;Ljavax/xml/stream/util/XMLEventConsumer;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/util/XMLEventAllocator"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/util/XMLEventConsumer.class",
+      "occurrence": 0,
+      "sha256": "bef3adef390e70af7777ea06dd16e7628a0b3afaffad4afa5df3f7196c490755",
+      "name": "javax/xml/stream/util/XMLEventConsumer",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/xml/stream/events/XMLEvent;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/util/XMLEventConsumer"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLStreamReader.class",
+      "occurrence": 0,
+      "sha256": "7db462b8af7f46dc92b688550129bd24e52bd811f6040bcc73f4e3f534b3c3af",
+      "name": "javax/xml/stream/XMLStreamReader",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/XMLStreamConstants"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "require",
+          "descriptor": "(ILjava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getElementText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "nextTag",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isStartElement",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isEndElement",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isCharacters",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isWhiteSpace",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeCount",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeName",
+          "descriptor": "(I)Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeNamespace",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeLocalName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributePrefix",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeType",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeValue",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isAttributeSpecified",
+          "descriptor": "(I)Z",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceCount",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getNamespacePrefix",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceContext",
+          "descriptor": "()Ljavax/xml/namespace/NamespaceContext;",
+          "access": 1025
+        },
+        {
+          "name": "getEventType",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getTextCharacters",
+          "descriptor": "()[C",
+          "access": 1025
+        },
+        {
+          "name": "getTextCharacters",
+          "descriptor": "(I[CII)I",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getTextStart",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getTextLength",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "hasText",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/xml/stream/Location;",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1025
+        },
+        {
+          "name": "getLocalName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "hasName",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isStandalone",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "standaloneSet",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getCharacterEncodingScheme",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPITarget",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPIData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamConstants",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/XMLStreamReader"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLEventReader.class",
+      "occurrence": 0,
+      "sha256": "d0804853ab2a092dd18a24a77d19cd34ffa02a9e7966a84d8ec4ca571103735a",
+      "name": "javax/xml/stream/XMLEventReader",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "nextEvent",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "peek",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getElementText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "nextTag",
+          "descriptor": "()Ljavax/xml/stream/events/XMLEvent;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "javax/xml/stream/XMLEventReader",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLEventWriter.class",
+      "occurrence": 0,
+      "sha256": "0e49d18eb282c24a1ce21041be75cc319bd1d0c06baf77cdaa89ab22403f0bd6",
+      "name": "javax/xml/stream/XMLEventWriter",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/stream/util/XMLEventConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/xml/stream/events/XMLEvent;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/xml/stream/XMLEventReader;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setPrefix",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setDefaultNamespace",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setNamespaceContext",
+          "descriptor": "(Ljavax/xml/namespace/NamespaceContext;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getNamespaceContext",
+          "descriptor": "()Ljavax/xml/namespace/NamespaceContext;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLEventWriter",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/util/XMLEventConsumer"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/FactoryFinder$ClassLoaderFinder.class",
+      "occurrence": 0,
+      "sha256": "f38548cf1da764748d9b82789f4c108ee5fb5ade9e8aed1a9c4f165fa841900b",
+      "name": "javax/xml/stream/FactoryFinder$ClassLoaderFinder",
+      "major": 46,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 1024
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/xml/stream/FactoryFinder$1;)V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/FactoryFinder$1",
+        "javax/xml/stream/FactoryFinder$ClassLoaderFinder"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/FactoryFinder$ClassLoaderFinderConcrete.class",
+      "occurrence": 0,
+      "sha256": "7ad29653cc5e56a76fbd3ab0d2ea5f61a434c2cee09456a4ce849273635fab07",
+      "name": "javax/xml/stream/FactoryFinder$ClassLoaderFinderConcrete",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "javax/xml/stream/FactoryFinder$ClassLoaderFinder",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 0,
+          "code_sha256": "d9e529507699438ee5ad278595d39f76f91f7c5724f7a0d3405a7ca3509dbd18",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Thread",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/FactoryFinder$1",
+        "javax/xml/stream/FactoryFinder$ClassLoaderFinder",
+        "javax/xml/stream/FactoryFinder$ClassLoaderFinderConcrete"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/FactoryFinder$1.class",
+      "occurrence": 0,
+      "sha256": "1e4c24c04f4b638c34f0611385d64e4f1c159bc0d5eeef6e1fbe1661ab1b723e",
+      "name": "javax/xml/stream/FactoryFinder$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/FactoryFinder$1"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/FactoryFinder.class",
+      "occurrence": 0,
+      "sha256": "3c2451551ce960311fa7d937e74679f9819715438c166bce04fbefc812e9899b",
+      "name": "javax/xml/stream/FactoryFinder",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "debug",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "class$javax$xml$stream$FactoryFinder",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "debugPrintln",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "1827a7b6c8fa42e1215b752f3b0938a1ba24fc0f6dad3644635ec54ed85f914b",
+          "code_length": 32
+        },
+        {
+          "name": "findClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 10,
+          "code_sha256": "acb836528b95dd5ea4d01898e4e12f2544f49951b220d7f70124cfbd6c61106a",
+          "code_length": 136,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "51a589e34ec90b42f02df504d087b72679719cb507b9e69175b2ec0e797a3cc8",
+          "code_length": 95,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "21f66eb204feac73e6673e44e794cd1a392861176cb2561b3ab3cc5007b272b0",
+          "code_length": 6,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "d4600922724f604c0035e5656da5dbe0e47c9f86375d4d3beb9ae80abf69c6b8",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "4d5b155a2d2af40b83dcba11a71c269c592fb5b3890ed84aa19cfc6971e11794",
+          "code_length": 420,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "409177167af9e996835f16797ee74c00d78641b5740d219ceb14bcaddc4c43c8",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedReader",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/InputStreamReader",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/LinkageError",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/util/Properties",
+        "javax/xml/stream/FactoryConfigurationError",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/FactoryFinder$1",
+        "javax/xml/stream/FactoryFinder$ClassLoaderFinder",
+        "javax/xml/stream/FactoryFinder$ClassLoaderFinderConcrete"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/FactoryConfigurationError.class",
+      "occurrence": 0,
+      "sha256": "af08d53090e90226967a92fd4e7cbc25274fc7bafb4406d3454351e5b3cf687a",
+      "name": "javax/xml/stream/FactoryConfigurationError",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Error",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "nested",
+          "descriptor": "Ljava/lang/Exception;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Exception;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3c84559c21829b4f20d1adaa58e7471e96194e3bed348b73428f2ee8ef47ca7c",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "ed6864f2f4c62a11287621c9b66ae60d2a10aaf38fc4499377d438782d37308b",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "getException",
+          "descriptor": "()Ljava/lang/Exception;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "39d7dc3a6591b5d55d1bdde99d075374e1b8501a2bef895d1577fe0208444d69",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "javax/xml/stream/FactoryConfigurationError"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/StreamFilter.class",
+      "occurrence": 0,
+      "sha256": "ee4f0fc073bb46a5baec669bdfc2402ea24be0f01c0ca0e695f9686c25f00770",
+      "name": "javax/xml/stream/StreamFilter",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "accept",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/StreamFilter"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLInputFactory.class",
+      "occurrence": 0,
+      "sha256": "496c782cf21d32112bf805021d09470ef535b707855bda2a50329d02ae357c47",
+      "name": "javax/xml/stream/XMLInputFactory",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IS_NAMESPACE_AWARE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IS_VALIDATING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IS_COALESCING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IS_REPLACING_ENTITY_REFERENCES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IS_SUPPORTING_EXTERNAL_ENTITIES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SUPPORT_DTD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "REPORTER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RESOLVER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ALLOCATOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljavax/xml/stream/XMLInputFactory;",
+          "access": 9,
+          "code_sha256": "1d804234da1b415282224bea0b4b4cce0e332dcad84387efdbade7cfde7c3cbc",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljavax/xml/stream/XMLInputFactory;",
+          "access": 9,
+          "code_sha256": "0781905d36003ce703a8918e19d80740c2732ae675edbf7e432a6ca88733e2e9",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljavax/xml/transform/Source;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljava/io/InputStream;Ljava/lang/String;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljava/lang/String;Ljava/io/InputStream;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamReader",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Reader;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Reader;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljavax/xml/transform/Source;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljava/io/InputStream;Ljava/lang/String;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventReader",
+          "descriptor": "(Ljava/lang/String;Ljava/io/InputStream;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createFilteredReader",
+          "descriptor": "(Ljavax/xml/stream/XMLStreamReader;Ljavax/xml/stream/StreamFilter;)Ljavax/xml/stream/XMLStreamReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createFilteredReader",
+          "descriptor": "(Ljavax/xml/stream/XMLEventReader;Ljavax/xml/stream/EventFilter;)Ljavax/xml/stream/XMLEventReader;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getXMLResolver",
+          "descriptor": "()Ljavax/xml/stream/XMLResolver;",
+          "access": 1025
+        },
+        {
+          "name": "setXMLResolver",
+          "descriptor": "(Ljavax/xml/stream/XMLResolver;)V",
+          "access": 1025
+        },
+        {
+          "name": "getXMLReporter",
+          "descriptor": "()Ljavax/xml/stream/XMLReporter;",
+          "access": 1025
+        },
+        {
+          "name": "setXMLReporter",
+          "descriptor": "(Ljavax/xml/stream/XMLReporter;)V",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "isPropertySupported",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "setEventAllocator",
+          "descriptor": "(Ljavax/xml/stream/util/XMLEventAllocator;)V",
+          "access": 1025
+        },
+        {
+          "name": "getEventAllocator",
+          "descriptor": "()Ljavax/xml/stream/util/XMLEventAllocator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "javax/xml/stream/FactoryConfigurationError",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/XMLInputFactory",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/EventFilter.class",
+      "occurrence": 0,
+      "sha256": "3b7e02b6c3bcd12c1e9721fed370529391411b3784ce67ad5879501a24e29382",
+      "name": "javax/xml/stream/EventFilter",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "accept",
+          "descriptor": "(Ljavax/xml/stream/events/XMLEvent;)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/EventFilter"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLResolver.class",
+      "occurrence": 0,
+      "sha256": "ca6afa03fb3b2e1bf9b01caf221c91a01d103be647b00da0be56ca0fc7b98fb5",
+      "name": "javax/xml/stream/XMLResolver",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "resolveEntity",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLResolver",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLReporter.class",
+      "occurrence": 0,
+      "sha256": "77c71762b1cbfde182c83ba8eeb5404236d4faccb57d8cc8a910f6da78d8d921",
+      "name": "javax/xml/stream/XMLReporter",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "report",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;Ljavax/xml/stream/Location;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/XMLReporter",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLOutputFactory.class",
+      "occurrence": 0,
+      "sha256": "2f22d1b209433cabba074bf17da73c885f54bb59fd7ea125f6ecf30fa144c500",
+      "name": "javax/xml/stream/XMLOutputFactory",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IS_REPAIRING_NAMESPACES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljavax/xml/stream/XMLOutputFactory;",
+          "access": 9,
+          "code_sha256": "1d804234da1b415282224bea0b4b4cce0e332dcad84387efdbade7cfde7c3cbc",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljavax/xml/stream/XMLOutputFactory;",
+          "access": 9,
+          "code_sha256": "0781905d36003ce703a8918e19d80740c2732ae675edbf7e432a6ca88733e2e9",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "createXMLStreamWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/xml/stream/XMLStreamWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/xml/stream/XMLStreamWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamWriter",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/lang/String;)Ljavax/xml/stream/XMLStreamWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLStreamWriter",
+          "descriptor": "(Ljavax/xml/transform/Result;)Ljavax/xml/stream/XMLStreamWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventWriter",
+          "descriptor": "(Ljavax/xml/transform/Result;)Ljavax/xml/stream/XMLEventWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/xml/stream/XMLEventWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventWriter",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/lang/String;)Ljavax/xml/stream/XMLEventWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "createXMLEventWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/xml/stream/XMLEventWriter;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "isPropertySupported",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "javax/xml/stream/FactoryConfigurationError",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/XMLOutputFactory",
+        "javax/xml/stream/XMLStreamException"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLStreamWriter.class",
+      "occurrence": 0,
+      "sha256": "0171085c457f8e8d890c76bc6e1d3920dc768a4f867d60b997c567f27bb826f8",
+      "name": "javax/xml/stream/XMLStreamWriter",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "writeStartElement",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeStartElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeStartElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEmptyElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEmptyElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEmptyElement",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEndElement",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEndDocument",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeNamespace",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeDefaultNamespace",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeComment",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeProcessingInstruction",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeProcessingInstruction",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeCData",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeDTD",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeEntityRef",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeStartDocument",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeStartDocument",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeStartDocument",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeCharacters",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "writeCharacters",
+          "descriptor": "([CII)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setPrefix",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setDefaultNamespace",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "setNamespaceContext",
+          "descriptor": "(Ljavax/xml/namespace/NamespaceContext;)V",
+          "access": 1025,
+          "throws": [
+            "javax/xml/stream/XMLStreamException"
+          ]
+        },
+        {
+          "name": "getNamespaceContext",
+          "descriptor": "()Ljavax/xml/namespace/NamespaceContext;",
+          "access": 1025
+        },
+        {
+          "name": "getProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "javax/xml/stream/XMLStreamException",
+        "javax/xml/stream/XMLStreamWriter"
+      ]
+    },
+    {
+      "entry": "javax/xml/stream/XMLEventFactory.class",
+      "occurrence": 0,
+      "sha256": "c640c7f68bba5154b08e9b4b00c57c7ac252223b3d0cc92ad1937a0d95b77101",
+      "name": "javax/xml/stream/XMLEventFactory",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljavax/xml/stream/XMLEventFactory;",
+          "access": 9,
+          "code_sha256": "1d804234da1b415282224bea0b4b4cce0e332dcad84387efdbade7cfde7c3cbc",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljavax/xml/stream/XMLEventFactory;",
+          "access": 9,
+          "code_sha256": "0781905d36003ce703a8918e19d80740c2732ae675edbf7e432a6ca88733e2e9",
+          "code_length": 11,
+          "throws": [
+            "javax/xml/stream/FactoryConfigurationError"
+          ]
+        },
+        {
+          "name": "setLocation",
+          "descriptor": "(Ljavax/xml/stream/Location;)V",
+          "access": 1025
+        },
+        {
+          "name": "createAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/Attribute;",
+          "access": 1025
+        },
+        {
+          "name": "createAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/Attribute;",
+          "access": 1025
+        },
+        {
+          "name": "createAttribute",
+          "descriptor": "(Ljavax/xml/namespace/QName;Ljava/lang/String;)Ljavax/xml/stream/events/Attribute;",
+          "access": 1025
+        },
+        {
+          "name": "createNamespace",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Namespace;",
+          "access": 1025
+        },
+        {
+          "name": "createNamespace",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/Namespace;",
+          "access": 1025
+        },
+        {
+          "name": "createStartElement",
+          "descriptor": "(Ljavax/xml/namespace/QName;Ljava/util/Iterator;Ljava/util/Iterator;)Ljavax/xml/stream/events/StartElement;",
+          "access": 1025
+        },
+        {
+          "name": "createStartElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/StartElement;",
+          "access": 1025
+        },
+        {
+          "name": "createStartElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Iterator;Ljava/util/Iterator;)Ljavax/xml/stream/events/StartElement;",
+          "access": 1025
+        },
+        {
+          "name": "createStartElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Iterator;Ljava/util/Iterator;Ljavax/xml/namespace/NamespaceContext;)Ljavax/xml/stream/events/StartElement;",
+          "access": 1025
+        },
+        {
+          "name": "createEndElement",
+          "descriptor": "(Ljavax/xml/namespace/QName;Ljava/util/Iterator;)Ljavax/xml/stream/events/EndElement;",
+          "access": 1025
+        },
+        {
+          "name": "createEndElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/EndElement;",
+          "access": 1025
+        },
+        {
+          "name": "createEndElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/Iterator;)Ljavax/xml/stream/events/EndElement;",
+          "access": 1025
+        },
+        {
+          "name": "createCharacters",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Characters;",
+          "access": 1025
+        },
+        {
+          "name": "createCData",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Characters;",
+          "access": 1025
+        },
+        {
+          "name": "createSpace",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Characters;",
+          "access": 1025
+        },
+        {
+          "name": "createIgnorableSpace",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Characters;",
+          "access": 1025
+        },
+        {
+          "name": "createStartDocument",
+          "descriptor": "()Ljavax/xml/stream/events/StartDocument;",
+          "access": 1025
+        },
+        {
+          "name": "createStartDocument",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Z)Ljavax/xml/stream/events/StartDocument;",
+          "access": 1025
+        },
+        {
+          "name": "createStartDocument",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/StartDocument;",
+          "access": 1025
+        },
+        {
+          "name": "createStartDocument",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/StartDocument;",
+          "access": 1025
+        },
+        {
+          "name": "createEndDocument",
+          "descriptor": "()Ljavax/xml/stream/events/EndDocument;",
+          "access": 1025
+        },
+        {
+          "name": "createEntityReference",
+          "descriptor": "(Ljava/lang/String;Ljavax/xml/stream/events/EntityDeclaration;)Ljavax/xml/stream/events/EntityReference;",
+          "access": 1025
+        },
+        {
+          "name": "createComment",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/Comment;",
+          "access": 1025
+        },
+        {
+          "name": "createProcessingInstruction",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/stream/events/ProcessingInstruction;",
+          "access": 1025
+        },
+        {
+          "name": "createDTD",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/stream/events/DTD;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/stream/FactoryConfigurationError",
+        "javax/xml/stream/FactoryFinder",
+        "javax/xml/stream/XMLEventFactory"
+      ]
+    },
+    {
+      "entry": "javax/xml/namespace/QName.class",
+      "occurrence": 0,
+      "sha256": "d0c92e345d9231b7ba9d5236668cd637810f7c57adbd805c03590b0d9d3b96cf",
+      "name": "javax/xml/namespace/QName",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "namespaceURI",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "localPart",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "prefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b90c44e1569250b5071e9c0698b4712aeb973eaa4cf21968805b76265fd196f6",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "5c86cc3fbbad01d1154429b9e66085788a0ddc4d75f6e8328bba1036360507ad",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4774a834c0f155e53bd08315e5fe8b1dfc0eb7b29ea02088526cba8e2ddca814",
+          "code_length": 48
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getLocalPart",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4cb1274ff02b3382e541fca19ade1c434b2d4298ce75ce7d6b77c2c69fab3b2e",
+          "code_length": 52
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/namespace/QName;",
+          "access": 9,
+          "code_sha256": "3b569c575d4a4c1a87d89d472d49bff5faa6d94dc774625a04f3c3b463d6ec7f",
+          "code_length": 105
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "38d76b2a1f55f3d30ca94160923ae84160b513de5366b9cf0c27ff56b2306d22",
+          "code_length": 16
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "737610d1958448d93643b6e22537ccd110c9b8a79aa89af63623003c133f8a3c",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "javax/xml/namespace/QName"
+      ]
+    },
+    {
+      "entry": "javax/xml/namespace/NamespaceContext.class",
+      "occurrence": 0,
+      "sha256": "2ff91a9ce8213ec57a83decdbb0137353be1e8ab28802814fd52abb80f0729f7",
+      "name": "javax/xml/namespace/NamespaceContext",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getPrefixes",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/namespace/NamespaceContext"
+      ]
+    },
+    {
+      "entry": "javax/xml/XMLConstants.class",
+      "occurrence": 0,
+      "sha256": "fc6e4e77523a999434214ced39809adf69112419f4ecca1405de9fccb73b29cf",
+      "name": "javax/xml/XMLConstants",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_NS_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "XML_NS_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "XML_NS_URI",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "XMLNS_ATTRIBUTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "XMLNS_ATTRIBUTE_NS_URI",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/xml/XMLConstants"
+      ]
+    }
+  ]
+}

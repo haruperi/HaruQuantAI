@@ -2,7 +2,7 @@ import { useOptionsController } from '../OptionsCtrl';
 import { SqdFieldset, SqdSelect, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
 import { formatTimeOfDay } from '../../ProjectWorkbench/settings/sharedSettingsFixtures';
 
-/** "Trading options" tab (donor evidence SQX144-EV-000041): the property grid. */
+/** "Trading options" tab (donor evidence retained target UI; current donor equivalence unverified): the property grid. */
 export function TradingOptionsTab() {
   const { properties, setProperty } = useOptionsController();
 

@@ -1,0 +1,2408 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/Snippets.jar",
+  "archive_sha256": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "SQ/Trading/Commissions/PercentageBased.class",
+      "occurrence": 0,
+      "sha256": "fbcecd37a82479a153fe3abdcce4790efe14ea533c7fe0e3d473deed467673a0",
+      "name": "SQ/Trading/Commissions/PercentageBased",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CommissionsMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CommissionPct",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "computeCommissionsOnOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "f93405630e3a78d5c0b4e57ceb81cf6cb9de7c670ed7f5fb832fbfeb8c3acb80",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeCommissionsOnClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Trading/Commissions/PercentageBased",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/Trading/Commissions/PerTrade.class",
+      "occurrence": 0,
+      "sha256": "5769b65fe8fe1563fdf93d317d11bdfeb5bb05ba0188ea69f94aebf57b418b35",
+      "name": "SQ/Trading/Commissions/PerTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CommissionsMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Commission",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "computeCommissionsOnOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "34c25fc3e412c3dfa25329217331cbc31c623afa2225c914914ba0c77944499c",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeCommissionsOnClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "f1a08a8cbdb5ba5e1f9aa012592c5156634ad67005224b315d555918162a6780",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Trading/Commissions/PerTrade",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/Trading/Commissions/SizeBased.class",
+      "occurrence": 0,
+      "sha256": "388950b10db5c028ec70cd2168152cd813bf10a319bfe03a9761635d130d2815",
+      "name": "SQ/Trading/Commissions/SizeBased",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CommissionsMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Commission",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "computeCommissionsOnOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "9f8327b19f2d93d93f1d11ba22f751f405e0d7ab26bbc37c1c5dead0c4ba83bf",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeCommissionsOnClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Trading/Commissions/SizeBased",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/Trading/Commissions/Stockpicker.class",
+      "occurrence": 0,
+      "sha256": "3ca7fc0a7496386d7720cea5231a82c950e1f1edbca69cec57f946d51f259e00",
+      "name": "SQ/Trading/Commissions/Stockpicker",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CommissionsMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Commission",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "CommissionType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "MinPerOrder",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "MinPerOrderType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "MaxPerOrder",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "MaxPerOrderType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "computeCommissionsOnOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "936bcfea2ba0483a094157b58442dab91cdc00f3a77d343841d504aa613d096d",
+          "code_length": 527,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeCommissionsOnClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DD)D",
+          "access": 1,
+          "code_sha256": "f5e1cd20068dd618f3015b22a05994fe70502501961edb56f697b889e0f35066",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Trading/Commissions/Stockpicker",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Trading/Scaling/NoScaling.class",
+      "occurrence": 0,
+      "sha256": "076d7cafcaa0ba780bc01e1f77d3d30ba2f4478addf2359ef3df9a0b538e36da",
+      "name": "SQ/Trading/Scaling/NoScaling",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/ScalingMethod",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "SQ/Trading/Scaling/NoScaling",
+        "com/strategyquant/tradinglib/ScalingMethod"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/DontTradeOnWeekends.class",
+      "occurrence": 0,
+      "sha256": "a0fd746e810d181411bcc9a86c1e2bc77f7744d623f9d9e924d29b1c599199e5",
+      "name": "SQ/TradingOptions/DontTradeOnWeekends",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DontTradeOnWeekends",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "FridayCloseTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SundayOpenTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "thisFridayExitTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "thisSundayBeginTime",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "37435cb4130b15bb65deb7729f6fb975a34d1f9915c49c8c83110b64d085eb2e",
+          "code_length": 19
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0444c148c33d0a5fcdd7611423c76c9593fda8461d10034848ff0d1c1ff22193",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "f355d00803e2fc9d381c953eea6b0755e0ffa24c7144f2dd17105bee9b364f38",
+          "code_length": 66,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "OnTick",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/datalib/TickEvent;Z)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initTimes",
+          "descriptor": "(JZLcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 2,
+          "code_sha256": "ff53d8151d3634727628180930377eba7931d6941a2d1ed58fb6bc7624331d37",
+          "code_length": 167
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "efdcb22d9e01b58d6b5b3e9d6da6114381a41e5b77fd431f9b65584390310f71",
+          "code_length": 34
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "884974cf56b134206a425487cf4847504ac3a86fe2a2ce842e655a12c4cc45e6",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "884974cf56b134206a425487cf4847504ac3a86fe2a2ce842e655a12c4cc45e6",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/DontTradeOnWeekends",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/ExitAtEndOfDay.class",
+      "occurrence": 0,
+      "sha256": "33823f3ae52e76e01d5ef23d83cc168ce91bd08e8b11aef8ceeb1c9321d963f9",
+      "name": "SQ/TradingOptions/ExitAtEndOfDay",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ExitAtEndOfDay",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "EODExitTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dailyEODExitTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "EODTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "closedThisDay",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "previousTickTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "LimitTimeRangeChecked",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "SignalTimeRangeFrom",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "SignalTimeRangeTo",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "dailySignalTimeRangeFrom",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "dailySignalTimeRangeTo",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "LimitTimeRange",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "80c90e213edf095a59286563ddf92eea2c69c4be0d3afba1f9a23b46aaa02a2e",
+          "code_length": 61
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aece51df23ee847e071ab55a74ffbdcdf6d8c53ec811ac8c087ac16fd1374ea3",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "ee9268a9b91ec060c2f340186de60ccf19d02fd4515d49ce56511fba70423cda",
+          "code_length": 254,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "OnTick",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/datalib/TickEvent;Z)V",
+          "access": 1,
+          "code_sha256": "15559cfc507b3156eb2400e3c1c15cb1767370b0c9a9074ea206c642f8f6cc78",
+          "code_length": 226,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initTimesForCurrentDay",
+          "descriptor": "(JLcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 2,
+          "code_sha256": "a86d8b74fadc74ef6634c53299d832f80dce3ed0a3549c1c972a1f45b94fb9bf",
+          "code_length": 128
+        },
+        {
+          "name": "initLimitTimeRangeForCurrentDay",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "5caf0597172468986175589834831ec165c4eb9ba81ece96a9234d9c070e57ec",
+          "code_length": 96
+        },
+        {
+          "name": "closeAllPositions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;ZJLcom/strategyquant/datalib/TickEvent;)Z",
+          "access": 2,
+          "code_sha256": "a3cba817f58edf988c891ba8979e41f53ece730a322e9142612a9d28342e0c8e",
+          "code_length": 299,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "a37097a62cc82413b3919b4ad35acbcc2271c4919014c408cb74407b85d6f4c1",
+          "code_length": 26
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "e5a5bd9a80324f3a04ec69ff20f6d5751153434e275b46a458cb619b67ddaa54",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "e5a5bd9a80324f3a04ec69ff20f6d5751153434e275b46a458cb619b67ddaa54",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/ExitAtEndOfDay",
+        "SQ/TradingOptions/LimitTimeRange",
+        "[Lcom/strategyquant/tradinglib/TradingOption;",
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/LiveOrderObj",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/ExitOnFriday.class",
+      "occurrence": 0,
+      "sha256": "b683cd8382319a937495c67969e8358dcfd2aa2a25d62c006143f7d594195297",
+      "name": "SQ/TradingOptions/ExitOnFriday",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ExitOnFriday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "FridayExitTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "thisFridayExitTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "thisSundayBeginTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "closedThisWeek",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "EOFDayTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "previousTickTime",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "414a4916660e0cae4c24a0a0b2844c8af69a5ae7733a83c47813b0be8d78b409",
+          "code_length": 31
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "107631c8d913debfdbdb949151ca3db4de6cf49c499be0981bb1521de6e6739a",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "56f31c0854f8ea963a5f00323ea8a82f5777703a0ac8ee2f49fcdbde6d0bce11",
+          "code_length": 66,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "OnTick",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/datalib/TickEvent;Z)V",
+          "access": 1,
+          "code_sha256": "94f46a6737c4dcaca52bbc1470c65b94ee80f989342b22e24a0fe6a7587028e2",
+          "code_length": 115,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initFridayExitTime",
+          "descriptor": "(JZLcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 2,
+          "code_sha256": "f6ac0e7b1b7b2ac132dea1e0e5baa4ada2e0a4db5472cda8d767fbd28dc02987",
+          "code_length": 167
+        },
+        {
+          "name": "closeAllPositions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;ZJLcom/strategyquant/datalib/TickEvent;)Z",
+          "access": 2,
+          "code_sha256": "d354cd216921f4a5541b4b3252b97a0164aed106e23fe1dc3f7577f19b9d49a5",
+          "code_length": 348,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "1fc85baf35fe381b240a339f872dfe503c492623d18ac2ee013f2326fe4930d4",
+          "code_length": 26
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "dad97d8d0a47507bd252cab5ef41e1b74c3569c0a3f7c480dd1e437b22940918",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "dad97d8d0a47507bd252cab5ef41e1b74c3569c0a3f7c480dd1e437b22940918",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/ExitOnFriday",
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/LiveOrderObj",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/LimitTimeRange.class",
+      "occurrence": 0,
+      "sha256": "12b72a6315585b10456034e84bdc4484fe9f77daa076b3e9506c205e316246ca",
+      "name": "SQ/TradingOptions/LimitTimeRange",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LimitTimeRange",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "SignalTimeRangeFrom",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SignalTimeRangeTo",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ExitAtEndOfRange",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "OrderTypeToExit",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dailySignalTimeRangeFrom",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "dailySignalTimeRangeTo",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "closedThisDay",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "79b82c43a8463577a93d0110c09bc69380d9d0f6c933a58ade8fea736b017077",
+          "code_length": 62,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "OnTick",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/datalib/TickEvent;Z)V",
+          "access": 1,
+          "code_sha256": "401067c9520db4dd8b5573b52a171ec07775da8c0d104954ee03ac8b078c6e2f",
+          "code_length": 99,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initTimesForCurrentDay",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "891d163d1399d351cfb220cc94604b4396ca3ea658b76499a84e5a33ad83535e",
+          "code_length": 163
+        },
+        {
+          "name": "closeAllPositions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/datalib/TickEvent;)V",
+          "access": 2,
+          "code_sha256": "0bea6b696b70e4a51881a104924e3684d4a4ab0e2589913d73882a696af74c8d",
+          "code_length": 154,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "7039ae159f5e91c455241fe32a639bed52f1f60b905f97f717348a60c6b3d7fd",
+          "code_length": 50
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "2fa3838c0f51e39619f9378ce8483f88b0b0d3ed1bee62c3fc5daf5886642855",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "2fa3838c0f51e39619f9378ce8483f88b0b0d3ed1bee62c3fc5daf5886642855",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/LimitTimeRange",
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/MaxDistanceFromMarket.class",
+      "occurrence": 0,
+      "sha256": "37ab63ecbb744eb9ca54753059d51dfae68c9755530dbf7d6d034e5b036802fe",
+      "name": "SQ/TradingOptions/MaxDistanceFromMarket",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MaxDistanceFromMarket",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "MaxDistancePct",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "40f56a83bf33146983fa4fcac7b9753f1eb8be38474802233d637179c813889e",
+          "code_length": 26
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "8493e112aa1bed53602447addbf7e4585f2253ab8a1cb7e89adcb235e8f80fbf",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "8493e112aa1bed53602447addbf7e4585f2253ab8a1cb7e89adcb235e8f80fbf",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/MaxDistanceFromMarket",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/TradingOption",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/MaxTradesPerDay.class",
+      "occurrence": 0,
+      "sha256": "3b674e807be0b90edffbd237c093dc5972242218c826e0f846aeb07d92dbb645",
+      "name": "SQ/TradingOptions/MaxTradesPerDay",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MaxTradesPerDay",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "historyPositionPreviousDay",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "openTimeToday",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "EODTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "reachedLimitToday",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40724bb1860ef922cba0cea5ad2d949e9bbae816441f0bba8ac056a8de8a1616",
+          "code_length": 15
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c69f8cb3ef80c8a5e21ea3a43c02ba6d70640b4ec1d4bcfca5483d60225191ce",
+          "code_length": 13
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "6b00790d67864147accc902df54165b0f5fc4be5abf711c28c71b598554b91c1",
+          "code_length": 67,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "initForCurrentDay",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "8e43b6e4f0fd1b413edf12ca13b7ae2f69ae690e843a12df7fde60927980ebe3",
+          "code_length": 22
+        },
+        {
+          "name": "getNumberOfTradesToday",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)I",
+          "access": 2,
+          "code_sha256": "f2059a36e2de34199665d3835286ad48b6185c6249c3d15cff021ee816d9e214",
+          "code_length": 200
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "ce3091db9afd361e5cfe08523be23f1320485c8a712e54668f602368ff0520d7",
+          "code_length": 18
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "61fea742fcb6404faa7a2559b63bbf296d318c7d637c1712187994d4441132b8",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "61fea742fcb6404faa7a2559b63bbf296d318c7d637c1712187994d4441132b8",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/MaxTradesPerDay",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/MinMaxSLPT.class",
+      "occurrence": 0,
+      "sha256": "33cbe7ddaf61c65d375d5868f089af08949536254aeb30ac900a07eaf16c021a",
+      "name": "SQ/TradingOptions/MinMaxSLPT",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MinimumSL",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MaximumSL",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MinimumPT",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MaximumPT",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "227f311c9da9f8d7a039da845b953bdc504cb8df52048733a2e26edb66e25d28",
+          "code_length": 42
+        },
+        {
+          "name": "setFromParameterEl",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "66e023dcbf450f1c15f03c65d74f5b5b051f8bbc18ba075440465cad70c39adc",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "7d7f39b0d58627adb2dbc9f9c9418b2d12b186f32475511574479787cbc84d89",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "7d7f39b0d58627adb2dbc9f9c9418b2d12b186f32475511574479787cbc84d89",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/MinMaxSLPT",
+        "com/strategyquant/tradinglib/TradingOption",
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/jdom2/Element"
+      ]
+    },
+    {
+      "entry": "SQ/TradingOptions/UseInitialSLPT.class",
+      "occurrence": 0,
+      "sha256": "dbaff106288c2b8d194ec1c55079442b8d8953db6236808eec7407174f1a168b",
+      "name": "SQ/TradingOptions/UseInitialSLPT",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradingOption",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UseInitialSLPT",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isUsedInTrading",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/TradingOption;",
+          "access": 1,
+          "code_sha256": "51b67554cf25ce89c8ec5ec2ef460c38c8e7ddce871e5db7593a6c0a852a68cc",
+          "code_length": 18
+        },
+        {
+          "name": "setFromParameterEl",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "8f496d65dafa7a86ff95a3dc28d4bf7d2d133d0aaf9eb4cab48a74b6d437de96",
+          "code_length": 43,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1bdd923b807f36a70ea15053c1c4738d3d8adefe099dea2d8b4aa066b6101c6a",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties;",
+          "access": 4161,
+          "code_sha256": "1bdd923b807f36a70ea15053c1c4738d3d8adefe099dea2d8b4aa066b6101c6a",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/TradingOptions/UseInitialSLPT",
+        "com/strategyquant/tradinglib/TradingOption",
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/jdom2/Element"
+      ]
+    },
+    {
+      "entry": "SQ/Utils/TimeDiffUtil.class",
+      "occurrence": 0,
+      "sha256": "1a9959d84056c0f30ef5e8690a8db8dbec18f5c16588b6e3ddd1871aa8c5c742",
+      "name": "SQ/Utils/TimeDiffUtil",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DAY_MILLIS",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDiffInDays",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartData;IZ)I",
+          "access": 9,
+          "code_sha256": "e30c7833414176c523c06a975e9b5403e2f27e335979491628b69e53b06f8b4d",
+          "code_length": 146,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getDiffInWeeks",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartData;I)I",
+          "access": 9,
+          "code_sha256": "18777b41c5e4468a30e135103b558a900f41143c5e4132015864ddcaa06b7b82",
+          "code_length": 79,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getDiffInMonths",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartData;I)I",
+          "access": 9,
+          "code_sha256": "b824bdd7d1cd62836208595234db5b5b2fdb69b9a63df9af0fccd1d3d0819955",
+          "code_length": 106,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/ChartData",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ByDays.class",
+      "occurrence": 0,
+      "sha256": "34afb736c4d72e1739fa45c7842a743bc140410702f387c353279187790c2da0",
+      "name": "SQ/WhatIf/ByDays",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "Monday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Tuesday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Wednesday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Thursday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Friday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Saturday",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Sunday",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "7c06d26d0024b14d279f8a1a6bdd0eaa69686c99bb7415d00ab1483bf1e68e97",
+          "code_length": 136,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "658cbaa5e1e50cee9fed5eaa536ead6e3b735b7ebe464abac11b02f48bbb5d4b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/ByDays",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ByHours.class",
+      "occurrence": 0,
+      "sha256": "d3285118f402fe6827eab51588053073c8a8d508971c680a1355d6ae846bae20",
+      "name": "SQ/WhatIf/ByHours",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "H0",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H1",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H2",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H3",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H4",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H5",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H6",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H7",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H8",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H9",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H10",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H11",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H12",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H13",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H14",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H15",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H16",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H17",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H18",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H19",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H20",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H21",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H22",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "H23",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "311926db1a5804d3ba6000af0e906aea70ad040e995d77e8484a35b70478efb5",
+          "code_length": 372,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0b4aa7bf4c13591ee72647f5f30282632cdc0db36b55f483beacbf7fae92ba44",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/ByHours",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ByMonths.class",
+      "occurrence": 0,
+      "sha256": "de9395c897385d007b3e0fefd473df866529c6d83e9409c1cb20a8f72700d08c",
+      "name": "SQ/WhatIf/ByMonths",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "January",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "February",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "March",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "April",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "May",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "June",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "July",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "August",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "September",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "October",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "November",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "December",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "06e1c67277f98e6a61ec92f4c158a78a7243ae2e1c2b2ddb926dfde53d39ab41",
+          "code_length": 206,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "487b20f0166d0226bc1cfba42941adbb6860dacbcf496d93c1384bb5107a4a9f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/ByMonths",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExcludePctTradesWithBiggestPl.class",
+      "occurrence": 0,
+      "sha256": "6954ec303f9a24e22d2d4b2c25b084abfc84ce5d0eca2667c8af436830699b5d",
+      "name": "SQ/WhatIf/ExcludePctTradesWithBiggestPl",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "TradesPct",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "36e22952dbb743c171a43580febbcd39bd0dc43f32971bba664b0ce7bf0ce3b9",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b5626b341a5e703a5215348ae74e7e6dff18dd799dd29ae72e0190f120e68cc9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Functions/ComparatorByProfit",
+        "SQ/WhatIf/ExcludePctTradesWithBiggestPl",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExcludePctTradesWithLowestPl.class",
+      "occurrence": 0,
+      "sha256": "62d4d3d941c03175417b5748aa369855c1f546ead5b136902d486d833553a89b",
+      "name": "SQ/WhatIf/ExcludePctTradesWithLowestPl",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "TradesPct",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "08de8a66591e118f37ef6e381d9880f9a0298d39d73be0a3299c6e7c2b85c823",
+          "code_length": 100,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b5626b341a5e703a5215348ae74e7e6dff18dd799dd29ae72e0190f120e68cc9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Functions/ComparatorByProfit",
+        "SQ/WhatIf/ExcludePctTradesWithLowestPl",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExcludeShortTrades.class",
+      "occurrence": 0,
+      "sha256": "865d84181ad1ff2a1f0b3887a7ae6167afa8db7674ad751d7501798656ad4f73",
+      "name": "SQ/WhatIf/ExcludeShortTrades",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "TradesPct",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Minutes",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "e2ffa7b38566e4f7cbf482c2cfa22ecdbffe0f92bec9dc02cd1fc85c25993a58",
+          "code_length": 107,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5135ea6aaa45f1859feb0e2b13f88b731e5c22091f7eaa9b96c85c3e5ae4f61f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/ExcludeShortTrades",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExcludeTradesWithBiggestPl.class",
+      "occurrence": 0,
+      "sha256": "84f1ab3d0f73a5174fbadabd46a44c5ef43ab9db6dea4e8c9456b037f23bd807",
+      "name": "SQ/WhatIf/ExcludeTradesWithBiggestPl",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "Trades",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "e679fdfda26a42d8512d160de25d52e35c6c6d862ea611f26fba84309d0e8d8e",
+          "code_length": 75,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "43862ff0b7feb7b81413e68deebf464d4f07766150b557d69a940d593f6ea1c3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Functions/ComparatorByProfit",
+        "SQ/WhatIf/ExcludeTradesWithBiggestPl",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExcludeTradesWithLowestPl.class",
+      "occurrence": 0,
+      "sha256": "74fd15ba22c49d49eadd7684c0ceaa59be016de7b57a6be31bce3795eca37ad4",
+      "name": "SQ/WhatIf/ExcludeTradesWithLowestPl",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "Trades",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "f2a2c2937e23dd165fc25950bfca3c128d02941c6ac6ea8f84489b9f7b3072c0",
+          "code_length": 79,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3ac2e4bfe9ed08cabbb7851a600f9c215051c569cf79a1d37ba3bf36763cf5e8",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Functions/ComparatorByProfit",
+        "SQ/WhatIf/ExcludeTradesWithLowestPl",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/ExludeOverlappingTrades.class",
+      "occurrence": 0,
+      "sha256": "e5935dc9e94d0323f413f6742e42bac0110de7f2b9c6f73808ef1653f34577d8",
+      "name": "SQ/WhatIf/ExludeOverlappingTrades",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "3d04675ac648bdbc7d6cc6edb8d98c9ffc9500e56f7e250b934b946d476daefa",
+          "code_length": 90,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ac9e2c2d755c4f3dc08f4785bcf70f5a46aae687cc1929097394772ef1ef9cb2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/ExludeOverlappingTrades",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByOpenTime",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/RemoveBalanceTransactions.class",
+      "occurrence": 0,
+      "sha256": "d4d7cd10fcdb65bd5c69c35fcc5297740e559517e3ad8bdedf7fc4d73111bc07",
+      "name": "SQ/WhatIf/RemoveBalanceTransactions",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "1c92ca392c11dc5caefc8220bbb4a53493f9da449960ecb91c3af01e8cc9854b",
+          "code_length": 41,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1746acaedd6aa66f7d133f8ee490b131ced4572fa7c6b17a7bf6ed07ebd91ecd",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/RemoveBalanceTransactions",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/RemovePendingTrades.class",
+      "occurrence": 0,
+      "sha256": "1e616cd5e9f6b74b18d2c34914720d31bd658c990f597f32305de33cc34195ad",
+      "name": "SQ/WhatIf/RemovePendingTrades",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "1c92ca392c11dc5caefc8220bbb4a53493f9da449960ecb91c3af01e8cc9854b",
+          "code_length": 41,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1746acaedd6aa66f7d133f8ee490b131ced4572fa7c6b17a7bf6ed07ebd91ecd",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/RemovePendingTrades",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/Swap.class",
+      "occurrence": 0,
+      "sha256": "19a09ca8d4ca3630b46764f5aeae7a6c9c3f7f909c7a3749de5744f90cc4ac4f",
+      "name": "SQ/WhatIf/Swap",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "swapLongInput",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "swapShortInput",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "swapMethod",
+          "descriptor": "Lcom/strategyquant/tradinglib/SwapMethod;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "9e713023a585de1223d3bb655adb280d98cccca8f9c787995a83c3f3aef26c24",
+          "code_length": 80,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a781521fb71a7e905fa108b77f9192ea3bffef1d7c855f6cead0bd6ce415f087",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/Swap",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/SwapMethod",
+        "com/strategyquant/tradinglib/SwapTypes",
+        "com/strategyquant/tradinglib/TripleSwapOptions",
+        "com/strategyquant/tradinglib/WhatIf",
+        "com/strategyquant/tradinglib/swap/SwapCalculator",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/TakeEverySecondTrade.class",
+      "occurrence": 0,
+      "sha256": "11ab98a804ff13872292f60bae11d9fb1f839e6a7492718cc145419069c6d11d",
+      "name": "SQ/WhatIf/TakeEverySecondTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "d93ce35faa56a86f30d7c9f3d8e56ec487f916e4002717a85ab070c9a9b7990a",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "eff0b58831cf9ec211f1949cd01a48ba2f496cfea975c7907b811258cba0d012",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/TakeEverySecondTrade",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByOpenTime",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/TakeMaxTradesPerDay.class",
+      "occurrence": 0,
+      "sha256": "5d8683cfe0fca3196903e68e549a61118bd6abe1bce149f8b18ee467c8c59f06",
+      "name": "SQ/WhatIf/TakeMaxTradesPerDay",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "Trades",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "8f9dbb5576ec4980328977fd6f77dc07fc607bf2128e48f8f04d95fbfe7c9094",
+          "code_length": 114,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c3559b8cec9e5827960588ee9b4aea67595b16811be8add4878f80ff306064c3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/TakeMaxTradesPerDay",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByOpenTime",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/WhatIf/UseFixedLots.class",
+      "occurrence": 0,
+      "sha256": "c53ac2a45808863e7ed0fc0b1aab8a6fa4d33594bf6174065c50cdb0b38c5e9e",
+      "name": "SQ/WhatIf/UseFixedLots",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WhatIf",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "Size",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 1,
+          "code_sha256": "dfddab40bd91117d60e386bb9cea6451db56258885bb439633f201baf667ef3f",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "27b9044d25b26fbbb63aff3f81d37d271790b8a87e27346f7d0c81c9ae5463f9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/WhatIf/UseFixedLots",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/WhatIf",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "java/lang/Exception",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+  "sha256": "40595742e8d58ca30f84671dcfd5280d15a6a42222166c510efffc444a29de45",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardBlocksTagCloud.class": "c7bbb0b2eee0c5fb04369b9131fbf544ab87b95fdf17e1693dad1d7021537b6c",
+    "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardRecentFiles.class": "97d1f78d72570bb403983860fd1f693ed833b1e614af226879ec03780811a0b5",
+    "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet.class": "74bcd35ada7418c6a125fe71f1b3c28cbf725823cc4757432bcc8097a0c1c283",
+    "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServletPlugin.class": "d4d50d7b4ddaee58e5c1f235316415aab14ea5df2d8b5331286bc5caf16f8a23"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardBlocksTagCloud.class",
+      "occurrence": 0,
+      "sha256": "c7bbb0b2eee0c5fb04369b9131fbf544ab87b95fdf17e1693dad1d7021537b6c",
+      "member_shard": "docs/dev/evidence/sqx145/members/228/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardRecentFiles.class",
+      "occurrence": 0,
+      "sha256": "97d1f78d72570bb403983860fd1f693ed833b1e614af226879ec03780811a0b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/228/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet.class",
+      "occurrence": 0,
+      "sha256": "74bcd35ada7418c6a125fe71f1b3c28cbf725823cc4757432bcc8097a0c1c283",
+      "member_shard": "docs/dev/evidence/sqx145/members/228/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "d4d50d7b4ddaee58e5c1f235316415aab14ea5df2d8b5331286bc5caf16f8a23",
+      "member_shard": "docs/dev/evidence/sqx145/members/228/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/228/001.json",
+      "sha256": "416d860d22a27d75eea5f815815c19c3cbb451091584743849f9cfa0b46affe8"
+    }
+  ]
+}

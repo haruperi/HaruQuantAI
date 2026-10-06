@@ -1,0 +1,903 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar",
+  "archive_sha256": "f4d719de679ce6da796373e0342e3c0de70078273ebc0f69ba43a6fab49e7071",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher.class",
+      "occurrence": 0,
+      "sha256": "d0e0865b917bcde23ba47009da6a015d990c39f0bfbb6d12861661d40043f7d6",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [
+        "com/strategyquant/lib/utils/IProgressListener"
+      ],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher;",
+          "access": 10
+        },
+        {
+          "name": "info",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 2
+        },
+        {
+          "name": "status",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        },
+        {
+          "name": "lastData",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/StampedLock;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "13f437706b836dbba3a3e67a9c8c05e778fd37578f0c4bedd50bd3c901598cc6",
+          "code_length": 70
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher;",
+          "access": 9,
+          "code_sha256": "7c15927f9d2106e4c09916ff9acb7a385988d24fbe86ca9c29ac81f1f76aafd2",
+          "code_length": 20
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 4,
+          "code_sha256": "9cd57b55fd6dac29205cc82c1eb34a9d5a5d124286f15a68960aedc76e42b45e",
+          "code_length": 76
+        },
+        {
+          "name": "setMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "18bbde0b54d06cc936b8f337d42428710cfe47829a3908fa07702c32851d4438",
+          "code_length": 66
+        },
+        {
+          "name": "onProgress",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "4d82f6f875ebc7b2f8251b70792f0c752a9dca6398dfb2e5ae8135afeb2fa956",
+          "code_length": 107
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "756102623999ca28662fd6ae9f59d8105ab97837fc0c706e0f345e22b9acac84",
+          "code_length": 44
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fb835b673eadc1ae16c2b2d4cbc658dc9ca6bb4554cd6364a54d54e797b13853",
+          "code_length": 7
+        },
+        {
+          "name": "onStart",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "onFinish",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "onConfirm",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "setStep",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "onPause",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "onContinue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/indicatorTester/IndicatorTesterConfig",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/utils/IProgressListener",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/concurrent/locks/StampedLock",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "7c2b1839170a8517849dd1adffac218f88b2feae6a861e401bfd1ffedb7071fd",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "73a32485675ba5f2b605ca97433119788a686e83f7609127afbde1203c9e064f",
+          "code_length": 114
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1",
+        "java/lang/Thread",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor.class",
+      "occurrence": 0,
+      "sha256": "6792edc13cef075dbb5a8223ff48aaa8ddb85d04bdd0c9585d198849b498c69d",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "testConfigs",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/jdom2/Element;>;"
+        },
+        {
+          "name": "tester",
+          "descriptor": "Lcom/strategyquant/indicatorTester/IndicatorTester;",
+          "access": 2
+        },
+        {
+          "name": "testIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "runningStatus",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "shouldStop",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "newUpdate",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "info",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 2
+        },
+        {
+          "name": "status",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 2
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ee9755a3b1c826b649185935b850b950c9152238ffd43ae2caecfa27bedfbbc4",
+          "code_length": 95
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;",
+          "access": 9,
+          "code_sha256": "b7a70067177070111bbbf0d8c6f53261854fd10fbc8a24aed29fdf03431a2e15",
+          "code_length": 20
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3e94950b9742a8df614d427a190ae76ff3f51d482837ffd8b039694938017856",
+          "code_length": 52,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8e8d6c0bbd1f500c699a19fd85f66b4c9da33c15e7f7caa91fabecefe04a5ec9",
+          "code_length": 6
+        },
+        {
+          "name": "loadTestsConfig",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a310abb0f90b092f8591a783542683e9b4be80327aebf4471695949b20d3db3d",
+          "code_length": 134,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runNextTest",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4282a5e6699eb19cdf0ca405ca918adde39cf6ddbe33bfebac412a3d15885d82",
+          "code_length": 135
+        },
+        {
+          "name": "addErrors",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "30cc7bd3aaefc201e1561a375024966121498bcf8ecd72c12e0ed2806b113324",
+          "code_length": 92
+        },
+        {
+          "name": "getResultMessage",
+          "descriptor": "(Lcom/strategyquant/indicatorTester/IndicatorTestException;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c7cd02579c497de410cb26ab2435dd1df73fd37e4fc177c4ba7328ede2b00c20",
+          "code_length": 114
+        },
+        {
+          "name": "performTest",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e9bb57bac1dd6b48083367135641448ac0540d53e23819bd0f97832f9cd2d138",
+          "code_length": 224,
+          "throws": [
+            "com/strategyquant/indicatorTester/IndicatorTestException"
+          ]
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "0f00c6152eefc7d02b71c46c2d86cca0544b66d597e5260f170ac7a77b76c971",
+          "code_length": 131
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getTestIndex",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "5679382d8e7ff4ec6d4146aedde60d24e4fe3410780135945f4ea0b5ffd53195",
+          "code_length": 31
+        },
+        {
+          "name": "setTestIndex",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "a5af7207f8a11e62bc30ee01379906a0ef6001fa601a71d228c76cea55957b5f",
+          "code_length": 20
+        },
+        {
+          "name": "incrementTestIndex",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "24e3b72ad312c9b466321e138b00189991d9f457775ef148fc21d6a71d1e672f",
+          "code_length": 25
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4b7044d41b537057458ffe67e3882ac95df66c643d7730397c4ad7147d3b9883",
+          "code_length": 31
+        },
+        {
+          "name": "setRunningStatus",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "b9c8ff20edf03b84cab54e595ddacc5e7b55af2c6bef89b3feb79c0364c78115",
+          "code_length": 20
+        },
+        {
+          "name": "setNewUpdate",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "8d6866c5d46cf20fa181b820367674e3d56bedd179f3f0300275036ec06bbd75",
+          "code_length": 20
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;Z)Z",
+          "access": 4104,
+          "code_sha256": "1d9d8d347a5e846a72c960b8aa6943c5adcc17935af29bcccb5fd4dbf001427c",
+          "code_length": 7
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;I)V",
+          "access": 4104,
+          "code_sha256": "3a28baf9e0e21e14f354a17c6ad9082e5c10cea865cc48e61b2dadabf382bda2",
+          "code_length": 6
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;I)V",
+          "access": 4104,
+          "code_sha256": "fedb0de8acb483df19d1c638fb07f58aa8deed9e6c6eecabb878065e07c396ba",
+          "code_length": 6
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)I",
+          "access": 4104,
+          "code_sha256": "c5986763d4d1d06b892a9b5a1b19960dfadcbf3fe9ce652bdf2420f9e78c04d6",
+          "code_length": 5
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)Ljava/util/List;",
+          "access": 4104,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)Z",
+          "access": 4104,
+          "code_sha256": "1010793b1c478cd9dba76622de9b5fa2602360d8c920264824d19123a73a9a0b",
+          "code_length": 5
+        },
+        {
+          "name": "access$500",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)V",
+          "access": 4104,
+          "code_sha256": "8896539f287b998e729c647434c756c34343aac77b5f723ad14b251137b4f61b",
+          "code_length": 5
+        },
+        {
+          "name": "access$600",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)V",
+          "access": 4104,
+          "code_sha256": "453e557c6548b35730a6cc77039ad677c34240c042947f27d4cde64a2c487b62",
+          "code_length": 5
+        },
+        {
+          "name": "access$700",
+          "descriptor": "(Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor;)V",
+          "access": 4104,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b4787969dfa06713fd561c221b1a4255976ec25d08b0d98b29335ad72533bc8f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/indicatorTester/IndicatorParameters",
+        "com/strategyquant/indicatorTester/IndicatorTestException",
+        "com/strategyquant/indicatorTester/IndicatorTester",
+        "com/strategyquant/indicatorTester/IndicatorTesterConfig",
+        "com/strategyquant/indicatorTester/IndicatorsLoader",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/jdom2/Element",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterPlugin.class",
+      "occurrence": 0,
+      "sha256": "cf3ef24f543d9dd65fcb0981e64062d9f24524e0aa7a7205244efaa7be7d247d",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "connectionContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterPlugin",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet.class",
+      "occurrence": 0,
+      "sha256": "ffe30d136c4e2d44758738cc3edbf58c50de134aabd36f86243dc5cc0aa7c600",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5d6a27b5e782bb663f8febf43414cd971441b8d373e12786a2f3adba49bb0981",
+          "code_length": 9
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "0f72a567c5f11172e1bb160258c67d328d32ce9d8b7c372f69664de5d53520ac",
+          "code_length": 357,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onListIndicators",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2290adddb0a67fffcae943018035e3f1060f0dfb21b7da36f364d215ee7b5db4",
+          "code_length": 117
+        },
+        {
+          "name": "onCreateNewConfig",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "25b1f2aedd9c374d01330d933cae8d7b7ab0cea920edd2b193562d978419b161",
+          "code_length": 87,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAddTests",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b1e4fe79155d34bbb2398b9b8af9c8ed5a88ee4594373c5f73f4186eae03a646",
+          "code_length": 95,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onLoadConfig",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "770f2e21336cb67a1ad2f000ca0c7a279a0a95906f995c4f519f1747cd8342f3",
+          "code_length": 60,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSaveConfig",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "cf2c41a570ca64d696bf458a79510fba358450596589f52e28e926d269e0504b",
+          "code_length": 85,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onStartTesting",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fae4117c18e345bd4ff7a650381571963df6fc8904ee7c65198407d9dfb1074c",
+          "code_length": 65,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onStopTesting",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ade7a9414fb18eeb333f2eda35466131d69be6a1de4627b1351051006952b803",
+          "code_length": 35
+        },
+        {
+          "name": "onDownloadTests",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "086bf727f6738fc5ba12fc79db015192f4588c889191de0f79ac888d01260f32",
+          "code_length": 73
+        },
+        {
+          "name": "onCalibrate",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1e5752cc889954c656fc34ab8710983f02f7704de52cfe0778f787bf1306704c",
+          "code_length": 324,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bfdc9824be4a37063d5a10df036446b74410c09508d347e2494ae46c97d1b618",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/indicatorTester/CalibrationInfo",
+        "com/strategyquant/indicatorTester/CalibrationRangesInfo",
+        "com/strategyquant/indicatorTester/IndicatorCalibrator",
+        "com/strategyquant/indicatorTester/IndicatorInfo",
+        "com/strategyquant/indicatorTester/IndicatorTesterConfig",
+        "com/strategyquant/indicatorTester/IndicatorsLoader",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1.class",
+      "occurrence": 0,
+      "sha256": "b72082db81223b49e29d7cf8526c61b3e26163862d51724e11296cf21b5859eb",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$listener",
+          "descriptor": "Lcom/strategyquant/lib/utils/IProgressListener;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "95f7a7c9a346f4306cc49d65262e56fff5fd3c2cc518f2ac1ed1b4c786eb8757",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/utils/IProgressListener",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1",
+        "java/lang/Exception",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader.class",
+      "occurrence": 0,
+      "sha256": "d6e938a252acf3b9c4cfc6921702f0a8768ada3d20931d082195bf0e0285db44",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "downloadURL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "targetFilePath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "processingThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "63ceef94c0fbb4d351362de466a4c2dda3bbc7ddf10a43482e2b7685a23a47be",
+          "code_length": 5
+        },
+        {
+          "name": "downloadTests",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 9,
+          "code_sha256": "a9274e4ca79a7fcdf12ed270a7b7c99a7bd2b027d310aced7e748b9164e69d78",
+          "code_length": 43,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "downloadFile",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 10,
+          "code_sha256": "1cf9baa08f3897df1120abb94cfcc2df57c7c3c6af3c16da84d0a015eedfff23",
+          "code_length": 303,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "copyTestFiles",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 10,
+          "code_sha256": "6b86d1bbb97977d5f6ec7e46860c1c21a5f8a287c627e63205b594dd998251bd",
+          "code_length": 353,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateTesterConfig",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 10,
+          "code_sha256": "9061d9ed98d8b9579488752a2a92bfb520041d4217aead5aa2845a102a123512",
+          "code_length": 162,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 4104,
+          "code_sha256": "ef0cdd4de18a061eebf14fdd2801f093d21e5142c9c39bb740d29bc429b13a3b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 4104,
+          "code_sha256": "ca2fb9c9d16cd0101e8ca4d7b8c01f558d5030505c228d471af211751132f65c",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;)V",
+          "access": 4104,
+          "code_sha256": "41263c2733d59ac089c8b364bc712603c0cfbc6d281bbc2f9386cdde19040257",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1651570d2eba6961d2b430a128ab9a15b2e1a3871b1c5f2ed9f334b67eb406e9",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/strategyquant/indicatorTester/IndicatorTesterConfig",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/lib/utils/IProgressListener",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader",
+        "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1",
+        "java/io/BufferedInputStream",
+        "java/io/BufferedOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/net/HttpURLConnection",
+        "java/net/URL",
+        "java/util/Enumeration",
+        "java/util/zip/ZipEntry",
+        "java/util/zip/ZipFile",
+        "org/jdom2/Element"
+      ]
+    }
+  ]
+}

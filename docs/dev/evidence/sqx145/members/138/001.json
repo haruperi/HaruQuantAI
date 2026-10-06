@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
+  "archive_sha256": "5bedd8ddbf4c457a5f9512d721092fa1f79cb16ac9d302cec46a055fb6339f52",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXHome/SQXHomePlugin.class",
+      "occurrence": 0,
+      "sha256": "ead8c9bca3545fa69fea255fc8ecac452866c8b042a1f93b6d47f3cae112b17c",
+      "name": "com/strategyquant/plugin/App/impl/SQXHome/SQXHomePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getContextPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getAppCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "431034cbe64ce7aa669460b922771c46e391bad78e1f55810986f31765f72009",
+          "code_length": 3
+        },
+        {
+          "name": "getTooltip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        },
+        {
+          "name": "getProject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b950cf29b200773088a2b11f762a4c4f98f9481f86fc850b7b249354d6b72e71",
+          "code_length": 56
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f9d94b115137ac5b474d883b0674eab28f046b2461c8151b9024d0eb47b84a59",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/SQXHome/SQXHomePlugin",
+        "com/strategyquant/plugin/App/impl/SQXHome/SQXHomeServlet",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXHome/SQXHomeServlet.class",
+      "occurrence": 0,
+      "sha256": "fc5910aa99c58b4a502b2a1c75d3ecc604750b96599ee11fa6a86dff8269cedb",
+      "name": "com/strategyquant/plugin/App/impl/SQXHome/SQXHomeServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "6c8c52ab6e9f290f6db3579550941c019a14033c7cf44b6fdc8ebd2bb9d6b84a",
+          "code_length": 45,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a693b09b34d894f31654d96c55fa0eae44dce3fb1c2a13fd2e44156ac1b1ec4b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/App/impl/SQXHome/SQXHomeServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

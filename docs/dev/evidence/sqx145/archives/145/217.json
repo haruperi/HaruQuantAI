@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
+  "sha256": "2b2ffee19ff286f637a317db951feb515d473e4ede01057b83ea8db705c8876f",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/StrategyConfig/StrategyConfigPlugin.class": "88c297aa6a4cad123043d3a8b4afe74e406ee2d2f694c399165a2b251dc32a8f",
+    "com/strategyquant/plugin/Results/impl/StrategyConfig/StrategyConfigServlet.class": "e4f3260a867b7a2950dfd838d814423ae4685041ba26ea6b34fca3f7f8600854"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/StrategyConfig/StrategyConfigPlugin.class",
+      "occurrence": 0,
+      "sha256": "88c297aa6a4cad123043d3a8b4afe74e406ee2d2f694c399165a2b251dc32a8f",
+      "member_shard": "docs/dev/evidence/sqx145/members/217/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/StrategyConfig/StrategyConfigServlet.class",
+      "occurrence": 0,
+      "sha256": "e4f3260a867b7a2950dfd838d814423ae4685041ba26ea6b34fca3f7f8600854",
+      "member_shard": "docs/dev/evidence/sqx145/members/217/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/217/001.json",
+      "sha256": "591f5f35498fbc68b9e94054c45e81ba00ea16843fd35b35ba2f0f9a80da86cb"
+    }
+  ]
+}

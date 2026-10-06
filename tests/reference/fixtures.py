@@ -85,7 +85,7 @@ class FixtureSet(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
     schema_version: int = Field(strict=True, ge=1, le=1)
-    reference_cohort: Literal["144.2953"]
+    reference_cohort: Literal["145-dev1"]
     runtime_status: Literal["unavailable"]
     cases: list[ReferenceFixture]
 

@@ -1,7 +1,7 @@
 # Dukascopy UI
 
 This React plugin is a structural traceability pilot for
-`SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy`. The target root is
+`SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy`. The target root is
 `HARUQUANTAI_ROOT/ui/app/plugins/data_source/Dukascopy`.
 
 ## Feature registry
@@ -84,3 +84,7 @@ The canonical reimplementation ledger/schema are absent; this manifest does not
 replace them or claim ledger-schema validation. Current donor runtime parity has
 not been independently established. Review this pilot's walkthrough before
 authorizing equivalent work in other plugins; inventory each plugin independently.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

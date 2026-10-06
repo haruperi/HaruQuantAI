@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletStrategy/ServletStrategy.jar",
+  "archive_sha256": "ad58850406ffb2bcdf01773459b48bae65a95737a30d023f0442f7fb35bbb5e6",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy.class",
+      "occurrence": 0,
+      "sha256": "a16a8ea83c68e4d7e168aff738903a0e46096de36a70f50839ca708076b2d33f",
+      "name": "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/StrategyBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "Initialize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e86d02ada220c836468d6dfed7a0871e31e5bf35ff8715880b12065d5334f394",
+          "code_length": 42,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "callOnInit",
+          "descriptor": "(Lcom/strategyquant/tradinglib/engine/TradingSetup;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getATRValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartData;II)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet.class",
+      "occurrence": 0,
+      "sha256": "b4ef6c5bfc2889c994a5ed4d99cb9325d87d83dac8e453bc89b7f3d23854bab9",
+      "name": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "tradingEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/engine/TradingEngine;",
+          "access": 2
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9eaff76a39097469859cc33b64d010b476a9da42213ea5d542d74489c83aae9e",
+          "code_length": 16
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet;",
+          "access": 9,
+          "code_sha256": "afc8b9abcd858ca2fc039be08ff5a581a15c5fd9f66677daf2e27856f79770b9",
+          "code_length": 4
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "62ece163e40987ed7e8664f16f9bf320ac3bc80ca3a406abe631d8560614b6fb",
+          "code_length": 215
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0b1cd348ed857c8e98009c21551e0df4fdb624853fe17037bae3e5fa9bb5fd1e",
+          "code_length": 119
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a173f90cd5d148abf793323ac53fd6c5ee12ded65600357353f3b89d26708ddb",
+          "code_length": 208
+        },
+        {
+          "name": "onRemove",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8d6ac7b030341febc22606c33e31319ca915da761ea96c8d033ef2cd65dc124d",
+          "code_length": 102
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bae6642d63e1c17ebabaaa76194f1dfa5351e5d47a22857514dbf256cd77bb14",
+          "code_length": 137
+        },
+        {
+          "name": "onStop",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8fc970e77a270fcaa9b80f845e7f27cc2acae168723e7f6c13ef042c740dc187",
+          "code_length": 137
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "52713130c4e24f605e510929c0fb48a6849c8127c9032f3dc71cc24f33723688",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/BackloadType",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Servlet/impl/Strategy/MyStrategy",
+        "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/engine/TradingEngine",
+        "com/strategyquant/tradinglib/engine/TradingSetup",
+        "com/strategyquant/tradinglib/engine/TradingSetupStatus",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "3e7f99857d68dabb2c0a580fb5ac58aa961bd73149862ba94cf6742a1db60ba0",
+      "name": "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "strategyContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServlet",
+        "com/strategyquant/plugin/Servlet/impl/Strategy/StrategyServletPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

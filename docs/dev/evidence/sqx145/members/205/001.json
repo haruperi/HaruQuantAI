@@ -1,0 +1,1121 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+  "archive_sha256": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfilePlugin.class",
+      "occurrence": 0,
+      "sha256": "23d3bf9c8a83984b2a2ebadea7d63ad6b8bb01b26ecd3b07b12a3827978fcee3",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfilePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "8687567a651c3e3405404a832cc0094c5d49374122f7542d6094e8cfa82c4262",
+          "code_length": 13,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "64afbfe5f4d61b6b75cd2a8a561856b2b1be2e4c2468e68d905dd2625889898a",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfilePlugin",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet.class",
+      "occurrence": 0,
+      "sha256": "09792daa1bd284c93a31d0dbe88168da1548ae060d11a65b370dbb21a2031b49",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_OPTPROFSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 2
+        },
+        {
+          "name": "columnValues",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        },
+        {
+          "name": "optimization3d",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart;",
+          "access": 2
+        },
+        {
+          "name": "optimization2d",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart;",
+          "access": 2
+        },
+        {
+          "name": "optimizationScatter",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart;",
+          "access": 2
+        },
+        {
+          "name": "resultsViews",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews;",
+          "access": 2
+        },
+        {
+          "name": "results",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "fe87b81c4d5c3bfec91d03f37ace8f5d37182e1d941b974ffec74397806fcdfa",
+          "code_length": 106
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "94d0fd3f34befde0d328bc47d4a98f5969ed18d37810eea5e19815f60dcf17c0",
+          "code_length": 254,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bef7542e171e132c09670bdb6940e195315b13cee3cd45ab0764a9006d5de259",
+          "code_length": 297,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetAvailableParams",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f53d27a7b420d209ea3634dd794a8224849597c8d6e204c9fc289c5241b86044",
+          "code_length": 354,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getColumnValues",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 34,
+          "code_sha256": "2d927be785827dff89fc0a314fc282c067f1d7e9a5e39cb573e1319b5c116bda",
+          "code_length": 107
+        },
+        {
+          "name": "onPrintChart",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3c23dfaf4d5ce5a77b297abc40b927da3606f7e16dcae857375389b2d616f66d",
+          "code_length": 310,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrintResults",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9226b864c681cc327a2dc0f68df45ce6d76edfc7a6c43bd058af82d2a534ed37",
+          "code_length": 239,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onExport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9e269627894d5af7196600995da97da91f96febf4cc64739d5a92f4ac15d8317",
+          "code_length": 299,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c45e227669dc5e228e773c91a80cb879ebdd0aa926f512ad3b9d781b76860de7",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/optimization/OptProfileChecksLevels",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart.class",
+      "occurrence": 0,
+      "sha256": "d72098007c64ad1c5fc606728b3084af665028a36324b60effbedf554fac7b52",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "81f33ae4e8071bb1882a11f91e607be6fdf263418a8c7ba790a1214f0aede95a",
+          "code_length": 470,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2066106931000bcd9f1f09646b096870480b0166bf86af4b6d25a8bfd31fba49",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart",
+        "com/strategyquant/tradinglib/BarChart",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "it/unimi/dsi/fastutil/doubles/DoubleArrayList",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Collections",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1.class",
+      "occurrence": 0,
+      "sha256": "617639c27154e5a6e451f264568376a8e826b7c2aff9dfd8d5785fe82049b0b3",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group.class",
+      "occurrence": 0,
+      "sha256": "fac0e6e17f610c68cabc345abd9e0b219b7c0279ddd75a6c3a9c3ca8a5d18906",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "COUNT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "zvalues",
+          "descriptor": "[D",
+          "access": 1
+        },
+        {
+          "name": "params",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart;)V",
+          "access": 2,
+          "code_sha256": "36af080a96e887e74daf5f4495b17957aaf7173e4111749e12f2edf5f42d5253",
+          "code_length": 30
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Double;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "072dce0d1d8b9f6dde4da683432f327b575d623386621c967b0cd5093702d512",
+          "code_length": 178
+        },
+        {
+          "name": "getMaxIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6b705ce018b73bbe9a3c9e227cbe8c339529761979bdeb0473d52818a31a345b",
+          "code_length": 38
+        },
+        {
+          "name": "getMinIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "36ce2ff0180d909377add723f47d32775b99b85404c140798237d97ee55a6bc1",
+          "code_length": 38
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "50b8d62292d8fb5838b500fa2afc0edc92b90321645c9d7d4d73fedcd1e8fa48",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart;Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group",
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart.class",
+      "occurrence": 0,
+      "sha256": "1161c627a524c70324324a1957e0c0b484f3422412d1b9d8f9ff6d42b1241fd9",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "d491b0ab6d54ff663b463c72dfb63c3cf8c8e0c616fed4c28da35b9721c4351d",
+          "code_length": 983,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "has3DData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "a2dd9481c65afe62a05fb3d6ae2e3edf9ab31169fd148a5c4249a2252cf6bc33",
+          "code_length": 31
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4c142625b71469d3b554b7036f6f3ce74d5d6d3bf4f68a7d154de16cd1304fd6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[[Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group;",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "it/unimi/dsi/fastutil/doubles/DoubleArrayList",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Collections",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart.class",
+      "occurrence": 0,
+      "sha256": "8872cbd60e6470f3e3bc0f7eaa64f556abec75919f69d00d402a11b386e70c23",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "90cd9447189e8b1991050ef52823b5e39632d7870f64d2bdd8c7573c451c9f89",
+          "code_length": 166,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "895ca7e38e636406c8635e04b9e29f7ed0a14882622ad605c381470b42c3776d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/ScatterChart",
+        "com/strategyquant/tradinglib/charts/linechart/series/XYSeries",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness.class",
+      "occurrence": 0,
+      "sha256": "b3649ebd9f9def3e34cbd306b0514e661cd14aed82b5fa3492a999e6460c7edc",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lcom/strategyquant/tradinglib/optimization/OptimizationTestResult;Lcom/strategyquant/tradinglib/optimization/OptimizationTestResult;)I",
+          "access": 1,
+          "code_sha256": "0e24852b4d0229a1aed6df924b59efae0586d8887240cefca829a6e0a5cd9a58",
+          "code_length": 50
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "71ad83f342ca303a1b7d49d39887c4cbead84bc8a3167e423240d712ee921534",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lcom/strategyquant/tradinglib/optimization/OptimizationTestResult;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults.class",
+      "occurrence": 0,
+      "sha256": "0fa787cd803a255e00d7e20b6825d3cc1b0c2b4a9cea7458e490494b66174540",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "afc91857a87331cf664a8399c92429ee0299edd642c43f448bbe8e1b1a403e4c",
+          "code_length": 102
+        },
+        {
+          "name": "printRow",
+          "descriptor": "(Lcom/strategyquant/tradinglib/optimization/OptimizationTestResult;Lcom/strategyquant/tradinglib/databank/DatabankTableView;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "941df1a8797c17788f006da2e9f2094f5aecea27212a08c172cc87827654f864",
+          "code_length": 291
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport.class",
+      "occurrence": 0,
+      "sha256": "36acd06f6edb151e1fd64c3ade638edaf1ec5c08f0209899a0bd152ebe9f652e",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toXlsx",
+          "descriptor": "(Ljava/lang/String;ZLcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)V",
+          "access": 1,
+          "code_sha256": "ee980cd226e4f6fc5da18ec621ae0ac5156449f5607206c893d6b30646f796d5",
+          "code_length": 867
+        },
+        {
+          "name": "toCsv",
+          "descriptor": "(Ljava/lang/String;ZLcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)V",
+          "access": 1,
+          "code_sha256": "1457b8fdfe6c6ca43f7003c0e2aad5fb7bccdc10b63266f6311b50a63851431a",
+          "code_length": 645
+        },
+        {
+          "name": "formatValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/databank/DatabankTableColumnEntry;Ljava/lang/String;Z)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4fb556a25cdaca8078b1a044cb5137414ca1ed366ee7517d7bf0f2ac1f319599",
+          "code_length": 149
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "539b101a44b9ae3a5cf0696a7744a036195a235f522b767ea3f46f3b7f832021",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationTestResult",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/io/FileOutputStream",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "org/apache/poi/ss/usermodel/Cell",
+        "org/apache/poi/ss/usermodel/CellStyle",
+        "org/apache/poi/ss/usermodel/Font",
+        "org/apache/poi/ss/usermodel/IndexedColors",
+        "org/apache/poi/ss/usermodel/Row",
+        "org/apache/poi/ss/usermodel/Sheet",
+        "org/apache/poi/ss/usermodel/Workbook",
+        "org/apache/poi/xssf/usermodel/XSSFWorkbook",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews.class",
+      "occurrence": 0,
+      "sha256": "8a9f8e78ae444c52cdc31ebbe7a8d2570473989643a0a41706c89b0c8fee7a83",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "manager",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cf1aabe1e7cdf31c3983732c0a00731725cfddf245690b50addf202cd1fa2928",
+          "code_length": 17
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2f46780d2503a2c31af23ce9b92e1fb1b164191057f89757771df01b214dfc16",
+          "code_length": 232,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetColumns",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "79ef22b173466c6bc3adc237380bc258b9bafb23148f3d533c23e6c34fab569f",
+          "code_length": 130
+        },
+        {
+          "name": "onGetViews",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5132707f244596325b49498bb2227083515bcc0a93f620a3b331d9ababc79dc8",
+          "code_length": 322,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAddView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "640f0e1a64fef6ab82ec09d8d5ee9aa384f020a3fde218762b68d63de0f80ed6",
+          "code_length": 69,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "eebd50ba309dc2bad1486b2b9d5ba2560c72907587e8dd87262707f53595f497",
+          "code_length": 70,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2b40daf7a5ce1e6120010eca805cbc205edeab72432991fb0d39fd96032904d3",
+          "code_length": 69,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "tryGetParam",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "27ca9ee36a016dc094437bc8e35d835e2ace534fa866296b3adeff53fb2f2a5c",
+          "code_length": 42,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)[Ljava/lang/String;"
+        },
+        {
+          "name": "getViewByName",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "69f5ad4db13a5bde94d181598e06affbeceb6e6be35f3d8a8a3de1a1ae53e9c2",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f20122aecc879d5053599fbbfc6e2c40f6c5998ff41bd1888a8179a53a1a335b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager.class",
+      "occurrence": 0,
+      "sha256": "710bfc57d843baf8e4250330a3ddccdd55a5e059e2e35b73614b4976a1258635",
+      "name": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "views",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "viewsFolder",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "fileExtension",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "SettingsKey",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e07ab1b1f92b4e9a89b2e8aceda402411cc80db24050296738feb6676515df3e",
+          "code_length": 31
+        },
+        {
+          "name": "loadViews",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7dae10e9883cf93091e725a77f38d318b8320601ed31d4ac58a5be20c2f01658",
+          "code_length": 136
+        },
+        {
+          "name": "getViews",
+          "descriptor": "()Ljava/util/HashMap;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "getView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "94e0631cbc49971290aac084d2af094152c82226be3210f507eb55dac2b6136e",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "addView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "47ed313e8d27140f718175371294b61188d9ab04d632c4e5471c8f42d9850fed",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_addView",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 2,
+          "code_sha256": "62b069849a66b164881276d5977a1f8f6353e4232a7f82b5409baf894be70434",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "1edbded30c3d41d0c73828cc8b4b1c55f1dacf96a86cf675c68926fdb54e9b7c",
+          "code_length": 166,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "removeView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c5f2a90dd6df9a569c2fed389b12d7830767a94e3ae79f8836d1778ff4e4f0f5",
+          "code_length": 89,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createDefaultView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "0b4fe1f78937fe35fe3cf6dbeee758b0a393685dfb8f02390b46313ff5dc8c20",
+          "code_length": 208
+        },
+        {
+          "name": "getTableView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 2,
+          "code_sha256": "7d38358c24e3c2f884a916e3f39aaf5f21a99fb550c6c411b9f812fb6bbdafcb",
+          "code_length": 23,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getViewFilePath",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2f1c04df312adca4c28c0cecb6223db9133d9a81abdbf91a5ca57deb13c2da7e",
+          "code_length": 38
+        },
+        {
+          "name": "getSelectedView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "a1a80004ea878d955881794eb1e355337b7c4817255d21eea17d0b3af3cddfad",
+          "code_length": 53
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2cfaae21082787ec978b9e3150634ac49d4fc5b62cccf3c624d7a427bcd88bb2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultTypes",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/io/File",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

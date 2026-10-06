@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ConnectionLiveTest/ConnectionLiveTest.jar",
+  "sha256": "9285422ca69b69efe92f72954b2c5e8f938ec4879f9b5b42819faa128b9c9bfe",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnection$1.class": "5ea3180e4769ec36e3ac879bcf993be6fa2f338a1d461f6b6f8e0683ee5c104a",
+    "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnection.class": "93c3b747806985bcc5d1e772f7066e2726d484b892c2e140f9335d84203b79c9",
+    "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnectionPlugin.class": "f2f8e71f1b3e6dae07633feb1e688029eb33b8f50d0631519fbc4e98e5d87f87"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnection$1.class",
+      "occurrence": 0,
+      "sha256": "5ea3180e4769ec36e3ac879bcf993be6fa2f338a1d461f6b6f8e0683ee5c104a",
+      "member_shard": "docs/dev/evidence/sqx145/members/144/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnection.class",
+      "occurrence": 0,
+      "sha256": "93c3b747806985bcc5d1e772f7066e2726d484b892c2e140f9335d84203b79c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/144/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/LiveTest/LiveTestConnectionPlugin.class",
+      "occurrence": 0,
+      "sha256": "f2f8e71f1b3e6dae07633feb1e688029eb33b8f50d0631519fbc4e98e5d87f87",
+      "member_shard": "docs/dev/evidence/sqx145/members/144/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/144/001.json",
+      "sha256": "157ec8b4a7bb8eba544a77f3e4826b22cb6743e6006c69b9ae570b1a04b3702f"
+    }
+  ]
+}

@@ -1,100 +1,123 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only portfolio/merge bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge",
-    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
-    "review":  {
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan",
-                   "version":  1
-               },
-    "owner":  {
-                  "domain":  "plugins/databank",
-                  "feature":  "FEAT-UI-DATABANK_BUILDER",
-                  "decision":  "DEC-UI-DATABANK-PORTFOLIO-MERGE-STRUCTURAL-OWNERSHIP",
-                  "requirements":  [
-                                       "FR-UI-DATABANK-source-mapping",
-                                       "FR-UI-DATABANK-workflow-preservation",
-                                       "FR-UI-DATABANK-clean-room"
-                                   ]
-              },
-    "clean_room":  {
-                       "paraphrased_behavior_only":  true,
-                       "contains_personal_data":  false,
-                       "contains_sensitive_data":  false,
-                       "contains_proprietary_source":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultsdatabankactions-portfolio-merge-ui",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge",
-                               "family":  "bounded installed portfolio composition-action frontend artifacts"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-merge-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/mergeStrategiesPopup.html",
-                        "relative_path":  "mergeStrategiesPopup.html",
-                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from current responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "e23e75d17caed8bb2f6a66403ab901e208ebeabe33e1b1b163595d804a93a2c2",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No existing databank merge dialog/configuration controls; current action remains a deferred notice."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-merge-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/MergeStrategiesPopupCtrl.js",
-                        "relative_path":  "MergeStrategiesPopupCtrl.js",
-                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from current responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "762616816d1f4c355cc4639bb8262be1baa200e532586b4badbf83f84a2297b5",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No existing merge popup state, progress or backend invocation to relocate; no quantitative merging authorized."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-merge-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target menu/deferred-dispatch counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "11c41c64cb4ab5e9c601eb5034606f773c39996ca84ec21437c0fe85e855aa7f",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing action remains a generic deferred notice, without donor guards/selection semantics/backend execution; no runtime parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-merge-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/styles.css",
-                        "relative_path":  "styles.css",
-                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from current responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "26e14e11096a47fbe778175e6d792ab55cf8ad45b11e4ad6c07171dfe153de49",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No current merge-popup styling; generic shared menu styling is retained elsewhere."
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Bounded structural manifest, not behavioral ledger."
-                        }
-                    ],
-    "limitations":  [
-                        "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity claims.",
-                        "Action only sends its existing deferred label; no selection/running guard, dialog, portfolio mutation or quantitative algorithm.",
-                        "Coordinator parent aggregation/consumer/registry integration pending."
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only portfolio/merge bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-PORTFOLIO-MERGE-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-portfolio-merge-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge",
+      "family": "bounded installed portfolio composition-action frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-portfolio-merge-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/mergeStrategiesPopup.html",
+      "relative_path": "mergeStrategiesPopup.html",
+      "location": "whole-file structural identity and scoped menu/dispatch responsibility",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from current responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "4acb7efcfbee434b50e32ac962c18a0837e0bc2325e4d55fbeafbda4099244ef",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing databank merge dialog/configuration controls; current action remains a deferred notice. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-portfolio-merge-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/MergeStrategiesPopupCtrl.js",
+      "relative_path": "MergeStrategiesPopupCtrl.js",
+      "location": "whole-file structural identity and scoped menu/dispatch responsibility",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from current responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "bd10bdd46f4f0d70b1ad40d0f62ad6cbcfc4aa0b69c804859b7aace3b902ca9c",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing merge popup state, progress or backend invocation to relocate; no quantitative merging authorized. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-portfolio-merge-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity and scoped menu/dispatch responsibility",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target menu/deferred-dispatch counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "2eb9e0c95583005e27c184daff06cafbda32c7708cf7185cbe664a4ab5bda8b3",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing action remains a generic deferred notice, without donor guards/selection semantics/backend execution; no runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-portfolio-merge-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/merge/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity and scoped menu/dispatch responsibility",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from current responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "9003b57b2e049e632a61340aeb10592ee71851eb41b5e581619abfb5ab044d55",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No current merge-popup styling; generic shared menu styling is retained elsewhere. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger."
+    }
+  ],
+  "limitations": [
+    "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity claims.",
+    "Action only sends its existing deferred label; no selection/running guard, dialog, portfolio mutation or quantitative algorithm.",
+    "Coordinator parent aggregation/consumer/registry integration pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

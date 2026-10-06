@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppPortfolioComposer/AppPortfolioComposer.jar",
+  "sha256": "957b37bd0dcc9f84697533357b937708dc0cfae067fda658855620a2b0ea27c4",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/PortfolioComposer/PortfolioComposerAppPlugin.class": "ed58f5017d77b0169d129a83f98c92e24f7fc4cb6c66e80d7245b213e51e7e9b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/PortfolioComposer/PortfolioComposerAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "ed58f5017d77b0169d129a83f98c92e24f7fc4cb6c66e80d7245b213e51e7e9b",
+      "member_shard": "docs/dev/evidence/sqx145/members/133/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/133/001.json",
+      "sha256": "2fd3da1e4b72a0a1d9545091d12eccf0c1f6b88e9d75fc4df496f320d3ee2dfe"
+    }
+  ]
+}

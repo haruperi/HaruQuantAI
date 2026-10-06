@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFiles.jar",
+  "archive_sha256": "e2d006dc4011cf1915f610add048c56d73cfcd4843b8f9a72accefb1339bcf7b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/LoadFromFiles/SettingsLoadFromFiles.class",
+      "occurrence": 0,
+      "sha256": "5e38eae735916aaefbe44cfff386bad793835eb2062e621fc36144a1d30979f2",
+      "name": "com/strategyquant/plugin/Settings/impl/LoadFromFiles/SettingsLoadFromFiles",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin"
+      ],
+      "fields": [
+        {
+          "name": "tabTitle",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "69de8ab51a559f830f2e3707381f883aa69e57ff3edd6029c4d3f9b5d4b01543",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "ac678c71b572eff5b1717cd3b3c9e387372c19104cc780bdadfe402b6e250ae1",
+          "code_length": 266
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bc3150c8c51165b460de81d6167b9a191f5c1cfda8209c0e745e5c1980fe44fb",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e15e90bf7dc7bf0e420565b5fbb661a0988f52d219a9094da0cf37bfb79c853f",
+          "code_length": 6
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Settings/impl/LoadFromFiles/SettingsLoadFromFiles",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/io/File",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/jdom2/Element"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,483 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jackson-datatype-jsr310-2.21.1.jar",
+  "sha256": "4d63378b0a6b53733f086ebd301023ba211b9387e417bd584a5400320cd08b8d",
+  "class_count": 65,
+  "unique_class_entries": 65,
+  "resource_count": 6,
+  "duplicate_entries": [],
+  "classes": {
+    "com/fasterxml/jackson/datatype/jsr310/DecimalUtils.class": "13eaf8c2f74b742ea6f02110f91b83f3bcbf6473fbc1bc3ab7509c5b9a738c1f",
+    "com/fasterxml/jackson/datatype/jsr310/JSR310Module$1.class": "96e2fba639a25fbdeb9f2dacc3f2e2daeda0801be95fe24985a3a53d98d5ffc5",
+    "com/fasterxml/jackson/datatype/jsr310/JSR310Module.class": "76662e119805350e15219c313c1a4191a023273f3fda8ea9885aff8d2022062c",
+    "com/fasterxml/jackson/datatype/jsr310/JavaTimeFeature.class": "51ff5307d24eee9e43b9eb90b2ebe3c2f8950a5c8090388dc133f2c56a8cffbe",
+    "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule$1.class": "1c09927ae931a8e611caa139e43fb73b1325a014537fdf91ebd61e0ba07348a0",
+    "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule$JavaTimeSerializers.class": "dfd54e51b852df73c286edbc98dc9283950271439a82315f87098b77ed0b074b",
+    "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule.class": "14070aae97905fedff705f0ed7888c6cf400a33724376b6e5ceb050a03a28424",
+    "com/fasterxml/jackson/datatype/jsr310/PackageVersion.class": "cfbdbd166e8180873706e03d4828f3a0d92760ef18f17f547ab53789233a7944",
+    "com/fasterxml/jackson/datatype/jsr310/deser/DurationDeserializer.class": "c0ede10e4450e27875de77decf1f062ff65bc6a0b68c5b258320e1d4dffffeec",
+    "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer$FromDecimalArguments.class": "a867826c52d378860c62dce50d6fb0eadbe9c43e53a1aeded1b99726ef71cbe6",
+    "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer$FromIntegerArguments.class": "a96ded7d6d09c96cc7d38b774598c74969081c5164756aa80e9ae396ecfb736a",
+    "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer.class": "3f26b05f961acd924430c8b8c8a5068ecc4770ba3538ded429fff41030f943e4",
+    "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DateTimeDeserializerBase.class": "92f9936827e1bb4bf4742c3ca4602d2d586a1e1421e1a91e31c2fca95441f269",
+    "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DeserializerBase$1.class": "4cbebe14ac5768afe6bb089055f0b2e30801c97ea8fc1dfd119104e88ad29f07",
+    "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DeserializerBase.class": "70e88dde0583c13c054fd17e878f098bd520391816badfb50caa4e7edae12795",
+    "com/fasterxml/jackson/datatype/jsr310/deser/JSR310StringParsableDeserializer.class": "d059efce71afe4aec4ab65290aaf65755088e2dd8c6edb0503c3d642ea2e8dcc",
+    "com/fasterxml/jackson/datatype/jsr310/deser/JavaTimeDeserializerModifier.class": "0179a15f40b9fec50adb087dea6b6310049ed6973000c0f17e3ec9567494855c",
+    "com/fasterxml/jackson/datatype/jsr310/deser/LocalDateDeserializer.class": "7fb393a7f6b588b36fae5d57f6fd6f7c9c0d46908c7f0626e63e033b3ba6662f",
+    "com/fasterxml/jackson/datatype/jsr310/deser/LocalDateTimeDeserializer.class": "abd2623fee70a0a733ec27e3bc4c9092d08f9953a80b5b8589338c716938ebc8",
+    "com/fasterxml/jackson/datatype/jsr310/deser/LocalTimeDeserializer.class": "f0e426fb2be03306d16a8ec6e05b94a646eb097b186390412e1e7e775a90678a",
+    "com/fasterxml/jackson/datatype/jsr310/deser/MonthDayDeserializer.class": "07af6b98047ff5f3220a5cde1c4e2044e6d403310626e70c7ed042a8cdee49a0",
+    "com/fasterxml/jackson/datatype/jsr310/deser/OffsetTimeDeserializer.class": "915bccefa776b0d932ff4876011d8845ea4e701879c9549b291e25b7e1ccc600",
+    "com/fasterxml/jackson/datatype/jsr310/deser/OneBasedMonthDeserializer$1.class": "6ccd28150714180b1e32b809971ba07e5a85681ef529857503bc360167efdef3",
+    "com/fasterxml/jackson/datatype/jsr310/deser/OneBasedMonthDeserializer.class": "810cdb86920b77744e662c2427f8de49a9f98c99f7aab012251910a9408438f5",
+    "com/fasterxml/jackson/datatype/jsr310/deser/YearDeserializer.class": "2863dd6909143ce561acc09020037ea2e4d5b24aecae363f9148715b8a6d00c9",
+    "com/fasterxml/jackson/datatype/jsr310/deser/YearMonthDeserializer.class": "fface676be91d14a3e5f9a45f0ab5090bcba578b72e6d02f8740bdda26d559a2",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/DurationKeyDeserializer.class": "c4a894de75c960984cce5460c3766ced1694a3c170fd731b16a3dd3cbcae61b5",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/InstantKeyDeserializer.class": "eccece046fdd6346cdfc78fd2973e1461e0d07742236ff329508a1aa349f85ee",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/Jsr310KeyDeserializer.class": "d471924a93499f791b12b6e7a42b8e4fd96213287471b8fa4a04f7cd2a1a9b4a",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalDateKeyDeserializer.class": "aa7a26161aea89177f0cd907c9cc28974212f72407a50bccd25b699728ec391e",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalDateTimeKeyDeserializer.class": "32e04095bd011853fb0c57c3be8fdb25d8c92ae08dca4f7ae87826af365b632b",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalTimeKeyDeserializer.class": "226b68648978b0f2634e5ed53794f8291b5c45926b64c213c4d0c70416db0d93",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/MonthDayKeyDeserializer.class": "e5bcd3889dc2f3bd830709711bf0d3cb8d70788335c1eb06b67fb989dfa6cfb0",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/OffsetDateTimeKeyDeserializer.class": "bb17adbb3e25e2ced78ab8c11b8300c02fe2f174a344907379481b7eb21f1f9d",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/OffsetTimeKeyDeserializer.class": "bd7bbd3fc8e342a8817944ab6afaca8f04576736d6c8f3603e625c867b861cf4",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/PeriodKeyDeserializer.class": "b6852b98972c0d71e42c69e388486c25ef5dc4d019fca0b8e900a2bd6e6ffd0f",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/YearKeyDeserializer.class": "e66c0f86d70488702defceb8eef79971b3dd9eb0dc18f67c8eaad314166da926",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/YearMonthKeyDeserializer.class": "87246dd01167676fd4c7200ba8e2eea7db4ca682658fbcc7f5036c9b9ee93a91",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/YearMothKeyDeserializer.class": "f70b80a7e786e6de14b15a32cf00d270fddfcf01d41a3973bfd931903b899c8b",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/ZoneIdKeyDeserializer.class": "71cd7e4674138ad634c794ae6ccc72663dfda08c3f34a77b4b94033ccfb4b196",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/ZoneOffsetKeyDeserializer.class": "dfa96ff835659ddbc7c7360f5480c5b543e0d3c261e8ddcf0404738f315bbbb1",
+    "com/fasterxml/jackson/datatype/jsr310/deser/key/ZonedDateTimeKeyDeserializer.class": "423e2c455b6e42c77cb7151942bcc369045654fb2860d02fc2814f106c865533",
+    "com/fasterxml/jackson/datatype/jsr310/ser/DurationSerializer.class": "261e780a00d19c8bb3425dd163100dad66d91371763e33fa6e07a9ebf1d66e2e",
+    "com/fasterxml/jackson/datatype/jsr310/ser/InstantSerializer.class": "8b0bdf3be2d0162778cfe7bf71299eff696e95540a65f91f965e79bfaf35765c",
+    "com/fasterxml/jackson/datatype/jsr310/ser/InstantSerializerBase.class": "082ef4ee078e7d904e9446790a24222eed1822ace9626cff32c77e26db7131fd",
+    "com/fasterxml/jackson/datatype/jsr310/ser/JSR310FormattedSerializerBase.class": "79b1ae3f77cfdeda88918572c9c7cac06490a47e4b0e8e36c9bdfa6b8857053a",
+    "com/fasterxml/jackson/datatype/jsr310/ser/JSR310SerializerBase.class": "62c89046efe85d3612cb841a3636958f000c315087650e691290fd13d4e12ca9",
+    "com/fasterxml/jackson/datatype/jsr310/ser/JavaTimeSerializerModifier.class": "05d0a9f6db010855fdd9d90bb5dbf2812c1acd8db225bf5440b5825ab53f8de2",
+    "com/fasterxml/jackson/datatype/jsr310/ser/LocalDateSerializer.class": "211387ee7550005cc8c4797020cffffb66238bf55f2363a9b3ba61e72b62b653",
+    "com/fasterxml/jackson/datatype/jsr310/ser/LocalDateTimeSerializer.class": "5657a3296f78f45b714bb079fe63e8adcf3c6ad3fef6cb1331eb15d17d327a3b",
+    "com/fasterxml/jackson/datatype/jsr310/ser/LocalTimeSerializer.class": "ebbe53f58f4b31a26eb7e90d9f63f5a04ca24c01eaf8c47c690dd2422e1de230",
+    "com/fasterxml/jackson/datatype/jsr310/ser/MonthDaySerializer.class": "95ca5083bcce504d7bf9e92a741363a26c3d3aa0e41550ebc623c2b906a9ef9b",
+    "com/fasterxml/jackson/datatype/jsr310/ser/OffsetDateTimeSerializer.class": "18b81b360ca4d48c9123d7d7e5fabf7d65c3ce17943fa043ffed21b5517b44ac",
+    "com/fasterxml/jackson/datatype/jsr310/ser/OffsetTimeSerializer.class": "68ee3a3979fe2f67682114394bd850c1e56ccc15b069c6f3b079e5d165f78379",
+    "com/fasterxml/jackson/datatype/jsr310/ser/OneBasedMonthSerializer.class": "eb0d60af5cac84d58285097d3fdf85d24dd7446cb3c8636844f71112afd89e71",
+    "com/fasterxml/jackson/datatype/jsr310/ser/YearMonthSerializer.class": "2a307c350011e22aab3631bee75d36a276dabab7844f0e9760137b94693d9f93",
+    "com/fasterxml/jackson/datatype/jsr310/ser/YearSerializer.class": "726fd1c21198e3ff3251c7ee712e208f5f7b80ff1187201152e14fe53aa0751d",
+    "com/fasterxml/jackson/datatype/jsr310/ser/ZoneIdSerializer.class": "5525d00cd12ee66089d18173c22603d6d3a166ea24daecfbd8ccff522de894a4",
+    "com/fasterxml/jackson/datatype/jsr310/ser/ZonedDateTimeSerializer.class": "44aee0e410cdcf5fb082eeed54d3c236ac062a633c5d2d59e07a7b0cb79b036d",
+    "com/fasterxml/jackson/datatype/jsr310/ser/ZonedDateTimeWithZoneIdSerializer.class": "6cba05e7df47b78b809672e0bd7a090d69c43da5affb527da28e786b0884d87a",
+    "com/fasterxml/jackson/datatype/jsr310/ser/key/Jsr310NullKeySerializer.class": "42b43eebf6c9ff00d55e93a622ff4d225bbd490365c630a707179bbede233db3",
+    "com/fasterxml/jackson/datatype/jsr310/ser/key/ZonedDateTimeKeySerializer.class": "6824629365430f4a9ffe30ca64f26555978d883ced159e4e10f40fbf5c4bbbec",
+    "com/fasterxml/jackson/datatype/jsr310/util/DurationUnitConverter$DurationSerialization.class": "f079586e595e5197bb0c4f24f8b73ea4ca8e56427cde66b42bbf78ad8e9dba8c",
+    "com/fasterxml/jackson/datatype/jsr310/util/DurationUnitConverter.class": "fe04c7523bcd8ec91f339f091dd8ab6a4a96d84ecdc147563ae108f7808ad0b6",
+    "META-INF/versions/9/module-info.class": "eb923548a9c08d5e8e5f8d4c796f8394419ce7c69d5cbb6f09f810af8c2d2f72"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "5980668957b146a722874597928b902db54ef2d1e3c3f0a2ec464abb791b11d9",
+    "META-INF/LICENSE": "66ea9c8987b1674aababbcc24f61c83ab4fb7baf3af1d701caf0a3aaea97fa92",
+    "META-INF/NOTICE": "7347397a0665f6898b32894a1869a514251abef7da7620902b0e57c5026cf1ed",
+    "META-INF/maven/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/pom.properties": "b9abd8fc0a0095804e5c3364192e7f1762f346f3cdaf80a061f69b91c259b0f2",
+    "META-INF/maven/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/pom.xml": "74c5ce8ca0ea08ef319d5a6ce62424dfd9cb93dadc01ef9817873fb7f6699bae",
+    "META-INF/services/com.fasterxml.jackson.databind.Module": "bc1898b537fe14b0e799be754c7d6c3b23b794a0a28c851591ebd0bba8b98061"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/DecimalUtils.class",
+      "occurrence": 0,
+      "sha256": "13eaf8c2f74b742ea6f02110f91b83f3bcbf6473fbc1bc3ab7509c5b9a738c1f",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JSR310Module$1.class",
+      "occurrence": 0,
+      "sha256": "96e2fba639a25fbdeb9f2dacc3f2e2daeda0801be95fe24985a3a53d98d5ffc5",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JSR310Module.class",
+      "occurrence": 0,
+      "sha256": "76662e119805350e15219c313c1a4191a023273f3fda8ea9885aff8d2022062c",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JavaTimeFeature.class",
+      "occurrence": 0,
+      "sha256": "51ff5307d24eee9e43b9eb90b2ebe3c2f8950a5c8090388dc133f2c56a8cffbe",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule$1.class",
+      "occurrence": 0,
+      "sha256": "1c09927ae931a8e611caa139e43fb73b1325a014537fdf91ebd61e0ba07348a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule$JavaTimeSerializers.class",
+      "occurrence": 0,
+      "sha256": "dfd54e51b852df73c286edbc98dc9283950271439a82315f87098b77ed0b074b",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/JavaTimeModule.class",
+      "occurrence": 0,
+      "sha256": "14070aae97905fedff705f0ed7888c6cf400a33724376b6e5ceb050a03a28424",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/PackageVersion.class",
+      "occurrence": 0,
+      "sha256": "cfbdbd166e8180873706e03d4828f3a0d92760ef18f17f547ab53789233a7944",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/DurationDeserializer.class",
+      "occurrence": 0,
+      "sha256": "c0ede10e4450e27875de77decf1f062ff65bc6a0b68c5b258320e1d4dffffeec",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer$FromDecimalArguments.class",
+      "occurrence": 0,
+      "sha256": "a867826c52d378860c62dce50d6fb0eadbe9c43e53a1aeded1b99726ef71cbe6",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer$FromIntegerArguments.class",
+      "occurrence": 0,
+      "sha256": "a96ded7d6d09c96cc7d38b774598c74969081c5164756aa80e9ae396ecfb736a",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/InstantDeserializer.class",
+      "occurrence": 0,
+      "sha256": "3f26b05f961acd924430c8b8c8a5068ecc4770ba3538ded429fff41030f943e4",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DateTimeDeserializerBase.class",
+      "occurrence": 0,
+      "sha256": "92f9936827e1bb4bf4742c3ca4602d2d586a1e1421e1a91e31c2fca95441f269",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DeserializerBase$1.class",
+      "occurrence": 0,
+      "sha256": "4cbebe14ac5768afe6bb089055f0b2e30801c97ea8fc1dfd119104e88ad29f07",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/JSR310DeserializerBase.class",
+      "occurrence": 0,
+      "sha256": "70e88dde0583c13c054fd17e878f098bd520391816badfb50caa4e7edae12795",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/JSR310StringParsableDeserializer.class",
+      "occurrence": 0,
+      "sha256": "d059efce71afe4aec4ab65290aaf65755088e2dd8c6edb0503c3d642ea2e8dcc",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/JavaTimeDeserializerModifier.class",
+      "occurrence": 0,
+      "sha256": "0179a15f40b9fec50adb087dea6b6310049ed6973000c0f17e3ec9567494855c",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/LocalDateDeserializer.class",
+      "occurrence": 0,
+      "sha256": "7fb393a7f6b588b36fae5d57f6fd6f7c9c0d46908c7f0626e63e033b3ba6662f",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/LocalDateTimeDeserializer.class",
+      "occurrence": 0,
+      "sha256": "abd2623fee70a0a733ec27e3bc4c9092d08f9953a80b5b8589338c716938ebc8",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/LocalTimeDeserializer.class",
+      "occurrence": 0,
+      "sha256": "f0e426fb2be03306d16a8ec6e05b94a646eb097b186390412e1e7e775a90678a",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/MonthDayDeserializer.class",
+      "occurrence": 0,
+      "sha256": "07af6b98047ff5f3220a5cde1c4e2044e6d403310626e70c7ed042a8cdee49a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/OffsetTimeDeserializer.class",
+      "occurrence": 0,
+      "sha256": "915bccefa776b0d932ff4876011d8845ea4e701879c9549b291e25b7e1ccc600",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/OneBasedMonthDeserializer$1.class",
+      "occurrence": 0,
+      "sha256": "6ccd28150714180b1e32b809971ba07e5a85681ef529857503bc360167efdef3",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/OneBasedMonthDeserializer.class",
+      "occurrence": 0,
+      "sha256": "810cdb86920b77744e662c2427f8de49a9f98c99f7aab012251910a9408438f5",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/YearDeserializer.class",
+      "occurrence": 0,
+      "sha256": "2863dd6909143ce561acc09020037ea2e4d5b24aecae363f9148715b8a6d00c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/YearMonthDeserializer.class",
+      "occurrence": 0,
+      "sha256": "fface676be91d14a3e5f9a45f0ab5090bcba578b72e6d02f8740bdda26d559a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/DurationKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "c4a894de75c960984cce5460c3766ced1694a3c170fd731b16a3dd3cbcae61b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/InstantKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "eccece046fdd6346cdfc78fd2973e1461e0d07742236ff329508a1aa349f85ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/Jsr310KeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "d471924a93499f791b12b6e7a42b8e4fd96213287471b8fa4a04f7cd2a1a9b4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalDateKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "aa7a26161aea89177f0cd907c9cc28974212f72407a50bccd25b699728ec391e",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalDateTimeKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "32e04095bd011853fb0c57c3be8fdb25d8c92ae08dca4f7ae87826af365b632b",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/LocalTimeKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "226b68648978b0f2634e5ed53794f8291b5c45926b64c213c4d0c70416db0d93",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/MonthDayKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "e5bcd3889dc2f3bd830709711bf0d3cb8d70788335c1eb06b67fb989dfa6cfb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/OffsetDateTimeKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "bb17adbb3e25e2ced78ab8c11b8300c02fe2f174a344907379481b7eb21f1f9d",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/OffsetTimeKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "bd7bbd3fc8e342a8817944ab6afaca8f04576736d6c8f3603e625c867b861cf4",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/PeriodKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "b6852b98972c0d71e42c69e388486c25ef5dc4d019fca0b8e900a2bd6e6ffd0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/YearKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "e66c0f86d70488702defceb8eef79971b3dd9eb0dc18f67c8eaad314166da926",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/YearMonthKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "87246dd01167676fd4c7200ba8e2eea7db4ca682658fbcc7f5036c9b9ee93a91",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/YearMothKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "f70b80a7e786e6de14b15a32cf00d270fddfcf01d41a3973bfd931903b899c8b",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/ZoneIdKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "71cd7e4674138ad634c794ae6ccc72663dfda08c3f34a77b4b94033ccfb4b196",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/ZoneOffsetKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "dfa96ff835659ddbc7c7360f5480c5b543e0d3c261e8ddcf0404738f315bbbb1",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/deser/key/ZonedDateTimeKeyDeserializer.class",
+      "occurrence": 0,
+      "sha256": "423e2c455b6e42c77cb7151942bcc369045654fb2860d02fc2814f106c865533",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/DurationSerializer.class",
+      "occurrence": 0,
+      "sha256": "261e780a00d19c8bb3425dd163100dad66d91371763e33fa6e07a9ebf1d66e2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/InstantSerializer.class",
+      "occurrence": 0,
+      "sha256": "8b0bdf3be2d0162778cfe7bf71299eff696e95540a65f91f965e79bfaf35765c",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/InstantSerializerBase.class",
+      "occurrence": 0,
+      "sha256": "082ef4ee078e7d904e9446790a24222eed1822ace9626cff32c77e26db7131fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/JSR310FormattedSerializerBase.class",
+      "occurrence": 0,
+      "sha256": "79b1ae3f77cfdeda88918572c9c7cac06490a47e4b0e8e36c9bdfa6b8857053a",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/JSR310SerializerBase.class",
+      "occurrence": 0,
+      "sha256": "62c89046efe85d3612cb841a3636958f000c315087650e691290fd13d4e12ca9",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/JavaTimeSerializerModifier.class",
+      "occurrence": 0,
+      "sha256": "05d0a9f6db010855fdd9d90bb5dbf2812c1acd8db225bf5440b5825ab53f8de2",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/LocalDateSerializer.class",
+      "occurrence": 0,
+      "sha256": "211387ee7550005cc8c4797020cffffb66238bf55f2363a9b3ba61e72b62b653",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/LocalDateTimeSerializer.class",
+      "occurrence": 0,
+      "sha256": "5657a3296f78f45b714bb079fe63e8adcf3c6ad3fef6cb1331eb15d17d327a3b",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/LocalTimeSerializer.class",
+      "occurrence": 0,
+      "sha256": "ebbe53f58f4b31a26eb7e90d9f63f5a04ca24c01eaf8c47c690dd2422e1de230",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/MonthDaySerializer.class",
+      "occurrence": 0,
+      "sha256": "95ca5083bcce504d7bf9e92a741363a26c3d3aa0e41550ebc623c2b906a9ef9b",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/OffsetDateTimeSerializer.class",
+      "occurrence": 0,
+      "sha256": "18b81b360ca4d48c9123d7d7e5fabf7d65c3ce17943fa043ffed21b5517b44ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/OffsetTimeSerializer.class",
+      "occurrence": 0,
+      "sha256": "68ee3a3979fe2f67682114394bd850c1e56ccc15b069c6f3b079e5d165f78379",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/OneBasedMonthSerializer.class",
+      "occurrence": 0,
+      "sha256": "eb0d60af5cac84d58285097d3fdf85d24dd7446cb3c8636844f71112afd89e71",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/YearMonthSerializer.class",
+      "occurrence": 0,
+      "sha256": "2a307c350011e22aab3631bee75d36a276dabab7844f0e9760137b94693d9f93",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/YearSerializer.class",
+      "occurrence": 0,
+      "sha256": "726fd1c21198e3ff3251c7ee712e208f5f7b80ff1187201152e14fe53aa0751d",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/ZoneIdSerializer.class",
+      "occurrence": 0,
+      "sha256": "5525d00cd12ee66089d18173c22603d6d3a166ea24daecfbd8ccff522de894a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/ZonedDateTimeSerializer.class",
+      "occurrence": 0,
+      "sha256": "44aee0e410cdcf5fb082eeed54d3c236ac062a633c5d2d59e07a7b0cb79b036d",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/ZonedDateTimeWithZoneIdSerializer.class",
+      "occurrence": 0,
+      "sha256": "6cba05e7df47b78b809672e0bd7a090d69c43da5affb527da28e786b0884d87a",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/key/Jsr310NullKeySerializer.class",
+      "occurrence": 0,
+      "sha256": "42b43eebf6c9ff00d55e93a622ff4d225bbd490365c630a707179bbede233db3",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/ser/key/ZonedDateTimeKeySerializer.class",
+      "occurrence": 0,
+      "sha256": "6824629365430f4a9ffe30ca64f26555978d883ced159e4e10f40fbf5c4bbbec",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/util/DurationUnitConverter$DurationSerialization.class",
+      "occurrence": 0,
+      "sha256": "f079586e595e5197bb0c4f24f8b73ea4ca8e56427cde66b42bbf78ad8e9dba8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "com/fasterxml/jackson/datatype/jsr310/util/DurationUnitConverter.class",
+      "occurrence": 0,
+      "sha256": "fe04c7523bcd8ec91f339f091dd8ab6a4a96d84ecdc147563ae108f7808ad0b6",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "eb923548a9c08d5e8e5f8d4c796f8394419ce7c69d5cbb6f09f810af8c2d2f72",
+      "member_shard": "docs/dev/evidence/sqx145/members/046/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/046/001.json",
+      "sha256": "9bf8b914cfb5188e491a77fca1794f1ba2b7de0e83eb947af32e572bfb94e035"
+    }
+  ]
+}

@@ -1,0 +1,1698 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
+  "archive_sha256": "46998223c28fb3ddce99dcf44bb5009fef53a8c7df0d09889a455b4aac0a1e16",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1.class",
+      "occurrence": 0,
+      "sha256": "6ad46ad8e48f0dab87de700f12725650474339c9d157b67257c88e20c441e2f0",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog.class",
+      "occurrence": 0,
+      "sha256": "ee4194b8a321d48ff698ab7c3b328417c632dd5c2868c40804cea2f129305880",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tradesModified",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "b",
+          "descriptor": "Ljava/lang/StringBuilder;",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer;)V",
+          "access": 2,
+          "code_sha256": "c5058dd4c298e9778f4b276692fab78bf4a00c8b3c72832c58ab48ddde7c5028",
+          "code_length": 26
+        },
+        {
+          "name": "print",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "356d323de859a624064eae248c915159c1e7ed976874a6cd0b10927caae1688e",
+          "code_length": 28
+        },
+        {
+          "name": "tradesModified",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d88c55527a7597c7a9b0c3d74be7c65166560a36bd3c8552c44134c5bc3dcb3b",
+          "code_length": 6
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9ece0827297529ef77a83195f8a92f7b1a13e1944973702c53acb1a4598dfe97",
+          "code_length": 17
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0a8e7eca2dd982c902426e9e9ad8b918a660dc162f32f3aaa4264ce7524e7a5a",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer.class",
+      "occurrence": 0,
+      "sha256": "3fc074e30999df7908513aac001159773615a2f21539bca0279740d4e0ed562c",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "isRunning",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "recalculate",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;[Ljava/lang/Double;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1,
+          "code_sha256": "0675b14b72f71b7812e5d3170ef21df8ef787d096b05350fcbe004c059d1fa94",
+          "code_length": 4923,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "calculateExpectedShortfall",
+          "descriptor": "(DDD)D",
+          "access": 9,
+          "code_sha256": "5cce6b5f8174fc88cea234ef0ce705936ec9cca6ee6e3282a29d1ce1be5cb0df",
+          "code_length": 43
+        },
+        {
+          "name": "addProfit",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;JLjava/lang/String;DD)V",
+          "access": 9,
+          "code_sha256": "945846e10eae4a2400327b304dcf4b0eb5784672019010630920c861a748ce12",
+          "code_length": 206,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;JLjava/lang/String;DD)V"
+        },
+        {
+          "name": "calculateStandardDeviationLastNPeriods",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Ljava/lang/String;I)D",
+          "access": 9,
+          "code_sha256": "671e804080a99383cd51cbc6583c05755036646eda76092d09f409af55be7432",
+          "code_length": 424,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Ljava/lang/String;I)D"
+        },
+        {
+          "name": "getAverageProfitPercentage",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Ljava/lang/String;I)D",
+          "access": 9,
+          "code_sha256": "2e32ab22aa0a8f5293fde8ce696af3a68e4209129f8c00984fdadba0380e35d5",
+          "code_length": 310,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Ljava/lang/String;I)D"
+        },
+        {
+          "name": "getLastMarginUsed",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "fcdd7ce35de8ec4ec030e50583a8b4295162acb7185c1275932fb07d21635277",
+          "code_length": 102,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Ljava/lang/String;)D"
+        },
+        {
+          "name": "getAverageMarginUsed",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "712c7da5039f64ca3cb170b8ae7badb22407cfd03b091a1fbff105f3efdaa61d",
+          "code_length": 87,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Ljava/lang/String;)D"
+        },
+        {
+          "name": "getCorrelation",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Ljava/lang/String;Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "aa24b0228946ef24f7429620a4cda610e00dc949cc2fb916f310505931e4476c",
+          "code_length": 244,
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Ljava/util/Map<Ljava/lang/String;Ljava/lang/Double;>;>;Ljava/lang/String;Ljava/lang/String;)D"
+        },
+        {
+          "name": "updateMM",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;D)V",
+          "access": 2,
+          "code_sha256": "cff3af99555902dafdf98500c38449b48e8f91d4902b89f541e3784f40ab22b9",
+          "code_length": 154
+        },
+        {
+          "name": "updateHodlResults",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lit/unimi/dsi/fastutil/objects/ObjectArrayList;)V",
+          "access": 2,
+          "code_sha256": "d97f3cd476f1b08f07fd747a8b20a378ca9e5f681a2cc563ab97799fb3cb2b31",
+          "code_length": 344,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "modifyHodlOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;JJ)V",
+          "access": 2,
+          "code_sha256": "6ac1603af13966640aa9c1a5d151ddaaff94bf15b5882698e87769094e5eebad",
+          "code_length": 308,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "calculateMargin",
+          "descriptor": "(FDLcom/strategyquant/datalib/InstrumentInfo;)D",
+          "access": 2,
+          "code_sha256": "35244f38d876dd96928acec71f0de3377e4fed654ab5f0f528042945280ac7d3",
+          "code_length": 11
+        },
+        {
+          "name": "getInstrumentInfo",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/Order;)Lcom/strategyquant/datalib/InstrumentInfo;",
+          "access": 2,
+          "code_sha256": "17d43edd39e0ec4c5c37675f6f4f11705b3957d53aad22d70e2358a16fb2a874",
+          "code_length": 76,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "calculateUsedMargin",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Lit/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap;)D",
+          "access": 2,
+          "code_sha256": "e12769a0bdf448a58a583693aa0e96836e57accf27b601e3884f7b5ef76d3c25",
+          "code_length": 153,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Lcom/strategyquant/tradinglib/Order;>;>;Lit/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/ResultsGroup;>;)D"
+        },
+        {
+          "name": "printOpenTrades",
+          "descriptor": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog;Lit/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap;I)V",
+          "access": 2,
+          "code_sha256": "89f8b6ce1a2b6569a6d4453f56add571bc7f2dd68a0c77825712005e0c637b0d",
+          "code_length": 354,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Lcom/strategyquant/tradinglib/Order;>;>;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog;Lit/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/ResultsGroup;>;I)V"
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5aaf9b6fa83a40063f31176a8840eaf51e45f2ca12ee84e2090ab2233316ae9",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$getLastMarginUsed$0",
+          "descriptor": "(Ljava/lang/Long;Ljava/lang/Long;)I",
+          "access": 4106,
+          "code_sha256": "532acef7d04a032cf7388839eb819dbf582103ade0ebd210e2fffa38c9ef1bbf",
+          "code_length": 12
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ebf06ba2e55b567fb84de7ca3e449f4f89fd6f19a58489db8400e2344bd2d63f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[Ljava/lang/Double;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/IDataLoader",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$1",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer$DailyLog",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerLog",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/MoneyManagementMethod",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/TradeSizeSmallerThanOneException",
+        "com/strategyquant/tradinglib/correlation/CorrelationComputer",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/moneymanagement/MoneyManagementMethodsList",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/results/SymbolInfo",
+        "com/strategyquant/tradinglib/results/SymbolsMap",
+        "com/strategyquant/tradinglib/results/stats/comparator/OrderComparatorByOpenTime",
+        "com/strategyquant/tradinglib/results/stats/computer/OrderPLComputer",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectOpenHashMap",
+        "it/unimi/dsi/fastutil/longs/LongSortedSet",
+        "it/unimi/dsi/fastutil/objects/Object2DoubleMap",
+        "it/unimi/dsi/fastutil/objects/Object2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/Object2IntMap",
+        "it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "it/unimi/dsi/fastutil/objects/ObjectCollection",
+        "it/unimi/dsi/fastutil/objects/ObjectListIterator",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/stream/DoubleStream",
+        "java/util/stream/Stream",
+        "org/apache/commons/math3/distribution/NormalDistribution",
+        "org/apache/commons/math3/stat/descriptive/DescriptiveStatistics",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerChart.class",
+      "occurrence": 0,
+      "sha256": "362da9cc04bda59ab7bf1dac4d0784abc836ad6542e92f158fb8203cbd858bc8",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerChart",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "labelTitle",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "labelX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "labelY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "labelMinimumRiskPortfolio",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "labelOptimalPortfolio",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "x",
+          "descriptor": "[D",
+          "access": 0
+        },
+        {
+          "name": "y",
+          "descriptor": "[D",
+          "access": 0
+        },
+        {
+          "name": "weights",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "bestX",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "bestY",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "MinimumRiskPortofolioX",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "MinimumRiskPortofolioY",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "decimals",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ba44cd8c3b7cac559702c866d73e5ebfcc47d07fd0c4f7e76725d8b2d5f7ae17",
+          "code_length": 32
+        },
+        {
+          "name": "toJsonString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4e36ff99e111896a6ce03e291df8d1cf5d95214892bd7577b14588031a50e6d5",
+          "code_length": 187
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerChart",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob.class",
+      "occurrence": 0,
+      "sha256": "14d956027d2d5dafd6dd4c5ae90de5de8e84442e189b908ab950f303d38ded1e",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "portfolioName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "params",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;"
+        },
+        {
+          "name": "composer",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer;",
+          "access": 2
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;",
+          "access": 2
+        },
+        {
+          "name": "weights",
+          "descriptor": "[Ljava/lang/Double;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "8db9434c6c22b656663c5cd2a4aa1c504a9989c4f1c815d3fcb0750e75ff6df8",
+          "code_length": 79,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1,
+          "code_sha256": "d8b1c1cefa3fe4d51be3b3ab70de98c20f492ed4ede4a0c5eb36a456a5a9262a",
+          "code_length": 25,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "f2dd6430faebbb2aae73e7ae1cdcd954e6d024c3491ba13cbc804f8a7741393d",
+          "code_length": 16
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f28807c05d16a11fe1512ae6be56c380d48ed63b2a30055541cc478f7ebb77bd",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2088b23e2effad934f69897d069ee026d8c52335390008d996dc14245f5ecc8a",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Lcom/strategyquant/tradinglib/ResultsGroup;>;",
+      "class_references": [
+        "[Ljava/lang/Double;",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/util/Map",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerLog.class",
+      "occurrence": 0,
+      "sha256": "99c5df769af53de4e2816d09278dce2146b6f79c6cbcf657ca5386d9cc89a409",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerLog",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "b",
+          "descriptor": "Ljava/lang/StringBuilder;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;)V",
+          "access": 1,
+          "code_sha256": "976835c03ab2a8a06c6cf465f42f80242c92ac4513cda20947e36f126939d79b",
+          "code_length": 186
+        },
+        {
+          "name": "getStrategies",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "06c7a7098906abb69cf350ea45e8e84d61e472675ceb74b7e8a94bf430c485f6",
+          "code_length": 122
+        },
+        {
+          "name": "print",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d858824b1be0ea9d433840398ea20e8a63821a701cfb56e038f4e095ac734225",
+          "code_length": 28
+        },
+        {
+          "name": "printNoNewLine",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "277c3c1717a6fd39dae3186cebc5372636eaebf726489e516f9e76377af2de45",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dcf175475a94057fcfde9a9f8105b6fe7042d7a66792bad9c1b0d30e28ed5b20",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2db6b8580edf3af96388676f168c532c294d4675b4ab7d684dc5a3c16ae39047",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerLog",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerPlugin.class",
+      "occurrence": 0,
+      "sha256": "ea5fdbbf064773e5f301e9ccef8067d8bd9d9f9dc9ecd09eeefcae405a663260",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerPlugin",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender.class",
+      "occurrence": 0,
+      "sha256": "1f16df78d428e6e48ac96a3395f9d40e0194cb3f155b4b8ceb2c7fd5ec1a06f2",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "toSend",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dd1797467bb95261284aac3dbb924b1179425b786546fa05760acddd5f2e7c94",
+          "code_length": 39
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "d6d3002e7e37932e6a7286f08296994513f9acbc7d2f1d36b053d2d551554d14",
+          "code_length": 40
+        },
+        {
+          "name": "sendData",
+          "descriptor": "(Lorg/json/JSONObject;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "progress",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "84aad0ef0229a65ff78b78b8a18e220bd50406d80d1205799f891feacdac2e68",
+          "code_length": 41
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "49b5a519372804dac843f251fa541e992229f32dbfaca1584bc92c86ddfb88b9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$1.class",
+      "occurrence": 0,
+      "sha256": "898efa502bad5c84f7e8d0c5cb7ad5971b27b777d7ded79bcecb10a327105d30",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$project",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/SQProject;",
+          "access": 4112
+        },
+        {
+          "name": "val$settings",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;",
+          "access": 4112
+        },
+        {
+          "name": "val$autocomputation",
+          "descriptor": "Z",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;Z)V",
+          "access": 0,
+          "code_sha256": "61677f4fef44a583d22df88c282abe6ee0bc78db63912ebcaee897a7dd31ca28",
+          "code_length": 26
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0eb39913c84ce34689ce0099c14d60c43abac42c0b2d8491cd65717212272593",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$1",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$2.class",
+      "occurrence": 0,
+      "sha256": "831d0ca998b1243884c0e20c33369acd9b99d27cf073efc1e98b3abce55e212e",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$paths",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;[Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "257ba1a89c84207a3a64aef5de9c650107e888d2300b1f5613f1429c9bae2184",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$2",
+        "java/lang/Thread",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet.class",
+      "occurrence": 0,
+      "sha256": "c8dde65e442f20eafa97ae4183d71d5d00e0df724a3a56c8b3cbd60d87edc7ee",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "sender",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender;",
+          "access": 2
+        },
+        {
+          "name": "stopPauseEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/StopPauseEngine;",
+          "access": 2
+        },
+        {
+          "name": "simulator",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator;",
+          "access": 2
+        },
+        {
+          "name": "progressEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "67794be44d08f99db07c54b6eed2696d991fab6eedd88405f818d154ae2b8c6d",
+          "code_length": 59
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b9fa95408d508eb1853e6badf55a34f865e3d7d3788bfac8d6b664c4522fbea3",
+          "code_length": 292,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAddBuyHoldStrategy",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "153dba139ca88366a504d295d2099c259467d352050ad42fdf3f90ee63d7e0d8",
+          "code_length": 201,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveReports",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c8875bef03a85640a65cb8263476714a12bba603053def7af3936e2efda3031d",
+          "code_length": 99,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveAllReports",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7ef0c48561148631b1d343fa1897a5181bbcde561d6acb3388b3ede3655c4433",
+          "code_length": 98,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onLoadGridData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a8e768e43277106d7a0708515958d61b524a3d44751df9917192bfbfc7ee839c",
+          "code_length": 386,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRecompute",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4c2d7aeeba02bc7c2e9db3893e7158bf40196af37cc3afac317223bf1c100e60",
+          "code_length": 635,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onLoadFiles",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e310d1b52c615d4d013d5a3e4a834d41ee433290b01cf12c6f07301012396d48",
+          "code_length": 51,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "loadFiles",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "0385fd95f525f915e820609c36a00f83f4784ceeca358fc0a498d25b245c7acd",
+          "code_length": 432
+        },
+        {
+          "name": "onStop",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "77dee8779d99db6b47c875bb6391d5deba129c84299cb7af3b7d70cce1180c13",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;)Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender;",
+          "access": 4104,
+          "code_sha256": "215514a3ba98d8863bce9e3203285417c77ecd99a4bbfb9b8e6245b3f27a5c82",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;)Lcom/strategyquant/tradinglib/project/StopPauseEngine;",
+          "access": 4104,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;)Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator;",
+          "access": 4104,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet;[Ljava/lang/String;)V",
+          "access": 4104,
+          "code_sha256": "ffdde2c0cd5acd083e3102d935aceaa0a77ca01ed92d9bb824e792167a0a2489",
+          "code_length": 6
+        },
+        {
+          "name": "access$400",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2b96bf34a5b037e43d57f511baeee6ca974e7b99627f0d74191dfe9bce0e82f3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/lib/memory/MemoryUsageChecker",
+        "com/strategyquant/lib/memory/SQMemoryProtectionError",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$1",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet$2",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/MoneyManagementMethod",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/databank/DatabankChange",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectProgress",
+        "com/strategyquant/tradinglib/project/ProjectProgressInfo",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/StopPauseEngine",
+        "com/strategyquant/tradinglib/project/UserConfirm",
+        "com/strategyquant/tradinglib/project/bestresults/BestResults",
+        "com/strategyquant/tradinglib/project/websocket/ProjectDataPublisher",
+        "com/strategyquant/tradinglib/project/websocket/channels/ProjectChannels",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/strategy/StrategyLoader",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Double",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType.class",
+      "occurrence": 0,
+      "sha256": "89953a595cd31dfaf065f96475afce6a8f0e6b0a03c07ae49f27d23540d9ad96",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SharpeRatio",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 16409
+        },
+        {
+          "name": "ReturnDrawdownRatio",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 16409
+        },
+        {
+          "name": "CAGRMaxDrawdownRatio",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 16409
+        },
+        {
+          "name": "CAGRMeanDrawdownRatio",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 16409
+        },
+        {
+          "name": "NetProfit",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 9,
+          "code_sha256": "0d720954b09b57638106a545a25c1d38001615525f5611abae3fe870f5a2e9be",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 9,
+          "code_sha256": "27cb3cd13e8ce707c5590a013cca66b4f0ebddb337143f3202d5025223e759f7",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "73df9ce8f241bb2d76a4a2f71f30913b5b267816ed7053a19b7a359455bcf262",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 4106,
+          "code_sha256": "2bcbeeff9905e23eabe93ec35cd3c80f390bc15df63e30eaeab5723524461fef",
+          "code_length": 35
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9eec7f311d4131ad95623691829be74db2ab388b44a9e8cac77e986a2c045b35",
+          "code_length": 72
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;>;",
+      "class_references": [
+        "[Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings.class",
+      "occurrence": 0,
+      "sha256": "dd2c0b05d71ac90ad492b6b47fd7e829ea5bd6eca4cdfe3877bfdc218e3822c7",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "PortfolioSelectionType",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType;",
+          "access": 1
+        },
+        {
+          "name": "dateRangeLimited",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "startDay",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "endDay",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "initialCapital",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "leverage",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "decimals",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "maxSimulations",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "confidenceLevel",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "RiskFreeRate",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "strategies",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "weights",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "128a8e5c5ec9bd8c700954bcdce607212193d22f7af24169f77d6cdc0497ac04",
+          "code_length": 84
+        },
+        {
+          "name": "setSelectionTypeByString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "eb2aeb02f16501211744d40254ae2407500d3a48749e2415292ebf733b87b3b7",
+          "code_length": 267,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getDecimalsByFitness",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8b912f26d1771458ff904d417118560a7e60f0674ff2723a20910a987f4216ae",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType",
+        "java/io/Serializable",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator$1.class",
+      "occurrence": 0,
+      "sha256": "699b0ab1f22fd7c04ed2a2d05b69e00b98da7540da6d6d6d5b4a19fde4de9a16",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$simulationResults",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/gridlib/client/GridJob;ZLjava/util/ArrayList;)V",
+          "access": 0,
+          "code_sha256": "8a1a0462df63ac0c7c87014df51448213156846ade7d6ea1fb7dd678a1ce5173",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createJobsBatch",
+          "descriptor": "(ILcom/strategyquant/gridlib/client/GridClient;)Ljava/util/ArrayList;",
+          "access": 4,
+          "code_sha256": "103ab3eba8d181e1a80f7a1d939f857628dde3f2dca90f6205d876219bfa63e0",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(ILcom/strategyquant/gridlib/client/GridClient;)Ljava/util/ArrayList<Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob;>;"
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/gridlib/client/JobDetails;)V",
+          "access": 4,
+          "code_sha256": "3acafc4c892666deaddc3cf0a54a80307114d18e89bac9ecb313df8f50b7b559",
+          "code_length": 14,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 4,
+          "code_sha256": "10239e1f58f6247308d886a506b1917cbf263d3f74899f88a9929ff9d9b831f4",
+          "code_length": 13
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Ljava/io/Serializable;Lcom/strategyquant/gridlib/client/JobDetails;)V",
+          "access": 4164,
+          "code_sha256": "da2615a4307a8919d8d83175d1f42387ac34e8272b6d90095cd3e232ee7a5891",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/tradinglib/simplegrid/SimpleGridEngine<Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob;Lcom/strategyquant/tradinglib/ResultsGroup;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator$1",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+        "java/lang/Exception",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator.class",
+      "occurrence": 0,
+      "sha256": "4b1b820ebe404228662986e3c529b39943b4a32f97a4bd0ffdc5a060b3ef4bf4",
+      "name": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "project",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/SQProject;",
+          "access": 2
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;",
+          "access": 2
+        },
+        {
+          "name": "sender",
+          "descriptor": "Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender;",
+          "access": 2
+        },
+        {
+          "name": "autocomputation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "numberOfSimulations",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "jobCounter",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "lastIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "stopPauseEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/StopPauseEngine;",
+          "access": 2
+        },
+        {
+          "name": "weightCombinations",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<[Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9a86533e147e2ec1d11a11ffd9b8b4a73cf2f5aa409fe707a6fd66cc998375ac",
+          "code_length": 10
+        },
+        {
+          "name": "start",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings;Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Z)V",
+          "access": 1,
+          "code_sha256": "9d03c3d1c370b58d8ed5b5192e7b6e10b35176fdb006a6437570eaca3d0933e1",
+          "code_length": 32
+        },
+        {
+          "name": "_start",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "23ba6d9aca3eb0077219a88324387002f0b7da13eb52809d43422dc574aaddb8",
+          "code_length": 230
+        },
+        {
+          "name": "calculateWeightCombinations",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "f642d0eb97ee0b2cceb84db2e600e547f1f8d8deb57780ef5575d7476d03f128",
+          "code_length": 297,
+          "generic_signature": "()Ljava/util/ArrayList<[Ljava/lang/Double;>;"
+        },
+        {
+          "name": "runOnGrid",
+          "descriptor": "(Z)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "efc6078bf99911820b08466a448ef5d86bddbdcf4bac32cda797b2bf3d0335d6",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Z)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "selectOptimalPortfolio",
+          "descriptor": "(Ljava/util/ArrayList;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2,
+          "code_sha256": "dfa1832d2ef0774b3a7ed21cee7354b2a09a5ca0f8d28321823c1e36d393af07",
+          "code_length": 2076,
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;)Lcom/strategyquant/tradinglib/ResultsGroup;"
+        },
+        {
+          "name": "processJobResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/gridlib/client/JobDetails;Ljava/util/ArrayList;)V",
+          "access": 4,
+          "code_sha256": "fde61c6aafd066f40ba41f8e690768363898ff77414acc2520a63488c32be08e",
+          "code_length": 127,
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/gridlib/client/JobDetails;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;)V"
+        },
+        {
+          "name": "createBatch",
+          "descriptor": "(ILcom/strategyquant/gridlib/client/GridClient;J)Ljava/util/ArrayList;",
+          "access": 4,
+          "code_sha256": "c13c5438f6295013c93f7cd3c34e8efd7fe0f4e2240e17ab0a1efe49ee0d87e9",
+          "code_length": 157,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(ILcom/strategyquant/gridlib/client/GridClient;J)Ljava/util/ArrayList<Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob;>;"
+        },
+        {
+          "name": "getJobParams",
+          "descriptor": "(ILjava/lang/String;)Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "ad3d886fa83bcb15dd76563e2785e6490b42af783419141a656dbedfafeb4d8d",
+          "code_length": 56,
+          "generic_signature": "(ILjava/lang/String;)Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;"
+        },
+        {
+          "name": "addBestPortfolioToDatabank",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 2,
+          "code_sha256": "b3851aa95583c8eb8f5ec23998ef6b9f5774f5e1dd8d6614895745d4a15a0186",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateUIProgress",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "4fc972aaef5b43ddcb9020329adc56ce1a4021e3364b62c33da648e721e63aad",
+          "code_length": 10
+        },
+        {
+          "name": "updateUI",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "d40aa24005b5fa3212ad27fd2207572f818a5cc2bf3dc370d68924b951e18515",
+          "code_length": 7
+        },
+        {
+          "name": "updateUI",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 2,
+          "code_sha256": "d94f8749761bb77e876355d0f2845aae5f371a2c91a3b87b6eaa2419700ce964",
+          "code_length": 7
+        },
+        {
+          "name": "updateUI",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "377cff558425debe277c32322e4f0d2e3f9e7b9994db6aef894aa701d0a87924",
+          "code_length": 75
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator;)I",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "82b3bec45de5ab97ca94b658bfffef80d14ce5d967c11ad8b5cf1ebb671eaf39",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/lang/Double;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/gridlib/client/JobDetails",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/TaskStoppedException",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposer",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerChart",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerJob",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerResultsSender",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSettings$PortfolioSelectionType",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator",
+        "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerSimulator$1",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/StopPauseEngine",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+        "java/io/Serializable",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/math/BigDecimal",
+        "java/math/RoundingMode",
+        "java/security/SecureRandom",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # MetaTrader UI
 
-Donor: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api`.
+Donor: `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api`.
 Target: `HARUQUANTAI_ROOT/ui/app/plugins/data_source/MetaTrader`.
 Outer names intentionally differ. Donor informs; specification owns.
 
@@ -42,3 +42,7 @@ Structural mapping does not establish SQX behavioral parity. Real terminal APIs,
 broker discovery, market bars and donor backend lifecycle remain unimplemented.
 Canonical reimplementation ledger/schema were absent; no new behavioral evidence
 record or ledger-schema validation is asserted. Manifest does not replace ledger.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

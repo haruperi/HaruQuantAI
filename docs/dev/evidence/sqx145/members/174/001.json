@@ -1,0 +1,1022 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+  "archive_sha256": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager.class",
+      "occurrence": 0,
+      "sha256": "97470a2a453608579d7a9ec459982e388c8ebf0a9e971a5211930514f6565cc9",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "DOWNLOAD_DARWINEX_SYMBOL_JOB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "dataListPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "dataListLineDelimiter",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "dataListValueDelimiter",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "dataListDateFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "availableData",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/datalib/SymbolData;>;"
+        },
+        {
+          "name": "availableDataMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lcom/strategyquant/datalib/SymbolData;>;"
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 10
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager;",
+          "access": 41,
+          "code_sha256": "f790e983d7a5dde60bed097989ac722afde060dc2848de4272fa765b9d487b1e",
+          "code_length": 50
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5a3b560e1af1bcc796fcc208955aae8b3e3833de7ae195fe47fa9dcf20527208",
+          "code_length": 35
+        },
+        {
+          "name": "loadSettings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ef7111d3ed38d2c062459f401ff2b1eeaf396efecd29ee06324a81310b2d673f",
+          "code_length": 13
+        },
+        {
+          "name": "loadAvailableData",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ce8bf5b66d93866c19ec114bf18f48af99e4dc73fc6eab79882e935d05efa493",
+          "code_length": 318
+        },
+        {
+          "name": "getAvailableDataList",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "292913c3bb8487c04156bd2528a26f2a7c750f7f3f0e10b26cff291c2220ed07",
+          "code_length": 30,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/datalib/SymbolData;>;"
+        },
+        {
+          "name": "suggestSymbols",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f766d4066f0c4dbb08b1c27902a0c3cf2065895db4b788f3eac160d4fcc0dcac",
+          "code_length": 179
+        },
+        {
+          "name": "getAvailableDataInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/datalib/SymbolData;",
+          "access": 1,
+          "code_sha256": "ea441d7a75cb7618431d47407b5eff95479875d35ec336efa485c479545dc49e",
+          "code_length": 37
+        },
+        {
+          "name": "addData",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "322e5483a14a7be1057f3fcd8a15afd80d14fc4c681a5d61ab22b9184fbcce27",
+          "code_length": 401,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "generateName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0c4313ced353d6bbb6de84a7af5b4d0ae5bc797237ed43b41a1a939479c2e1b2",
+          "code_length": 123
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a1a35a32ad4ddb013963b316e552e4d446c0a2e7f680d9000a2ceea6a8d445c4",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/SymbolData",
+        "com/strategyquant/datalib/broker/BrokerDto",
+        "com/strategyquant/datalib/broker/BrokerManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager",
+        "java/io/File",
+        "java/lang/Byte",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexPlugin.class",
+      "occurrence": 0,
+      "sha256": "41192c4977d340fa6f76470d586363fa1f32e004e6d2f41cb98ac676acf1a59a",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "9978bbd60e4b845f9a57a796f04c7517b2540112292d23088b7ccca558834eb7",
+          "code_length": 56
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexPlugin",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1.class",
+      "occurrence": 0,
+      "sha256": "144d51a61a284ed1182e1fd968ff94fa894a65de8b38e876eb41fc0bceb37116",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2.class",
+      "occurrence": 0,
+      "sha256": "73d1a06e3b6983b7a1eeaddf36a610f99b7fca93c0f784eecb210c858013bbd3",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3.class",
+      "occurrence": 0,
+      "sha256": "3250c96d9be64712f94e475365e252cc0bca4bd74c4c60f365cec25af721e68a",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aed5805fd454cafe4c35d011fd587efe9db13fd1c11bce70d491a38b7a1e47c5",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet.class",
+      "occurrence": 0,
+      "sha256": "6f948c5c19f4807b4dd8d1c74a1745db063b0ee6eaf98294633275801b949d82",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "53ff329b7a11e709ef8ff7aaef0e7c2af47de5b0a0f9b9646f1331d617cb84c2",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "dea56305d456f4d006ed0dfdcaf838b448c3f7590ed7da6ffc13dd6f8abc0443",
+          "code_length": 443,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAddCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9ed299140ead2bf336e08e3b71f213ddb59e969d5bc507ebe4ebfcae44c9d9b5",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAddData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "eb61e9706dd986afebce923691be9d1177c8ffa29eaa85830090a32b8875ad79",
+          "code_length": 74,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onAdd",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "26bcf8020b423d96bc54cc4ec822e81971c10602e12a5a3689f1accb79b7c8b5",
+          "code_length": 496,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onImportLoadAvailableSymbols",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "92668b0796e304dff4c5b622276eb45a4a9f6eda4b80d7bbb047042d7a5926f7",
+          "code_length": 275,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "da4e9a51932f88f893ef2a9fc83dd7cc99f8fbd5f65fc97245b139e3de8457c1",
+          "code_length": 82,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportDataCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9ed299140ead2bf336e08e3b71f213ddb59e969d5bc507ebe4ebfcae44c9d9b5",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_onImportData",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "5b92edac77396fb8dc1b22f9558ac0e8934333f573527b278ce874cf2d47c67b",
+          "code_length": 686,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a8c1dc1d841a1417927f52c09bd2583a52b98226296f144ee7b301d5e3ea6eb5",
+          "code_length": 216,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onDownloadGetDataList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a43d3f279ac3722c733f2ac924383e08c62a6d134ae261da10e21569c4cd3816",
+          "code_length": 208
+        },
+        {
+          "name": "onDownloadAddData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "03367818973c5a8b7944ba0595a319bf989eb9baac523f89bbf902858828d641",
+          "code_length": 54,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onDownloadAddData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3576a324bf245fcbaa154c9c496228be50a16c80de11242c9e2149131315da22",
+          "code_length": 442,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onDownloadData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "34dfd91e62436d797fd2faf9c9a44d88ad3e3208debe1b7690a0983a72b03fe7",
+          "code_length": 596,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onDownloadDataAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e3d288757b09544bbf6a0edee9d89bc7093262ed833a050431b7e8e5b8aef7c5",
+          "code_length": 238,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5c8accfd8a6b0c2fa272345158ed8e01224d65d15c99bc401b7ab8824610e0c0",
+          "code_length": 329
+        },
+        {
+          "name": "onUpdateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a38c7729224a8cadc4567b098fae63e71b01a74450f03da997e0eb3e301cf610",
+          "code_length": 537,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "e32bbe7fd925c96cf3575a796b5c1f4ca120c9aa4e2e7e4efef429f46604b027",
+          "code_length": 6
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "ffdde2c0cd5acd083e3102d935aceaa0a77ca01ed92d9bb824e792167a0a2489",
+          "code_length": 6
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "b2ea10cb9ea684d6466759de2f928a5cc59516dcaa63fc5b4f607796dd744688",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "404e5e1d376c07f52ce2c3f342e3c69347b483fe58de4eaecb8cb1a4d92f7b90",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/SymbolData",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport",
+        "com/strategyquant/qdm/QDM",
+        "com/strategyquant/qdm/activity/QDMActivity",
+        "com/strategyquant/qdm/activity/QDMActivityTypes",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport.class",
+      "occurrence": 0,
+      "sha256": "1577c9e0e3e077d7aadad4f558936e2753be69d91d8d2bc148bc8ce7e336a838",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "IMPORT_DARWINEX_JOB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport;",
+          "access": 41,
+          "code_sha256": "839cebf37003c0bf318401c03a84e2288348a46b3964e08231b43431b1114324",
+          "code_length": 20
+        },
+        {
+          "name": "stop",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f73c01142bf380f42f9eea9489d9691b728946347f9ad360bc24a01ab2c876f3",
+          "code_length": 28
+        },
+        {
+          "name": "pause",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8d2629f8d84fff03c9f13997a58479ebdf87740088ed3a61096d20c05e6486b0",
+          "code_length": 28
+        },
+        {
+          "name": "restart",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "299854a1f0f40e148362d7b62fa16bdca7f96425034435e946749cc0cf6fbbdf",
+          "code_length": 28
+        },
+        {
+          "name": "importData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;Ljava/lang/String;Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;)V",
+          "access": 1,
+          "code_sha256": "be92a345cc5ca4400471b1a8cf4dea69ec7ca4fea57fc6566e3e07d8527c65e3",
+          "code_length": 210
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4574260b6dc730d34569b776e24bef537bef6f1a36714e85522cf524c3da9fad",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob.class",
+      "occurrence": 0,
+      "sha256": "c1035fce0d7b9a5610dbe4293236910c991914cc9f6845d2e5ccb5a9bb059652",
+      "name": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "writer",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew;",
+          "access": 0
+        },
+        {
+          "name": "fileName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "tempFileName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "importInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;",
+          "access": 2
+        },
+        {
+          "name": "path",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "paused",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;",
+          "access": 2
+        },
+        {
+          "name": "dateFormatter",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 2
+        },
+        {
+          "name": "int2Form",
+          "descriptor": "Ljava/text/DecimalFormat;",
+          "access": 10
+        },
+        {
+          "name": "lastAsk",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "lastBid",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "lastVolume",
+          "descriptor": "D",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c66bf8809e3a27379c614438280d54ea6740045c2fc5433a20a9256ccebd8868",
+          "code_length": 47,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "evalFromTo",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "ebb18275d69a4cee7373e05a46434373b9b5c41a41eb1d6622733b884122c505",
+          "code_length": 51
+        },
+        {
+          "name": "getMinMaxDate",
+          "descriptor": "(Ljava/lang/String;Z)Ljava/lang/Long;",
+          "access": 2,
+          "code_sha256": "d772d5bcc253e3da8ef9d8e5a8763f6fea3508278844dd02097a2db0064cc772",
+          "code_length": 126
+        },
+        {
+          "name": "parseTime",
+          "descriptor": "(Ljava/io/File;)J",
+          "access": 2,
+          "code_sha256": "92f26c2d75a1ea6f772d9edd1ab91efc6bb7a2155f5b99462a544f70c6d20c14",
+          "code_length": 43
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "93296b0da7103da6328e3d37237ef922cec2fb2f81fcc4858a7e503c0096cd1f",
+          "code_length": 58
+        },
+        {
+          "name": "finish",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4a27b4e8d2b1d4f40313891349d6d2cb6c319382c9bf06c4ff776bb8e98dd17e",
+          "code_length": 228
+        },
+        {
+          "name": "initWriter",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "7cd07aa459d4553698f9e0ab299c68175ae5728d5321d846a5f967eaab07eaa5",
+          "code_length": 93,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "setProgressListener",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;)V",
+          "access": 1,
+          "code_sha256": "8790d7bfbd77447791f9520985e73086d9d4fa591bff0db34f084543345803c4",
+          "code_length": 6
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "2b555ddf226100ae8dc333d8dec071f115798c54af6ad8e299154699b809c61e",
+          "code_length": 479,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "writeData",
+          "descriptor": "(Ljava/io/File;Ljava/io/File;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap;)V",
+          "access": 2,
+          "code_sha256": "b8f757023164adab41c3d382267dd146e785d4383540fef88a9154c55b9130ee",
+          "code_length": 225,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/io/File;Ljava/io/File;Lit/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap<Lcom/strategyquant/datalib/data/io/VersatileData;>;)V"
+        },
+        {
+          "name": "checkPaused",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3384b26c8b51a8d59fae2903b319e866c95a785feb0ea4c885b4305339513414",
+          "code_length": 46,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "sendRefreshMessage",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "2d4cd555d47cedc40ceb5390e74e4ac3a772a2dcfc38548743fc58b0bf189c62",
+          "code_length": 52
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "597648259b596f687dcc9160d74abfa77c3ae53d97e4297fc8e351e602dc251c",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7e4fb946384def2254b4331c88fbba8dba46daf2caf3c27279f4614683fa5346",
+          "code_length": 22
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/Void;>;",
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/basket/BasketOfStocksManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/darwinex/DarwinexUtils",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/ImportDataInfo",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/datalib/timezone/Timezone",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/io/File",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/text/DecimalFormat",
+        "java/util/Iterator",
+        "org/joda/time/format/DateTimeFormat",
+        "org/joda/time/format/DateTimeFormatter",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

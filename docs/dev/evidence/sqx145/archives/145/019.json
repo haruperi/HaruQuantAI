@@ -1,0 +1,286 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-exec-1.3.jar",
+  "sha256": "cb49812dc1bfb0ea4f20f398bcae1a88c6406e213e67f7524fb10d4f8ad9347b",
+  "class_count": 37,
+  "unique_class_entries": 37,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "org/apache/commons/exec/CommandLine$1.class": "e229dc7ac3fa1b5245ace358fa24c98344e9149703394e93aa6cf3f30a1a281b",
+    "org/apache/commons/exec/CommandLine$Argument.class": "2db7dbd1f9e08ffbb6c4aa27975db430ef3ae68c82c50a67e3d884314b2c62ce",
+    "org/apache/commons/exec/CommandLine.class": "470a290f496bd514d210e49a5d0b01b940b77eed617a8d54a256b21b55309d0b",
+    "org/apache/commons/exec/DaemonExecutor.class": "08f04fb742f09a28420f768bbf5f4f8efdd9d65552326fbdb2ed2295e343a007",
+    "org/apache/commons/exec/DefaultExecuteResultHandler.class": "1e998ce4459efd77f995ce7ba99b4f605dfa3e3f6c3e828cfa5dd00ab33229f3",
+    "org/apache/commons/exec/DefaultExecutor$1.class": "4bd9f71a8a3e65b5429dba35ca4d85583a9ee172f9d109f84f7f784261cb2d0e",
+    "org/apache/commons/exec/DefaultExecutor.class": "32126bc79f7f7d749df892913942cdc0c845c0e209af86b85c9a333b835c134e",
+    "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1.class": "6efa8c859a6bd7f5b50e50ba0dcee14a26da96fa5747c69e7a1f8c9dd7b878cb",
+    "org/apache/commons/exec/environment/DefaultProcessingEnvironment.class": "04f052dfd6ac95ee789cdccb55b64b0efd55d8fd1fa5fd88aa14679c59065408",
+    "org/apache/commons/exec/environment/EnvironmentUtils.class": "ebdffc2e76194e0c62b39c30540ea3c9c92b01eefbc3d5c845bedb7ad5d119dd",
+    "org/apache/commons/exec/environment/OpenVmsProcessingEnvironment.class": "3b891edae1f8ea061200d4a0bf2d3944f359f2c2e68b556dc06c0586aa8f61f5",
+    "org/apache/commons/exec/ExecuteException.class": "e9b59bc4a577ba43cf31cb275223f571a1051d5acdac602bff2a537104da6e30",
+    "org/apache/commons/exec/ExecuteResultHandler.class": "d36ca559eae8049c2068b93875653ec0496ca6657c2a26841333a6043c409e30",
+    "org/apache/commons/exec/ExecuteStreamHandler.class": "218b1f0d88751df20b61091c4177c3051f0c679b21dc657eeb0bba34d52fb835",
+    "org/apache/commons/exec/ExecuteWatchdog.class": "b8182e5e3aa62d6a3c6c7db00f5bbe239e071699b96ecb2e82e24cb6409777c9",
+    "org/apache/commons/exec/Executor.class": "bf075ecdecb76027830fea26a2bb3abfa5627058456e9ec5c33852901b6f29ea",
+    "org/apache/commons/exec/InputStreamPumper.class": "21ce8b76b0613a70f3bb39cf55b79e23a8111b0726938f3332e341914f5e5c25",
+    "org/apache/commons/exec/launcher/CommandLauncher.class": "b260e7eddd635fd5bfea8862678d07358a241584cad746ac3ef562d2bf9c4f73",
+    "org/apache/commons/exec/launcher/CommandLauncherFactory.class": "dd0607d00e52260066c1d187b1c4f3962f4d760e6296cd0c1b58064e6f07eff8",
+    "org/apache/commons/exec/launcher/CommandLauncherImpl.class": "2f83a613c53d7a2e62ad3478f60103f298cf78df141d33bd1f0589e0d3c71bc4",
+    "org/apache/commons/exec/launcher/CommandLauncherProxy.class": "756728405d0de2d9580a4032f40549bcb3c4cbb8be2add1bbe36f73159db060a",
+    "org/apache/commons/exec/launcher/Java13CommandLauncher.class": "aa702cd242f125d62282b67564eda1a5a0e6c3110a127ac2d4ff1593fd1587d4",
+    "org/apache/commons/exec/launcher/OS2CommandLauncher.class": "afab22ec77201113c7a78322b32489eb477e58a21b346d0005525a46a64ded5f",
+    "org/apache/commons/exec/launcher/VmsCommandLauncher.class": "bd1dce59d398bc858beb54b4cd5b21d122d31f49930b502e8aa93d878858c984",
+    "org/apache/commons/exec/launcher/WinNTCommandLauncher.class": "6936a3a593d5718434e70d9d1171e8731fe2029e670b349ca3b23164552c67cf",
+    "org/apache/commons/exec/LogOutputStream.class": "2cc6a827358eda8867d3fc9dc68110f01013d0a6bd4e4c8672bf34dfec79ddc8",
+    "org/apache/commons/exec/OS.class": "bc86e4c2c25820eec3559c6e4a04a3dc00e27250ee4ca096fe8deff084827286",
+    "org/apache/commons/exec/ProcessDestroyer.class": "30e88d4b8bb67920eed86f650e1024f9a5018f7ad24bfeedee9e63bf56c0a38a",
+    "org/apache/commons/exec/PumpStreamHandler.class": "79426ab4f5e051c749fbca74e0279024b37f5f51e1517593891b194870a2de8a",
+    "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl.class": "345aa017c5d52df75a6b3fec77afe0f075715205713a62a3805b8ccf053be615",
+    "org/apache/commons/exec/ShutdownHookProcessDestroyer.class": "7600da6450bea630abc01a55643ca0265bb9fafbf73e7f7b3bd9a561eb84d542",
+    "org/apache/commons/exec/StreamPumper.class": "0aa19fa15383f1ea2bd895bc16749f183643ce9664256555fe3f35a685bf0fdc",
+    "org/apache/commons/exec/TimeoutObserver.class": "aee27f7b933daf6b08690f8ecf5d22c22f968a925ce90aa7ffe7f5a2ffc60170",
+    "org/apache/commons/exec/util/DebugUtils.class": "eaaa8f290beae050e44cbaef2d53496e769af2f687af3a6c10146b764dd78b75",
+    "org/apache/commons/exec/util/MapUtils.class": "960f01cdcd55eca9a7e1c43ccdc352173939f658ab4deb28a478dbac1f462fef",
+    "org/apache/commons/exec/util/StringUtils.class": "a572e991c52e42dd238930e0d4503d923dc89c496184df6dca0897aa87365bc6",
+    "org/apache/commons/exec/Watchdog.class": "94ea27bc369b1be55e9b66759bc9d9aa77edf8fe48fc4587ab2be296ae7bcddc"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "ab48da8608bb2338e14491a9acf80a668eb0cd756a50b45b165f9446058e3592",
+    "META-INF/LICENSE.txt": "2f2f7c23c936578ac3d402c58c151e83c1451f9b47d4754c467771393e125b92",
+    "META-INF/NOTICE.txt": "f31b4ed29d347e69e01ae7a81be9ec7f5cf5eb9053047576f10a29e277506b00",
+    "META-INF/maven/org.apache.commons/commons-exec/pom.xml": "82827f6019c0f71bd74fba886ab337ff6da291f63df9723379a209d6ad3b44f8",
+    "META-INF/maven/org.apache.commons/commons-exec/pom.properties": "c73e1e846096fa3df8fecc15b5f920d4d63bef39a42f2787918da0dd43295b03"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/apache/commons/exec/CommandLine$1.class",
+      "occurrence": 0,
+      "sha256": "e229dc7ac3fa1b5245ace358fa24c98344e9149703394e93aa6cf3f30a1a281b",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/CommandLine$Argument.class",
+      "occurrence": 0,
+      "sha256": "2db7dbd1f9e08ffbb6c4aa27975db430ef3ae68c82c50a67e3d884314b2c62ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/CommandLine.class",
+      "occurrence": 0,
+      "sha256": "470a290f496bd514d210e49a5d0b01b940b77eed617a8d54a256b21b55309d0b",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/DaemonExecutor.class",
+      "occurrence": 0,
+      "sha256": "08f04fb742f09a28420f768bbf5f4f8efdd9d65552326fbdb2ed2295e343a007",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecuteResultHandler.class",
+      "occurrence": 0,
+      "sha256": "1e998ce4459efd77f995ce7ba99b4f605dfa3e3f6c3e828cfa5dd00ab33229f3",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "4bd9f71a8a3e65b5429dba35ca4d85583a9ee172f9d109f84f7f784261cb2d0e",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecutor.class",
+      "occurrence": 0,
+      "sha256": "32126bc79f7f7d749df892913942cdc0c845c0e209af86b85c9a333b835c134e",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1.class",
+      "occurrence": 0,
+      "sha256": "6efa8c859a6bd7f5b50e50ba0dcee14a26da96fa5747c69e7a1f8c9dd7b878cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/DefaultProcessingEnvironment.class",
+      "occurrence": 0,
+      "sha256": "04f052dfd6ac95ee789cdccb55b64b0efd55d8fd1fa5fd88aa14679c59065408",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/EnvironmentUtils.class",
+      "occurrence": 0,
+      "sha256": "ebdffc2e76194e0c62b39c30540ea3c9c92b01eefbc3d5c845bedb7ad5d119dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/OpenVmsProcessingEnvironment.class",
+      "occurrence": 0,
+      "sha256": "3b891edae1f8ea061200d4a0bf2d3944f359f2c2e68b556dc06c0586aa8f61f5",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteException.class",
+      "occurrence": 0,
+      "sha256": "e9b59bc4a577ba43cf31cb275223f571a1051d5acdac602bff2a537104da6e30",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteResultHandler.class",
+      "occurrence": 0,
+      "sha256": "d36ca559eae8049c2068b93875653ec0496ca6657c2a26841333a6043c409e30",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteStreamHandler.class",
+      "occurrence": 0,
+      "sha256": "218b1f0d88751df20b61091c4177c3051f0c679b21dc657eeb0bba34d52fb835",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteWatchdog.class",
+      "occurrence": 0,
+      "sha256": "b8182e5e3aa62d6a3c6c7db00f5bbe239e071699b96ecb2e82e24cb6409777c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/Executor.class",
+      "occurrence": 0,
+      "sha256": "bf075ecdecb76027830fea26a2bb3abfa5627058456e9ec5c33852901b6f29ea",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/InputStreamPumper.class",
+      "occurrence": 0,
+      "sha256": "21ce8b76b0613a70f3bb39cf55b79e23a8111b0726938f3332e341914f5e5c25",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "b260e7eddd635fd5bfea8862678d07358a241584cad746ac3ef562d2bf9c4f73",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherFactory.class",
+      "occurrence": 0,
+      "sha256": "dd0607d00e52260066c1d187b1c4f3962f4d760e6296cd0c1b58064e6f07eff8",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherImpl.class",
+      "occurrence": 0,
+      "sha256": "2f83a613c53d7a2e62ad3478f60103f298cf78df141d33bd1f0589e0d3c71bc4",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherProxy.class",
+      "occurrence": 0,
+      "sha256": "756728405d0de2d9580a4032f40549bcb3c4cbb8be2add1bbe36f73159db060a",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/Java13CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "aa702cd242f125d62282b67564eda1a5a0e6c3110a127ac2d4ff1593fd1587d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/OS2CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "afab22ec77201113c7a78322b32489eb477e58a21b346d0005525a46a64ded5f",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/VmsCommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "bd1dce59d398bc858beb54b4cd5b21d122d31f49930b502e8aa93d878858c984",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/WinNTCommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "6936a3a593d5718434e70d9d1171e8731fe2029e670b349ca3b23164552c67cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/LogOutputStream.class",
+      "occurrence": 0,
+      "sha256": "2cc6a827358eda8867d3fc9dc68110f01013d0a6bd4e4c8672bf34dfec79ddc8",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/OS.class",
+      "occurrence": 0,
+      "sha256": "bc86e4c2c25820eec3559c6e4a04a3dc00e27250ee4ca096fe8deff084827286",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ProcessDestroyer.class",
+      "occurrence": 0,
+      "sha256": "30e88d4b8bb67920eed86f650e1024f9a5018f7ad24bfeedee9e63bf56c0a38a",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/PumpStreamHandler.class",
+      "occurrence": 0,
+      "sha256": "79426ab4f5e051c749fbca74e0279024b37f5f51e1517593891b194870a2de8a",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl.class",
+      "occurrence": 0,
+      "sha256": "345aa017c5d52df75a6b3fec77afe0f075715205713a62a3805b8ccf053be615",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/ShutdownHookProcessDestroyer.class",
+      "occurrence": 0,
+      "sha256": "7600da6450bea630abc01a55643ca0265bb9fafbf73e7f7b3bd9a561eb84d542",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/StreamPumper.class",
+      "occurrence": 0,
+      "sha256": "0aa19fa15383f1ea2bd895bc16749f183643ce9664256555fe3f35a685bf0fdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/TimeoutObserver.class",
+      "occurrence": 0,
+      "sha256": "aee27f7b933daf6b08690f8ecf5d22c22f968a925ce90aa7ffe7f5a2ffc60170",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/util/DebugUtils.class",
+      "occurrence": 0,
+      "sha256": "eaaa8f290beae050e44cbaef2d53496e769af2f687af3a6c10146b764dd78b75",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/util/MapUtils.class",
+      "occurrence": 0,
+      "sha256": "960f01cdcd55eca9a7e1c43ccdc352173939f658ab4deb28a478dbac1f462fef",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/util/StringUtils.class",
+      "occurrence": 0,
+      "sha256": "a572e991c52e42dd238930e0d4503d923dc89c496184df6dca0897aa87365bc6",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    },
+    {
+      "entry": "org/apache/commons/exec/Watchdog.class",
+      "occurrence": 0,
+      "sha256": "94ea27bc369b1be55e9b66759bc9d9aa77edf8fe48fc4587ab2be296ae7bcddc",
+      "member_shard": "docs/dev/evidence/sqx145/members/019/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/019/001.json",
+      "sha256": "c26810fa326f28d8c27183f8b1f8ca49008a3182dd279064391c7ad5660b13b7"
+    }
+  ]
+}

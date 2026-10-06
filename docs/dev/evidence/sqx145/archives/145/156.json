@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar",
+  "sha256": "f61657cfd2d188cba920a733bdf0810138e8aa702fc8e38d47bf55b352646edb",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CryptoExchange/impl/Binance/CryptoExchangeBinancePlugin.class": "75cbdd618509b13e57f40f9a050bfc78ba2c8266dab5bfb459f37f10662c5a4f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/Binance/CryptoExchangeBinancePlugin.class",
+      "occurrence": 0,
+      "sha256": "75cbdd618509b13e57f40f9a050bfc78ba2c8266dab5bfb459f37f10662c5a4f",
+      "member_shard": "docs/dev/evidence/sqx145/members/156/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/156/001.json",
+      "sha256": "0486fb50380f7df48ac0a5e01a576c8b73d91e4752f6695c28584ad2ed2b2782"
+    }
+  ]
+}

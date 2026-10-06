@@ -1,0 +1,179 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/error_prone_annotations-2.4.0.jar",
+  "sha256": "5f2a0648230a662e8be049df308d583d7369f13af683e44ddf5829b6d741a228",
+  "class_count": 22,
+  "unique_class_entries": 22,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "com/google/errorprone/annotations/CanIgnoreReturnValue.class": "7b908ae05832c942f1cd82750e86710ae8551d7865aa6fda683868c2587a800b",
+    "com/google/errorprone/annotations/IncompatibleModifiers.class": "9bf81b42c94a56d6d6f200ba52d7377fa0d833778eddfcea5e46b06d37e255bd",
+    "com/google/errorprone/annotations/RestrictedApi.class": "5c856f6302bb5dcffbe34da074f26164c5e8a871d0b8734d8e5a7012db87ff7b",
+    "com/google/errorprone/annotations/RequiredModifiers.class": "f90c4a945a289e30e5281fbccae92db1e28e0a1d247ab212eb6ba74e80c5c5df",
+    "com/google/errorprone/annotations/concurrent/LockMethod.class": "c07e89a2ebb34dddbd4bf4746ac667033ccd070fad0c085550575b29bf298136",
+    "com/google/errorprone/annotations/concurrent/LazyInit.class": "ff14b997374484af78c5a0a7d563dd8de85a271e8f49ec5705e8db30c816b5ac",
+    "com/google/errorprone/annotations/concurrent/UnlockMethod.class": "39727227b4b249e15e72fd340594578238d93b368e423aaa2825a788f43d39bf",
+    "com/google/errorprone/annotations/concurrent/GuardedBy.class": "35ae0dfde8938d68a695560607c81d0e8fd1ae05ac166342c4fc5eaaa0ed5602",
+    "com/google/errorprone/annotations/NoAllocation.class": "35ae8d947f90b538c8ae6af10889a66e0e608041f59aa7a938f37b33175a55ce",
+    "com/google/errorprone/annotations/Immutable.class": "c2f421da3f28d5e5d4bd82233490493f8d92b8d57d90a9ef797c4132d7cf557a",
+    "com/google/errorprone/annotations/OverridingMethodsMustInvokeSuper.class": "7e928c6f8023b8b48c9d1439da7da4f05df559f471fb39f0cc310b2a05c11e36",
+    "com/google/errorprone/annotations/CompatibleWith.class": "f87396f38f850ff9280f99497c9e389a8245b4b8c78c2923cf506aafa901787b",
+    "com/google/errorprone/annotations/CheckReturnValue.class": "63fe138c1bb0b585fe8ef8b5a4296b8575a11f3d25069d5b6fb4c41493c7ac87",
+    "com/google/errorprone/annotations/FormatMethod.class": "2cb02fede6bef92da58d9818ded630cf793454551c77f57de54314588341ddd4",
+    "com/google/errorprone/annotations/DoNotMock.class": "814a479f1f950a7998588882a3c7c91a7b4bb05703469c4a7ee2dc15c5c1b91f",
+    "com/google/errorprone/annotations/FormatString.class": "1327d830c766c6e91e43d5bb6899a63da9ca20250a841727251fd7831af898be",
+    "com/google/errorprone/annotations/Var.class": "4f68444ada32ddb4b6f5f992e9b51b8e79a6cb8918c6904bc0795674cb04d79a",
+    "com/google/errorprone/annotations/MustBeClosed.class": "4244431cb5b331f5bc3561d861bf064b2b39a1a3dd31a1e2b5e238989c74e0ca",
+    "com/google/errorprone/annotations/CompileTimeConstant.class": "e218c3a65586627ab5d8bf57aa9e3704c666d9e67f2b279fb029b057f992af2e",
+    "com/google/errorprone/annotations/SuppressPackageLocation.class": "74f0e0edcacbf8526ae0ded4201bdfe67c8fc52ab4f335dbee6044adf0dfe6b4",
+    "com/google/errorprone/annotations/ForOverride.class": "c32691981d4c7c11a62d09d7be4deccd81fc9cb1393f525489bd204fabfe12f9",
+    "com/google/errorprone/annotations/DoNotCall.class": "e6fd1e9fce32aea250e642c527c3707aac77157b03df8ae0c3f07b44d22d4746"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "15520c460707f79525829c8630dd34884bd00b0bee9610cd233f92979645e6a8",
+    "META-INF/maven/com.google.errorprone/error_prone_annotations/pom.xml": "7ea54bfa260ea03d4f084158d284ac8737a5507f77c80f9634da8bdcc018474f",
+    "META-INF/maven/com.google.errorprone/error_prone_annotations/pom.properties": "9fd5b467b339b3b4547ea8fb579c3be111f68d83efc7873e9d2dfbf2bdedf59e"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/google/errorprone/annotations/CanIgnoreReturnValue.class",
+      "occurrence": 0,
+      "sha256": "7b908ae05832c942f1cd82750e86710ae8551d7865aa6fda683868c2587a800b",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/IncompatibleModifiers.class",
+      "occurrence": 0,
+      "sha256": "9bf81b42c94a56d6d6f200ba52d7377fa0d833778eddfcea5e46b06d37e255bd",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/RestrictedApi.class",
+      "occurrence": 0,
+      "sha256": "5c856f6302bb5dcffbe34da074f26164c5e8a871d0b8734d8e5a7012db87ff7b",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/RequiredModifiers.class",
+      "occurrence": 0,
+      "sha256": "f90c4a945a289e30e5281fbccae92db1e28e0a1d247ab212eb6ba74e80c5c5df",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/LockMethod.class",
+      "occurrence": 0,
+      "sha256": "c07e89a2ebb34dddbd4bf4746ac667033ccd070fad0c085550575b29bf298136",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/LazyInit.class",
+      "occurrence": 0,
+      "sha256": "ff14b997374484af78c5a0a7d563dd8de85a271e8f49ec5705e8db30c816b5ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/UnlockMethod.class",
+      "occurrence": 0,
+      "sha256": "39727227b4b249e15e72fd340594578238d93b368e423aaa2825a788f43d39bf",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/GuardedBy.class",
+      "occurrence": 0,
+      "sha256": "35ae0dfde8938d68a695560607c81d0e8fd1ae05ac166342c4fc5eaaa0ed5602",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/NoAllocation.class",
+      "occurrence": 0,
+      "sha256": "35ae8d947f90b538c8ae6af10889a66e0e608041f59aa7a938f37b33175a55ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/Immutable.class",
+      "occurrence": 0,
+      "sha256": "c2f421da3f28d5e5d4bd82233490493f8d92b8d57d90a9ef797c4132d7cf557a",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/OverridingMethodsMustInvokeSuper.class",
+      "occurrence": 0,
+      "sha256": "7e928c6f8023b8b48c9d1439da7da4f05df559f471fb39f0cc310b2a05c11e36",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CompatibleWith.class",
+      "occurrence": 0,
+      "sha256": "f87396f38f850ff9280f99497c9e389a8245b4b8c78c2923cf506aafa901787b",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CheckReturnValue.class",
+      "occurrence": 0,
+      "sha256": "63fe138c1bb0b585fe8ef8b5a4296b8575a11f3d25069d5b6fb4c41493c7ac87",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/FormatMethod.class",
+      "occurrence": 0,
+      "sha256": "2cb02fede6bef92da58d9818ded630cf793454551c77f57de54314588341ddd4",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/DoNotMock.class",
+      "occurrence": 0,
+      "sha256": "814a479f1f950a7998588882a3c7c91a7b4bb05703469c4a7ee2dc15c5c1b91f",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/FormatString.class",
+      "occurrence": 0,
+      "sha256": "1327d830c766c6e91e43d5bb6899a63da9ca20250a841727251fd7831af898be",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/Var.class",
+      "occurrence": 0,
+      "sha256": "4f68444ada32ddb4b6f5f992e9b51b8e79a6cb8918c6904bc0795674cb04d79a",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/MustBeClosed.class",
+      "occurrence": 0,
+      "sha256": "4244431cb5b331f5bc3561d861bf064b2b39a1a3dd31a1e2b5e238989c74e0ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CompileTimeConstant.class",
+      "occurrence": 0,
+      "sha256": "e218c3a65586627ab5d8bf57aa9e3704c666d9e67f2b279fb029b057f992af2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/SuppressPackageLocation.class",
+      "occurrence": 0,
+      "sha256": "74f0e0edcacbf8526ae0ded4201bdfe67c8fc52ab4f335dbee6044adf0dfe6b4",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/ForOverride.class",
+      "occurrence": 0,
+      "sha256": "c32691981d4c7c11a62d09d7be4deccd81fc9cb1393f525489bd204fabfe12f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    },
+    {
+      "entry": "com/google/errorprone/annotations/DoNotCall.class",
+      "occurrence": 0,
+      "sha256": "e6fd1e9fce32aea250e642c527c3707aac77157b03df8ae0c3f07b44d22d4746",
+      "member_shard": "docs/dev/evidence/sqx145/members/025/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/025/001.json",
+      "sha256": "e911cdfeeace560d1843eb3c36084f8736ac2784266a9eda7f4341e6a007034e"
+    }
+  ]
+}

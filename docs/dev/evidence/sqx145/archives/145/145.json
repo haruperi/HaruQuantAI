@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
+  "sha256": "e197dc620cdeb9bccc53742aa8c3aa6a3a9bc41aea320f3e95eb3b052e503d7d",
+  "class_count": 7,
+  "unique_class_entries": 7,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge.class": "2e4ca5a995a1289182449cf3e6582ff5c2d99bdd552df852a7ff8c951493342c",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1.class": "68b504dcbdaa50ea44ea9ff9fdd0db8c0d4dea3fd6942bb7f84f240eae918494",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection.class": "33aca15343911716b373872306b7f985322ce6ace7ff4e6880d34768a7059b30",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin.class": "5db4a84c516ab15bec920e33038751ae31b7aa71979b1756ef664934a53efade",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed.class": "ed243e16f3a63cfb9da535164446917e6eff9e6e8ddb982299b370c951621f5e",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine.class": "b7efeb2e8935cca7cbabe87f2b87ae87c7072072b98d142a19b16e88719a04fb",
+    "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager.class": "314e2022010038ae942ba66bf8b0d1bd999bea1a22c0c1e0e14a2ba7f3125ee8"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge.class",
+      "occurrence": 0,
+      "sha256": "2e4ca5a995a1289182449cf3e6582ff5c2d99bdd552df852a7ff8c951493342c",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1.class",
+      "occurrence": 0,
+      "sha256": "68b504dcbdaa50ea44ea9ff9fdd0db8c0d4dea3fd6942bb7f84f240eae918494",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection.class",
+      "occurrence": 0,
+      "sha256": "33aca15343911716b373872306b7f985322ce6ace7ff4e6880d34768a7059b30",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin.class",
+      "occurrence": 0,
+      "sha256": "5db4a84c516ab15bec920e33038751ae31b7aa71979b1756ef664934a53efade",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed.class",
+      "occurrence": 0,
+      "sha256": "ed243e16f3a63cfb9da535164446917e6eff9e6e8ddb982299b370c951621f5e",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine.class",
+      "occurrence": 0,
+      "sha256": "b7efeb2e8935cca7cbabe87f2b87ae87c7072072b98d142a19b16e88719a04fb",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager.class",
+      "occurrence": 0,
+      "sha256": "314e2022010038ae942ba66bf8b0d1bd999bea1a22c0c1e0e14a2ba7f3125ee8",
+      "member_shard": "docs/dev/evidence/sqx145/members/145/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/145/001.json",
+      "sha256": "a683c7a6e6c2091ecdb5a77a97ab20d7c4f4b89a2c0f86dc68648acc255db5af"
+    }
+  ]
+}

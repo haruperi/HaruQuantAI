@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+  "sha256": "4a9d64a03e668d1563a14e179c041721779a83b440c7ada56097fb9d28f54a3d",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooPlugin.class": "9e46208e83301871bd17a66a4fa7f7cd84392601986372b8a7e5fa844a76eea5",
+    "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1.class": "4cac10db560d9239cf11215a92cfc7b0a76f1c0427720ed3bff924a023ac9da9",
+    "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet.class": "6eb2edd80e4947fabcb4418e7f42e6c02bdf837fecdda441d2b3271950725765",
+    "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager.class": "dfdb6461845e7c406baa63e707b429e8b519cbae0526d26a991a33c00b4272b7",
+    "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol.class": "41078c6db0d87abd320df58fb7ee839f0df2593369bdd1f4740428d239e6f3e2"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooPlugin.class",
+      "occurrence": 0,
+      "sha256": "9e46208e83301871bd17a66a4fa7f7cd84392601986372b8a7e5fa844a76eea5",
+      "member_shard": "docs/dev/evidence/sqx145/members/181/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1.class",
+      "occurrence": 0,
+      "sha256": "4cac10db560d9239cf11215a92cfc7b0a76f1c0427720ed3bff924a023ac9da9",
+      "member_shard": "docs/dev/evidence/sqx145/members/181/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet.class",
+      "occurrence": 0,
+      "sha256": "6eb2edd80e4947fabcb4418e7f42e6c02bdf837fecdda441d2b3271950725765",
+      "member_shard": "docs/dev/evidence/sqx145/members/181/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager.class",
+      "occurrence": 0,
+      "sha256": "dfdb6461845e7c406baa63e707b429e8b519cbae0526d26a991a33c00b4272b7",
+      "member_shard": "docs/dev/evidence/sqx145/members/181/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol.class",
+      "occurrence": 0,
+      "sha256": "41078c6db0d87abd320df58fb7ee839f0df2593369bdd1f4740428d239e6f3e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/181/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/181/001.json",
+      "sha256": "b11c186cbd93f53677e06bd020d8874b96716f1692e9c3574f88ab74d4d765fa"
+    }
+  ]
+}

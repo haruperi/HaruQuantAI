@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsPortfolioComposerLog/ResultsPortfolioComposerLog.jar",
+  "sha256": "4653f9610a2df1b77fc164a9cb14ca21461ef3c58ebefdef570da9eb2bbcc043",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/PortfolioComposerLog/PortfolioComposerLogPlugin.class": "d5557df9573f70dc8fe8695ef9a47f1bb338c351b4553a5d895b0c60054d8ef5",
+    "com/strategyquant/plugin/Results/impl/PortfolioComposerLog/PortfolioComposerLogServlet.class": "7ddf5378341097a25d2414310d1f2821414dfa5cbacfe60c3a82246e8dea6307"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioComposerLog/PortfolioComposerLogPlugin.class",
+      "occurrence": 0,
+      "sha256": "d5557df9573f70dc8fe8695ef9a47f1bb338c351b4553a5d895b0c60054d8ef5",
+      "member_shard": "docs/dev/evidence/sqx145/members/209/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioComposerLog/PortfolioComposerLogServlet.class",
+      "occurrence": 0,
+      "sha256": "7ddf5378341097a25d2414310d1f2821414dfa5cbacfe60c3a82246e8dea6307",
+      "member_shard": "docs/dev/evidence/sqx145/members/209/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/209/001.json",
+      "sha256": "c822b1ffaa198c280d38c10fb93632b2e404aed0013b85b8c5ae943c6ffb8d97"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckWalkForwardMatrix/CrossCheckWalkForwardMatrix.jar",
+  "archive_sha256": "f007a6c8f3edeee29044a0c357cd51a1a60768b4daa06d621fd1508789543c1a",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/WalkForwardMatrix/WalkForwardMatrix.class",
+      "occurrence": 0,
+      "sha256": "296598d81a203721b005a6ae6a40428602ba0000bf4efeb470261e2131e9e07d",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/WalkForwardMatrix/WalkForwardMatrix",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "distributionUp",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "distributionDown",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxSteps",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "paramTypesWFM",
+          "descriptor": "Lcom/strategyquant/lib/ValuesMap;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f6f3f1a273b5976ccbd80607197b82cafdfb0c44d52a2c03bff63749d5c1d562",
+          "code_length": 36
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8c511e27edfd8cba192f0eee5cd4a1e2b6de1e8ea2bb329081829622f15c2280",
+          "code_length": 4
+        },
+        {
+          "name": "getShortName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "246f4ecc194424ae6db930856d0b2b9c519e59d111e6666eb4c675e90c9175b4",
+          "code_length": 6
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "023899f0641d15365efe55b4c21910120b3db0055e2e0397a9075580b67d2193",
+          "code_length": 6
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ff16c61f70840e9a95983034a1e6cde6105fa6f42bf2955454c51317914bc74f",
+          "code_length": 4
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "4b1e5bab09460520b2a127ebeb53216a8b71dbdb0c5f7be4a3e48eba0e6e8db6",
+          "code_length": 497,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "prepareSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lorg/jdom2/Element;Z)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4,
+          "code_sha256": "acb6ac0df35ddd9a653b9b97dacc71034c75831d4203546f1161bbc8551c4d88",
+          "code_length": 297,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;",
+          "access": 1,
+          "code_sha256": "d27596fcd9ebe1adb06672986daf6aa94439936466b9b86af895fb323c87ae59",
+          "code_length": 83
+        },
+        {
+          "name": "getChartSetups",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;)Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "printSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cc3c56f7098b6aa79fb920f29934ac0bb7d1e6760fba6a7b1be0cca4941fe249",
+          "code_length": 902,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getBadStrategyReason",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a023558515cf34fe949233e6beb4a918af1a4cc262757d0f6b78294bf42a7717",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "eae8952ef4ed071e7cbb0ff47502c4b70e311b6e5ed8a12625db0941f5ab53b2",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/ValuesMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CrossCheck/impl/WalkForwardMatrix/WalkForwardMatrix",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Variables",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/optimization/OptimizationConst",
+        "com/strategyquant/tradinglib/optimization/OptimizationMethods",
+        "com/strategyquant/tradinglib/optimization/OptimizationSettings",
+        "com/strategyquant/tradinglib/optimization/OptimizationTypes",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "org/jdom2/Element",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

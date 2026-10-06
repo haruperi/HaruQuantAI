@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+  "sha256": "a93d9519154a9761ea6226b14b7997c2e75418bb9c9cf899d11d5e077549fc8c",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationPlugin.class": "3446bff7b58d8dc9a24f381a32eceee8f5a22795cb55bdb1b07e3c04fce46241",
+    "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet.class": "be27944535791da7576e8f0e97c58ca6b708b56afe507d8691d443cbbdcb9f49"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationPlugin.class",
+      "occurrence": 0,
+      "sha256": "3446bff7b58d8dc9a24f381a32eceee8f5a22795cb55bdb1b07e3c04fce46241",
+      "member_shard": "docs/dev/evidence/sqx145/members/218/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet.class",
+      "occurrence": 0,
+      "sha256": "be27944535791da7576e8f0e97c58ca6b708b56afe507d8691d443cbbdcb9f49",
+      "member_shard": "docs/dev/evidence/sqx145/members/218/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/218/001.json",
+      "sha256": "5f7845225ef88c53051716f37c199a51ac7eac05bc8f1f27fdf26c64ec167278"
+    }
+  ]
+}

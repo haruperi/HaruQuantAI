@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppGridTest/AppGridTest.jar",
+  "archive_sha256": "54052d60afe500b1cbe04113905e1812077bd2f6e696329e42b5e14ef8529023",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/GridTest/GridTestAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "e2882348df6e30cc82a9f3d8e10e969b91f71e07e10134d9a40436ddfb2cdddf",
+      "name": "com/strategyquant/plugin/App/impl/GridTest/GridTestAppPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getContextPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getAppCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "431034cbe64ce7aa669460b922771c46e391bad78e1f55810986f31765f72009",
+          "code_length": 3
+        },
+        {
+          "name": "getTooltip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        },
+        {
+          "name": "getProject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9b8415f6f012a50cbd0c2aa6ff1b6774476c86a6ad0b8abc1786f39bd98e9014",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/GridTest/GridTestAppPlugin",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

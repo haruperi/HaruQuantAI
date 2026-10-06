@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsRankings/SettingsRankings.jar",
+  "sha256": "abbe6504b602945607a4f412bf247fe5710481d7726056398957ac6f5886da06",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/Rankings/SettingsRankingsPlugin.class": "e7da59853301ada7910e9f46f76fe303426916a91866dcb30b2ea3498fc32cc2",
+    "com/strategyquant/plugin/Settings/impl/Rankings/SettingsRankingsServlet.class": "a48fd7d14651c1d6e917ae728580a7eae689e067f7fa03f1f8a423033ae43482"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Rankings/SettingsRankingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "e7da59853301ada7910e9f46f76fe303426916a91866dcb30b2ea3498fc32cc2",
+      "member_shard": "docs/dev/evidence/sqx145/members/260/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Rankings/SettingsRankingsServlet.class",
+      "occurrence": 0,
+      "sha256": "a48fd7d14651c1d6e917ae728580a7eae689e067f7fa03f1f8a423033ae43482",
+      "member_shard": "docs/dev/evidence/sqx145/members/260/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/260/001.json",
+      "sha256": "443fcc44129d17a47ef7353640288399a7d4c92c8942aa2f52225d278d411c50"
+    }
+  ]
+}

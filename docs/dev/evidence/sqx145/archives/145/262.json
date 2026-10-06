@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsStopAndStart/SettingsStopAndStart.jar",
+  "sha256": "9f850d7aa0c52ed082f30f4ceada82f8b914d9151b9a100b3ddeab9fa3a32689",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/StopAndStart/SettingsStopAndStartPlugin.class": "e447d63ee9511f9eb802d37c0f306cfb00a8fa32339d1b9eecb43af016d78e96"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/StopAndStart/SettingsStopAndStartPlugin.class",
+      "occurrence": 0,
+      "sha256": "e447d63ee9511f9eb802d37c0f306cfb00a8fa32339d1b9eecb43af016d78e96",
+      "member_shard": "docs/dev/evidence/sqx145/members/262/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/262/001.json",
+      "sha256": "abae256a0aecb239490772c1c99f1ce17c65081fb4c7dc1edf278e650c3e35fc"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+  "sha256": "ae170dfb47e1a0b7bacebb47b8575ac7a33976d613784c84a96abf5507a38a3f",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataPlugin.class": "94df4557a43ca39b691a1bd644383abaf2d866a7e28a8358fa79cc2fafed6f63",
+    "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1.class": "5f57b3c00371829d61715de615ca79326137136439b33085a02743b21dd774bb",
+    "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2.class": "8bc4d85547b88ca6862a402383dfc9489c2562f073d3fb6821ded94fb1089f9b",
+    "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3.class": "d26f1f1486cbe9b724a6b684cc3e1418efc75f955dc4811c796ed817e6d46f83",
+    "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet.class": "91ca356c42989923e2b1830ada1db91aa606e150bb35dd57698da1cd16f15f15"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataPlugin.class",
+      "occurrence": 0,
+      "sha256": "94df4557a43ca39b691a1bd644383abaf2d866a7e28a8358fa79cc2fafed6f63",
+      "member_shard": "docs/dev/evidence/sqx145/members/179/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1.class",
+      "occurrence": 0,
+      "sha256": "5f57b3c00371829d61715de615ca79326137136439b33085a02743b21dd774bb",
+      "member_shard": "docs/dev/evidence/sqx145/members/179/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2.class",
+      "occurrence": 0,
+      "sha256": "8bc4d85547b88ca6862a402383dfc9489c2562f073d3fb6821ded94fb1089f9b",
+      "member_shard": "docs/dev/evidence/sqx145/members/179/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3.class",
+      "occurrence": 0,
+      "sha256": "d26f1f1486cbe9b724a6b684cc3e1418efc75f955dc4811c796ed817e6d46f83",
+      "member_shard": "docs/dev/evidence/sqx145/members/179/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet.class",
+      "occurrence": 0,
+      "sha256": "91ca356c42989923e2b1830ada1db91aa606e150bb35dd57698da1cd16f15f15",
+      "member_shard": "docs/dev/evidence/sqx145/members/179/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/179/001.json",
+      "sha256": "e3a686db57ef70c3ec467f7de37ea2f00132a436e04bfdb58686887e0dd96b71"
+    }
+  ]
+}

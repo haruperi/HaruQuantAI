@@ -1,0 +1,270 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jsr305-3.0.2.jar",
+  "sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7",
+  "class_count": 35,
+  "unique_class_entries": 35,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "javax/annotation/CheckForNull.class": "5fa59b59f215cba12a540ca090fcb3f962e513c12cf01c868d1927916ca63af4",
+    "javax/annotation/CheckForSigned.class": "d8a347f815d20158998dd5be8280459fd0babf792ada6656ad5872b82da1802b",
+    "javax/annotation/CheckReturnValue.class": "2b6d2054baadaf5db7fcc6df157b83abb0e16fa9a2067a97aeb8018d142e9bb6",
+    "javax/annotation/concurrent/GuardedBy.class": "c60ab8afab8f6597f3b48807c5d7b17090067ba9d8d77b1c1ae44c7931527fdf",
+    "javax/annotation/concurrent/Immutable.class": "35ac11c7bbc605bc81763310ae2646ebdd61e97f0e841f022f4707ee5552482f",
+    "javax/annotation/concurrent/NotThreadSafe.class": "8da8a5626599f3357c117fc105c8f693e6cb50de88ad92200850374916ae677b",
+    "javax/annotation/concurrent/ThreadSafe.class": "5473ba9cba72d2560e7f311026cbcf0bf8d971b8e705bc2cf6c3a201a94f1e95",
+    "javax/annotation/Detainted.class": "dbff06a53974a4aab588e70c00eccf5ba8ad633942ab23cfeb8faca9a1f6c8ac",
+    "javax/annotation/MatchesPattern$Checker.class": "1d0903d9b801dbc95ac5929cc7bc78ba78dadf8c8b48ba4bd54831f401a3bd39",
+    "javax/annotation/MatchesPattern.class": "80a8ca877069ed4b96c332dcf72d23125e026a7fb7d1fd4aceea963cf85e110f",
+    "javax/annotation/meta/Exclusive.class": "582f4687e28058857069d15aab567c56db8c8b21e4533f05cee7a77c0366290c",
+    "javax/annotation/meta/Exhaustive.class": "52fa2ba25b5c13c98b334bf913003870979c45961b57c33d55142eb7d97ae76c",
+    "javax/annotation/meta/TypeQualifier.class": "65c01688d5002219c9dcb8a0defc5871e9587a1fdc23f9fe4ca3d0d129effb34",
+    "javax/annotation/meta/TypeQualifierDefault.class": "246eef37fc67c2b37cbb9d97944e897fec1100e5aad3e3c240ee87e6c09e7d81",
+    "javax/annotation/meta/TypeQualifierNickname.class": "60756aa9e427037f5d14c6b88716c62383acf6bb73b2f4579118b73391a087c3",
+    "javax/annotation/meta/TypeQualifierValidator.class": "b955f075af35f689055ed007eaf80446e460d61e2c78e99c7674a7236b1666d5",
+    "javax/annotation/meta/When.class": "2a8f8892c3c3bf72c1ba8b0bfe9fd09fe0ad68558954aa36f7aaf8f20eba5104",
+    "javax/annotation/Nonnegative$Checker.class": "11130af801137746c018270467cba6764d1fa1f507d39edaa2007bd35d7f062b",
+    "javax/annotation/Nonnegative.class": "50b23189867f2129fa7f6e68e0285106dd1a98a611a4974b668ca5329a3f8b89",
+    "javax/annotation/Nonnull$Checker.class": "a179bdcda05127d700befba901422bf8170b28d3136921fa7f19ff3cea7a3b4e",
+    "javax/annotation/Nonnull.class": "c0572d5c061ece17c11160bfeaed18ed7845d738fb76e0262ff19d4192f60178",
+    "javax/annotation/Nullable.class": "ec67e16bda9e00f06bbb6dca85e39ee88239db8c6ea410bc322839af67373ded",
+    "javax/annotation/OverridingMethodsMustInvokeSuper.class": "acb4b3e96eb9045ae3ae8c43be71870cdac6b5b958bc2df1510a166cf422cdc8",
+    "javax/annotation/ParametersAreNonnullByDefault.class": "730fe9f413e529cc10e98f624c5552834ca07343f1b9451903c4027f964be4d0",
+    "javax/annotation/ParametersAreNullableByDefault.class": "e986fcd305a1b512ddca018d194e2c3709e12a374c5399e0e4ee7b6ef7b77de4",
+    "javax/annotation/PropertyKey.class": "e4e5548e071a2f0b5e6e191bdfaa98e80b7053b3bd3566913973b9684badf31d",
+    "javax/annotation/RegEx$Checker.class": "2b2cad66ce6254c4a7117aa5eabff360077c3aaa46eb43f06472ef0f5c49c806",
+    "javax/annotation/RegEx.class": "dd4449a4d6cb80594d1a1d0523daed49fd2008c2e54a5aa4f7507d0de7d4dfa6",
+    "javax/annotation/Signed.class": "3235c957f0d766a7f72955875c663f078fb33eb3e2ba6c0f3ff494cb63c48c6a",
+    "javax/annotation/Syntax.class": "1179a64e0c0556d7f0040caaa4219c4f7c0e9b26e8f4ace9d764b01a23f0ca54",
+    "javax/annotation/Tainted.class": "2aaf8d9de64111525186d8019835ec19e6c25a2735e2e2c34be80a2ca5370ec7",
+    "javax/annotation/Untainted.class": "b1d1e05dffd012fc3541002955db5acb653c7d5497b12d3866d7b67769730209",
+    "javax/annotation/WillClose.class": "599ca8acb5ed1bec57ab6d2b2eb4674327de774cc37d68f5b1cfb20a2a15f3ca",
+    "javax/annotation/WillCloseWhenClosed.class": "7eb5c0b358f08f56c927a9676630852e438c5474eb044a6d85b51d6de7a87017",
+    "javax/annotation/WillNotClose.class": "dc518608313b1d11a78cd378bc9a40cc1e9b977e5136d1ee7e412009ef9e8793"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "9329f6c6942e128348908339b59dbf209642c148dda83f1cf55fc8516a023092",
+    "META-INF/maven/com.google.code.findbugs/jsr305/pom.xml": "19889dbdf1b254b2601a5ee645b8147a974644882297684c798afe5d63d78dfe",
+    "META-INF/maven/com.google.code.findbugs/jsr305/pom.properties": "a1bc40920a401d8954cb1368e63e6d36f88fb9cfd4ef1bed8534cbdcecfec127"
+  },
+  "class_occurrences": [
+    {
+      "entry": "javax/annotation/CheckForNull.class",
+      "occurrence": 0,
+      "sha256": "5fa59b59f215cba12a540ca090fcb3f962e513c12cf01c868d1927916ca63af4",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/CheckForSigned.class",
+      "occurrence": 0,
+      "sha256": "d8a347f815d20158998dd5be8280459fd0babf792ada6656ad5872b82da1802b",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/CheckReturnValue.class",
+      "occurrence": 0,
+      "sha256": "2b6d2054baadaf5db7fcc6df157b83abb0e16fa9a2067a97aeb8018d142e9bb6",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/concurrent/GuardedBy.class",
+      "occurrence": 0,
+      "sha256": "c60ab8afab8f6597f3b48807c5d7b17090067ba9d8d77b1c1ae44c7931527fdf",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/concurrent/Immutable.class",
+      "occurrence": 0,
+      "sha256": "35ac11c7bbc605bc81763310ae2646ebdd61e97f0e841f022f4707ee5552482f",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/concurrent/NotThreadSafe.class",
+      "occurrence": 0,
+      "sha256": "8da8a5626599f3357c117fc105c8f693e6cb50de88ad92200850374916ae677b",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/concurrent/ThreadSafe.class",
+      "occurrence": 0,
+      "sha256": "5473ba9cba72d2560e7f311026cbcf0bf8d971b8e705bc2cf6c3a201a94f1e95",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Detainted.class",
+      "occurrence": 0,
+      "sha256": "dbff06a53974a4aab588e70c00eccf5ba8ad633942ab23cfeb8faca9a1f6c8ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/MatchesPattern$Checker.class",
+      "occurrence": 0,
+      "sha256": "1d0903d9b801dbc95ac5929cc7bc78ba78dadf8c8b48ba4bd54831f401a3bd39",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/MatchesPattern.class",
+      "occurrence": 0,
+      "sha256": "80a8ca877069ed4b96c332dcf72d23125e026a7fb7d1fd4aceea963cf85e110f",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/Exclusive.class",
+      "occurrence": 0,
+      "sha256": "582f4687e28058857069d15aab567c56db8c8b21e4533f05cee7a77c0366290c",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/Exhaustive.class",
+      "occurrence": 0,
+      "sha256": "52fa2ba25b5c13c98b334bf913003870979c45961b57c33d55142eb7d97ae76c",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifier.class",
+      "occurrence": 0,
+      "sha256": "65c01688d5002219c9dcb8a0defc5871e9587a1fdc23f9fe4ca3d0d129effb34",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierDefault.class",
+      "occurrence": 0,
+      "sha256": "246eef37fc67c2b37cbb9d97944e897fec1100e5aad3e3c240ee87e6c09e7d81",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierNickname.class",
+      "occurrence": 0,
+      "sha256": "60756aa9e427037f5d14c6b88716c62383acf6bb73b2f4579118b73391a087c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierValidator.class",
+      "occurrence": 0,
+      "sha256": "b955f075af35f689055ed007eaf80446e460d61e2c78e99c7674a7236b1666d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/meta/When.class",
+      "occurrence": 0,
+      "sha256": "2a8f8892c3c3bf72c1ba8b0bfe9fd09fe0ad68558954aa36f7aaf8f20eba5104",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Nonnegative$Checker.class",
+      "occurrence": 0,
+      "sha256": "11130af801137746c018270467cba6764d1fa1f507d39edaa2007bd35d7f062b",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Nonnegative.class",
+      "occurrence": 0,
+      "sha256": "50b23189867f2129fa7f6e68e0285106dd1a98a611a4974b668ca5329a3f8b89",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Nonnull$Checker.class",
+      "occurrence": 0,
+      "sha256": "a179bdcda05127d700befba901422bf8170b28d3136921fa7f19ff3cea7a3b4e",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Nonnull.class",
+      "occurrence": 0,
+      "sha256": "c0572d5c061ece17c11160bfeaed18ed7845d738fb76e0262ff19d4192f60178",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Nullable.class",
+      "occurrence": 0,
+      "sha256": "ec67e16bda9e00f06bbb6dca85e39ee88239db8c6ea410bc322839af67373ded",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/OverridingMethodsMustInvokeSuper.class",
+      "occurrence": 0,
+      "sha256": "acb4b3e96eb9045ae3ae8c43be71870cdac6b5b958bc2df1510a166cf422cdc8",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/ParametersAreNonnullByDefault.class",
+      "occurrence": 0,
+      "sha256": "730fe9f413e529cc10e98f624c5552834ca07343f1b9451903c4027f964be4d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/ParametersAreNullableByDefault.class",
+      "occurrence": 0,
+      "sha256": "e986fcd305a1b512ddca018d194e2c3709e12a374c5399e0e4ee7b6ef7b77de4",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/PropertyKey.class",
+      "occurrence": 0,
+      "sha256": "e4e5548e071a2f0b5e6e191bdfaa98e80b7053b3bd3566913973b9684badf31d",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/RegEx$Checker.class",
+      "occurrence": 0,
+      "sha256": "2b2cad66ce6254c4a7117aa5eabff360077c3aaa46eb43f06472ef0f5c49c806",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/RegEx.class",
+      "occurrence": 0,
+      "sha256": "dd4449a4d6cb80594d1a1d0523daed49fd2008c2e54a5aa4f7507d0de7d4dfa6",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Signed.class",
+      "occurrence": 0,
+      "sha256": "3235c957f0d766a7f72955875c663f078fb33eb3e2ba6c0f3ff494cb63c48c6a",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Syntax.class",
+      "occurrence": 0,
+      "sha256": "1179a64e0c0556d7f0040caaa4219c4f7c0e9b26e8f4ace9d764b01a23f0ca54",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Tainted.class",
+      "occurrence": 0,
+      "sha256": "2aaf8d9de64111525186d8019835ec19e6c25a2735e2e2c34be80a2ca5370ec7",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/Untainted.class",
+      "occurrence": 0,
+      "sha256": "b1d1e05dffd012fc3541002955db5acb653c7d5497b12d3866d7b67769730209",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/WillClose.class",
+      "occurrence": 0,
+      "sha256": "599ca8acb5ed1bec57ab6d2b2eb4674327de774cc37d68f5b1cfb20a2a15f3ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/WillCloseWhenClosed.class",
+      "occurrence": 0,
+      "sha256": "7eb5c0b358f08f56c927a9676630852e438c5474eb044a6d85b51d6de7a87017",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    },
+    {
+      "entry": "javax/annotation/WillNotClose.class",
+      "occurrence": 0,
+      "sha256": "dc518608313b1d11a78cd378bc9a40cc1e9b977e5136d1ee7e412009ef9e8793",
+      "member_shard": "docs/dev/evidence/sqx145/members/072/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/072/001.json",
+      "sha256": "50a72c5f08fb9b0e2c8860e42d8db31e24c4e6541d017ab3702121a77c0d030f"
+    }
+  ]
+}

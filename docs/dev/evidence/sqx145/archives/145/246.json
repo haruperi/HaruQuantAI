@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+  "sha256": "12ed3ab90da9476cdd55e57d00d67ef8f913a0af4963abe3a54070c03dc3515e",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksPlugin.class": "ee376914d97a5972c4b1860b28d6a9f70db4f8266155ce508e5c90a1390cadaa",
+    "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksServlet.class": "f6a2e2baa61cace98e80845b9c5204322906bcdcc7829e044295ae21b27ed9ca"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksPlugin.class",
+      "occurrence": 0,
+      "sha256": "ee376914d97a5972c4b1860b28d6a9f70db4f8266155ce508e5c90a1390cadaa",
+      "member_shard": "docs/dev/evidence/sqx145/members/246/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksServlet.class",
+      "occurrence": 0,
+      "sha256": "f6a2e2baa61cace98e80845b9c5204322906bcdcc7829e044295ae21b27ed9ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/246/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/246/001.json",
+      "sha256": "b5bdeb7df9e74db2336d13645d9bcbdf23d509afdcaa994a9ba78c29cd2baf6d"
+    }
+  ]
+}

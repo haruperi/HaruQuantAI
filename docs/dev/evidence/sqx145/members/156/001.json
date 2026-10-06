@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar",
+  "archive_sha256": "f61657cfd2d188cba920a733bdf0810138e8aa702fc8e38d47bf55b352646edb",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/Binance/CryptoExchangeBinancePlugin.class",
+      "occurrence": 0,
+      "sha256": "75cbdd618509b13e57f40f9a050bfc78ba2c8266dab5bfb459f37f10662c5a4f",
+      "name": "com/strategyquant/plugin/CryptoExchange/impl/Binance/CryptoExchangeBinancePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/exchange/Exchange",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "availableSymbols",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70e8411ed87192ad55eaaf582299ae93aae251f70e9c737839e631b2d4e4d677",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getSymbols",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "536dffc6eac79c910dc33dce4f2137f3142834d24fea1abbd670aa413ca844e0",
+          "code_length": 89,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/exchange/IExchange;",
+          "access": 1,
+          "code_sha256": "f8ba0b3cdb027d135b27a1fa7ed9fb8653cb5564b92732815fd07cd6ddbeabba",
+          "code_length": 8
+        },
+        {
+          "name": "download",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "357f00bac12191404abec4d04ddc2ff21e375c71b893f06129221662f0da66f2",
+          "code_length": 400,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "parseData2",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "d2be46d36b50cc59029536c6b7f9ce5e3764be04a855a50d307a9c6503dfbe16",
+          "code_length": 121,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseData",
+          "descriptor": "(Lorg/json/JSONArray;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "bf58b3530a4d8021cfe4f1d50f16e33a903fcf5f7765c9b0eb1a1b3f8c5ed937",
+          "code_length": 64
+        },
+        {
+          "name": "availableTimeframes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "5f3a1496dec15e002adf2e7ac623578375893165f4de34c15f05a247f6e63b7f",
+          "code_length": 80
+        },
+        {
+          "name": "convertTimeframe",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2a73819d6fcf021e25cd304ba6d0d27662c85ddd471d16a38529c13d75d910b5",
+          "code_length": 253,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkSymbolExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "21dcc2d8aaee368f991fac1e95ee6d73bf08695c192e98d253d68b860e4bec18",
+          "code_length": 59
+        },
+        {
+          "name": "getSymbolInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 1,
+          "code_sha256": "5e65a00cc14f36e5c575b318c89258bca6df2e222ee41655262754e6cad37be4",
+          "code_length": 63
+        },
+        {
+          "name": "findSymbolInfo",
+          "descriptor": "(Lorg/json/JSONArray;Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 2,
+          "code_sha256": "a57e90e8d8c9d8b29e2f9624840ef3330487f9e7e5f94dcb36463ada782db436",
+          "code_length": 60
+        },
+        {
+          "name": "fillSymbolInfo",
+          "descriptor": "(Lcom/strategyquant/tradinglib/exchange/SymbolInfo;Lorg/json/JSONObject;)V",
+          "access": 2,
+          "code_sha256": "d1061b7279601cedc69b34dcb4a8974113dff54ad3af07ef3913d42f4c9d80bb",
+          "code_length": 106
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "185489b7c5599ade1abef46849aac263a5cd34f162673efaaf21a05487164947",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonFactory",
+        "com/fasterxml/jackson/core/JsonParser",
+        "com/fasterxml/jackson/core/JsonToken",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/CryptoExchange/impl/Binance/CryptoExchangeBinancePlugin",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/exchange/Exchange",
+        "com/strategyquant/tradinglib/exchange/SymbolInfo",
+        "com/strategyquant/tradinglib/historyData/HttpApacheManager",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    }
+  ]
+}

@@ -1,136 +1,38 @@
 # TaskUpdateData.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/TaskUpdateData/TaskUpdateData.jar`.
-- SHA-256: `3d34fcd874c184c8252011f964cc0c3d7d2f841dd8c8954376db356555507b08`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **2**; non-nested: **1**; nested/anonymous: **1**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskUpdateData/TaskUpdateData.jar`.
+- **SHA-256:** `bfa0bb75056cfc77dac3ae15b19e58fc62fc86178154d9d9a04c6f0dd3d47508`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 2 raw entries; 2 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-PROJECT-TASK-UPDATE-DATA`, P13; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [287.json](../../dev/evidence/sqx145/archives/145/287.json).
 
-The `CustomProjects` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/287/001.json) — SHA-256 `52a14a0cecc489f0e04e58753b1c45d94428b4afa705a4f0f6bbac527eee11c6`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Task.impl.UpdateData`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C6500c8ac9302["UpdateDataTask"] {
-        -logMessage
-        -symbolsToUpdate
-        -type
-        +getType()
-        +getName()
-        +clone()
-        +start()
-    }
-    class C507ddf99c601["DataInfo"]
-    class Ce44d386802cb["AbstractTask"]
-    Ce44d386802cb <|-- C6500c8ac9302 : declared extends
-    C6500c8ac9302 ..> C507ddf99c601 : field type
+    class C0["UpdateDataTask"]
+    class E0["AbstractTask"]
+    E0 <|-- C0
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C507ddf99c601` | [`com.strategyquant.datalib.DataInfo`](../Shared/SQDataLib.md) | referenced external type |
-| `C6500c8ac9302` | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` (this JAR) | this diagram |
-| `Ce44d386802cb` | [`com.strategyquant.tradinglib.taskImpl.AbstractTask`](../Shared/SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | class | non-nested |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` | class | nested/anonymous |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.tradinglib.taskImpl.AbstractTask`](../Shared/SQTradingLib.md) | extends | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / class declaration: `public class com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask extends com.strategyquant.tradinglib.taskImpl.AbstractTask` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / field declaration: `private java.lang.String logMessage;`<br>`private java.lang.String type;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public java.lang.String getType();`<br>`public java.lang.String getName();`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public java.lang.String getPluginFolderName();`<br>`public java.lang.String[] getSettings();`<br>`static java.lang.String access$284(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask, java.lang.Object);` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.util.List` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / field declaration: `private java.util.List<com.strategyquant.datalib.DataInfo> symbolsToUpdate;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.util.List` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `static java.util.List access$000(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.datalib.DataInfo`](../Shared/SQDataLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / field declaration: `private java.util.List<com.strategyquant.datalib.DataInfo> symbolsToUpdate;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask() throws java.lang.Exception;`<br>`public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`private void loadSymbols(org.jdom2.Element) throws java.lang.Exception;`<br>`public void start() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.tradinglib.project.ProgressEngine`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`static com.strategyquant.tradinglib.project.ProgressEngine access$100(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);`<br>`static com.strategyquant.tradinglib.project.ProgressEngine access$300(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);`<br>`static com.strategyquant.tradinglib.project.ProgressEngine access$400(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);`<br>`static com.strategyquant.tradinglib.project.ProgressEngine access$500(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.tradinglib.taskImpl.ISQTask`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `org.jdom2.Element` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `private void loadSymbols(org.jdom2.Element) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.tradinglib.Databank`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `protected com.strategyquant.tradinglib.Databank[] getUsedDatabanks();`<br>`protected com.strategyquant.tradinglib.Databank getOutputDatabank();` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | [`com.strategyquant.tradinglib.project.ProjectGlobalLog`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `public void logTaskFinished(com.strategyquant.tradinglib.project.ProjectGlobalLog);` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` | `java.lang.Object` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` / method signature: `static java.lang.String access$284(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask, java.lang.Object);` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` | `java.lang.Thread` (not resolved in scoped archives) | extends | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` / class declaration: `class com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1 extends java.lang.Thread` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` (this JAR) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` / field declaration: `final com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask this$0;` |
-| `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask` (this JAR) | type dependency | `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1` / method signature: `com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask</summary>
-
-```text
-public class com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask extends com.strategyquant.tradinglib.taskImpl.AbstractTask
-    private java.lang.String logMessage;
-    private java.util.List<com.strategyquant.datalib.DataInfo> symbolsToUpdate;
-    private java.lang.String type;
-    public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask() throws java.lang.Exception;
-    public com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;
-    public java.lang.String getType();
-    public java.lang.String getName();
-    public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;
-    private void init();
-    private void loadSymbols(org.jdom2.Element) throws java.lang.Exception;
-    public void start() throws java.lang.Exception;
-    protected int getRunningStatus();
-    public java.lang.String getPluginFolderName();
-    public int getPreferredPosition();
-    public java.lang.String[] getSettings();
-    protected com.strategyquant.tradinglib.Databank[] getUsedDatabanks();
-    protected com.strategyquant.tradinglib.Databank getOutputDatabank();
-    public void logTaskFinished(com.strategyquant.tradinglib.project.ProjectGlobalLog);
-    static java.util.List access$000(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-    static com.strategyquant.tradinglib.project.ProgressEngine access$100(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-    static java.lang.String access$284(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask, java.lang.Object);
-    static com.strategyquant.tradinglib.project.ProgressEngine access$300(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-    static com.strategyquant.tradinglib.project.ProgressEngine access$400(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-    static com.strategyquant.tradinglib.project.ProgressEngine access$500(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1</summary>
-
-```text
-class com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1 extends java.lang.Thread
-    final com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask this$0;
-    com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask$1(com.strategyquant.plugin.Task.impl.UpdateData.UpdateDataTask);
-    public void run();
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask$1.class` | 0 | `4a45f7bfa70700c756743557f2735188a1b1db0835d178186441168d685409d8` | 1 | 2 |
+| `com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask.class` | 0 | `ae7dcf47bb8bb400c622cbb39c9e8fd44e58edc1e27320cf3b77b3c4193c5987` | 3 | 21 |

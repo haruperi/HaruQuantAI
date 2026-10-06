@@ -1,0 +1,2607 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/xstream-1.4.9.jar",
+  "archive_sha256": "381ea035b0e22eb1a02e5c09b60fb93293930516c4c79b43519f97a9ea9cbad3",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/SerializableConverter$UnserializableParentsReflectionProvider.class",
+      "occurrence": 0,
+      "sha256": "444936516f682b50f83264a733abfd1f420437b14f26bcdbedd5b01433e07295",
+      "name": "com/thoughtworks/xstream/converters/reflection/SerializableConverter$UnserializableParentsReflectionProvider",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/thoughtworks/xstream/converters/reflection/ReflectionProviderWrapper",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "visitSerializableFields",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor;)V",
+          "access": 1,
+          "code_sha256": "a2bab3a1f378ab3e6f9f3a14bb01e1f584ef1d75cce47c8c6c439c48c635bfb4",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProviderWrapper",
+        "com/thoughtworks/xstream/converters/reflection/SerializableConverter",
+        "com/thoughtworks/xstream/converters/reflection/SerializableConverter$UnserializableParentsReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/SerializableConverter$UnserializableParentsReflectionProvider$1"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter$ReverseEngineeredCallbackFilter.class",
+      "occurrence": 0,
+      "sha256": "d593f290068b4fbaabf02338bd9565c1d835cb22731212a88e31cb524877b674",
+      "name": "com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter$ReverseEngineeredCallbackFilter",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/sf/cglib/proxy/CallbackFilter"
+      ],
+      "fields": [
+        {
+          "name": "callbackIndexMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/reflect/Method;)I",
+          "access": 1,
+          "code_sha256": "0f2776d4d9226fa5f508338e4201d96dab07a504ae4e1beab1a53f16cd7d3d3f",
+          "code_length": 52
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter",
+        "com/thoughtworks/xstream/converters/reflection/CGLIBEnhancedConverter$ReverseEngineeredCallbackFilter",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/reflect/Method",
+        "java/util/Map",
+        "net/sf/cglib/proxy/CallbackFilter"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$FieldInfo.class",
+      "occurrence": 0,
+      "sha256": "d1954c602dd88522e6b0d097b16c65fc83292aa996b865949d124552ccc148b1",
+      "name": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$FieldInfo",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$FieldLocation",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 16
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "d3a4a2bf6bdcd06e62b9ace0cce9af09e2d3185defa44e70fb0834b5bdfdc15d",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$FieldInfo",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$FieldLocation"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/ReflectionProviderWrapper.class",
+      "occurrence": 0,
+      "sha256": "9499ddd96bb96124ea770b5975353bf098962a2f01d7cbda78d0f4e86a88825f",
+      "name": "com/thoughtworks/xstream/converters/reflection/ReflectionProviderWrapper",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider"
+      ],
+      "fields": [
+        {
+          "name": "wrapped",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "fieldDefinedInClass",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d6ea0b23ff9513d528866167e3f82680fabdf18145155677a4a3b6a3746f3402",
+          "code_length": 12
+        },
+        {
+          "name": "getField",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;",
+          "access": 1,
+          "code_sha256": "2eef000a5b44da6222079d9f713eff262247c4d5f3131429d92e8e8e1c25e09f",
+          "code_length": 12
+        },
+        {
+          "name": "getFieldOrNull",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;",
+          "access": 1,
+          "code_sha256": "2787a7f0e5d88c58c6f36921c7403f6478651953aabee7c6b747f8f5ca1dfffb",
+          "code_length": 12
+        },
+        {
+          "name": "getFieldType",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "ce1061dfc47b0adcdb04750df5dd45be152968fc677c9c41e83dadc59abfb6b4",
+          "code_length": 13
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "252591b33afe0353f0ddd2248c8ae6c4ab310b038ef0ba842a3efd8369543e7a",
+          "code_length": 11
+        },
+        {
+          "name": "visitSerializableFields",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor;)V",
+          "access": 1,
+          "code_sha256": "655caf63a53d5056aafc43c104fe73a280ea5c03d61f8100b728794f01c7adb7",
+          "code_length": 12
+        },
+        {
+          "name": "writeField",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "8cb9e6231cd9c1331b970d37e1b458912053a23d60de1a0bfc5c9b07dc80363f",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProviderWrapper",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$DuplicateFieldException.class",
+      "occurrence": 0,
+      "sha256": "517f9d78ed3a07b0174faf68366978d046dbfe74585c781b34af6b2e4a134963",
+      "name": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$DuplicateFieldException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/ConversionException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8125c092e2defcc1a0ece87e50c5182287fbe0810c5c88501efe12defe657305",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$DuplicateFieldException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/FieldKey.class",
+      "occurrence": 0,
+      "sha256": "39ce3307729f84ccc9e8857602fecd2b75588798469e6c5791ca67d6a189a62e",
+      "name": "com/thoughtworks/xstream/converters/reflection/FieldKey",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fieldName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "declaringClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18
+        },
+        {
+          "name": "depth",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "order",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;I)V",
+          "access": 1,
+          "code_sha256": "211bf8d13c20d34fcffebfe6db5600ef318ec1dbaedce7782a4273c036c00c6f",
+          "code_length": 71
+        },
+        {
+          "name": "getFieldName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getDeclaringClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getDepth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getOrder",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e54ee13bdd8bf86567dc095d8157a1f3083497c44a0a2e8cd814c7de06400492",
+          "code_length": 55
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5a552e8b0af9b0edfe25b7974b94d62fd738aa178f7685121da28b64843d364e",
+          "code_length": 23
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a733de115e56ee807e27ff3a483a3e3c1cc74d57deda87f48f24acb60fe58394",
+          "code_length": 69
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/FieldKey",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/SelfStreamingInstanceChecker.class",
+      "occurrence": 0,
+      "sha256": "62ac30c18fb1f4033d1b891e20c4333f3785059021f81f11fa37a2d3dfd0afa3",
+      "name": "com/thoughtworks/xstream/converters/reflection/SelfStreamingInstanceChecker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/core/util/SelfStreamingInstanceChecker",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/Converter;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/SelfStreamingInstanceChecker",
+        "com/thoughtworks/xstream/core/util/SelfStreamingInstanceChecker"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor.class",
+      "occurrence": 0,
+      "sha256": "768d8f10e1dbd58ed7b183f562fd33686a1254301efb22c1f7d416daed09594b",
+      "name": "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "visit",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/Object;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider$1.class",
+      "occurrence": 0,
+      "sha256": "779732339e2c98c4b5d68b44354ecbcfd73b56a6e09b244533f5ec2691048180",
+      "name": "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/ObjectInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider;Ljava/io/InputStream;Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "092f2392bbec9e4eeb9a2059d7d278fd18f76c858d2e549a6b4bb873135eb1d9",
+          "code_length": 16
+        },
+        {
+          "name": "resolveClass",
+          "descriptor": "(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;",
+          "access": 4,
+          "code_sha256": "3027cc153b18bc6da1681a6932e05fbd81164eabfea977401722bc84a0bbe302",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider$1",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider.class",
+      "occurrence": 0,
+      "sha256": "7a79a9789b545b5e939516aadad07e208c3c2a5d85cee4aa1da898e134457bb3",
+      "name": "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider"
+      ],
+      "fields": [
+        {
+          "name": "serializedDataCache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 130
+        },
+        {
+          "name": "fieldDictionary",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/FieldDictionary;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c8c9397d7b45c18939417c34e9633eaaae4ef696766d24f22b433ca65926a7ac",
+          "code_length": 19
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/FieldDictionary;)V",
+          "access": 1,
+          "code_sha256": "f9aea5f215f1eda4bb21a3e242d12f36d38aa6ecba9da852db97e451d6e898b6",
+          "code_length": 14
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ae150cce80a1ff7502db85900d696f657b8796dedf2b094a012cca5d4ec22759",
+          "code_length": 183
+        },
+        {
+          "name": "instantiateUsingSerialization",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "62b69b6bf16e65e5ca09d7f78193fd150db6a183ace79eb455ce4719ce1fe85f",
+          "code_length": 221
+        },
+        {
+          "name": "visitSerializableFields",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor;)V",
+          "access": 1,
+          "code_sha256": "cbb24184fd58438b3c15fa3dc480481a7433380516b3603e8c5d157b87674f7e",
+          "code_length": 85
+        },
+        {
+          "name": "writeField",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "9ed006e529b81712b3331ef851c6b520d9d722c730272dc3c89347fa4eaa891c",
+          "code_length": 30
+        },
+        {
+          "name": "getFieldType",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "3f39499099298b4a62b0495145247541fda6860721d1a1186c58c47b3331d868",
+          "code_length": 17
+        },
+        {
+          "name": "fieldDefinedInClass",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "f3d064bc6fa4649ea7ce9054c0efac841b50f98d60e0f4bac1eac6a5b1fefdab",
+          "code_length": 29
+        },
+        {
+          "name": "fieldModifiersSupported",
+          "descriptor": "(Ljava/lang/reflect/Field;)Z",
+          "access": 4,
+          "code_sha256": "95698513d2b9699c1201a2581c5169f12da6874f4e751071cbb9a0febccb4ac2",
+          "code_length": 25
+        },
+        {
+          "name": "validateFieldAccess",
+          "descriptor": "(Ljava/lang/reflect/Field;)V",
+          "access": 4,
+          "code_sha256": "a8a77d04274f1d5ca82e20d267f7492346d91b484572c7e6c176503ad50c0548",
+          "code_length": 77
+        },
+        {
+          "name": "getField",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;",
+          "access": 1,
+          "code_sha256": "65e25aa58e6558064190f1accfe58b143859ac733c8a553e234bb9f373dc0935",
+          "code_length": 11
+        },
+        {
+          "name": "getFieldOrNull",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;",
+          "access": 1,
+          "code_sha256": "e4859ef87121cdbfe5d3d1c7da2ae27ea6b1702c51329723ed2fdb7f17409dd9",
+          "code_length": 11
+        },
+        {
+          "name": "setFieldDictionary",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/FieldDictionary;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "d2321739e75501ef520f2d3c8c582f5eb1e6d6ec6bedaa4eb706d62866d662a9",
+          "code_length": 6
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0f44a2c5762b610859a625c9d47e327ccfd2a5da9fd8cd930e82480ee9b87898",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/thoughtworks/xstream/converters/reflection/FieldDictionary",
+        "com/thoughtworks/xstream/converters/reflection/ImmutableFieldKeySorter",
+        "com/thoughtworks/xstream/converters/reflection/ObjectAccessException",
+        "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/PureJavaReflectionProvider$1",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider$Visitor",
+        "com/thoughtworks/xstream/core/JVM",
+        "com/thoughtworks/xstream/core/util/Fields",
+        "java/io/ByteArrayInputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectStreamClass",
+        "java/io/ObjectStreamConstants",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Error",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Modifier",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/WeakHashMap"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/SerializableConverter$2$1.class",
+      "occurrence": 0,
+      "sha256": "61876c5af794f8963e7a217e867a400bbc0bace495c837d19614be88dc4aef9c",
+      "name": "com/thoughtworks/xstream/converters/reflection/SerializableConverter$2$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$validation",
+          "descriptor": "Ljava/io/ObjectInputValidation;",
+          "access": 4112
+        },
+        {
+          "name": "this$1",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/SerializableConverter$2;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/SerializableConverter$2;Ljava/io/ObjectInputValidation;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "92b7780abff1d7c349bfecfcefcbae356b9a6c734f42f615ecd6ac8444b4c5d5",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/ObjectAccessException",
+        "com/thoughtworks/xstream/converters/reflection/SerializableConverter$2",
+        "com/thoughtworks/xstream/converters/reflection/SerializableConverter$2$1",
+        "java/io/InvalidObjectException",
+        "java/io/ObjectInputValidation",
+        "java/lang/Object",
+        "java/lang/Runnable"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$MappingList.class",
+      "occurrence": 0,
+      "sha256": "c6713c35d413fa6149fffb42ca550d61df22a4cf9258ec53991f2576198c7f00",
+      "name": "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$MappingList",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "keyFieldName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "fieldCache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a6dab4974c44a0033bda530d632ffa4a44cef4ece436bff81e5fe459766cfb9c",
+          "code_length": 31
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "011d63065ee12e4c1663625b68326caf3eadf38181fa072028ee668d91fa7d90",
+          "code_length": 215
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d89fb654cd6c78c89193c8feea121f0fe139b097c9e4d6355fc0be3ca9f1e036",
+          "code_length": 8
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3ff8c506e99820153673f3a2b5229bf6ca773d6c958addfb50ea10a99e8a4263",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter",
+        "com/thoughtworks/xstream/converters/reflection/AbstractReflectionConverter$MappingList",
+        "com/thoughtworks/xstream/converters/reflection/ReflectionProvider",
+        "com/thoughtworks/xstream/core/util/Fields",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/reflect/Field",
+        "java/util/AbstractList",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/ImmutableFieldKeySorter.class",
+      "occurrence": 0,
+      "sha256": "0e493025c2aa5e2e4093a174183e157c16bc9763d8804a05f139e666b6dccf1c",
+      "name": "com/thoughtworks/xstream/converters/reflection/ImmutableFieldKeySorter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/reflection/FieldKeySorter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "sort",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "bd67b655109b64ce86c0d2fff93da7638267d12f2c3c5c0530c722bc9538a007",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/FieldKeySorter",
+        "com/thoughtworks/xstream/converters/reflection/ImmutableFieldKeySorter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/MissingFieldException.class",
+      "occurrence": 0,
+      "sha256": "d33d02799e0cbbaf683982842d6a7e1edd55c47ba2ec23bbaa743221c4e31ce4",
+      "name": "com/thoughtworks/xstream/converters/reflection/MissingFieldException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/reflection/ObjectAccessException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fieldName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "className",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "38a7fd21193096af5b49c02661826657507eba181e81e45d89a7b081d9b13cf4",
+          "code_length": 46
+        },
+        {
+          "name": "getFieldName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getClassName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/MissingFieldException",
+        "com/thoughtworks/xstream/converters/reflection/ObjectAccessException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/SerializationMethodInvoker.class",
+      "occurrence": 0,
+      "sha256": "1a0ac291edb4c749ba02aafb8f07d19fd25ce81a48c8dfd76d8e1db3288d5466",
+      "name": "com/thoughtworks/xstream/converters/reflection/SerializationMethodInvoker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/core/Caching"
+      ],
+      "fields": [
+        {
+          "name": "serializationMembers",
+          "descriptor": "Lcom/thoughtworks/xstream/core/util/SerializationMembers;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "callReadResolve",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ad4970eeeca8acc3fb9383f90daa4d997c377a24d82c5926ecc956738833b464",
+          "code_length": 9
+        },
+        {
+          "name": "callWriteReplace",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9a62a77a11a50d65ac8f8b0ec6d45120d561258ae59fd1105b65424d2dfc2b84",
+          "code_length": 9
+        },
+        {
+          "name": "supportsReadObject",
+          "descriptor": "(Ljava/lang/Class;Z)Z",
+          "access": 1,
+          "code_sha256": "261aca05f1b45ed5add7d6cea107a514878e21ba849f7e1ce64c36b0f4576c52",
+          "code_length": 10
+        },
+        {
+          "name": "callReadObject",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Object;Ljava/io/ObjectInputStream;)V",
+          "access": 1,
+          "code_sha256": "2bbb71dbd870c21d836bf17a6205ae51ee83e494003f867dd391ce7171e340de",
+          "code_length": 11
+        },
+        {
+          "name": "supportsWriteObject",
+          "descriptor": "(Ljava/lang/Class;Z)Z",
+          "access": 1,
+          "code_sha256": "bf0a705391efddbaf788bec680323992a3fcebb7313974b64220ab1373927437",
+          "code_length": 10
+        },
+        {
+          "name": "callWriteObject",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Object;Ljava/io/ObjectOutputStream;)V",
+          "access": 1,
+          "code_sha256": "d6f1dc359ccebd4cc8e1a3db4d9fea000578024fc98112d34f0dbe067dfe97c5",
+          "code_length": 11
+        },
+        {
+          "name": "flushCache",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a522f06362a81f34524f646437b463122755d7b9d79674fa64ac59eaa7202ac4",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/SerializationMethodInvoker",
+        "com/thoughtworks/xstream/core/Caching",
+        "com/thoughtworks/xstream/core/util/SerializationMembers",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/FieldKeySorter.class",
+      "occurrence": 0,
+      "sha256": "ed0e7ded755e7de295d7f4aa3a04c3f0e94374fe5c12ef2e74ea77d2f6592ce4",
+      "name": "com/thoughtworks/xstream/converters/reflection/FieldKeySorter",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "sort",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;)Ljava/util/Map;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/FieldKeySorter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter$1.class",
+      "occurrence": 0,
+      "sha256": "fc8dc76122fb105122e162dc09f60b30c71973d1560d30042c1e8875c7be31a4",
+      "name": "com/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "cbe78968a58ebce92fa37ed99f809d5b524f23d444cd6c664385d9dfa0fd02f6",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/FieldKey",
+        "com/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter",
+        "com/thoughtworks/xstream/converters/reflection/NativeFieldKeySorter$1",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/FieldDictionary$DictionaryEntry.class",
+      "occurrence": 0,
+      "sha256": "5978522c96fcb47d66c569e91d7630787baa36c6b94c691f99452fc02ba6e286",
+      "name": "com/thoughtworks/xstream/converters/reflection/FieldDictionary$DictionaryEntry",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "keyedByFieldName",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "keyedByFieldKey",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getKeyedByFieldName",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getKeyedByFieldKey",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/FieldDictionary",
+        "com/thoughtworks/xstream/converters/reflection/FieldDictionary$DictionaryEntry",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/reflection/Sun14ReflectionProvider.class",
+      "occurrence": 0,
+      "sha256": "15229ad0ff5ef9c6e943efad5cfdc63cd840b1d0433f4a54991428a977bad5b6",
+      "name": "com/thoughtworks/xstream/converters/reflection/Sun14ReflectionProvider",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/reflection/SunUnsafeReflectionProvider",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/reflection/FieldDictionary;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "aa16ad77c9cd24ffe6d1283cc7be7567ae0d148c817d8a2d5ca78604cdc4e03e",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/reflection/Sun14ReflectionProvider",
+        "com/thoughtworks/xstream/converters/reflection/SunUnsafeReflectionProvider"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/LongConverter.class",
+      "occurrence": 0,
+      "sha256": "89746e140dbfdddd54eeaf64425159441c9c9f5d86b16cd3f85b2e81ca8cf342",
+      "name": "com/thoughtworks/xstream/converters/basic/LongConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "83ae40a48c8e3fd451d82d8b81d4907ba410b857d2811ed1bbb7f53a3c8f0081",
+          "code_length": 232
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/LongConverter",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/CharConverter.class",
+      "occurrence": 0,
+      "sha256": "ae9033e210e56e0d5bff371713cba32bac8999b2261354d5428defe7d64065e3",
+      "name": "com/thoughtworks/xstream/converters/basic/CharConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/Converter",
+        "com/thoughtworks/xstream/converters/SingleValueConverter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "marshal",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/io/HierarchicalStreamWriter;Lcom/thoughtworks/xstream/converters/MarshallingContext;)V",
+          "access": 1,
+          "code_sha256": "acaf2bd295b3ff00c7fd895048234881f77a926d1d98aa93966d98920f3b5d40",
+          "code_length": 12
+        },
+        {
+          "name": "unmarshal",
+          "descriptor": "(Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;Lcom/thoughtworks/xstream/converters/UnmarshallingContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "14d493d47e040c901b8856177d7f42d909a60250cea9414109ed94cb1c7c87e3",
+          "code_length": 42
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f3961ccbb93110e605e5a3973f3d8b1ae8dd4de3bb3313b10fd81a6bfb8e6f41",
+          "code_length": 29
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0308ce2b3dfc87b69f955854841134d9dfbf7dfe17d3511077876a7f49bf2f47",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/Converter",
+        "com/thoughtworks/xstream/converters/SingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/CharConverter",
+        "com/thoughtworks/xstream/io/HierarchicalStreamReader",
+        "com/thoughtworks/xstream/io/HierarchicalStreamWriter",
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/IntConverter.class",
+      "occurrence": 0,
+      "sha256": "37b833443c5b9cf6d43c61cdadd3cf0f57efae9b316421c8eb053c58d2a97e62",
+      "name": "com/thoughtworks/xstream/converters/basic/IntConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "eb80b73d31236a16597da97b309531b1dfd78c69ab38ed88d78c2fb927435b6b",
+          "code_length": 66
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/IntConverter",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/FloatConverter.class",
+      "occurrence": 0,
+      "sha256": "276b7f69f1f962bb856710d68d54eee626962681d38554f98c0d9b8dcc759f75",
+      "name": "com/thoughtworks/xstream/converters/basic/FloatConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "548c4761b9ff7f974b7ead7b12db35ec22918c2567bf745702d7132da851302a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/FloatConverter",
+        "java/lang/Float",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/StringBufferConverter.class",
+      "occurrence": 0,
+      "sha256": "807a0075531696cfc3a57d41c210ace435b19e52a49ffc2c84a79df421fb9764",
+      "name": "com/thoughtworks/xstream/converters/basic/StringBufferConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "6442064a7e2d03c5e9dd7dc20c7264c8fb0c348214dcd678903d94ad993231b2",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/StringBufferConverter",
+        "java/lang/Object",
+        "java/lang/StringBuffer"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/DoubleConverter.class",
+      "occurrence": 0,
+      "sha256": "1bdfe3124fb34a711374b4b08457136a0d89ed134e9c6aadaf663eafdb69771b",
+      "name": "com/thoughtworks/xstream/converters/basic/DoubleConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "548c4761b9ff7f974b7ead7b12db35ec22918c2567bf745702d7132da851302a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/DoubleConverter",
+        "java/lang/Double",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/ShortConverter.class",
+      "occurrence": 0,
+      "sha256": "37a896d1b3652b70d5629154e1f75ce92406684c58cd49009d9c444f778823fc",
+      "name": "com/thoughtworks/xstream/converters/basic/ShortConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "97c3d7c34e419931b2283792aa92689d46bf2fb886d7ff2f8d9387d851c11795",
+          "code_length": 63
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/ShortConverter",
+        "java/lang/Integer",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/Short",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter.class",
+      "occurrence": 0,
+      "sha256": "98a94c0f358e74aa442e86c686711179e9cbbae8ed51dfc84a947bdefb9522d3",
+      "name": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/SingleValueConverter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "41ceffad441fb6d8d9b22fbd8b96c929075b44f1e697fd099e01e28d5cb7adce",
+          "code_length": 13
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/SingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/StringBuilderConverter.class",
+      "occurrence": 0,
+      "sha256": "4be41a0b2a5cbc22b2119971b0323d74803580cdf6504f56458b308614c8cd4b",
+      "name": "com/thoughtworks/xstream/converters/basic/StringBuilderConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "6442064a7e2d03c5e9dd7dc20c7264c8fb0c348214dcd678903d94ad993231b2",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/StringBuilderConverter",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/StringConverter.class",
+      "occurrence": 0,
+      "sha256": "08bf9ae157ae57ed230481c3989b1ff5892f060e910e9cd219e887d406674047",
+      "name": "com/thoughtworks/xstream/converters/basic/StringConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LENGTH_LIMIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "lengthLimit",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;I)V",
+          "access": 1,
+          "code_sha256": "0d93a6f5dcd67a59aaa1abbbec5fe8afe956043aa0a5cd1ce924722a8eaa9ad4",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "0d6105047b891783b481e69235d2c51f286ba19668cf9160da4e0a156d84c3b9",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "052045d99420de6c31ccfd497466585a651ee3381bbe6ebfeafdd0504bfec313",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "75802427b4a3679abfc0cb695f68b02692ace7d4233e3dbcf8bbbdd82e665b62",
+          "code_length": 7
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d5c5b6a157f2b275c23fad512325b0fecaf30c793306860131bdd0e95a95c6d6",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "48a2c616373b8f70b0fb6e2f2276b52e08c2ed5095a63256cdbb56bbd2d5f8d8",
+          "code_length": 65
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/StringConverter",
+        "com/thoughtworks/xstream/core/util/WeakCache",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Collections",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/URLConverter.class",
+      "occurrence": 0,
+      "sha256": "da8fe16fb7d1dee093a730b6d6b681da786f4f05c4f5df297bbd48d2cc3351a0",
+      "name": "com/thoughtworks/xstream/converters/basic/URLConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "8fef55d4f1262aab3454a1508848d4fc58ed11e46c0d90ec73af5c5dd136cdc3",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2f4888d74b8ec86a98be309df544c1029ce9d2323d3f38d589b158022a7400dc",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/URLConverter",
+        "java/lang/Object",
+        "java/net/MalformedURLException",
+        "java/net/URL"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/BooleanConverter.class",
+      "occurrence": 0,
+      "sha256": "388146dac1d9b86dc9636c7960e633c6f72b68a7f010112c41a1960cc100129d",
+      "name": "com/thoughtworks/xstream/converters/basic/BooleanConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TRUE_FALSE",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/basic/BooleanConverter;",
+          "access": 25
+        },
+        {
+          "name": "YES_NO",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/basic/BooleanConverter;",
+          "access": 25
+        },
+        {
+          "name": "BINARY",
+          "descriptor": "Lcom/thoughtworks/xstream/converters/basic/BooleanConverter;",
+          "access": 25
+        },
+        {
+          "name": "positive",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "negative",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "caseSensitive",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Z)V",
+          "access": 1,
+          "code_sha256": "d94f057fc3a89e8becf65a7387a99d5403f6cecfc55a73c086e1d17c4d2a56c2",
+          "code_length": 20
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "248b9261732e0b22af104759ddd959bf0d1d6a7d747e0124fb853891ca860e7c",
+          "code_length": 10
+        },
+        {
+          "name": "shouldConvert",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "1fcec57ae38df9bd8389f87391a6aac491865a61ad20e48cd2b1c8b5807efd9b",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "af63643b2c4573d7e8e99e256ab9ec1099e68b9a18f45569b6811414218bf146",
+          "code_length": 49
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9c4cbaa9c214479d42afd06bd1967d8178fe0831dd4a6f852b45f08551abeae3",
+          "code_length": 32
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d4e05ca772f5037e3d2e9bed92b50f51174691e6439a7a749503da4b3c0cc2ba",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/BooleanConverter",
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/BigIntegerConverter.class",
+      "occurrence": 0,
+      "sha256": "3fad9dc05caa9d1b17c694aa26a7d42b8caaed20fb13fcb9f7fa6675c7b88ba1",
+      "name": "com/thoughtworks/xstream/converters/basic/BigIntegerConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "8fef55d4f1262aab3454a1508848d4fc58ed11e46c0d90ec73af5c5dd136cdc3",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "13ec89cbcee9d64d2bffee720357c291cf953f41ee7964d123f63f054c91dce2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/BigIntegerConverter",
+        "java/lang/Object",
+        "java/math/BigInteger"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/URIConverter.class",
+      "occurrence": 0,
+      "sha256": "da3896ff0d1412b4e8bf734a3f3cd0980a567a1eef0d000dbcceafd74a8cad5f",
+      "name": "com/thoughtworks/xstream/converters/basic/URIConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "8fef55d4f1262aab3454a1508848d4fc58ed11e46c0d90ec73af5c5dd136cdc3",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2f4888d74b8ec86a98be309df544c1029ce9d2323d3f38d589b158022a7400dc",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/URIConverter",
+        "java/lang/Object",
+        "java/net/URI",
+        "java/net/URISyntaxException"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/BigDecimalConverter.class",
+      "occurrence": 0,
+      "sha256": "5a34ad923f99ff051685f1598ba97872e9c00ac88b2bce335e694c7b9ff402eb",
+      "name": "com/thoughtworks/xstream/converters/basic/BigDecimalConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "8fef55d4f1262aab3454a1508848d4fc58ed11e46c0d90ec73af5c5dd136cdc3",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "13ec89cbcee9d64d2bffee720357c291cf953f41ee7964d123f63f054c91dce2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/BigDecimalConverter",
+        "java/lang/Object",
+        "java/math/BigDecimal"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/NullConverter.class",
+      "occurrence": 0,
+      "sha256": "310fa0ac40cd0210860554db0acc28260f1aef8bc7811967141b6d3c9ed25ef0",
+      "name": "com/thoughtworks/xstream/converters/basic/NullConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/Converter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "b06597ddcb47012fe0a406d0264eedbfe9764046f8a644c5b7a104b9fcc25af9",
+          "code_length": 19
+        },
+        {
+          "name": "marshal",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/io/HierarchicalStreamWriter;Lcom/thoughtworks/xstream/converters/MarshallingContext;)V",
+          "access": 1,
+          "code_sha256": "340604a6164c968d993333ef87ed518e285bff1803314b8b08a2930617b1c33e",
+          "code_length": 15
+        },
+        {
+          "name": "unmarshal",
+          "descriptor": "(Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;Lcom/thoughtworks/xstream/converters/UnmarshallingContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/Converter",
+        "com/thoughtworks/xstream/converters/basic/NullConverter",
+        "com/thoughtworks/xstream/io/ExtendedHierarchicalStreamWriterHelper",
+        "com/thoughtworks/xstream/io/HierarchicalStreamWriter",
+        "com/thoughtworks/xstream/mapper/Mapper",
+        "com/thoughtworks/xstream/mapper/Mapper$Null",
+        "java/lang/Class",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/DateConverter.class",
+      "occurrence": 0,
+      "sha256": "eb438d8b5681d067a0a6b873e7335cb9b0c4add44029c7d275fbedf5eee013b8",
+      "name": "com/thoughtworks/xstream/converters/basic/DateConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/ErrorReporter"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_ACCEPTABLE_FORMATS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_PATTERN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_ERA_PATTERN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "UTC",
+          "descriptor": "Ljava/util/TimeZone;",
+          "access": 26
+        },
+        {
+          "name": "ERA_START",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "defaultFormat",
+          "descriptor": "Lcom/thoughtworks/xstream/core/util/ThreadSafeSimpleDateFormat;",
+          "access": 18
+        },
+        {
+          "name": "defaultEraFormat",
+          "descriptor": "Lcom/thoughtworks/xstream/core/util/ThreadSafeSimpleDateFormat;",
+          "access": 18
+        },
+        {
+          "name": "acceptableFormats",
+          "descriptor": "[Lcom/thoughtworks/xstream/core/util/ThreadSafeSimpleDateFormat;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "af2cdd886f6052173aeba19f359748943e1e8cfcbdb805789fcd526bee8a9882",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/TimeZone;)V",
+          "access": 1,
+          "code_sha256": "341db75651a38de0c36a0986d8f0ea5fe1e1d89d581b36027da1f5e089373241",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "9bb60bf8af80a9a9a6b090ebd9679a0b2402e9b53e6cca86c8fd49a307b4ac29",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7f179ecabc3938a0b1bfdddbcf9cd3b559bb69493dc979e29c6d76208649a93d",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;Ljava/util/TimeZone;)V",
+          "access": 1,
+          "code_sha256": "f68bdfd2d6b0d3af17482d959b8263d04a35b56a62b0a1246ea31256a87043e9",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;Z)V",
+          "access": 1,
+          "code_sha256": "f532ac658378b1f01f6edb7ebba88ac37a4448dff37567ac5ca72624a4d7525b",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/String;Ljava/util/TimeZone;Z)V",
+          "access": 1,
+          "code_sha256": "4e4e621171b92bd861e2d607ec3781748a27eb43862e1c159ef26bd41388f547",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/util/Locale;Ljava/util/TimeZone;Z)V",
+          "access": 1,
+          "code_sha256": "cddf035128377fa00eebffa6276b7fd68906e157f8653747691211bc61424c7c",
+          "code_length": 125
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "1023fc554e3977dbfa27e837baf6e8d8569e06aa835cdc281760cdb32d4200ec",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e6e65e29a8ed78fd33a7d710846ca256dfeccdba1f49fc62b35a640d4a4fe8af",
+          "code_length": 86
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ad3d99dcd626d9e91079fdb733c3583d3d077cb193a5ecbcec416e4e22533176",
+          "code_length": 41
+        },
+        {
+          "name": "appendErrors",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/ErrorWriter;)V",
+          "access": 1,
+          "code_sha256": "0cbf92eef878d39c2f88651858f47c443cbb1c1ab3091674ddc7e74561fb1a41",
+          "code_length": 72
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ccafbe0ab246226489a6e0bd7c14b93ec931dce481e565d36d0501a558e2fc09",
+          "code_length": 220
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/ErrorReporter",
+        "com/thoughtworks/xstream/converters/ErrorWriter",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/DateConverter",
+        "com/thoughtworks/xstream/core/JVM",
+        "com/thoughtworks/xstream/core/util/ThreadSafeSimpleDateFormat",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/ParseException",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/Date",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/TimeZone"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/UUIDConverter.class",
+      "occurrence": 0,
+      "sha256": "db22457870096642b61a3c2891df3cb00d90fc471bcc36a155db439017662d90",
+      "name": "com/thoughtworks/xstream/converters/basic/UUIDConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "8fef55d4f1262aab3454a1508848d4fc58ed11e46c0d90ec73af5c5dd136cdc3",
+          "code_length": 7
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "52fd3ffd0dbb4b0b427c009f5d61f09350e0fdd1147bced17e9712bb12167f2f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/UUIDConverter",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/UUID"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/basic/ByteConverter.class",
+      "occurrence": 0,
+      "sha256": "6ca6a7fd33c9068a3d9bb4943541879fdd74e8f6c94f273f3ae128a31ccca3de",
+      "name": "com/thoughtworks/xstream/converters/basic/ByteConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d12d1ced651c2bbfe24a6982e62cd2de81c385019d5a4e22f632db9bc1330796",
+          "code_length": 25
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "443360ce6a311edbb739c9db7545330734e1721feee13223257c6795e494e828",
+          "code_length": 63
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/basic/ByteConverter",
+        "java/lang/Byte",
+        "java/lang/Integer",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/ErrorWriter.class",
+      "occurrence": 0,
+      "sha256": "e22d7d50657f8d8fb3d2938516f0a190bf6498de8aa7cf63a9f2fa6c0105074d",
+      "name": "com/thoughtworks/xstream/converters/ErrorWriter",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "keys",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ErrorWriter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/DataHolder.class",
+      "occurrence": 0,
+      "sha256": "722a36edacd76c090d945290e7b79a93646c408d31db48de80522ee073268d29",
+      "name": "com/thoughtworks/xstream/converters/DataHolder",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "keys",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/DataHolder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/enums/EnumMapConverter.class",
+      "occurrence": 0,
+      "sha256": "d4b5171bdb453df7cf7724c28726e670a0141fc1a1da4474c39489cc6dbeda87",
+      "name": "com/thoughtworks/xstream/converters/enums/EnumMapConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/collections/MapConverter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "typeField",
+          "descriptor": "Ljava/lang/reflect/Field;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/mapper/Mapper;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "a20041bdac0044d51e9459c3455802a44d00fdce2714d86d633c065d5f8b078a",
+          "code_length": 18
+        },
+        {
+          "name": "marshal",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/io/HierarchicalStreamWriter;Lcom/thoughtworks/xstream/converters/MarshallingContext;)V",
+          "access": 1,
+          "code_sha256": "5195b22a561cfa99836a0be985a78c0fe224acffc6397370538a251d43eddc81",
+          "code_length": 57
+        },
+        {
+          "name": "unmarshal",
+          "descriptor": "(Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;Lcom/thoughtworks/xstream/converters/UnmarshallingContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3c83321ebffd2dc700020b1cba2ee5b2364a525b3b4530b9677ec1c60d1f16c2",
+          "code_length": 66
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "71ffb5f7e378aa39377f4de3db748ae25e9253a3750820c1eb1bb0fc3d386a06",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/collections/MapConverter",
+        "com/thoughtworks/xstream/converters/enums/EnumMapConverter",
+        "com/thoughtworks/xstream/core/util/Fields",
+        "com/thoughtworks/xstream/io/HierarchicalStreamReader",
+        "com/thoughtworks/xstream/io/HierarchicalStreamWriter",
+        "com/thoughtworks/xstream/mapper/Mapper",
+        "java/lang/Class",
+        "java/util/EnumMap"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/enums/EnumConverter.class",
+      "occurrence": 0,
+      "sha256": "757841facdd2103a0b951299b68dc79ca67924acb43a4c75d99e50312e0f9477",
+      "name": "com/thoughtworks/xstream/converters/enums/EnumConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/Converter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "d6711dd0c771e3224c227b1c955b8d0a1bc57c32f5a6511d995b9d12fe619785",
+          "code_length": 22
+        },
+        {
+          "name": "marshal",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/io/HierarchicalStreamWriter;Lcom/thoughtworks/xstream/converters/MarshallingContext;)V",
+          "access": 1,
+          "code_sha256": "b070fa068f4c4dc8727d5e5775622705b45a5f6253d92575dddd64c490431f35",
+          "code_length": 14
+        },
+        {
+          "name": "unmarshal",
+          "descriptor": "(Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;Lcom/thoughtworks/xstream/converters/UnmarshallingContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "939bf6f4761879ea1f7d1a217794ea5a8b6da0e56cd13aacb56eea73fabc0a66",
+          "code_length": 97
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Enum;",
+        "com/thoughtworks/xstream/converters/Converter",
+        "com/thoughtworks/xstream/converters/UnmarshallingContext",
+        "com/thoughtworks/xstream/converters/enums/EnumConverter",
+        "com/thoughtworks/xstream/io/HierarchicalStreamReader",
+        "com/thoughtworks/xstream/io/HierarchicalStreamWriter",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/enums/EnumToStringConverter.class",
+      "occurrence": 0,
+      "sha256": "6572a867b2660259e8034ecc20849f6d9f88b0cefa4243ea260c78e302606683",
+      "name": "com/thoughtworks/xstream/converters/enums/EnumToStringConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "enumType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "strings",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;TT;>;"
+        },
+        {
+          "name": "values",
+          "descriptor": "Ljava/util/EnumMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/EnumMap<TT;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "46ac0198c7f0b55fe4a5227257b9062677f61cf3d7ad0233288a3b1d4f98a255",
+          "code_length": 11,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "931c7f5ceae479d735a15f6467d32f02caebe0c4b8d8d26def5c3826caa28762",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/Class<TT;>;Ljava/util/Map<Ljava/lang/String;TT;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;Ljava/util/EnumMap;)V",
+          "access": 2,
+          "code_sha256": "4d182c49a3f2cc2fdcfef676a4ba732d7eaabfac608d1de2d3462528344c6816",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/Class<TT;>;Ljava/util/Map<Ljava/lang/String;TT;>;Ljava/util/EnumMap<TT;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "extractStringMap",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "bc15b1df0becc8256a08a04e658e34e900c2eadf9f1b7599165ad3ffdfa12a98",
+          "code_length": 102,
+          "generic_signature": "<T:Ljava/lang/Enum<TT;>;>(Ljava/lang/Class<TT;>;)Ljava/util/Map<Ljava/lang/String;TT;>;"
+        },
+        {
+          "name": "checkType",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 10,
+          "code_sha256": "a995752e29f3f2081d3fbcbd53ed2b83eb1762ed9292488c5a95cd04f2677c56",
+          "code_length": 26,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "buildValueMap",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;)Ljava/util/EnumMap;",
+          "access": 10,
+          "code_sha256": "9aba6f5a6291a8aa8aafec9332aec5802827dcfc6ab6d48d72ad441d17849fc0",
+          "code_length": 68,
+          "generic_signature": "<T:Ljava/lang/Enum<TT;>;>(Ljava/lang/Class<TT;>;Ljava/util/Map<Ljava/lang/String;TT;>;)Ljava/util/EnumMap<TT;Ljava/lang/String;>;"
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "dcc07bf1d9d8e9e9afaea35a900a0284170c7a522a552511863db2b97f831ae8",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "39c9bf5e446df038055ec8f29731d557bfea00082f373f595d58bac341149df3",
+          "code_length": 36
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8764e0d9b0ffe31918b7eb433421d0d80318be9602408e0a5742c0b5903a900e",
+          "code_length": 58
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Enum<TT;>;>Lcom/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter;",
+      "class_references": [
+        "com/thoughtworks/xstream/InitializationException",
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/enums/EnumToStringConverter",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/EnumMap",
+        "java/util/EnumSet",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/enums/EnumSetConverter.class",
+      "occurrence": 0,
+      "sha256": "d332f23470abed00912388052d511fbf41e75fd3894a284277359c5ee45036b2",
+      "name": "com/thoughtworks/xstream/converters/enums/EnumSetConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/thoughtworks/xstream/converters/Converter"
+      ],
+      "fields": [
+        {
+          "name": "typeField",
+          "descriptor": "Ljava/lang/reflect/Field;",
+          "access": 26
+        },
+        {
+          "name": "mapper",
+          "descriptor": "Lcom/thoughtworks/xstream/mapper/Mapper;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/thoughtworks/xstream/mapper/Mapper;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "6c60679905d78cff8c10afac440b483a80038e40713ff28fbec061049465c207",
+          "code_length": 21
+        },
+        {
+          "name": "marshal",
+          "descriptor": "(Ljava/lang/Object;Lcom/thoughtworks/xstream/io/HierarchicalStreamWriter;Lcom/thoughtworks/xstream/converters/MarshallingContext;)V",
+          "access": 1,
+          "code_sha256": "c351982ae12c8dca19d0ac26ee627d9ce67b6d43481ccf1400c125ed911e4486",
+          "code_length": 69
+        },
+        {
+          "name": "joinEnumValues",
+          "descriptor": "(Ljava/util/EnumSet;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ad7e598192438d3ba1eaf619a3aed3726558fbbd1deed4e840561e7d57a36cab",
+          "code_length": 72
+        },
+        {
+          "name": "unmarshal",
+          "descriptor": "(Lcom/thoughtworks/xstream/io/HierarchicalStreamReader;Lcom/thoughtworks/xstream/converters/UnmarshallingContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "59c40173da1bb819b68b988967df95f9bc832a9f7c3ab019cba2c99f94da39ff",
+          "code_length": 112
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2f611fdda36a4e3246fdecf32540d41938ea8ac5acc2792141110e198111b386",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ConversionException",
+        "com/thoughtworks/xstream/converters/Converter",
+        "com/thoughtworks/xstream/converters/enums/EnumSetConverter",
+        "com/thoughtworks/xstream/core/util/Fields",
+        "com/thoughtworks/xstream/io/HierarchicalStreamReader",
+        "com/thoughtworks/xstream/io/HierarchicalStreamWriter",
+        "com/thoughtworks/xstream/mapper/Mapper",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/EnumSet",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/enums/EnumSingleValueConverter.class",
+      "occurrence": 0,
+      "sha256": "3b0c5bed99bb3fb8b6510ba6479a99792c2900182eabae8543e9cefe6f172a12",
+      "name": "com/thoughtworks/xstream/converters/enums/EnumSingleValueConverter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "enumType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<+Ljava/lang/Enum;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "13baea7aeee48fab843ccd58930cc34620d728717663b59b36b682a5fc496e7a",
+          "code_length": 35,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/Enum;>;)V"
+        },
+        {
+          "name": "canConvert",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "abea85e86960df541fde953f728130a253fdd608f74961a4133c657d3b84be4b",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4fbfa2d6b9b4b68aff691da65ca0d061ee7ea80afbd6ba402edf357bb91191f7",
+          "code_length": 13
+        },
+        {
+          "name": "fromString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "dc6cdcba50df23c9816638c61210a76635a9bb429f37d8244772a7775ee45c4a",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/basic/AbstractSingleValueConverter",
+        "com/thoughtworks/xstream/converters/enums/EnumSingleValueConverter",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException"
+      ]
+    },
+    {
+      "entry": "com/thoughtworks/xstream/converters/ErrorReporter.class",
+      "occurrence": 0,
+      "sha256": "fc13b33a4f9d38b697c6f1bc1706990cbf8de61663aaeefd19c2ad30cbf1d332",
+      "name": "com/thoughtworks/xstream/converters/ErrorReporter",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "appendErrors",
+          "descriptor": "(Lcom/thoughtworks/xstream/converters/ErrorWriter;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/thoughtworks/xstream/converters/ErrorReporter",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3817 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-logging-1.2.jar",
+  "archive_sha256": "daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/logging/impl/AvalonLogger.class",
+      "occurrence": 0,
+      "sha256": "f9427e8fa378fb831fe7d054787a948ef99a677ba9817c194d8c68d986f1ad57",
+      "name": "org/apache/commons/logging/impl/AvalonLogger",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log"
+      ],
+      "fields": [
+        {
+          "name": "defaultLogger",
+          "descriptor": "Lorg/apache/avalon/framework/logger/Logger;",
+          "access": 74
+        },
+        {
+          "name": "logger",
+          "descriptor": "Lorg/apache/avalon/framework/logger/Logger;",
+          "access": 146
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/avalon/framework/logger/Logger;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1ad8a04d207c1f158a35c4a30d46cecadb255c20a45e4657526e91c80328e23b",
+          "code_length": 34
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Lorg/apache/avalon/framework/logger/Logger;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setDefaultLogger",
+          "descriptor": "(Lorg/apache/avalon/framework/logger/Logger;)V",
+          "access": 9,
+          "code_sha256": "b69af6c6d297103efd29d2cb81d2b629b8c84edcb51d856af603a6ec92e871db",
+          "code_length": 5
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c71f27630e253039dcb691f985209b64ef8177ec6995e0a54ff2cb0bc3aba1b2",
+          "code_length": 27
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "77169e0c72978acf069a3a9ec87b5c1a0c77059e68103301777e2aaf4de42b95",
+          "code_length": 26
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "b5099d1f3f7154f5e9a09b3626c944687ac879ce2cee54deace549e0b140d66b",
+          "code_length": 27
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c6330e62ee5d1b75b9510a781533ee0de1fbb0aa801fb09e0ad0d39e1bcbbb17",
+          "code_length": 26
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "0963fb07eb8974d158e27d721836a8f5bc99c065d74666013b07075f03337a86",
+          "code_length": 27
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "1902efc7fd17c95b68a7fed462e3ef2c6d5dfc5aacd591dde86ed4b617957526",
+          "code_length": 26
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "927dcafbba8685646bc9577ec6d606050039aa3d67d32fd43bd2b2d0248dadb3",
+          "code_length": 27
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e1734f4d94c0de4dca057b15d99e550182a71c12e1ef48da9bdda49f2b740f08",
+          "code_length": 26
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ff1789e9f37b08fc2ab13fc7d2e6fc3023058e564d49761e416b34407e2101ff",
+          "code_length": 10
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "11c38fae3249f547e4dc0bb585d7b843028e5624b6c4fe8491bf781b86e88a2f",
+          "code_length": 10
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fce2356ddfd435fc33f7a4e8f464a270d88b21b55fc76c645fac23630e002b20",
+          "code_length": 10
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "04a428c4715ec3d97285d505d3d9a979d5ccf0e99af4976b8b34b6897faa7059",
+          "code_length": 10
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ff1789e9f37b08fc2ab13fc7d2e6fc3023058e564d49761e416b34407e2101ff",
+          "code_length": 10
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fc7444d9b995473c2b430d794983528046221bb761121a55b24e7e235f42fdb2",
+          "code_length": 10
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c71f27630e253039dcb691f985209b64ef8177ec6995e0a54ff2cb0bc3aba1b2",
+          "code_length": 27
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "77169e0c72978acf069a3a9ec87b5c1a0c77059e68103301777e2aaf4de42b95",
+          "code_length": 26
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "71c995a397f6798a70ca76bb657453218a56c6f97eedeb4036622ef70e9dfcfb",
+          "code_length": 27
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "69497789f7b96f753aa75008476d00b8e1a797465c27159d155245c3d42205e5",
+          "code_length": 26
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1dd9ce9af376328cdc78db90eea2d59e41079aa59fa5db00f05fc43889fa2786",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/avalon/framework/logger/Logger",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/AvalonLogger"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/SimpleLog.class",
+      "occurrence": 0,
+      "sha256": "c506cac8cc49b52e68ac9a7733ec85000ced8e58eb7ae1e37fb7472777b46734",
+      "name": "org/apache/commons/logging/impl/SimpleLog",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "systemPrefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "simpleLogProps",
+          "descriptor": "Ljava/util/Properties;",
+          "access": 28
+        },
+        {
+          "name": "DEFAULT_DATE_TIME_FORMAT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "showLogName",
+          "descriptor": "Z",
+          "access": 76
+        },
+        {
+          "name": "showShortName",
+          "descriptor": "Z",
+          "access": 76
+        },
+        {
+          "name": "showDateTime",
+          "descriptor": "Z",
+          "access": 76
+        },
+        {
+          "name": "dateTimeFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 76
+        },
+        {
+          "name": "dateFormatter",
+          "descriptor": "Ljava/text/DateFormat;",
+          "access": 12
+        },
+        {
+          "name": "LOG_LEVEL_TRACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_DEBUG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_WARN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_FATAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOG_LEVEL_OFF",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "logName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 68
+        },
+        {
+          "name": "currentLogLevel",
+          "descriptor": "I",
+          "access": 68
+        },
+        {
+          "name": "shortLogName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 66
+        },
+        {
+          "name": "class$java$lang$Thread",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$commons$logging$impl$SimpleLog",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "getStringProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "59f2c2359cc88ca46d8d13f8b05f36abdd713a9585d2d12ba4143c233fd50a1d",
+          "code_length": 27
+        },
+        {
+          "name": "getStringProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "c8f576d6656bf3acb61de93fe156fa44f5d25183d1c48dbf00b0de57ecd5f52e",
+          "code_length": 15
+        },
+        {
+          "name": "getBooleanProperty",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 10,
+          "code_sha256": "9ec7086772b66443c6062ad10d0acf263473bf5c9a4d161edf5a6f39f8ccd286",
+          "code_length": 20
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d5ffa89f9b8eb30412bcd290ba05187c59fd8162124569ac3722f8373eab3b4a",
+          "code_length": 260
+        },
+        {
+          "name": "setLevel",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ab5824c0f03d54f65416d6927ad87c68ba01f8d2e7d01c2998007f4a82688f21",
+          "code_length": 6
+        },
+        {
+          "name": "getLevel",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7e99de3c85c595453b2b2f98f49c7ea90a030841500e6d37b987653cbc16e933",
+          "code_length": 5
+        },
+        {
+          "name": "log",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 4,
+          "code_sha256": "2c469b305c2149113ea2486b8a4421488c29295347797975d0709d5b8f407749",
+          "code_length": 363
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/StringBuffer;)V",
+          "access": 4,
+          "code_sha256": "8cce598c3b123b50096a2e0f17e5185f872f99c40cce47c1b3bcff0b35f17f12",
+          "code_length": 11
+        },
+        {
+          "name": "isLevelEnabled",
+          "descriptor": "(I)Z",
+          "access": 4,
+          "code_sha256": "afe5c0851512e41632666ae91865c3431cffe855be060f4d0131f62499bae2c0",
+          "code_length": 14
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "c4d053fb0c18d058ddf0bd5e7c52dbfd10b73b2eb5bd7dc2bb8ab0c13e61ea3c",
+          "code_length": 16
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "fcbced0fbedccf2578ade4cfa5dbad022e6ef2c1c8b618efe237008ac4bfb2c9",
+          "code_length": 16
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "ae75233751482be265700ad6f6b8eec6b571ffc77a5b7e613a5ed31b6a4bedb2",
+          "code_length": 16
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "342c9660b11fbb8a2c20b75a6f333fb463f92ce510ffee3ecc4d032c0c734146",
+          "code_length": 16
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "a936b8a3604d6e5a363d7e3b2ffa16569024ee45732e1e38bfa3a29abdf2ca43",
+          "code_length": 16
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "72ad1d05b8b80ca0f9315a97f471cc9c89a995cb36a96bb825589f5c35b41bb5",
+          "code_length": 16
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "ca505f9de51de50d6377aad80f551afb4347ff2b759a16ece27472bde066b20d",
+          "code_length": 16
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "c60dcffa5bfb2a9ec1902822b6879cdb84b708689f1917955497ed0230ea7ec5",
+          "code_length": 16
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "71920c45e266e60237879e2ed467e73237f30862794300a116ed314e945783e2",
+          "code_length": 16
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "3ee56a27eeef277754141f7dee274acb12cc6ab12d78be3147eec32381ddf7a5",
+          "code_length": 16
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "b3b54f565dc5b37661b94067a97fa00959f3d2a620ab944001003b6bd3c01fac",
+          "code_length": 18
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 17,
+          "code_sha256": "47702d674521e5d22e4ec3b5106d060c3387dc9b0b7d7861b2f8fa5f761c5880",
+          "code_length": 18
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "ba8522861f18adfdb1a4f5f611754f266968a3cfb18bc1f0640e13aa3b04a511",
+          "code_length": 6
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "a73706ba5dc938c0335b456e4c6eb6596473adf4e6d6bf114c779c4e091b78ea",
+          "code_length": 6
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "88372660d5c3f76c8e801946e3095c5b278d0e5e6315b38b8f2f819f11863c9d",
+          "code_length": 7
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "e8796e65b7fd852bdffcef0f7234feda6b4ced8c6c45f963b41bb450fb88fb8f",
+          "code_length": 6
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "ff899f8320f8a4af67bff61d355e95b28cd7ff018946d6aa839b5f1b78503436",
+          "code_length": 6
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "a67fce1b4da0be04e4a14310c8bb9f3427485d8686aeeb01a3e2ab14852e3ca7",
+          "code_length": 6
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 10,
+          "code_sha256": "5bff8a7b5701f2b3a0ec974546c052293d3aea4bc67798856c1fa2443c3c9e34",
+          "code_length": 118
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 10,
+          "code_sha256": "790cf0045d7440f35e38141f2a07ac21e2e08f698ac06928e18298444b8d7c2c",
+          "code_length": 15
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "84134ad7a03c3bd8a6e31eeb6fa1934d7551a82914bacfd30b62b57f2b3d87a0",
+          "code_length": 18
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 8,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "29f16fc7b08dff499b8125dde7943afb2d2b3ce34bad79d9a2ccc85b807b8d36",
+          "code_length": 143
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/PrintStream",
+        "java/io/PrintWriter",
+        "java/io/Serializable",
+        "java/io/StringWriter",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/security/AccessController",
+        "java/text/DateFormat",
+        "java/text/SimpleDateFormat",
+        "java/util/Date",
+        "java/util/Properties",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/LogConfigurationException",
+        "org/apache/commons/logging/impl/SimpleLog",
+        "org/apache/commons/logging/impl/SimpleLog$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Log4JLogger.class",
+      "occurrence": 0,
+      "sha256": "06900a59cc23825afc7f4b553be4b0f86b3921cd1a77e5834543177b9c0bcd79",
+      "name": "org/apache/commons/logging/impl/Log4JLogger",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "FQCN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "logger",
+          "descriptor": "Lorg/apache/log4j/Logger;",
+          "access": 194
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "traceLevel",
+          "descriptor": "Lorg/apache/log4j/Priority;",
+          "access": 26
+        },
+        {
+          "name": "class$org$apache$commons$logging$impl$Log4JLogger",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$log4j$Level",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$log4j$Priority",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5f23ef1e71d0d43f3642fa3ee0368f194e0cf21d35426d461119faf7693c757f",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b6e626405c52d7a005da029ae14e834a7b6036e8d7642054ddebc082e611c6e9",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/log4j/Logger;)V",
+          "access": 1,
+          "code_sha256": "e73171ba6aad969cebb61e780e85dfb6e76b5bf6b69fab55e2f47db0884153e5",
+          "code_length": 37
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "4a68a41927ae6d43976094ec7348cb8bd742b79ea601aade0efe45664671c992",
+          "code_length": 16
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "92a8d9e94a206721488d00dc2f3c492c3c4a12cf6abf5b52d4e509f29acc2a0e",
+          "code_length": 16
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "2de0cea32525c4b10c37541ee32fec372197b30b13ea853986f42bc45860281c",
+          "code_length": 16
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "521dfb467cd3ce31c0b10e8606223bd90bf423ea4bf47d8754d9d7946418fbb6",
+          "code_length": 16
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "9c8f9d4c84fd7ca54edd17c6bc9392eeef3365f2378b3f0a3b7b5f0c12dfe900",
+          "code_length": 16
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "66145f76b60228a77daf528ea052c1127d8188a5c5e9a0bd32a3acf0c4851c7f",
+          "code_length": 16
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "a6e40e06b7d4715152fa0928554ff21b3f2185359c50123c7f8554358108c1d6",
+          "code_length": 16
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "248284ce854a1fa7f16aab3a820352ffc000d626e9f721f6300fbf55aad91608",
+          "code_length": 16
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "30320ac7e9601f61ee935ca2c94052cb9a163f24e9b72af1de3a5d632ffb8caa",
+          "code_length": 16
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "db39e69db97c949b5fdbc5d513fc08d14589c601941efd508c9da9b8402076bc",
+          "code_length": 16
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "95b7a4b1435f956a3cd86b742d6e5a8c2b89dbb051fcd2ccf31ca7a87226b6f4",
+          "code_length": 16
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "109387120a8d69080226230bd0e09e92add5c0ee0004204b6ad8c18d9934f39b",
+          "code_length": 16
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Lorg/apache/log4j/Logger;",
+          "access": 1,
+          "code_sha256": "961c83f64e08a1687a6e76294ca5a0ef99b310d4e6977d0611748cfbb932d3f4",
+          "code_length": 47
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "325b4ed26b158d87837a2e4c97924fa6b1079bfc0812ed009d527e62bbdbed9d",
+          "code_length": 8
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d90680d2a7f3c5b90451d89ef515934993bad2a38f52d48ca6f7c89117dd063e",
+          "code_length": 11
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "35b2bdbed84d7b4818362405307d0b9b8c3da382e15cc8181051e4c76fa86375",
+          "code_length": 11
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9b2291ff8bc14f28a4d376bdbe15d3ddd669d8a6987eecde1724d6d1bdbef44b",
+          "code_length": 8
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0edcf42452f2fbe49a74f50a640dad53b5295c7f8e7d678895d33498ab64d38a",
+          "code_length": 11
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1c39972ae3d11a260c9a4d4d2332693aca334f102ee1e5e411cb981c5604abfc",
+          "code_length": 11
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5a677619127fba40cb5fce92b982f73353f5c90ba84e8ccb87074107646cf350",
+          "code_length": 132
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationError",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/reflect/Field",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/Log4JLogger",
+        "org/apache/log4j/Level",
+        "org/apache/log4j/Logger",
+        "org/apache/log4j/Priority"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable.class",
+      "occurrence": 0,
+      "sha256": "f422e02a277445e8e06d4fc70a95537bf151fbc6bc89f5b9dd78099d6b44fe27",
+      "name": "org/apache/commons/logging/impl/WeakHashtable",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/util/Hashtable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "MAX_CHANGES_BEFORE_PURGE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "PARTIAL_PURGE_COUNT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "queue",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 18
+        },
+        {
+          "name": "changeCount",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "55d5f1460f01a41c862a274602106b6885931c15566189382b203020df5d27fc",
+          "code_length": 21
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8f0ba82b9bea4cfb8902d4b5b276c85e7786ce05b5aafc0c0cb731a4738674ec",
+          "code_length": 16
+        },
+        {
+          "name": "elements",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1,
+          "code_sha256": "77b5134bcd8af0f4598ab9c646860f89873a6b96964d3853cea85ed9c7aa1621",
+          "code_length": 9
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "92880e43c1ac9c1199775a4a38a423a2ffc45cd9a5ab77453f44e2d33f52d478",
+          "code_length": 105
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "101a69e7b3efcfc94af39b3c3963fbd71a7096983194c2be1fae9d55c29b5532",
+          "code_length": 16
+        },
+        {
+          "name": "keys",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1,
+          "code_sha256": "16ce86082e468e903df8933279a87998c7b4d9877fbe844fb68a2508e81d0c38",
+          "code_length": 19
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "f3ff0f4f87c6cd38248ea03bc53899ef8fa2e0cace1803df4d2fb310ec11a566",
+          "code_length": 70
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 33,
+          "code_sha256": "9a90e60a2f2e3c8cef909968b72e62970731c0a1d9bbba7fae46fb49d9a4700e",
+          "code_length": 91
+        },
+        {
+          "name": "putAll",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "34f341c02f347d4f3449564c2c5bef02c5513f148139191ac9e068ef80e3418e",
+          "code_length": 61
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "9e6b27ee7c55735225b10a18798e5932d38d0e9ffe6157d6d217b2bd06680e04",
+          "code_length": 9
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 33,
+          "code_sha256": "d68e190284c0272635d888087d4d59bb460d550430fec424c0c244bd1e580ed2",
+          "code_length": 56
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e3689cbeb1a63012da0e2b51c60e2575baeb689054a31c03e703433e2a24ea20",
+          "code_length": 9
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1482c4ccb1a15e30c2959999e0d7f3fa581684536ceff076052bc34a6076cad2",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f7e8906cc0850128c48ff743ffe8438b8c878b6858fa5ccc878db78399fa55fc",
+          "code_length": 9
+        },
+        {
+          "name": "rehash",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "601e4a0b155f365d058d9a3dcbf56de4a2cf4ee26f552e417c898e104a0e130c",
+          "code_length": 9
+        },
+        {
+          "name": "purge",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b7949976089d0f4001ed4d22bd56b03895b77c8b21f5a371280a88266b21f81e",
+          "code_length": 89
+        },
+        {
+          "name": "purgeOne",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b9dadc3ae7943dcce112e560b6d2ba7c4d2e1521207a4d6781e5a89702e91cdc",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "java/lang/NullPointerException",
+        "java/lang/ref/ReferenceQueue",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Hashtable",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/logging/impl/WeakHashtable",
+        "org/apache/commons/logging/impl/WeakHashtable$1",
+        "org/apache/commons/logging/impl/WeakHashtable$Entry",
+        "org/apache/commons/logging/impl/WeakHashtable$Referenced",
+        "org/apache/commons/logging/impl/WeakHashtable$WeakKey"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$1.class",
+      "occurrence": 0,
+      "sha256": "f0b97758f88d7537c99733a86c178d9153f5e4210121e87cfa7bc520d7705adc",
+      "name": "org/apache/commons/logging/impl/WeakHashtable$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Enumeration"
+      ],
+      "fields": [
+        {
+          "name": "val$enumer",
+          "descriptor": "Ljava/util/Enumeration;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/logging/impl/WeakHashtable;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/logging/impl/WeakHashtable;Ljava/util/Enumeration;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "hasMoreElements",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "af4b95c152064942120b39aa567aa7337ff29f48b4f5085c825cee9d69f42a25",
+          "code_length": 10
+        },
+        {
+          "name": "nextElement",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ae800cecd014b3728452e86d98b51e5915f28eae6738bce8086d00708d5f952a",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Enumeration",
+        "org/apache/commons/logging/impl/WeakHashtable",
+        "org/apache/commons/logging/impl/WeakHashtable$1",
+        "org/apache/commons/logging/impl/WeakHashtable$Referenced"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Jdk14Logger.class",
+      "occurrence": 0,
+      "sha256": "4a4110e2db0818ea7450eb6dd0d8a40471c0b35f3a6a2e6e4a302476a101ffa3",
+      "name": "org/apache/commons/logging/impl/Jdk14Logger",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "dummyLevel",
+          "descriptor": "Ljava/util/logging/Level;",
+          "access": 28
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 132
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9d29fe76fca8708b3c4bffc545d37e67dde52417b779cf81b37beb10f50cd6e8",
+          "code_length": 28
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 4,
+          "code_sha256": "9fb4cc01fa269872b09d62d2360ac1cbb3f4d32292d9ed79d61082a34071a0fd",
+          "code_length": 97
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "5473a895ea11f0158e203b5975b370c7bbb4c288ee8592b4e0f8ef588723df51",
+          "code_length": 13
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "9b8f7faeaefae03a95c5ca8afefebff2f5bd6d319612dd543e5f4b483a761538",
+          "code_length": 13
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cb32c839feee9775c472fc3c48de6f1b38d60bf319689cdd89cb14ba3b67ffe8",
+          "code_length": 13
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "949014c21c46e39ce4206dfbe4fb19db8e75c1a2f652bc88497bbb5b333b0c17",
+          "code_length": 13
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cb32c839feee9775c472fc3c48de6f1b38d60bf319689cdd89cb14ba3b67ffe8",
+          "code_length": 13
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "949014c21c46e39ce4206dfbe4fb19db8e75c1a2f652bc88497bbb5b333b0c17",
+          "code_length": 13
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Ljava/util/logging/Logger;",
+          "access": 1,
+          "code_sha256": "9b3acb210887ebc0f35bf653055583f7399a9b5c40a0aa85b0212b39ab4646d4",
+          "code_length": 23
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e73cff49140b7f1c7ecb34323e4356d43345e9a9e25680f88c956d6817b4b989",
+          "code_length": 13
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "727be4338275e9b5d327c40d22d21869016b6f61e11a0655ddcc73e064203e1e",
+          "code_length": 13
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "93bf016feeefcd9522275200243df5522d7d78b4f2bc2eb7d1491a135c82a42e",
+          "code_length": 11
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cae83e553d00eb1e08bb5518eeed535bcabbef41393810c241089666424f9330",
+          "code_length": 11
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cae83e553d00eb1e08bb5518eeed535bcabbef41393810c241089666424f9330",
+          "code_length": 11
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a3b63a8d428f8000b538dd583e2dbed716395a3f16f778d2eca7d0652fb5502d",
+          "code_length": 11
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a6b78f67deaa8331b1e564d579966b3e4188793fc30e7fb9dbbeedfbbb48f213",
+          "code_length": 11
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0cc382f33912a97d6948ebba0967d19abf720b7348d1fd257ff1e77da5d6e657",
+          "code_length": 11
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "a86362785765bcfbe94bcd13ccf0e53092634cafd07068c8376070208a9b0e1a",
+          "code_length": 13
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "92362da89afb23fad5c9728fdd1789186b6b1d84ad73cb539469ab31ed4dacba",
+          "code_length": 13
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "b2c233d912b0de84bd4238ab08243b2cb642133ed801fa1c1e4c542d66726d8a",
+          "code_length": 13
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "1e9cd8253b1c6a5565022b18d2e7bca01b654981c8c53be97068fca1e752d351",
+          "code_length": 13
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9b6defae99634f48f9796de0117e34d50a05a19ba7d8e9582aac7d2ff7799ee0",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/StackTraceElement",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/Jdk14Logger"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/ServletContextCleaner.class",
+      "occurrence": 0,
+      "sha256": "76342437e114f9c93bb8b1f0e0cc2e657e167af99cd879dc3a893d33036813a6",
+      "name": "org/apache/commons/logging/impl/ServletContextCleaner",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/servlet/ServletContextListener"
+      ],
+      "fields": [
+        {
+          "name": "RELEASE_SIGNATURE",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 26
+        },
+        {
+          "name": "class$java$lang$ClassLoader",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "contextDestroyed",
+          "descriptor": "(Ljavax/servlet/ServletContextEvent;)V",
+          "access": 1,
+          "code_sha256": "0b64af5aaeba1d8694ddf74bc60a3946ef3dfad567ffec57ab6fd15db4df6880",
+          "code_length": 127
+        },
+        {
+          "name": "contextInitialized",
+          "descriptor": "(Ljavax/servlet/ServletContextEvent;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "64b28d5127bfa575d4795457f35461d5d7b1c99d15190de216e345ae8ba610c5",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bd8a57b676fb9232dcbfd79e82386d82e87d3cd146dcee5a874ba1d6617aa0ca",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "javax/servlet/ServletContextListener",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/impl/ServletContextCleaner"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$WeakKey.class",
+      "occurrence": 0,
+      "sha256": "d05a1da35de6015a965c86e03be65cc16cadca2aa861fb8921ab23888ae0f49a",
+      "name": "org/apache/commons/logging/impl/WeakHashtable$WeakKey",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/ref/WeakReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "referenced",
+          "descriptor": "Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;)V",
+          "access": 2,
+          "code_sha256": "057550286f6e9b5f366013905d7df047934f456c99c725e020619cc465d3acb8",
+          "code_length": 12
+        },
+        {
+          "name": "getReferenced",
+          "descriptor": "()Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;",
+          "access": 2,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lorg/apache/commons/logging/impl/WeakHashtable$WeakKey;)Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;",
+          "access": 8,
+          "code_sha256": "ed2b8254e0ba5a4243ea4b6f3d71ddfe0edc73225edd6f928618cb103449edb9",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V",
+          "access": 0,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/ref/WeakReference",
+        "org/apache/commons/logging/impl/WeakHashtable",
+        "org/apache/commons/logging/impl/WeakHashtable$1",
+        "org/apache/commons/logging/impl/WeakHashtable$Referenced",
+        "org/apache/commons/logging/impl/WeakHashtable$WeakKey"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/NoOpLog.class",
+      "occurrence": 0,
+      "sha256": "9227b39903c04bf379e7cd0fe9c353640feba172826431545c86bde4c28edb19",
+      "name": "org/apache/commons/logging/impl/NoOpLog",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/NoOpLog"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogKitLogger.class",
+      "occurrence": 0,
+      "sha256": "8e2ee10e0665a76118b186cd092910a9d35760980e2d7b09a2c7f70c977596d3",
+      "name": "org/apache/commons/logging/impl/LogKitLogger",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "logger",
+          "descriptor": "Lorg/apache/log/Logger;",
+          "access": 196
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9d29fe76fca8708b3c4bffc545d37e67dde52417b779cf81b37beb10f50cd6e8",
+          "code_length": 28
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Lorg/apache/log/Logger;",
+          "access": 1,
+          "code_sha256": "1e105e0e0f1d46b3e60055b618b1a331ee6e797df60229d9c674d35a9601db41",
+          "code_length": 50
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cc9219a21628e7d7aaa98a2ec4eb678aea12f78a4529c3e598747539b143e484",
+          "code_length": 6
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "1628dcc63202f8ae7cbf05c0af6f2ce4fc817712a2adcaad213665accb96d56c",
+          "code_length": 7
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c754640675bb52c6973d254c9d67a6db55c56d76b3af32f7ac82e68611940e91",
+          "code_length": 16
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "099fd1317ca4d65182e10e5cdad5a57a6ffd2ef45aa3eb230831628ef02eecf5",
+          "code_length": 17
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "0c10b7cdd3b19eac60bdee74a88dcb45aa92bdff2f3449386f9f792afba3d606",
+          "code_length": 16
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "7f5d312c12f01a00ef2e75ef5cf98aa598277798e4fad33143f2ea46c2335cd2",
+          "code_length": 17
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "b1e416552c1787f374cf4d81d8fc29ab36dbd76a8cb07109e5d028a2fb749739",
+          "code_length": 16
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "42bbf99ade421211ff9a61bba94e579e279f7870e93327292fde9db99a5b48c9",
+          "code_length": 17
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "fc65d8a9c439cff756f4bc3874beb9a56651e3dd90d956761ccbcc7c8e2231a8",
+          "code_length": 16
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "4a95f5070e5325271b5b7c80d47b822199f90b3b8f709588050004418bb92b80",
+          "code_length": 17
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "60bf44f97b6ec17b75f17ca39c573435a797070f3e47de2302ae678c6afca84a",
+          "code_length": 16
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "af77efdfe66e5ac853e79d794d511f9c59a98ce6d1f031cd002002f3d9b08fdd",
+          "code_length": 17
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8b364844707caf23eb3525555f552821a6d205330e3fafd74fab232f97b6b36b",
+          "code_length": 8
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cb325804f3a8dcecf347a3daa7810e31979d8ebc1323ada7adc53a2dce7ddbba",
+          "code_length": 8
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6f12ff8f64e80168dc4f7a4e920cd5b8de7f80d9d9f097000a3b0c10be007e5a",
+          "code_length": 8
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "38718fb0cec66a2351031f5771ccb8f573abadd0d2de03793d4e24241404a140",
+          "code_length": 8
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8b364844707caf23eb3525555f552821a6d205330e3fafd74fab232f97b6b36b",
+          "code_length": 8
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5892b8186976c210006daf54880fd5f3f1eb115e8f297fbedb5a696b54dc508e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/LogKitLogger",
+        "org/apache/log/Hierarchy",
+        "org/apache/log/Logger"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$3.class",
+      "occurrence": 0,
+      "sha256": "4999c0dbf350ed5d0ea40f5639eb84746fa4b1b440d0c68a22a96bf20718a3f8",
+      "name": "org/apache/commons/logging/impl/LogFactoryImpl$3",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$cl",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/logging/impl/LogFactoryImpl;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/logging/impl/LogFactoryImpl;Ljava/lang/ClassLoader;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "40c78c45ff8807307acfb5ab3e8258288b8c4e619785ed488be23914d9142924",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/impl/LogFactoryImpl$3"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$1.class",
+      "occurrence": 0,
+      "sha256": "32a9df68b3d3eb474bc7407d8d7f4d675bbe7e8a993678f8e29ddc244e8350fa",
+      "name": "org/apache/commons/logging/impl/LogFactoryImpl$1",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7da9dd61ff61968819edb8f9bbfe2d440373f2a1cc610a357a981a82f44f2769",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/impl/LogFactoryImpl",
+        "org/apache/commons/logging/impl/LogFactoryImpl$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$Referenced.class",
+      "occurrence": 0,
+      "sha256": "40bae0ec2c8903f5dad4619b912997524774d487cff3c7844e69ee9bfae63ea6",
+      "name": "org/apache/commons/logging/impl/WeakHashtable$Referenced",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "reference",
+          "descriptor": "Ljava/lang/ref/WeakReference;",
+          "access": 18
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "f03bd473b275e8d243725d47a1bf9517291413614e17c617286fadb1ca4baaa7",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V",
+          "access": 2,
+          "code_sha256": "dca2fdabf26573acfc9684af108b12b794da00704a205fb97ce0bcdf15e75840",
+          "code_length": 28
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "d35cbbbf20021c636637a03b39e481e1754ec6cc7392355fb73533468497f68e",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "274367cbcb47c1fbe36e8e2e5b2640e5003380788bc5fc654c366c0bfaebe0a7",
+          "code_length": 76
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V",
+          "access": 0,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/logging/impl/WeakHashtable$Referenced;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "ed2b8254e0ba5a4243ea4b6f3d71ddfe0edc73225edd6f928618cb103449edb9",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/ref/WeakReference",
+        "org/apache/commons/logging/impl/WeakHashtable",
+        "org/apache/commons/logging/impl/WeakHashtable$1",
+        "org/apache/commons/logging/impl/WeakHashtable$Referenced",
+        "org/apache/commons/logging/impl/WeakHashtable$WeakKey"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/SimpleLog$1.class",
+      "occurrence": 0,
+      "sha256": "87bfd399e8c651bfe5b8e20349de8777fe3febd5c419a06b631967b2708e8f36",
+      "name": "org/apache/commons/logging/impl/SimpleLog$1",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "21be4e77dbee42950ab5c63eb06c5fc2c60057d2960be063ac90ecc7f78b0617",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/impl/SimpleLog",
+        "org/apache/commons/logging/impl/SimpleLog$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Jdk13LumberjackLogger.class",
+      "occurrence": 0,
+      "sha256": "622c5a3e5064e04be7b239f2cc2111f9217f1a302c51ffe83eaceff613a773df",
+      "name": "org/apache/commons/logging/impl/Jdk13LumberjackLogger",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/logging/Log",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 132
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "sourceClassName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "sourceMethodName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "classAndMethodFound",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "dummyLevel",
+          "descriptor": "Ljava/util/logging/Level;",
+          "access": 28
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "37edfe7de7fc53dee6c00b27526f3cb94ed4306b10f49e3bd0a4f94f2907c2ae",
+          "code_length": 45
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/util/logging/Level;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 2,
+          "code_sha256": "69b830075d5a795086484b37d7aa8b24d065c24711f8ef755863a38dfd84c359",
+          "code_length": 71
+        },
+        {
+          "name": "getClassAndMethod",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5eac073da1ef819acd174bd3e5573a5cee278eae3249c6143d1a63a0296d1c92",
+          "code_length": 196
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cbc73fe332a55d3219510f261eae7a1616b808d1179d8f3ea6e6248ea0ebb4cb",
+          "code_length": 13
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c437d91efd62a159a03b2290a41685fcb0fa6a21c2c760f6e49362cf06d4f2ad",
+          "code_length": 13
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6945749eea14cae6fa39da8285b4c61742049059e4535b17e14cb4254b8f8c5b",
+          "code_length": 13
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cf306bcb14eba5c0b0a47839ec45cfb8e300634423849903de7384f17e25ee34",
+          "code_length": 13
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6945749eea14cae6fa39da8285b4c61742049059e4535b17e14cb4254b8f8c5b",
+          "code_length": 13
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cf306bcb14eba5c0b0a47839ec45cfb8e300634423849903de7384f17e25ee34",
+          "code_length": 13
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "()Ljava/util/logging/Logger;",
+          "access": 1,
+          "code_sha256": "3fce3e446ac411cbf160fe42fd8bbe6df0d049532c0d0ba44fb53eb5d59ad9d3",
+          "code_length": 23
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "b305cb445d0dd1b5188384587e2dcff856bcf8ae4499b77bdb7908a5270c7373",
+          "code_length": 13
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "57cf7505c4f03987510991696ab057bedd81fa82eeb2b4cd4486590740ec2cde",
+          "code_length": 13
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "bf705d4ec7df15508a43c61458be4143a740d289516d20b1b227eb7d839665c7",
+          "code_length": 11
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e58c95815619eb3d50aad892dee517245335bbb9e178c10a2717d8372c58f987",
+          "code_length": 11
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e58c95815619eb3d50aad892dee517245335bbb9e178c10a2717d8372c58f987",
+          "code_length": 11
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5be9efc5b7239e6064096360d4fddb9e2bc2039d7e83429365aaf16fb1500abb",
+          "code_length": 11
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f5de83c5b4b7d2ef3209f36cc8ccc092b88dd7fcea58821cf2f61440a9559358",
+          "code_length": 11
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8687488c96696505f9e8fd896555313ebab2ee439ca6f63c42a2865f31228534",
+          "code_length": 11
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "2814a7176e64feae67d770531e5b85fd9b58aeef7ab264eb7c77f8ce2e3cb54b",
+          "code_length": 13
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "9c8864218e9d119c6a3c028fc9e5d3b60127cd1f40087d08e495c6715b08dd2f",
+          "code_length": 13
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "f032cc875ef8a8f7f5dc35908e1f1f473a62d730b4bd2a0f5dc65ba3c7a040c3",
+          "code_length": 13
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "0e8133c6c36a204142f36d56aed895e4874b9b01ab67fa914e770ad35bd38871",
+          "code_length": 13
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bb309b664cd2234b7e08be062ad3c12f0638f898b1fcebb7580e3a0fcc373832",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/io/PrintWriter",
+        "java/io/Serializable",
+        "java/io/StringWriter",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/Throwable",
+        "java/util/StringTokenizer",
+        "java/util/logging/Level",
+        "java/util/logging/LogRecord",
+        "java/util/logging/Logger",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/impl/Jdk13LumberjackLogger"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl.class",
+      "occurrence": 0,
+      "sha256": "e95346565a25b7547c8b08b9474a9473a6765c60584b5806b570b066e25d2de7",
+      "name": "org/apache/commons/logging/impl/LogFactoryImpl",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/logging/LogFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGING_IMPL_LOG4J_LOGGER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "LOGGING_IMPL_JDK14_LOGGER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "LOGGING_IMPL_LUMBERJACK_LOGGER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "LOGGING_IMPL_SIMPLE_LOGGER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PKG_IMPL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PKG_LEN",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LOG_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LOG_PROPERTY_OLD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "ALLOW_FLAWED_CONTEXT_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ALLOW_FLAWED_DISCOVERY_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ALLOW_FLAWED_HIERARCHY_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "classesToDiscover",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "useTCCL",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "diagnosticPrefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "attributes",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 4
+        },
+        {
+          "name": "instances",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 4
+        },
+        {
+          "name": "logClassName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "logConstructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 4
+        },
+        {
+          "name": "logConstructorSignature",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 4
+        },
+        {
+          "name": "logMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 4
+        },
+        {
+          "name": "logMethodSignature",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 4
+        },
+        {
+          "name": "allowFlawedContext",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "allowFlawedDiscovery",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "allowFlawedHierarchy",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "class$java$lang$String",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$commons$logging$LogFactory",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$commons$logging$impl$LogFactoryImpl",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        },
+        {
+          "name": "class$org$apache$commons$logging$Log",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "574e1286e1d72d614415d72962e9c67208714dfbc2e19683c8e13531d4380428",
+          "code_length": 122
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b91d71f0a7e54d1f08b0114e630c5a3354696a4c0fbf0501ebaccb1ee43c8213",
+          "code_length": 9
+        },
+        {
+          "name": "getAttributeNames",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "47a6c972b5352c4e3d11fdc44934fba4dcdc5a50c35db2c15fdd9447d3142c97",
+          "code_length": 29
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/Class;)Lorg/apache/commons/logging/Log;",
+          "access": 1,
+          "code_sha256": "0ced5c556d097e0cdcefdc1e55e601d7cbac2aae1d1b07b8f342ef3f65c75863",
+          "code_length": 9,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 1,
+          "code_sha256": "a9fb389861be28f1431c170d01a5a241b03fcbf882621b7228c810b37fb60523",
+          "code_length": 34,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "release",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0a58c2182adc6d5a34ba8067cb8b812dc84d8b1aae766554c6f05730e8513190",
+          "code_length": 14
+        },
+        {
+          "name": "removeAttribute",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "416b78a73467df074b17bb9126154ef05452146c2dff69a02b045c5e25184c86",
+          "code_length": 10
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "583298e9a4af42d3438a609174ed4b8f059fff5e9b1696302650ef00656039ef",
+          "code_length": 75
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 12,
+          "code_sha256": "6dfc82c6a00b14475c01ba8ae5a4806c0c889a4e4a23326ae2474d89401b00f8",
+          "code_length": 4,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "isDiagnosticsEnabled",
+          "descriptor": "()Z",
+          "access": 12,
+          "code_sha256": "e1a4521390082ba0f3725936a2ae57e6554374cd81a293e64b22026b37b6c90d",
+          "code_length": 4
+        },
+        {
+          "name": "getClassLoader",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/ClassLoader;",
+          "access": 12,
+          "code_sha256": "a18a481763332c727fc2da202fa7beb69144a0c6906f70315861a0078ad0efb7",
+          "code_length": 5
+        },
+        {
+          "name": "initDiagnostics",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "6773236efbc2e76c4a5050ae378e6a3de4ae5e630be96bbc9595d20c9dc448ab",
+          "code_length": 74
+        },
+        {
+          "name": "logDiagnostic",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "1a99808d83c56d3c296e4c99621d468941d49e2c7ad4fda43ea6f57fa7734618",
+          "code_length": 31
+        },
+        {
+          "name": "getLogClassName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "5df4efff9dc91b6fd3432b8a192034c06580bc6059e35e89fdd0b09836223e8b",
+          "code_length": 24
+        },
+        {
+          "name": "getLogConstructor",
+          "descriptor": "()Ljava/lang/reflect/Constructor;",
+          "access": 4,
+          "code_sha256": "56a4d89aaa1dcc869ec1e656c0686f77e1dcbf6674423babe38842cf4136f13a",
+          "code_length": 24,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "isJdk13LumberjackAvailable",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "b70ac4c3a0ddaa564a92212d7f26b496e6f6bf52e63fddd653d22a050ab743fc",
+          "code_length": 9
+        },
+        {
+          "name": "isJdk14Available",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "d215cb0d3fe034091aefbb6f5b2ad854c68e0ce4015751ed9cf4830ba626bcce",
+          "code_length": 9
+        },
+        {
+          "name": "isLog4JAvailable",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "2f386111728bb01d8f6690b13f449de7a1eceb2fabaf72582b2e4327ea855dd1",
+          "code_length": 9
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 4,
+          "code_sha256": "1a52af5f2c0a0127d6362722372923d1f05fe433336f4dcfbe6b1a7afa87dfb9",
+          "code_length": 108,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getContextClassLoaderInternal",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 10,
+          "code_sha256": "8baf6753f8ff6e32e071a6dd46c48db03f8e94e8f1b4e68c39548e3b2280d987",
+          "code_length": 14,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getSystemProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "c132be39df26c03bc8a4c1201bf3419221c205646e4c903e7df2367cc21853b1",
+          "code_length": 16,
+          "throws": [
+            "java/lang/SecurityException"
+          ]
+        },
+        {
+          "name": "getParentClassLoader",
+          "descriptor": "(Ljava/lang/ClassLoader;)Ljava/lang/ClassLoader;",
+          "access": 2,
+          "code_sha256": "e361a293cd44479cdbb2d3c9984f4a635abde2d0e742279e3bade564e09e2022",
+          "code_length": 25
+        },
+        {
+          "name": "isLogLibraryAvailable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "104d083af0e644dc73e980cfb8865f7931899279a91ad4fce9079f24e004f5f8",
+          "code_length": 161
+        },
+        {
+          "name": "getConfigurationValue",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c93a999444a4bd53fe19a78c2662481f65730241b95bd4b3893152ea663e0245",
+          "code_length": 254
+        },
+        {
+          "name": "getBooleanConfiguration",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 2,
+          "code_sha256": "da36b9b78e05e9b74fc1da2450eefdbbf5186cce5130f1548f06fbdb70effb87",
+          "code_length": 20
+        },
+        {
+          "name": "initConfiguration",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "eaea1476e87841f30809ce6a684e2ced5369c8627cf727c79738cb473ec663c1",
+          "code_length": 34
+        },
+        {
+          "name": "discoverLogImplementation",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 2,
+          "code_sha256": "cba2e07904f3e0cd0c51e9c5c453e1a55c3f448b7d9be3e2eb23207710f34116",
+          "code_length": 213,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "informUponSimilarName",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "35eb01e9b80ca457fa9bfefa547528ee1480fc4abca263080d1f996fe726357d",
+          "code_length": 46
+        },
+        {
+          "name": "findUserSpecifiedLogClassName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "39b3b1c0bbaa467881b9379362c16e50afb547b32665beaf676f3e62cc027638",
+          "code_length": 177
+        },
+        {
+          "name": "createLogFromClass",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Z)Lorg/apache/commons/logging/Log;",
+          "access": 2,
+          "code_sha256": "61ce4ddb8e62506c2cbdafd07cf8fc71ff08185f318f3517805a682f805629ef",
+          "code_length": 768,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getBaseClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 2,
+          "code_sha256": "cc9695a7648bfb84be6e8f6cfa265e053a183d5b3c8784883134479fc8751d1e",
+          "code_length": 119,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getLowestClassLoader",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/ClassLoader;)Ljava/lang/ClassLoader;",
+          "access": 2,
+          "code_sha256": "669556e54ef7d0cf23fcf2bc670111cf7e5ba24dca5c39692d4e577ef9abf2ef",
+          "code_length": 58
+        },
+        {
+          "name": "handleFlawedDiscovery",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;Ljava/lang/Throwable;)V",
+          "access": 2,
+          "code_sha256": "108c125f7a087af6ddcf00acc68342b4ec231d0af98a96f678a5db092e806753",
+          "code_length": 219
+        },
+        {
+          "name": "handleFlawedHierarchy",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "e597c55cbbd0bf1be3b66bfa6f9db9f38a2830394de5d0363d0bc5f992f9dc68",
+          "code_length": 518,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "84134ad7a03c3bd8a6e31eeb6fa1934d7551a82914bacfd30b62b57f2b3d87a0",
+          "code_length": 18
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 8,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bcaf97728af18310c24f306f5529538803d3bd4148447debe307a1f74d346189",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/PrintWriter",
+        "java/io/StringWriter",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/ExceptionInInitializerError",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/security/AccessController",
+        "java/util/Hashtable",
+        "java/util/Set",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/LogConfigurationException",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/impl/LogFactoryImpl",
+        "org/apache/commons/logging/impl/LogFactoryImpl$1",
+        "org/apache/commons/logging/impl/LogFactoryImpl$2",
+        "org/apache/commons/logging/impl/LogFactoryImpl$3"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$2.class",
+      "occurrence": 0,
+      "sha256": "c4c53510a440d61d96526b5ce17b18b3a397ab6730132eb4149326c20caf28d6",
+      "name": "org/apache/commons/logging/impl/LogFactoryImpl$2",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "val$def",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8447c73bc7d3a8c1bead05890829d94d6b8ca8870fc0d83dd8cd3386a80ab9c3",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/impl/LogFactoryImpl$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$Entry.class",
+      "occurrence": 0,
+      "sha256": "092716c667b99f160ba3e68f0ae58d3bf0d091dfab5413ede208998f0f2854e3",
+      "name": "org/apache/commons/logging/impl/WeakHashtable$Entry",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "d4565b16dedfeaf1abf4942ad32ae2966aea393d57a46c9a81b4c1f2447e4932",
+          "code_length": 15
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "7c282770b6c0057d7a14d217127024bcf6a92f2f5aa9191db4aebaa694c45a40",
+          "code_length": 96
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fd0bb87f13547ebe6c575857badcea873b0568e698af01008634c58c32ecfb96",
+          "code_length": 38
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a4a71a278a7c337ad2baf95a93cfa316e6bf818b19363bfffdd9884d88644ad5",
+          "code_length": 10
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Lorg/apache/commons/logging/impl/WeakHashtable$1;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/logging/impl/WeakHashtable",
+        "org/apache/commons/logging/impl/WeakHashtable$1",
+        "org/apache/commons/logging/impl/WeakHashtable$Entry"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogSource.class",
+      "occurrence": 0,
+      "sha256": "c315741f45ebe0b0a1438f8272bc7daacba268bc3c578eb92790b562845e9246",
+      "name": "org/apache/commons/logging/LogSource",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logs",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 12
+        },
+        {
+          "name": "log4jIsAvailable",
+          "descriptor": "Z",
+          "access": 12
+        },
+        {
+          "name": "jdk14IsAvailable",
+          "descriptor": "Z",
+          "access": 12
+        },
+        {
+          "name": "logImplctor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 12
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setLogImplementation",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "34cd9801aa7c8cac86e618e1cf89f1638f430e188c9f8c0e5c9b0fd03f51d3bf",
+          "code_length": 35,
+          "throws": [
+            "java/lang/LinkageError",
+            "java/lang/NoSuchMethodException",
+            "java/lang/SecurityException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "setLogImplementation",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 9,
+          "code_sha256": "ab53359ed9bf25d0ac25629ed4874f9bc777b5506fb5e0e5c4eb466a715c276c",
+          "code_length": 22,
+          "throws": [
+            "java/lang/LinkageError",
+            "java/lang/ExceptionInInitializerError",
+            "java/lang/NoSuchMethodException",
+            "java/lang/SecurityException"
+          ]
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 9,
+          "code_sha256": "e6f5aa87bd5a0e04fc953499a158e5655a8419afbf113a13c634cd8815691d38",
+          "code_length": 32
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/Class;)Lorg/apache/commons/logging/Log;",
+          "access": 9,
+          "code_sha256": "5d4b10412892d6797a10f0c91272ae42635a8190d2dd4e4d2376d662bcf8bd77",
+          "code_length": 8
+        },
+        {
+          "name": "makeNewLogInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 9,
+          "code_sha256": "71afcaa0163e6cb36ae6bbda79f35605398e9ea76e91f55b45cc6bac023c23ca",
+          "code_length": 42
+        },
+        {
+          "name": "getLogNames",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a601d4f49f1bc6e48e105c6bb820820ec6a2dae075874d3aeba2c0ed21a75103",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b7c3154992f8272f178f6abec30be7f36062ce216c8a90c52b01da5934bce283",
+          "code_length": 174
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/ExceptionInInitializerError",
+        "java/lang/LinkageError",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/util/Hashtable",
+        "java/util/Set",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/LogSource",
+        "org/apache/commons/logging/impl/NoOpLog"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$4.class",
+      "occurrence": 0,
+      "sha256": "1efefab7835d51f495978d2a25eaba6b800c275be77454c987ad63bcdefedb1a",
+      "name": "org/apache/commons/logging/LogFactory$4",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$loader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        },
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "563411ae959ebb5abc19383f986b60d6ece1abfe81151ec3d5cc8ef91b89a95e",
+          "code_length": 76
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/ClassLoader",
+        "java/lang/NoSuchMethodError",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/LogFactory$4"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$3.class",
+      "occurrence": 0,
+      "sha256": "b943569622c0d48d6a2343e90f090bd10bdd0e1c9a119842cef354c66d1a2825",
+      "name": "org/apache/commons/logging/LogFactory$3",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$loader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        },
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4a954dc989d13c10a02b55f8b7667abb5d70e04af475bf063b95535b234473f1",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/LogFactory$3"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$6.class",
+      "occurrence": 0,
+      "sha256": "c6a6b22e7c3c6ecb9009e59892176e03468a998632555acdb607e5dd31ce21a3",
+      "name": "org/apache/commons/logging/LogFactory$6",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "val$def",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8447c73bc7d3a8c1bead05890829d94d6b8ca8870fc0d83dd8cd3386a80ab9c3",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/LogFactory$6"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogConfigurationException.class",
+      "occurrence": 0,
+      "sha256": "713bcf0e265adb22235d9ac7d7a954a70df45bb7d91187c4a21f421049a4e7b7",
+      "name": "org/apache/commons/logging/LogConfigurationException",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "cause",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5aa8b1d788997e7d70ad6fa3292d3ef3697f4be437a6f16c2bcd1c7707462aa6",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8efd9f5f861bb1316738a6be0c8cdcf740751ebc65b2ff6e0fde1768993d7b41",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "e783a861b90a01ee3d8b1082d0ceace9a40869e24c5a883f39278b08e3eb4164",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "11a98aec332cff9215e2a73ff8867bbf2c9712685385eb65cb20e3df41b27646",
+          "code_length": 43
+        },
+        {
+          "name": "getCause",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "java/lang/StringBuffer",
+        "java/lang/Throwable",
+        "org/apache/commons/logging/LogConfigurationException"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory.class",
+      "occurrence": 0,
+      "sha256": "9ef05a717b80acfaa616e69e0cecf12c4f12f1ac16a588fac836ef0a92088bd9",
+      "name": "org/apache/commons/logging/LogFactory",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRIORITY_KEY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TCCL_KEY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FACTORY_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FACTORY_DEFAULT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FACTORY_PROPERTIES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "DIAGNOSTICS_DEST_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "diagnosticsStream",
+          "descriptor": "Ljava/io/PrintStream;",
+          "access": 10
+        },
+        {
+          "name": "diagnosticPrefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HASHTABLE_IMPLEMENTATION_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WEAK_HASHTABLE_CLASSNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "thisClassLoader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 26
+        },
+        {
+          "name": "factories",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 12
+        },
+        {
+          "name": "nullClassLoaderFactory",
+          "descriptor": "Lorg/apache/commons/logging/LogFactory;",
+          "access": 76
+        },
+        {
+          "name": "class$org$apache$commons$logging$LogFactory",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "453e557c6548b35730a6cc77039ad677c34240c042947f27d4cde64a2c487b62",
+          "code_length": 5
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getAttributeNames",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/Class;)Lorg/apache/commons/logging/Log;",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "release",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "removeAttribute",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "createFactoryStore",
+          "descriptor": "()Ljava/util/Hashtable;",
+          "access": 26,
+          "code_sha256": "341638aead5beae9785600487df2e35e4e125dd7e5c6ece35e370b31f6773144",
+          "code_length": 88
+        },
+        {
+          "name": "trim",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "58ae6fa7baa12caf3668665417ffd71192f550a35f00a9cfbde8a1401620bbdb",
+          "code_length": 11
+        },
+        {
+          "name": "handleThrowable",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 12,
+          "code_sha256": "84e0ae8ea51acb9f960541ca6a0414b09dd2574c86399ee3038938ef99c500ab",
+          "code_length": 25
+        },
+        {
+          "name": "getFactory",
+          "descriptor": "()Lorg/apache/commons/logging/LogFactory;",
+          "access": 9,
+          "code_sha256": "893683c59f8f5ccd9ecb16183f1733f59c79b285651449d788db2c47f8dbdde8",
+          "code_length": 684,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getLog",
+          "descriptor": "(Ljava/lang/Class;)Lorg/apache/commons/logging/Log;",
+          "access": 9,
+          "code_sha256": "fa3a41402de210171d06b0e9706deceb3d3583c4714c3a705d9aef5baf29dc88",
+          "code_length": 8,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getLog",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/logging/Log;",
+          "access": 9,
+          "code_sha256": "f2d04584db2ea7313b9f9e04674a49f2ad5fa65452e2f2525610500b6354f52c",
+          "code_length": 8,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "release",
+          "descriptor": "(Ljava/lang/ClassLoader;)V",
+          "access": 9,
+          "code_sha256": "3322d5ad8e50e4cb4de007da780dcf46eea7a10a238d604d24106ad7b8d25098",
+          "code_length": 98
+        },
+        {
+          "name": "releaseAll",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "ff7bb65aeb5ba9cb5cdda80a0046d6bbf00b121ea29bf4e8ef9e3ce4980d9110",
+          "code_length": 83
+        },
+        {
+          "name": "getClassLoader",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/ClassLoader;",
+          "access": 12,
+          "code_sha256": "dfdad90d5c9ec06ff8f616ae59a80ec022269202e927aaa959bded4f9b4c3ec6",
+          "code_length": 48
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 12,
+          "code_sha256": "37b9fc7da6b1ddaab4d0a0b0cefe9b8b2de169b847acfe48a2ed32a6449b20c8",
+          "code_length": 4,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getContextClassLoaderInternal",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 10,
+          "code_sha256": "fb6de88751b943a97a73ac6a116cef6b1459763434e9ff1836a82351215c762d",
+          "code_length": 14,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "directGetContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 12,
+          "code_sha256": "9b14a829b04e032fe72047fe45d81dd3e5399fbae5e51e411238f011701ffdee",
+          "code_length": 15,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "getCachedFactory",
+          "descriptor": "(Ljava/lang/ClassLoader;)Lorg/apache/commons/logging/LogFactory;",
+          "access": 10,
+          "code_sha256": "0278c157386e596694371b62872d0a420cc246c97ee5e9f54cd27d1e66bd05b0",
+          "code_length": 19
+        },
+        {
+          "name": "cacheFactory",
+          "descriptor": "(Ljava/lang/ClassLoader;Lorg/apache/commons/logging/LogFactory;)V",
+          "access": 10,
+          "code_sha256": "4ac3e4ecc4f578b7fd15f6b1436b65cd9b5009beeb194b996f0d7e237ab88cda",
+          "code_length": 25
+        },
+        {
+          "name": "newFactory",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;Ljava/lang/ClassLoader;)Lorg/apache/commons/logging/LogFactory;",
+          "access": 12,
+          "code_sha256": "7b112fdcab33737ec6fcbb4be1647690ddb2f03d751472eaf65f0bcefeb299fd",
+          "code_length": 109,
+          "throws": [
+            "org/apache/commons/logging/LogConfigurationException"
+          ]
+        },
+        {
+          "name": "newFactory",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Lorg/apache/commons/logging/LogFactory;",
+          "access": 12,
+          "code_sha256": "faa9fcd884917cf99b1158bf6b600732f3c5d8c8043aa06bfa4f68a242d0164a",
+          "code_length": 7
+        },
+        {
+          "name": "createFactory",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Object;",
+          "access": 12,
+          "code_sha256": "3c321cc758f93b9d1ecaedcabe732f20c496f68f9b8e4a65f1b1b270a748f16e",
+          "code_length": 611
+        },
+        {
+          "name": "implementsLogFactory",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 10,
+          "code_sha256": "3f5d5dd04c49e11ff20968dce82f433473582eeed5272280d6e465e00e2eeae6",
+          "code_length": 179
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 10,
+          "code_sha256": "eb1272de018f2f539aff5ce987501623b64d42d4fc64ee150ae1604e8d00d60e",
+          "code_length": 16
+        },
+        {
+          "name": "getResources",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/util/Enumeration;",
+          "access": 10,
+          "code_sha256": "7dfc96266385467af966ef9291a13f926b52277de29fd381acd00e571247e4a8",
+          "code_length": 20
+        },
+        {
+          "name": "getProperties",
+          "descriptor": "(Ljava/net/URL;)Ljava/util/Properties;",
+          "access": 10,
+          "code_sha256": "e7c288f9ea0e98430a220526d0c34b5274f04f8f85a24c894141359a0183b51b",
+          "code_length": 17
+        },
+        {
+          "name": "getConfigurationFile",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/util/Properties;",
+          "access": 26,
+          "code_sha256": "a38f3dd8f87812206464d71c911413a1749e45cbbf7358b12082136354038cfb",
+          "code_length": 411
+        },
+        {
+          "name": "getSystemProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "aa8eb4f912c17e0dc93da9088a396a91ba9228660a3cfaa6e141a9ad6111a5d9",
+          "code_length": 16,
+          "throws": [
+            "java/lang/SecurityException"
+          ]
+        },
+        {
+          "name": "initDiagnostics",
+          "descriptor": "()Ljava/io/PrintStream;",
+          "access": 10,
+          "code_sha256": "a03c37ab99773055bf9f480a1bb952956097a8c318e640937cded54767072b97",
+          "code_length": 67
+        },
+        {
+          "name": "isDiagnosticsEnabled",
+          "descriptor": "()Z",
+          "access": 12,
+          "code_sha256": "4c1c60222e1da3f3979699d0b85d8632c2d98885ee339e5a486b0cbbd9e26429",
+          "code_length": 12
+        },
+        {
+          "name": "logDiagnostic",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 26,
+          "code_sha256": "7a6a03a15218122b71cce129f09f469ac07bb17f262a11efab3a117edcabf40d",
+          "code_length": 29
+        },
+        {
+          "name": "logRawDiagnostic",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 28,
+          "code_sha256": "07d58443205d13e7209cc4f32332fa6afe1524df6479cd23e4cce04172fa88aa",
+          "code_length": 20
+        },
+        {
+          "name": "logClassLoaderEnvironment",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 10,
+          "code_sha256": "0f61796d58eea27c09bd571f7808a00f24470d89df8651b56f056d2d9db570cf",
+          "code_length": 168
+        },
+        {
+          "name": "logHierarchy",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)V",
+          "access": 10,
+          "code_sha256": "01c3346ed2899b3fed1d1a244a300dd1e46b08e07c3be13704af2c39e365741d",
+          "code_length": 186
+        },
+        {
+          "name": "objectId",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "598ec7ec737ce2cd011c8c5ac0805ea19fc0dd37d4bd515a191b2f7858b43a26",
+          "code_length": 40
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "84134ad7a03c3bd8a6e31eeb6fa1934d7551a82914bacfd30b62b57f2b3d87a0",
+          "code_length": 18
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 8,
+          "code_sha256": "41263c2733d59ac089c8b364bc712603c0cfbc6d281bbc2f9386cdde19040257",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6ac2c0972716e0cfe9ae0dcdc7dd4d4150ca67725a7d27482a149c99aab2ac4d",
+          "code_length": 142
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedReader",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/io/PrintStream",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassCastException",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/LinkageError",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/ThreadDeath",
+        "java/lang/Throwable",
+        "java/lang/VirtualMachineError",
+        "java/net/URL",
+        "java/security/AccessController",
+        "java/util/Enumeration",
+        "java/util/Hashtable",
+        "java/util/Properties",
+        "org/apache/commons/logging/LogConfigurationException",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/LogFactory$1",
+        "org/apache/commons/logging/LogFactory$2",
+        "org/apache/commons/logging/LogFactory$3",
+        "org/apache/commons/logging/LogFactory$4",
+        "org/apache/commons/logging/LogFactory$5",
+        "org/apache/commons/logging/LogFactory$6"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$5.class",
+      "occurrence": 0,
+      "sha256": "8920912c7f16b39ff946cfac78da4c9927734c3063033eff153ce2a41354ca0a",
+      "name": "org/apache/commons/logging/LogFactory$5",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$url",
+          "descriptor": "Ljava/net/URL;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f00aa3533c2a6b6a3119cba9897bbf001b302a778ab9939000d700209db1a7f4",
+          "code_length": 268
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/net/URL",
+        "java/net/URLConnection",
+        "java/security/PrivilegedAction",
+        "java/util/Properties",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/LogFactory$5"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$1.class",
+      "occurrence": 0,
+      "sha256": "fe66f560eb529b9df72763fb79ce77b2495a898f59909e5128f027a4cf1db393",
+      "name": "org/apache/commons/logging/LogFactory$1",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7da9dd61ff61968819edb8f9bbfe2d440373f2a1cc610a357a981a82f44f2769",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/LogFactory$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$2.class",
+      "occurrence": 0,
+      "sha256": "dc836b785dff81f1062af4d0017ba295aa3f6c536284113e088cd3a646cbda7c",
+      "name": "org/apache/commons/logging/LogFactory$2",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$factoryClass",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "val$classLoader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8447c73bc7d3a8c1bead05890829d94d6b8ca8870fc0d83dd8cd3386a80ab9c3",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/commons/logging/LogFactory$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/logging/Log.class",
+      "occurrence": 0,
+      "sha256": "015e092e7c1766216f573cce8097f4cb84f1a84568bea32ad92efdedaebecfdc",
+      "name": "org/apache/commons/logging/Log",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "fatal",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isErrorEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isFatalEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isInfoEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isTraceEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isWarnEnabled",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/logging/Log"
+      ]
+    }
+  ]
+}

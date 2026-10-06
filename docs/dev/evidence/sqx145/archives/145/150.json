@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckRetestOnAdditionalMarkets/CrossCheckRetestOnAdditionalMarkets.jar",
+  "sha256": "d351ae03bb2e4c695dcb4a3abb3ca223a8777ae850deb2572c8eb30934d4ddaa",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1.class": "6eedd81f5d75ec19274d5c00635a545274ee9dbe987bc3ff1a31008377d12eaa",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal.class": "af9442732f23ac14072775e96a61044b1313f3640ed7f70fabe21d80e3027908",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets.class": "e7a2e950a115ad635adbb2072582b8f769ea38adffb5e3cea92b1d4a57e43612",
+    "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet.class": "b2e5b4ad8e0f5e2da3a49af9cbbcdf88e45381a8bb1b384abd1a65b238e2bfc6"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$1.class",
+      "occurrence": 0,
+      "sha256": "6eedd81f5d75ec19274d5c00635a545274ee9dbe987bc3ff1a31008377d12eaa",
+      "member_shard": "docs/dev/evidence/sqx145/members/150/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets$Goal.class",
+      "occurrence": 0,
+      "sha256": "af9442732f23ac14072775e96a61044b1313f3640ed7f70fabe21d80e3027908",
+      "member_shard": "docs/dev/evidence/sqx145/members/150/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarkets.class",
+      "occurrence": 0,
+      "sha256": "e7a2e950a115ad635adbb2072582b8f769ea38adffb5e3cea92b1d4a57e43612",
+      "member_shard": "docs/dev/evidence/sqx145/members/150/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/RetestOnAdditionalMarkets/RetestOnAdditionalMarketsServlet.class",
+      "occurrence": 0,
+      "sha256": "b2e5b4ad8e0f5e2da3a49af9cbbcdf88e45381a8bb1b384abd1a65b238e2bfc6",
+      "member_shard": "docs/dev/evidence/sqx145/members/150/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/150/001.json",
+      "sha256": "ff945e82af11262a420fff13379d8f66a85201b242ae932c568e1290e1477a3a"
+    }
+  ]
+}

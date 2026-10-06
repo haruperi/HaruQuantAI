@@ -1,0 +1,2250 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/guava-26.0-jre.jar",
+  "archive_sha256": "a0e9cabad665bc20bcd2b01f108e5fc03f756e13aea80abaadb9f407033bea2c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/google/common/util/concurrent/Striped$PaddedLock.class",
+      "occurrence": 0,
+      "sha256": "87660139c15d38b7395cad06d37b8e258f4a02a88d0e01263d678194cad28ca0",
+      "name": "com/google/common/util/concurrent/Striped$PaddedLock",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/concurrent/locks/ReentrantLock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "unused1",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "unused2",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "unused3",
+          "descriptor": "J",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "af2cdd886f6052173aeba19f359748943e1e8cfcbdb805789fcd526bee8a9882",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$PaddedLock",
+        "java/util/concurrent/locks/ReentrantLock"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$PaddedSemaphore.class",
+      "occurrence": 0,
+      "sha256": "92300670576730f5fa5d06624674ccc0aa61fafd96811bf7e9fcd5b86fa90d92",
+      "name": "com/google/common/util/concurrent/Striped$PaddedSemaphore",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/concurrent/Semaphore",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "unused1",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "unused2",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "unused3",
+          "descriptor": "J",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "2f77cb2f75fc57144f38526825733f0039fdd54a4d5b770d2364270ca4cf38fe",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$PaddedSemaphore",
+        "java/util/concurrent/Semaphore"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$PowerOfTwoStriped.class",
+      "occurrence": 0,
+      "sha256": "ceb65a754db8b39dae4df70e4ab4f83e1f819edfd3773e44b50169743a43b17e",
+      "name": "com/google/common/util/concurrent/Striped$PowerOfTwoStriped",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "com/google/common/util/concurrent/Striped",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "mask",
+          "descriptor": "I",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "d5901c0ebecbff4ab085480ee946fdd3de50b0b7ac46ce15ce0ac44c7080eb5e",
+          "code_length": 40
+        },
+        {
+          "name": "indexFor",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 16,
+          "code_sha256": "e79dbf6206ffcb7fe5a3a319e1bc32bb4702dd72e9c7f0b9919de1236f9af85a",
+          "code_length": 15
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "5e35ce24aebc6a61532cc7bc9f94988dd2ea1e7c06abd5554709f702a3b7502e",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/Object;)TL;"
+        }
+      ],
+      "generic_signature": "<L:Ljava/lang/Object;>Lcom/google/common/util/concurrent/Striped<TL;>;",
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/primitives/Ints",
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$1",
+        "com/google/common/util/concurrent/Striped$PowerOfTwoStriped",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$SmallLazyStriped$ArrayReference.class",
+      "occurrence": 0,
+      "sha256": "c67834ea90ed9ba788f492b2ae908885433d8f70ddac492f2f2d4b906857d17e",
+      "name": "com/google/common/util/concurrent/Striped$SmallLazyStriped$ArrayReference",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/ref/WeakReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;ILjava/lang/ref/ReferenceQueue;)V",
+          "access": 0,
+          "code_sha256": "b0c9cd3a326fcda5ff03daf5136a1c01a932e093806b56d8a91e4e6ff58b25d1",
+          "code_length": 12,
+          "generic_signature": "(TL;ILjava/lang/ref/ReferenceQueue<TL;>;)V"
+        }
+      ],
+      "generic_signature": "<L:Ljava/lang/Object;>Ljava/lang/ref/WeakReference<TL;>;",
+      "class_references": [
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$SmallLazyStriped",
+        "com/google/common/util/concurrent/Striped$SmallLazyStriped$ArrayReference",
+        "java/lang/ref/WeakReference"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$SmallLazyStriped.class",
+      "occurrence": 0,
+      "sha256": "f85fccf41950d40746dd88b91d12fe5e70333f869297c1caeff0d82486a5735e",
+      "name": "com/google/common/util/concurrent/Striped$SmallLazyStriped",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/google/common/util/concurrent/Striped$PowerOfTwoStriped",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "locks",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReferenceArray;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReferenceArray<Lcom/google/common/util/concurrent/Striped$SmallLazyStriped$ArrayReference<+TL;>;>;"
+        },
+        {
+          "name": "supplier",
+          "descriptor": "Lcom/google/common/base/Supplier;",
+          "access": 16,
+          "generic_signature": "Lcom/google/common/base/Supplier<TL;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "queue",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 16,
+          "generic_signature": "Ljava/lang/ref/ReferenceQueue<TL;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILcom/google/common/base/Supplier;)V",
+          "access": 0,
+          "code_sha256": "86b43f77e6214da2556bb270b57ec6d322a7200f33ce2ad8eb36aefe51f078ea",
+          "code_length": 60,
+          "generic_signature": "(ILcom/google/common/base/Supplier<TL;>;)V"
+        },
+        {
+          "name": "getAt",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "31aa0513c8985893a47b6729920400138e8aff751dac7b4e5485744261938f6e",
+          "code_length": 128,
+          "generic_signature": "(I)TL;"
+        },
+        {
+          "name": "drainQueue",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a279b3932ae8c2c926ec4f1800856b319936967bbdef1a796eb192905ffc537f",
+          "code_length": 35
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<L:Ljava/lang/Object;>Lcom/google/common/util/concurrent/Striped$PowerOfTwoStriped<TL;>;",
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/base/Supplier",
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$PowerOfTwoStriped",
+        "com/google/common/util/concurrent/Striped$SmallLazyStriped",
+        "com/google/common/util/concurrent/Striped$SmallLazyStriped$ArrayReference",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/ref/Reference",
+        "java/lang/ref/ReferenceQueue",
+        "java/util/concurrent/atomic/AtomicReferenceArray"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$WeakSafeCondition.class",
+      "occurrence": 0,
+      "sha256": "5a4a3a65151edeb9509a9c28434531c85c982a5a4392816751b3302232581fea",
+      "name": "com/google/common/util/concurrent/Striped$WeakSafeCondition",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/google/common/util/concurrent/ForwardingCondition",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/locks/Condition;",
+          "access": 18
+        },
+        {
+          "name": "strongReference",
+          "descriptor": "Lcom/google/common/util/concurrent/Striped$WeakSafeReadWriteLock;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/locks/Condition;Lcom/google/common/util/concurrent/Striped$WeakSafeReadWriteLock;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "delegate",
+          "descriptor": "()Ljava/util/concurrent/locks/Condition;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/ForwardingCondition",
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$WeakSafeCondition",
+        "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$WeakSafeLock.class",
+      "occurrence": 0,
+      "sha256": "8bc3bfc260c72e7bd7f5e5c3e23097efd7f3ef6351c798c6db01a9592bbaaf12",
+      "name": "com/google/common/util/concurrent/Striped$WeakSafeLock",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/google/common/util/concurrent/ForwardingLock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "strongReference",
+          "descriptor": "Lcom/google/common/util/concurrent/Striped$WeakSafeReadWriteLock;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/locks/Lock;Lcom/google/common/util/concurrent/Striped$WeakSafeReadWriteLock;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "delegate",
+          "descriptor": "()Ljava/util/concurrent/locks/Lock;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "newCondition",
+          "descriptor": "()Ljava/util/concurrent/locks/Condition;",
+          "access": 1,
+          "code_sha256": "7cb2c66baa43c9c89a293426d14f85596c139023b1d7984a02658beda415e67a",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/ForwardingLock",
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$WeakSafeCondition",
+        "com/google/common/util/concurrent/Striped$WeakSafeLock",
+        "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock",
+        "java/util/concurrent/locks/Lock"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock.class",
+      "occurrence": 0,
+      "sha256": "f545d69d211c89aa363acc67c9d357c767971dcacb420b0affb577aa237d2ec7",
+      "name": "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/locks/ReadWriteLock"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/locks/ReadWriteLock;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "readLock",
+          "descriptor": "()Ljava/util/concurrent/locks/Lock;",
+          "access": 1,
+          "code_sha256": "350f1155800685fc5444ac0ad3653efe9b05e920953c03d9e013e6a3bcb17c4a",
+          "code_length": 18
+        },
+        {
+          "name": "writeLock",
+          "descriptor": "()Ljava/util/concurrent/locks/Lock;",
+          "access": 1,
+          "code_sha256": "2e88aa884d03ed01a506fba3a8ac5ce2a3e085876eaeb96552aca6962635b5d5",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$WeakSafeLock",
+        "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock",
+        "java/lang/Object",
+        "java/util/concurrent/locks/ReadWriteLock",
+        "java/util/concurrent/locks/ReentrantReadWriteLock"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Striped.class",
+      "occurrence": 0,
+      "sha256": "9e6ba827f20be4db49486a05910a96866e0560296648cec7570ba95092a0ba41",
+      "name": "com/google/common/util/concurrent/Striped",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LARGE_LAZY_CUTOFF",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "READ_WRITE_LOCK_SUPPLIER",
+          "descriptor": "Lcom/google/common/base/Supplier;",
+          "access": 26,
+          "generic_signature": "Lcom/google/common/base/Supplier<Ljava/util/concurrent/locks/ReadWriteLock;>;"
+        },
+        {
+          "name": "WEAK_SAFE_READ_WRITE_LOCK_SUPPLIER",
+          "descriptor": "Lcom/google/common/base/Supplier;",
+          "access": 26,
+          "generic_signature": "Lcom/google/common/base/Supplier<Ljava/util/concurrent/locks/ReadWriteLock;>;"
+        },
+        {
+          "name": "ALL_SET",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ec13924c62330cec641b07cb26251a98d912aaa81f8f9ca142098a7066953461",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Object;)TL;"
+        },
+        {
+          "name": "getAt",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(I)TL;"
+        },
+        {
+          "name": "indexFor",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1024
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "bulkGet",
+          "descriptor": "(Ljava/lang/Iterable;)Ljava/lang/Iterable;",
+          "access": 1,
+          "code_sha256": "2d2dc62ad96aba5163b774a3f099989466f0ec59b8d63bc42a6a0640d9d373d1",
+          "code_length": 135,
+          "generic_signature": "(Ljava/lang/Iterable<*>;)Ljava/lang/Iterable<TL;>;"
+        },
+        {
+          "name": "custom",
+          "descriptor": "(ILcom/google/common/base/Supplier;)Lcom/google/common/util/concurrent/Striped;",
+          "access": 8,
+          "code_sha256": "d616ed54153b05a5d61576ab68d390a92e6007d0749fbf259dfd4cb8331e9c3a",
+          "code_length": 11,
+          "generic_signature": "<L:Ljava/lang/Object;>(ILcom/google/common/base/Supplier<TL;>;)Lcom/google/common/util/concurrent/Striped<TL;>;"
+        },
+        {
+          "name": "lock",
+          "descriptor": "(I)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "050cdca2f7377bc55663780e6a6ebd2f421ef035abd486553ac0f7462a38101d",
+          "code_length": 12,
+          "generic_signature": "(I)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/locks/Lock;>;"
+        },
+        {
+          "name": "lazyWeakLock",
+          "descriptor": "(I)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "83a893004d46e56aa67c92c3b411af6f750136ec9daf41d3a883a767c1cd0734",
+          "code_length": 12,
+          "generic_signature": "(I)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/locks/Lock;>;"
+        },
+        {
+          "name": "lazy",
+          "descriptor": "(ILcom/google/common/base/Supplier;)Lcom/google/common/util/concurrent/Striped;",
+          "access": 10,
+          "code_sha256": "42e33b16a0af4ad75d3c7dfa6ab0ee77cd4b21b7a25d51de2d98123c91f2a354",
+          "code_length": 29,
+          "generic_signature": "<L:Ljava/lang/Object;>(ILcom/google/common/base/Supplier<TL;>;)Lcom/google/common/util/concurrent/Striped<TL;>;"
+        },
+        {
+          "name": "semaphore",
+          "descriptor": "(II)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "871a85ebd31cc958a0c2a86cbf44cc0d94a9f80f7e99a834a4929c1680591610",
+          "code_length": 13,
+          "generic_signature": "(II)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/Semaphore;>;"
+        },
+        {
+          "name": "lazyWeakSemaphore",
+          "descriptor": "(II)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "c75f8cb0b43a6315b8870357bb93c01a70624dd040f3fbf675a6eaee6a5f9756",
+          "code_length": 13,
+          "generic_signature": "(II)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/Semaphore;>;"
+        },
+        {
+          "name": "readWriteLock",
+          "descriptor": "(I)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "84f0a2e0348f3a9913a4fcbbd4f06ea159e1ad5d10cab8743ad02d11c04f6692",
+          "code_length": 8,
+          "generic_signature": "(I)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/locks/ReadWriteLock;>;"
+        },
+        {
+          "name": "lazyWeakReadWriteLock",
+          "descriptor": "(I)Lcom/google/common/util/concurrent/Striped;",
+          "access": 9,
+          "code_sha256": "aad1fafa631362af6f1d9f88b2b212c33c3b01618ca8f4f6d297e5f6c95a4ed4",
+          "code_length": 8,
+          "generic_signature": "(I)Lcom/google/common/util/concurrent/Striped<Ljava/util/concurrent/locks/ReadWriteLock;>;"
+        },
+        {
+          "name": "ceilToPowerOfTwo",
+          "descriptor": "(I)I",
+          "access": 10,
+          "code_sha256": "293ec1f44e600bf5eebaa5510f504b7fcf74ef4bd9d15e4b47379a1d685f22f9",
+          "code_length": 10
+        },
+        {
+          "name": "smear",
+          "descriptor": "(I)I",
+          "access": 10,
+          "code_sha256": "c78f9eb2a1ca994ac837a06be58d45c478ba6af2755f708395e1820a402ba4c4",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/Striped$1;)V",
+          "access": 4096,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(I)I",
+          "access": 4104,
+          "code_sha256": "0bf7bbff871a01bb9161b6d3c3d49be444181f710f51df0cddc1a0c44c60660a",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(I)I",
+          "access": 4104,
+          "code_sha256": "a1dfea319cc1e0ff3dac93a136f0bde2a2f1042edf88c3125a8e9c54d24e6ad0",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "98cdd6c4841bbad0f841e46ce69e556e628b07f05cf44187a687ea8dcb468b15",
+          "code_length": 21
+        }
+      ],
+      "generic_signature": "<L:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Object;",
+        "com/google/common/collect/ImmutableList",
+        "com/google/common/collect/Iterables",
+        "com/google/common/math/IntMath",
+        "com/google/common/util/concurrent/Striped",
+        "com/google/common/util/concurrent/Striped$1",
+        "com/google/common/util/concurrent/Striped$2",
+        "com/google/common/util/concurrent/Striped$3",
+        "com/google/common/util/concurrent/Striped$4",
+        "com/google/common/util/concurrent/Striped$5",
+        "com/google/common/util/concurrent/Striped$6",
+        "com/google/common/util/concurrent/Striped$CompactStriped",
+        "com/google/common/util/concurrent/Striped$LargeLazyStriped",
+        "com/google/common/util/concurrent/Striped$PaddedLock",
+        "com/google/common/util/concurrent/Striped$PaddedSemaphore",
+        "com/google/common/util/concurrent/Striped$PowerOfTwoStriped",
+        "com/google/common/util/concurrent/Striped$SmallLazyStriped",
+        "com/google/common/util/concurrent/Striped$WeakSafeCondition",
+        "com/google/common/util/concurrent/Striped$WeakSafeLock",
+        "com/google/common/util/concurrent/Striped$WeakSafeReadWriteLock",
+        "java/lang/Object",
+        "java/math/RoundingMode",
+        "java/util/Arrays",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/ThreadFactoryBuilder$1.class",
+      "occurrence": 0,
+      "sha256": "a3f024340f8e315f0743bdc83f46654c048e7119de40b71722e2236ece4fd4ec",
+      "name": "com/google/common/util/concurrent/ThreadFactoryBuilder$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ThreadFactory"
+      ],
+      "fields": [
+        {
+          "name": "val$backingThreadFactory",
+          "descriptor": "Ljava/util/concurrent/ThreadFactory;",
+          "access": 4112
+        },
+        {
+          "name": "val$nameFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$count",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 4112
+        },
+        {
+          "name": "val$daemon",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 4112
+        },
+        {
+          "name": "val$priority",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 4112
+        },
+        {
+          "name": "val$uncaughtExceptionHandler",
+          "descriptor": "Ljava/lang/Thread$UncaughtExceptionHandler;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ThreadFactory;Ljava/lang/String;Ljava/util/concurrent/atomic/AtomicLong;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Thread$UncaughtExceptionHandler;)V",
+          "access": 0,
+          "code_sha256": "47978492603c0e48ce1df094ba92e6c4e3965a689a8815b02778c3ac0cd3ca6e",
+          "code_length": 38
+        },
+        {
+          "name": "newThread",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "9bcf465b50d71f521ac0a3dd391a9e6f8a25122fc52352d4238e6f4184264ab4",
+          "code_length": 99
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/ThreadFactoryBuilder",
+        "com/google/common/util/concurrent/ThreadFactoryBuilder$1",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler",
+        "java/util/concurrent/ThreadFactory",
+        "java/util/concurrent/atomic/AtomicLong"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/ThreadFactoryBuilder.class",
+      "occurrence": 0,
+      "sha256": "1a2840586311c5030b9c3005a424b59a598ea8ad55619d9adba5eb6bfd4e8503",
+      "name": "com/google/common/util/concurrent/ThreadFactoryBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "nameFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "daemon",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 2
+        },
+        {
+          "name": "priority",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 2
+        },
+        {
+          "name": "uncaughtExceptionHandler",
+          "descriptor": "Ljava/lang/Thread$UncaughtExceptionHandler;",
+          "access": 2
+        },
+        {
+          "name": "backingThreadFactory",
+          "descriptor": "Ljava/util/concurrent/ThreadFactory;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6419b649daed6042b99a3ff787d62d6ba7439f672f72d1eb958869d7b7fd7f9f",
+          "code_length": 30
+        },
+        {
+          "name": "setNameFormat",
+          "descriptor": "(Ljava/lang/String;)Lcom/google/common/util/concurrent/ThreadFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "df610960091d643f65df3135748e4741ef3979874b5672a2ffe13a3a955d4c5d",
+          "code_length": 23
+        },
+        {
+          "name": "setDaemon",
+          "descriptor": "(Z)Lcom/google/common/util/concurrent/ThreadFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "bbe2f3118e189ddb3edeb7cbfebf1c2858ef935e9654e02c3d89b86b278d67f3",
+          "code_length": 10
+        },
+        {
+          "name": "setPriority",
+          "descriptor": "(I)Lcom/google/common/util/concurrent/ThreadFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "1403e3b3c504470eedf16a3f41baa95087af72e86b1fe877cd63a92c17e0484e",
+          "code_length": 46
+        },
+        {
+          "name": "setUncaughtExceptionHandler",
+          "descriptor": "(Ljava/lang/Thread$UncaughtExceptionHandler;)Lcom/google/common/util/concurrent/ThreadFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "d45cdf1ffe1e8249312fcfaf26e6e21946a9ba963968aaefea7ab8149d3341b8",
+          "code_length": 13
+        },
+        {
+          "name": "setThreadFactory",
+          "descriptor": "(Ljava/util/concurrent/ThreadFactory;)Lcom/google/common/util/concurrent/ThreadFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "3da2548100f53bc95f0516ea4633e40a38c84b8b1dd757287582933541f8305b",
+          "code_length": 13
+        },
+        {
+          "name": "build",
+          "descriptor": "()Ljava/util/concurrent/ThreadFactory;",
+          "access": 1,
+          "code_sha256": "760f9e9bc8a88747d9bdc8f683404e7c2759196bc00478baef61b595a95a5c0b",
+          "code_length": 5
+        },
+        {
+          "name": "doBuild",
+          "descriptor": "(Lcom/google/common/util/concurrent/ThreadFactoryBuilder;)Ljava/util/concurrent/ThreadFactory;",
+          "access": 10,
+          "code_sha256": "a401e97e708c4e97f3f69275ed557937e981f907ad6fa54a2b4f6ebd1e1dda40",
+          "code_length": 75
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 138,
+          "code_sha256": "c9c9c82579c18b5737e8b89e4f9144ddbc4e2db670eeddae6e0a96f1504ac9ca",
+          "code_length": 9
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "3621e5441960b6d23630b35cc935874b0c256bf231879598d890655cf9693e42",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/util/concurrent/ThreadFactoryBuilder",
+        "com/google/common/util/concurrent/ThreadFactoryBuilder$1",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler",
+        "java/util/Locale",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/ThreadFactory",
+        "java/util/concurrent/atomic/AtomicLong"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TimeLimiter.class",
+      "occurrence": 0,
+      "sha256": "efca8e0d2a13fb8d8cb4f6b8a5d777a334c55712bcb62eb50646ca064026d52b",
+      "name": "com/google/common/util/concurrent/TimeLimiter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newProxy",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Class;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Ljava/lang/Class<TT;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "callWithTimeout",
+          "descriptor": "(Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/util/concurrent/TimeoutException",
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "callUninterruptiblyWithTimeout",
+          "descriptor": "(Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/util/concurrent/TimeoutException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "runWithTimeout",
+          "descriptor": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)V",
+          "access": 1025,
+          "throws": [
+            "java/util/concurrent/TimeoutException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "runUninterruptiblyWithTimeout",
+          "descriptor": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)V",
+          "access": 1025,
+          "throws": [
+            "java/util/concurrent/TimeoutException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/TimeLimiter",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/TimeoutException"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TimeoutFuture$Fire.class",
+      "occurrence": 0,
+      "sha256": "a9830042f8c900ca6864020419ef5f14e52f418b0a8dfe7f17836b90ebad75ba",
+      "name": "com/google/common/util/concurrent/TimeoutFuture$Fire",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "timeoutFutureRef",
+          "descriptor": "Lcom/google/common/util/concurrent/TimeoutFuture;",
+          "access": 0,
+          "generic_signature": "Lcom/google/common/util/concurrent/TimeoutFuture<TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/TimeoutFuture;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lcom/google/common/util/concurrent/TimeoutFuture<TV;>;)V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dc7f4467c48ddcc3d5e50f4bf0e99de3aae2144bc0a73670bf56e6e7c3533864",
+          "code_length": 97
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Runnable;",
+      "class_references": [
+        "com/google/common/util/concurrent/ListenableFuture",
+        "com/google/common/util/concurrent/TimeoutFuture",
+        "com/google/common/util/concurrent/TimeoutFuture$Fire",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/concurrent/TimeoutException"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TimeoutFuture.class",
+      "occurrence": 0,
+      "sha256": "4409252705877b27d4adfbf8925c6f8071c04ec669f96a24041eea4ab8057431",
+      "name": "com/google/common/util/concurrent/TimeoutFuture",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/google/common/util/concurrent/AbstractFuture$TrustedFuture",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "delegateRef",
+          "descriptor": "Lcom/google/common/util/concurrent/ListenableFuture;",
+          "access": 2,
+          "generic_signature": "Lcom/google/common/util/concurrent/ListenableFuture<TV;>;"
+        },
+        {
+          "name": "timer",
+          "descriptor": "Ljava/util/concurrent/Future;",
+          "access": 2,
+          "generic_signature": "Ljava/util/concurrent/Future<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lcom/google/common/util/concurrent/ListenableFuture;JLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/ScheduledExecutorService;)Lcom/google/common/util/concurrent/ListenableFuture;",
+          "access": 8,
+          "code_sha256": "0a848f6157c57c1b950e85997d0f23701056d4967fd67b7e1327a8c38d8cc664",
+          "code_length": 51,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lcom/google/common/util/concurrent/ListenableFuture<TV;>;JLjava/util/concurrent/TimeUnit;Ljava/util/concurrent/ScheduledExecutorService;)Lcom/google/common/util/concurrent/ListenableFuture<TV;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/ListenableFuture;)V",
+          "access": 2,
+          "code_sha256": "b6d4f068d00dfc6bb5f4ef3cb1593ec7db8a09e93c1b7f1d5f59df55ea41db50",
+          "code_length": 16,
+          "generic_signature": "(Lcom/google/common/util/concurrent/ListenableFuture<TV;>;)V"
+        },
+        {
+          "name": "pendingToString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "1cbce953627d474c531b6e0d56ceeec83678413f7ed4ffd267be730aaa8b5217",
+          "code_length": 36
+        },
+        {
+          "name": "afterDone",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "6641a2983ac0363b0fa49a5afddfa232d7b435d26d7515e97bd8046a81080c50",
+          "code_length": 36
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/google/common/util/concurrent/TimeoutFuture;)Lcom/google/common/util/concurrent/ListenableFuture;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Lcom/google/common/util/concurrent/AbstractFuture$TrustedFuture<TV;>;",
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/util/concurrent/AbstractFuture",
+        "com/google/common/util/concurrent/AbstractFuture$TrustedFuture",
+        "com/google/common/util/concurrent/ListenableFuture",
+        "com/google/common/util/concurrent/MoreExecutors",
+        "com/google/common/util/concurrent/TimeoutFuture",
+        "com/google/common/util/concurrent/TimeoutFuture$Fire",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/Future",
+        "java/util/concurrent/ScheduledExecutorService"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleAsyncTask.class",
+      "occurrence": 0,
+      "sha256": "f240c6b3c99b6a6f1cd3d589ffb89c861d0620d5e6477988afc217639dffabe7",
+      "name": "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleAsyncTask",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/google/common/util/concurrent/InterruptibleTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "callable",
+          "descriptor": "Lcom/google/common/util/concurrent/AsyncCallable;",
+          "access": 18,
+          "generic_signature": "Lcom/google/common/util/concurrent/AsyncCallable<TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/google/common/util/concurrent/TrustedListenableFutureTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/TrustedListenableFutureTask;Lcom/google/common/util/concurrent/AsyncCallable;)V",
+          "access": 0,
+          "code_sha256": "6f2b6e68c0833dbb957e1f364b765cbb9ef3032bf33594a0975b07f1c14090bf",
+          "code_length": 21,
+          "generic_signature": "(Lcom/google/common/util/concurrent/AsyncCallable<TV;>;)V"
+        },
+        {
+          "name": "isDone",
+          "descriptor": "()Z",
+          "access": 16,
+          "code_sha256": "115352856b461dedb53fa731d14aa611cd42193075d8514225c28aa8aac52b82",
+          "code_length": 8
+        },
+        {
+          "name": "runInterruptibly",
+          "descriptor": "()Lcom/google/common/util/concurrent/ListenableFuture;",
+          "access": 0,
+          "code_sha256": "a0da446b856dce4eb7bd9bea9ad9da1f4f493fd775bbf068ff7f36047ed54fe7",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Lcom/google/common/util/concurrent/ListenableFuture<TV;>;"
+        },
+        {
+          "name": "afterRanInterruptibly",
+          "descriptor": "(Lcom/google/common/util/concurrent/ListenableFuture;Ljava/lang/Throwable;)V",
+          "access": 0,
+          "code_sha256": "d6b3a3a6c6288e47f6338b682c719458b75ec078a897ae6afddc62247fa4fb4d",
+          "code_length": 26,
+          "generic_signature": "(Lcom/google/common/util/concurrent/ListenableFuture<TV;>;Ljava/lang/Throwable;)V"
+        },
+        {
+          "name": "toPendingString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "dd04fbbc1beadec9ba0dad7bb59aebea450eb554d0669de7ae5077997347b155",
+          "code_length": 8
+        },
+        {
+          "name": "afterRanInterruptibly",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 4160,
+          "code_sha256": "c22e0d36a12ef299cc0e95cbf5733ca080d944c776c08634841c694a02f6addd",
+          "code_length": 10
+        },
+        {
+          "name": "runInterruptibly",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4160,
+          "code_sha256": "6cfa028ac65f30ccc477487d520b028bb6dac4c20320a066f887ba2b61e7d67b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Lcom/google/common/util/concurrent/InterruptibleTask<Lcom/google/common/util/concurrent/ListenableFuture<TV;>;>;",
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/util/concurrent/AsyncCallable",
+        "com/google/common/util/concurrent/InterruptibleTask",
+        "com/google/common/util/concurrent/ListenableFuture",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleAsyncTask",
+        "java/lang/Exception",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleTask.class",
+      "occurrence": 0,
+      "sha256": "9ccfd082f3da9328af2cbcf4ed83634b4901f21a29ada9643677945a206540f1",
+      "name": "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleTask",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/google/common/util/concurrent/InterruptibleTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "callable",
+          "descriptor": "Ljava/util/concurrent/Callable;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/Callable<TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/google/common/util/concurrent/TrustedListenableFutureTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/TrustedListenableFutureTask;Ljava/util/concurrent/Callable;)V",
+          "access": 0,
+          "code_sha256": "6f2b6e68c0833dbb957e1f364b765cbb9ef3032bf33594a0975b07f1c14090bf",
+          "code_length": 21,
+          "generic_signature": "(Ljava/util/concurrent/Callable<TV;>;)V"
+        },
+        {
+          "name": "isDone",
+          "descriptor": "()Z",
+          "access": 16,
+          "code_sha256": "115352856b461dedb53fa731d14aa611cd42193075d8514225c28aa8aac52b82",
+          "code_length": 8
+        },
+        {
+          "name": "runInterruptibly",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "0c2229f1219417a821087aeb1226ff2e86df5044bd87c5f5bcd6ff48ea325b52",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "afterRanInterruptibly",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 0,
+          "code_sha256": "be9d38cc3e8a3a3b7cff8afa2de88b45676bffd9e1f667fe74fc365142511090",
+          "code_length": 26,
+          "generic_signature": "(TV;Ljava/lang/Throwable;)V"
+        },
+        {
+          "name": "toPendingString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "62d8c8bb015545034584e37cb213ddc8fb93864826127c30ad515626bfb443f5",
+          "code_length": 8
+        }
+      ],
+      "generic_signature": "Lcom/google/common/util/concurrent/InterruptibleTask<TV;>;",
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/util/concurrent/InterruptibleTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleTask",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/concurrent/Callable"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/TrustedListenableFutureTask.class",
+      "occurrence": 0,
+      "sha256": "a58545da598e5ee3ea8e33ffe67126544f61eff8881f294b41375a19366867dd",
+      "name": "com/google/common/util/concurrent/TrustedListenableFutureTask",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/google/common/util/concurrent/AbstractFuture$TrustedFuture",
+      "interfaces": [
+        "java/util/concurrent/RunnableFuture"
+      ],
+      "fields": [
+        {
+          "name": "task",
+          "descriptor": "Lcom/google/common/util/concurrent/InterruptibleTask;",
+          "access": 66,
+          "generic_signature": "Lcom/google/common/util/concurrent/InterruptibleTask<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lcom/google/common/util/concurrent/AsyncCallable;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask;",
+          "access": 8,
+          "code_sha256": "ca8ac0e1ba54e1a47e51674ef2e7b6052e0d2a9832b1b63fe8cd68bf4284357e",
+          "code_length": 9,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lcom/google/common/util/concurrent/AsyncCallable<TV;>;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask<TV;>;"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask;",
+          "access": 8,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TV;>;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask<TV;>;"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/Object;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask;",
+          "access": 8,
+          "code_sha256": "2aaf812f53487a85253c1e7ca3f010ef75bc594e5c7fe6dc9b7336a2d0fea465",
+          "code_length": 13,
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/lang/Runnable;TV;)Lcom/google/common/util/concurrent/TrustedListenableFutureTask<TV;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/Callable;)V",
+          "access": 0,
+          "code_sha256": "77464dbd6ece6395a6d29ece40fb7654fecb3000df16ce72d41f73fc651cbfb8",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/concurrent/Callable<TV;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/AsyncCallable;)V",
+          "access": 0,
+          "code_sha256": "7e4b4b5da7cd81148e27db11648eafeeaf0205fc51cda69eea1e27d11fff0faa",
+          "code_length": 18,
+          "generic_signature": "(Lcom/google/common/util/concurrent/AsyncCallable<TV;>;)V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f56f11860088a828fd4ee9f9d3804c75c77260dd746fd45b5e3655b8365b0179",
+          "code_length": 19
+        },
+        {
+          "name": "afterDone",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "87ad4208e484fc06e08b4efd849c11122866c790692af106615eb35d9bc89fbb",
+          "code_length": 30
+        },
+        {
+          "name": "pendingToString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "303523a85abbd600e89842f1b1f4a97f2c59b77d39806d3174367bbb4e569250",
+          "code_length": 39
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Lcom/google/common/util/concurrent/AbstractFuture$TrustedFuture<TV;>;Ljava/util/concurrent/RunnableFuture<TV;>;",
+      "class_references": [
+        "com/google/common/util/concurrent/AbstractFuture",
+        "com/google/common/util/concurrent/AbstractFuture$TrustedFuture",
+        "com/google/common/util/concurrent/InterruptibleTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleAsyncTask",
+        "com/google/common/util/concurrent/TrustedListenableFutureTask$TrustedFutureInterruptibleTask",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/RunnableFuture"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/UncaughtExceptionHandlers$Exiter.class",
+      "occurrence": 0,
+      "sha256": "926c851366ac66b5c5472fbc775dc471154c49799fd4b70396863395a3687f78",
+      "name": "com/google/common/util/concurrent/UncaughtExceptionHandlers$Exiter",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Thread$UncaughtExceptionHandler"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "runtime",
+          "descriptor": "Ljava/lang/Runtime;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Runtime;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "uncaughtException",
+          "descriptor": "(Ljava/lang/Thread;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "6a8457bc0c853eaee19f6edc3ae066daccfa5dbc4cc9d4738735da3b5b64bec4",
+          "code_length": 83
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "81f88f896cfd9aacb88005580e2173ddc667a055e75adf0afef84b987b83caf6",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/UncaughtExceptionHandlers",
+        "com/google/common/util/concurrent/UncaughtExceptionHandlers$Exiter",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler",
+        "java/lang/Throwable",
+        "java/util/Locale",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/UncaughtExceptionHandlers.class",
+      "occurrence": 0,
+      "sha256": "3461edfd5850df94071bf83c6c02e2456763debe3b3086e8a981ca6639361a4d",
+      "name": "com/google/common/util/concurrent/UncaughtExceptionHandlers",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "systemExit",
+          "descriptor": "()Ljava/lang/Thread$UncaughtExceptionHandler;",
+          "access": 9,
+          "code_sha256": "9f92f07ffa236c5d2a4252f8c437e8687f4dc12f73120d01b0f8b7aaef5bf6fd",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/UncaughtExceptionHandlers",
+        "com/google/common/util/concurrent/UncaughtExceptionHandlers$Exiter",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/UncheckedExecutionException.class",
+      "occurrence": 0,
+      "sha256": "9458f7826b2227c38c1922bd2bb7e57c9541ee68ee2942be466d976cfbade405",
+      "name": "com/google/common/util/concurrent/UncheckedExecutionException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/UncheckedExecutionException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/UncheckedTimeoutException.class",
+      "occurrence": 0,
+      "sha256": "40765ccd42e9f63a1762bfeb417e8e13bb553d25f955b8074c37d654d592b6c7",
+      "name": "com/google/common/util/concurrent/UncheckedTimeoutException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c7021e2ca5dee0584483fa6381b595bf98a0a6e5ad7f0ec86e051dbe7c77a1c3",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/UncheckedTimeoutException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/Uninterruptibles.class",
+      "occurrence": 0,
+      "sha256": "5e2398c49d7daccd17d37e768260c152c3c24f78a681b9fbf157c248877a5156",
+      "name": "com/google/common/util/concurrent/Uninterruptibles",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "awaitUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/CountDownLatch;)V",
+          "access": 9,
+          "code_sha256": "34e7b15689ca1993b5e924a46852af11dcc22942d8aeb701a9b06c87318e9116",
+          "code_length": 36
+        },
+        {
+          "name": "awaitUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/CountDownLatch;JLjava/util/concurrent/TimeUnit;)Z",
+          "access": 9,
+          "code_sha256": "13f467cc95c81e49937064227e9553cbf333728582fd0f8a47ad18706e6d9eee",
+          "code_length": 75
+        },
+        {
+          "name": "awaitUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/locks/Condition;JLjava/util/concurrent/TimeUnit;)Z",
+          "access": 9,
+          "code_sha256": "7a03746bddca613dd6ae15a8530244683e63ac848e7b6896542d05437e098d0a",
+          "code_length": 77
+        },
+        {
+          "name": "joinUninterruptibly",
+          "descriptor": "(Ljava/lang/Thread;)V",
+          "access": 9,
+          "code_sha256": "583b27c0177fb9efff6972985892598b09555cf79174133287d9d71ef04ed8e4",
+          "code_length": 36
+        },
+        {
+          "name": "joinUninterruptibly",
+          "descriptor": "(Ljava/lang/Thread;JLjava/util/concurrent/TimeUnit;)V",
+          "access": 9,
+          "code_sha256": "bcd5e98cac903f3f7dd4383a035edf67cbafadfa4af102d0d7718b2ad85aa110",
+          "code_length": 76
+        },
+        {
+          "name": "getUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/Future;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "182f2a809b7234e3f220ed99110a3d9ed1518dd13e6a1f16df4f45dc59ba012a",
+          "code_length": 40,
+          "throws": [
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Future<TV;>;)TV;"
+        },
+        {
+          "name": "getUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/Future;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "b1e15056214d244e188aba07ec64dfe4a7f6ea8d8824690aafe79edced9fb1d7",
+          "code_length": 77,
+          "throws": [
+            "java/util/concurrent/ExecutionException",
+            "java/util/concurrent/TimeoutException"
+          ],
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Future<TV;>;JLjava/util/concurrent/TimeUnit;)TV;"
+        },
+        {
+          "name": "takeUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/BlockingQueue;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "a6161ca06a5283ef6513cbfe8c21984115a218bb738ac12b83bd44ef67aa92fd",
+          "code_length": 40,
+          "generic_signature": "<E:Ljava/lang/Object;>(Ljava/util/concurrent/BlockingQueue<TE;>;)TE;"
+        },
+        {
+          "name": "putUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/BlockingQueue;Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "783be6f41047da2cbb0ebe3aef821cc4cce4b1811aaae25d3f7416cc4f517a35",
+          "code_length": 41,
+          "generic_signature": "<E:Ljava/lang/Object;>(Ljava/util/concurrent/BlockingQueue<TE;>;TE;)V"
+        },
+        {
+          "name": "sleepUninterruptibly",
+          "descriptor": "(JLjava/util/concurrent/TimeUnit;)V",
+          "access": 9,
+          "code_sha256": "5cf0dee908190c175109643fc16145c88dac7045cd69ae4ebaa5c7a159c083f2",
+          "code_length": 66
+        },
+        {
+          "name": "tryAcquireUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/Semaphore;JLjava/util/concurrent/TimeUnit;)Z",
+          "access": 9,
+          "code_sha256": "7416f9ab79c9fee4be198be9b1f21207325f849b2e6d4b0e16fc1105aacee025",
+          "code_length": 8
+        },
+        {
+          "name": "tryAcquireUninterruptibly",
+          "descriptor": "(Ljava/util/concurrent/Semaphore;IJLjava/util/concurrent/TimeUnit;)Z",
+          "access": 9,
+          "code_sha256": "73c765cba677769f4333519ba7d55883f1c9b8a935e8920ad43d1248d8360e9b",
+          "code_length": 77
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a9c6229f8627d4e536a6c126a138e2868ac1fa13c1edeae6ee722883cebffa65",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/util/concurrent/Uninterruptibles",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/concurrent/BlockingQueue",
+        "java/util/concurrent/CountDownLatch",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/Future",
+        "java/util/concurrent/Semaphore",
+        "java/util/concurrent/TimeUnit",
+        "java/util/concurrent/TimeoutException",
+        "java/util/concurrent/locks/Condition"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/WrappingExecutorService$1.class",
+      "occurrence": 0,
+      "sha256": "47b91e5684c4eb7ef42296580b381854c97642852e0b650a563a7908baefccbd",
+      "name": "com/google/common/util/concurrent/WrappingExecutorService$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$wrapped",
+          "descriptor": "Ljava/util/concurrent/Callable;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/google/common/util/concurrent/WrappingExecutorService;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/google/common/util/concurrent/WrappingExecutorService;Ljava/util/concurrent/Callable;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2d0d7413bb4ab819478d1f6e7ee8cd5632d9fe5ecdf830ea5d4a94d7b137837a",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/google/common/base/Throwables",
+        "com/google/common/util/concurrent/WrappingExecutorService",
+        "com/google/common/util/concurrent/WrappingExecutorService$1",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/RuntimeException",
+        "java/util/concurrent/Callable"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/WrappingExecutorService.class",
+      "occurrence": 0,
+      "sha256": "20fab0d9e169f2c2914ab7c99cb5d30618baa05e647ac45e03ca2fbabbde5a88",
+      "name": "com/google/common/util/concurrent/WrappingExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ExecutorService"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ExecutorService;)V",
+          "access": 4,
+          "code_sha256": "6715eb57b093ebdf889ff9e7f562921969bf984bff81557858010db14b07282f",
+          "code_length": 16
+        },
+        {
+          "name": "wrapTask",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Callable;",
+          "access": 1028,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Callable<TT;>;"
+        },
+        {
+          "name": "wrapTask",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Runnable;",
+          "access": 4,
+          "code_sha256": "f3e7e7c49fe83ab2a732c38180069d791d917f84477507efb24e448d0e03495f",
+          "code_length": 20
+        },
+        {
+          "name": "wrapTasks",
+          "descriptor": "(Ljava/util/Collection;)Lcom/google/common/collect/ImmutableList;",
+          "access": 2,
+          "code_sha256": "d63d997cd8dce0a2c0cf665d24e786f8863311e8ac0eca13493d19bd111968b0",
+          "code_length": 50,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)Lcom/google/common/collect/ImmutableList<Ljava/util/concurrent/Callable<TT;>;>;"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 17,
+          "code_sha256": "8f4aba31e5dc3cef77323494767c103eaf5829214e80da8deaed39c3dd3037b2",
+          "code_length": 15
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Future;",
+          "access": 17,
+          "code_sha256": "00581cae1fa8f02d9c7c1a11376113327165a65bb7abea8fdc479d0473b08cbf",
+          "code_length": 21,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future;",
+          "access": 17,
+          "code_sha256": "cd0b1eabb6493fc27d5e250d94054f33bfa68d2d11f52c900600851ac8543255",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future<*>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/Object;)Ljava/util/concurrent/Future;",
+          "access": 17,
+          "code_sha256": "858ba272af9eab1238e723d3f59b430fc7e500aa8313a1cee84094eb7e82554f",
+          "code_length": 16,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Runnable;TT;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 17,
+          "code_sha256": "a21daf214e91438d7072c45a31e58c5c552167437663cee50c00b6fc47dce423",
+          "code_length": 15,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/util/List;",
+          "access": 17,
+          "code_sha256": "f0a9468929646fcd6c32a7787d6bb421f99d7b7d77a4879c6ea43a50130c1b85",
+          "code_length": 18,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "64ec75adb2b15fb24d61e0f6588d722b8b3f185ab3059d24bc2c4cb1be59cf32",
+          "code_length": 15,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)TT;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "11c2b0d97778d837707c30c916339765abb63134a88f027f7c77a95a8691cfa5",
+          "code_length": 18,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException",
+            "java/util/concurrent/TimeoutException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "e8c448fb9721ad3f66a9547ecee009763a1e3a66da2063e9326f6561fd3fcd73",
+          "code_length": 10
+        },
+        {
+          "name": "shutdownNow",
+          "descriptor": "()Ljava/util/List;",
+          "access": 17,
+          "code_sha256": "b5f865ba9c30e0a98fb2e07e2384431877b26d322bbfd8f4928b0537d69d6600",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "isShutdown",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "dbe445b0318dda3898bce8fb4fcbfef7c22ad52f0125cdf1ee8d8a04c9002fbd",
+          "code_length": 10
+        },
+        {
+          "name": "isTerminated",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "cbae8db17713a9d6bd54c055f6a7020fc75901f95ccbfac050eedf3bb2540341",
+          "code_length": 10
+        },
+        {
+          "name": "awaitTermination",
+          "descriptor": "(JLjava/util/concurrent/TimeUnit;)Z",
+          "access": 17,
+          "code_sha256": "c6a737a6d16c4f85014055af1ea3b491808a2bf2e1ed01551ed3704e993bb94b",
+          "code_length": 12,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/google/common/base/Preconditions",
+        "com/google/common/collect/ImmutableList",
+        "com/google/common/collect/ImmutableList$Builder",
+        "com/google/common/util/concurrent/WrappingExecutorService",
+        "com/google/common/util/concurrent/WrappingExecutorService$1",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/concurrent/Callable",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/TimeoutException"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/WrappingScheduledExecutorService.class",
+      "occurrence": 0,
+      "sha256": "4b41aea742643a78db338525b0deba43a14de3bdb0d040d6b3b648407953ec4d",
+      "name": "com/google/common/util/concurrent/WrappingScheduledExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "com/google/common/util/concurrent/WrappingExecutorService",
+      "interfaces": [
+        "java/util/concurrent/ScheduledExecutorService"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ScheduledExecutorService;)V",
+          "access": 4,
+          "code_sha256": "ac28cbcee26f8aca4b40a2707f4d4ccd85ecb0c48148a3e72d69f5f83d7a4949",
+          "code_length": 11
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 17,
+          "code_sha256": "68db9889fed4e2b890c195d70dec47c8736336fa0fe8d86698db66e08bf97d5b",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 17,
+          "code_sha256": "ff1ab4a0c4beec95e0dfd1fdecd8b6f6d1413fcd529f03801a99caa0c8c5e6bb",
+          "code_length": 18,
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TV;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<TV;>;"
+        },
+        {
+          "name": "scheduleAtFixedRate",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 17,
+          "code_sha256": "fad59faca674569b4162637103e7e5932911edc8614dd7e45a41a254b6045ffc",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "scheduleWithFixedDelay",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 17,
+          "code_sha256": "c337e94de38d897655eaffa46f28a50a72b045fed1e29efb7a0432b2642f011c",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        }
+      ],
+      "class_references": [
+        "com/google/common/util/concurrent/WrappingExecutorService",
+        "com/google/common/util/concurrent/WrappingScheduledExecutorService",
+        "java/util/concurrent/ScheduledExecutorService"
+      ]
+    },
+    {
+      "entry": "com/google/common/util/concurrent/package-info.class",
+      "occurrence": 0,
+      "sha256": "6d42d0339e512b37966c8a55f4243e517113d1abf7834ed6786fcd69b53bd4b9",
+      "name": "com/google/common/util/concurrent/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/common/util/concurrent/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/common/xml/XmlEscapers.class",
+      "occurrence": 0,
+      "sha256": "38b2d171b3699164cca22e2c43d39393c10927cfb3551f0d9c75d4d5a8ea6e42",
+      "name": "com/google/common/xml/XmlEscapers",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MIN_ASCII_CONTROL_CHAR",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "MAX_ASCII_CONTROL_CHAR",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "XML_ESCAPER",
+          "descriptor": "Lcom/google/common/escape/Escaper;",
+          "access": 26
+        },
+        {
+          "name": "XML_CONTENT_ESCAPER",
+          "descriptor": "Lcom/google/common/escape/Escaper;",
+          "access": 26
+        },
+        {
+          "name": "XML_ATTRIBUTE_ESCAPER",
+          "descriptor": "Lcom/google/common/escape/Escaper;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "xmlContentEscaper",
+          "descriptor": "()Lcom/google/common/escape/Escaper;",
+          "access": 9,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "xmlAttributeEscaper",
+          "descriptor": "()Lcom/google/common/escape/Escaper;",
+          "access": 9,
+          "code_sha256": "7dce45470ce11b005c4bd504408c0a8d8802f3d308124b41edb171ccc07c237c",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3dff2ae11ae9dfd94173175b59b025e1f89da81054244ac1e788e7ff846edc4f",
+          "code_length": 155
+        }
+      ],
+      "class_references": [
+        "com/google/common/escape/Escapers",
+        "com/google/common/escape/Escapers$Builder",
+        "com/google/common/xml/XmlEscapers",
+        "java/lang/Character",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/common/xml/package-info.class",
+      "occurrence": 0,
+      "sha256": "427dd5eb1ddd4fc2de005cf33283154b644c2bf460fd7b59d14f9cb83f5ff581",
+      "name": "com/google/common/xml/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/common/xml/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/thirdparty/publicsuffix/PublicSuffixPatterns.class",
+      "occurrence": 0,
+      "sha256": "36b861e103c4a3d81880947f5a0bf8fb704fd6e28f5d9435b88a2c124d63ed58",
+      "name": "com/google/thirdparty/publicsuffix/PublicSuffixPatterns",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EXACT",
+          "descriptor": "Lcom/google/common/collect/ImmutableMap;",
+          "access": 25,
+          "generic_signature": "Lcom/google/common/collect/ImmutableMap<Ljava/lang/String;Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;"
+        },
+        {
+          "name": "UNDER",
+          "descriptor": "Lcom/google/common/collect/ImmutableMap;",
+          "access": 25,
+          "generic_signature": "Lcom/google/common/collect/ImmutableMap<Ljava/lang/String;Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;"
+        },
+        {
+          "name": "EXCLUDED",
+          "descriptor": "Lcom/google/common/collect/ImmutableMap;",
+          "access": 25,
+          "generic_signature": "Lcom/google/common/collect/ImmutableMap<Ljava/lang/String;Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1501605ba3c9597cae58c34c30334d75dda4b8b1aafc6c571acf65a4e5fab04d",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/google/thirdparty/publicsuffix/PublicSuffixPatterns",
+        "com/google/thirdparty/publicsuffix/TrieParser",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/google/thirdparty/publicsuffix/PublicSuffixType.class",
+      "occurrence": 0,
+      "sha256": "1000a66a9530a0e86091547f182e26ee7ca02ad331802779d5fb63452df2a39b",
+      "name": "com/google/thirdparty/publicsuffix/PublicSuffixType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRIVATE",
+          "descriptor": "Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 16409
+        },
+        {
+          "name": "REGISTRY",
+          "descriptor": "Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 16409
+        },
+        {
+          "name": "innerNodeCode",
+          "descriptor": "C",
+          "access": 18
+        },
+        {
+          "name": "leafNodeCode",
+          "descriptor": "C",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ICC)V",
+          "access": 2,
+          "code_sha256": "a4f70988567ba1b5724bd0b35260734d811b95b14e7e749b2222ea02e30e4041",
+          "code_length": 18,
+          "generic_signature": "(CC)V"
+        },
+        {
+          "name": "getLeafNodeCode",
+          "descriptor": "()C",
+          "access": 0,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "getInnerNodeCode",
+          "descriptor": "()C",
+          "access": 0,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "fromCode",
+          "descriptor": "(C)Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 8,
+          "code_sha256": "5ec6296b89077be25f7f312b9a12f762b806d67945f20f0f0b624d8e2c0c8765",
+          "code_length": 73
+        },
+        {
+          "name": "fromIsPrivate",
+          "descriptor": "(Z)Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+          "access": 8,
+          "code_sha256": "8eee5e88b6578bd368ea2e6b40921a8b8325d80efcdf56fdc160c888353248ca",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5867142013cd18ec035725776b36cb2352ed8769674c7d9ad77965718eabb2d3",
+          "code_length": 54
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;",
+      "class_references": [
+        "[Lcom/google/thirdparty/publicsuffix/PublicSuffixType;",
+        "com/google/thirdparty/publicsuffix/PublicSuffixType",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/google/thirdparty/publicsuffix/TrieParser.class",
+      "occurrence": 0,
+      "sha256": "124609b33532619ff8fe427d6534ddc9781357aee4608640ac6276fe3dd188fa",
+      "name": "com/google/thirdparty/publicsuffix/TrieParser",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PREFIX_JOINER",
+          "descriptor": "Lcom/google/common/base/Joiner;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "parseTrie",
+          "descriptor": "(Ljava/lang/CharSequence;)Lcom/google/common/collect/ImmutableMap;",
+          "access": 8,
+          "code_sha256": "6eccd8a7e58dcd1f675d96e80aa24ee76242e3141ea49d3d7e5b425dfddb882f",
+          "code_length": 38,
+          "generic_signature": "(Ljava/lang/CharSequence;)Lcom/google/common/collect/ImmutableMap<Ljava/lang/String;Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;"
+        },
+        {
+          "name": "doParseTrieToBuilder",
+          "descriptor": "(Ljava/util/List;Ljava/lang/CharSequence;ILcom/google/common/collect/ImmutableMap$Builder;)I",
+          "access": 10,
+          "code_sha256": "802b8f4476fa8cf56b60f93bb9f22e250f515d743eb10b6435e242073ed16378",
+          "code_length": 233,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/CharSequence;>;Ljava/lang/CharSequence;ILcom/google/common/collect/ImmutableMap$Builder<Ljava/lang/String;Lcom/google/thirdparty/publicsuffix/PublicSuffixType;>;)I"
+        },
+        {
+          "name": "reverse",
+          "descriptor": "(Ljava/lang/CharSequence;)Ljava/lang/CharSequence;",
+          "access": 10,
+          "code_sha256": "5512125e22b045da1ca991ff7463113fac340687f3aa7a6801b7fc196b33851e",
+          "code_length": 12
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ec94256f77d044aae6957198fd87a84cb64aec6b40326bcf858bf7996f92e378",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/google/common/base/Joiner",
+        "com/google/common/collect/ImmutableMap",
+        "com/google/common/collect/ImmutableMap$Builder",
+        "com/google/common/collect/Lists",
+        "com/google/thirdparty/publicsuffix/PublicSuffixType",
+        "com/google/thirdparty/publicsuffix/TrieParser",
+        "java/lang/CharSequence",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/List"
+      ]
+    }
+  ]
+}

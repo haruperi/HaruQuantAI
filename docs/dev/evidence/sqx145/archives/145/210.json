@@ -1,0 +1,115 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+  "sha256": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5",
+  "class_count": 13,
+  "unique_class_entries": 13,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException.class": "51866d640e818b4b8d6d3819042812d3eb54dfd168aaf3118e4ec152372da77e",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationPlugin.class": "4501f7e40f638abef65c4a2028169d804906392c832d244b7c66e244eed6d565",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender.class": "17065a9ba1ad892baff21874d30b784bf4c3ddf5c92e3f3547d9ee922f6708a5",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1.class": "2f749ce5b123c37248cd55a6b6e584a46defd3bcdf4d544e529d1c52100cd070",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet.class": "ed5f9646c248812a961c2e9d681e91a47556b6085ea487938c7be06a16720e85",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask.class": "a90d8d3461a9b27ba1e458795f51986ef6d9a667ba6672d20898ddfc380fd34a",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult.class": "6d6a746b2308d56f71f2268b44ab55e26cd02f6567f94d64a929db480a8ea1ad",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.class": "7e26869e874b099f46f4a3f2782c759313625040df2c174d898cf5266bce0bdf",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult.class": "71bc1986b0ccbd8f2563252aaf7a0c5eaf2a19c6adaf74d12955e04bf72ce272",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade.class": "5774cc8b6436950d8b6846c71876b6fcf2b1fdf7bf69521c99bbc8bf63463fd7",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades.class": "bf17ddb2c7cfc5a2bc1d7f88097d6f2f8ea124c0de25e4553930e7b3c80f830e",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.class": "8e5ff4744cdc4a93bcb488fa4c79e82a4d77dff6aca2fd1dae376ac03e52a386",
+    "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask.class": "98dfaa1d5381fcad91b8939607a8f7e4842dc05c40eaebc6dfbc22de87b99762"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException.class",
+      "occurrence": 0,
+      "sha256": "51866d640e818b4b8d6d3819042812d3eb54dfd168aaf3118e4ec152372da77e",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationPlugin.class",
+      "occurrence": 0,
+      "sha256": "4501f7e40f638abef65c4a2028169d804906392c832d244b7c66e244eed6d565",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender.class",
+      "occurrence": 0,
+      "sha256": "17065a9ba1ad892baff21874d30b784bf4c3ddf5c92e3f3547d9ee922f6708a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1.class",
+      "occurrence": 0,
+      "sha256": "2f749ce5b123c37248cd55a6b6e584a46defd3bcdf4d544e529d1c52100cd070",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet.class",
+      "occurrence": 0,
+      "sha256": "ed5f9646c248812a961c2e9d681e91a47556b6085ea487938c7be06a16720e85",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask.class",
+      "occurrence": 0,
+      "sha256": "a90d8d3461a9b27ba1e458795f51986ef6d9a667ba6672d20898ddfc380fd34a",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult.class",
+      "occurrence": 0,
+      "sha256": "6d6a746b2308d56f71f2268b44ab55e26cd02f6567f94d64a929db480a8ea1ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.class",
+      "occurrence": 0,
+      "sha256": "7e26869e874b099f46f4a3f2782c759313625040df2c174d898cf5266bce0bdf",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult.class",
+      "occurrence": 0,
+      "sha256": "71bc1986b0ccbd8f2563252aaf7a0c5eaf2a19c6adaf74d12955e04bf72ce272",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade.class",
+      "occurrence": 0,
+      "sha256": "5774cc8b6436950d8b6846c71876b6fcf2b1fdf7bf69521c99bbc8bf63463fd7",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades.class",
+      "occurrence": 0,
+      "sha256": "bf17ddb2c7cfc5a2bc1d7f88097d6f2f8ea124c0de25e4553930e7b3c80f830e",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.class",
+      "occurrence": 0,
+      "sha256": "8e5ff4744cdc4a93bcb488fa4c79e82a4d77dff6aca2fd1dae376ac03e52a386",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask.class",
+      "occurrence": 0,
+      "sha256": "98dfaa1d5381fcad91b8939607a8f7e4842dc05c40eaebc6dfbc22de87b99762",
+      "member_shard": "docs/dev/evidence/sqx145/members/210/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/210/001.json",
+      "sha256": "cfda45f9100604fc2cad30065bcd27ab87fbeaae015eb55c004c54e539e827aa"
+    }
+  ]
+}

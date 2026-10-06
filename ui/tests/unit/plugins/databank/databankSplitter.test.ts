@@ -8,7 +8,7 @@ import { databanks, strategies } from '../../../../app/plugins/databank/fixtures
 
 const ALL_STATES: SplitterState[] = ['collapsed', 'active', 'maximised'];
 
-describe('DatabankSplitter state machine (donor SQX144-EV-000025..027)', () => {
+describe('DatabankSplitter state machine (donor retained target UI; current donor equivalence unverified)', () => {
   it('starts collapsed and toggles to active and back', () => {
     expect(nextSplitterState('collapsed', 'toggle')).toBe('active');
     expect(nextSplitterState('active', 'toggle')).toBe('collapsed');

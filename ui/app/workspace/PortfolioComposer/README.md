@@ -37,6 +37,10 @@ The automatic model is the observed Markowitz label; other displayed fitness cho
 are fixtures, not an exhaustive backend registry. Donor initial configuration values
 are presentation defaults, not evidence of saved project values.
 
-Evidence: SQX144-EV-000073 through SQX144-EV-000082 (applicable workspace claims).
+Evidence: retained target UI; current donor equivalence unverified (applicable workspace claims).
 Verification: 277 UI unit tests, 27 shared/portfolio browser journeys, UI typecheck/build
 and repository CI passed on 2026-09-25. This qualifies the mock UI candidate only.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

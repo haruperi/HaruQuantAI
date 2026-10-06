@@ -70,7 +70,7 @@ export function validateSourceMapping(
   if (mapping.schema_version !== 1) fail("Unsupported mapping version");
   if (
     mapping.donor_root !==
-      `SQX_REFERENCE_ROOT/internal/plugins/${scope.plugin}` ||
+      `SQX_145_REFERENCE_ROOT/internal/plugins/${scope.plugin}` ||
     mapping.target_root !==
       `HARUQUANTAI_ROOT/ui/app/plugins/${domain}/${scope.plugin}`
   )

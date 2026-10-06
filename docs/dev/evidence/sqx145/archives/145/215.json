@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
+  "sha256": "73a05e6d594be525c4068892f3fdea77929b2740dba3338c4e212360e98067a9",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewPlugin.class": "c2f33620aaa0cdc4ec1d3f4429bf1656c5b31033fee0a4a85e8400f9da2dc340",
+    "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock.class": "cd957738c9438789a41f0db844cdf37d518513803bcad767cbd0e159730a173d",
+    "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL.class": "326c849c8c7857f0bb8c9c861f499c9afe82f052dc24ab43751f8bd3843d5e2e",
+    "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume.class": "63722913967dc828de96d0006a56109747def8d60f52ace7d7921813ea4e23bf",
+    "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet.class": "a2e39e842b2879e27ebc95c25d042d4ed6c60322af03d12af9580418f51b2f9c"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewPlugin.class",
+      "occurrence": 0,
+      "sha256": "c2f33620aaa0cdc4ec1d3f4429bf1656c5b31033fee0a4a85e8400f9da2dc340",
+      "member_shard": "docs/dev/evidence/sqx145/members/215/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock.class",
+      "occurrence": 0,
+      "sha256": "cd957738c9438789a41f0db844cdf37d518513803bcad767cbd0e159730a173d",
+      "member_shard": "docs/dev/evidence/sqx145/members/215/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL.class",
+      "occurrence": 0,
+      "sha256": "326c849c8c7857f0bb8c9c861f499c9afe82f052dc24ab43751f8bd3843d5e2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/215/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume.class",
+      "occurrence": 0,
+      "sha256": "63722913967dc828de96d0006a56109747def8d60f52ace7d7921813ea4e23bf",
+      "member_shard": "docs/dev/evidence/sqx145/members/215/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet.class",
+      "occurrence": 0,
+      "sha256": "a2e39e842b2879e27ebc95c25d042d4ed6c60322af03d12af9580418f51b2f9c",
+      "member_shard": "docs/dev/evidence/sqx145/members/215/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/215/001.json",
+      "sha256": "d05d38c301acaf3c9593cf7ec0d71b0decc3936d7bf4262ffef8df4bca66e995"
+    }
+  ]
+}

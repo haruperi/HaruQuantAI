@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only SettingsPanel bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsPanel",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-    "version": 1,
-    "state": "owner-approved-plan"
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
   },
   "owner": {
     "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
@@ -28,62 +28,82 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel",
       "id": "sqx-settingspanel-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-settingspanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "bdef8c12d95a6bce81b3ac3b01ef9c303e4e8b1383045f0dfb2c92126b88a37e",
+      "sha256": "cee3fdc2b7e5b839f1f359be085eef9a6d95a3093720a5c82d73aa61f33f96ca",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingspanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/settings.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel/settings.html",
       "relative_path": "settings.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9cd0333c2f30730712c1dd21fc4a4f2b46ff5c12a4cb0b310bba1930f75daaef",
+      "sha256": "1afe8c546fb4a36809aa600b66316d710bfa4715a0ad2f0194dfc513173ca83c",
       "target": "settings.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingspanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/SettingsPanelCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel/SettingsPanelCtrl.js",
       "relative_path": "SettingsPanelCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "d399231bff1d1188f5dc521dcec7bd2d4fd3335e87e4a886fc91148874831ddb",
+      "sha256": "377d7a5186f0ef94751c617d75996d5a52b02b36fdc961902d36600383296dbb",
       "target": "SettingsPanelCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingspanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPanel/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "8b653192ce55feb16beea7aa0e821f66633549935ec4007fbefaab38ba67546d",
+      "sha256": "b7b81d3132115c37d8331f1455bc881558e264b27d76144293f25ec70757aad0",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles."
+      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -124,6 +144,9 @@
   ],
   "limitations": [
     "No backend, database mutation, live engine capability, new route or SQX parity claim.",
-    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
-  ]
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

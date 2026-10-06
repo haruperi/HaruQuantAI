@@ -1,6 +1,6 @@
 # Darwinex UI
 
-Donor: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex`.
+Donor: `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex`.
 Target: `HARUQUANTAI_ROOT/ui/app/plugins/data_source/Darwinex`.
 Donor informs; specification owns. All implementation is independently written target code.
 
@@ -46,3 +46,7 @@ Mapping validation does not establish SQX behavioral parity. Real folder data
 decoding, CDN/network lifecycle and generated bars remain backend gaps.
 Canonical reimplementation ledger/schema were absent; this manifest does not
 replace the ledger and no new behavioral evidence record is asserted.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

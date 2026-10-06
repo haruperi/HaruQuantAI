@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsOverview bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsOverview",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "version": 1,
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+    "version": 1
   },
   "owner": {
     "feature": "FEAT-UI-PROJECT_WORKBENCH",
@@ -28,166 +28,226 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview",
       "id": "sqx-resultsoverview-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "b743615092006c157f85c03e972a77cf4b9c65065ef87243ef80f26cc7ada5dc",
+      "sha256": "863167e2f1fc122112bf8644f81c975b187ebb0fd3c055aa91969e734a1f7d3a",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/overview.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/overview.html",
       "relative_path": "overview.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "356523627db3c8abb7ecdbc7226af1597a48c4b7ae8f87c23f9580bce0b30b8c",
+      "sha256": "efe47507dacf476015d221fef5f8bc05b24251026478894dd530fe20c6f6d951",
       "target": "overview.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverview.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverview.jar",
       "relative_path": "ResultsOverview.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "9a97ec7cf2324e744f87a5e5039e7365cb162713ca4ff5b0cc324a6bf7dcfa23",
+      "sha256": "d728475561b669238963858dd91145cbc03ca0e4a4955445ce73f6a4c42c80aa",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
       "relative_path": "ResultsOverviewCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "14717fa23229c7c2dceef6b2e0be7572117d6e8c34a56ff7d9c0e9e78012bd3d",
+      "sha256": "339dd052800cfc1360946d7253ffe3b91b12cf3591c395474cf607e9eb23e245",
       "target": "ResultsOverviewCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js",
       "relative_path": "ResultsOverviewService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "0298e264f725fa5c8ff7541cf47da7397bf14904981cdce7aa90c29cb04fe8f1",
+      "sha256": "4005b8500953022925728607aab7d2cd4c81f68fbf7463b68c85b7d8fa4552cc",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services."
+      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "1c8d6cd9fd82e19da27d6f390749e8df7ef397ea4a815c29ab47d193e3856911",
+      "sha256": "f9b204adc3a1e8d408e2979bcf626d70f51d1ef8616463f5f19280436322b0aa",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/awshareddefault_template.htm",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/awshareddefault_template.htm",
       "relative_path": "templates/awshareddefault_template.htm",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "ea2efd63467eb5e2f6e5766d07764473a3c9f9847ceaec79f4aadc7706fa244e",
+      "sha256": "1b1f9e449fcb9c94ef3fe1fa7799a608781093438951d4511d0bddd3688b92d1",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot_portfolio.jpg",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot_portfolio.jpg",
       "relative_path": "templates/sqdefault_screenshot_portfolio.jpg",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
       "sha256": "39500c62559b9211b88ead8cdc3300a2b1b3d07c13a4b8c44416f46fcdab3f3f",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot.jpg",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot.jpg",
       "relative_path": "templates/sqdefault_screenshot.jpg",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
       "sha256": "b8d3f88166971b9b80620a608e89aa7cfca6b86c12604b396e708fb6c0a736e3",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_template.htm",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_template.htm",
       "relative_path": "templates/sqdefault_template.htm",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "92462712adad1f6107bc864ae10958e98066efd3dcc571df4ac7316b43fc7815",
+      "sha256": "512cb8ada40d4af62df2585ebb9ae928e6bacaf6b243fe07b86b02f4a49ebe8a",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_screenshot.jpg",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_screenshot.jpg",
       "relative_path": "templates/ts_screenshot.jpg",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
       "sha256": "0a1c0399609fde4b14f732e1bfb79d98174aa952bf91bb3220a6b71ed23cf6bc",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_template.htm",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_template.htm",
       "relative_path": "templates/ts_template.htm",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "d38f4341d95946b1738d5eb25d91c04ec547ac53d925be3f9e872c5cf4716a75",
+      "sha256": "361b7dc9971a0380840c69afa07ac72650a626b42a9ce1550bce9743968512e2",
       "target": null,
       "classification": "excluded",
-      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -229,6 +289,9 @@
   "limitations": [
     "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
     "Views/analyses remain session-only; reports/charts are precomputed approximations.",
-    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
-  ]
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

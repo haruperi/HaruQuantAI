@@ -1,0 +1,1871 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jfx_2.4.9_sq.jar",
+  "sha256": "b05ca416555206d0dc5282431cd690c088d6481cf07c1d4a24ec91737bd8b2d5",
+  "class_count": 261,
+  "unique_class_entries": 261,
+  "resource_count": 10,
+  "duplicate_entries": [],
+  "classes": {
+    "com/jfx/ErrTradeContextBusy.class": "de4ea11db6d96fe5c949386ad287f2238af1ad1983398246b6aca4a733bff31a",
+    "com/jfx/MessageBoxID.class": "884b5ec5b9048d54ab93bb6d4c3321065b093681b9970a342062a50b6feb08ff",
+    "com/jfx/ErrNotEnoughMoney.class": "5580e1aea9383cbf24729eade42f8512e2a775e1aa55b476d4c4502966c40362",
+    "com/jfx/ErrTradeExpirationDenied.class": "7d9265537fc41c9c1848f125390dd0e106ef5d7f5b775f6701a4f27e13f8fd6b",
+    "com/jfx/ErrNoError.class": "859f76ec3a348dd87dc45808d04693a2319e91755fe4872679e99fb406204de8",
+    "com/jfx/SymbolInfo$DayOfWeek.class": "90c7737ac47ad5b450e477062aaf12ef451ed0f3fa2a9cae106206cb89ddd7bb",
+    "com/jfx/SymbolInfo$ExpirationMode.class": "b4ad18ffe6fc36b41709a2618d179b571df0c593a423bce6faa97e447e024d3a",
+    "com/jfx/SymbolInfo$FillingMode.class": "3c719d7719c7c8aa5a553583b49efe7b7abbf127dbf4a5917a059418b18db6d3",
+    "com/jfx/SymbolInfo$OrderMode.class": "af9f9d1770c38fd0b926358c46427df68bbd68c53d9ec4517752b12b89d9a20c",
+    "com/jfx/SymbolInfo$PriceCalculationMode.class": "85b4e7d0a1cc94cd9108b2191d270993541db6ad748b24bc7e384218f8a96fb8",
+    "com/jfx/SymbolInfo$SwapMode.class": "201cc9f33c37186535471613e8d81c747cf7519a3740651242d8568a688882cc",
+    "com/jfx/SymbolInfo$TradeExecutionMode.class": "b691e7bab614a88cd689f57cbcdf0619b8b89352c9ebb22f3f8c4548cd3f022f",
+    "com/jfx/SymbolInfo$TradeMode.class": "6ab3f25c12174c7033408e21dafd58d70f6fe6d2805f34963650a5939314e381",
+    "com/jfx/SymbolInfo.class": "0fb90ae19cdd261091e96e2e5854481d0fb45659e74380d0601295b4f1985895",
+    "com/jfx/ErrLongsNotAllowed.class": "c2fe765e2367dd5c8974d4abad5b4b5f833c93c948b1af48e6f139a87a7969f0",
+    "com/jfx/MACDIndicatorLines.class": "a7355b286b81d61ea3b700564f339f3a2556c8fbeb44a2f30d049cd6aa3e4f7f",
+    "com/jfx/SelectionType.class": "17fe89cee484d4f661c658bd4d91c6adab3f85079cf1339bb78e26d1546ce95b",
+    "com/jfx/ErrIntegerParameterExpected.class": "d7f0a4d4b3b59fc920b542f5f787c639523515d5ce10e18e5b81d8df695e2ea4",
+    "com/jfx/SDParser.class": "1430e83d2809a6e2b19b4133da0679b192ce0442a0c82253c01b7a8b3a825ab7",
+    "com/jfx/Bar.class": "28c6b947a714188375f587cba39199003e394ae3b3b5d0232a51b552d9cf10d4",
+    "com/jfx/UninitializeReason.class": "f015c1bc8fc6390e1eb7404edf09353f544f8c284306ea8e9f568e76c178b704",
+    "com/jfx/DDParser.class": "204544dd57fbc89186c44db96d04e3371e585c17015dc2f764397410d7239ee3",
+    "com/jfx/BandsIndicatorLines.class": "778d52c0de2235a540bc01992924d13d573fa273951c6877343cf8030388e58b",
+    "com/jfx/MT4RuntimeException.class": "06a879e6ac4dfb942533513628b4fa43d70f41b1b67d9ce3f522aed037784de8",
+    "com/jfx/ErrGlobalVariableNotFound.class": "990d6d333b04b398dd0974050c55d68251d39a2847663784bb3b69650806943a",
+    "com/jfx/ErrCustomIndicatorError.class": "a94265115472d580d62a58a111f6c8ca12fe347c8f33aa2fa84648ff48f10c3e",
+    "com/jfx/ErrTradeNotAllowed.class": "420a0db32f8e64d135049ba73cb54f47f96ecb1a7fb22cca4ea1e70fe3fd1b09",
+    "com/jfx/AccountInfo$StopOutMode.class": "c140ee00c44949d02b0250b69d181dbcb4c8e88f37003cc5f8ca09163e59f522",
+    "com/jfx/AccountInfo$TradeMode.class": "a7c4bd8e527ee8793344fd7acb72a7ee35475d78972e6386cdb6c7fa35c42661",
+    "com/jfx/AccountInfo.class": "007af18f077d23fea789f2526beb579df08750db143f638f27f5877e84a8b7d1",
+    "com/jfx/ErrInvalidTradeParameters.class": "76ae053db137c879175c043e0c644c8c94c0365fa6506e648f207d9eb884a542",
+    "com/jfx/ErrServerBusy.class": "65fe59eb7a5ee5e2633e11edf37e8378c916dbc38bb61ec74c065d0abb5d39dd",
+    "com/jfx/ErrTradeTooManyOrders.class": "ad55f762bf6d4d49cef5053f56e0aed7bf78b1bb651adde95f38eae590075217",
+    "com/jfx/ErrTradeTimeout3.class": "8a8dde6c067487a69907bcff6156c586ecc3bac4d741b2db45abef9f52ee6f87",
+    "com/jfx/ErrOrderLocked.class": "afa2581c8e88ebed7a80e1009312bae00c50b79488edfbd8b6ee8b41be0511c5",
+    "com/jfx/MarketInformation.class": "e7ac1bbab3de4405b097cf9cc4382eaf0065bc0f7107d64feeeb8c838007c795",
+    "com/jfx/Rate.class": "cbf8a887280acd8659ece88c0ae288cc1d3628e1e4dfa8e08e2503a46cd527a9",
+    "com/jfx/ErrOldVersion.class": "428e7e5ce4645e4cdb557304c02884833590b165cd7454e6ae2d8c73d0fffc22",
+    "com/jfx/MovingAverageMethod.class": "cdd57fecb03da814e162cd9b02c2dd95c7111096ee154a1d70d6ad8bd637cfa1",
+    "com/jfx/ADXIndicatorLines.class": "0b01b3e9d565fd1680e83915483b5682f81ea9ae6d0cdb3c8ad1323a6a42c045",
+    "com/jfx/Tick.class": "5fc65296f96976125b5389fa1684d1fbe495c239e702d32cbaba08ce0f17b854",
+    "com/jfx/TickInfo.class": "828fc9c910672cf60f0676ed244e6f91813f3fcfc89437c247f082ad8b319025",
+    "com/jfx/ErrCommonError.class": "b8b8a1bd9dbb5e71c231481c5dc2202825e936d816c6b4539b437834f89fe74a",
+    "com/jfx/GatorMode.class": "86bad9b4da3865dac5efff85f071ae39af3a4c1ac2090a81c8504d1cb5f69de7",
+    "com/jfx/ErrNoConnection.class": "df2d635013d9183f9c3d9b271fd101eff25ae534ef2d2e2d4da245b6d64cd470",
+    "com/jfx/ErrTradeTimeout4.class": "4c2aa33df12d25300a5c08a31f77c4b77fe5ffa484cea1b56e2eb8f0c6feaba6",
+    "com/jfx/ErrMarketClosed.class": "aca980b8408aa55a40a0cedb7f2cda8aa2e6a75deb83f1dae2385dc3044077e8",
+    "com/jfx/ErrTradeDisabled.class": "a7ad33f07a737260f9e76a682472115097a621436d3deb8d08d848eceb6c267d",
+    "com/jfx/MessageBoxFlag.class": "437ea033764167513c02bf056af2cc5b9fca649cb758dd490ecf7bc1c3caf8a6",
+    "com/jfx/TradeOperation.class": "2c15cc2a2930e9385304e956120ee3427718b1e70e8f0aa150f3fcf3709c13ee",
+    "com/jfx/ArrowCodes.class": "1f3b2e04386a3ddbf79a1feaf3e555337c7d470622445aef1343bef6a405cb3c",
+    "com/jfx/ErrInvalidPrice.class": "81b9bef0f356bd44c89ecaac4d03424f7ef886c2e73880ab4875b61d204ddd78",
+    "com/jfx/IchimokuSource.class": "438d5234f1ffa62505cb9d69ae517ee0eb751af7427ab0d245b1944a3b1e2a2a",
+    "com/jfx/ErrInvalidAccount.class": "89ca9729767f33cd9951f54080e1099ccbc7352723b09426dc3f8cf36b3eb32b",
+    "com/jfx/ErrTooFrequentRequests.class": "4c6d5512133066e60a9c03d3ece1e4a68f12206b1f53b6baca0bb34e590876a9",
+    "com/jfx/MT4$1.class": "d781488a13efe167304858dcc07b2df64b5d5c660a3d09feac9a2c496226e18e",
+    "com/jfx/MT4$2.class": "e1ad35ce7f7c5a6add9a4ce1644afc1d8c0cf3fd3daa604b01c03a10349cac7a",
+    "com/jfx/MT4$3.class": "333b2baebfc1f162a0be0d67cc81fe90c565584f36165dea65d7225820ccca27",
+    "com/jfx/MT4$CustomParameters.class": "7f099154f29d0a6797e521c0aed48b0717f138af84b1335da39fc1c14273b873",
+    "com/jfx/MT4$MT4DateFormat.class": "b55efd76402677882ac5b4976f1f4057bfab20ec2376976a5f499b7f47798162",
+    "com/jfx/MT4.class": "cc0a883dc6b18fc5628eb45f27f92295a5c06bb6f2e52928781116d4568c63af",
+    "com/jfx/ErrIncorrectSeriesarrayUsing.class": "cbb967228590fd403474571180fc696734bb79b281b44c3f676a88cfad4f54e0",
+    "com/jfx/ErrLongPositionsOnlyAllowed.class": "860d29161205cfa23e3812b73e0ae898414d060448d0532b22ed7b0985ff20cb",
+    "com/jfx/DrawingStyle.class": "8329ebf912aabf5d960b60e5fe469214f4944c1474ef98f5f6dc01753b6a1a8b",
+    "com/jfx/Broker$ProxyType.class": "a63f02716b8081a112a37c9eb14c2ae5f443c4da5ec893da3eabd69ae3be7b91",
+    "com/jfx/Broker.class": "4e77e069e7cb0896272e4cf9bd7eda23720125355fa70b4bd0c2caeea6e9dca4",
+    "com/jfx/ErrRequote.class": "262fe1b811e7942185a45091538c21af848eda5c57217471bca9946e5b6dc938",
+    "com/jfx/AppliedPrice.class": "a9d798c2ae057dc1bd8437b772c991949d948df6ff8a3059ce49e0b48dd3f0d4",
+    "com/jfx/ErrHistoryWillUpdated.class": "4a4fef73c7ce47234322396ce0494172b9614bbeb651b2ed1f44d2cbb61d5b1f",
+    "com/jfx/ObjectProperty.class": "f3f8c4226a57c249c5d61d181f75806b9f1af5f39cfb50cb63fe504146c60849",
+    "com/jfx/MarketInfo.class": "4dc1850abc63c9643d6df9367add4b08048465162333830cd5a36595841fa607",
+    "com/jfx/ErrStringParameterExpected.class": "5c58fb4145403cc74b5ce11f39cde0432af7f8a27d9de3c227d6269780067f9a",
+    "com/jfx/ObjectType.class": "06572f24410f04b711439ca2594d24c5e4197cf8b4a3da1e540417a94201faa2",
+    "com/jfx/ErrPriceChanged.class": "b486801db9451dbbf79a6be3f14f232f60c4318e80b8d950bd4d3d211a4ac7a0",
+    "com/jfx/PositionChangeImpl.class": "715b476fe5e2813f934fc7795140a2164115918556a39663a496c2d4d3df7cd0",
+    "com/jfx/ErrNoOrderSelected.class": "68d35f5f05524d0b56988bda6ac43c29715e5923537621295a42c4f2a8c2e6c1",
+    "com/jfx/SelectionPool.class": "3d64d939ad3905481942306c6d34559f0cee80c028c69b36be4d10a4437a413b",
+    "com/jfx/ErrInvalidStops.class": "0895604ae120e3d2750cc6f90cb1b5b3cd18ee7c3d6a794fdb281be5c8b0bd0c",
+    "com/jfx/ErrTradeTimeout2.class": "ed3fc13f8b1197c42878d5514d1d85ec1ecc0af18eb76c8a8266d39f6a87aafc",
+    "com/jfx/ErrOffQuotes.class": "ca7ef20dc0b0fb6378d13755ce9d4adc955af96c0d7f9c9471d4d96e04ce0e1a",
+    "com/jfx/OrderImpl.class": "8cbeda3dd4e324d65455229ca964b4091e9ed99ba6755635ab2b18167e5305f4",
+    "com/jfx/Color.class": "7450dbf39bd77f79b7526c0865668ab130520fb63176dfbcb3a2c860a8b668eb",
+    "com/jfx/ErrTradeTimeout.class": "46c64a680f666b08fbfbbeb65c17847470ec576c9d8861eea415ca1c51c3e187",
+    "com/jfx/Version.class": "60adb4af330eb527d1ceadab53ee17225310c4a8846f09da5c21b7e1d66b4275",
+    "com/jfx/ErrTradeModifyDenied.class": "99ed93022ac60608d6df40655600297f1940cf478fa9d1123a5e5a9cc8f10a0f",
+    "com/jfx/ErrInvalidTicket.class": "c02c19724f0f09f05313cdcb74bf20e338fa6ae78688dfd5375e3de15bc0c56d",
+    "com/jfx/ErrShortsNotAllowed.class": "36f146436d0e6862fe9b68a566be75eaf3a13a9adf45ea6c3ee578aa39202025",
+    "com/jfx/ErrInvalidPriceParam.class": "2733695ac8805993cc305e6d93a085556615b0c326354237a6ed451ebcfe79cd",
+    "com/jfx/PositionImpl.class": "6f6bca8224ed9a6e015bc297f04feac36761ded573f6d1cefcb7cba232c04adf",
+    "com/jfx/Timeframe.class": "1d5c0ae6ce3b55f0b8f0faa4a991c61482f3ccac864a61e98aeae3997e66b625",
+    "com/jfx/ErrAccountDisabled.class": "8b6e4091667cace20f4c5a13c7366c34910f429982ecd2880f03571c1667c831",
+    "com/jfx/ErrNoResult.class": "3940caadd99959a2002eb09a15ba717a4b75fc511bb0cd8a483ad82f09b11c39",
+    "com/jfx/DrawingShape.class": "0cee211541f6c25ede7ad9646f721841643816eda03ba43cca73d3d7cf3b0349",
+    "com/jfx/ErrTooManyRequests.class": "3b2f961900ef5b9ec8b53f6f99921c4238f676d4a4ba6d9fee1aabfba08bf676",
+    "com/jfx/ObjectVisibility.class": "91dbbf1f975886581543f72ad1c07747e112222386b4d66c19c00d427ce74b93",
+    "com/jfx/ErrInvalidTradeVolume.class": "ff1595e3b01eca8aa8e2f59a0870cce7514f1c2326b35e6e21a686afb31cd7f3",
+    "com/jfx/ErrUnknownSymbol.class": "8574768cb3fa1422ee8665323195a82c7b522be3275ab436cc101fcf8fc853e8",
+    "com/jfx/ErrInvalidFunctionParamvalue.class": "508fb9346aae46ef1cb45b309f9b0ee34c32e3e2d28fb1b87028b14e062eb813",
+    "com/jfx/ArrowSpecial.class": "36b315cbc9c1981110cc8c4c4d5eb0d96b4c4d08dde9f3fca2fe0dcbd832a4cd",
+    "com/jfx/Series.class": "a2a6e2bff1c7d22e8c5ef93a70992a41ffa435d600d2701dab10b3db492e2102",
+    "com/jfx/MT4Exception.class": "b9e513301643706e542bc608f8e755bfbe65a3be3dceb89261247cb5f2133bb0",
+    "com/jfx/io/BytesListener.class": "ee16fd13b7ae155a0bb68af1a47ed82e99118212478f0026979b7a517258124d",
+    "com/jfx/io/CachedThreadFactory.class": "a3d3b39a2531200b8f5b6aad3537121dcd0212ec1826821d86b235d6bdd63633",
+    "com/jfx/io/CommandListener.class": "1f3d924c7029066217769f80830aa98d2abb4d287b637f4d86a093b128881cff",
+    "com/jfx/io/InputStreamManager$1.class": "8ac2a66fd8ab1070506287e53decfa363f709d6556e6df6cb29377c36ea9af82",
+    "com/jfx/io/InputStreamManager$2.class": "f959670a5910b664111785b3e5b8356ecada27d80e750d885c4c69df02742af6",
+    "com/jfx/io/InputStreamManager$GetBytesListener.class": "3df69a30bb0f6b6c5ae906096760aa676987d0776c3ebf3be3ab14c387d0cc14",
+    "com/jfx/io/InputStreamManager$GetBytesListenerLF.class": "72dd32639b76ca5cac8a07dc04151ecfad4548e9f6d53366f75318ffd83328ec",
+    "com/jfx/io/InputStreamManager$InputStreamReadableByteChannel.class": "1cc45f2cd82a1e960c0bf673e8afd9f042c28cfe50370a126111887c3e222ff1",
+    "com/jfx/io/InputStreamManager.class": "73040316b134c56c403fd7a76f0c47acac89e265763442583b0025e2731a89b9",
+    "com/jfx/io/ConfigurationFile.class": "330ee5519e8642779e9d91d747dc8d6cda83bb95443a4125b1828b18f0b1cb62",
+    "com/jfx/io/LineListener.class": "64239f228496c3094a2bd93a69cdb342dac8681eff4aa8a26252d9050180d111",
+    "com/jfx/io/ExtendedLineListener.class": "fc0b650ec2c8bd245f1a8754236f39ac893f1e05378f67c64c83b1767b826876",
+    "com/jfx/io/Log4JUtil$Logger.class": "4d4e0d941c5a9fa9f1de709af0984b2ced3756afe6e0a5cfeb41e28edfe13828",
+    "com/jfx/io/Log4JUtil.class": "4071708fa0435d9366a381e4dabb0c421ab6841b06a6bb68607dc312f646f020",
+    "com/jfx/io/ResourceReader.class": "eeab8405d43ff34883c0a31823d735936a664d19f0800630b9b6d392c0dba078",
+    "com/jfx/io/BytesLineListener.class": "afd6d9d1a549be6c18bfbb7c9360fa0f406b043d894ed466c0dfa18b1d129d69",
+    "com/jfx/jboss/JFXService.class": "3048587fb4d806e92fd6edb2453e8258ccada9fa6fa1ecb42bbcda35e656d95c",
+    "com/jfx/jboss/JFXStrategy.class": "e54ebcda8bc324963d5f48797d6fc5b282618e551c4aa8acf8763d1caccd494d",
+    "com/jfx/jmx/JMXServer.class": "0bba439ea8674f6224d47a578b8985494cb549333884378c6aae50a2691f23e5",
+    "com/jfx/jmx/DummyMBeanServer.class": "e0fba25128fc351399c4b6fbaae2f4e55e4b932d5c01f96eba9fce401fc5a832",
+    "com/jfx/jmx/mx4j/JMXServerImpl.class": "d6a707fd997e4ba2554eb6b1daceacd4baf631e211288904c591ef3bc687e9d1",
+    "com/jfx/md5/MD5.class": "5e16c61aad2a9acb463388d6a4d60b40e4c47981e9b6b26d0cd7253e8d103b11",
+    "com/jfx/md5/MD5State.class": "b5b5ddcb1ff443dbe51fcfdb8b9894958f8f5c97b2005f7cf37990e86803014c",
+    "com/jfx/mt5/Broker.class": "0d45b422b83c95af668ea4e8e52364da32821d7e6010d9b82f0f1aeb39602fe4",
+    "com/jfx/net/UnsafeByteBuffer$1.class": "8da31310f05f87238a9dce9b231a420dc7f7fe117d970f41dd98c46370655467",
+    "com/jfx/net/UnsafeByteBuffer.class": "3a130cc6f3a15b8b2b2108643a1b2c07e95c9722608f563e38663836bc701fdc",
+    "com/jfx/net/JFXServer$ListenerThread.class": "3b41ec4d36d3cf357fa671e41afed9bb45555d9777bc97cd40990382dd070b51",
+    "com/jfx/net/JFXServer.class": "183989665a5494b204bf41d2e49b08e23726141da3e3d95beaab18cbfb1370d8",
+    "com/jfx/net/TSClient$1.class": "5300557e40484d959257711e202043081709321c3aa2aef6568ddaecf5efed4a",
+    "com/jfx/net/TSClient$WebEndpointInterceptor.class": "818a641d76296d37ffecde3a9dfc30805d4310a5e3641cd574c3a7ecab0fa2cc",
+    "com/jfx/net/TSClient.class": "ed2ff79126288e3f5eb5463c2a6f69fc80f52ae4ba39205d56098b402625cfc4",
+    "com/jfx/net/Greeter$1.class": "0b0d2da52c37ddcee2744119279bac5bcbd55190350ccf53acd55f91b38a7c79",
+    "com/jfx/net/Greeter$2.class": "248bce592459fbb3831d9ee11c0b8e8f947e9f49c6e6a44c069def5ef3e8fd95",
+    "com/jfx/net/Greeter.class": "32e7907574477e5d54f88515172152ce7f0d7bfc235c564cec1c703b17792a8c",
+    "com/jfx/net/InprocessSocket$InprocessInputStream.class": "a6311e1a462c494c408bbff625ed62838d5e960b1feab220d191ae8161be4e62",
+    "com/jfx/net/InprocessSocket$InprocessOutputStream.class": "3bc4125b64e2d864c26ee535edd392568a4d130b2ba98274bd3f02a7cadde437",
+    "com/jfx/net/InprocessSocket.class": "bec8967396628989cc56752c66dc035c00f69353e10ac6972a2eed336550b56d",
+    "com/jfx/net/TerminalClient$ConnectionWorkerThread.class": "529853f7094adb741c4ceb72bcb61f63b8a97f413be9b2153ddafa7f3caa61cc",
+    "com/jfx/net/TerminalClient.class": "b423c31aaf3784f377a6389c88f17aacc270538bade910971a60b6b410bc1c99",
+    "com/jfx/net/UbbArgsMapper.class": "9e43342b379940177f18b786f01c9999194f62fcc42529442ed92b0099203296",
+    "com/jfx/net/InprocessServer$1.class": "5c3b9365834db57a220e4d38c97c084fd457ce271360fe159ac7de8585ce47ab",
+    "com/jfx/net/InprocessServer.class": "db65a1391d31da3091e1a42d2e9a0fba6102035165a31923ff6c583ec9cd7f84",
+    "com/jfx/net/ByteBufferBuilder.class": "7b669c635914306a30061966a8a83f2a89602d1227d737faf484670a20854721",
+    "com/jfx/net/tsapi/ObjectFactory.class": "1cea049c72d3895323f663a66f9e02e97ff18a9440754faa7afb339c52298748",
+    "com/jfx/net/tsapi/package-info.class": "16e3521930a7b8dbd5b84478e8c5659e4b0b1f73987b7cf15eb6323a7c4cd657",
+    "com/jfx/net/tsapi/EaInputs.class": "2b38101f76802ceebd6f5f1f2120679f7ee456af7db28ab966e2188ca967aa69",
+    "com/jfx/net/tsapi/RunMT4ExpertResponse.class": "6979df343edc452152c1659f771df841d41de51fe4395bedc5597ed0cc969def",
+    "com/jfx/net/tsapi/Mt4ExpertParams.class": "dae66968be6dc9e2fa3ffe12ec74535e1eae1f37f8283e3684321acddf5ec42d",
+    "com/jfx/net/tsapi/GetRunningExperts.class": "6e5bd3a4b3d85677b03251c7c80587b775773f985c99878821c39b02c15815ba",
+    "com/jfx/net/tsapi/GetTSInfo.class": "85f29268817ec5dd5acbb8a997b96b59e194217441bb3a2778b1a56a27a828df",
+    "com/jfx/net/tsapi/Close.class": "363387953fb33c168591421e845dc29e8c2413c2d6dfddb5da13ec4a633676bc",
+    "com/jfx/net/tsapi/Nj4XMT4Account.class": "e24b5783dc1058727adc1d6db8b55806fd2d8329226e357171f3fbc74209a1d1",
+    "com/jfx/net/tsapi/Deposit.class": "3fc075fff7002c7b1ff90f0f38e4c497121a3d8d4a9ab66180e7e850a93f8b4d",
+    "com/jfx/net/tsapi/RunMT4Terminal.class": "0e9c1a9dcdd9db52e94320d8301bdd56ac6ab9e4b6675f1a1637409a403a747c",
+    "com/jfx/net/tsapi/DealType.class": "7eb9347af371858d11112cffb0e574a6df41507f05795354072eb4d33a2bbba6",
+    "com/jfx/net/tsapi/SingleTestReport.class": "6b0f1e522d8116f3c3e154557f13e8048e09bfd264ff1ddb89b237c22e7ebe11",
+    "com/jfx/net/tsapi/Mt4ExpertTesterParams.class": "f9e3c3fe7da908afbbcc392b2450b591f8357ef20d314de5ab3ce9a1f24bf2aa",
+    "com/jfx/net/tsapi/StopMT4ExpertResponse.class": "35236c29f7f47527415cba29939aa59f9f84dd6396d1daa2d7ea950c0f4fa86e",
+    "com/jfx/net/tsapi/Nj4XTSInfo.class": "525df43cb3c8eb01df79a43b6482f75cc2465461d8c7d0153ca1e0e125645f05",
+    "com/jfx/net/tsapi/EaInput.class": "8e2815c3973c47e4728add684aafb56a415c0337912c33a8f912d2ff0d726e53",
+    "com/jfx/net/tsapi/KillMT4Expert.class": "d5471d8b6baf7aa777f0e802df9236758da0d9a0c45617fe795b4486cb178e96",
+    "com/jfx/net/tsapi/KillMT4ExpertResponse.class": "c74d4256c756bc1bc45375cb9828e9ed0a8ee857ae63331f6e5aa4ec3cc7c4ae",
+    "com/jfx/net/tsapi/EaRunParams.class": "c6e6ac2150d85ac63a90e40a1597d9604cbdcc3e3b780dad450ea4889d108765",
+    "com/jfx/net/tsapi/InstallExpertResponse.class": "25bb97e14448b829cc4d642d1c53232f4e31bd11a83519050730255a118f1a98",
+    "com/jfx/net/tsapi/TesterService.class": "cdf61b248364ccabb58f10731e6691f42d18463c2edc83bfd5173e520efc8845",
+    "com/jfx/net/tsapi/TestModel.class": "c10c65cae0cda8ef0406eba7f4839be0fe31114fdcd50ade051fac55236c53ca",
+    "com/jfx/net/tsapi/Nj4XClientInfo.class": "6afae4344667239d38a38615ab0f4df4251827b5593170b2c346cb6609dff21b",
+    "com/jfx/net/tsapi/RunMT4TerminalResponse.class": "83460dade8d703970d23a7f038f6fd4aafc5b772e6eb1e41881e3d3e50283c34",
+    "com/jfx/net/tsapi/GetInstalledExperts.class": "d60b0de0191f53f976cdad9018b0634c71031405181bca5ddbeef4e6f909a635",
+    "com/jfx/net/tsapi/Experts.class": "4749b9ac55df80b8fd417ae1ed325a0e5885fa2be515cf0fbec98d752021b681",
+    "com/jfx/net/tsapi/Deal.class": "1aed5b387e8edf3ae4dd1a184278baf21136d40421a89ae102c7f28ebd1bc07a",
+    "com/jfx/net/tsapi/OptimizationReport.class": "254f916043b4aaa3c7341b52888fcbcdcb9947dcaaffdb039315f1446c2f3376",
+    "com/jfx/net/tsapi/GetExpertInputsResponse.class": "7b228208a092d5c65d1bc2a76ad5f1ba058603aec1c8cd4f00e459e9732c3fef",
+    "com/jfx/net/tsapi/EaTestOptimizedParameter.class": "ed48ba7ea0bf16acd1063c39ec84bd8460f011e9e1b6cfa1d9bb0ac686c51e90",
+    "com/jfx/net/tsapi/RunMT4TesterResponse.class": "4e92ba6f259b05a8780b49cd46e7c402ea2f4a1c5f5b1164f4d8398d8b57d2d5",
+    "com/jfx/net/tsapi/GetTSInfoResponse.class": "e1077042d41483ae1289038e08439695b85890d63d7eef62dd6ca0f9443ac8ce",
+    "com/jfx/net/tsapi/IsExpertInstalledResponse.class": "8ec95acfcbac48e3ebd15ada752e0bdafed8f7429a2be2c68e7910de65e31510",
+    "com/jfx/net/tsapi/StartSession.class": "469c832f43380689f8e7cb0ac7ef32cf6c379b2d28cf2de37d4de44e18347e28",
+    "com/jfx/net/tsapi/IsExpertInstalled.class": "b6c98c3a862f551a682873badb8aa1c7e58070397e76d80c29e4e6be30837a7a",
+    "com/jfx/net/tsapi/StartSessionResponse.class": "43c685c1313309752d33d65625b0b152fd995fedf73e16cf0e9b34a8793e4b6e",
+    "com/jfx/net/tsapi/TS.class": "38da604559d6b7ff9395228b6220e6b4951a54ac500e6b3ece7c18cf47b4b841",
+    "com/jfx/net/tsapi/Nj4XChartParams.class": "61532527a08247640a92c865e7e42ce12ade6151ac23060d70e06a82f5dd271e",
+    "com/jfx/net/tsapi/Mt4EAInput.class": "8d64467514432d265dd0bf4ec6a233c316b911fe7b4eacf2bb4afc90385cdaef",
+    "com/jfx/net/tsapi/CheckMT4Terminal.class": "2b8c770bb6a77a4cac358c17b26e61e984642c51db6ba2e16949e722391ece54",
+    "com/jfx/net/tsapi/RunMT4Tester.class": "cc3e8a6259e3f2b430f72e41ea4b009852e8afc8fb0d03c6bd8bbb734ed883de",
+    "com/jfx/net/tsapi/Mt4EAInputs.class": "e73333cbd128bf4b9d4a0a852e60092c79879860043ec6daa6d0ecc259d61e25",
+    "com/jfx/net/tsapi/OptimizationRun.class": "f5546926cfb0c648318edb7df24efc27de52d4043094797845616882a97bffab",
+    "com/jfx/net/tsapi/DisconnectMT4TerminalResponse.class": "ab5e437c90a9c9d4cb0ebec4ffe755bcbadc21bf497ecbf16a50a70f880be495",
+    "com/jfx/net/tsapi/GetRunningExpertsResponse.class": "00defcdf101177fcd92957cafe91367fb406e57d4a328f0337f65c8c9e51ba05",
+    "com/jfx/net/tsapi/RunMT4Expert.class": "bd2d53927904c946d0025678a4825e4d477f0c745d512b55753602e73c3699f8",
+    "com/jfx/net/tsapi/GetAvailableSRVFiles.class": "b78c4dd98d4d513ef13f759873addc6d1a76f1bdc21fc6635b11d287b407b5ab",
+    "com/jfx/net/tsapi/Nj4XParams.class": "6affa0e14603d259812e007779f1a300acf1d4982135d47c7899116b54fc6847",
+    "com/jfx/net/tsapi/KillMT4Terminal.class": "849952b7c89e57375a4ea7ac6f2c72f59abb172ef31f607423b8612062ddb80d",
+    "com/jfx/net/tsapi/CloseResponse.class": "4e3ddf4d6331eacae78ea8bd483a056ffb6a03f592b4bf6334933c26493d8678",
+    "com/jfx/net/tsapi/InstallExpertLibrary.class": "ef1a84c00908df84ab5f7eadfa2498096062269ad3de614a94ea6cc9c08d7b98",
+    "com/jfx/net/tsapi/Period.class": "d6a967e682efec6352e76814e8f7182cb236f33d8fdb9144324e4d0e933e31c6",
+    "com/jfx/net/tsapi/GetBoxIDResponse.class": "69cbae0c019ba76339d5922c8e2a152bbaea40e2f2b720a9a9f380319b670cdd",
+    "com/jfx/net/tsapi/TSService.class": "35d42b2dd0bc014c1837e6da4931f69a0e80952e499e40819795f4de82af3f11",
+    "com/jfx/net/tsapi/DisconnectMT4Terminal.class": "d9ef9fae1973d227b75e9df2a12a4c7f4e51c4473e32ef90541db4b1ca08062a",
+    "com/jfx/net/tsapi/GetBoxID.class": "69dd59dfc60244533d0b57c4472897ed622fff8592a685a5dbb95e93be267e9c",
+    "com/jfx/net/tsapi/KillMT4TerminalResponse.class": "4989bbd024f2ee9128d783219652b7354b07c202f3704374f78bd80978f1480e",
+    "com/jfx/net/tsapi/Mt4EATesterConfiguration.class": "e291c385bd2b057e44cf5a5bc65c7043904683c07d461fb5b06a1a2e1b8b2357",
+    "com/jfx/net/tsapi/Mt4EATesterLimits.class": "0fe316bd5b8a7fed7e95aa127aaf1f8f88e88fa69a775141a4959c00557b0d0d",
+    "com/jfx/net/tsapi/GetAvailableSRVFilesResponse.class": "d8e8546b8b83606a44d2ec9a27758c4e2cf046f67b65c2f0d22cee660266bc1c",
+    "com/jfx/net/tsapi/StopMT4Expert.class": "108203781e4a561dd7b35140642b8343fdb41ddbf80d3e33dee43dbc83ce925f",
+    "com/jfx/net/tsapi/InstallExpertLibraryResponse.class": "19757c6ed485479758db56e7005698ea3fbb62f8b6956a2eaab1321238190b50",
+    "com/jfx/net/tsapi/DataType.class": "32fa738dc002f87cefb3fb722d9d83959a8944d5b3e5faf3b82ad0d08612446e",
+    "com/jfx/net/tsapi/InstallExpert.class": "30735ff9d9f43ca7a504c3ae900261565b776cac9f9183e4bace266bd105ab29",
+    "com/jfx/net/tsapi/GetExpertInputs.class": "69d6d99f2e8966e75e856c1f7ae132146a62dbbfdc9229c2191d0b68e9635eab",
+    "com/jfx/net/tsapi/Mt4TesterReport.class": "6ac96c6c7ef6024b77637659529e2da14efc4ec9adfe67f75f64fee3b72a33fa",
+    "com/jfx/net/tsapi/EAService.class": "a430ecc08c50346f39f36217de416d73b4d348f44c8474c9799bed938a5cb7f6",
+    "com/jfx/net/tsapi/Tester.class": "c284dbfe1a9aa20fcf1d3e135c2e08e14e5a235a069da0fd1083b1ed1765efa3",
+    "com/jfx/net/tsapi/EaTestPositions.class": "03fd042f06d86a90a7599f90d262ad31f34a9904f7c191be02cc315acc2f443b",
+    "com/jfx/net/tsapi/GetInstalledExpertsResponse.class": "cdffc0875a01afb980b03eee88e6bae1a3678e130545e470429fff6a7dd9b596",
+    "com/jfx/net/tsapi/CheckMT4TerminalResponse.class": "2abb6bf358bea5a86cf3d89552914df18ecac98a3b63a7fdecbfe316bebec447",
+    "com/jfx/strategy/MT4TerminalConnection$UDPClientPacket.class": "8e1452c176800148a1cf9d5a6799c19318de5e728a7995d37e811365c2f77fd4",
+    "com/jfx/strategy/MT4TerminalConnection.class": "bd0351f9dde1fa1ee1f6777e9bd405b595246368d7173b182b3618ac86d67be1",
+    "com/jfx/strategy/PositionChangeInfo.class": "849cdb50c4da8aa53321565a40f73269b8789ed6a35be2abc366a376ac8ac61a",
+    "com/jfx/strategy/PositionListener.class": "5d7cc59b69bd4b49d95a73c34514d1c1eaf6ba148fd3745812b2a4b0beb05cd1",
+    "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException.class": "3100ed8246a4b01b3b3da5a0edd60e6800af29718857688e2fa81b325df69c69",
+    "com/jfx/strategy/NJ4XNoConnectionToServerException.class": "002cb29bbdfe579f6a6f08afd6db96f01d256a190921fc721ff3232c0430e209",
+    "com/jfx/strategy/MT4DisconnectException.class": "22fc9bfcc5cda80f5088567d2de46901898551a1b4e0885823a1ecb5da5c36e0",
+    "com/jfx/strategy/MT4InprocessConnection.class": "10099ec53fd852ab9223d26bba9ea742feb49bfea94f9d24232c0b63ed5d30b2",
+    "com/jfx/strategy/BasicStrategyRunner$1.class": "362cb6907232f810683f9169b8390cfafd3084fd5002210d2ab9b7150a21520d",
+    "com/jfx/strategy/BasicStrategyRunner$2.class": "6127d5cfde4de2afab042d8a5e98894370bbc9f2db58ce92ece2bebb2af24daa",
+    "com/jfx/strategy/BasicStrategyRunner.class": "3c0726a98339177c722df6c59e0efcedfb1dc44bb80594d05a50fde4acd8fbff",
+    "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException.class": "5dc869c2389647b939b1b04606ca5f190493dcdd1284c530ebcea2a5896a7a0c",
+    "com/jfx/strategy/Dummy.class": "6b5cb7e982aa510827fc6979a22f4edb36feb34a618aed3fc27556643c3eb115",
+    "com/jfx/strategy/PositionInfo.class": "b201dbb49295ebdf17e31e3d8b9629c2bbae859ec66897827013625931f2e817",
+    "com/jfx/strategy/OrderInfo.class": "dacff93252380318c0bf0067ab37ce08c414e261054fd7e324b7c3aae4036978",
+    "com/jfx/strategy/StrategyRunner.class": "0261e5c7d79bb33930488ecb1830401c31f3601a492b6020a8e37751185701c7",
+    "com/jfx/strategy/Strategy$1.class": "1a32f2e0abd951aa45bd7114ee916decc753e4522eb82421c0c0d67fe2fc72e7",
+    "com/jfx/strategy/Strategy$2.class": "adfb47effc12d43f7ae49cc50cc57bfa1d48a314893643d82161e37070bc7582",
+    "com/jfx/strategy/Strategy$3.class": "c33cf98fec5120cdfb67deb26962e568175d8493ab29f55fe4ae537c2de22327",
+    "com/jfx/strategy/Strategy$BulkTickListener.class": "c9859ab4f2785d4314e040962bb0b3b5bfb28fa7421f70feebd8a76ac27e7536",
+    "com/jfx/strategy/Strategy$Chart.class": "edb47a681d29372fd2191b40ffcc8e47c72f15ec080891a1e52e882e4d841183",
+    "com/jfx/strategy/Strategy$HistoryPeriod.class": "700797a38f898fea158e7dc3140143448d08e4ddd525d9b79814e19d3fb32fb4",
+    "com/jfx/strategy/Strategy$Instrument.class": "c90e8f43328b10cf678af7561f8c89989eb9cf3018213590d96def2cd3807bbf",
+    "com/jfx/strategy/Strategy$Terminal.class": "4d09188dadf58606ba965be0250777f098c2db306019cb8e7d03ecfa07a87228",
+    "com/jfx/strategy/Strategy$TerminalStrategy$1.class": "80b0cb2351ee7cffc4eba6334c4e37320b94a4944f0ae88a324e6e8e9c6394ab",
+    "com/jfx/strategy/Strategy$TerminalStrategy.class": "0e0b597549ed0cf7fd5f6a535724aaf54060d3e2aab17fe08a619875c2156167",
+    "com/jfx/strategy/Strategy$TerminalType.class": "15c54a7780bbed58fa5028eaf3d092d859cc634a7e56ee835f67a7a5cb9e2d13",
+    "com/jfx/strategy/Strategy$TickListener.class": "f4baf023fcd954a8682c74023df9e448b6ff30a801ffc447cc3112126e87bb7b",
+    "com/jfx/strategy/Strategy$TickListenerChart.class": "d0410cb06e8fce75576ede94d76f59d796a81083033a455774ce194b7461ccd0",
+    "com/jfx/strategy/Strategy$TimerListener.class": "3dd8f69a3525e0a98324e948704411c5c39b43f7bb5190ff61343a15d45838ba",
+    "com/jfx/strategy/Strategy.class": "1676f4edc01d8f13762d12d0f0ed4227f031c9f6d5b8a33cdd650bd00ab991cd",
+    "com/jfx/xml/DOMUtil$1.class": "cb7b0bc679785cac59fc299dfb48d5bf3ee0625628abf800a1f6026e01134159",
+    "com/jfx/xml/DOMUtil$2.class": "b63dca015eae1700fb7c8a8342d27b3c5033d40990d05bdf741e541aa8da224b",
+    "com/jfx/xml/DOMUtil$3.class": "b51a51dcf6bdf00d6cdd4044e3a2db00b2d35a9daa8f74a56b4b0cf05bb99967",
+    "com/jfx/xml/DOMUtil$ElementIterator.class": "e4c7fea03b5f000e602435ea4b2be80620875d45decdf00b1dd5a9d1c74b954b",
+    "com/jfx/xml/DOMUtil$NoElementIterator.class": "3ffe666c8a04f42b3750f94fd6534492ff9f83241816be825fe6fbef7a732a0c",
+    "com/jfx/xml/DOMUtil$NodeFilter.class": "63af8e399319ff638cc57ba160140e0c44bb61d8380cf3e0d0119b3c1fad174e",
+    "com/jfx/xml/DOMUtil$SAXDocument$1.class": "404563c1cc7b263c19578f458332d6ae055eddb210a66f74e9a645008f3abec5",
+    "com/jfx/xml/DOMUtil$SAXDocument$2$1$1.class": "784fe0638683de059fc58e9b4a3c1cc83e0c53f05db70f8ccf2b7d35724bd368",
+    "com/jfx/xml/DOMUtil$SAXDocument$2$1.class": "112c50d7a62ed2cbc029382f9d2d76fbdfaf7ec69f843c43a6ecd7c2257bb9be",
+    "com/jfx/xml/DOMUtil$SAXDocument$2.class": "326789814d701c1ab9076bfdb7bee6b5852b77a54b8b47aae69ce9ab96f1e167",
+    "com/jfx/xml/DOMUtil$SAXDocument.class": "1568bea8636bb278cc0532e0f886c45d4bf096a5f5cc623ddac39b9334566ef7",
+    "com/jfx/xml/DOMUtil$SAXNode.class": "fbc3caf4bf6c87f6df3a453f583d42976f554132d80aa0b6060c3d2c0fde159a",
+    "com/jfx/xml/DOMUtil$SiblingIterator.class": "95bc62eb3ad54973c43dc6a255bdb715ee5c026fa66f9d4d9ebe244d0b254a8a",
+    "com/jfx/xml/DOMUtil.class": "bb13b5686f69ea4d4b1c34e3fbaedeebf91ebcc1d8cc73122eaa2b13e3b3f169"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    "com/jfx/net/resources/JFXServer.properties": "6392e985dd4215d1d0b205cada72a35530b0221bddf7ce8bcdcc496db6e238a0",
+    ".classpath": "b5f04ac988c0715aec1015d318d9928fbdf1cd5486ddb1caad3cad612432d499",
+    ".project": "e7aee167b943d9a3b99744c93512c1b28ab3dce80c896fa66b7a62fd57fab406",
+    "test/java/com/jfx/DemoAccount.java": "bc3b527428ac5d30559dd66570875455b9c8ffd376f08375626f0f377483bc49",
+    "test/java/com/jfx/PUtils.java": "083fd51734043b61f86a676f6671ade741ae6bbbec0a91ae4fb1514ec74654d5",
+    "test/java/com/jfx/strategy/CopierDemo.java": "06965fa212298dab56395d3140c4feccd71535fa623bdc452f8f6abc63e46d8c",
+    "test/java/com/jfx/strategy/PositionListenerExample.java": "efbd90c259efea838c79f71d596a0aa13d476e1f66cb1662a7c20cdabf09b92f",
+    "test/java/com/jfx/strategy/StrategyITCase.java": "7ddb43d54d4dfb62de189e1a1efe8b90119c672667a83adceff9f91a115a141e",
+    "test/java/com/jfx/strategy/TickListenerExample.java": "6f0bfadde6e839f297cb37312bec152cbc78c6f2742ed3e4f03036310004372d"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/jfx/ErrTradeContextBusy.class",
+      "occurrence": 0,
+      "sha256": "de4ea11db6d96fe5c949386ad287f2238af1ad1983398246b6aca4a733bff31a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MessageBoxID.class",
+      "occurrence": 0,
+      "sha256": "884b5ec5b9048d54ab93bb6d4c3321065b093681b9970a342062a50b6feb08ff",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrNotEnoughMoney.class",
+      "occurrence": 0,
+      "sha256": "5580e1aea9383cbf24729eade42f8512e2a775e1aa55b476d4c4502966c40362",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeExpirationDenied.class",
+      "occurrence": 0,
+      "sha256": "7d9265537fc41c9c1848f125390dd0e106ef5d7f5b775f6701a4f27e13f8fd6b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrNoError.class",
+      "occurrence": 0,
+      "sha256": "859f76ec3a348dd87dc45808d04693a2319e91755fe4872679e99fb406204de8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$DayOfWeek.class",
+      "occurrence": 0,
+      "sha256": "90c7737ac47ad5b450e477062aaf12ef451ed0f3fa2a9cae106206cb89ddd7bb",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$ExpirationMode.class",
+      "occurrence": 0,
+      "sha256": "b4ad18ffe6fc36b41709a2618d179b571df0c593a423bce6faa97e447e024d3a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$FillingMode.class",
+      "occurrence": 0,
+      "sha256": "3c719d7719c7c8aa5a553583b49efe7b7abbf127dbf4a5917a059418b18db6d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$OrderMode.class",
+      "occurrence": 0,
+      "sha256": "af9f9d1770c38fd0b926358c46427df68bbd68c53d9ec4517752b12b89d9a20c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$PriceCalculationMode.class",
+      "occurrence": 0,
+      "sha256": "85b4e7d0a1cc94cd9108b2191d270993541db6ad748b24bc7e384218f8a96fb8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$SwapMode.class",
+      "occurrence": 0,
+      "sha256": "201cc9f33c37186535471613e8d81c747cf7519a3740651242d8568a688882cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$TradeExecutionMode.class",
+      "occurrence": 0,
+      "sha256": "b691e7bab614a88cd689f57cbcdf0619b8b89352c9ebb22f3f8c4548cd3f022f",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo$TradeMode.class",
+      "occurrence": 0,
+      "sha256": "6ab3f25c12174c7033408e21dafd58d70f6fe6d2805f34963650a5939314e381",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SymbolInfo.class",
+      "occurrence": 0,
+      "sha256": "0fb90ae19cdd261091e96e2e5854481d0fb45659e74380d0601295b4f1985895",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrLongsNotAllowed.class",
+      "occurrence": 0,
+      "sha256": "c2fe765e2367dd5c8974d4abad5b4b5f833c93c948b1af48e6f139a87a7969f0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MACDIndicatorLines.class",
+      "occurrence": 0,
+      "sha256": "a7355b286b81d61ea3b700564f339f3a2556c8fbeb44a2f30d049cd6aa3e4f7f",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SelectionType.class",
+      "occurrence": 0,
+      "sha256": "17fe89cee484d4f661c658bd4d91c6adab3f85079cf1339bb78e26d1546ce95b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrIntegerParameterExpected.class",
+      "occurrence": 0,
+      "sha256": "d7f0a4d4b3b59fc920b542f5f787c639523515d5ce10e18e5b81d8df695e2ea4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SDParser.class",
+      "occurrence": 0,
+      "sha256": "1430e83d2809a6e2b19b4133da0679b192ce0442a0c82253c01b7a8b3a825ab7",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/Bar.class",
+      "occurrence": 0,
+      "sha256": "28c6b947a714188375f587cba39199003e394ae3b3b5d0232a51b552d9cf10d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/UninitializeReason.class",
+      "occurrence": 0,
+      "sha256": "f015c1bc8fc6390e1eb7404edf09353f544f8c284306ea8e9f568e76c178b704",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/DDParser.class",
+      "occurrence": 0,
+      "sha256": "204544dd57fbc89186c44db96d04e3371e585c17015dc2f764397410d7239ee3",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/BandsIndicatorLines.class",
+      "occurrence": 0,
+      "sha256": "778d52c0de2235a540bc01992924d13d573fa273951c6877343cf8030388e58b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4RuntimeException.class",
+      "occurrence": 0,
+      "sha256": "06a879e6ac4dfb942533513628b4fa43d70f41b1b67d9ce3f522aed037784de8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrGlobalVariableNotFound.class",
+      "occurrence": 0,
+      "sha256": "990d6d333b04b398dd0974050c55d68251d39a2847663784bb3b69650806943a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrCustomIndicatorError.class",
+      "occurrence": 0,
+      "sha256": "a94265115472d580d62a58a111f6c8ca12fe347c8f33aa2fa84648ff48f10c3e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeNotAllowed.class",
+      "occurrence": 0,
+      "sha256": "420a0db32f8e64d135049ba73cb54f47f96ecb1a7fb22cca4ea1e70fe3fd1b09",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/AccountInfo$StopOutMode.class",
+      "occurrence": 0,
+      "sha256": "c140ee00c44949d02b0250b69d181dbcb4c8e88f37003cc5f8ca09163e59f522",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/AccountInfo$TradeMode.class",
+      "occurrence": 0,
+      "sha256": "a7c4bd8e527ee8793344fd7acb72a7ee35475d78972e6386cdb6c7fa35c42661",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/AccountInfo.class",
+      "occurrence": 0,
+      "sha256": "007af18f077d23fea789f2526beb579df08750db143f638f27f5877e84a8b7d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidTradeParameters.class",
+      "occurrence": 0,
+      "sha256": "76ae053db137c879175c043e0c644c8c94c0365fa6506e648f207d9eb884a542",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrServerBusy.class",
+      "occurrence": 0,
+      "sha256": "65fe59eb7a5ee5e2633e11edf37e8378c916dbc38bb61ec74c065d0abb5d39dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeTooManyOrders.class",
+      "occurrence": 0,
+      "sha256": "ad55f762bf6d4d49cef5053f56e0aed7bf78b1bb651adde95f38eae590075217",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeTimeout3.class",
+      "occurrence": 0,
+      "sha256": "8a8dde6c067487a69907bcff6156c586ecc3bac4d741b2db45abef9f52ee6f87",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrOrderLocked.class",
+      "occurrence": 0,
+      "sha256": "afa2581c8e88ebed7a80e1009312bae00c50b79488edfbd8b6ee8b41be0511c5",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MarketInformation.class",
+      "occurrence": 0,
+      "sha256": "e7ac1bbab3de4405b097cf9cc4382eaf0065bc0f7107d64feeeb8c838007c795",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/Rate.class",
+      "occurrence": 0,
+      "sha256": "cbf8a887280acd8659ece88c0ae288cc1d3628e1e4dfa8e08e2503a46cd527a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrOldVersion.class",
+      "occurrence": 0,
+      "sha256": "428e7e5ce4645e4cdb557304c02884833590b165cd7454e6ae2d8c73d0fffc22",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MovingAverageMethod.class",
+      "occurrence": 0,
+      "sha256": "cdd57fecb03da814e162cd9b02c2dd95c7111096ee154a1d70d6ad8bd637cfa1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ADXIndicatorLines.class",
+      "occurrence": 0,
+      "sha256": "0b01b3e9d565fd1680e83915483b5682f81ea9ae6d0cdb3c8ad1323a6a42c045",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/Tick.class",
+      "occurrence": 0,
+      "sha256": "5fc65296f96976125b5389fa1684d1fbe495c239e702d32cbaba08ce0f17b854",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/TickInfo.class",
+      "occurrence": 0,
+      "sha256": "828fc9c910672cf60f0676ed244e6f91813f3fcfc89437c247f082ad8b319025",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrCommonError.class",
+      "occurrence": 0,
+      "sha256": "b8b8a1bd9dbb5e71c231481c5dc2202825e936d816c6b4539b437834f89fe74a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/GatorMode.class",
+      "occurrence": 0,
+      "sha256": "86bad9b4da3865dac5efff85f071ae39af3a4c1ac2090a81c8504d1cb5f69de7",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrNoConnection.class",
+      "occurrence": 0,
+      "sha256": "df2d635013d9183f9c3d9b271fd101eff25ae534ef2d2e2d4da245b6d64cd470",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeTimeout4.class",
+      "occurrence": 0,
+      "sha256": "4c2aa33df12d25300a5c08a31f77c4b77fe5ffa484cea1b56e2eb8f0c6feaba6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrMarketClosed.class",
+      "occurrence": 0,
+      "sha256": "aca980b8408aa55a40a0cedb7f2cda8aa2e6a75deb83f1dae2385dc3044077e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeDisabled.class",
+      "occurrence": 0,
+      "sha256": "a7ad33f07a737260f9e76a682472115097a621436d3deb8d08d848eceb6c267d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MessageBoxFlag.class",
+      "occurrence": 0,
+      "sha256": "437ea033764167513c02bf056af2cc5b9fca649cb758dd490ecf7bc1c3caf8a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/TradeOperation.class",
+      "occurrence": 0,
+      "sha256": "2c15cc2a2930e9385304e956120ee3427718b1e70e8f0aa150f3fcf3709c13ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ArrowCodes.class",
+      "occurrence": 0,
+      "sha256": "1f3b2e04386a3ddbf79a1feaf3e555337c7d470622445aef1343bef6a405cb3c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidPrice.class",
+      "occurrence": 0,
+      "sha256": "81b9bef0f356bd44c89ecaac4d03424f7ef886c2e73880ab4875b61d204ddd78",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/IchimokuSource.class",
+      "occurrence": 0,
+      "sha256": "438d5234f1ffa62505cb9d69ae517ee0eb751af7427ab0d245b1944a3b1e2a2a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidAccount.class",
+      "occurrence": 0,
+      "sha256": "89ca9729767f33cd9951f54080e1099ccbc7352723b09426dc3f8cf36b3eb32b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTooFrequentRequests.class",
+      "occurrence": 0,
+      "sha256": "4c6d5512133066e60a9c03d3ece1e4a68f12206b1f53b6baca0bb34e590876a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4$1.class",
+      "occurrence": 0,
+      "sha256": "d781488a13efe167304858dcc07b2df64b5d5c660a3d09feac9a2c496226e18e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4$2.class",
+      "occurrence": 0,
+      "sha256": "e1ad35ce7f7c5a6add9a4ce1644afc1d8c0cf3fd3daa604b01c03a10349cac7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4$3.class",
+      "occurrence": 0,
+      "sha256": "333b2baebfc1f162a0be0d67cc81fe90c565584f36165dea65d7225820ccca27",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4$CustomParameters.class",
+      "occurrence": 0,
+      "sha256": "7f099154f29d0a6797e521c0aed48b0717f138af84b1335da39fc1c14273b873",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4$MT4DateFormat.class",
+      "occurrence": 0,
+      "sha256": "b55efd76402677882ac5b4976f1f4057bfab20ec2376976a5f499b7f47798162",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MT4.class",
+      "occurrence": 0,
+      "sha256": "cc0a883dc6b18fc5628eb45f27f92295a5c06bb6f2e52928781116d4568c63af",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrIncorrectSeriesarrayUsing.class",
+      "occurrence": 0,
+      "sha256": "cbb967228590fd403474571180fc696734bb79b281b44c3f676a88cfad4f54e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrLongPositionsOnlyAllowed.class",
+      "occurrence": 0,
+      "sha256": "860d29161205cfa23e3812b73e0ae898414d060448d0532b22ed7b0985ff20cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/DrawingStyle.class",
+      "occurrence": 0,
+      "sha256": "8329ebf912aabf5d960b60e5fe469214f4944c1474ef98f5f6dc01753b6a1a8b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/Broker$ProxyType.class",
+      "occurrence": 0,
+      "sha256": "a63f02716b8081a112a37c9eb14c2ae5f443c4da5ec893da3eabd69ae3be7b91",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/Broker.class",
+      "occurrence": 0,
+      "sha256": "4e77e069e7cb0896272e4cf9bd7eda23720125355fa70b4bd0c2caeea6e9dca4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrRequote.class",
+      "occurrence": 0,
+      "sha256": "262fe1b811e7942185a45091538c21af848eda5c57217471bca9946e5b6dc938",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/AppliedPrice.class",
+      "occurrence": 0,
+      "sha256": "a9d798c2ae057dc1bd8437b772c991949d948df6ff8a3059ce49e0b48dd3f0d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrHistoryWillUpdated.class",
+      "occurrence": 0,
+      "sha256": "4a4fef73c7ce47234322396ce0494172b9614bbeb651b2ed1f44d2cbb61d5b1f",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ObjectProperty.class",
+      "occurrence": 0,
+      "sha256": "f3f8c4226a57c249c5d61d181f75806b9f1af5f39cfb50cb63fe504146c60849",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/MarketInfo.class",
+      "occurrence": 0,
+      "sha256": "4dc1850abc63c9643d6df9367add4b08048465162333830cd5a36595841fa607",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrStringParameterExpected.class",
+      "occurrence": 0,
+      "sha256": "5c58fb4145403cc74b5ce11f39cde0432af7f8a27d9de3c227d6269780067f9a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ObjectType.class",
+      "occurrence": 0,
+      "sha256": "06572f24410f04b711439ca2594d24c5e4197cf8b4a3da1e540417a94201faa2",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrPriceChanged.class",
+      "occurrence": 0,
+      "sha256": "b486801db9451dbbf79a6be3f14f232f60c4318e80b8d950bd4d3d211a4ac7a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/PositionChangeImpl.class",
+      "occurrence": 0,
+      "sha256": "715b476fe5e2813f934fc7795140a2164115918556a39663a496c2d4d3df7cd0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrNoOrderSelected.class",
+      "occurrence": 0,
+      "sha256": "68d35f5f05524d0b56988bda6ac43c29715e5923537621295a42c4f2a8c2e6c1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/SelectionPool.class",
+      "occurrence": 0,
+      "sha256": "3d64d939ad3905481942306c6d34559f0cee80c028c69b36be4d10a4437a413b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidStops.class",
+      "occurrence": 0,
+      "sha256": "0895604ae120e3d2750cc6f90cb1b5b3cd18ee7c3d6a794fdb281be5c8b0bd0c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeTimeout2.class",
+      "occurrence": 0,
+      "sha256": "ed3fc13f8b1197c42878d5514d1d85ec1ecc0af18eb76c8a8266d39f6a87aafc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/ErrOffQuotes.class",
+      "occurrence": 0,
+      "sha256": "ca7ef20dc0b0fb6378d13755ce9d4adc955af96c0d7f9c9471d4d96e04ce0e1a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/001.json"
+    },
+    {
+      "entry": "com/jfx/OrderImpl.class",
+      "occurrence": 0,
+      "sha256": "8cbeda3dd4e324d65455229ca964b4091e9ed99ba6755635ab2b18167e5305f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/Color.class",
+      "occurrence": 0,
+      "sha256": "7450dbf39bd77f79b7526c0865668ab130520fb63176dfbcb3a2c860a8b668eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeTimeout.class",
+      "occurrence": 0,
+      "sha256": "46c64a680f666b08fbfbbeb65c17847470ec576c9d8861eea415ca1c51c3e187",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/Version.class",
+      "occurrence": 0,
+      "sha256": "60adb4af330eb527d1ceadab53ee17225310c4a8846f09da5c21b7e1d66b4275",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrTradeModifyDenied.class",
+      "occurrence": 0,
+      "sha256": "99ed93022ac60608d6df40655600297f1940cf478fa9d1123a5e5a9cc8f10a0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidTicket.class",
+      "occurrence": 0,
+      "sha256": "c02c19724f0f09f05313cdcb74bf20e338fa6ae78688dfd5375e3de15bc0c56d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrShortsNotAllowed.class",
+      "occurrence": 0,
+      "sha256": "36f146436d0e6862fe9b68a566be75eaf3a13a9adf45ea6c3ee578aa39202025",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidPriceParam.class",
+      "occurrence": 0,
+      "sha256": "2733695ac8805993cc305e6d93a085556615b0c326354237a6ed451ebcfe79cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/PositionImpl.class",
+      "occurrence": 0,
+      "sha256": "6f6bca8224ed9a6e015bc297f04feac36761ded573f6d1cefcb7cba232c04adf",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/Timeframe.class",
+      "occurrence": 0,
+      "sha256": "1d5c0ae6ce3b55f0b8f0faa4a991c61482f3ccac864a61e98aeae3997e66b625",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrAccountDisabled.class",
+      "occurrence": 0,
+      "sha256": "8b6e4091667cace20f4c5a13c7366c34910f429982ecd2880f03571c1667c831",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrNoResult.class",
+      "occurrence": 0,
+      "sha256": "3940caadd99959a2002eb09a15ba717a4b75fc511bb0cd8a483ad82f09b11c39",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/DrawingShape.class",
+      "occurrence": 0,
+      "sha256": "0cee211541f6c25ede7ad9646f721841643816eda03ba43cca73d3d7cf3b0349",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrTooManyRequests.class",
+      "occurrence": 0,
+      "sha256": "3b2f961900ef5b9ec8b53f6f99921c4238f676d4a4ba6d9fee1aabfba08bf676",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ObjectVisibility.class",
+      "occurrence": 0,
+      "sha256": "91dbbf1f975886581543f72ad1c07747e112222386b4d66c19c00d427ce74b93",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidTradeVolume.class",
+      "occurrence": 0,
+      "sha256": "ff1595e3b01eca8aa8e2f59a0870cce7514f1c2326b35e6e21a686afb31cd7f3",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrUnknownSymbol.class",
+      "occurrence": 0,
+      "sha256": "8574768cb3fa1422ee8665323195a82c7b522be3275ab436cc101fcf8fc853e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ErrInvalidFunctionParamvalue.class",
+      "occurrence": 0,
+      "sha256": "508fb9346aae46ef1cb45b309f9b0ee34c32e3e2d28fb1b87028b14e062eb813",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/ArrowSpecial.class",
+      "occurrence": 0,
+      "sha256": "36b315cbc9c1981110cc8c4c4d5eb0d96b4c4d08dde9f3fca2fe0dcbd832a4cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/Series.class",
+      "occurrence": 0,
+      "sha256": "a2a6e2bff1c7d22e8c5ef93a70992a41ffa435d600d2701dab10b3db492e2102",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/MT4Exception.class",
+      "occurrence": 0,
+      "sha256": "b9e513301643706e542bc608f8e755bfbe65a3be3dceb89261247cb5f2133bb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/BytesListener.class",
+      "occurrence": 0,
+      "sha256": "ee16fd13b7ae155a0bb68af1a47ed82e99118212478f0026979b7a517258124d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/CachedThreadFactory.class",
+      "occurrence": 0,
+      "sha256": "a3d3b39a2531200b8f5b6aad3537121dcd0212ec1826821d86b235d6bdd63633",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/CommandListener.class",
+      "occurrence": 0,
+      "sha256": "1f3d924c7029066217769f80830aa98d2abb4d287b637f4d86a093b128881cff",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager$1.class",
+      "occurrence": 0,
+      "sha256": "8ac2a66fd8ab1070506287e53decfa363f709d6556e6df6cb29377c36ea9af82",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager$2.class",
+      "occurrence": 0,
+      "sha256": "f959670a5910b664111785b3e5b8356ecada27d80e750d885c4c69df02742af6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager$GetBytesListener.class",
+      "occurrence": 0,
+      "sha256": "3df69a30bb0f6b6c5ae906096760aa676987d0776c3ebf3be3ab14c387d0cc14",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager$GetBytesListenerLF.class",
+      "occurrence": 0,
+      "sha256": "72dd32639b76ca5cac8a07dc04151ecfad4548e9f6d53366f75318ffd83328ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager$InputStreamReadableByteChannel.class",
+      "occurrence": 0,
+      "sha256": "1cc45f2cd82a1e960c0bf673e8afd9f042c28cfe50370a126111887c3e222ff1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/InputStreamManager.class",
+      "occurrence": 0,
+      "sha256": "73040316b134c56c403fd7a76f0c47acac89e265763442583b0025e2731a89b9",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/ConfigurationFile.class",
+      "occurrence": 0,
+      "sha256": "330ee5519e8642779e9d91d747dc8d6cda83bb95443a4125b1828b18f0b1cb62",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/LineListener.class",
+      "occurrence": 0,
+      "sha256": "64239f228496c3094a2bd93a69cdb342dac8681eff4aa8a26252d9050180d111",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/ExtendedLineListener.class",
+      "occurrence": 0,
+      "sha256": "fc0b650ec2c8bd245f1a8754236f39ac893f1e05378f67c64c83b1767b826876",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/Log4JUtil$Logger.class",
+      "occurrence": 0,
+      "sha256": "4d4e0d941c5a9fa9f1de709af0984b2ced3756afe6e0a5cfeb41e28edfe13828",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/Log4JUtil.class",
+      "occurrence": 0,
+      "sha256": "4071708fa0435d9366a381e4dabb0c421ab6841b06a6bb68607dc312f646f020",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/ResourceReader.class",
+      "occurrence": 0,
+      "sha256": "eeab8405d43ff34883c0a31823d735936a664d19f0800630b9b6d392c0dba078",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/io/BytesLineListener.class",
+      "occurrence": 0,
+      "sha256": "afd6d9d1a549be6c18bfbb7c9360fa0f406b043d894ed466c0dfa18b1d129d69",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/jboss/JFXService.class",
+      "occurrence": 0,
+      "sha256": "3048587fb4d806e92fd6edb2453e8258ccada9fa6fa1ecb42bbcda35e656d95c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/jboss/JFXStrategy.class",
+      "occurrence": 0,
+      "sha256": "e54ebcda8bc324963d5f48797d6fc5b282618e551c4aa8acf8763d1caccd494d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/jmx/JMXServer.class",
+      "occurrence": 0,
+      "sha256": "0bba439ea8674f6224d47a578b8985494cb549333884378c6aae50a2691f23e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/jmx/DummyMBeanServer.class",
+      "occurrence": 0,
+      "sha256": "e0fba25128fc351399c4b6fbaae2f4e55e4b932d5c01f96eba9fce401fc5a832",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/jmx/mx4j/JMXServerImpl.class",
+      "occurrence": 0,
+      "sha256": "d6a707fd997e4ba2554eb6b1daceacd4baf631e211288904c591ef3bc687e9d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/md5/MD5.class",
+      "occurrence": 0,
+      "sha256": "5e16c61aad2a9acb463388d6a4d60b40e4c47981e9b6b26d0cd7253e8d103b11",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/md5/MD5State.class",
+      "occurrence": 0,
+      "sha256": "b5b5ddcb1ff443dbe51fcfdb8b9894958f8f5c97b2005f7cf37990e86803014c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/mt5/Broker.class",
+      "occurrence": 0,
+      "sha256": "0d45b422b83c95af668ea4e8e52364da32821d7e6010d9b82f0f1aeb39602fe4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/UnsafeByteBuffer$1.class",
+      "occurrence": 0,
+      "sha256": "8da31310f05f87238a9dce9b231a420dc7f7fe117d970f41dd98c46370655467",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/UnsafeByteBuffer.class",
+      "occurrence": 0,
+      "sha256": "3a130cc6f3a15b8b2b2108643a1b2c07e95c9722608f563e38663836bc701fdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/JFXServer$ListenerThread.class",
+      "occurrence": 0,
+      "sha256": "3b41ec4d36d3cf357fa671e41afed9bb45555d9777bc97cd40990382dd070b51",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/JFXServer.class",
+      "occurrence": 0,
+      "sha256": "183989665a5494b204bf41d2e49b08e23726141da3e3d95beaab18cbfb1370d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/TSClient$1.class",
+      "occurrence": 0,
+      "sha256": "5300557e40484d959257711e202043081709321c3aa2aef6568ddaecf5efed4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/TSClient$WebEndpointInterceptor.class",
+      "occurrence": 0,
+      "sha256": "818a641d76296d37ffecde3a9dfc30805d4310a5e3641cd574c3a7ecab0fa2cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/TSClient.class",
+      "occurrence": 0,
+      "sha256": "ed2ff79126288e3f5eb5463c2a6f69fc80f52ae4ba39205d56098b402625cfc4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/Greeter$1.class",
+      "occurrence": 0,
+      "sha256": "0b0d2da52c37ddcee2744119279bac5bcbd55190350ccf53acd55f91b38a7c79",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/Greeter$2.class",
+      "occurrence": 0,
+      "sha256": "248bce592459fbb3831d9ee11c0b8e8f947e9f49c6e6a44c069def5ef3e8fd95",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/Greeter.class",
+      "occurrence": 0,
+      "sha256": "32e7907574477e5d54f88515172152ce7f0d7bfc235c564cec1c703b17792a8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/InprocessSocket$InprocessInputStream.class",
+      "occurrence": 0,
+      "sha256": "a6311e1a462c494c408bbff625ed62838d5e960b1feab220d191ae8161be4e62",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/InprocessSocket$InprocessOutputStream.class",
+      "occurrence": 0,
+      "sha256": "3bc4125b64e2d864c26ee535edd392568a4d130b2ba98274bd3f02a7cadde437",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/InprocessSocket.class",
+      "occurrence": 0,
+      "sha256": "bec8967396628989cc56752c66dc035c00f69353e10ac6972a2eed336550b56d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/TerminalClient$ConnectionWorkerThread.class",
+      "occurrence": 0,
+      "sha256": "529853f7094adb741c4ceb72bcb61f63b8a97f413be9b2153ddafa7f3caa61cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/TerminalClient.class",
+      "occurrence": 0,
+      "sha256": "b423c31aaf3784f377a6389c88f17aacc270538bade910971a60b6b410bc1c99",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/UbbArgsMapper.class",
+      "occurrence": 0,
+      "sha256": "9e43342b379940177f18b786f01c9999194f62fcc42529442ed92b0099203296",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/InprocessServer$1.class",
+      "occurrence": 0,
+      "sha256": "5c3b9365834db57a220e4d38c97c084fd457ce271360fe159ac7de8585ce47ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/InprocessServer.class",
+      "occurrence": 0,
+      "sha256": "db65a1391d31da3091e1a42d2e9a0fba6102035165a31923ff6c583ec9cd7f84",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/ByteBufferBuilder.class",
+      "occurrence": 0,
+      "sha256": "7b669c635914306a30061966a8a83f2a89602d1227d737faf484670a20854721",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/ObjectFactory.class",
+      "occurrence": 0,
+      "sha256": "1cea049c72d3895323f663a66f9e02e97ff18a9440754faa7afb339c52298748",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/package-info.class",
+      "occurrence": 0,
+      "sha256": "16e3521930a7b8dbd5b84478e8c5659e4b0b1f73987b7cf15eb6323a7c4cd657",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EaInputs.class",
+      "occurrence": 0,
+      "sha256": "2b38101f76802ceebd6f5f1f2120679f7ee456af7db28ab966e2188ca967aa69",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4ExpertResponse.class",
+      "occurrence": 0,
+      "sha256": "6979df343edc452152c1659f771df841d41de51fe4395bedc5597ed0cc969def",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4ExpertParams.class",
+      "occurrence": 0,
+      "sha256": "dae66968be6dc9e2fa3ffe12ec74535e1eae1f37f8283e3684321acddf5ec42d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetRunningExperts.class",
+      "occurrence": 0,
+      "sha256": "6e5bd3a4b3d85677b03251c7c80587b775773f985c99878821c39b02c15815ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetTSInfo.class",
+      "occurrence": 0,
+      "sha256": "85f29268817ec5dd5acbb8a997b96b59e194217441bb3a2778b1a56a27a828df",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Close.class",
+      "occurrence": 0,
+      "sha256": "363387953fb33c168591421e845dc29e8c2413c2d6dfddb5da13ec4a633676bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Nj4XMT4Account.class",
+      "occurrence": 0,
+      "sha256": "e24b5783dc1058727adc1d6db8b55806fd2d8329226e357171f3fbc74209a1d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Deposit.class",
+      "occurrence": 0,
+      "sha256": "3fc075fff7002c7b1ff90f0f38e4c497121a3d8d4a9ab66180e7e850a93f8b4d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4Terminal.class",
+      "occurrence": 0,
+      "sha256": "0e9c1a9dcdd9db52e94320d8301bdd56ac6ab9e4b6675f1a1637409a403a747c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/DealType.class",
+      "occurrence": 0,
+      "sha256": "7eb9347af371858d11112cffb0e574a6df41507f05795354072eb4d33a2bbba6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/SingleTestReport.class",
+      "occurrence": 0,
+      "sha256": "6b0f1e522d8116f3c3e154557f13e8048e09bfd264ff1ddb89b237c22e7ebe11",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4ExpertTesterParams.class",
+      "occurrence": 0,
+      "sha256": "f9e3c3fe7da908afbbcc392b2450b591f8357ef20d314de5ab3ce9a1f24bf2aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/StopMT4ExpertResponse.class",
+      "occurrence": 0,
+      "sha256": "35236c29f7f47527415cba29939aa59f9f84dd6396d1daa2d7ea950c0f4fa86e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Nj4XTSInfo.class",
+      "occurrence": 0,
+      "sha256": "525df43cb3c8eb01df79a43b6482f75cc2465461d8c7d0153ca1e0e125645f05",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/002.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EaInput.class",
+      "occurrence": 0,
+      "sha256": "8e2815c3973c47e4728add684aafb56a415c0337912c33a8f912d2ff0d726e53",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/KillMT4Expert.class",
+      "occurrence": 0,
+      "sha256": "d5471d8b6baf7aa777f0e802df9236758da0d9a0c45617fe795b4486cb178e96",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/KillMT4ExpertResponse.class",
+      "occurrence": 0,
+      "sha256": "c74d4256c756bc1bc45375cb9828e9ed0a8ee857ae63331f6e5aa4ec3cc7c4ae",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EaRunParams.class",
+      "occurrence": 0,
+      "sha256": "c6e6ac2150d85ac63a90e40a1597d9604cbdcc3e3b780dad450ea4889d108765",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/InstallExpertResponse.class",
+      "occurrence": 0,
+      "sha256": "25bb97e14448b829cc4d642d1c53232f4e31bd11a83519050730255a118f1a98",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/TesterService.class",
+      "occurrence": 0,
+      "sha256": "cdf61b248364ccabb58f10731e6691f42d18463c2edc83bfd5173e520efc8845",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/TestModel.class",
+      "occurrence": 0,
+      "sha256": "c10c65cae0cda8ef0406eba7f4839be0fe31114fdcd50ade051fac55236c53ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Nj4XClientInfo.class",
+      "occurrence": 0,
+      "sha256": "6afae4344667239d38a38615ab0f4df4251827b5593170b2c346cb6609dff21b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4TerminalResponse.class",
+      "occurrence": 0,
+      "sha256": "83460dade8d703970d23a7f038f6fd4aafc5b772e6eb1e41881e3d3e50283c34",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetInstalledExperts.class",
+      "occurrence": 0,
+      "sha256": "d60b0de0191f53f976cdad9018b0634c71031405181bca5ddbeef4e6f909a635",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Experts.class",
+      "occurrence": 0,
+      "sha256": "4749b9ac55df80b8fd417ae1ed325a0e5885fa2be515cf0fbec98d752021b681",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Deal.class",
+      "occurrence": 0,
+      "sha256": "1aed5b387e8edf3ae4dd1a184278baf21136d40421a89ae102c7f28ebd1bc07a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/OptimizationReport.class",
+      "occurrence": 0,
+      "sha256": "254f916043b4aaa3c7341b52888fcbcdcb9947dcaaffdb039315f1446c2f3376",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetExpertInputsResponse.class",
+      "occurrence": 0,
+      "sha256": "7b228208a092d5c65d1bc2a76ad5f1ba058603aec1c8cd4f00e459e9732c3fef",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EaTestOptimizedParameter.class",
+      "occurrence": 0,
+      "sha256": "ed48ba7ea0bf16acd1063c39ec84bd8460f011e9e1b6cfa1d9bb0ac686c51e90",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4TesterResponse.class",
+      "occurrence": 0,
+      "sha256": "4e92ba6f259b05a8780b49cd46e7c402ea2f4a1c5f5b1164f4d8398d8b57d2d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetTSInfoResponse.class",
+      "occurrence": 0,
+      "sha256": "e1077042d41483ae1289038e08439695b85890d63d7eef62dd6ca0f9443ac8ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/IsExpertInstalledResponse.class",
+      "occurrence": 0,
+      "sha256": "8ec95acfcbac48e3ebd15ada752e0bdafed8f7429a2be2c68e7910de65e31510",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/StartSession.class",
+      "occurrence": 0,
+      "sha256": "469c832f43380689f8e7cb0ac7ef32cf6c379b2d28cf2de37d4de44e18347e28",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/IsExpertInstalled.class",
+      "occurrence": 0,
+      "sha256": "b6c98c3a862f551a682873badb8aa1c7e58070397e76d80c29e4e6be30837a7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/StartSessionResponse.class",
+      "occurrence": 0,
+      "sha256": "43c685c1313309752d33d65625b0b152fd995fedf73e16cf0e9b34a8793e4b6e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/TS.class",
+      "occurrence": 0,
+      "sha256": "38da604559d6b7ff9395228b6220e6b4951a54ac500e6b3ece7c18cf47b4b841",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Nj4XChartParams.class",
+      "occurrence": 0,
+      "sha256": "61532527a08247640a92c865e7e42ce12ade6151ac23060d70e06a82f5dd271e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4EAInput.class",
+      "occurrence": 0,
+      "sha256": "8d64467514432d265dd0bf4ec6a233c316b911fe7b4eacf2bb4afc90385cdaef",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/CheckMT4Terminal.class",
+      "occurrence": 0,
+      "sha256": "2b8c770bb6a77a4cac358c17b26e61e984642c51db6ba2e16949e722391ece54",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4Tester.class",
+      "occurrence": 0,
+      "sha256": "cc3e8a6259e3f2b430f72e41ea4b009852e8afc8fb0d03c6bd8bbb734ed883de",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4EAInputs.class",
+      "occurrence": 0,
+      "sha256": "e73333cbd128bf4b9d4a0a852e60092c79879860043ec6daa6d0ecc259d61e25",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/OptimizationRun.class",
+      "occurrence": 0,
+      "sha256": "f5546926cfb0c648318edb7df24efc27de52d4043094797845616882a97bffab",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/DisconnectMT4TerminalResponse.class",
+      "occurrence": 0,
+      "sha256": "ab5e437c90a9c9d4cb0ebec4ffe755bcbadc21bf497ecbf16a50a70f880be495",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetRunningExpertsResponse.class",
+      "occurrence": 0,
+      "sha256": "00defcdf101177fcd92957cafe91367fb406e57d4a328f0337f65c8c9e51ba05",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/RunMT4Expert.class",
+      "occurrence": 0,
+      "sha256": "bd2d53927904c946d0025678a4825e4d477f0c745d512b55753602e73c3699f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetAvailableSRVFiles.class",
+      "occurrence": 0,
+      "sha256": "b78c4dd98d4d513ef13f759873addc6d1a76f1bdc21fc6635b11d287b407b5ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Nj4XParams.class",
+      "occurrence": 0,
+      "sha256": "6affa0e14603d259812e007779f1a300acf1d4982135d47c7899116b54fc6847",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/KillMT4Terminal.class",
+      "occurrence": 0,
+      "sha256": "849952b7c89e57375a4ea7ac6f2c72f59abb172ef31f607423b8612062ddb80d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/CloseResponse.class",
+      "occurrence": 0,
+      "sha256": "4e3ddf4d6331eacae78ea8bd483a056ffb6a03f592b4bf6334933c26493d8678",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/InstallExpertLibrary.class",
+      "occurrence": 0,
+      "sha256": "ef1a84c00908df84ab5f7eadfa2498096062269ad3de614a94ea6cc9c08d7b98",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Period.class",
+      "occurrence": 0,
+      "sha256": "d6a967e682efec6352e76814e8f7182cb236f33d8fdb9144324e4d0e933e31c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetBoxIDResponse.class",
+      "occurrence": 0,
+      "sha256": "69cbae0c019ba76339d5922c8e2a152bbaea40e2f2b720a9a9f380319b670cdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/TSService.class",
+      "occurrence": 0,
+      "sha256": "35d42b2dd0bc014c1837e6da4931f69a0e80952e499e40819795f4de82af3f11",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/DisconnectMT4Terminal.class",
+      "occurrence": 0,
+      "sha256": "d9ef9fae1973d227b75e9df2a12a4c7f4e51c4473e32ef90541db4b1ca08062a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetBoxID.class",
+      "occurrence": 0,
+      "sha256": "69dd59dfc60244533d0b57c4472897ed622fff8592a685a5dbb95e93be267e9c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/KillMT4TerminalResponse.class",
+      "occurrence": 0,
+      "sha256": "4989bbd024f2ee9128d783219652b7354b07c202f3704374f78bd80978f1480e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4EATesterConfiguration.class",
+      "occurrence": 0,
+      "sha256": "e291c385bd2b057e44cf5a5bc65c7043904683c07d461fb5b06a1a2e1b8b2357",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4EATesterLimits.class",
+      "occurrence": 0,
+      "sha256": "0fe316bd5b8a7fed7e95aa127aaf1f8f88e88fa69a775141a4959c00557b0d0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetAvailableSRVFilesResponse.class",
+      "occurrence": 0,
+      "sha256": "d8e8546b8b83606a44d2ec9a27758c4e2cf046f67b65c2f0d22cee660266bc1c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/StopMT4Expert.class",
+      "occurrence": 0,
+      "sha256": "108203781e4a561dd7b35140642b8343fdb41ddbf80d3e33dee43dbc83ce925f",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/InstallExpertLibraryResponse.class",
+      "occurrence": 0,
+      "sha256": "19757c6ed485479758db56e7005698ea3fbb62f8b6956a2eaab1321238190b50",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/DataType.class",
+      "occurrence": 0,
+      "sha256": "32fa738dc002f87cefb3fb722d9d83959a8944d5b3e5faf3b82ad0d08612446e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/InstallExpert.class",
+      "occurrence": 0,
+      "sha256": "30735ff9d9f43ca7a504c3ae900261565b776cac9f9183e4bace266bd105ab29",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetExpertInputs.class",
+      "occurrence": 0,
+      "sha256": "69d6d99f2e8966e75e856c1f7ae132146a62dbbfdc9229c2191d0b68e9635eab",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Mt4TesterReport.class",
+      "occurrence": 0,
+      "sha256": "6ac96c6c7ef6024b77637659529e2da14efc4ec9adfe67f75f64fee3b72a33fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EAService.class",
+      "occurrence": 0,
+      "sha256": "a430ecc08c50346f39f36217de416d73b4d348f44c8474c9799bed938a5cb7f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/Tester.class",
+      "occurrence": 0,
+      "sha256": "c284dbfe1a9aa20fcf1d3e135c2e08e14e5a235a069da0fd1083b1ed1765efa3",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/EaTestPositions.class",
+      "occurrence": 0,
+      "sha256": "03fd042f06d86a90a7599f90d262ad31f34a9904f7c191be02cc315acc2f443b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/GetInstalledExpertsResponse.class",
+      "occurrence": 0,
+      "sha256": "cdffc0875a01afb980b03eee88e6bae1a3678e130545e470429fff6a7dd9b596",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/net/tsapi/CheckMT4TerminalResponse.class",
+      "occurrence": 0,
+      "sha256": "2abb6bf358bea5a86cf3d89552914df18ecac98a3b63a7fdecbfe316bebec447",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/MT4TerminalConnection$UDPClientPacket.class",
+      "occurrence": 0,
+      "sha256": "8e1452c176800148a1cf9d5a6799c19318de5e728a7995d37e811365c2f77fd4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/MT4TerminalConnection.class",
+      "occurrence": 0,
+      "sha256": "bd0351f9dde1fa1ee1f6777e9bd405b595246368d7173b182b3618ac86d67be1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/PositionChangeInfo.class",
+      "occurrence": 0,
+      "sha256": "849cdb50c4da8aa53321565a40f73269b8789ed6a35be2abc366a376ac8ac61a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/PositionListener.class",
+      "occurrence": 0,
+      "sha256": "5d7cc59b69bd4b49d95a73c34514d1c1eaf6ba148fd3745812b2a4b0beb05cd1",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException.class",
+      "occurrence": 0,
+      "sha256": "3100ed8246a4b01b3b3da5a0edd60e6800af29718857688e2fa81b325df69c69",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/NJ4XNoConnectionToServerException.class",
+      "occurrence": 0,
+      "sha256": "002cb29bbdfe579f6a6f08afd6db96f01d256a190921fc721ff3232c0430e209",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/MT4DisconnectException.class",
+      "occurrence": 0,
+      "sha256": "22fc9bfcc5cda80f5088567d2de46901898551a1b4e0885823a1ecb5da5c36e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/MT4InprocessConnection.class",
+      "occurrence": 0,
+      "sha256": "10099ec53fd852ab9223d26bba9ea742feb49bfea94f9d24232c0b63ed5d30b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/BasicStrategyRunner$1.class",
+      "occurrence": 0,
+      "sha256": "362cb6907232f810683f9169b8390cfafd3084fd5002210d2ab9b7150a21520d",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/BasicStrategyRunner$2.class",
+      "occurrence": 0,
+      "sha256": "6127d5cfde4de2afab042d8a5e98894370bbc9f2db58ce92ece2bebb2af24daa",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/BasicStrategyRunner.class",
+      "occurrence": 0,
+      "sha256": "3c0726a98339177c722df6c59e0efcedfb1dc44bb80594d05a50fde4acd8fbff",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException.class",
+      "occurrence": 0,
+      "sha256": "5dc869c2389647b939b1b04606ca5f190493dcdd1284c530ebcea2a5896a7a0c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Dummy.class",
+      "occurrence": 0,
+      "sha256": "6b5cb7e982aa510827fc6979a22f4edb36feb34a618aed3fc27556643c3eb115",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/PositionInfo.class",
+      "occurrence": 0,
+      "sha256": "b201dbb49295ebdf17e31e3d8b9629c2bbae859ec66897827013625931f2e817",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/OrderInfo.class",
+      "occurrence": 0,
+      "sha256": "dacff93252380318c0bf0067ab37ce08c414e261054fd7e324b7c3aae4036978",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/StrategyRunner.class",
+      "occurrence": 0,
+      "sha256": "0261e5c7d79bb33930488ecb1830401c31f3601a492b6020a8e37751185701c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$1.class",
+      "occurrence": 0,
+      "sha256": "1a32f2e0abd951aa45bd7114ee916decc753e4522eb82421c0c0d67fe2fc72e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$2.class",
+      "occurrence": 0,
+      "sha256": "adfb47effc12d43f7ae49cc50cc57bfa1d48a314893643d82161e37070bc7582",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$3.class",
+      "occurrence": 0,
+      "sha256": "c33cf98fec5120cdfb67deb26962e568175d8493ab29f55fe4ae537c2de22327",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$BulkTickListener.class",
+      "occurrence": 0,
+      "sha256": "c9859ab4f2785d4314e040962bb0b3b5bfb28fa7421f70feebd8a76ac27e7536",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$Chart.class",
+      "occurrence": 0,
+      "sha256": "edb47a681d29372fd2191b40ffcc8e47c72f15ec080891a1e52e882e4d841183",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$HistoryPeriod.class",
+      "occurrence": 0,
+      "sha256": "700797a38f898fea158e7dc3140143448d08e4ddd525d9b79814e19d3fb32fb4",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$Instrument.class",
+      "occurrence": 0,
+      "sha256": "c90e8f43328b10cf678af7561f8c89989eb9cf3018213590d96def2cd3807bbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$Terminal.class",
+      "occurrence": 0,
+      "sha256": "4d09188dadf58606ba965be0250777f098c2db306019cb8e7d03ecfa07a87228",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/003.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalStrategy$1.class",
+      "occurrence": 0,
+      "sha256": "80b0cb2351ee7cffc4eba6334c4e37320b94a4944f0ae88a324e6e8e9c6394ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalStrategy.class",
+      "occurrence": 0,
+      "sha256": "0e0b597549ed0cf7fd5f6a535724aaf54060d3e2aab17fe08a619875c2156167",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalType.class",
+      "occurrence": 0,
+      "sha256": "15c54a7780bbed58fa5028eaf3d092d859cc634a7e56ee835f67a7a5cb9e2d13",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TickListener.class",
+      "occurrence": 0,
+      "sha256": "f4baf023fcd954a8682c74023df9e448b6ff30a801ffc447cc3112126e87bb7b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TickListenerChart.class",
+      "occurrence": 0,
+      "sha256": "d0410cb06e8fce75576ede94d76f59d796a81083033a455774ce194b7461ccd0",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TimerListener.class",
+      "occurrence": 0,
+      "sha256": "3dd8f69a3525e0a98324e948704411c5c39b43f7bb5190ff61343a15d45838ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy.class",
+      "occurrence": 0,
+      "sha256": "1676f4edc01d8f13762d12d0f0ed4227f031c9f6d5b8a33cdd650bd00ab991cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$1.class",
+      "occurrence": 0,
+      "sha256": "cb7b0bc679785cac59fc299dfb48d5bf3ee0625628abf800a1f6026e01134159",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$2.class",
+      "occurrence": 0,
+      "sha256": "b63dca015eae1700fb7c8a8342d27b3c5033d40990d05bdf741e541aa8da224b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$3.class",
+      "occurrence": 0,
+      "sha256": "b51a51dcf6bdf00d6cdd4044e3a2db00b2d35a9daa8f74a56b4b0cf05bb99967",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$ElementIterator.class",
+      "occurrence": 0,
+      "sha256": "e4c7fea03b5f000e602435ea4b2be80620875d45decdf00b1dd5a9d1c74b954b",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$NoElementIterator.class",
+      "occurrence": 0,
+      "sha256": "3ffe666c8a04f42b3750f94fd6534492ff9f83241816be825fe6fbef7a732a0c",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$NodeFilter.class",
+      "occurrence": 0,
+      "sha256": "63af8e399319ff638cc57ba160140e0c44bb61d8380cf3e0d0119b3c1fad174e",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$1.class",
+      "occurrence": 0,
+      "sha256": "404563c1cc7b263c19578f458332d6ae055eddb210a66f74e9a645008f3abec5",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2$1$1.class",
+      "occurrence": 0,
+      "sha256": "784fe0638683de059fc58e9b4a3c1cc83e0c53f05db70f8ccf2b7d35724bd368",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2$1.class",
+      "occurrence": 0,
+      "sha256": "112c50d7a62ed2cbc029382f9d2d76fbdfaf7ec69f843c43a6ecd7c2257bb9be",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2.class",
+      "occurrence": 0,
+      "sha256": "326789814d701c1ab9076bfdb7bee6b5852b77a54b8b47aae69ce9ab96f1e167",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument.class",
+      "occurrence": 0,
+      "sha256": "1568bea8636bb278cc0532e0f886c45d4bf096a5f5cc623ddac39b9334566ef7",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXNode.class",
+      "occurrence": 0,
+      "sha256": "fbc3caf4bf6c87f6df3a453f583d42976f554132d80aa0b6060c3d2c0fde159a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SiblingIterator.class",
+      "occurrence": 0,
+      "sha256": "95bc62eb3ad54973c43dc6a255bdb715ee5c026fa66f9d4d9ebe244d0b254a8a",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil.class",
+      "occurrence": 0,
+      "sha256": "bb13b5686f69ea4d4b1c34e3fbaedeebf91ebcc1d8cc73122eaa2b13e3b3f169",
+      "member_shard": "docs/dev/evidence/sqx145/members/056/004.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/056/001.json",
+      "sha256": "491e75e4c9b81c30108302325a4bfa1a882759b6ac04169d13f83c46d2564075"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/056/002.json",
+      "sha256": "9ef5d8f0f88a63aa37953fad5b7743c901c20c21420837f76f7e660a2b0a994e"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/056/003.json",
+      "sha256": "77afa2a31da82757c3e9eb919e3767fffa3addca457674096b87d3c9a5e561f8"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/056/004.json",
+      "sha256": "b4ff82f6a5c352d12791bbd98bf40cd704d25dbf93ac773863ec86c30dd5e018"
+    }
+  ]
+}

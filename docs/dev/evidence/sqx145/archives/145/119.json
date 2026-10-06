@@ -1,0 +1,74 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/WMI4Java-1.6.3.jar",
+  "sha256": "7b9955ac56dcef6731961588f037b56d3e27f36222a3ec4ead2cd315059eea72",
+  "class_count": 7,
+  "unique_class_entries": 7,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "com/profesorfalken/wmi4java/WMI4Java.class": "e5758501c9683f62e6db3f675d7192cb119fc4bc9446fcb03222f607c0c16f8b",
+    "com/profesorfalken/wmi4java/WMI4JavaUtil.class": "06c61d30f3ba2f940a98663547d505d89dd9955918e752376bc2fd05dac84dcd",
+    "com/profesorfalken/wmi4java/WMIClass.class": "2c1cec64a8a575b7162cde51c6a303ebdfb8240311f0f9e97760950ce8b5b8c8",
+    "com/profesorfalken/wmi4java/WMIException.class": "c46d6583f8f5d36cb3cf1927b443b69be1c209f7512ba9af2e6a75d4d060b39d",
+    "com/profesorfalken/wmi4java/WMIPowerShell.class": "d4cfd5b8d68cf429fae67b9e71493dab9f76c0761e4eef2ea7167604c577d052",
+    "com/profesorfalken/wmi4java/WMIStub.class": "f8c25030661f6cfa2f9828cbfd0211cdb92d1a06d6a822b447988bf0fb7680ae",
+    "com/profesorfalken/wmi4java/WMIVBScript.class": "41c0d2046c0735b12fbe99789b55f434e669de1d25d58e55badc51b20e0c42dd"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "0526b3742d42e95a839a47b6b841993938a5722a1187de7edb97efa2468b9bf7",
+    "META-INF/maven/com.profesorfalken/WMI4Java/pom.xml": "c16582f7d427d4ec4d1926bfc46d0163d9473853a5836f3c1e7841e59f13f272",
+    "META-INF/maven/com.profesorfalken/WMI4Java/pom.properties": "de4337b95f47f8f514f4a830c7f4b1e3a7fe56fa83c98aa2a3b5bd30c1529605"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/profesorfalken/wmi4java/WMI4Java.class",
+      "occurrence": 0,
+      "sha256": "e5758501c9683f62e6db3f675d7192cb119fc4bc9446fcb03222f607c0c16f8b",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMI4JavaUtil.class",
+      "occurrence": 0,
+      "sha256": "06c61d30f3ba2f940a98663547d505d89dd9955918e752376bc2fd05dac84dcd",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIClass.class",
+      "occurrence": 0,
+      "sha256": "2c1cec64a8a575b7162cde51c6a303ebdfb8240311f0f9e97760950ce8b5b8c8",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIException.class",
+      "occurrence": 0,
+      "sha256": "c46d6583f8f5d36cb3cf1927b443b69be1c209f7512ba9af2e6a75d4d060b39d",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIPowerShell.class",
+      "occurrence": 0,
+      "sha256": "d4cfd5b8d68cf429fae67b9e71493dab9f76c0761e4eef2ea7167604c577d052",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIStub.class",
+      "occurrence": 0,
+      "sha256": "f8c25030661f6cfa2f9828cbfd0211cdb92d1a06d6a822b447988bf0fb7680ae",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/wmi4java/WMIVBScript.class",
+      "occurrence": 0,
+      "sha256": "41c0d2046c0735b12fbe99789b55f434e669de1d25d58e55badc51b20e0c42dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/119/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/119/001.json",
+      "sha256": "3c4e5330344b6de168efbee654ecd3cd82c50c38bb9a10192529dddfb8470a11"
+    }
+  ]
+}

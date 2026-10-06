@@ -37,8 +37,8 @@ to another workspace. Its confirmation explicitly explains this boundary.
 
 ## Donor evidence and limitations
 
-Reference: `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/`, installed build
-144.2953. Source observations are paraphrased in the evidence ledger and task
+Reference: `SQX_145_REFERENCE_ROOT/internal/web/AlgoWizard/`, installed build
+145-dev1. Source observations are paraphrased in the evidence ledger and task
 interaction matrix. Vendor JavaScript, CSS, source archives and bitmap assets
 are not embedded. Charts are independently drawn SVG illustrations.
 
@@ -60,3 +60,7 @@ the new workspace does not invoke their legacy code generators.
 - Repository qualification commands prescribed by `AGENTS.md`.
 
 Evidence: `.agents/logs/2026-09-25T135524_algowizard-ui-parity/`.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

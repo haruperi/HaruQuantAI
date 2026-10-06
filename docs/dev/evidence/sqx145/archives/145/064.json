@@ -1,0 +1,109 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jProcesses-1.6.5.jar",
+  "sha256": "57f61d01102f0e88e87c4a3cae6ccea3e5b390a38aeb3abd2ed20b06f25466ea",
+  "class_count": 12,
+  "unique_class_entries": 12,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "org/jutils/jprocesses/info/AbstractProcessesService.class": "b09503673a03a31cf975053aa35c9977d128565ebfc6069dead43460247f05a3",
+    "org/jutils/jprocesses/info/ProcessesFactory.class": "492d4e41ec7d717afda2a14a9d8fe0489e9d81920d13ca31ae13a7d7a4bd9ab7",
+    "org/jutils/jprocesses/info/ProcessesService.class": "8a7c178a2b0b6ad70a6fb9ce94022343cad8fa4c6ef07d905debf14837d2bbd9",
+    "org/jutils/jprocesses/info/UnixProcessesService.class": "60f153107e9a2504795761713312746138d2dbfb318355d57910c1313df9bc82",
+    "org/jutils/jprocesses/info/VBScriptHelper.class": "1d22384bfc5f7009d227ebc58e8418eb9ad7df01d139f0863efcaf6c580b951b",
+    "org/jutils/jprocesses/info/WindowsProcessesService.class": "451668e6ab9be6305ea7781855448c9b9b31155f5a85fad391469635a8052264",
+    "org/jutils/jprocesses/JProcesses.class": "eba81a71ac4c02f93b9e5a2707c57a486e1bb7673ea27f5f4633f41734d5deb5",
+    "org/jutils/jprocesses/model/JProcessesResponse.class": "2c2489fd52f476f70f7d4eda6111845ee25ac2815f4cb7f577294df4ad1fda9e",
+    "org/jutils/jprocesses/model/ProcessInfo.class": "e8a4b692366d3432ca498b0017e8f4d9a6217fbaa20558cc29b8372f6804915f",
+    "org/jutils/jprocesses/model/WindowsPriority.class": "9d2093fea5897e53196d69c72e1ce5b67fc9cc848cae1fca08f4bcd8c4ac5f31",
+    "org/jutils/jprocesses/util/OSDetector.class": "10beb167d48abdd1238c1cb1dd29199e7bd90a735da510ef626d049aca62edfa",
+    "org/jutils/jprocesses/util/ProcessesUtils.class": "6ca2d87d0f4d02d9d2b7163a2415f32a946a975144db603a179c378daa31d08f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "0526b3742d42e95a839a47b6b841993938a5722a1187de7edb97efa2468b9bf7",
+    "META-INF/maven/org.jprocesses/jProcesses/pom.xml": "7216db3e8403ba4b2ac018f9389f4aeb1d2dbb8edde6a0fd3dd1dd49d62dbeb5",
+    "META-INF/maven/org.jprocesses/jProcesses/pom.properties": "41473510f4ea380e24b510fe545360425f9b4fda1a49f1af3290ef4b25248e4d"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/jutils/jprocesses/info/AbstractProcessesService.class",
+      "occurrence": 0,
+      "sha256": "b09503673a03a31cf975053aa35c9977d128565ebfc6069dead43460247f05a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/ProcessesFactory.class",
+      "occurrence": 0,
+      "sha256": "492d4e41ec7d717afda2a14a9d8fe0489e9d81920d13ca31ae13a7d7a4bd9ab7",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/ProcessesService.class",
+      "occurrence": 0,
+      "sha256": "8a7c178a2b0b6ad70a6fb9ce94022343cad8fa4c6ef07d905debf14837d2bbd9",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/UnixProcessesService.class",
+      "occurrence": 0,
+      "sha256": "60f153107e9a2504795761713312746138d2dbfb318355d57910c1313df9bc82",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/VBScriptHelper.class",
+      "occurrence": 0,
+      "sha256": "1d22384bfc5f7009d227ebc58e8418eb9ad7df01d139f0863efcaf6c580b951b",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/WindowsProcessesService.class",
+      "occurrence": 0,
+      "sha256": "451668e6ab9be6305ea7781855448c9b9b31155f5a85fad391469635a8052264",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/JProcesses.class",
+      "occurrence": 0,
+      "sha256": "eba81a71ac4c02f93b9e5a2707c57a486e1bb7673ea27f5f4633f41734d5deb5",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/JProcessesResponse.class",
+      "occurrence": 0,
+      "sha256": "2c2489fd52f476f70f7d4eda6111845ee25ac2815f4cb7f577294df4ad1fda9e",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/ProcessInfo.class",
+      "occurrence": 0,
+      "sha256": "e8a4b692366d3432ca498b0017e8f4d9a6217fbaa20558cc29b8372f6804915f",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/WindowsPriority.class",
+      "occurrence": 0,
+      "sha256": "9d2093fea5897e53196d69c72e1ce5b67fc9cc848cae1fca08f4bcd8c4ac5f31",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/util/OSDetector.class",
+      "occurrence": 0,
+      "sha256": "10beb167d48abdd1238c1cb1dd29199e7bd90a735da510ef626d049aca62edfa",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    },
+    {
+      "entry": "org/jutils/jprocesses/util/ProcessesUtils.class",
+      "occurrence": 0,
+      "sha256": "6ca2d87d0f4d02d9d2b7163a2415f32a946a975144db603a179c378daa31d08f",
+      "member_shard": "docs/dev/evidence/sqx145/members/064/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/064/001.json",
+      "sha256": "2e9e243f97c2bd7295cbdf0bfea7ebe7443c1362a591c127d03156a6a5d1ae91"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+  "sha256": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a",
+  "class_count": 8,
+  "unique_class_entries": 8,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager.class": "97470a2a453608579d7a9ec459982e388c8ebf0a9e971a5211930514f6565cc9",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexPlugin.class": "41192c4977d340fa6f76470d586363fa1f32e004e6d2f41cb98ac676acf1a59a",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1.class": "144d51a61a284ed1182e1fd968ff94fa894a65de8b38e876eb41fc0bceb37116",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2.class": "73d1a06e3b6983b7a1eeaddf36a610f99b7fca93c0f784eecb210c858013bbd3",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3.class": "3250c96d9be64712f94e475365e252cc0bca4bd74c4c60f365cec25af721e68a",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet.class": "6f948c5c19f4807b4dd8d1c74a1745db063b0ee6eaf98294633275801b949d82",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport.class": "1577c9e0e3e077d7aadad4f558936e2753be69d91d8d2bc148bc8ce7e336a838",
+    "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob.class": "c1035fce0d7b9a5610dbe4293236910c991914cc9f6845d2e5ccb5a9bb059652"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager.class",
+      "occurrence": 0,
+      "sha256": "97470a2a453608579d7a9ec459982e388c8ebf0a9e971a5211930514f6565cc9",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexPlugin.class",
+      "occurrence": 0,
+      "sha256": "41192c4977d340fa6f76470d586363fa1f32e004e6d2f41cb98ac676acf1a59a",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$1.class",
+      "occurrence": 0,
+      "sha256": "144d51a61a284ed1182e1fd968ff94fa894a65de8b38e876eb41fc0bceb37116",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$2.class",
+      "occurrence": 0,
+      "sha256": "73d1a06e3b6983b7a1eeaddf36a610f99b7fca93c0f784eecb210c858013bbd3",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet$3.class",
+      "occurrence": 0,
+      "sha256": "3250c96d9be64712f94e475365e252cc0bca4bd74c4c60f365cec25af721e68a",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet.class",
+      "occurrence": 0,
+      "sha256": "6f948c5c19f4807b4dd8d1c74a1745db063b0ee6eaf98294633275801b949d82",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImport.class",
+      "occurrence": 0,
+      "sha256": "1577c9e0e3e077d7aadad4f558936e2753be69d91d8d2bc148bc8ce7e336a838",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob.class",
+      "occurrence": 0,
+      "sha256": "c1035fce0d7b9a5610dbe4293236910c991914cc9f6845d2e5ccb5a9bb059652",
+      "member_shard": "docs/dev/evidence/sqx145/members/174/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/174/001.json",
+      "sha256": "3b40be0706a651802e30811eb82ed20c657807ad78879a4118a7ed03362bf25c"
+    }
+  ]
+}

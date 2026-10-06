@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/httpclient-cache-4.5.13.jar",
+  "archive_sha256": "66cefdee7475985256af680bf3ae7cd5d7d42e8fdeb939a6277922e1bdeed43a",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/http/impl/client/cache/memcached/MemcachedOperationTimeoutException.class",
+      "occurrence": 0,
+      "sha256": "16a92c5fe9e44b0225ba2f728883a466f9d0831cf7ed2347399e90e917ecb248",
+      "name": "org/apache/http/impl/client/cache/memcached/MemcachedOperationTimeoutException",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/IOException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cf5e86caa363b7f0189af8c92bce93427bec5ea9c9d283732fada089786b8258",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Throwable",
+        "org/apache/http/impl/client/cache/memcached/MemcachedOperationTimeoutException"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/client/cache/HeapResource.class",
+      "occurrence": 0,
+      "sha256": "36239fca64a5d01a16142ee2974a092e9de380bee239759495faaf10b1c7fa69",
+      "name": "org/apache/http/impl/client/cache/HeapResource",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/client/cache/Resource"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "b",
+          "descriptor": "[B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getByteArray",
+          "descriptor": "()[B",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "538c577bc221b9f020067923cd742439524615345186e6eba4a296c5c3e0a1fe",
+          "code_length": 12
+        },
+        {
+          "name": "length",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c8468dc030af6fc99d40f340980139a08db4f0cc62d230ecb701b63c8a951e04",
+          "code_length": 7
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayInputStream",
+        "java/lang/Object",
+        "org/apache/http/client/cache/Resource",
+        "org/apache/http/impl/client/cache/HeapResource"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/client/cache/AsynchronousValidationRequest.class",
+      "occurrence": 0,
+      "sha256": "3044642c303acbcadacdb3c57beb5fff0c37d82ccc727bcf9079f74595d17c64",
+      "name": "org/apache/http/impl/client/cache/AsynchronousValidationRequest",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "parent",
+          "descriptor": "Lorg/apache/http/impl/client/cache/AsynchronousValidator;",
+          "access": 18
+        },
+        {
+          "name": "cachingExec",
+          "descriptor": "Lorg/apache/http/impl/client/cache/CachingExec;",
+          "access": 18
+        },
+        {
+          "name": "route",
+          "descriptor": "Lorg/apache/http/conn/routing/HttpRoute;",
+          "access": 18
+        },
+        {
+          "name": "request",
+          "descriptor": "Lorg/apache/http/client/methods/HttpRequestWrapper;",
+          "access": 18
+        },
+        {
+          "name": "context",
+          "descriptor": "Lorg/apache/http/client/protocol/HttpClientContext;",
+          "access": 18
+        },
+        {
+          "name": "execAware",
+          "descriptor": "Lorg/apache/http/client/methods/HttpExecutionAware;",
+          "access": 18
+        },
+        {
+          "name": "cacheEntry",
+          "descriptor": "Lorg/apache/http/client/cache/HttpCacheEntry;",
+          "access": 18
+        },
+        {
+          "name": "identifier",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "consecutiveFailedAttempts",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "log",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/impl/client/cache/AsynchronousValidator;Lorg/apache/http/impl/client/cache/CachingExec;Lorg/apache/http/conn/routing/HttpRoute;Lorg/apache/http/client/methods/HttpRequestWrapper;Lorg/apache/http/client/protocol/HttpClientContext;Lorg/apache/http/client/methods/HttpExecutionAware;Lorg/apache/http/client/cache/HttpCacheEntry;Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "7decc438849dad5a9ceb8244a507cb7bec7442a8dae31089bb56b06917f5af97",
+          "code_length": 67
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "76e104e38c682775ea944cd6d622e96ff048129026d4b0fc7a10a0f638be6e1b",
+          "code_length": 61
+        },
+        {
+          "name": "revalidateCacheEntry",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "d9f601bcbb66adf80fe95ed5a5eba6e55b117ad28cd113f6f8327de1853b63be",
+          "code_length": 142
+        },
+        {
+          "name": "isNotServerError",
+          "descriptor": "(I)Z",
+          "access": 2,
+          "code_sha256": "3c4d3daa0340f633d6ac53d8667c9f17583924ddd27ec454f76038e5ee688b83",
+          "code_length": 13
+        },
+        {
+          "name": "isNotStale",
+          "descriptor": "(Lorg/apache/http/HttpResponse;)Z",
+          "access": 2,
+          "code_sha256": "dabe0fdaf1ff827721f4ea735a2121097b47e1848c02b9f8782da52854c3015e",
+          "code_length": 74
+        },
+        {
+          "name": "getIdentifier",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "getConsecutiveFailedAttempts",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/http/Header;",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "org/apache/commons/logging/Log",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/http/Header",
+        "org/apache/http/HttpException",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/StatusLine",
+        "org/apache/http/client/methods/CloseableHttpResponse",
+        "org/apache/http/impl/client/cache/AsynchronousValidationRequest",
+        "org/apache/http/impl/client/cache/AsynchronousValidator",
+        "org/apache/http/impl/client/cache/CachingExec"
+      ]
+    }
+  ]
+}

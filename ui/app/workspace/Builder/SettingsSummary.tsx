@@ -10,8 +10,8 @@ import {
 } from './fixtures';
 
 /**
- * SQX-parity "Settings summary" column of the Builder Progress tab (donor
- * evidence SQX144-EV-000036): the predefined-config dropdown, the Data
+ * SQX-style "Settings summary" column of the Builder Progress tab (donor
+ * evidence retained target UI; current donor equivalence unverified): the predefined-config dropdown, the Data
  * rows, the Build options rows (click opens Full settings), and the cross
  * checks switch tree with Disable all. All values are demo fixture truth.
  */

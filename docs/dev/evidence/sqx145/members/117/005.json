@@ -1,0 +1,1878 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/weblaf-core-1.2.9.jar",
+  "archive_sha256": "4628977369f5510bffdbec811866241e3e218893386c34610e3a21bf93adb99f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/alee/utils/ZipUtils.class",
+      "occurrence": 0,
+      "sha256": "9d804ac1d1505c193fa7e73473c452f65f86d05d926a3cc294166aa856b03842",
+      "name": "com/alee/utils/ZipUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "unzip",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "ce08f7fc8d15ec9fc02551ed2fe2a38ed0b7b006d5d6f1e2d846eb1bfc4f70c4",
+          "code_length": 7
+        },
+        {
+          "name": "unzip",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/alee/utils/zip/UnzipListener;)Z",
+          "access": 9,
+          "code_sha256": "4a9cef5b09644d9394171ecb5fe3490b21631209baf23a1d3eb56fbab006011b",
+          "code_length": 21
+        },
+        {
+          "name": "unzip",
+          "descriptor": "(Ljava/io/File;Ljava/io/File;)Z",
+          "access": 9,
+          "code_sha256": "51322a585da3743cecffb8fd91b007c9f8d09fd52839017d64df2bae6444c03b",
+          "code_length": 7
+        },
+        {
+          "name": "unzip",
+          "descriptor": "(Ljava/io/File;Ljava/io/File;Lcom/alee/utils/zip/UnzipListener;)Z",
+          "access": 9,
+          "code_sha256": "22de186bdcffab5a4627fa41e7f14d5a90d27af6840275bc898e4e1e65c97b99",
+          "code_length": 187
+        },
+        {
+          "name": "getZipEntryFileName",
+          "descriptor": "(Ljava/util/zip/ZipEntry;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4df9367e1fa40112e536691012ada6b07d046a55f1cde06cbd44ad319fcedd50",
+          "code_length": 18
+        },
+        {
+          "name": "getZipEntryFileLocation",
+          "descriptor": "(Ljava/util/zip/ZipEntry;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "37c181a73e4bf0bac84ed47f38497dda7242bb9366d1be6f81862f185fe53ae1",
+          "code_length": 19
+        },
+        {
+          "name": "copyInputStream",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)V",
+          "access": 10,
+          "code_sha256": "398544704229c1c5f6375929357242148eee9d75a83130d4eb9cb887b840cd33",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/alee/utils/FileUtils",
+        "com/alee/utils/UtilityException",
+        "com/alee/utils/ZipUtils",
+        "com/alee/utils/zip/UnzipListener",
+        "java/io/BufferedOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Enumeration",
+        "java/util/zip/ZipEntry",
+        "java/util/zip/ZipFile",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/MiscComposite.class",
+      "occurrence": 0,
+      "sha256": "2adfa2d04dd024eac462a0e135111ddea0eac1dcd734c6863913679d4e97ea10",
+      "name": "com/alee/graphics/filters/MiscComposite",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/Composite"
+      ],
+      "fields": [
+        {
+          "name": "BLEND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ADD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SUBTRACT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIFFERENCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MULTIPLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DARKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BURN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR_BURN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SCREEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LIGHTEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DODGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR_DODGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SATURATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OVERLAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SOFT_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HARD_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIN_LIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EXCLUSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NEGATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "AVERAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STENCIL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SILHOUETTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MIN_RULE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MAX_RULE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "RULE_NAMES",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 9
+        },
+        {
+          "name": "extraAlpha",
+          "descriptor": "F",
+          "access": 4
+        },
+        {
+          "name": "rule",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "cf2009095e5938f0e76666691c6121b24447afdbe0e5d45b3b490f1c56536b27",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IF)V",
+          "access": 2,
+          "code_sha256": "3d24a633477af52140025b7680e49a58963b2b9b0ab1ebd47d1d21cd7d05875c",
+          "code_length": 57
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(IF)Ljava/awt/Composite;",
+          "access": 9,
+          "code_sha256": "a00830e8f4936215d505c370ce597646457ae17d7b13ea21ac7c49ffd6838d26",
+          "code_length": 66
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/image/ColorModel;Ljava/awt/RenderingHints;)Ljava/awt/CompositeContext;",
+          "access": 1,
+          "code_sha256": "fbd11ef5fc34c665d93f2153a3c4daeb069e2fe5210e73231ab0a311e1ccd3bc",
+          "code_length": 18
+        },
+        {
+          "name": "getAlpha",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "77cbcb4925d5ffb95ed02674707e926d149b7482d28d3f75fa640866b1ed05ee",
+          "code_length": 5
+        },
+        {
+          "name": "getRule",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95b489b5b8102c6c61f198f05faa80c5b0abc40ef4a812f7feb048973fbe94f9",
+          "code_length": 16
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "60a508e905d6bf92d704b58f2e391f96aadfdbe6de8e3ab43002186687499098",
+          "code_length": 43
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0e1633a7eb62b370d7058686e38674c61280b719ca562593dd4ebc1379f0d73f",
+          "code_length": 153
+        }
+      ],
+      "class_references": [
+        "com/alee/graphics/filters/MiscComposite",
+        "com/alee/graphics/filters/MiscCompositeContext",
+        "java/awt/AlphaComposite",
+        "java/awt/Composite",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/MiscCompositeContext.class",
+      "occurrence": 0,
+      "sha256": "e9a0e27fdc02600f5d627d427e2ddf2a51b839f0ade9972f1b5cfe74ffcaf70b",
+      "name": "com/alee/graphics/filters/MiscCompositeContext",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/CompositeContext"
+      ],
+      "fields": [
+        {
+          "name": "rule",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "alpha",
+          "descriptor": "F",
+          "access": 18
+        },
+        {
+          "name": "srcColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 18
+        },
+        {
+          "name": "dstColorModel",
+          "descriptor": "Ljava/awt/image/ColorModel;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IFLjava/awt/image/ColorModel;Ljava/awt/image/ColorModel;)V",
+          "access": 1,
+          "code_sha256": "49aa9d41464e0c35a03724d7f8f56d6f81e193a45bddcec0bd6fa28f5898732d",
+          "code_length": 26
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "multiply255",
+          "descriptor": "(II)I",
+          "access": 8,
+          "code_sha256": "17c721766a2e2042ecd19f5a5ae8f1035180fc12111f4b1db86cc23ebb9af8f3",
+          "code_length": 18
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "224146c6bdcf09d83b647535b91526810a1660559e821abfcc38f9d95c558dbd",
+          "code_length": 23
+        },
+        {
+          "name": "compose",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;)V",
+          "access": 1,
+          "code_sha256": "0e1335ca5b9c075893b62d47aca262d8b724b1c268c0a63756f36c061e659c72",
+          "code_length": 2214
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[I",
+        "com/alee/graphics/filters/MiscCompositeContext",
+        "java/awt/Color",
+        "java/awt/CompositeContext",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/lang/Math",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/GrayscaleFilter.class",
+      "occurrence": 0,
+      "sha256": "2973ca27885b1c9f0a3613ecd56bcae78fb80ca02c7200db218858b015f2a02f",
+      "name": "com/alee/graphics/filters/GrayscaleFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/graphics/filters/PointFilter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6dfd9151d175f6d5c847bc8793d934584313c3e490b1150ae2f2310696f99a96",
+          "code_length": 10
+        },
+        {
+          "name": "filterRGB",
+          "descriptor": "(III)I",
+          "access": 1,
+          "code_sha256": "c216dcfacb29aa02cd1604d9f80288ba5accbcff2537a3ed673abea037a16467",
+          "code_length": 70
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c9cdc1d4e77197d79563e1ed9ee90789a892e4d5f35b7c42afe23ed087b4f220",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/alee/graphics/filters/GrayscaleFilter",
+        "com/alee/graphics/filters/PointFilter"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/ReduceNoiseFilter.class",
+      "occurrence": 0,
+      "sha256": "1baa8e9a6bbd80ab4268843247aca95ee97883b4788a8ec2f09a1b04fd12285b",
+      "name": "com/alee/graphics/filters/ReduceNoiseFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/graphics/filters/WholeImageFilter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "smooth",
+          "descriptor": "([I)I",
+          "access": 2,
+          "code_sha256": "73601010fd03670ec1328686929098ddde3381d5d853ef26fe68280b116e4f65",
+          "code_length": 98
+        },
+        {
+          "name": "filterPixels",
+          "descriptor": "(II[ILjava/awt/Rectangle;)[I",
+          "access": 4,
+          "code_sha256": "ef15ddaea11c208b54146bea2538e6acdbb60c350f77dffaa4f9afef352c5e92",
+          "code_length": 333
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/alee/graphics/filters/ReduceNoiseFilter",
+        "com/alee/graphics/filters/WholeImageFilter",
+        "java/awt/Rectangle",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/ImageMath.class",
+      "occurrence": 0,
+      "sha256": "8c75743b3e5a69cd4972ea87738d10d37feb73cbfd238f9b02fa7536e90c373c",
+      "name": "com/alee/graphics/filters/ImageMath",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PI",
+          "descriptor": "F",
+          "access": 25
+        },
+        {
+          "name": "HALF_PI",
+          "descriptor": "F",
+          "access": 25
+        },
+        {
+          "name": "QUARTER_PI",
+          "descriptor": "F",
+          "access": 25
+        },
+        {
+          "name": "TWO_PI",
+          "descriptor": "F",
+          "access": 25
+        },
+        {
+          "name": "m00",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m01",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m02",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m03",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m10",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m11",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m12",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m13",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m20",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m21",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m22",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m23",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m30",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m31",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m32",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "m33",
+          "descriptor": "F",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "bias",
+          "descriptor": "(FF)F",
+          "access": 9,
+          "code_sha256": "95025c9218cfbbac23a6c8bacf6e9281bd1e48567d99f7c29eaf40904101770b",
+          "code_length": 14
+        },
+        {
+          "name": "gain",
+          "descriptor": "(FF)F",
+          "access": 9,
+          "code_sha256": "5fe88fe1519582156a003468a7879e848cf68aaa8cf2dd0f8a46c284f7369365",
+          "code_length": 35
+        },
+        {
+          "name": "step",
+          "descriptor": "(FF)F",
+          "access": 9,
+          "code_sha256": "24407f729b8e6ef9fcb832815b3a35ace79da06c4d77032740c9a63225de98a8",
+          "code_length": 12
+        },
+        {
+          "name": "pulse",
+          "descriptor": "(FFF)F",
+          "access": 9,
+          "code_sha256": "8b7a7b2824e9c76ccaf2817d0e9b79c7a402b04c51fb3316604130269bf0f198",
+          "code_length": 18
+        },
+        {
+          "name": "smoothPulse",
+          "descriptor": "(FFFFF)F",
+          "access": 9,
+          "code_sha256": "7ece84a6f6412e127b036188de576c17516e100c1675bbcbfd87e099b69d1cf8",
+          "code_length": 82
+        },
+        {
+          "name": "smoothStep",
+          "descriptor": "(FFF)F",
+          "access": 9,
+          "code_sha256": "5f233b5eadba4fb982378bf02b2a446a5944c280fa5573a3e549801ecb815139",
+          "code_length": 35
+        },
+        {
+          "name": "circleUp",
+          "descriptor": "(F)F",
+          "access": 9,
+          "code_sha256": "28aae2ef20dfc7d336489837d58424fac27eaa251a0497de4e5eaba4ba9e9395",
+          "code_length": 15
+        },
+        {
+          "name": "circleDown",
+          "descriptor": "(F)F",
+          "access": 9,
+          "code_sha256": "a3d990e2674bbea22261d611ea2e623df46f1053bb9c99c4b839df1042056501",
+          "code_length": 13
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(FFF)F",
+          "access": 9,
+          "code_sha256": "ab575937281bc0a876b0990b80d106c4f188712e4a6980945b1c210a94c19b99",
+          "code_length": 22
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(III)I",
+          "access": 9,
+          "code_sha256": "5584199deb83538088bb3f150a86e07fea45f0dd598359e14db79a39d7c1071a",
+          "code_length": 20
+        },
+        {
+          "name": "mod",
+          "descriptor": "(DD)D",
+          "access": 9,
+          "code_sha256": "7921d46b9c8201d6a5b3399dded78b55f2fe159ba8aef8ae80b2a405f6447b0e",
+          "code_length": 26
+        },
+        {
+          "name": "mod",
+          "descriptor": "(FF)F",
+          "access": 9,
+          "code_sha256": "fac9198a6bf99e5e298f4f7f7a7b9827f417d85d79f5af7e1e648db13fe80405",
+          "code_length": 24
+        },
+        {
+          "name": "mod",
+          "descriptor": "(II)I",
+          "access": 9,
+          "code_sha256": "6a458e7a42ee143b229a7ddb92336065c351dea3096f2813b95a1331d11f61ae",
+          "code_length": 20
+        },
+        {
+          "name": "triangle",
+          "descriptor": "(F)F",
+          "access": 9,
+          "code_sha256": "1370d20d11c146488879758b3d389b5f7cfab0599b5adeb05e0958fd71ff3a29",
+          "code_length": 25
+        },
+        {
+          "name": "lerp",
+          "descriptor": "(FFF)F",
+          "access": 9,
+          "code_sha256": "f0b57605b7b81984703baebf9f640645d92e576fc8b9b7b0096419a0f27eb5ea",
+          "code_length": 8
+        },
+        {
+          "name": "lerp",
+          "descriptor": "(FII)I",
+          "access": 9,
+          "code_sha256": "4e5e930d31d55c6a82670688b56c8801f4e73bddf97d8e5046c39608120c9160",
+          "code_length": 11
+        },
+        {
+          "name": "mixColors",
+          "descriptor": "(FII)I",
+          "access": 9,
+          "code_sha256": "610ef9279d8cc93da60ba2bc516476364e13bb047dbc5bd30416a73f93ecd1f6",
+          "code_length": 131
+        },
+        {
+          "name": "bilinearInterpolate",
+          "descriptor": "(FF[I)I",
+          "access": 9,
+          "code_sha256": "c0e0ff62f00a8f17cd4265976acd147926b440b4629a2353ea8ffc67d51d5d5e",
+          "code_length": 367
+        },
+        {
+          "name": "brightnessNTSC",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "ef0fe875eb1ec150dab49e03aa9d01878703162c9ea4f365153b07ecdfa12e34",
+          "code_length": 43
+        },
+        {
+          "name": "spline",
+          "descriptor": "(FI[F)F",
+          "access": 9,
+          "code_sha256": "c9d079f86701e04d6133f6690a977c7e48a13e06250c03af16394be452b52f38",
+          "code_length": 187
+        },
+        {
+          "name": "spline",
+          "descriptor": "(FI[I[I)F",
+          "access": 9,
+          "code_sha256": "5c9156dddfa0fff27458d149e6e0686a847e5c1e7b51d2c63d121eedc35e9f8d",
+          "code_length": 248
+        },
+        {
+          "name": "colorSpline",
+          "descriptor": "(FI[I)I",
+          "access": 9,
+          "code_sha256": "cb2118efe28da5300ae13ba60579e25ad4c4a9a8707b9d924e9b37422fc7fd3a",
+          "code_length": 283
+        },
+        {
+          "name": "colorSpline",
+          "descriptor": "(II[I[I)I",
+          "access": 9,
+          "code_sha256": "80d8b053574798f4fc402f7e5a48bb8f79f8fb8bdead540dbb036e8d6085f0be",
+          "code_length": 338
+        },
+        {
+          "name": "resample",
+          "descriptor": "([I[IIII[F)V",
+          "access": 9,
+          "code_sha256": "72ede0427a5f8e6ed0c1d20a2fb03758d690ae7f9788c2c202444312ee968fb4",
+          "code_length": 590
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[I",
+        "com/alee/graphics/filters/ImageMath",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/PointFilter.class",
+      "occurrence": 0,
+      "sha256": "7705fc59d4f4786d357aff3c8423650da0ea7f79fb93b7fca558c2779b77629c",
+      "name": "com/alee/graphics/filters/PointFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/graphics/filters/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "canFilterIndexColorModel",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "937aaf4bc2a41b713d3a63a534dac82f8ab777f70ad197a3a68d03d64c2cae68",
+          "code_length": 197
+        },
+        {
+          "name": "setDimensions",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "filterRGB",
+          "descriptor": "(III)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/alee/graphics/filters/AbstractBufferedImageOp",
+        "com/alee/graphics/filters/PointFilter",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/WritableRaster"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/ConvolveFilter.class",
+      "occurrence": 0,
+      "sha256": "59e3181c0604e38fd3f9637f916828a4eed464881b47282d2caf078213f1cc44",
+      "name": "com/alee/graphics/filters/ConvolveFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/graphics/filters/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZERO_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "CLAMP_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "WRAP_EDGES",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "kernel",
+          "descriptor": "Ljava/awt/image/Kernel;",
+          "access": 4
+        },
+        {
+          "name": "alpha",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "edgeAction",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dbb7c1081126a83321e29bfdf33d298545d0dc63581ec432baf785d19a43d6c2",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([F)V",
+          "access": 1,
+          "code_sha256": "f22eda9500430ba14195492deb9ab87367053b57240325c5903ae1804a3bd5ad",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II[F)V",
+          "access": 1,
+          "code_sha256": "1e41e95a987a800a63fcfaf2b7e0b65036137cb2a0cf1f2bc538aeeeba241350",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/Kernel;)V",
+          "access": 1,
+          "code_sha256": "cdf1746a22a8b22960631a68dc995e01d58f0d58e8a72b897d1a23b38fae04d5",
+          "code_length": 27
+        },
+        {
+          "name": "setKernel",
+          "descriptor": "(Ljava/awt/image/Kernel;)V",
+          "access": 1,
+          "code_sha256": "48fb720aa2a9b68dfbb952c6e9e11d36348ceb48bf0fec91e3294ba5ac037a6d",
+          "code_length": 6
+        },
+        {
+          "name": "getKernel",
+          "descriptor": "()Ljava/awt/image/Kernel;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "setEdgeAction",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c7062452efbc8119e6431ccc80d9a89050da832ed7c1ec8d596b49a13c3326c6",
+          "code_length": 6
+        },
+        {
+          "name": "getEdgeAction",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "c9f729ee751fe63c409a2d20c279d3eb01af728be7b2dfa5a6c1cb991f57b30a",
+          "code_length": 87
+        },
+        {
+          "name": "createCompatibleDestImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/ColorModel;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "51a10dc4f684d3220b8a77540bdda5bac3fc272501ab539430deeaeb57f44f75",
+          "code_length": 35
+        },
+        {
+          "name": "getBounds2D",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "9b80d4df90dcb69ba9b67b484fda689438611e99a4480e336362342b62602cd1",
+          "code_length": 18
+        },
+        {
+          "name": "getPoint2D",
+          "descriptor": "(Ljava/awt/geom/Point2D;Ljava/awt/geom/Point2D;)Ljava/awt/geom/Point2D;",
+          "access": 1,
+          "code_sha256": "3130614b1631d3c9607a9943ddcc795cdd653ccee879b5c8052a4c4173cc8aa7",
+          "code_length": 26
+        },
+        {
+          "name": "getRenderingHints",
+          "descriptor": "()Ljava/awt/RenderingHints;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "convolve",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIII)V",
+          "access": 9,
+          "code_sha256": "57f4444605c80197257bd82ad0178e8a4b96d7d1358464399a61422350723bfd",
+          "code_length": 13
+        },
+        {
+          "name": "convolve",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "ad0d3abb5e48fbe64f0227a0b57616c37948c911d8d71c3157d083099ba8e15c",
+          "code_length": 62
+        },
+        {
+          "name": "convolveHV",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "ee17324bcdddc258f4f01db2605039e453ebe5f5d2a899d4845e787cc459c96f",
+          "code_length": 428
+        },
+        {
+          "name": "convolveH",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "d7e3f2287a8e0b364333cf65149e2cdbe8cd08dbd6a3f856e50005d5b8e16899",
+          "code_length": 358
+        },
+        {
+          "name": "convolveV",
+          "descriptor": "(Ljava/awt/image/Kernel;[I[IIIZI)V",
+          "access": 9,
+          "code_sha256": "f1359b5c4b61160fc1d8217c779e893e2cf4badd3a0b0a5026917239581096e4",
+          "code_length": 391
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0fdf773bf4e35c2ab0ce459ba891187721b713ffc970f62282d139109c2f102a",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[I",
+        "com/alee/graphics/filters/AbstractBufferedImageOp",
+        "com/alee/graphics/filters/ConvolveFilter",
+        "com/alee/graphics/filters/PixelUtils",
+        "java/awt/Rectangle",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/awt/image/Kernel"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/CompoundFilter.class",
+      "occurrence": 0,
+      "sha256": "25bb724eac592e300b416768dc0ff2158ac8dcd2a652f667108573e1e323990a",
+      "name": "com/alee/graphics/filters/CompoundFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/graphics/filters/AbstractBufferedImageOp",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "filter1",
+          "descriptor": "Ljava/awt/image/BufferedImageOp;",
+          "access": 18
+        },
+        {
+          "name": "filter2",
+          "descriptor": "Ljava/awt/image/BufferedImageOp;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImageOp;Ljava/awt/image/BufferedImageOp;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "8d43d311c63a2d4ae12e991336dd6d6f832a8c405469894c95b9c1f400eb1659",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/alee/graphics/filters/AbstractBufferedImageOp",
+        "com/alee/graphics/filters/CompoundFilter",
+        "java/awt/image/BufferedImageOp"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/filters/PixelUtils.class",
+      "occurrence": 0,
+      "sha256": "d525249d6ce2d10e36913d575c37b81ff9fbfb14b09595d24ae11d0ffdf9ae49",
+      "name": "com/alee/graphics/filters/PixelUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "REPLACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NORMAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MIN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ADD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SUBTRACT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIFFERENCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MULTIPLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SATURATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COLOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SCREEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "AVERAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OVERLAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLEAR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EXCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISSOLVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DST_IN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ALPHA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ALPHA_TO_GRAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "hsb1",
+          "descriptor": "[F",
+          "access": 26
+        },
+        {
+          "name": "hsb2",
+          "descriptor": "[F",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "clamp",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "c8c8c2f68f90ab2ee2028da77d91e0a3976d0ddbe5edf864be2f0daf812b5244",
+          "code_length": 19
+        },
+        {
+          "name": "interpolate",
+          "descriptor": "(IIF)I",
+          "access": 9,
+          "code_sha256": "53c05dce061a8c5fb4b5ebb0769a7cf717c8e69c3b35638534ff62f32cd0e71c",
+          "code_length": 14
+        },
+        {
+          "name": "brightness",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "0b7c2250ae7e717ce6a3dea7bd3ec1af87149e623e078432a109397e81499f2f",
+          "code_length": 32
+        },
+        {
+          "name": "nearColors",
+          "descriptor": "(III)Z",
+          "access": 9,
+          "code_sha256": "c1661a443e031484e11ebc6f3df6879d5477794e06a3f23763866d1e86666c99",
+          "code_length": 94
+        },
+        {
+          "name": "combinePixels",
+          "descriptor": "(III)I",
+          "access": 9,
+          "code_sha256": "cd9167959cc3296f1e24318d5f8ecc9c41cacec4f6e9f82836c1723bca285c43",
+          "code_length": 10
+        },
+        {
+          "name": "combinePixels",
+          "descriptor": "(IIIII)I",
+          "access": 9,
+          "code_sha256": "7cfc1f034ffbdecf5d8da1651c6996be9fec282ce752956b70cba1884236c611",
+          "code_length": 18
+        },
+        {
+          "name": "combinePixels",
+          "descriptor": "(IIII)I",
+          "access": 9,
+          "code_sha256": "8b4d3979db739538c2bb5b63de0767058341aab53a3599baf9d75b74c097d3a7",
+          "code_length": 1139
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "97377458d2bcf7a40f2e4947d368bd9d2cd3524d1045a1cafe8fc715de883395",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/alee/graphics/filters/PixelUtils",
+        "com/alee/utils/MathUtils",
+        "java/awt/Color",
+        "java/lang/Math",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/graphics/shapes/StarPolygon.class",
+      "occurrence": 0,
+      "sha256": "d49ad865de5cebeb10f599bc367cd4a369216bacbd07ea8d58648d741d95664c",
+      "name": "com/alee/graphics/shapes/StarPolygon",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/Polygon",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IIIII)V",
+          "access": 1,
+          "code_sha256": "660b8fb8338353b8d898dfce4e59570f08503d5fa83915adbfefa593bdf10f8d",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIIIID)V",
+          "access": 1,
+          "code_sha256": "2e20968b55c490fa4efac9d5f19c8682c5e30aa07057aaede426ad9bdea377a6",
+          "code_length": 33
+        },
+        {
+          "name": "getXCoordinates",
+          "descriptor": "(IIIIID)[I",
+          "access": 12,
+          "code_sha256": "846f97a21159c78c859b3c6ddf34a928c726d3ab9bb4aabc494200a73f971750",
+          "code_length": 110
+        },
+        {
+          "name": "getYCoordinates",
+          "descriptor": "(IIIIID)[I",
+          "access": 12,
+          "code_sha256": "3a14fdd201ed6c28568e1e91b358a73c056480b23d482462e79d7ed7ecb32e2d",
+          "code_length": 110
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/alee/graphics/shapes/StarPolygon",
+        "java/awt/Polygon",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/alee/api/jdk/UnsafeSupplier.class",
+      "occurrence": 0,
+      "sha256": "2077bf1db2bb5b239ce87af712f2da928532b3a8d389ba94ee13be71b5118a5f",
+      "name": "com/alee/api/jdk/UnsafeSupplier",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "com/alee/api/jdk/UnsafeSupplier",
+        "java/lang/Exception",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/jdk/SerializableSupplier.class",
+      "occurrence": 0,
+      "sha256": "fc36daa6d66accd49e914d6b9f38b62ca0b336b7802f20e2f93a0113be05f2d9",
+      "name": "com/alee/api/jdk/SerializableSupplier",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier",
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<TT;>;Ljava/io/Serializable;",
+      "class_references": [
+        "com/alee/api/jdk/SerializableSupplier",
+        "com/alee/api/jdk/Supplier",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/jdk/SerializableFunction.class",
+      "occurrence": 0,
+      "sha256": "ad721d74169ef15df066c5b6ebfcf0543d74abaa7fc0741cfe8da1094b83f347",
+      "name": "com/alee/api/jdk/SerializableFunction",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Function",
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;R:Ljava/lang/Object;>Ljava/lang/Object;Lcom/alee/api/jdk/Function<TT;TR;>;Ljava/io/Serializable;",
+      "class_references": [
+        "com/alee/api/jdk/Function",
+        "com/alee/api/jdk/SerializableFunction",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/jdk/SerializableBiPredicate.class",
+      "occurrence": 0,
+      "sha256": "d052bf18fc63568d77b6c74a5453a1233c1ec41361709b2849973697704fe771",
+      "name": "com/alee/api/jdk/SerializableBiPredicate",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/BiPredicate",
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>Ljava/lang/Object;Lcom/alee/api/jdk/BiPredicate<TT;TU;>;Ljava/io/Serializable;",
+      "class_references": [
+        "com/alee/api/jdk/BiPredicate",
+        "com/alee/api/jdk/SerializableBiPredicate",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/jdk/Objects.class",
+      "occurrence": 0,
+      "sha256": "eaed7f29fd5a358a03f51935aeaf65d7277a505f07fbfb676e99bdc386bca7d9",
+      "name": "com/alee/api/jdk/Objects",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "hash",
+          "descriptor": "([Ljava/lang/Object;)I",
+          "access": 137,
+          "code_sha256": "3ffd98c9944b9fcb9bef553eb3fc8f6e3c80bf3c9c5db07c8dae4bb9375b59f9",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "818e09c335b57dee4c8414d5c07ff1279a04fb4bee9ff8e10d5dd69a6ec3acef",
+          "code_length": 23
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;[Ljava/lang/Object;)Z",
+          "access": 137,
+          "code_sha256": "55a764765329cfd19ff9ebaf8478084601caeca40b9fb53c7ed73b76c8c8caff",
+          "code_length": 48
+        },
+        {
+          "name": "notEquals",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "0cda25a31514feaeee405acff65c3aca25c3d7ccd0b755466157a28845125c15",
+          "code_length": 23
+        },
+        {
+          "name": "notEquals",
+          "descriptor": "(Ljava/lang/Object;[Ljava/lang/Object;)Z",
+          "access": 137,
+          "code_sha256": "0fff8c5913db35bd499c961144e14f6bbdf4587038b88a413a9a81d990c2e41a",
+          "code_length": 48
+        },
+        {
+          "name": "equalsImpl",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 10,
+          "code_sha256": "818e09c335b57dee4c8414d5c07ff1279a04fb4bee9ff8e10d5dd69a6ec3acef",
+          "code_length": 23
+        },
+        {
+          "name": "requireNonNull",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "a8cef9ccdca2a38d4a7ed6d2fd00e55198df392c9dad11c3317b5f075185380c",
+          "code_length": 7,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;)TT;"
+        },
+        {
+          "name": "requireNonNull",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "6390813b007047e43c4d1774aac4f26afc3f9736d6695c04a5ae8ff735a89025",
+          "code_length": 33,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Ljava/lang/String;)TT;"
+        },
+        {
+          "name": "requireNonNull",
+          "descriptor": "(Ljava/lang/Object;Lcom/alee/api/jdk/Supplier;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "81911b1f12163a7c9ae2b139c344783ced8e31f89ad4d045e5970c6333facbc4",
+          "code_length": 16,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Lcom/alee/api/jdk/Supplier<Ljava/lang/RuntimeException;>;)TT;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/alee/api/jdk/Objects",
+        "com/alee/api/jdk/Supplier",
+        "com/alee/managers/language/LM",
+        "com/alee/utils/UtilityException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/alee/api/merge/nullresolver/SkippingNullResolver.class",
+      "occurrence": 0,
+      "sha256": "fc8e36a9d438f5b5f18ec8bd067acb5e8f2a2f112af9aa40e09f3cb0e5fa31b5",
+      "name": "com/alee/api/merge/nullresolver/SkippingNullResolver",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/merge/NullResolver"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lcom/alee/api/merge/RecursiveMerge;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "63d2d9b1537176a2f9e49f181b62f1a9e24a70155c02cf5a219ee37cbb70cc74",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/alee/api/merge/NullResolver",
+        "com/alee/api/merge/nullresolver/SkippingNullResolver",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/merge/unknownresolver/SkippingUnknownResolver.class",
+      "occurrence": 0,
+      "sha256": "9ebbe64c8d5ba1e846d9eac50f06369c7a380b53f7640df371b0520f03cc35ee",
+      "name": "com/alee/api/merge/unknownresolver/SkippingUnknownResolver",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/merge/UnknownResolver"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lcom/alee/api/merge/RecursiveMerge;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "bd67b655109b64ce86c0d2fff93da7638267d12f2c3c5c0530c722bc9538a007",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/alee/api/merge/UnknownResolver",
+        "com/alee/api/merge/unknownresolver/SkippingUnknownResolver",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/data/BoxOrientation.class",
+      "occurrence": 0,
+      "sha256": "f6e39b891544148c4351001d693e3ceb953566873eae969599ad64ddc73ee6a7",
+      "name": "com/alee/api/data/BoxOrientation",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "javax/swing/SwingConstants"
+      ],
+      "fields": [
+        {
+          "name": "center",
+          "descriptor": "Lcom/alee/api/data/BoxOrientation;",
+          "access": 16409
+        },
+        {
+          "name": "top",
+          "descriptor": "Lcom/alee/api/data/BoxOrientation;",
+          "access": 16409
+        },
+        {
+          "name": "left",
+          "descriptor": "Lcom/alee/api/data/BoxOrientation;",
+          "access": 16409
+        },
+        {
+          "name": "bottom",
+          "descriptor": "Lcom/alee/api/data/BoxOrientation;",
+          "access": 16409
+        },
+        {
+          "name": "right",
+          "descriptor": "Lcom/alee/api/data/BoxOrientation;",
+          "access": 16409
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/alee/api/data/BoxOrientation;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/alee/api/data/BoxOrientation;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/alee/api/data/BoxOrientation;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 2,
+          "code_sha256": "a0ebab726cde8af73b1a2ca45237ea2322601078e012a4afd66ab371e18c6435",
+          "code_length": 12,
+          "generic_signature": "(I)V"
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "isCenter",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c45a6b140c3c41d553c00041ac607946d44f9a35e1a55a07dcd20d645afb6c9b",
+          "code_length": 13
+        },
+        {
+          "name": "isTop",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a9a6834f0d5f97896b7e08a6d345c1d32a4137928a38e6cc5e4678f6c379269f",
+          "code_length": 13
+        },
+        {
+          "name": "isLeft",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0cffb3a7ef76999527b99a9da8ee8a9a10fd78aced953e2585951f103b67aeed",
+          "code_length": 13
+        },
+        {
+          "name": "isBottom",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "87bd6057f53e5ea95f84e5cae1a513aa6cccfcdbb85f2a59d7611957cfc35490",
+          "code_length": 13
+        },
+        {
+          "name": "isRight",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d274e64bf8a6022f726e3e1471395ea68f9e83a9cd017426df5c70752040b4c8",
+          "code_length": 13
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lcom/alee/api/data/BoxOrientation;",
+          "access": 9,
+          "code_sha256": "cae3504c19ed9b41735a240aedc3c8bc7e10736ba838eb2c79d8f956a8bc6084",
+          "code_length": 84
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e953d16215b25c3d50dea00194caedfbc2da9b3c10cd370f7a7694ff016c8196",
+          "code_length": 110
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/alee/api/data/BoxOrientation;>;Ljavax/swing/SwingConstants;",
+      "class_references": [
+        "[Lcom/alee/api/data/BoxOrientation;",
+        "com/alee/api/data/BoxOrientation",
+        "java/lang/Enum",
+        "javax/swing/SwingConstants"
+      ]
+    },
+    {
+      "entry": "com/alee/api/data/Corner.class",
+      "occurrence": 0,
+      "sha256": "111e8af7dcd71b990a845aa467e6c53a675908f260bb1a4be900f01499c52a60",
+      "name": "com/alee/api/data/Corner",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "upperLeft",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "upperLeading",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "upperRight",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "upperTrailing",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "lowerLeft",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "lowerLeading",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "lowerRight",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "lowerTrailing",
+          "descriptor": "Lcom/alee/api/data/Corner;",
+          "access": 16409
+        },
+        {
+          "name": "scrollPaneConstant",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/alee/api/data/Corner;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/alee/api/data/Corner;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/alee/api/data/Corner;",
+          "access": 9,
+          "code_sha256": "ee1866a70f59c89c65ebb175c0e649373698f0f1206ff8ba84cdedd681931231",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "4ac726ee3b8c2c8396c78efc80dbda91f1dc1f27f6bd000659ab462dd6123bd1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;)V"
+        },
+        {
+          "name": "getScrollPaneConstant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "is",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "ad531a943508ca4d01b832606534e4de2434823b33b97a90435126a2b1673a71",
+          "code_length": 41
+        },
+        {
+          "name": "at",
+          "descriptor": "(Ljava/lang/String;)Lcom/alee/api/data/Corner;",
+          "access": 9,
+          "code_sha256": "ae0bb513d50be657c6a3b30624cf760769d45b95ba9f7e26df0313093efb3845",
+          "code_length": 67
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b9f575b8089e061d4c58a90455e11f62a1e862848d8b7b08d206ba986105c4d4",
+          "code_length": 181
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/alee/api/data/Corner;>;",
+      "class_references": [
+        "[Lcom/alee/api/data/Corner;",
+        "com/alee/api/data/Corner",
+        "com/alee/api/jdk/Objects",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException",
+        "java/lang/StringBuilder",
+        "javax/swing/ScrollPaneConstants"
+      ]
+    }
+  ]
+}

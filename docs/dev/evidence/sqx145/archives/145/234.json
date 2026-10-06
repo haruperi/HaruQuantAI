@@ -1,0 +1,115 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
+  "sha256": "39cb9a77afca650b62226815fe1a5e43f465da620b291eab0a9f0be98036d7ed",
+  "class_count": 13,
+  "unique_class_entries": 13,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$1.class": "839fb5987290d527db691e92345cff37c87f9f8c59ead9fcb4b8b326d833b7a4",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$10.class": "140d739302e1f72b91e6a89ec3829bb74bef08d2a831ff86bbe3ae737b365c49",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$2.class": "7a6920f678b75d7beafa2d5ef3d3fd8659c172d2580f9d5e454184b39c6e9cbe",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$3.class": "4fd069dc53b5353d7f9d1c1183d25208e90ecccee51734ee90a826a89b04e319",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$4.class": "29e628daea7fc9399d0d4e7feaf9c25af72b879cdf05edf94e81ccdb739e1d0c",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$5.class": "c7f4086c253d234b66dbfd00da9a84460e21caf54577058b0cbb4032fea4b9ca",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$6.class": "abe423dd0d917843f824ce980b26910a935fcbe8c630e445b51fb93e45980a0f",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$7.class": "de18456d0e9296a6599decbea1b59324d88372e072c2f2e393ee275d75b85859",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$8.class": "4cde001c5674593fefae89da1465ce7bd87eb9ea7427fec28a6e2bdf4457ed61",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$9.class": "31e9b171ade8b2837da69b0a04f42848b3f3394baaa02d41a54e5bf8a30febfc",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet.class": "86b943c0d1d941dba44a1ad1dd9ebb187c8c0a4f5c1df03253db43d207d052e1",
+    "com/strategyquant/plugin/Servlet/impl/Project/ProjectServletPlugin.class": "106901a019af07137f971af909fe16d01422d0d4232bb8d809d4d37cffcf8577",
+    "com/strategyquant/plugin/Servlet/impl/Project/TaskConfigWorker.class": "41777ddaacdcdb74f0f798948b5dbaaeae87f88f525d60989a4c3d9168e832f5"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$1.class",
+      "occurrence": 0,
+      "sha256": "839fb5987290d527db691e92345cff37c87f9f8c59ead9fcb4b8b326d833b7a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$10.class",
+      "occurrence": 0,
+      "sha256": "140d739302e1f72b91e6a89ec3829bb74bef08d2a831ff86bbe3ae737b365c49",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$2.class",
+      "occurrence": 0,
+      "sha256": "7a6920f678b75d7beafa2d5ef3d3fd8659c172d2580f9d5e454184b39c6e9cbe",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$3.class",
+      "occurrence": 0,
+      "sha256": "4fd069dc53b5353d7f9d1c1183d25208e90ecccee51734ee90a826a89b04e319",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$4.class",
+      "occurrence": 0,
+      "sha256": "29e628daea7fc9399d0d4e7feaf9c25af72b879cdf05edf94e81ccdb739e1d0c",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$5.class",
+      "occurrence": 0,
+      "sha256": "c7f4086c253d234b66dbfd00da9a84460e21caf54577058b0cbb4032fea4b9ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$6.class",
+      "occurrence": 0,
+      "sha256": "abe423dd0d917843f824ce980b26910a935fcbe8c630e445b51fb93e45980a0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$7.class",
+      "occurrence": 0,
+      "sha256": "de18456d0e9296a6599decbea1b59324d88372e072c2f2e393ee275d75b85859",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$8.class",
+      "occurrence": 0,
+      "sha256": "4cde001c5674593fefae89da1465ce7bd87eb9ea7427fec28a6e2bdf4457ed61",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet$9.class",
+      "occurrence": 0,
+      "sha256": "31e9b171ade8b2837da69b0a04f42848b3f3394baaa02d41a54e5bf8a30febfc",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet.class",
+      "occurrence": 0,
+      "sha256": "86b943c0d1d941dba44a1ad1dd9ebb187c8c0a4f5c1df03253db43d207d052e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "106901a019af07137f971af909fe16d01422d0d4232bb8d809d4d37cffcf8577",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Project/TaskConfigWorker.class",
+      "occurrence": 0,
+      "sha256": "41777ddaacdcdb74f0f798948b5dbaaeae87f88f525d60989a4c3d9168e832f5",
+      "member_shard": "docs/dev/evidence/sqx145/members/234/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/234/001.json",
+      "sha256": "34905cadd09dbdc1cf173f71d32786797c7d582ad116530214c7999b436557a7"
+    }
+  ]
+}

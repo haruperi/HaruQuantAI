@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar",
+  "sha256": "a9b596747d3b2f47afb2c9a949331708a6c9edf3930316dba1adfab76ffc9256",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/NeuralNetwork/NeuralNetworkAppPlugin.class": "822d0f14f6d18f93e8d7d7d86cbd07a189c2fe1a262dcff7d2c599a6574e9cd4"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/NeuralNetwork/NeuralNetworkAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "822d0f14f6d18f93e8d7d7d86cbd07a189c2fe1a262dcff7d2c599a6574e9cd4",
+      "member_shard": "docs/dev/evidence/sqx145/members/131/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/131/001.json",
+      "sha256": "2e16050aebd87fa5422cc94ab21cbd5d5e8ee6fa0202d9c651f6c46aac335911"
+    }
+  ]
+}

@@ -1,97 +1,37 @@
 # SettingsCallExternalScript.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar`.
-- SHA-256: `f2b82f3c269f7f4f5d34ceb44697713a72a203953093c5a06cc2227dd8966a36`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **1**; non-nested: **1**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar`.
+- **SHA-256:** `29fab77fa8681e74516379fd4083aa8af33e7cd960cea5c0143614645daf788f`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 1 raw entries; 1 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT`, P13; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [243.json](../../dev/evidence/sqx145/archives/145/243.json).
 
-Shared component: a single canonical document is linked from relevant workspace indexes. Its presence here does not establish which workspaces load it at runtime.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/243/001.json) — SHA-256 `d6fd5d60ecdb7cf0d96841efb42de4c8d288fb6c2fcd3a4a6ec1c2edc7c22527`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Settings.impl.CallExternalScript`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C39ac4a4813ea["SettingsCallExternalScript"] {
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +readSettings()
-        +getStrategyConfigSettings()
-        +getSettingName()
-        +getName()
-    }
-    class C27734eb41505["ISettingTabPlugin"]
-    C27734eb41505 <|.. C39ac4a4813ea : declared interface
+    class C0["SettingsCallExternalScript"]
+    class E0["ISettingTabPlugin"]
+    E0 <|.. C0
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C39ac4a4813ea` | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` (this JAR) | this diagram |
-| `C27734eb41505` | [`com.strategyquant.tradinglib.task.settings.ISettingTabPlugin`](SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | [`com.strategyquant.tradinglib.task.settings.ISettingTabPlugin`](SQTradingLib.md) | implements | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / class declaration: `public class com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript implements com.strategyquant.tradinglib.task.settings.ISettingTabPlugin` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public java.lang.String getProduct();`<br>`public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);`<br>`public java.lang.String getSettingName();`<br>`public java.lang.String getName();` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;`<br>`public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | [`com.strategyquant.tradinglib.taskImpl.ISQTask`](SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | `org.jdom2.Element` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);`<br>`public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | [`com.strategyquant.tradinglib.task.settings.TaskSettingsData`](SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | `org.json.JSONArray` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` | `org.json.JSONObject` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript` / method signature: `public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript</summary>
-
-```text
-public class com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript implements com.strategyquant.tradinglib.task.settings.ISettingTabPlugin
-    public com.strategyquant.plugin.Settings.impl.CallExternalScript.SettingsCallExternalScript();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);
-    public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;
-    public java.lang.String getSettingName();
-    public java.lang.String getName();
-    public org.json.JSONObject getInitializationData() throws java.lang.Exception;
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Settings/impl/CallExternalScript/SettingsCallExternalScript.class` | 0 | `6f511d87eceb296c28c3a6d151f53dcd22835d15305ff46a2ebf986f8dc00b88` | 0 | 9 |

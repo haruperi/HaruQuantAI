@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+  "sha256": "0e9a2fcba6c8457afbf3412a09c50572f207d04290e96469cefa9858f33aaf64",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiPlugin.class": "1b6c09b0bab1c74749e0b0334cfb82bb81b5894730b3b402dd270570344f2af9",
+    "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1.class": "38412b5c7bbdb9b7ed601b8673619014187cfe951a2884757e93e047465c3816",
+    "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2.class": "6e8364d89b847dc0e26eab94c672673d386c874d1d0c61e67263e92eefdd1e02",
+    "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet.class": "c95f1a84d82f2685d6cf9c40ceb5d233be9ee3698cbfc5dfdc40b6687c82d80e"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiPlugin.class",
+      "occurrence": 0,
+      "sha256": "1b6c09b0bab1c74749e0b0334cfb82bb81b5894730b3b402dd270570344f2af9",
+      "member_shard": "docs/dev/evidence/sqx145/members/177/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1.class",
+      "occurrence": 0,
+      "sha256": "38412b5c7bbdb9b7ed601b8673619014187cfe951a2884757e93e047465c3816",
+      "member_shard": "docs/dev/evidence/sqx145/members/177/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2.class",
+      "occurrence": 0,
+      "sha256": "6e8364d89b847dc0e26eab94c672673d386c874d1d0c61e67263e92eefdd1e02",
+      "member_shard": "docs/dev/evidence/sqx145/members/177/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet.class",
+      "occurrence": 0,
+      "sha256": "c95f1a84d82f2685d6cf9c40ceb5d233be9ee3698cbfc5dfdc40b6687c82d80e",
+      "member_shard": "docs/dev/evidence/sqx145/members/177/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/177/001.json",
+      "sha256": "15c29bf35bb20fa8cca8153030a66b427c156290f5caca2fdc6dd08fe549b354"
+    }
+  ]
+}

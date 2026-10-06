@@ -1,90 +1,66 @@
 {
   "schema_version": 1,
-  "reference_cohort": "144.2953",
+  "reference_cohort": "145-dev1",
   "runtime_status": "unavailable",
   "cases": [
     {
-      "case_id": "installed-class-count",
+      "case_id": "current-archive-count",
       "feature_id": "FEAT-HOST-EVIDENCE",
       "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
       "decision_ids": [
-        "DEC-HOST-P00-RELEASE-GATES",
-        "DEC-HOST-P00-BOUNDED-FIXTURES"
+        "DEC-HOST-P00-BOUNDED-FIXTURES",
+        "DEC-HOST-P00-RELEASE-GATES"
       ],
       "evidence_ids": [
-        "SQX144-EV-000091"
+        "SQX145-EV-000132"
       ],
       "artifact": "docs/dev/evidence/p00-inventory.json",
-      "artifact_sha256": "09d69b6e619e7dde058a57cff3877f07f4183023dac4dab83aa1e33cdb82c2ae",
-      "location": "/totals/classes",
+      "artifact_sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3",
+      "location": "/totals/archives",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",
-      "captured_at": "2026-10-06T15:07:57.025762+00:00",
+      "captured_at": "2026-10-06T18:54:51.906614+00:00",
       "capture_artifact": "docs/dev/evidence/p00-inventory.json",
       "input": {
-        "method": "read-only independent static observation"
+        "scope": "current scoped read-only ZIP/directory inventory"
       },
-      "expected": 41512,
-      "actual": 41512,
-      "units": "class entries",
+      "expected": 289,
+      "actual": 289,
+      "units": "count",
       "tolerance": 0,
-      "failure_behavior": "Missing/changed source or unavailable runtime authority fails closed.",
+      "failure_behavior": "Identity/count drift fails qualification.",
       "limitations": [
-        "Static expected outputs are derived from actual inspection, not a donor execution fixture."
+        "Independent static observation only; no donor runtime output is implied."
       ]
     },
     {
-      "case_id": "fallback-port-order",
+      "case_id": "current-resource-count",
       "feature_id": "FEAT-HOST-EVIDENCE",
       "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
       "decision_ids": [
-        "DEC-HOST-P00-RELEASE-GATES",
-        "DEC-HOST-P00-BOUNDED-FIXTURES"
+        "DEC-HOST-P00-BOUNDED-FIXTURES",
+        "DEC-HOST-P00-RELEASE-GATES"
       ],
       "evidence_ids": [
-        "SQX144-EV-000094"
+        "SQX145-EV-000133"
       ],
-      "artifact": "internal/libs/SQWebGUILib.jar",
-      "artifact_sha256": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af",
-      "location": "com.strategyquant.webguilib.server.AbstractUIWebServer.start offsets 89-232",
+      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact_sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3",
+      "location": "/totals/resources",
       "observation_kind": "static",
-      "inspection_method": "bytecode_inspection",
-      "captured_at": "2026-10-06T15:07:57.025762+00:00",
-      "capture_artifact": "docs/dev/evidence/p00-common-core.md",
+      "inspection_method": "archive_inventory",
+      "captured_at": "2026-10-06T18:54:51.906614+00:00",
+      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
       "input": {
-        "method": "read-only independent static observation"
+        "scope": "current scoped read-only ZIP/directory inventory"
       },
-      "expected": [
-        8080,
-        8081,
-        8082,
-        8083,
-        8084,
-        8085,
-        8086,
-        8087,
-        8088,
-        8089,
-        8090
-      ],
-      "actual": [
-        8080,
-        8081,
-        8082,
-        8083,
-        8084,
-        8085,
-        8086,
-        8087,
-        8088,
-        8089,
-        8090
-      ],
-      "units": "TCP port numbers",
+      "expected": 17,
+      "actual": 17,
+      "units": "count",
       "tolerance": 0,
-      "failure_behavior": "Missing/changed source or unavailable runtime authority fails closed.",
+      "failure_behavior": "Identity/count drift fails qualification.",
       "limitations": [
-        "Static expected outputs are derived from actual inspection, not a donor execution fixture."
+        "Independent static observation only; no donor runtime output is implied."
       ]
     }
   ]

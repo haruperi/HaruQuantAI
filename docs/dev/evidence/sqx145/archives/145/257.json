@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsOptimization/SettingsOptimization.jar",
+  "sha256": "396caaa71a8de45400cba27e8aa6810341088c077a56be9b0411adff13a9ea05",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/Optimization/OptimizationServlet.class": "c0dce89b0693ba72e2d92e20ab02cc3c12027465aefe3915eae3860fb35fa0a9",
+    "com/strategyquant/plugin/Settings/impl/Optimization/OptimizationSettingsPlugin.class": "f099814332e547269ddb987833626b1277b2b4a98531f019ba7a3826bde4ecc8"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Optimization/OptimizationServlet.class",
+      "occurrence": 0,
+      "sha256": "c0dce89b0693ba72e2d92e20ab02cc3c12027465aefe3915eae3860fb35fa0a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/257/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Optimization/OptimizationSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "f099814332e547269ddb987833626b1277b2b4a98531f019ba7a3826bde4ecc8",
+      "member_shard": "docs/dev/evidence/sqx145/members/257/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/257/001.json",
+      "sha256": "8f7e5ca2e9ecfd539a1806343a073d068edc1e6bee5cee52fdc8305b22a11341"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+  "sha256": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer.class": "48238041caaa8a169e852e4c507e9f6ac941d4ffe6275ade299ca93fd1e08fd1",
+    "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisPlugin.class": "fdbc5e6e725d101d68a589a4fc4b85a10bace9a6f00ddfa053a7b7b35a3bb057",
+    "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet.class": "2574c3641d85cd1d2d102e7c0609e7be3e21e05fa991a112d935dd75fce9f1b7"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer.class",
+      "occurrence": 0,
+      "sha256": "48238041caaa8a169e852e4c507e9f6ac941d4ffe6275ade299ca93fd1e08fd1",
+      "member_shard": "docs/dev/evidence/sqx145/members/219/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisPlugin.class",
+      "occurrence": 0,
+      "sha256": "fdbc5e6e725d101d68a589a4fc4b85a10bace9a6f00ddfa053a7b7b35a3bb057",
+      "member_shard": "docs/dev/evidence/sqx145/members/219/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet.class",
+      "occurrence": 0,
+      "sha256": "2574c3641d85cd1d2d102e7c0609e7be3e21e05fa991a112d935dd75fce9f1b7",
+      "member_shard": "docs/dev/evidence/sqx145/members/219/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/219/001.json",
+      "sha256": "bbe556f6e3a0863aea6fde9b8e623c268e6720bde629de9344a451b67f5524f5"
+    }
+  ]
+}

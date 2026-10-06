@@ -1,0 +1,1198 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/artemis-jms-client-1.5.0.jar",
+  "archive_sha256": "4222e99981a27e0d096b3f27433b0e4149a01c45fc0ddd8251aa0f7ed5c21bec",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/activemq/artemis/jndi/ReadOnlyContext$1.class",
+      "occurrence": 0,
+      "sha256": "e215988ca5f84ba1831fec448a7601b36cef5e5f5f079100b79f8db22469049e",
+      "name": "org/apache/activemq/artemis/jndi/ReadOnlyContext$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListBindingEnumeration.class",
+      "occurrence": 0,
+      "sha256": "07660a32724168cb3c72a658a4f8c08f3c3902b7194fe47877f877322bfd590d",
+      "name": "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListBindingEnumeration",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;)V",
+          "access": 0,
+          "code_sha256": "525149430b11b753e17cde723a75e7a4b53e797da81068b06028b0f96f94f347",
+          "code_length": 12
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1a23dbd02110184ffb76bf77bcade8e415f91c0551b7cc42d21a227c3e5beeda",
+          "code_length": 5,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "nextElement",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "344e050dd5d8f43c514faa105758cbb5a611e11fdcfd3f38ae1dd8246ceef3f2",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "javax/naming/Binding",
+        "javax/naming/NamingException",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$1",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListBindingEnumeration",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListEnumeration.class",
+      "occurrence": 0,
+      "sha256": "3724c8db91f7355c4c923d48536b44b526abf6756c205e428808782a039f7f25",
+      "name": "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListEnumeration",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;)V",
+          "access": 0,
+          "code_sha256": "525149430b11b753e17cde723a75e7a4b53e797da81068b06028b0f96f94f347",
+          "code_length": 12
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1a23dbd02110184ffb76bf77bcade8e415f91c0551b7cc42d21a227c3e5beeda",
+          "code_length": 5,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "nextElement",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "aefa84885be4a630be23faba1fd1f6970cf0c375b2aa9be50e82ed1a36bc78e5",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "javax/naming/NameClassPair",
+        "javax/naming/NamingException",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$1",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListEnumeration",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration.class",
+      "occurrence": 0,
+      "sha256": "c8fa16d128e24ee4200771d490f754de1f21a114cdae759a9eabc4c619bb1527",
+      "name": "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/naming/NamingEnumeration"
+      ],
+      "fields": [
+        {
+          "name": "i",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<Ljava/util/Map$Entry<Ljava/lang/String;Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;)V",
+          "access": 2,
+          "code_sha256": "e80eb0931a1cb17da1f6b40d481f9a2f2cf0e341151c7098a21f22144d44b0e2",
+          "code_length": 31
+        },
+        {
+          "name": "hasMore",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "88292dc17710f56cc42f910657ccca263cd424b9abc6cf097f899cd445e620c8",
+          "code_length": 10,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "hasMoreElements",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "88292dc17710f56cc42f910657ccca263cd424b9abc6cf097f899cd445e620c8",
+          "code_length": 10
+        },
+        {
+          "name": "getNext",
+          "descriptor": "()Ljava/util/Map$Entry;",
+          "access": 4,
+          "code_sha256": "5695c7f2315505665125222d2da6e1e58558bf25319b70eab00dffdeee56ab95",
+          "code_length": 13,
+          "generic_signature": "()Ljava/util/Map$Entry<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;Lorg/apache/activemq/artemis/jndi/ReadOnlyContext$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "javax/naming/NamingEnumeration",
+        "javax/naming/NamingException",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$1",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/jndi/ReadOnlyContext.class",
+      "occurrence": 0,
+      "sha256": "4c2b62b8ba260fdb2fde20586432ee16302d571a9697e2a1329ff57201070560",
+      "name": "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/naming/Context",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "SEPARATOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "NAME_PARSER",
+          "descriptor": "Ljavax/naming/NameParser;",
+          "access": 28
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "environment",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 20,
+          "generic_signature": "Ljava/util/Hashtable<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "bindings",
+          "descriptor": "Ljava/util/Map;",
+          "access": 20,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "treeBindings",
+          "descriptor": "Ljava/util/Map;",
+          "access": 20,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "frozen",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "nameInNamespace",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f0b17c5401c505377b3dd8d4286cc6ed0c744c8b4a062ba6d2df0edf022e53e6",
+          "code_length": 44
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Hashtable;)V",
+          "access": 1,
+          "code_sha256": "71d7be92f167eb84effd93aed7eedb9e7b47ef6f4def2895ac75a3c596203b39",
+          "code_length": 55
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Hashtable;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "7b3f1ccd65892822ab680c13624ca08ed76a24a9a84c7795c89f20a290456738",
+          "code_length": 187,
+          "generic_signature": "(Ljava/util/Hashtable;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Hashtable;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a5a40179cd79fb6b959cd095bbe3dc72c74c8b443af03424a61f377d6d26a77e",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/Hashtable;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;Ljava/util/Hashtable;)V",
+          "access": 4,
+          "code_sha256": "a550d8ff41eafc4da9347d8f181ff71f01d5d62389f68798b2da8f17ee77244e",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;Ljava/util/Hashtable;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "0cfa2c8ba60a3add590327ad7246011636c6470778eeca6c65a37ffcc8105428",
+          "code_length": 12,
+          "generic_signature": "(Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;Ljava/util/Hashtable<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "freeze",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3e56b1df04308e5ec0a1598603b4ccc91f8c2bcf1e9e8add0cd5ee70a79aa936",
+          "code_length": 6
+        },
+        {
+          "name": "isFrozen",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "9bcb244defc50bbabfd2dd1d7b5d2d56007edc817c09fae83f8cc4ce6c06a85d",
+          "code_length": 5
+        },
+        {
+          "name": "internalBind",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/Map;",
+          "access": 4,
+          "code_sha256": "2825df4f4377f04f144ab6bee756f4aff168462408b0cd5f79911f63a1bdfa4b",
+          "code_length": 406,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "newContext",
+          "descriptor": "()Lorg/apache/activemq/artemis/jndi/ReadOnlyContext;",
+          "access": 4,
+          "code_sha256": "32ec3c3f2c5acbda99a4a32060c06ad2a9b7047718010ac0a556b9851c8d5795",
+          "code_length": 8
+        },
+        {
+          "name": "addToEnvironment",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1ce83b85a06255b47e759a241922f69eaa74f9bd7afa54c419894635ca146710",
+          "code_length": 10,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "getEnvironment",
+          "descriptor": "()Ljava/util/Hashtable;",
+          "access": 1,
+          "code_sha256": "3e73417089c43034d9a0fcb400ff84a6cb460789c9e491732d3abfc17a628c05",
+          "code_length": 11,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "()Ljava/util/Hashtable<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "removeFromEnvironment",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ebd8b05ba6f7411639ec6f48de0a40798a371de6df9532f6579338becea5996d",
+          "code_length": 9,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "lookup",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4b9de7f209e620d851262842f313034041190d2ec428ab21cf715e3d31e8c8d0",
+          "code_length": 368,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "lookup",
+          "descriptor": "(Ljavax/naming/Name;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9bd1815b11e6b082254fbced667893f11e3796311f05d7d6e3b11095121ebf10",
+          "code_length": 9,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "lookupLink",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "41950cf46670dff79f2233be18bbdc9303f2eb0e646f4e2272b60c45370fa153",
+          "code_length": 6,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "composeName",
+          "descriptor": "(Ljavax/naming/Name;Ljavax/naming/Name;)Ljavax/naming/Name;",
+          "access": 1,
+          "code_sha256": "328fba8ce4f1fda8e1b9a7b28c77733936da93a0aead69bb0b5922beb30a6431",
+          "code_length": 20,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "composeName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fbfb8de0cbe389910fffb08f1f9a15f8b24a0f0be8633507691fd5bb8d23deaa",
+          "code_length": 27,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "list",
+          "descriptor": "(Ljava/lang/String;)Ljavax/naming/NamingEnumeration;",
+          "access": 1,
+          "code_sha256": "d40e6849960337e405b7370fed3806c3df1245fb9b2060918014c96eff135db4",
+          "code_length": 47,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "(Ljava/lang/String;)Ljavax/naming/NamingEnumeration<Ljavax/naming/NameClassPair;>;"
+        },
+        {
+          "name": "listBindings",
+          "descriptor": "(Ljava/lang/String;)Ljavax/naming/NamingEnumeration;",
+          "access": 1,
+          "code_sha256": "2e2092c1138e2619c37c0c9bc995b23a849c3bfb83bb543076646fad82b432c5",
+          "code_length": 47,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "(Ljava/lang/String;)Ljavax/naming/NamingEnumeration<Ljavax/naming/Binding;>;"
+        },
+        {
+          "name": "lookupLink",
+          "descriptor": "(Ljavax/naming/Name;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "39b4c64e002c4800017d276d4bf3206dde04d8f30236cc380f34a969a8000e5c",
+          "code_length": 9,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "list",
+          "descriptor": "(Ljavax/naming/Name;)Ljavax/naming/NamingEnumeration;",
+          "access": 1,
+          "code_sha256": "8148711fcfa86f0525ce1399db2f0c548a1959a8ebb6edf85d4a0aac7a018b8a",
+          "code_length": 9,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "(Ljavax/naming/Name;)Ljavax/naming/NamingEnumeration<Ljavax/naming/NameClassPair;>;"
+        },
+        {
+          "name": "listBindings",
+          "descriptor": "(Ljavax/naming/Name;)Ljavax/naming/NamingEnumeration;",
+          "access": 1,
+          "code_sha256": "6ec602e44f03279641cc25e7add70e2a71f1afbb2b860432560fc61f8f779db4",
+          "code_length": 9,
+          "throws": [
+            "javax/naming/NamingException"
+          ],
+          "generic_signature": "(Ljavax/naming/Name;)Ljavax/naming/NamingEnumeration<Ljavax/naming/Binding;>;"
+        },
+        {
+          "name": "bind",
+          "descriptor": "(Ljavax/naming/Name;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "bind",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "createSubcontext",
+          "descriptor": "(Ljavax/naming/Name;)Ljavax/naming/Context;",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "createSubcontext",
+          "descriptor": "(Ljava/lang/String;)Ljavax/naming/Context;",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "destroySubcontext",
+          "descriptor": "(Ljavax/naming/Name;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "destroySubcontext",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "getNameInNamespace",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "getNameParser",
+          "descriptor": "(Ljavax/naming/Name;)Ljavax/naming/NameParser;",
+          "access": 1,
+          "code_sha256": "813d36c21c6110844abd17f82e359e22df47fce3f468b12e23428106df384781",
+          "code_length": 4,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "getNameParser",
+          "descriptor": "(Ljava/lang/String;)Ljavax/naming/NameParser;",
+          "access": 1,
+          "code_sha256": "813d36c21c6110844abd17f82e359e22df47fce3f468b12e23428106df384781",
+          "code_length": 4,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "rebind",
+          "descriptor": "(Ljavax/naming/Name;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "rebind",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "rename",
+          "descriptor": "(Ljavax/naming/Name;Ljavax/naming/Name;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "rename",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "unbind",
+          "descriptor": "(Ljavax/naming/Name;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "unbind",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "644958dd0c1d58ecce183fd3f6b77070c3359b059c5e7cd1ce62d51889ea3d68",
+          "code_length": 8,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "92506c01275c0bb19ed1d2d8695b99fa80568241e418d2a34c9ee47537ff03cf",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Hashtable",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "javax/naming/CompositeName",
+        "javax/naming/Context",
+        "javax/naming/LinkRef",
+        "javax/naming/Name",
+        "javax/naming/NameNotFoundException",
+        "javax/naming/NamingException",
+        "javax/naming/NotContextException",
+        "javax/naming/OperationNotSupportedException",
+        "javax/naming/Reference",
+        "javax/naming/spi/NamingManager",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientLogger",
+        "org/apache/activemq/artemis/jndi/NameParserImpl",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$1",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListBindingEnumeration",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$ListEnumeration",
+        "org/apache/activemq/artemis/jndi/ReadOnlyContext$LocalNamingEnumeration"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/AbstractCFSchema.class",
+      "occurrence": 0,
+      "sha256": "f67e482218f4470f3a0884d13dc74cf44d8b4da8659ea63d418ac0ae1426ad1f",
+      "name": "org/apache/activemq/artemis/uri/AbstractCFSchema",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/activemq/artemis/utils/uri/URISchema",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newConectionOptions",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;)Lorg/apache/activemq/artemis/uri/JMSConnectionOptions;",
+          "access": 4,
+          "code_sha256": "dda4f316423a106a2d0ec006e4a8f2c5e39ed0d63a7d2ffa5de475f837fe63cd",
+          "code_length": 48,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/net/URI;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Lorg/apache/activemq/artemis/uri/JMSConnectionOptions;"
+        }
+      ],
+      "generic_signature": "Lorg/apache/activemq/artemis/utils/uri/URISchema<Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/net/URI",
+        "java/util/Map",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientLogger",
+        "org/apache/activemq/artemis/uri/AbstractCFSchema",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/utils/uri/BeanSupport",
+        "org/apache/activemq/artemis/utils/uri/URISchema"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/ConnectionFactoryParser.class",
+      "occurrence": 0,
+      "sha256": "2b54742864b4164c696884bb8148c5722c23b119c7c1b48eec24f40fc942ed1c",
+      "name": "org/apache/activemq/artemis/uri/ConnectionFactoryParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/utils/uri/URIFactory",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ef524e0e51b1a8e4b7f9ce34d8d8387e7b9a7c8f2c708d2bebf250187017acb8",
+          "code_length": 49
+        }
+      ],
+      "generic_signature": "Lorg/apache/activemq/artemis/utils/uri/URIFactory<Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;Ljava/lang/String;>;",
+      "class_references": [
+        "org/apache/activemq/artemis/uri/ConnectionFactoryParser",
+        "org/apache/activemq/artemis/uri/InVMSchema",
+        "org/apache/activemq/artemis/uri/JGroupsSchema",
+        "org/apache/activemq/artemis/uri/TCPSchema",
+        "org/apache/activemq/artemis/uri/UDPSchema",
+        "org/apache/activemq/artemis/utils/uri/URIFactory"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/InVMSchema.class",
+      "occurrence": 0,
+      "sha256": "08e7f35554815208b4265bb628d3265db31c2bc33203f4ad750f24a95b3e7558",
+      "name": "org/apache/activemq/artemis/uri/InVMSchema",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/uri/AbstractCFSchema",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSchemaName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;",
+          "access": 4,
+          "code_sha256": "7884daf2500a75c026b75e9277d453853152c9be64106d0851daf15d6b3e0d65",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/net/URI;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;"
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;)Ljava/net/URI;",
+          "access": 4,
+          "code_sha256": "58dd9839a332f5219b478106ee941d93effc0085e5b813b187c9cbdc3e1e9638",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Ljava/lang/Object;)Ljava/net/URI;",
+          "access": 4164,
+          "code_sha256": "2ede896f7adb188d981572d4c1b8fa7eaeedaf315c7b7368327bb534d4b7831a",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "75e725430067398803143798e089a7c71a842d94568a44ead9758caf7550f087",
+          "code_length": 11,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/apache/activemq/artemis/api/core/TransportConfiguration",
+        "org/apache/activemq/artemis/api/jms/ActiveMQJMSClient",
+        "org/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory",
+        "org/apache/activemq/artemis/uri/AbstractCFSchema",
+        "org/apache/activemq/artemis/uri/InVMSchema",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/uri/schema/connector/InVMTransportConfigurationSchema",
+        "org/apache/activemq/artemis/uri/schema/serverLocator/InVMServerLocatorSchema",
+        "org/apache/activemq/artemis/utils/uri/BeanSupport",
+        "org/apache/activemq/artemis/utils/uri/SchemaConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/JGroupsSchema.class",
+      "occurrence": 0,
+      "sha256": "803cd4f9669c49a7677b932c6b329c45cd9a0ed1516c2b4c4bbb5a0579b95840",
+      "name": "org/apache/activemq/artemis/uri/JGroupsSchema",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/uri/AbstractCFSchema",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSchemaName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;",
+          "access": 1,
+          "code_sha256": "c145ceb97f44e7b90518f680c21e59acb8afa32e2cd34bd6766155877bc55c50",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/net/URI;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;"
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;)Ljava/net/URI;",
+          "access": 4,
+          "code_sha256": "8d8655a0db282215362d6d7db0ca7b1c7842cc0fd231e3555628cca89f03320d",
+          "code_length": 121,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Ljava/lang/Object;)Ljava/net/URI;",
+          "access": 4164,
+          "code_sha256": "c2435b654a4184c6c5a2c90c518ffb479388fc24adb68da904ba6a527bb6ef08",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "cfeb35672a0baf182fb809f13a6bf1424808faf8df9e898110120abe0feeed29",
+          "code_length": 11,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/NotSerializableException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "org/apache/activemq/artemis/api/core/BroadcastEndpointFactory",
+        "org/apache/activemq/artemis/api/core/DiscoveryGroupConfiguration",
+        "org/apache/activemq/artemis/api/core/JGroupsFileBroadcastEndpointFactory",
+        "org/apache/activemq/artemis/api/core/JGroupsPropertiesBroadcastEndpointFactory",
+        "org/apache/activemq/artemis/api/jms/ActiveMQJMSClient",
+        "org/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory",
+        "org/apache/activemq/artemis/uri/AbstractCFSchema",
+        "org/apache/activemq/artemis/uri/JGroupsSchema",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/uri/schema/serverLocator/JGroupsServerLocatorSchema",
+        "org/apache/activemq/artemis/utils/uri/BeanSupport",
+        "org/apache/activemq/artemis/utils/uri/SchemaConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/JMSConnectionOptions.class",
+      "occurrence": 0,
+      "sha256": "5e4f2ff7d00bc11e0ba512725c5941d54f5ea83a51d47dddd8a9ce0ea4e4c9ce",
+      "name": "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/uri/schema/serverLocator/ConnectionOptions",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "factoryType",
+          "descriptor": "Lorg/apache/activemq/artemis/api/jms/JMSFactoryType;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40cdbcf9a81bc2a9778f2b521170c3d9a387785017d68688181ae61bb7f893c2",
+          "code_length": 12
+        },
+        {
+          "name": "getFactoryTypeEnum",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/jms/JMSFactoryType;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "40c78c45ff8807307acfb5ab3e8258288b8c4e619785ed488be23914d9142924",
+          "code_length": 8
+        },
+        {
+          "name": "setType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8b8f985115ae61cafec1407bec4357c9a2e61608d61c777197e79428d24974a8",
+          "code_length": 23
+        },
+        {
+          "name": "convertCFType",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/jms/JMSFactoryType;",
+          "access": 9,
+          "code_sha256": "0e1e169636a5b221a3538456b8943605a2a820926c7884d821491489c6346e1d",
+          "code_length": 21
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1331e95c883518cf2f195d2ab96798c2ef089cc3a01613881e9086dc0ff086ef",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "org/apache/activemq/artemis/api/jms/JMSFactoryType",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/uri/schema/serverLocator/ConnectionOptions"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/TCPSchema.class",
+      "occurrence": 0,
+      "sha256": "4e17e0d861c69273891f59c6b41e64298a9da2c0f7376aa514cc093a05799ba7",
+      "name": "org/apache/activemq/artemis/uri/TCPSchema",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/uri/AbstractCFSchema",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSchemaName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;",
+          "access": 4,
+          "code_sha256": "69da358d2774c9e34a93ab6ec2383af6af29e3481ad253fbb3b6c24141bde2c7",
+          "code_length": 92,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/net/URI;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;"
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;)Ljava/net/URI;",
+          "access": 4,
+          "code_sha256": "a706ab5cd30280227ef88450310f0e5fc62d1cee839aa5254ff3d751f323f95a",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Ljava/lang/Object;)Ljava/net/URI;",
+          "access": 4164,
+          "code_sha256": "ebce32b67206259b4ed8d054799c47b0ab0d4e07e3fe81f6352b0a60bdbb3d2b",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "cf6c9d9d0cc920482aacea1d5bae6d87e92dc99375d8f3bc634462b0c4e05c58",
+          "code_length": 11,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/activemq/artemis/api/core/TransportConfiguration;",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/List",
+        "org/apache/activemq/artemis/api/core/TransportConfiguration",
+        "org/apache/activemq/artemis/api/jms/ActiveMQJMSClient",
+        "org/apache/activemq/artemis/core/remoting/impl/netty/NettyConnectorFactory",
+        "org/apache/activemq/artemis/core/remoting/impl/netty/TransportConstants",
+        "org/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory",
+        "org/apache/activemq/artemis/uri/AbstractCFSchema",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/uri/TCPSchema",
+        "org/apache/activemq/artemis/uri/schema/connector/TCPTransportConfigurationSchema",
+        "org/apache/activemq/artemis/uri/schema/serverLocator/TCPServerLocatorSchema",
+        "org/apache/activemq/artemis/utils/uri/BeanSupport",
+        "org/apache/activemq/artemis/utils/uri/SchemaConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/uri/UDPSchema.class",
+      "occurrence": 0,
+      "sha256": "691e597eb8c8ab6dc6250f2d863cb434dd5b48092964aa6b95bdfd457b61ffab",
+      "name": "org/apache/activemq/artemis/uri/UDPSchema",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/uri/AbstractCFSchema",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSchemaName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;",
+          "access": 1,
+          "code_sha256": "25915cac51dbde3dd5b4b7ab7db8bd646c9980c77873ca20591c8b7c7c9856f4",
+          "code_length": 72,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/net/URI;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;"
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Lorg/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory;)Ljava/net/URI;",
+          "access": 4,
+          "code_sha256": "6ebab3500616c8cdafa2bb360aa81bc89bfb02b776528a4c8da06f7cd65023ee",
+          "code_length": 66,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewURI",
+          "descriptor": "(Ljava/lang/Object;)Ljava/net/URI;",
+          "access": 4164,
+          "code_sha256": "48c1a7e005f75f02cd6b39728ea07a53ba06a6117d52a0ee4b6f1f430b7cec18",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "internalNewObject",
+          "descriptor": "(Ljava/net/URI;Ljava/util/Map;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "2620a1cbd07a2f676ced1c18778d537a5fe8b4310a807be056bd991f104bbf15",
+          "code_length": 11,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URI",
+        "org/apache/activemq/artemis/api/core/DiscoveryGroupConfiguration",
+        "org/apache/activemq/artemis/api/core/UDPBroadcastEndpointFactory",
+        "org/apache/activemq/artemis/api/jms/ActiveMQJMSClient",
+        "org/apache/activemq/artemis/jms/client/ActiveMQConnectionFactory",
+        "org/apache/activemq/artemis/uri/AbstractCFSchema",
+        "org/apache/activemq/artemis/uri/JMSConnectionOptions",
+        "org/apache/activemq/artemis/uri/UDPSchema",
+        "org/apache/activemq/artemis/uri/schema/serverLocator/UDPServerLocatorSchema",
+        "org/apache/activemq/artemis/utils/uri/BeanSupport",
+        "org/apache/activemq/artemis/utils/uri/SchemaConstants"
+      ]
+    }
+  ]
+}

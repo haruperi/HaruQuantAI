@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
+  "archive_sha256": "bd40d7d7d7f71c7e7553bbfb3e08f5b700038e8d98263d3ac5dc78a4d4fdc7b7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet.class",
+      "occurrence": 0,
+      "sha256": "2cd3aa0798f8ff3c7fa8903405b5e2429d3c65fa71ae227b6df16fe5b0b96fe8",
+      "name": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOCK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "7c5dc4afc34a556ca2770822e1a747a5f88f23d1ea7440ca4f45a3466def5e49",
+          "code_length": 87,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "15af54543629563eb97d30fb91d079c4a33c773fa13294eefb5dae5aaca41364",
+          "code_length": 235,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "fromResultsGroup",
+          "descriptor": "(Ljava/util/Map;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "03b9ba965a627b4c03c630d423e889a757e09b1d4342d32dd1f9b4d6c44928a2",
+          "code_length": 186,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Lorg/json/JSONObject;"
+        },
+        {
+          "name": "paramValue",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "fafba826900b3845c8f66323f3602e23549434f0f5f67eb09fac81cd50bb552b",
+          "code_length": 31,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "notEmpty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "d37d75d1f0e46999695958ee51e4f4a016a792bd523dc16dd113c74fd269ada1",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/ailib/tools/MCPTools",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/algocloud/AlgoCloudImport",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "ff1b4f7ee23459293eeed2cf938dd906bf575e856ed65d4de1878e28da0d2182",
+      "name": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractBacktestPlugin",
+      "interfaces": [
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "7d553cc5c24ce2bf6f038bc7f15b253001e08d89dc0223900679771991cdc37d",
+          "code_length": 46,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet",
+        "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/tradinglib/results/AbstractBacktestPlugin",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

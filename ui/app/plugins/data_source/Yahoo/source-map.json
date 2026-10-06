@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only Yahoo structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Yahoo",
-  "source_head": "69c24c148be9693a2c300f88c179b3ef2e832ddc",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_135832_data-source-yahoo-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,140 +28,190 @@
   "source_catalog": [
     {
       "id": "sqx-yahoo-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
       "family": "installed plugin UI artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopup.html",
       "relative_path": "add/addPopup.html",
       "location": "lines 1-40; add/download form controls",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "750a66d6e32474b97e8756dc6f5cffc44d6523c0b5a61cabe9a7c06d3da1173d",
+      "sha256": "42467b674866a7bb4a80032512c7b38a9f5475c37e707f406ef0577d5c9da16e",
       "target": "add/addPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopupCtrl.js",
       "relative_path": "add/addPopupCtrl.js",
       "location": "lines 1-29; controller form state/actions",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "79d2c7b45328d653b32ab1541ec3cd0ca2d827d94e21eab2b9e27a92cb4b3fe5",
+      "sha256": "373e93a6216069dea94222788bab912ea8c986f473487bd6e89e27fcec2b1cb1",
       "target": "add/addPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/module.js",
       "relative_path": "add/module.js",
       "location": "lines 1-14; module contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "2b096ad9c3bbb28c961b40aff63257f06be7b3e15b471a2655851deacf26adec",
+      "sha256": "e3f335c3c7803612255b9ebce8d5460ee1b036bb0fa181bf5809000b330728a6",
       "target": "add/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
       "relative_path": "DataSourceYahoo.jar",
       "location": "whole-file binary identity",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend binary excluded",
       "access_date": "2026-10-06",
-      "sha256": "30216203401f5014f82d67f53c965c812a83dd1a2dae700550a370698ce6016b",
+      "sha256": "4a9d64a03e668d1563a14e179c041721779a83b440c7ada56097fb9d28f54a3d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopup.html",
       "relative_path": "download/downloadPopup.html",
       "location": "lines 1-57; add/download form controls",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0fb1c9bbbf41417d4f5d14fc2dac29844a4cbf76c991057ffdcbecbd74f3c805",
+      "sha256": "59622cdd568741e872cba60b5330777f50dcf87480e30e205f851534b32f8cfc",
       "target": "download/downloadPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js",
       "relative_path": "download/downloadPopupCtrl.js",
       "location": "lines 1-119; controller form state/actions",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "8334846d1c23c717ceee1da049648bf08dde03c6045fd976fb4cad490aef910b",
+      "sha256": "884b51e60f81a8949368cf8c89dfd172d6f34ef9ef694a832e3efdfa7bc207aa",
       "target": "download/downloadPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/module.js",
       "relative_path": "download/module.js",
       "location": "lines 1-10; module contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "7fed4d0b40228f3cdd950afe97c42ee3ebfababb470fca58bf9ef93b000afcb3",
+      "sha256": "a39c798454550ec0355479868e6f5ea571fc6cceb0800d517f7c440722d0c3bd",
       "target": "download/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/module.js",
       "relative_path": "module.js",
       "location": "lines 1-12; module contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "4a0ec550bab04b9ece9fdb29f739e6519a23d9039de3c6015e0766175c406a5a",
+      "sha256": "059f6941ee79eac6313d806f4b56c6f7abc8658e17cb61cf5b3cd0979f864659",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/style.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/style.css",
       "relative_path": "style.css",
       "location": "lines 1-108; plugin stylesheet rules",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "f548bd419897f2e872ec3a8b4de4db20274d8693d7622ad75540aa6062f9f7df",
+      "sha256": "ab660287fa1674e60cc985452d3b238ec80bdbf856101037eefd905a35840d48",
       "target": "style.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-yahoo-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/YahooService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/YahooService.js",
       "relative_path": "YahooService.js",
       "location": "lines 1-18; service add/import/action bindings",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "41f6dcaed4e23c321f123d77240c9817be7cd3b609b56a17f5dd6d1d8a140398",
+      "sha256": "de0fd9c9249366d43cdac0f1b30f7f3fb5ea851880c805ef4422106c43822e00",
       "target": "YahooService.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -181,5 +231,10 @@
       "path": "source-map.json",
       "reason": "Structural provenance manifest"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

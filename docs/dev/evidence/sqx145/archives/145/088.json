@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-common-1.61.0.jar",
+  "sha256": "618bd894feb3f65a563209603d27cbab534310be22705f78c525fc0e799e8e91",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "io/opentelemetry/common/ComponentLoader.class": "db3d1b27828f5967745a5b1852dc14d846035f447ee76b9a8e72584ad1a6671d",
+    "io/opentelemetry/common/ServiceLoaderComponentLoader.class": "ad4b16105c60853c501b63710de705d4dd05e80e209741c6ad3786b92ca4546b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "b6f41c67da5ef486200a15266941b292dde2ead69f44d493df3f4ea153e41eb1",
+    "io/opentelemetry/common/version.properties": "3f1b469a8bdb4bc7231028ff5974c516118f25dfe48a70f903b7d9256f88e01f"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/opentelemetry/common/ComponentLoader.class",
+      "occurrence": 0,
+      "sha256": "db3d1b27828f5967745a5b1852dc14d846035f447ee76b9a8e72584ad1a6671d",
+      "member_shard": "docs/dev/evidence/sqx145/members/088/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/common/ServiceLoaderComponentLoader.class",
+      "occurrence": 0,
+      "sha256": "ad4b16105c60853c501b63710de705d4dd05e80e209741c6ad3786b92ca4546b",
+      "member_shard": "docs/dev/evidence/sqx145/members/088/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/088/001.json",
+      "sha256": "d0dcc6f71a73dc932e3c4b24a30a445665fcb44f065e10a9c1251da2e0f64e7c"
+    }
+  ]
+}

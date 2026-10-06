@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/oshi-core-5.8.5.jar",
+  "archive_sha256": "fe16bd8836eecf3d152585c2151322273b68237d13f223e662e0db959dd13680",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "oshi/jna/platform/windows/NtDll$PEB.class",
+      "occurrence": 0,
+      "sha256": "310f32937ebac9c620ca0b5332d8329ae29598a5ba86ee57cb5b4c79bdb41897",
+      "name": "oshi/jna/platform/windows/NtDll$PEB",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pad",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "pad2",
+          "descriptor": "[Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "ProcessParameters",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a357d2343a2f89854e985bc3324225bc9cda710011b6300bd8bbfe2b9cf4edd7",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "oshi/jna/platform/windows/NtDll",
+        "oshi/jna/platform/windows/NtDll$PEB"
+      ]
+    },
+    {
+      "entry": "oshi/SystemInfo$1.class",
+      "occurrence": 0,
+      "sha256": "0df750f8d4278e43ff4dfeaf05a41ac8ead88375cb45e4d2379bb26103227192",
+      "name": "oshi/SystemInfo$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$oshi$PlatformEnum",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "edeccefe1e6d8711c3874917fe7c6e0c25111917a524933a9b8374421049842a",
+          "code_length": 117
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "oshi/PlatformEnum",
+        "oshi/SystemInfo",
+        "oshi/SystemInfo$1"
+      ]
+    }
+  ]
+}

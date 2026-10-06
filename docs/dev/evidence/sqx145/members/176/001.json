@@ -1,0 +1,1336 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+  "archive_sha256": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesPlugin.class",
+      "occurrence": 0,
+      "sha256": "3c9f5b644b4fedcf151134faa2fcc98a6e5741a1d24b728bcb993acd599ba54b",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataSourceFilesServlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet;",
+          "access": 2
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesPlugin",
+        "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet.class",
+      "occurrence": 0,
+      "sha256": "36ae89a1bbb1c894aef8384367b5d983e00f759ff63cf95fd4c9374b88c620ac",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b79b8fdcec29470a20ef2cf2c489b645259fd19bda30590b0fe173cc84ae6622",
+          "code_length": 479,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAppImport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d719690f581b28cb09b0319fec131ea69d88566cb05332f4f11a686c81e44274",
+          "code_length": 129,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCancelAppImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7ab1512e6fdca7aa0cf6f4e508c2d2765c0f6d7df710cea11e08fd9b6d53f95d",
+          "code_length": 32,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onMassImport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e7d3341e7d8b38ab2a335f1e894ec2be6cc9280f634819c504c3648b1459562a",
+          "code_length": 252,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCancelMassImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "858856b727251b371f3a30054264fd672964ec420f7d6f91d1776d794c2aae1d",
+          "code_length": 32,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0873e359509fd09ec43590bbc2737d462ebd96e10f030290d7a911a7d039c81d",
+          "code_length": 181,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportGetInfo",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7ff62869515bd1cec5a139824093c0331321d4dad60de3db31b71b183cd0cdac",
+          "code_length": 477
+        },
+        {
+          "name": "onImportGetOverview",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "16d7e9d3d558ecf9dba2fa42e479a006221736034aa0fcabf90f4adfb5519a4f",
+          "code_length": 682,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "fillMissingValues",
+          "descriptor": "(Lcom/strategyquant/datalib/data/imports/CustomDataFormat;Lorg/json/JSONArray;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "73eae8038093295e992254d53453a63d0767342f37a8831e5ff5cbbbe0fc4b18",
+          "code_length": 65
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "28b82a95a724a5e2e391362887e73669b0fa4288eb2364b3de7d3f79ac72ac01",
+          "code_length": 471,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8905b82e0cca60ce7119517716d7052a23fb960ec52bc97ba7ac6df0f713a5c0",
+          "code_length": 242,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportSaveNewDataFormat",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7e9ba0b5dfe1965523c3a0550ecf0c34411501a3d2294cab43e123a080baa0e9",
+          "code_length": 107,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportDeleteDataFormat",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "403448fa1601a6a48ce43373a2f57e8278b94191d4a416941646fc05b873d1fc",
+          "code_length": 67,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportUpdateDataFormat",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "98b22e3dfc416f9074e10f80530e7af57a855b5852d37a5c159ca1ae275bc6d0",
+          "code_length": 60,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getFileFormat",
+          "descriptor": "(Ljava/util/Map;)Lcom/strategyquant/datalib/data/imports/CustomDataFormat;",
+          "access": 2,
+          "code_sha256": "71e584b5ddf5ef80b8696d0e3502b1f152841f9bfea9a4ccbd0553fea4b6815b",
+          "code_length": 236,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Lcom/strategyquant/datalib/data/imports/CustomDataFormat;"
+        },
+        {
+          "name": "listColumnTypes",
+          "descriptor": "(Ljava/util/HashMap;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "95e155d2257aa6b4905ad28ca2f2e252c98f94774efcb34646f364e94b37c541",
+          "code_length": 70,
+          "generic_signature": "(Ljava/util/HashMap<Ljava/lang/Integer;Lcom/strategyquant/datalib/data/io/columns/DefaultCol;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "sendDataUpdate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "65254d174a8dcf0ef54033d9784d44e0d3648067bcc94d46d0bda2355679f976",
+          "code_length": 47
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "567996f9c3f7161de3081080b9bc6ffa58876ee767398dcafd7d047140a00038",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/imports/AvailableDataFormats",
+        "com/strategyquant/datalib/data/imports/CsvFileReader",
+        "com/strategyquant/datalib/data/imports/CustomDataFormat",
+        "com/strategyquant/datalib/data/imports/DataColumns",
+        "com/strategyquant/datalib/data/imports/DataImportEngine",
+        "com/strategyquant/datalib/data/io/ImportDataInfo",
+        "com/strategyquant/datalib/data/io/MassImportDataInfo",
+        "com/strategyquant/datalib/data/io/MassImportDataInfo$OverwriteStrategy",
+        "com/strategyquant/datalib/data/io/columns/DefaultCol",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/lib/time/DateFormats",
+        "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob",
+        "com/strategyquant/qdm/QDM",
+        "com/strategyquant/qdm/activity/QDMActivity",
+        "com/strategyquant/qdm/activity/QDMActivityTypes",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob.class",
+      "occurrence": 0,
+      "sha256": "622c76e8a8b8da0962624ac51a2e89bf42c17515ef05e3faad642ad7a280667e",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "importer",
+          "descriptor": "Lcom/strategyquant/tradinglib/data/AppDataImporter;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a74eed655f00e8f919ca17b2e9e7bb493f4b40651f18d7bfa183432747f18b98",
+          "code_length": 21
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "07ed614bf0611637b027b07ebaaf5b444358db2f8c3f0b629eee6582946f03b9",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "validate",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "612fa5c85e71f9c178987063b20124401d94b29fdc835c3de03972a54ae4fee5",
+          "code_length": 8
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "41e77c41c45fb3d19b83aab5236adc13c6c4b7895189589ea02077baad518f17",
+          "code_length": 36
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "102ecf72d2a1a6be13f43bc8fcc4eb6ecfed16d0ee6e8011f98e7fa3087c1469",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/Void;>;",
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob",
+        "com/strategyquant/tradinglib/data/AppDataImporter",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter.class",
+      "occurrence": 0,
+      "sha256": "8c695fc3eb747de94b1857ef915b20f9ee9264ce807df0b558bd34f30ec62b68",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "csvLoader",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/DataCsvLoader;",
+          "access": 2
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "paused",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/lib/utils/IProgressListener;",
+          "access": 2
+        },
+        {
+          "name": "skipInvalidRows",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "performImport",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;Lcom/strategyquant/datalib/DataInfo;Lcom/strategyquant/datalib/data/io/ImportDataInfo;)V",
+          "access": 1,
+          "code_sha256": "b1eefc5bad2e5fb06238ecf6da1dedddc470a36a850fd161140f0e1b9cc94a33",
+          "code_length": 1333,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "setProgress",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "6aeaea89de24e18ebe39fea58de0d882f255fc9794aa8d081f71d18854351248",
+          "code_length": 33
+        },
+        {
+          "name": "recomputeClonedData",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;)V",
+          "access": 2,
+          "code_sha256": "b71a320a0010a49c9d675646dba5a6ceb61ae77f14f63abd6c633a920789603b",
+          "code_length": 183,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "convertToOriginalTimezone",
+          "descriptor": "(Lcom/strategyquant/datalib/data/io/VersatileData;)V",
+          "access": 2,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "checkDataFile",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;Lcom/strategyquant/datalib/DataInfo;Lcom/strategyquant/datalib/data/io/ImportDataInfo;)V",
+          "access": 2,
+          "code_sha256": "7e033309bbb11e3e6c4c85ab68081a5f5980a5945d13c24cd6cfb77c8a670a76",
+          "code_length": 71,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkGaps",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;Lcom/strategyquant/datalib/DataInfo;Lcom/strategyquant/datalib/data/io/ImportDataInfo;)V",
+          "access": 4,
+          "code_sha256": "f18b5a59002ce48d60ae93c4c39003053d969befd006b677000cc6c331e74910",
+          "code_length": 382,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkTimeframe",
+          "descriptor": "(Lcom/strategyquant/lib/utils/IProgressListener;Lcom/strategyquant/datalib/DataInfo;Lcom/strategyquant/datalib/data/io/ImportDataInfo;)V",
+          "access": 2,
+          "code_sha256": "b6d53cff0864ceef0d0100012a416582ad3d862c67b8e6e465a6fa9d25de33fe",
+          "code_length": 160,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "importFormatContainsBid",
+          "descriptor": "(Lcom/strategyquant/datalib/data/io/ImportDataInfo;)Z",
+          "access": 2,
+          "code_sha256": "9f8f126ed215bd470e10b1ccf5c3d57e1e57870e9f43a8fa5faefd51eda0fe95",
+          "code_length": 61
+        },
+        {
+          "name": "checkPaused",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b14d2ca7f5988b40b918770d7cea9e58cafc8e7a2c882b5f67f49cb19614db13",
+          "code_length": 50,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "24b509a829c089d3a3729f55ebc31098a88baad05c61437222a3ecf04fec7dc2",
+          "code_length": 20
+        },
+        {
+          "name": "isCanceled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c82aed037c5afb54cd1235f0acbd9e50ea5462301ecc01f1e215873f28b1fa33",
+          "code_length": 5
+        },
+        {
+          "name": "pause",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bb59b7d7ca4afe5ec8b92fd11e7e44b26796eb96276931158a3c86ebfd8dca7f",
+          "code_length": 20
+        },
+        {
+          "name": "restart",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e0038645982e08a53ba7a3a00f791d30d644f742c59d27953c768e4cb5825549",
+          "code_length": 20
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4dc2d25f73e3291047a627194a831c57d0ea17a089102483e3fd9b930640bd3f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataCloner",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/DataCsvLoader",
+        "com/strategyquant/datalib/data/io/IDataLoader",
+        "com/strategyquant/datalib/data/io/ImportDataInfo",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/datalib/data/io/columns/DefaultCol",
+        "com/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/utils/IProgressListener",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/io/File",
+        "java/io/PrintStream",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Date",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob.class",
+      "occurrence": 0,
+      "sha256": "3ad0910330a847aa6b43172d69c787d0d1dff9483b67402f4e754d8009cc9fdf",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataImporter",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataImporter;",
+          "access": 2
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/lib/utils/IProgressListener;",
+          "access": 2
+        },
+        {
+          "name": "dataInfo",
+          "descriptor": "Lcom/strategyquant/datalib/DataInfo;",
+          "access": 2
+        },
+        {
+          "name": "importInfo",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/ImportDataInfo;",
+          "access": 2
+        },
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/lib/utils/IProgressListener;Lcom/strategyquant/datalib/DataInfo;Lcom/strategyquant/datalib/data/io/ImportDataInfo;)V",
+          "access": 1,
+          "code_sha256": "0523b3cecec011ee55f8e3a8e541c6ff5395ecd9ed4a5029046738614a73662d",
+          "code_length": 41
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "c7888bc1c69edd9c0364adea20655c70b7b395d3e34642472bb1447275a3956d",
+          "code_length": 166,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendRefreshMessage",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ed0211859bf8e6200303fec8b98864aefd0fb4aa23f359862706648b0bd89941",
+          "code_length": 39
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "1cfdb5da3a8a0bf218c7e98e4c14ac499ceebf179bb211b15f11b505a78d9d13",
+          "code_length": 64
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "24e7e1f53c659b5e850946c784be8431f35a153112b0f2f82b3dad4e3682f3f3",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/Void;>;",
+      "class_references": [
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/utils/IProgressListener",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter.class",
+      "occurrence": 0,
+      "sha256": "f7e222790094d086ed6d292d8b44fd04ef514274ad60e82967b83e002c46fd91",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "ACTION_LINK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "importInfo",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/MassImportDataInfo;",
+          "access": 2
+        },
+        {
+          "name": "file",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        },
+        {
+          "name": "existingSymbols",
+          "descriptor": "Ljava/util/Set;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "progressListener",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/MultiProgressListener;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/datalib/data/io/MassImportDataInfo;Ljava/io/File;Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20,
+          "generic_signature": "(Lcom/strategyquant/datalib/data/io/MassImportDataInfo;Ljava/io/File;Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d7805c2f316be57be1c9f43ac94774c3ed7fd83427da37943011cbe9821a5c59",
+          "code_length": 6
+        },
+        {
+          "name": "isCanceled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4c3ee618f94f6d0a299215efb4305a6d1d2298178196a7dfce14be8f959a5200",
+          "code_length": 5
+        },
+        {
+          "name": "performImport",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9a085c0f0f557e122f3e2846472561826e58bb254689d5df82f245f1cf72041b",
+          "code_length": 286,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "doImportFile",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;)V",
+          "access": 2,
+          "code_sha256": "6e9839e2caf8bcbdde10ad557776ea0e5cc86ad750992ff97ff9e5446ec4fba2",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "writeData",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "02ab4413ad6c6d44c438f3c0e4247518acd36cd3261b60d97b000bbb3fe2ce5d",
+          "code_length": 288,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Lcom/strategyquant/datalib/data/io/VersatileData;>;)V"
+        },
+        {
+          "name": "generateTickerName",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e29fae3c490fa5bca33b1e4084798ebcfcb522378de8fcceef937a923c2903f6",
+          "code_length": 31,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadData",
+          "descriptor": "(Ljava/io/File;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "a24f67dbc200fc215052013d235a30435918b96b852ba43f7f497e09b6045ba1",
+          "code_length": 276,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/io/File;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;)Ljava/util/List<Lcom/strategyquant/datalib/data/io/VersatileData;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "76cf77c85c9dde9a36745580ad86949ec33047cf3421a2658bd137c865aec28a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/ImportDataInfo",
+        "com/strategyquant/datalib/data/io/MassImportDataInfo",
+        "com/strategyquant/datalib/data/io/MassImportDataInfo$OverwriteStrategy",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/file/Files",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Set",
+        "org/apache/commons/io/FilenameUtils",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob.class",
+      "occurrence": 0,
+      "sha256": "d334747a2bbe157ec661878deb36cd1580e53669b1cb51b45f279394016fba31",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "importer",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter;",
+          "access": 2
+        },
+        {
+          "name": "file",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/io/File;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "ceda32fe021a91fd2fa32cb3cf72661129b4629f16f5b0ee053ac761be71f666",
+          "code_length": 28,
+          "generic_signature": "(Ljava/lang/String;Ljava/io/File;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3bfd5b78af0a8a78c26bb00759c79d44af5bbc8b87ebb9a81349eaf0fdb01eff",
+          "code_length": 45,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "0acfc8ef3bd3fdf429801592d34467d088cc32ec5c12c4cfbabebbe307bf8bdc",
+          "code_length": 36
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9762b2f5c0b189dd2c8752e81c1071779c0caecd8fdde16a6a09ffffaa8a30a3",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c2815ff5c0ec85bd0b24529d4b0ffaa5e76c6e6a2017b395638b6254269bc5db",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/String;>;",
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1.class",
+      "occurrence": 0,
+      "sha256": "f694b1d9cc6a56332a8a1bf6d328a88ab2843f5e2c101cc80b69a348bf66332a",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/FileFilter"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 1,
+          "code_sha256": "9cac1c7479a339bed3e92ae9b2f50bd5c47216536464de51d565786c880992a0",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1",
+        "java/io/File",
+        "java/io/FileFilter",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2.class",
+      "occurrence": 0,
+      "sha256": "36766db2a50de7b360dff2fad564c69011042cbe64f601c9ae290b164792afb8",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/gridlib/client/IGridMessageListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;)V",
+          "access": 0,
+          "code_sha256": "713a67c03e06fb2f59174f85a3a2f1789ba2ea80233cf7fcdc29a75448c0c901",
+          "code_length": 10
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "44bb640bc82acd5f8170ee82ab5b8f09ea6b10e76bc5e143eb8ebb197a7ad704",
+          "code_length": 147
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/gridlib/client/IGridMessageListener",
+        "com/strategyquant/gridlib/client/JobDetails",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob.class",
+      "occurrence": 0,
+      "sha256": "bcc42ef41aebd18ae5a0e1b828589a97fde90abe89699fee12b5767b84f691c2",
+      "name": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "MAX_IMPORT_COUNT_CONCURRENT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "BATCH_PROGRESS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "importInfo",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/MassImportDataInfo;",
+          "access": 2
+        },
+        {
+          "name": "finished",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 2
+        },
+        {
+          "name": "progressJson",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        },
+        {
+          "name": "error",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "totalFiles",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "IMPORT_GROUP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CHILD_JOB_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "symbols",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "filesForImport",
+          "descriptor": "[Ljava/io/File;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/datalib/data/io/MassImportDataInfo;)V",
+          "access": 1,
+          "code_sha256": "744fcfc104201274d96409aeed063895f5938c652c051954b6645f4b7dda7545",
+          "code_length": 59
+        },
+        {
+          "name": "importFinished",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 34,
+          "code_sha256": "0db509400084fc24409e1885249dfba925c03d87d474545ecfb854e84482051f",
+          "code_length": 42
+        },
+        {
+          "name": "hasFilesToImport",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fdd0795134ff7a4528bf91ab23e41c94e43a4454848b7658820c9287db410aab",
+          "code_length": 21
+        },
+        {
+          "name": "updateProgress",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "562c12447bd31c52da686776858ada7a7cfd90cc3741a303b750a7f84f17372a",
+          "code_length": 58
+        },
+        {
+          "name": "readFiles",
+          "descriptor": "(Ljava/lang/String;)[Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "d57f842cb7cfbed0a8a5225a6a2cd7e049a97deb7f6e2420a49409c98f61bd46",
+          "code_length": 33
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "7f040536a5334f6f05bee1654ad14fc8b0990eeb888168d17f316c4f90c9e204",
+          "code_length": 400,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createStockGroup",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6c6b88b189affb0197aea7833b604d2223851ba67fc749a381b5cb9856032461",
+          "code_length": 223,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getGroupName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d174ad3bdec609f3e101f9192facab8034c0b3a7609f1950f9a51ddbcfac166a",
+          "code_length": 96
+        },
+        {
+          "name": "unregisterListener",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ca6c525a5cd1ae79d3c776ad165a06ccec388116e990303a7a0061bf962ba122",
+          "code_length": 9
+        },
+        {
+          "name": "registerListener",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e9501792563209f8bf6aa1e9836a575fe98ba809279c4066e8c99839cc0a1c09",
+          "code_length": 17
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "9c37d238db6616756d1e06a2e05c58bfc122f4eff1e4e647fff6e5347915b6a8",
+          "code_length": 42
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "93e1bf6b873400764effa3c6fa9f073d04ecc76f3a3e439823896c96da78f57e",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;)Z",
+          "access": 4104,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "access$102",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;Z)Z",
+          "access": 4104,
+          "code_sha256": "ed68240c5d7cf35e7409b8d92cbe62c253a0fadca11811ecafbdd99435ccd3c2",
+          "code_length": 7
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob;Ljava/lang/String;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$call$0",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "e926000bfe7e704fb18ceba810ad75196ca415d586e34bf758850ed79a53578f",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "86a208025474081de8bb4e55f56f360664d0a8d8b47f7151ffcc981e4c75c304",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/Void;>;",
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/basket/BasketDto",
+        "com/strategyquant/datalib/basket/BasketOfStocksManager",
+        "com/strategyquant/datalib/basket/StockDto",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/MassImportDataInfo",
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/gridlib/compute/common/ExecuteOptions",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1",
+        "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

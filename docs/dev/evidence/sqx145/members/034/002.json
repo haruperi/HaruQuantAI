@@ -1,0 +1,727 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/httpasyncclient-4.1.4.jar",
+  "archive_sha256": "50e981a8e567a16ebdad104605b156540a863459fa127b8ba647f310dfc83ef8",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager$1.class",
+      "occurrence": 0,
+      "sha256": "78043deeb4994db22516ab7ceb5d2cc484f79d3055543505f3c1b2c176de5ffc",
+      "name": "org/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/concurrent/FutureCallback"
+      ],
+      "fields": [
+        {
+          "name": "val$resultFuture",
+          "descriptor": "Lorg/apache/http/concurrent/BasicFuture;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager;Lorg/apache/http/concurrent/BasicFuture;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "completed",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/CPoolEntry;)V",
+          "access": 1,
+          "code_sha256": "9a2b012f525d0be1d1e741cb288f3af1981f2089e06f8a9e386756ae4eb21c05",
+          "code_length": 116
+        },
+        {
+          "name": "failed",
+          "descriptor": "(Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "daf52abba8c3fd01e519cfa4929863aca27a4b29970692a1b9d215d544ed55c2",
+          "code_length": 40
+        },
+        {
+          "name": "cancelled",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b475b6594d78bfa433fa5c81320bbbcc24642f32f2c9853889677c9256ca7d39",
+          "code_length": 24
+        },
+        {
+          "name": "completed",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "893b814fc5ca5f4c8ffec2f4a8ae483d7a543c22bcfe841389047ee94146ac6b",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/http/concurrent/FutureCallback<Lorg/apache/http/impl/nio/conn/CPoolEntry;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/logging/Log",
+        "org/apache/http/concurrent/BasicFuture",
+        "org/apache/http/concurrent/FutureCallback",
+        "org/apache/http/conn/routing/HttpRoute",
+        "org/apache/http/impl/nio/conn/CPool",
+        "org/apache/http/impl/nio/conn/CPoolEntry",
+        "org/apache/http/impl/nio/conn/CPoolProxy",
+        "org/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager",
+        "org/apache/http/impl/nio/conn/PoolingNHttpClientConnectionManager$1",
+        "org/apache/http/nio/NHttpClientConnection",
+        "org/apache/http/util/Asserts"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/conn/DefaultHttpAsyncRoutePlanner.class",
+      "occurrence": 0,
+      "sha256": "4efe18ea06ce82a5deff03731b4164a891a0c8e8d559b98e778b62d595bdf6f9",
+      "name": "org/apache/http/impl/nio/conn/DefaultHttpAsyncRoutePlanner",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/conn/routing/HttpRoutePlanner"
+      ],
+      "fields": [
+        {
+          "name": "schemeRegistry",
+          "descriptor": "Lorg/apache/http/nio/conn/scheme/AsyncSchemeRegistry;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/nio/conn/scheme/AsyncSchemeRegistry;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSchemeRegistry",
+          "descriptor": "(Lorg/apache/http/protocol/HttpContext;)Lorg/apache/http/nio/conn/scheme/AsyncSchemeRegistry;",
+          "access": 2,
+          "code_sha256": "cf79dd29b8dbf61f1b3cd86826d975dfcd10d835cb8f9ef37903c06467c1bd31",
+          "code_length": 23
+        },
+        {
+          "name": "determineRoute",
+          "descriptor": "(Lorg/apache/http/HttpHost;Lorg/apache/http/HttpRequest;Lorg/apache/http/protocol/HttpContext;)Lorg/apache/http/conn/routing/HttpRoute;",
+          "access": 1,
+          "code_sha256": "b9863d0edd86d25f57dce1283a3175418f1fcb5b87e8101efac394e00e671a04",
+          "code_length": 172,
+          "throws": [
+            "org/apache/http/HttpException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/net/InetAddress",
+        "org/apache/http/HttpException",
+        "org/apache/http/HttpHost",
+        "org/apache/http/HttpRequest",
+        "org/apache/http/client/protocol/ClientContext",
+        "org/apache/http/conn/params/ConnRouteParams",
+        "org/apache/http/conn/routing/HttpRoute",
+        "org/apache/http/conn/routing/HttpRoutePlanner",
+        "org/apache/http/impl/nio/conn/DefaultHttpAsyncRoutePlanner",
+        "org/apache/http/nio/conn/scheme/AsyncScheme",
+        "org/apache/http/nio/conn/scheme/AsyncSchemeRegistry",
+        "org/apache/http/nio/conn/scheme/LayeringStrategy",
+        "org/apache/http/protocol/HttpContext"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/conn/ManagedNHttpClientConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "a1e34a1445df9f7af0e6e8623f80c0e001f4475534a88093096a7262d0a3a4bc",
+      "name": "org/apache/http/impl/nio/conn/ManagedNHttpClientConnectionFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/nio/conn/NHttpConnectionFactory"
+      ],
+      "fields": [
+        {
+          "name": "headerlog",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "wirelog",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "log",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "COUNTER",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 26
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/apache/http/impl/nio/conn/ManagedNHttpClientConnectionFactory;",
+          "access": 25
+        },
+        {
+          "name": "allocator",
+          "descriptor": "Lorg/apache/http/nio/util/ByteBufferAllocator;",
+          "access": 18
+        },
+        {
+          "name": "requestWriterFactory",
+          "descriptor": "Lorg/apache/http/nio/NHttpMessageWriterFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/http/nio/NHttpMessageWriterFactory<Lorg/apache/http/HttpRequest;>;"
+        },
+        {
+          "name": "responseParserFactory",
+          "descriptor": "Lorg/apache/http/nio/NHttpMessageParserFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/http/nio/NHttpMessageParserFactory<Lorg/apache/http/HttpResponse;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/nio/NHttpMessageWriterFactory;Lorg/apache/http/nio/NHttpMessageParserFactory;Lorg/apache/http/nio/util/ByteBufferAllocator;)V",
+          "access": 1,
+          "code_sha256": "fd4f440c811a2ea0244b34879e8f197b14999e7c1089592aef11136af7fa24bf",
+          "code_length": 77,
+          "generic_signature": "(Lorg/apache/http/nio/NHttpMessageWriterFactory<Lorg/apache/http/HttpRequest;>;Lorg/apache/http/nio/NHttpMessageParserFactory<Lorg/apache/http/HttpResponse;>;Lorg/apache/http/nio/util/ByteBufferAllocator;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "364088a674f64ed44fb5ee68a6a903afed0cfe13790c5b18a988bf0df00d52a9",
+          "code_length": 8
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;Lorg/apache/http/config/ConnectionConfig;)Lorg/apache/http/nio/conn/ManagedNHttpClientConnection;",
+          "access": 1,
+          "code_sha256": "bf17db626043c9a2965a230c34ee11be077af13d1b73153c978e6d39bb808a10",
+          "code_length": 195
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;Lorg/apache/http/config/ConnectionConfig;)Lorg/apache/http/nio/NHttpConnection;",
+          "access": 4161,
+          "code_sha256": "4946dbe8fb8a274678ed2d92be8f4dc293e0c297d416acf9ae2c6bbb83a2a226",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1ea7c954ddef5d1ee7294067f2f43852b3d7499465ebbf79046063261cd51885",
+          "code_length": 21
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/http/nio/conn/NHttpConnectionFactory<Lorg/apache/http/nio/conn/ManagedNHttpClientConnection;>;",
+      "class_references": [
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/nio/charset/CharsetDecoder",
+        "java/nio/charset/CharsetEncoder",
+        "java/nio/charset/CodingErrorAction",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/http/config/ConnectionConfig",
+        "org/apache/http/impl/nio/codecs/DefaultHttpRequestWriterFactory",
+        "org/apache/http/impl/nio/codecs/DefaultHttpResponseParserFactory",
+        "org/apache/http/impl/nio/conn/ManagedNHttpClientConnectionFactory",
+        "org/apache/http/impl/nio/conn/ManagedNHttpClientConnectionImpl",
+        "org/apache/http/nio/NHttpMessageParserFactory",
+        "org/apache/http/nio/NHttpMessageWriterFactory",
+        "org/apache/http/nio/conn/NHttpConnectionFactory",
+        "org/apache/http/nio/reactor/IOEventDispatch",
+        "org/apache/http/nio/reactor/IOSession",
+        "org/apache/http/nio/util/ByteBufferAllocator",
+        "org/apache/http/nio/util/HeapByteBufferAllocator"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/conn/LoggingIOSession.class",
+      "occurrence": 0,
+      "sha256": "c65de5c0e5550de4c920a78ef75f646aac1ff675ee9c1092e4c1e8af441c9f61",
+      "name": "org/apache/http/impl/nio/conn/LoggingIOSession",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/nio/reactor/IOSession"
+      ],
+      "fields": [
+        {
+          "name": "session",
+          "descriptor": "Lorg/apache/http/nio/reactor/IOSession;",
+          "access": 18
+        },
+        {
+          "name": "channel",
+          "descriptor": "Ljava/nio/channels/ByteChannel;",
+          "access": 18
+        },
+        {
+          "name": "id",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "log",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "wirelog",
+          "descriptor": "Lorg/apache/http/impl/nio/conn/Wire;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;Ljava/lang/String;Lorg/apache/commons/logging/Log;Lorg/apache/commons/logging/Log;)V",
+          "access": 1,
+          "code_sha256": "03cd638b7b6fad1ba568476cfc0c196a2010cc9356b7dcc6ff09d9f7a0173ded",
+          "code_length": 49
+        },
+        {
+          "name": "channel",
+          "descriptor": "()Ljava/nio/channels/ByteChannel;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getLocalAddress",
+          "descriptor": "()Ljava/net/SocketAddress;",
+          "access": 1,
+          "code_sha256": "65b14801909c908f700b2c2ff86c7a7951aa7cd12eff49f4051bab4ea7e29831",
+          "code_length": 10
+        },
+        {
+          "name": "getRemoteAddress",
+          "descriptor": "()Ljava/net/SocketAddress;",
+          "access": 1,
+          "code_sha256": "b0bb79ff1894f0abb9deaa2dab3dbd3966cb701732caba0bc5a3695fc7b41c7a",
+          "code_length": 10
+        },
+        {
+          "name": "getEventMask",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "49644b002a648d51a6ef7484a212d234ebe6919281b1155d62f694688ebaca21",
+          "code_length": 10
+        },
+        {
+          "name": "formatOps",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "9cfe399845896e44580ea22617a30516b42116ba4b85dbfbded92122bce11981",
+          "code_length": 83
+        },
+        {
+          "name": "setEventMask",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "0ae66640d276eb1a3de9a365dd534d8ceec73253d1e49be798091cce555f6a24",
+          "code_length": 73
+        },
+        {
+          "name": "setEvent",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "dbb2d4027b326779d48d77d584058588c07f68dd0f3b960d7deca47c77b85cd9",
+          "code_length": 73
+        },
+        {
+          "name": "clearEvent",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "de469e06d5c8b84a89a47a69c81ca89a41b594da1cbb1e58ca6c2f9dd1649067",
+          "code_length": 73
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3e7b621cdae542fd51556dde2e26ce16dc753ae7adaa5e870d6859e08aae400d",
+          "code_length": 65
+        },
+        {
+          "name": "getStatus",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d3b077958eec3b07ad12a39b5086cb95f80a0c818e6a1d62a735b4dccd184524",
+          "code_length": 10
+        },
+        {
+          "name": "isClosed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6e62482fd20ae44a9df8bb5d8a3202cefd4d76caf72bad8843a7f5d16c7f0938",
+          "code_length": 10
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "444aa7b80f1d38b048e9c67854f71193e2e488249c4b4e7ec06154b7f9389888",
+          "code_length": 65
+        },
+        {
+          "name": "getSocketTimeout",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ed922c742e977683f0b991a2eb7bd4a25dd84612dd255c21c26d4ecc4128b548",
+          "code_length": 10
+        },
+        {
+          "name": "setSocketTimeout",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4d5ed76aee16922973cfeb98cb7bd5245f0daddf7fb731f5f07ca3d888597f35",
+          "code_length": 70
+        },
+        {
+          "name": "setBufferStatus",
+          "descriptor": "(Lorg/apache/http/nio/reactor/SessionBufferStatus;)V",
+          "access": 1,
+          "code_sha256": "09f70ec69521849616602966d2b45ae9730fbc73dd78731a07c9d8c0acd07b64",
+          "code_length": 11
+        },
+        {
+          "name": "hasBufferedInput",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5f14e45761acc680f7f564638eb60e32ecd8d7c84ddc84aa20d6cb64149609a5",
+          "code_length": 10
+        },
+        {
+          "name": "hasBufferedOutput",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1cf3b0dc7e76f256ff7169dc2a48abd6488e9dfdb8c3d85962299de2e91a7225",
+          "code_length": 10
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c2d7c6fcbc45da080a5e97f6670e10f241fe052fc360a48428a06550eb1c7cee",
+          "code_length": 11
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "9d1c75de9ec2e8dbe8a656c0c2377b270b66cb47360f8112f9cfce75f1c050cd",
+          "code_length": 71
+        },
+        {
+          "name": "removeAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2493d932a6c96e5bf0c20579e93d9ae2e83428785f7a1aff3e32b3abe4e4b4b7",
+          "code_length": 70
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1a04010061dec55137a3958bb422f35eec4d78ff277211b46906c4fbdf58b23c",
+          "code_length": 33
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/LoggingIOSession;)Lorg/apache/http/nio/reactor/IOSession;",
+          "access": 4104,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/LoggingIOSession;)Lorg/apache/commons/logging/Log;",
+          "access": 4104,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/LoggingIOSession;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/LoggingIOSession;)Lorg/apache/http/impl/nio/conn/Wire;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/nio/channels/SelectionKey",
+        "org/apache/commons/logging/Log",
+        "org/apache/http/impl/nio/conn/LoggingIOSession",
+        "org/apache/http/impl/nio/conn/LoggingIOSession$LoggingByteChannel",
+        "org/apache/http/impl/nio/conn/Wire",
+        "org/apache/http/nio/reactor/IOSession"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager$InternalPoolEntryCallback.class",
+      "occurrence": 0,
+      "sha256": "cb807112adaeac532e32574f5f887e245560242eb37586a7dff0c367fba76aa8",
+      "name": "org/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager$InternalPoolEntryCallback",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/concurrent/FutureCallback"
+      ],
+      "fields": [
+        {
+          "name": "future",
+          "descriptor": "Lorg/apache/http/concurrent/BasicFuture;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/http/concurrent/BasicFuture<Lorg/apache/http/nio/conn/ManagedClientAsyncConnection;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager;Lorg/apache/http/concurrent/BasicFuture;)V",
+          "access": 1,
+          "code_sha256": "bdef3a801c9fac2d204639287b3f2c393bfe5499d476e4c8eb205b5310a92ff4",
+          "code_length": 15,
+          "generic_signature": "(Lorg/apache/http/concurrent/BasicFuture<Lorg/apache/http/nio/conn/ManagedClientAsyncConnection;>;)V"
+        },
+        {
+          "name": "completed",
+          "descriptor": "(Lorg/apache/http/impl/nio/conn/HttpPoolEntry;)V",
+          "access": 1,
+          "code_sha256": "44783ada904e724107379f435b7733f6e0cbc0e9cdc54caeba012386675309be",
+          "code_length": 114
+        },
+        {
+          "name": "failed",
+          "descriptor": "(Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "4a793467c5195f2966a55e97bb7f26eda5c4f608e5b601329991ed4d2e16541b",
+          "code_length": 40
+        },
+        {
+          "name": "cancelled",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d84a8804d707b45942e25f44ae837796c1bde832537dc9feed2771afa04be2e9",
+          "code_length": 24
+        },
+        {
+          "name": "completed",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "a8cd0b6d4706c85b88686acb5fc991b44a31f469a69c82432c2487b9f3fb4543",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/http/concurrent/FutureCallback<Lorg/apache/http/impl/nio/conn/HttpPoolEntry;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/logging/Log",
+        "org/apache/http/concurrent/BasicFuture",
+        "org/apache/http/concurrent/FutureCallback",
+        "org/apache/http/conn/routing/HttpRoute",
+        "org/apache/http/impl/nio/conn/HttpNIOConnPool",
+        "org/apache/http/impl/nio/conn/HttpPoolEntry",
+        "org/apache/http/impl/nio/conn/ManagedClientAsyncConnectionImpl",
+        "org/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager",
+        "org/apache/http/impl/nio/conn/PoolingClientAsyncConnectionManager$InternalPoolEntryCallback",
+        "org/apache/http/nio/conn/ManagedClientAsyncConnection"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/conn/DefaultClientAsyncConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "ae3480b42a1cc83ce9155a0942b660826e897437e607ea5e4a8173149ffeda12",
+      "name": "org/apache/http/impl/nio/conn/DefaultClientAsyncConnectionFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/http/nio/conn/ClientAsyncConnectionFactory",
+        "org/apache/http/nio/conn/NHttpConnectionFactory"
+      ],
+      "fields": [
+        {
+          "name": "headerlog",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "wirelog",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "log",
+          "descriptor": "Lorg/apache/commons/logging/Log;",
+          "access": 18
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/apache/http/impl/nio/conn/DefaultClientAsyncConnectionFactory;",
+          "access": 25
+        },
+        {
+          "name": "COUNTER",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 10
+        },
+        {
+          "name": "responseFactory",
+          "descriptor": "Lorg/apache/http/HttpResponseFactory;",
+          "access": 18
+        },
+        {
+          "name": "responseParserFactory",
+          "descriptor": "Lorg/apache/http/nio/NHttpMessageParserFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/http/nio/NHttpMessageParserFactory<Lorg/apache/http/HttpResponse;>;"
+        },
+        {
+          "name": "allocator",
+          "descriptor": "Lorg/apache/http/nio/util/ByteBufferAllocator;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/nio/NHttpMessageParserFactory;Lorg/apache/http/nio/util/ByteBufferAllocator;)V",
+          "access": 1,
+          "code_sha256": "5804f7c50ccffe1d8e649d3426f377562ddda481c149246e2a23ea4daef2594a",
+          "code_length": 70,
+          "generic_signature": "(Lorg/apache/http/nio/NHttpMessageParserFactory<Lorg/apache/http/HttpResponse;>;Lorg/apache/http/nio/util/ByteBufferAllocator;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "97ae4cd1d59aa15e3b2d22eb2dc56f889f85c683e4e5627fcd4b1898539cb74d",
+          "code_length": 66
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/http/nio/reactor/IOSession;Lorg/apache/http/params/HttpParams;)Lorg/apache/http/nio/conn/ClientAsyncConnection;",
+          "access": 1,
+          "code_sha256": "8f8471fb3773f3ea137284ebe65f399443879135a98c63dd36d4d1d45abe33e3",
+          "code_length": 19
+        },
+        {
+          "name": "createByteBufferAllocator",
+          "descriptor": "()Lorg/apache/http/nio/util/ByteBufferAllocator;",
+          "access": 4,
+          "code_sha256": "7d88605eff016acad6878c6eb1528502c579cec13aa604f7c17522c91886ec0b",
+          "code_length": 4
+        },
+        {
+          "name": "createHttpResponseFactory",
+          "descriptor": "()Lorg/apache/http/HttpResponseFactory;",
+          "access": 4,
+          "code_sha256": "56e0a11ba9ddad2a66c1eb4fbf1bffb4152b4296ca4f390e3ab8972a4c81a799",
+          "code_length": 4
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;Lorg/apache/http/config/ConnectionConfig;)Lorg/apache/http/nio/conn/ManagedNHttpClientConnection;",
+          "access": 1,
+          "code_sha256": "dc2ddb981ebe8f113443b51f856c1c5cdcbe3e47eb5fe381037b0a55e4d9886b",
+          "code_length": 192
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;Lorg/apache/http/config/ConnectionConfig;)Lorg/apache/http/nio/NHttpConnection;",
+          "access": 4161,
+          "code_sha256": "882735d1e18f139cc45e41d1c9c3012c370e12779f9294e416d35f9f11c4398b",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "997101eb5faf55de69c6694e3198d3435f2ab50fc75794a7eeeb851fcda28899",
+          "code_length": 23
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/http/nio/conn/ClientAsyncConnectionFactory;Lorg/apache/http/nio/conn/NHttpConnectionFactory<Lorg/apache/http/nio/conn/ManagedNHttpClientConnection;>;",
+      "class_references": [
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/nio/charset/CharsetDecoder",
+        "java/nio/charset/CharsetEncoder",
+        "java/nio/charset/CodingErrorAction",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/commons/logging/LogFactory",
+        "org/apache/http/config/ConnectionConfig",
+        "org/apache/http/impl/DefaultHttpResponseFactory",
+        "org/apache/http/impl/nio/codecs/DefaultHttpResponseParserFactory",
+        "org/apache/http/impl/nio/conn/DefaultClientAsyncConnection",
+        "org/apache/http/impl/nio/conn/DefaultClientAsyncConnectionFactory",
+        "org/apache/http/impl/nio/conn/ManagedNHttpClientConnectionImpl",
+        "org/apache/http/message/BasicLineParser",
+        "org/apache/http/nio/NHttpMessageParserFactory",
+        "org/apache/http/nio/conn/ClientAsyncConnectionFactory",
+        "org/apache/http/nio/conn/NHttpConnectionFactory",
+        "org/apache/http/nio/reactor/IOEventDispatch",
+        "org/apache/http/nio/reactor/IOSession",
+        "org/apache/http/nio/util/ByteBufferAllocator",
+        "org/apache/http/nio/util/HeapByteBufferAllocator"
+      ]
+    }
+  ]
+}

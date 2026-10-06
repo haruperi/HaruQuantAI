@@ -1,0 +1,3112 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-exec-1.3.jar",
+  "archive_sha256": "cb49812dc1bfb0ea4f20f398bcae1a88c6406e213e67f7524fb10d4f8ad9347b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/exec/CommandLine$1.class",
+      "occurrence": 0,
+      "sha256": "e229dc7ac3fa1b5245ace358fa24c98344e9149703394e93aa6cf3f30a1a281b",
+      "name": "org/apache/commons/exec/CommandLine$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/CommandLine$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/CommandLine$Argument.class",
+      "occurrence": 0,
+      "sha256": "2db7dbd1f9e08ffbb6c4aa27975db430ef3ae68c82c50a67e3d884314b2c62ce",
+      "name": "org/apache/commons/exec/CommandLine$Argument",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "handleQuoting",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/exec/CommandLine;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/lang/String;Z)V",
+          "access": 2,
+          "code_sha256": "f4b98fe5df98fb6cc198b64fa8dec60dcdc369d492d3b837ae1fd37d8e0566ce",
+          "code_length": 23
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "isHandleQuoting",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/lang/String;ZLorg/apache/commons/exec/CommandLine$1;)V",
+          "access": 4096,
+          "code_sha256": "d727f603b38d00728e66fa23e5f72178133f5964bf2c6728b72ec0078a9d6836",
+          "code_length": 8
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine$Argument;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "ed2b8254e0ba5a4243ea4b6f3d71ddfe0edc73225edd6f928618cb103449edb9",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine$Argument;)Z",
+          "access": 4104,
+          "code_sha256": "1a3aee1d622b61642140bff87f1df5491a96c6673666338c80f433d2d7a69561",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/CommandLine$1",
+        "org/apache/commons/exec/CommandLine$Argument"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/CommandLine.class",
+      "occurrence": 0,
+      "sha256": "470a290f496bd514d210e49a5d0b01b940b77eed617a8d54a256b21b55309d0b",
+      "name": "org/apache/commons/exec/CommandLine",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "arguments",
+          "descriptor": "Ljava/util/Vector;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Vector<Lorg/apache/commons/exec/CommandLine$Argument;>;"
+        },
+        {
+          "name": "executable",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "substitutionMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;*>;"
+        },
+        {
+          "name": "isFile",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/exec/CommandLine;",
+          "access": 9,
+          "code_sha256": "582a2f800f06e1dc10edd004bc66782020febe3f9ab843256158ca2089110f15",
+          "code_length": 6
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Lorg/apache/commons/exec/CommandLine;",
+          "access": 9,
+          "code_sha256": "c91e6b71577022b5a9aa4ad37f2171fcd90d7ca4a65b7d06fa5c07d3909b098a",
+          "code_length": 82,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;*>;)Lorg/apache/commons/exec/CommandLine;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9cebd8eaf087f5042f29a32646b725f537b790f301b2378ca199f7c0781584ce",
+          "code_length": 30
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "d42b77781fc7135146076134ee51ff4ef8c08721fd9c88570b496b55ffa61bc8",
+          "code_length": 33
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;)V",
+          "access": 1,
+          "code_sha256": "44101070a1ff51a1986b4bba03f86a59881ab22b33c3a72eccb0ef3bdabe530d",
+          "code_length": 122
+        },
+        {
+          "name": "getExecutable",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9393358c3abfc018d68265248df1526ed88eb6b22c6a631c2b5969302274f5c9",
+          "code_length": 12
+        },
+        {
+          "name": "isFile",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "86dcc05b641d58d58678ff6c5df64c6848ed07c0959278c629d5fe43f719ccc7",
+          "code_length": 5
+        },
+        {
+          "name": "addArguments",
+          "descriptor": "([Ljava/lang/String;)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "ecb5d3e29fbb3abb96a23a41e9666755c2d62c17e65180d4d7d68913fad1c867",
+          "code_length": 7
+        },
+        {
+          "name": "addArguments",
+          "descriptor": "([Ljava/lang/String;Z)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "aebcb7ff66298206304c2f7a8ea073a2cb682f4f8f69d4f9eb6c226022ac6737",
+          "code_length": 42
+        },
+        {
+          "name": "addArguments",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "7d2d62f2c476ce1d32cbc3cd8f72e3f898951eae7acb00251ec57808345dbd89",
+          "code_length": 7
+        },
+        {
+          "name": "addArguments",
+          "descriptor": "(Ljava/lang/String;Z)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "b495061c143db3f350ea4886e103e39d5b2d7faad10b7fcea2e925fd59147147",
+          "code_length": 18
+        },
+        {
+          "name": "addArgument",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "b70f6e07c57d8bf13722219fdc6ce1b0652fe30ac2ade391fedaaa89c5a7bf7b",
+          "code_length": 7
+        },
+        {
+          "name": "addArgument",
+          "descriptor": "(Ljava/lang/String;Z)Lorg/apache/commons/exec/CommandLine;",
+          "access": 1,
+          "code_sha256": "1b615a9059e106323110610b1e6084acc6c9cc498641e5bd6a9d794a2a82e4ef",
+          "code_length": 36
+        },
+        {
+          "name": "getArguments",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5cea41da2333951e7ff88151f1c4c163b51c1c379537014088afb1cabf590195",
+          "code_length": 70
+        },
+        {
+          "name": "getSubstitutionMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        },
+        {
+          "name": "setSubstitutionMap",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "b7b05e723824cfb5f3fdd117d4663e555274dd26e333a233a6967d5a6fc8e6ed",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)V"
+        },
+        {
+          "name": "toStrings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fece50592be8993fbdcf665aad9195bb775b393c88b38f98dbdbdcba7e408d9f",
+          "code_length": 36
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "35b939d68813bc4085315c3db1c65cbedb984d3b74fcaecd996c218b8a6dbf27",
+          "code_length": 33
+        },
+        {
+          "name": "expandArgument",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "009433016090586381041fa027041998232ca09062bc148db73c31bd6e55767f",
+          "code_length": 15
+        },
+        {
+          "name": "translateCommandline",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "e8639fc54e7b30100e55f0dbfb52c3d5e8104d8748ca461116e9cbf16c2e7363",
+          "code_length": 340
+        },
+        {
+          "name": "toCleanExecutable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e4e530766b45d0a7256cebe08a5fb04b43c063a04a275fef9b7b76b816f7ea84",
+          "code_length": 39
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/File",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/StringTokenizer",
+        "java/util/Vector",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/CommandLine$1",
+        "org/apache/commons/exec/CommandLine$Argument",
+        "org/apache/commons/exec/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/DaemonExecutor.class",
+      "occurrence": 0,
+      "sha256": "08f04fb742f09a28420f768bbf5f4f8efdd9d65552326fbdb2ed2295e343a007",
+      "name": "org/apache/commons/exec/DaemonExecutor",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/DefaultExecutor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createThread",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/String;)Ljava/lang/Thread;",
+          "access": 4,
+          "code_sha256": "8e13f30744dfd591811ca78af432ae7961ac8e66f7f0cf5de101b9b82dddee0d",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/Thread",
+        "org/apache/commons/exec/DaemonExecutor",
+        "org/apache/commons/exec/DefaultExecutor"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecuteResultHandler.class",
+      "occurrence": 0,
+      "sha256": "1e998ce4459efd77f995ce7ba99b4f605dfa3e3f6c3e828cfa5dd00ab33229f3",
+      "name": "org/apache/commons/exec/DefaultExecuteResultHandler",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/ExecuteResultHandler"
+      ],
+      "fields": [
+        {
+          "name": "SLEEP_TIME_MS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "hasResult",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "exitValue",
+          "descriptor": "I",
+          "access": 66
+        },
+        {
+          "name": "exception",
+          "descriptor": "Lorg/apache/commons/exec/ExecuteException;",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a534e78a07c7fc5ce3c88ea1671111d75b632131d94813be614cad1cee6c8d81",
+          "code_length": 16
+        },
+        {
+          "name": "onProcessComplete",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "889baa1938dd9d97d8f4a8c21b6910036edabe404b9beb157f8dea0d7100d039",
+          "code_length": 16
+        },
+        {
+          "name": "onProcessFailed",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteException;)V",
+          "access": 1,
+          "code_sha256": "e516ca81ef904094a4be9d7c33065bf728e6375167288bce276e6aedc10bb94d",
+          "code_length": 19
+        },
+        {
+          "name": "getException",
+          "descriptor": "()Lorg/apache/commons/exec/ExecuteException;",
+          "access": 1,
+          "code_sha256": "3ea6dd4b41e27fae1e671a0146ebe3a456a308bb0db41b30f5b3b9558fdda214",
+          "code_length": 22
+        },
+        {
+          "name": "getExitValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5d58763e4eb7953d183e3ea6d61b9a7820b7ee7dce2b0ecaafdb9d656bd1237b",
+          "code_length": 22
+        },
+        {
+          "name": "hasResult",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "waitFor",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fd621c8f0724c08b2c0764872add4131caa037cc64d694531fd722f5471e0df6",
+          "code_length": 17,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "waitFor",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "e10222fa1ce470bcc762767753df284898190e9e8e30c2fcf01594e6106d19ce",
+          "code_length": 31,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "org/apache/commons/exec/DefaultExecuteResultHandler",
+        "org/apache/commons/exec/ExecuteException",
+        "org/apache/commons/exec/ExecuteResultHandler"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "4bd9f71a8a3e65b5429dba35ca4d85583a9ee172f9d109f84f7f784261cb2d0e",
+      "name": "org/apache/commons/exec/DefaultExecutor$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$command",
+          "descriptor": "Lorg/apache/commons/exec/CommandLine;",
+          "access": 4112
+        },
+        {
+          "name": "val$environment",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "val$handler",
+          "descriptor": "Lorg/apache/commons/exec/ExecuteResultHandler;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/exec/DefaultExecutor;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/DefaultExecutor;Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Lorg/apache/commons/exec/ExecuteResultHandler;)V",
+          "access": 0,
+          "code_sha256": "e7df5de3f86295b83769a03058ab4a6e9cfc736dbdf1120b93fc74e6e83a2ef4",
+          "code_length": 26
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fdbedf87cc29753a79a980105f61ba9aa217b2133bfd9867ef2b03c619add6bd",
+          "code_length": 82
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/apache/commons/exec/DefaultExecutor",
+        "org/apache/commons/exec/DefaultExecutor$1",
+        "org/apache/commons/exec/ExecuteException",
+        "org/apache/commons/exec/ExecuteResultHandler"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/DefaultExecutor.class",
+      "occurrence": 0,
+      "sha256": "32126bc79f7f7d749df892913942cdc0c845c0e209af86b85c9a333b835c134e",
+      "name": "org/apache/commons/exec/DefaultExecutor",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/Executor"
+      ],
+      "fields": [
+        {
+          "name": "streamHandler",
+          "descriptor": "Lorg/apache/commons/exec/ExecuteStreamHandler;",
+          "access": 2
+        },
+        {
+          "name": "workingDirectory",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        },
+        {
+          "name": "watchdog",
+          "descriptor": "Lorg/apache/commons/exec/ExecuteWatchdog;",
+          "access": 2
+        },
+        {
+          "name": "exitValues",
+          "descriptor": "[I",
+          "access": 2
+        },
+        {
+          "name": "launcher",
+          "descriptor": "Lorg/apache/commons/exec/launcher/CommandLauncher;",
+          "access": 18
+        },
+        {
+          "name": "processDestroyer",
+          "descriptor": "Lorg/apache/commons/exec/ProcessDestroyer;",
+          "access": 2
+        },
+        {
+          "name": "executorThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "exceptionCaught",
+          "descriptor": "Ljava/io/IOException;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b8a9b105c70788e4ab4ad7097cb9fcc0697230e9a0e1367bd28726ce0d322626",
+          "code_length": 48
+        },
+        {
+          "name": "getStreamHandler",
+          "descriptor": "()Lorg/apache/commons/exec/ExecuteStreamHandler;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setStreamHandler",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteStreamHandler;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getWatchdog",
+          "descriptor": "()Lorg/apache/commons/exec/ExecuteWatchdog;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "setWatchdog",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteWatchdog;)V",
+          "access": 1,
+          "code_sha256": "357112b46d606be3030f83e27bd517dbb0e2e88b28fb5eb166beeb8eeaf6e331",
+          "code_length": 6
+        },
+        {
+          "name": "getProcessDestroyer",
+          "descriptor": "()Lorg/apache/commons/exec/ProcessDestroyer;",
+          "access": 1,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5
+        },
+        {
+          "name": "setProcessDestroyer",
+          "descriptor": "(Lorg/apache/commons/exec/ProcessDestroyer;)V",
+          "access": 1,
+          "code_sha256": "0278ccd7d3178be6eeb3789ab8e1ec9d116386a4a4eb9f4f472679058235f235",
+          "code_length": 6
+        },
+        {
+          "name": "getWorkingDirectory",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setWorkingDirectory",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;)I",
+          "access": 1,
+          "code_sha256": "7eaed2f62a336e85325ba1429fe12079d13d46e517f09537d2a8503258ac8f66",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)I",
+          "access": 1,
+          "code_sha256": "7e0777ec3b3d248fd3746b4937d38950bbf53015a8ceeed3bad6c0b25ed02f19",
+          "code_length": 62,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)I"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Lorg/apache/commons/exec/ExecuteResultHandler;)V",
+          "access": 1,
+          "code_sha256": "de285ace8e8414dbce699de6abca9ac1746432f39bd25b535e543c4da30dc875",
+          "code_length": 8,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Lorg/apache/commons/exec/ExecuteResultHandler;)V",
+          "access": 1,
+          "code_sha256": "5ef38b6ba89f8d9f33158a0aa9c484b6e141b8664bad3fd5c24610575a2e3b18",
+          "code_length": 94,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Lorg/apache/commons/exec/ExecuteResultHandler;)V"
+        },
+        {
+          "name": "setExitValue",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6e3f7cd10d65724185d7582484613bb1dbdb244faa558436f9d5a46c564ca5ad",
+          "code_length": 12
+        },
+        {
+          "name": "setExitValues",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "4a1e9288ac9b86a3b74456434c5cda071207ed1203cf1d9f1d2f16c30a51b4a4",
+          "code_length": 23
+        },
+        {
+          "name": "isFailure",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "e3938ddc1726a050b3ec5b90a402ae8bebef32393acb6ab50e3aff7af339bc81",
+          "code_length": 67
+        },
+        {
+          "name": "createThread",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/String;)Ljava/lang/Thread;",
+          "access": 4,
+          "code_sha256": "9a077865aecd7df51c45a8b3af7a0f125a0889df23a7a0ab7b05d62f007b29ef",
+          "code_length": 10
+        },
+        {
+          "name": "launch",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 4,
+          "code_sha256": "109e9eaeb984aa72eb8b2041103d962441e575175e9a15a9595c1a30bb5d49a5",
+          "code_length": 68,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        },
+        {
+          "name": "getExecutorThread",
+          "descriptor": "()Ljava/lang/Thread;",
+          "access": 4,
+          "code_sha256": "7e0bb919657973bf0959e14569eb267b15bb4e98602248480db68213179c69da",
+          "code_length": 5
+        },
+        {
+          "name": "closeProcessStreams",
+          "descriptor": "(Ljava/lang/Process;)V",
+          "access": 2,
+          "code_sha256": "8eeaf1dbd41d2184a4b0aabb4f92572d11cbb2f782a404c61ac62352ac59641c",
+          "code_length": 49
+        },
+        {
+          "name": "executeInternal",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;Lorg/apache/commons/exec/ExecuteStreamHandler;)I",
+          "access": 2,
+          "code_sha256": "87a76de3deca11dc4fee1eba8cd71bfebe4c0f537c3ea2c4bdf02f9b733988c0",
+          "code_length": 322,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;Lorg/apache/commons/exec/ExecuteStreamHandler;)I"
+        },
+        {
+          "name": "setExceptionCaught",
+          "descriptor": "(Ljava/io/IOException;)V",
+          "access": 2,
+          "code_sha256": "2b995dea6a1361ab672085a56f25a36c175764b607d4cd78727c808f48de1ffc",
+          "code_length": 13
+        },
+        {
+          "name": "getExceptionCaught",
+          "descriptor": "()Ljava/io/IOException;",
+          "access": 2,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/commons/exec/DefaultExecutor;)Ljava/io/File;",
+          "access": 4104,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/exec/DefaultExecutor;)Lorg/apache/commons/exec/ExecuteStreamHandler;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/commons/exec/DefaultExecutor;Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;Lorg/apache/commons/exec/ExecuteStreamHandler;)I",
+          "access": 4104,
+          "code_sha256": "40f9301c305c0e14883a26ff725c469cac832117258019d61e10bc25318b422b",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/util/Map",
+        "org/apache/commons/exec/DefaultExecutor",
+        "org/apache/commons/exec/DefaultExecutor$1",
+        "org/apache/commons/exec/ExecuteException",
+        "org/apache/commons/exec/ExecuteStreamHandler",
+        "org/apache/commons/exec/ExecuteWatchdog",
+        "org/apache/commons/exec/Executor",
+        "org/apache/commons/exec/ProcessDestroyer",
+        "org/apache/commons/exec/PumpStreamHandler",
+        "org/apache/commons/exec/launcher/CommandLauncher",
+        "org/apache/commons/exec/launcher/CommandLauncherFactory"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1.class",
+      "occurrence": 0,
+      "sha256": "6efa8c859a6bd7f5b50e50ba0dcee14a26da96fa5747c69e7a1f8c9dd7b878cb",
+      "name": "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/exec/environment/DefaultProcessingEnvironment;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/environment/DefaultProcessingEnvironment;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)I",
+          "access": 1,
+          "code_sha256": "ea8bf0b86044763855ac4b45472bd429b7eac632b6e53bb1c3b8a3ef78e9ca73",
+          "code_length": 6
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "46b87983c3b52081cee336b621cf46e5b2497ad76bb93c6c359bb24f32a67a4c",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Comparator",
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/DefaultProcessingEnvironment.class",
+      "occurrence": 0,
+      "sha256": "04f052dfd6ac95ee789cdccb55b64b0efd55d8fd1fa5fd88aa14679c59065408",
+      "name": "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "procEnvironment",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProcEnvironment",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 33,
+          "code_sha256": "17d3b7c02d40a542a10e7e12c919a78ae4ad0b8fdd91298e13735b01b5144622",
+          "code_length": 32,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "createProcEnvironment",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 4,
+          "code_sha256": "7e7c2d6765a4c3be304246958e8db4512c3b9b3e57cc2d9e5396647c12408435",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "runProcEnvCommand",
+          "descriptor": "()Ljava/io/BufferedReader;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getProcEnvCommand",
+          "descriptor": "()Lorg/apache/commons/exec/CommandLine;",
+          "access": 4,
+          "code_sha256": "5ce48d137ac4d32645dc2c377b717a6a0cfaeaddaed6f204d5647639cc1c6428",
+          "code_length": 4
+        },
+        {
+          "name": "createEnvironmentMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "66f4a1a4d0f869f98e6650fcbbd1d2f37b52815e103685c669f6166e30474b19",
+          "code_length": 30,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/TreeMap",
+        "org/apache/commons/exec/OS",
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/EnvironmentUtils.class",
+      "occurrence": 0,
+      "sha256": "ebdffc2e76194e0c62b39c30540ea3c9c92b01eefbc3d5c845bedb7ad5d119dd",
+      "name": "org/apache/commons/exec/environment/EnvironmentUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PROCESSING_ENVIRONMENT_IMPLEMENTATION",
+          "descriptor": "Lorg/apache/commons/exec/environment/DefaultProcessingEnvironment;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toStrings",
+          "descriptor": "(Ljava/util/Map;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c581b86629bfa5bcb3cf7e037a6db248cdc90119885fb9f06c4d768db6f12b58",
+          "code_length": 146,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)[Ljava/lang/String;"
+        },
+        {
+          "name": "getProcEnvironment",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "f27f325b11352c67b71c2821d004892d60eb4656185847410852d022997d9930",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "addVariableToEnvironment",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "77bf45edfb592b3ba7d16af004cfbd2b92fba61e0e3e2e750deebc32c568f614",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "parseEnvironmentVariable",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "d48edb558e3416e93218d91e9ae7b01d6644b93c8e2af3de7fd9eda9e7e5987e",
+          "code_length": 48
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6639f952ca3f90e611b2ab5b17135292fe0b71db73250bba4a6aaf1f2a3a5682",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+        "org/apache/commons/exec/environment/EnvironmentUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/environment/OpenVmsProcessingEnvironment.class",
+      "occurrence": 0,
+      "sha256": "3b891edae1f8ea061200d4a0bf2d3944f359f2c2e68b556dc06c0586aa8f61f5",
+      "name": "org/apache/commons/exec/environment/OpenVmsProcessingEnvironment",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/exec/environment/DefaultProcessingEnvironment",
+        "org/apache/commons/exec/environment/OpenVmsProcessingEnvironment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteException.class",
+      "occurrence": 0,
+      "sha256": "e9b59bc4a577ba43cf31cb275223f571a1051d5acdac602bff2a537104da6e30",
+      "name": "org/apache/commons/exec/ExecuteException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/IOException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "cause",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 18
+        },
+        {
+          "name": "exitValue",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "6e676b43bc8b8064bf9e179c2a4fcfe0b59c5ed74e6a5b2f4de05ad6f5256b12",
+          "code_length": 43
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "4c841e01aee0fb1b04054aee7fd934624208ac4cd838d91d854312f23218b48c",
+          "code_length": 52
+        },
+        {
+          "name": "getCause",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getExitValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "org/apache/commons/exec/ExecuteException"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteResultHandler.class",
+      "occurrence": 0,
+      "sha256": "d36ca559eae8049c2068b93875653ec0496ca6657c2a26841333a6043c409e30",
+      "name": "org/apache/commons/exec/ExecuteResultHandler",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onProcessComplete",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "onProcessFailed",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteException;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/exec/ExecuteResultHandler"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteStreamHandler.class",
+      "occurrence": 0,
+      "sha256": "218b1f0d88751df20b61091c4177c3051f0c679b21dc657eeb0bba34d52fb835",
+      "name": "org/apache/commons/exec/ExecuteStreamHandler",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setProcessInputStream",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setProcessErrorStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setProcessOutputStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/exec/ExecuteStreamHandler"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ExecuteWatchdog.class",
+      "occurrence": 0,
+      "sha256": "b8182e5e3aa62d6a3c6c7db00f5bbe239e071699b96ecb2e82e24cb6409777c9",
+      "name": "org/apache/commons/exec/ExecuteWatchdog",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/TimeoutObserver"
+      ],
+      "fields": [
+        {
+          "name": "INFINITE_TIMEOUT",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "process",
+          "descriptor": "Ljava/lang/Process;",
+          "access": 2
+        },
+        {
+          "name": "hasWatchdog",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "watch",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "caught",
+          "descriptor": "Ljava/lang/Exception;",
+          "access": 2
+        },
+        {
+          "name": "killedProcess",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "watchdog",
+          "descriptor": "Lorg/apache/commons/exec/Watchdog;",
+          "access": 18
+        },
+        {
+          "name": "processStarted",
+          "descriptor": "Z",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "eb928afd9a31ae2950ee974cfa136bea69155a1f652dc2d5653cb8d8613cf7d1",
+          "code_length": 72
+        },
+        {
+          "name": "start",
+          "descriptor": "(Ljava/lang/Process;)V",
+          "access": 33,
+          "code_sha256": "2b8f419510b9ca09ca0301c0d4d1dd2cc12814cf72394b452007d66cbd7967a5",
+          "code_length": 75
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "b285c67809c9db9aeb4c0e79df62bdd61cde8f7c533d443b53d51245a635b8e4",
+          "code_length": 25
+        },
+        {
+          "name": "destroyProcess",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "2c9d685804f4cedeb1de1b59b2022a34a654055baa65be4dd062ec72e87cbac1",
+          "code_length": 14
+        },
+        {
+          "name": "timeoutOccured",
+          "descriptor": "(Lorg/apache/commons/exec/Watchdog;)V",
+          "access": 33,
+          "code_sha256": "97cb9f27970f5c26c35315056774829405ca894eaf7a839c0a5c0663d86765fd",
+          "code_length": 72
+        },
+        {
+          "name": "checkException",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "ec8f8b1f7f01b4d3f6bc9233cccf3e978748f4135498fe5864806b5495cf9d95",
+          "code_length": 13,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isWatching",
+          "descriptor": "()Z",
+          "access": 33,
+          "code_sha256": "93f445c3f80aa366c63c302f5660ed70f9bae143c0eae8c8de856ea39a21a812",
+          "code_length": 9
+        },
+        {
+          "name": "killedProcess",
+          "descriptor": "()Z",
+          "access": 33,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "cleanUp",
+          "descriptor": "()V",
+          "access": 36,
+          "code_sha256": "44dc3d1f7c8cd126e6640ac586bdf73902846dfdc1b129a727127b9d8e913cb7",
+          "code_length": 11
+        },
+        {
+          "name": "setProcessNotStarted",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "c2bab0dc021a3e3234f3a6f683dc1010cddf2d5ba2ced5da38b161d5367fa610",
+          "code_length": 6
+        },
+        {
+          "name": "ensureStarted",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e67e3f686a8014fc4f16e6368480ce5711b3f900e7d991f58348565e5b01ae99",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/IllegalThreadStateException",
+        "java/lang/InterruptedException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/RuntimeException",
+        "org/apache/commons/exec/ExecuteWatchdog",
+        "org/apache/commons/exec/TimeoutObserver",
+        "org/apache/commons/exec/Watchdog",
+        "org/apache/commons/exec/util/DebugUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/Executor.class",
+      "occurrence": 0,
+      "sha256": "bf075ecdecb76027830fea26a2bb3abfa5627058456e9ec5c33852901b6f29ea",
+      "name": "org/apache/commons/exec/Executor",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INVALID_EXITVALUE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "setExitValue",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "setExitValues",
+          "descriptor": "([I)V",
+          "access": 1025
+        },
+        {
+          "name": "isFailure",
+          "descriptor": "(I)Z",
+          "access": 1025
+        },
+        {
+          "name": "getStreamHandler",
+          "descriptor": "()Lorg/apache/commons/exec/ExecuteStreamHandler;",
+          "access": 1025
+        },
+        {
+          "name": "setStreamHandler",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteStreamHandler;)V",
+          "access": 1025
+        },
+        {
+          "name": "getWatchdog",
+          "descriptor": "()Lorg/apache/commons/exec/ExecuteWatchdog;",
+          "access": 1025
+        },
+        {
+          "name": "setWatchdog",
+          "descriptor": "(Lorg/apache/commons/exec/ExecuteWatchdog;)V",
+          "access": 1025
+        },
+        {
+          "name": "getProcessDestroyer",
+          "descriptor": "()Lorg/apache/commons/exec/ProcessDestroyer;",
+          "access": 1025
+        },
+        {
+          "name": "setProcessDestroyer",
+          "descriptor": "(Lorg/apache/commons/exec/ProcessDestroyer;)V",
+          "access": 1025
+        },
+        {
+          "name": "getWorkingDirectory",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1025
+        },
+        {
+          "name": "setWorkingDirectory",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1025
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;)I",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)I",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)I"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Lorg/apache/commons/exec/ExecuteResultHandler;)V",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Lorg/apache/commons/exec/ExecuteResultHandler;)V",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/exec/ExecuteException",
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Lorg/apache/commons/exec/ExecuteResultHandler;)V"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/exec/ExecuteException",
+        "org/apache/commons/exec/Executor"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/InputStreamPumper.class",
+      "occurrence": 0,
+      "sha256": "21ce8b76b0613a70f3bb39cf55b79e23a8111b0726938f3332e341914f5e5c25",
+      "name": "org/apache/commons/exec/InputStreamPumper",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "SLEEPING_TIME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "is",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        },
+        {
+          "name": "os",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "stop",
+          "descriptor": "Z",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "3b275543cf9f0f8af0b8067f705cfb4931b7158f25b1757a97d189ae73629d53",
+          "code_length": 20
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b92c6608bfbea5f93b1047437d87ef54ce2a447f026f15b45efc4a02d549ed96",
+          "code_length": 77
+        },
+        {
+          "name": "stopProcessing",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4286e49865f4c1fa9c1d3019e9887a7063764bd2fa60f8c7f004f98231924779",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Thread",
+        "org/apache/commons/exec/InputStreamPumper",
+        "org/apache/commons/exec/util/DebugUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "b260e7eddd635fd5bfea8862678d07358a241584cad746ac3ef562d2bf9c4f73",
+      "name": "org/apache/commons/exec/launcher/CommandLauncher",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)Ljava/lang/Process;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/lang/Process;"
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        },
+        {
+          "name": "isFailure",
+          "descriptor": "(I)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/exec/launcher/CommandLauncher"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherFactory.class",
+      "occurrence": 0,
+      "sha256": "dd0607d00e52260066c1d187b1c4f3962f4d760e6296cd0c1b58064e6f07eff8",
+      "name": "org/apache/commons/exec/launcher/CommandLauncherFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createVMLauncher",
+          "descriptor": "()Lorg/apache/commons/exec/launcher/CommandLauncher;",
+          "access": 9,
+          "code_sha256": "7883b56743eeb0368555163dbd6242b2f1f4b27d249fb5733821924d166c0552",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/exec/OS",
+        "org/apache/commons/exec/launcher/CommandLauncherFactory",
+        "org/apache/commons/exec/launcher/Java13CommandLauncher",
+        "org/apache/commons/exec/launcher/VmsCommandLauncher"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherImpl.class",
+      "occurrence": 0,
+      "sha256": "2f83a613c53d7a2e62ad3478f60103f298cf78df141d33bd1f0589e0d3c71bc4",
+      "name": "org/apache/commons/exec/launcher/CommandLauncherImpl",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/launcher/CommandLauncher"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "cf56fc4a03d1787737c0a6345f53c34354805d215c1c11191fc8167bfa21ce82",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/lang/Process;"
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        },
+        {
+          "name": "isFailure",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "117b4549f57cc762cd78ecfcd59282047ebe54613f4d51b06c0b41e7717e7e20",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/environment/EnvironmentUtils",
+        "org/apache/commons/exec/launcher/CommandLauncher",
+        "org/apache/commons/exec/launcher/CommandLauncherImpl"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/CommandLauncherProxy.class",
+      "occurrence": 0,
+      "sha256": "756728405d0de2d9580a4032f40549bcb3c4cbb8be2add1bbe36f73159db060a",
+      "name": "org/apache/commons/exec/launcher/CommandLauncherProxy",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/exec/launcher/CommandLauncherImpl",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "myLauncher",
+          "descriptor": "Lorg/apache/commons/exec/launcher/CommandLauncher;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/launcher/CommandLauncher;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "b401d050af5eec8aa8a26398f0c295659224c8c21d665684448327eebf577ddb",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/lang/Process;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/apache/commons/exec/launcher/CommandLauncher",
+        "org/apache/commons/exec/launcher/CommandLauncherImpl",
+        "org/apache/commons/exec/launcher/CommandLauncherProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/Java13CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "aa702cd242f125d62282b67564eda1a5a0e6c3110a127ac2d4ff1593fd1587d4",
+      "name": "org/apache/commons/exec/launcher/Java13CommandLauncher",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/launcher/CommandLauncherImpl",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "8c6a1dd8a37a7e5565f5b045568b2027d84f026f6b6ffd89b496971999a2ad22",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Runtime",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/environment/EnvironmentUtils",
+        "org/apache/commons/exec/launcher/CommandLauncherImpl",
+        "org/apache/commons/exec/launcher/Java13CommandLauncher"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/OS2CommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "afab22ec77201113c7a78322b32489eb477e58a21b346d0005525a46a64ded5f",
+      "name": "org/apache/commons/exec/launcher/OS2CommandLauncher",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/launcher/CommandLauncherProxy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/launcher/CommandLauncher;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "30c331d9809408cd17c7ee80b76a9d82a24b0f7e0c448838c97ea7527b1ba81c",
+          "code_length": 48,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/launcher/CommandLauncherProxy",
+        "org/apache/commons/exec/launcher/OS2CommandLauncher"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/VmsCommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "bd1dce59d398bc858beb54b4cd5b21d122d31f49930b502e8aa93d878858c984",
+      "name": "org/apache/commons/exec/launcher/VmsCommandLauncher",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/launcher/Java13CommandLauncher",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "c45b0c9d5bc3ba010570310e6bf6d285349eb4327024f3fea2b5dddc0f41c9fc",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/lang/Process;"
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "bf1d0f0fe4e4bb9dea7e10d824ee7c2257d726f20bab685ef6b8134057e81fde",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        },
+        {
+          "name": "isFailure",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "621466ed27f3698227c75ca9c19b5e63ad241049d5cceeff06d33c07e89f2199",
+          "code_length": 12
+        },
+        {
+          "name": "createCommandFile",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;)Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "cd1d399c58e9e335f48df2dce71dc86b03ff9016c5e3c58ca6d9b282b0dc46fe",
+          "code_length": 436,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/io/File;"
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/FileWriter",
+        "java/io/IOException",
+        "java/io/PrintWriter",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/launcher/Java13CommandLauncher",
+        "org/apache/commons/exec/launcher/VmsCommandLauncher",
+        "org/apache/commons/exec/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/launcher/WinNTCommandLauncher.class",
+      "occurrence": 0,
+      "sha256": "6936a3a593d5718434e70d9d1171e8731fe2029e670b349ca3b23164552c67cf",
+      "name": "org/apache/commons/exec/launcher/WinNTCommandLauncher",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/exec/launcher/CommandLauncherProxy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/launcher/CommandLauncher;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map;Ljava/io/File;)Ljava/lang/Process;",
+          "access": 1,
+          "code_sha256": "30c331d9809408cd17c7ee80b76a9d82a24b0f7e0c448838c97ea7527b1ba81c",
+          "code_length": 48,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Lorg/apache/commons/exec/CommandLine;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/io/File;)Ljava/lang/Process;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/apache/commons/exec/CommandLine",
+        "org/apache/commons/exec/launcher/CommandLauncherProxy",
+        "org/apache/commons/exec/launcher/WinNTCommandLauncher"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/LogOutputStream.class",
+      "occurrence": 0,
+      "sha256": "2cc6a827358eda8867d3fc9dc68110f01013d0a6bd4e4c8672bf34dfec79ddc8",
+      "name": "org/apache/commons/exec/LogOutputStream",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INTIAL_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "CR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LF",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "buffer",
+          "descriptor": "Ljava/io/ByteArrayOutputStream;",
+          "access": 18
+        },
+        {
+          "name": "skip",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "level",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "31997a6e1ffcc7f2c8a8a63d4def5c697b8d2231422f420c0776ac7cc59a18b2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "76a8af5a9667360e0205574c4be082a863637ec174eb3bf6b0d85ddcad0f262f",
+          "code_length": 29
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "3aca7798e216c06a2a3a1639b46e4f5261ee0ac2463ebf0c4d9e348652fd95e8",
+          "code_length": 53,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4656b6ae56dd4fa9285862baff94fad062b7d6f35689af4b5e582244506a77d3",
+          "code_length": 15
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cb0a7a59a8a40299850d947c4cc34f571de301e8ae1673ff540ecb9cb1458117",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getMessageLevel",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "f502ac119dd41bc6fad14b8c71d30f75b9ade14c55e9f6b58631e79d6df36913",
+          "code_length": 119,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "processBuffer",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "731e620d539dd70733bfcdb3bed0e0e77a55c79959b38dcfbb45738a19816917",
+          "code_length": 19
+        },
+        {
+          "name": "processLine",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "aa47f520beff8e4046c27c47ae48b74d535895271835ce625342078f5f5019ce",
+          "code_length": 10
+        },
+        {
+          "name": "processLine",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "org/apache/commons/exec/LogOutputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/OS.class",
+      "occurrence": 0,
+      "sha256": "bc86e4c2c25820eec3559c6e4a04a3dc00e27250ee4ca096fe8deff084827286",
+      "name": "org/apache/commons/exec/OS",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FAMILY_OS_400",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_Z_OS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_WIN9X",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_OPENVMS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_UNIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_TANDEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_MAC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_DOS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_NETWARE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_OS_2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "FAMILY_WINDOWS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "OS_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "OS_ARCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "OS_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PATH_SEP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isFamily",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "619208ac80a0b56a67171767470c9ec3badfb10f242b77e97697cd3a44864991",
+          "code_length": 8
+        },
+        {
+          "name": "isFamilyDOS",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "18057e1250ae53c09870ef231470f78b0a5f8697e0b7d27de8bca887fcc664ef",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyMac",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "4a9b459889e67b061dbdd978db8f94365fa21e19ab37e518e920b49365baa0a7",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyNetware",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "40c3ed09ac290a73479adc0477d9cca0e9d14ef8692a3d9675a8c9d819c3ec78",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyOS2",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "f116859a4f37b4f9839c1c8aac3323fe9894cce648c1bcf6cd52bf1253b95970",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyTandem",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "3def75e50dabf17d6d5fef3149c887d79084aaf049575d2a22a5627fb60ff2ec",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyUnix",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "2b8890e4dbdba442c0883aabf8e7bc6544071a5d766590adbe9283ca7ff00712",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyWindows",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "75e25f74be34fcf580042b00a9e7d6f7edd82b7c2ded2da14955db4a460961a5",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyWin9x",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "91ddaf758ff075f969f66e6ad642e6d31120b4d1101f594e69b8e111d91a8bf5",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyZOS",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "41d4b14963711d2a8df4758167a053169a396143acc13b3a37cd957c0436485c",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyOS400",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "834206507fcd13a53fd13f9f4f80d375cc721ad0f725f086257d7762a0011152",
+          "code_length": 6
+        },
+        {
+          "name": "isFamilyOpenVms",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "80fdadbee393bf79b93e21a1c0c8aa38cf70a97b1bdfb3bc15cdbe4e05b52224",
+          "code_length": 6
+        },
+        {
+          "name": "isName",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "e245d8b101afb5f366281559289952d0bb582c2b4302b321c7a14f1106ef5248",
+          "code_length": 8
+        },
+        {
+          "name": "isArch",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "8994de6e746893c5cc7591296df60309436461b29649d226d1201a324c62a948",
+          "code_length": 8
+        },
+        {
+          "name": "isVersion",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "b841c5df1d0469124dd958a18f441aefdb7f7ecb7572383432a2ed5771f0d913",
+          "code_length": 8
+        },
+        {
+          "name": "isOs",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "5868a6dfe251204bbbdbead11d503ec5b7df14fb1306eb920a1a686329e53647",
+          "code_length": 562
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c1434c803fc9448e27fc3ff97a418b87393f8ca21fb35a75d55d6c04b2edd8ba",
+          "code_length": 51
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/Locale",
+        "org/apache/commons/exec/OS"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ProcessDestroyer.class",
+      "occurrence": 0,
+      "sha256": "30e88d4b8bb67920eed86f650e1024f9a5018f7ad24bfeedee9e63bf56c0a38a",
+      "name": "org/apache/commons/exec/ProcessDestroyer",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Process;)Z",
+          "access": 1025
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Process;)Z",
+          "access": 1025
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/exec/ProcessDestroyer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/PumpStreamHandler.class",
+      "occurrence": 0,
+      "sha256": "79426ab4f5e051c749fbca74e0279024b37f5f51e1517593891b194870a2de8a",
+      "name": "org/apache/commons/exec/PumpStreamHandler",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/ExecuteStreamHandler"
+      ],
+      "fields": [
+        {
+          "name": "STOP_TIMEOUT_ADDITION",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "outputThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "errorThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "inputThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "out",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "err",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "input",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        },
+        {
+          "name": "inputStreamPumper",
+          "descriptor": "Lorg/apache/commons/exec/InputStreamPumper;",
+          "access": 2
+        },
+        {
+          "name": "stopTimeout",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "caught",
+          "descriptor": "Ljava/io/IOException;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c8ca63f26e818746fad52cd9e0353c93ce212155a5dc103c692d2dcd8e787f53",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "aa9dd09c55dd653074a39fce11c1ecfc4241a4442905f864a9d093cfccb40d7e",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "a3242bf2254bcc4b083bc4e690aa1eca045962e5372e051ed4566dbf73a71d6a",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/io/OutputStream;Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "364248fb31cc072613f79e8b3e0cbce4c90813dbedbaf3a7886dcc3227b72ac2",
+          "code_length": 25
+        },
+        {
+          "name": "setStopTimeout",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "05736b1d25b15be6db58620b6e79094011f63e7f502e2fdf621e25dd1e4ec1af",
+          "code_length": 6
+        },
+        {
+          "name": "setProcessOutputStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "2c40b71d6a8d77b23ba09931c5a6e1320b69f7b9077708a985bf75225fe93a71",
+          "code_length": 17
+        },
+        {
+          "name": "setProcessErrorStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "7df657905ff0009101bfb6a6196023620dec763cb0e638fc4f5d908b796c57b3",
+          "code_length": 17
+        },
+        {
+          "name": "setProcessInputStream",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "8292639c636ca1f1ababdac077ece2876087045421e67afa7d32d1d20b5d12a8",
+          "code_length": 68
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "86cc7f6aaf3e80566acc904ccf8ec1eef4e774fa9c1dd08a32173c55d498b508",
+          "code_length": 43
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c04e3746d95a53e9b6a580291ee71f7c34dfc4fd763af29e8b5fc24b055f898a",
+          "code_length": 147,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getErr",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 4,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getOut",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 4,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "createProcessOutputPump",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)V",
+          "access": 4,
+          "code_sha256": "51bb5e2442317dcb7382d5388f62f45a7fa0e68dcf09b3efdefdff82703066d6",
+          "code_length": 11
+        },
+        {
+          "name": "createProcessErrorPump",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)V",
+          "access": 4,
+          "code_sha256": "c4f61cc2b7758b1d3f735cef582386da127a854852a08845b8d2bf86057033c3",
+          "code_length": 11
+        },
+        {
+          "name": "createPump",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)Ljava/lang/Thread;",
+          "access": 4,
+          "code_sha256": "e3672d636bf25fed48784615cbea44e4dd9c6a756c5f4a803102fb2039feae6b",
+          "code_length": 21
+        },
+        {
+          "name": "createPump",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;Z)Ljava/lang/Thread;",
+          "access": 4,
+          "code_sha256": "b832bc6654dce33771b31c2d117e901db010daf461277682cde227f9a08ea450",
+          "code_length": 30
+        },
+        {
+          "name": "stopThread",
+          "descriptor": "(Ljava/lang/Thread;J)V",
+          "access": 4,
+          "code_sha256": "70f1e3284f7c3211bed2075816bd782a7d15963718637aacba0973c3c3d88e3c",
+          "code_length": 98
+        },
+        {
+          "name": "createSystemInPump",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)Ljava/lang/Thread;",
+          "access": 2,
+          "code_sha256": "2868fbfb2ab6c5c786ffdfe87be336e8579888338c880ad35a19a19fa630259d",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/PipedOutputStream",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "org/apache/commons/exec/ExecuteException",
+        "org/apache/commons/exec/ExecuteStreamHandler",
+        "org/apache/commons/exec/InputStreamPumper",
+        "org/apache/commons/exec/PumpStreamHandler",
+        "org/apache/commons/exec/StreamPumper",
+        "org/apache/commons/exec/util/DebugUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl.class",
+      "occurrence": 0,
+      "sha256": "345aa017c5d52df75a6b3fec77afe0f075715205713a62a3805b8ccf053be615",
+      "name": "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "shouldDestroy",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/exec/ShutdownHookProcessDestroyer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/exec/ShutdownHookProcessDestroyer;)V",
+          "access": 1,
+          "code_sha256": "fae3f3b81a94fc76c3189182393b154590dcb6cc3f01c33b7ef1266bc6f9383a",
+          "code_length": 17
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5da9c6b4f3df80deda2f78d2a80b74e8dd961db4503ee73abdf013f305c307a9",
+          "code_length": 15
+        },
+        {
+          "name": "setShouldDestroy",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Thread",
+        "org/apache/commons/exec/ShutdownHookProcessDestroyer",
+        "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/ShutdownHookProcessDestroyer.class",
+      "occurrence": 0,
+      "sha256": "7600da6450bea630abc01a55643ca0265bb9fafbf73e7f7b3bd9a561eb84d542",
+      "name": "org/apache/commons/exec/ShutdownHookProcessDestroyer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/exec/ProcessDestroyer",
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "processes",
+          "descriptor": "Ljava/util/Vector;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Vector<Ljava/lang/Process;>;"
+        },
+        {
+          "name": "destroyProcessThread",
+          "descriptor": "Lorg/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl;",
+          "access": 2
+        },
+        {
+          "name": "added",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "running",
+          "descriptor": "Z",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "06449def41a33a2fa1db1f15250bb774c2fe510100dfab211564c44b3b531c5a",
+          "code_length": 31
+        },
+        {
+          "name": "addShutdownHook",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f1dbd9095edc4fb20e4b66f1d4c5f1e15dfd7d139f93f057fb8c1e276564cd97",
+          "code_length": 35
+        },
+        {
+          "name": "removeShutdownHook",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3c866f4d18ada024c340dd694c65aafb6490b23f7477585f7429b605f6c74fe8",
+          "code_length": 77
+        },
+        {
+          "name": "isAddedAsShutdownHook",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Process;)Z",
+          "access": 1,
+          "code_sha256": "63a51b5e7950e66dcdcac9a4fd857fa6857a34b76d5fa02301312115df28cfad",
+          "code_length": 45
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Process;)Z",
+          "access": 1,
+          "code_sha256": "818e507e34eb94df0e0ed07207b425e3d61708bb193422424da8b3248f33daa8",
+          "code_length": 45
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5688fc89e7643edb1d00b98a805c57a563c7a6cf84e05b11ac7fec364548c569",
+          "code_length": 8
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "69af888cd2d6ab250bb51dc0b12f06eed7624aebc0d6968a6d0385479ad96955",
+          "code_length": 72
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/Runnable",
+        "java/lang/Runtime",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/Enumeration",
+        "java/util/Vector",
+        "org/apache/commons/exec/ProcessDestroyer",
+        "org/apache/commons/exec/ShutdownHookProcessDestroyer",
+        "org/apache/commons/exec/ShutdownHookProcessDestroyer$ProcessDestroyerImpl"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/StreamPumper.class",
+      "occurrence": 0,
+      "sha256": "0aa19fa15383f1ea2bd895bc16749f183643ce9664256555fe3f35a685bf0fdc",
+      "name": "org/apache/commons/exec/StreamPumper",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "is",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        },
+        {
+          "name": "os",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "finished",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "closeWhenExhausted",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;Z)V",
+          "access": 1,
+          "code_sha256": "b0252d77518748d0e348bfeb91e4edec5010e2033968dc70a52e70098a016230",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;ZI)V",
+          "access": 1,
+          "code_sha256": "09b3f0867283a9ad0765134cd97232e6ce5cd23f29f7eb94734698855eb7b64f",
+          "code_length": 37
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "970d59d672ad1321928b56e763adb6eb4daf1fc3735593a3662e614c2244f266",
+          "code_length": 8
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dcd8e1060531d092e0250b91a4aefd652657250411e5f5250e87970205a85b05",
+          "code_length": 229
+        },
+        {
+          "name": "isFinished",
+          "descriptor": "()Z",
+          "access": 33,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "waitFor",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "c6a7665a4bd5f86f470780fe639d1a3560fea1c02063437a22a0641c41aa99c0",
+          "code_length": 15,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/apache/commons/exec/StreamPumper",
+        "org/apache/commons/exec/util/DebugUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/TimeoutObserver.class",
+      "occurrence": 0,
+      "sha256": "aee27f7b933daf6b08690f8ecf5d22c22f968a925ce90aa7ffe7f5a2ffc60170",
+      "name": "org/apache/commons/exec/TimeoutObserver",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "timeoutOccured",
+          "descriptor": "(Lorg/apache/commons/exec/Watchdog;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/exec/TimeoutObserver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/util/DebugUtils.class",
+      "occurrence": 0,
+      "sha256": "eaaa8f290beae050e44cbaef2d53496e769af2f687af3a6c10146b764dd78b75",
+      "name": "org/apache/commons/exec/util/DebugUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "COMMONS_EXEC_LENIENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "COMMONS_EXEC_DEBUG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "handleException",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 9,
+          "code_sha256": "507708831eb3328e45c00f1bb6118d91028a4363394bb98c29a648a92e2f21d4",
+          "code_length": 48
+        },
+        {
+          "name": "isDebugEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "8bf304924f046b927220a5e03ed4fdb5de5c0e81012e5c53128ad0298b3bc55b",
+          "code_length": 23
+        },
+        {
+          "name": "isLenientEnabled",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "06af5b6d7f2f15a0db5c2bc8cea9ca7c9dfde4847eae5b67a1631f7bbc6f972b",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/System",
+        "org/apache/commons/exec/util/DebugUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/util/MapUtils.class",
+      "occurrence": 0,
+      "sha256": "960f01cdcd55eca9a7e1c43ccdc352173939f658ab4deb28a478dbac1f462fef",
+      "name": "org/apache/commons/exec/util/MapUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "86d8d2d73b7980501c69942293aefae58f6bc2d8c9da80d5910d28a98637f70e",
+          "code_length": 23,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;)Ljava/util/Map<TK;TV;>;"
+        },
+        {
+          "name": "prefix",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "b742a1c0c82824e52ef180cb93934b987a1c954f90711254854673a6f5974ef2",
+          "code_length": 105,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;Ljava/lang/String;)Ljava/util/Map<Ljava/lang/String;TV;>;"
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "4297707610cef2decab3c636e3117082874c9a71e7000ee60956c8008b47be28",
+          "code_length": 58,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;Ljava/util/Map<TK;TV;>;)Ljava/util/Map<TK;TV;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/exec/util/MapUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/util/StringUtils.class",
+      "occurrence": 0,
+      "sha256": "a572e991c52e42dd238930e0d4503d923dc89c496184df6dca0897aa87365bc6",
+      "name": "org/apache/commons/exec/util/StringUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SINGLE_QUOTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DOUBLE_QUOTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SLASH_CHAR",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "BACKSLASH_CHAR",
+          "descriptor": "C",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "stringSubstitution",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Z)Ljava/lang/StringBuffer;",
+          "access": 9,
+          "code_sha256": "26225af16ba847999af6c7c3e9855b7ed35930725e8bc9379c57655e6ff93d9e",
+          "code_length": 395,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<-Ljava/lang/String;*>;Z)Ljava/lang/StringBuffer;"
+        },
+        {
+          "name": "split",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "11ca27c9ae440a57e2f18be7ef4732fe6c432bbf6c3f75c575b1d743683ce6e7",
+          "code_length": 58
+        },
+        {
+          "name": "fixFileSeparatorChar",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "ba2e05f434170daa77f3b9448b1d980ec9e4d4b98286a0a0199d157044c53bde",
+          "code_length": 18
+        },
+        {
+          "name": "toString",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "1d571b3f5d44588339ad9bb6390f8e6d51c1d4c6224b406df241de3c50c56b5c",
+          "code_length": 45
+        },
+        {
+          "name": "quoteArgument",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "ac1e2a6477fc7751ebea8958e8b6456b190b8b91cb9048e131cab742459d6b27",
+          "code_length": 163
+        },
+        {
+          "name": "isQuoted",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "46dc7050f7a765252da6ce3d208e3d5bc690d2320e874fb22da72cd703facc7e",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/File",
+        "java/lang/Character",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/StringTokenizer",
+        "org/apache/commons/exec/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/exec/Watchdog.class",
+      "occurrence": 0,
+      "sha256": "94ea27bc369b1be55e9b66759bc9d9aa77edf8fe48fc4587ab2be296ae7bcddc",
+      "name": "org/apache/commons/exec/Watchdog",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "observers",
+          "descriptor": "Ljava/util/Vector;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Vector<Lorg/apache/commons/exec/TimeoutObserver;>;"
+        },
+        {
+          "name": "timeout",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "03e13bd9296b0c0d3c5ed08aa6d0abeeb78111161badc4a360607e92d6f8e0a8",
+          "code_length": 43
+        },
+        {
+          "name": "addTimeoutObserver",
+          "descriptor": "(Lorg/apache/commons/exec/TimeoutObserver;)V",
+          "access": 1,
+          "code_sha256": "721994fc9c7b5fc1c2fb899908b0ff88b7efc99db0af3467a345c1f8a5f78673",
+          "code_length": 9
+        },
+        {
+          "name": "removeTimeoutObserver",
+          "descriptor": "(Lorg/apache/commons/exec/TimeoutObserver;)V",
+          "access": 1,
+          "code_sha256": "05569f619557f47558a4f67527c1a3d687a38539f4b3d11bad3c2eee557be179",
+          "code_length": 10
+        },
+        {
+          "name": "fireTimeoutOccured",
+          "descriptor": "()V",
+          "access": 20,
+          "code_sha256": "cc00bd70efdcf062800ef7d7d6360086dc2a5e79950ef022637768f8be2c8452",
+          "code_length": 36
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "1359d198045daabab0b65e5e5bb8d2458622c18f1766b1130e533f4522da9ae3",
+          "code_length": 26
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "242b5b05580ccff9651c7e633952c903824335a8fbaecbce03804e7dd5f8804e",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70839c0d615c2aa52d8e7d55813e6e53fd7b70a3d0a67012daf9d9c5d2157658",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/Enumeration",
+        "java/util/Vector",
+        "org/apache/commons/exec/TimeoutObserver",
+        "org/apache/commons/exec/Watchdog"
+      ]
+    }
+  ]
+}

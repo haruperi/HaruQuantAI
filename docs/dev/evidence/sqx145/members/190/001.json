@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/FitnessMethodWFResult/FitnessMethodWFResult.jar",
+  "archive_sha256": "9d652f7e6ef5d6631969668b6d2c50efa4244504eca0ab3d452e341e7c33546f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1.class",
+      "occurrence": 0,
+      "sha256": "ec057bd32c56448b112b0459568bc931bbece557401f834163484f17d6b0a235",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal.class",
+      "occurrence": 0,
+      "sha256": "1c43fef45c3476850bde894395ad8025661e36ce6bbac6d57278315b5435fd6a",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "valueType",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "use",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "statsValueName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "weight",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "target",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult;)V",
+          "access": 2,
+          "code_sha256": "fd47d0c7fba732c2ad89a9316fa1a76155de77ef7d9b6947b584e38dcb19e3fc",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult;Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult.class",
+      "occurrence": 0,
+      "sha256": "e6bc23056c31fc9109d33df1c41b0fe84b7362a7540a1db43f8d5930c44c555a",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "ComputeFromWFResult",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "databankColumnName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "weightedGoals",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a907987c1faaead3e68ebcfa366ecb20bfdeeea5e9e7ea4fffd0d563cd66eb64",
+          "code_length": 21
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7f40213b624e991c07bd11203f997129e0c3e28ec5d7b662027536f1f44109b2",
+          "code_length": 26
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6bb5e3db34b58b5a1199d1587f26728031e570b466b40e4d20782ba8e96d1f50",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BB)D",
+          "access": 1,
+          "code_sha256": "3415eeef6296532722389594e09ede35ee371a2c41861a53fe5a1bd4e75855f0",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBZ)D",
+          "access": 1,
+          "code_sha256": "a990006a870a75c68d0e9388bc196c5b89c6eab24f920af31ca42ae613e7a338",
+          "code_length": 63,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;DBZ)D",
+          "access": 2,
+          "code_sha256": "6d9fc9702e955f4acb8a0ebe092eeb58b9e78d42e35cc5ccb7d639e5e3cd33c4",
+          "code_length": 60,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeWeightedFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBZ)D",
+          "access": 2,
+          "code_sha256": "dee415fd1eb1d87709ba91814191c42e1f15dbb141fc300083afbc66354ed66f",
+          "code_length": 159,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initFitnessFromXml",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "b5df716a343336a2105dc60e64ea07eb22842969009b27d884c293b8a4a774fc",
+          "code_length": 212
+        },
+        {
+          "name": "getFitnessType",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "b722b3f1ce5f33632c02ed31f9a8c499d065c6e4937f03ef6d634df40085a4b6",
+          "code_length": 31,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "13e3df2d46879855a20817b2df530a68d08cbded07e99928b5a7c620a61625fd",
+          "code_length": 3
+        },
+        {
+          "name": "getFitnessName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "aac9bb625279491ff0523f1f97d5c9b77204ad8fcbb83505294957dbea720dfe",
+          "code_length": 6
+        },
+        {
+          "name": "getFitnessDatabankColumnName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getUsedStatValues",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "8a0722ae4f3fcfba5c813cd966b504e7b004f996d0d7f6673282fe451b294e54",
+          "code_length": 102,
+          "throws": [
+            "com/strategyquant/lib/snippets/NonexistingCustomClassException"
+          ],
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/DatabankColumn;>;"
+        },
+        {
+          "name": "printWeightedGoals",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d200b6ae775ca2b8330a471142f549ecf9a0edb762ba9733dd6f189f6b05ff6b",
+          "code_length": 108
+        },
+        {
+          "name": "getMetricsForFitness",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "ca55bef408e3fa230801b4a48266d94f71c9f10868d982936594fdc3a31254b4",
+          "code_length": 192,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/optimization/MetricForFitness;>;"
+        },
+        {
+          "name": "getMetricValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "68302d214ef9d8feda8396ccd4a878846f5d54558e19c878c749ade2c0bc5e23",
+          "code_length": 83,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/fitnessfunction/IFitnessFunction;",
+          "access": 1,
+          "code_sha256": "db878fbc8085e07b653296e3a667172e5953fe0ff362016239c568fabdc67b34",
+          "code_length": 26
+        },
+        {
+          "name": "cloneGoals",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "6f203b23e71b665e4be94669d46d5755a56d003046914ad1db77f4bf0834f21f",
+          "code_length": 104,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal;>;"
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "13b2973abfba7fcc229c9fbc94ce93f6bfb84d717e4110372775f5625075b7b8",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0f2d7ffe79c3bb1f2a7768e2687b998c08e301068184fcd8f60d2242660d8d62",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/snippets/NonexistingCustomClassException",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1",
+        "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/optimization/MetricForFitness",
+        "com/strategyquant/tradinglib/optimization/WalkForwardMatrixResult",
+        "com/strategyquant/tradinglib/results/stats/StatsComputer",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

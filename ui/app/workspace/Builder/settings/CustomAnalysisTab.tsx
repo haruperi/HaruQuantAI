@@ -1,7 +1,7 @@
 import { SqdFieldset, SqdHelpLink, SqdSelect, SqdTextInput } from './SettingsControls';
 import { customAnalysisDefaults, customAnalysisMethodOptions } from './settingsFixtures';
 
-/** "Custom analysis" tab (donor evidence SQX144-EV-000043). */
+/** "Custom analysis" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function CustomAnalysisTab() {
   const perStrategy = customAnalysisMethodOptions.filter(o => o.group === 'perStrategy');
   const fullDatabank = customAnalysisMethodOptions.filter(o => o.group === 'fullDatabank');

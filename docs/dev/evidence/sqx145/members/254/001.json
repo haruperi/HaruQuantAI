@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
+  "archive_sha256": "7798ced63fad323cb8591dcc4f0075a610147b27ccc9522a202e990e4ba8f57d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/MoneyManagement/MoneyManagementSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "8b0f539e7dc39852c907dbea5de20aff9e1c26b0be332cb54a6d84394b7acf16",
+      "name": "com/strategyquant/plugin/Settings/impl/MoneyManagement/MoneyManagementSettingsPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "tabTitle",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "de35150e24150e8208c82ef524cd41667de4ba7abacbe7bfaef5eba4fc4531b6",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "217317d25ed2465e8863ae0631f883cd4b4846f54f1c7aa2dfbae8d20937f4f3",
+          "code_length": 245
+        },
+        {
+          "name": "isCloudEngineTask",
+          "descriptor": "(Lorg/jdom2/Element;)Z",
+          "access": 2,
+          "code_sha256": "2428df219fc83341b5c7b2cf1885bd2f4c8b8a5581fe5e4c581ec0821bcbce39",
+          "code_length": 33
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "2a2e27bd67984c3e3dade1318c6893e84a092cde531e1948a9172e3db0c0bcb8",
+          "code_length": 232
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "cd57b3e3db8c07b9c106477af5dae5672033b403565d23c9a7a1d8a62611f599",
+          "code_length": 415,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f838786147a012b055580e07607df2f521eef519e72a6aea9957e46f90c15150",
+          "code_length": 4
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4a7c933c8730a123fc2e2597273877dc5e729115b02b92660145021072cbca5f",
+          "code_length": 6
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "02ddd389d8bd3b0bc7b0f5324213b2a7f63575588132c4fbc9a12003dd873e9f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Settings/impl/MoneyManagement/MoneyManagementSettingsPlugin",
+        "com/strategyquant/tradinglib/MoneyManagementMethod",
+        "com/strategyquant/tradinglib/RiskManagementMethod",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/propertygrid/IPGParameter",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

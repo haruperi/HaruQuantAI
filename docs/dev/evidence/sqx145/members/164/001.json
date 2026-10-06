@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DatabankRename/DatabankRename.jar",
+  "archive_sha256": "599ccf09cfdbdd4eb4e56c8aef81b2a6dfebe73743a0106e92abde7c77a1dffa",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.class",
+      "occurrence": 0,
+      "sha256": "cebaed075f47eef7de9ca9eafa48b6dad2b6463b126b654f03aeb798f54448b3",
+      "name": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/pluginlib/ISQPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "0f9019e539602bc94c9d1323d9abb0b8ecfb53a6bded055197312e486e00862a",
+          "code_length": 53
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5deae65562acae9c0db6a2e6f197def236cf007187ec703cd3fa0f067f1382a9",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c867b42b7a239fcc166dbfea01d516c55082551c20bef7d002c2ffb31e240d88",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "764d8e43324d67736ef0353d9e63d524423db7f84828d4f846b2541d71ee8865",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin",
+        "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet",
+        "com/strategyquant/pluginlib/ISQPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.class",
+      "occurrence": 0,
+      "sha256": "af6c01f27a18c605e26abe4fad524686b0a0896a2c9aeb3a4b2cece292874827",
+      "name": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c63329a17c0d26d63ad36eaa8a93964cb33942256292ccfb64055c80a11e1b34",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRename",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "44a79b7e54bf8b5e6276264d4288d416116e5f3a0b58a733c771ddbceda6c120",
+          "code_length": 637,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "322f65dcc34b2d51fcdf136ec049e43610fecfc323dc00969e876fb9909df554",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectProgress",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/websocket/ProjectDataPublisher",
+        "com/strategyquant/tradinglib/project/websocket/channels/ProjectChannels",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

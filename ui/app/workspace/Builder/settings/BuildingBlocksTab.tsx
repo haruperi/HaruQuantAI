@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { blocksSections, buildingBlocksCatalog, type BlockEntry } from './settingsFixtures';
 
 /**
- * "Building blocks" tab (donor evidence SQX144-EV-000042): the accordion of
+ * "Building blocks" tab (donor evidence retained target UI; current donor equivalence unverified): the accordion of
  * counted, filterable catalog sections. Catalog entries derive from the
  * donor Build template; Signals / Stop & Limit / Custom data carry labelled
  * demo lists (engine-fed in the donor).

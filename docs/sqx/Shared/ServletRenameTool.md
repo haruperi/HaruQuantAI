@@ -1,188 +1,45 @@
 # ServletRenameTool.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/ServletRenameTool/ServletRenameTool.jar`.
-- SHA-256: `ebe6f9347a0c34737dafa1df96f5c381ccc532d3c431940189de4952bd638388`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **4**; non-nested: **4**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/ServletRenameTool/ServletRenameTool.jar`.
+- **SHA-256:** `0117bc047a4a69c16530c78b263df70f607d19bef32dcca40fda647f0e886caf`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 4 raw entries; 4 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-RESULTS-SERVLET-RENAME-TOOL`, P08; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [235.json](../../dev/evidence/sqx145/archives/145/235.json).
 
-Shared component: a single canonical document is linked from relevant workspace indexes. Its presence here does not establish which workspaces load it at runtime.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/235/001.json) — SHA-256 `2f6cc58c6b8b365867352cad0668490696c0cb9919c169152d210dcaa5c70a33`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Servlet.impl.RenameTool`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C0c430da188b2["RenameToolGenerator"] {
-        -Log
-        -NO_VALUE
-        -strategyNumber
-        +processStrategy()
-    }
-    class Ce87843eb33ee["RenameToolServlet"] {
-        -Log
-        -lockName
-        #execute()
-    }
-    class C6636e0736a0d["RenameToolServletPlugin"] {
-        -dataContext
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getHandler()
-    }
-    class C88c3a20a1e96["RenameToolSettings"] {
-        -Log
-        -configFilePath
-        +SN_Markets
-        +load()
-    }
-    class C249b5c671b1a["IServletPlugin"]
-    class C8900f90ae594["HttpJSONServlet"]
-    C8900f90ae594 <|-- Ce87843eb33ee : declared extends
-    C249b5c671b1a <|.. C6636e0736a0d : declared interface
+    class C0["RenameToolGenerator"]
+    class C1["RenameToolServlet"]
+    class C2["RenameToolServletPlugin"]
+    class C3["RenameToolSettings"]
+    class E0["HttpJSONServlet"]
+    E0 <|-- C1
+    class E1["IServletPlugin"]
+    E1 <|.. C2
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C0c430da188b2` | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` (this JAR) | this diagram |
-| `Ce87843eb33ee` | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` (this JAR) | this diagram |
-| `C6636e0736a0d` | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` (this JAR) | this diagram |
-| `C88c3a20a1e96` | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` (this JAR) | this diagram |
-| `C249b5c671b1a` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](SQTradingLib.md) | referenced external type |
-| `C8900f90ae594` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](SQWebGUILib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | class | non-nested |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | class | non-nested |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | class | non-nested |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / field declaration: `private static java.lang.String NO_VALUE;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / method signature: `private static java.lang.String getValue(java.util.HashMap<java.lang.String, java.lang.String>, java.lang.String);`<br>`private static java.lang.String getNumber(java.lang.String);`<br>`private static java.lang.String getStrategyId(java.lang.String);`<br>`private static java.lang.String getTimeRangeHour(org.jdom2.Element);` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | [`com.strategyquant.tradinglib.ResultsGroup`](SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / method signature: `public static void processStrategy(com.strategyquant.tradinglib.ResultsGroup) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / method signature: `public static void processStrategy(com.strategyquant.tradinglib.ResultsGroup) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `java.util.HashMap` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / method signature: `private static java.lang.String getValue(java.util.HashMap<java.lang.String, java.lang.String>, java.lang.String);` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` | `org.jdom2.Element` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator` / method signature: `private static boolean isUsed(org.jdom2.Element);`<br>`private static java.lang.String getTimeRangeHour(org.jdom2.Element);` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](SQWebGUILib.md) | extends | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / class declaration: `public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / field declaration: `private static final java.lang.String lockName;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onRename(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onRename(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onRename(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](SQTradingLib.md) | implements | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` / class declaration: `public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | `org.eclipse.jetty.servlet.ServletContextHandler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` / field declaration: `private org.eclipse.jetty.servlet.ServletContextHandler dataContext;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` / method signature: `public java.lang.String getProduct();` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` | `org.eclipse.jetty.server.Handler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin` / method signature: `public org.eclipse.jetty.server.Handler getHandler();` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / field declaration: `private static final java.lang.String configFilePath;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Markets;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_TimeFrames;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_OrderTypes;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Indicators;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_Markets;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_TimeFrames;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / method signature: `private static void loadValues(org.jdom2.Element, java.lang.String, java.util.HashMap<java.lang.String, java.lang.String>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `java.util.LinkedHashMap` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / field declaration: `public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Markets;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_TimeFrames;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_OrderTypes;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Indicators;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_Markets;`<br>`public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_TimeFrames;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `org.jdom2.Element` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / method signature: `private static void loadValues(org.jdom2.Element, java.lang.String, java.util.HashMap<java.lang.String, java.lang.String>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `java.util.HashMap` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / method signature: `private static void loadValues(org.jdom2.Element, java.lang.String, java.util.HashMap<java.lang.String, java.lang.String>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings` / method signature: `private static void loadValues(org.jdom2.Element, java.lang.String, java.util.HashMap<java.lang.String, java.lang.String>) throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator</summary>
-
-```text
-public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator
-    private static final org.slf4j.Logger Log;
-    private static java.lang.String NO_VALUE;
-    private static int strategyNumber;
-    public com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolGenerator();
-    public static void processStrategy(com.strategyquant.tradinglib.ResultsGroup) throws java.lang.Exception;
-    private static java.lang.String getValue(java.util.HashMap<java.lang.String, java.lang.String>, java.lang.String);
-    private static java.lang.String getNumber(java.lang.String);
-    private static java.lang.String getStrategyId(java.lang.String);
-    private static boolean isUsed(org.jdom2.Element);
-    private static java.lang.String getTimeRangeHour(org.jdom2.Element);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet</summary>
-
-```text
-public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet
-    private static final org.slf4j.Logger Log;
-    private static final java.lang.String lockName;
-    public com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServlet();
-    protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;
-    private java.lang.String onRename(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin
-    private org.eclipse.jetty.servlet.ServletContextHandler dataContext;
-    public com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolServletPlugin();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public org.eclipse.jetty.server.Handler getHandler();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings</summary>
-
-```text
-public class com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings
-    private static final org.slf4j.Logger Log;
-    private static final java.lang.String configFilePath;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Markets;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_TimeFrames;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_OrderTypes;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> SN_Indicators;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_Markets;
-    public static java.util.LinkedHashMap<java.lang.String, java.lang.String> MN_TimeFrames;
-    public com.strategyquant.plugin.Servlet.impl.RenameTool.RenameToolSettings();
-    public static void load();
-    private static void loadValues(org.jdom2.Element, java.lang.String, java.util.HashMap<java.lang.String, java.lang.String>) throws java.lang.Exception;
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator.class` | 0 | `2fa8e4d7723a1183e2d2bc797d41b21a5f1714a56b43e1cf2a05a0c87e05cbb6` | 3 | 8 |
+| `com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet.class` | 0 | `98844c63bd1edf661c6c59f633aa534530c9980379d6eaec7245962aaf1b19a0` | 2 | 4 |
+| `com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin.class` | 0 | `273c1c34143909ca3fda3d2e2126f8a19b5a826418131ae7e29dbc421af305cf` | 1 | 5 |
+| `com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings.class` | 0 | `7d0d0cff3fe2bff1fd62e8aa413cab2c12fc8a535626c92a0199929fb74901aa` | 8 | 4 |

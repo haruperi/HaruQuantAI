@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+  "archive_sha256": "4a9d64a03e668d1563a14e179c041721779a83b440c7ada56097fb9d28f54a3d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooPlugin.class",
+      "occurrence": 0,
+      "sha256": "9e46208e83301871bd17a66a4fa7f7cd84392601986372b8a7e5fa844a76eea5",
+      "name": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooPlugin",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1.class",
+      "occurrence": 0,
+      "sha256": "4cac10db560d9239cf11215a92cfc7b0a76f1c0427720ed3bff924a023ac9da9",
+      "name": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "val$yahooSymbols",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet;Ljava/util/Map;Ljava/util/ArrayList;)V",
+          "access": 0,
+          "code_sha256": "d4876b454dd4442e647c3de87ce28f52fb5d0d9e2134b250d698d8c25f7e50c8",
+          "code_length": 20
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d55ef6f5480cd837e0524cea137569fc8d581b5ba010593a0d0a7f69cb68e7d2",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet.class",
+      "occurrence": 0,
+      "sha256": "6eb2edd80e4947fabcb4418e7f42e6c02bdf837fecdda441d2b3271950725765",
+      "name": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c17eb3a1b765a40676931f1223b78873d94e2f81399b4ef88ba7c7f47ca9f1de",
+          "code_length": 10
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "23f3e5915beedcbc3cafe7f3d5b46d9454e1870562176643304750cc8fac3e5a",
+          "code_length": 266,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dc5f1fd9d6b96f6e47e539ee8623db8b1542ac6a14dc0dc9dde0248de08798cc",
+          "code_length": 153,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onAdd",
+          "descriptor": "(Ljava/util/Map;Ljava/util/ArrayList;)V",
+          "access": 2,
+          "code_sha256": "f8fe6d8b4e6dfd96061321a132cb46b13538e0eb57404e2118360b37a3c6c72c",
+          "code_length": 428,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/util/ArrayList<Lcom/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol;>;)V"
+        },
+        {
+          "name": "onAddCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fdebcbf2a81fd9a68418de94b69761244156ce4ccbadc3e263f4ddafa6a866f5",
+          "code_length": 35,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "parseSymbols",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "02f48e16574bb2b3498822c43ce831138fa804be15db9429d73319291e7bfc92",
+          "code_length": 71,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0f4e757d1ec5821aefe4afd74d3cb726a8efc9185ef89e03e17c0bef39677edd",
+          "code_length": 563,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportDataAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b9e5824c914e07270cfe1ba7f78ad921d025726c04a45a018d5f16693c7ab1e4",
+          "code_length": 238,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e0bea970a61eaa04cf6032627e9e85feba1dcaf4e6e267d2f61530731840daca",
+          "code_length": 308
+        },
+        {
+          "name": "onUpdateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "734fc5273cd87c65a886ae1a6c9732837903f94c0bf459c77dd03adab7c8e842",
+          "code_length": 478,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet;Ljava/util/Map;Ljava/util/ArrayList;)V",
+          "access": 4104,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7185d0202dbba51871b6a8abecf3b1804f2d11c7a79c1e8718ee7ff1192a4e9a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet$1",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager.class",
+      "occurrence": 0,
+      "sha256": "dfdb6461845e7c406baa63e707b429e8b519cbae0526d26a991a33c00b4272b7",
+      "name": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager;",
+          "access": 41,
+          "code_sha256": "839cebf37003c0bf318401c03a84e2288348a46b3964e08231b43431b1114324",
+          "code_length": 20
+        },
+        {
+          "name": "addData",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;BLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3a4a16f67791d45068c1969a54a0cc49d759eedbea1ddfc039a4019efd1d893d",
+          "code_length": 212,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getCookieCrumb",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6a1a31364c854da20831d87c2e4449a3d5c7f2378c1e49da9148e560b9545aaa",
+          "code_length": 264,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "downloadInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol;",
+          "access": 1,
+          "code_sha256": "3c1df6d33a10373c2a22054404135c5bb37f6632b4fedb187cd7735a763f4354",
+          "code_length": 239,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bb6f3fea656806875f156f00edcd250586ed45ca36fbae7fdc3e70e448f97400",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooDataManager",
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol",
+        "com/strategyquant/tradinglib/yahoo/YahooHelper",
+        "java/io/BufferedReader",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/io/PrintStream",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/net/URLEncoder",
+        "java/nio/charset/StandardCharsets",
+        "org/apache/http/HttpEntity",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/HttpStatus",
+        "org/apache/http/StatusLine",
+        "org/apache/http/client/HttpClient",
+        "org/apache/http/client/methods/HttpGet",
+        "org/apache/http/impl/client/HttpClientBuilder",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol.class",
+      "occurrence": 0,
+      "sha256": "41078c6db0d87abd320df58fb7ee839f0df2593369bdd1f4740428d239e6f3e2",
+      "name": "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "exchange",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0df5bb76f50264676803d53313ccc7418a14759b90af1ca22b3d7d8e8b4ab1ca",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Yahoo/YahooSymbol",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

@@ -23,7 +23,7 @@ Resume, Stop and completion; it never submits quantitative jobs. Retester and
 Optimizer keep their settings mounted while switching the three project panels.
 Workspace unmount resets these drafts; they are not durable project documents.
 
-SQX declarations support shared composition (SQX144-EV-000065). No donor runtime
+SQX declarations support shared composition (retained target UI; current donor equivalence unverified). No donor runtime
 screenshot comparison or complete pixel-parity qualification has been performed.
 Progress configuration/statistic dialogs, charts and reports remain simplified
 local previews. Common settings retain earlier Builder approximation gaps; shared
@@ -53,3 +53,7 @@ Wave2 forwards DataTab and ProjectResults to bounded SettingsData and ProjectRes
 Wave3 structural extraction retains explicit shared contracts, fixtures, modal lifecycle, charts/model and compatibility adapters. Approved source-map inventories distinguish unsupported donor artifacts; no backend behavior or parity claim added.
 
 Wave4 structural extraction retains explicit shared contracts, fixtures, modal lifecycle, charts/model and compatibility adapters. Approved source-map inventories distinguish unsupported donor artifacts; no backend behavior or parity claim added.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

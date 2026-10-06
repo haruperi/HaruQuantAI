@@ -1,0 +1,942 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-compress-1.27.1.jar",
+  "archive_sha256": "293d80f54b536b74095dcd7ea3cf0a29bbfc3402519281332495f4420d370d16",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/compress/utils/InputStreamStatistics.class",
+      "occurrence": 0,
+      "sha256": "3060fa9cf20950e07f66bc947480eae5f2bfc1ea67ff1590085f14a9769814fe",
+      "name": "org/apache/commons/compress/utils/InputStreamStatistics",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getCompressedCount",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getUncompressedCount",
+          "descriptor": "()J",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/InputStreamStatistics"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/Iterators.class",
+      "occurrence": 0,
+      "sha256": "30a3e20fd9dbab6a0cb2481aaf3cf1c6a3b292d8470691ebc7fe3a071c53f4b2",
+      "name": "org/apache/commons/compress/utils/Iterators",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "addAll",
+          "descriptor": "(Ljava/util/Collection;Ljava/util/Iterator;)Z",
+          "access": 9,
+          "code_sha256": "4679bd05ec547828b19d3edf6591d904bf04ebbe3c99fbbfaea058d6c64697db",
+          "code_length": 41,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;Ljava/util/Iterator<+TT;>;)Z"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "8fc9fcbbc2f572cb5f5aa1b35c56428a4b839bb1b4a99c3dd440f9a2713cb0ad",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Objects",
+        "org/apache/commons/compress/utils/Iterators"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/Lists.class",
+      "occurrence": 0,
+      "sha256": "6bf0b8b29e9a0dee2e41c877acf7e93ac8669937004439c138986bdd3d285960",
+      "name": "org/apache/commons/compress/utils/Lists",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newArrayList",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 9,
+          "code_sha256": "48922ad88dba7a8c84866d92e561b2b0e1a269f03f36f3cd344402c65e7be377",
+          "code_length": 8,
+          "generic_signature": "<E:Ljava/lang/Object;>()Ljava/util/ArrayList<TE;>;"
+        },
+        {
+          "name": "newArrayList",
+          "descriptor": "(Ljava/util/Iterator;)Ljava/util/ArrayList;",
+          "access": 9,
+          "code_sha256": "b6807207c8a64d5bb284e2e68054145b377d20b231dc3df4dcacd0f83f6e1e94",
+          "code_length": 12,
+          "generic_signature": "<E:Ljava/lang/Object;>(Ljava/util/Iterator<+TE;>;)Ljava/util/ArrayList<TE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3cbf10796c8b68343919f56bd75d1061d3aefdbd02f8763313f594d895cc67df",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "org/apache/commons/compress/utils/Iterators",
+        "org/apache/commons/compress/utils/Lists"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/MultiReadOnlySeekableByteChannel.class",
+      "occurrence": 0,
+      "sha256": "5e58f6dd0016656fce4e01e029e640dc2ddb8419b18664d1172d95e6c52d7170",
+      "name": "org/apache/commons/compress/utils/MultiReadOnlySeekableByteChannel",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/nio/channels/SeekableByteChannel"
+      ],
+      "fields": [
+        {
+          "name": "EMPTY_PATH_ARRAY",
+          "descriptor": "[Ljava/nio/file/Path;",
+          "access": 26
+        },
+        {
+          "name": "channelList",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/nio/channels/SeekableByteChannel;>;"
+        },
+        {
+          "name": "globalPosition",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "currentChannelIdx",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "forFiles",
+          "descriptor": "([Ljava/io/File;)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 137,
+          "code_sha256": "fc80f08af6b6782a6b4117ee187047901f7c08c66f447edb7021c32113715e0f",
+          "code_length": 70,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "forPaths",
+          "descriptor": "([Ljava/nio/file/Path;)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 137,
+          "code_sha256": "12a7369f8907bf09b71fb9b019ff9eca4097cacec2eea4efc5e7f54cbc698147",
+          "code_length": 94,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "forSeekableByteChannels",
+          "descriptor": "([Ljava/nio/channels/SeekableByteChannel;)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 137,
+          "code_sha256": "173bc4134c08b231daf61fce070a793a78345e7894c1a0c2644bd4f3f54a2b8e",
+          "code_length": 30
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "c89cef8addea7323186523dab3f48c6de1acb1cc28f902c0e65d7d7c4ab820da",
+          "code_length": 28,
+          "generic_signature": "(Ljava/util/List<Ljava/nio/channels/SeekableByteChannel;>;)V"
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "612abe2eb8eede862bb89bb3f9aa427bc3496b6eb8f446e992dab1bdd9b46b4c",
+          "code_length": 68,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "31ef6ac71c39727ef77051070c2ac41f79b46eb075c5f78e48fcc4bb901fcef7",
+          "code_length": 20
+        },
+        {
+          "name": "position",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "418bc7e3de99a141a82e972abbaa2aea8c3f148e8a6485a80b4e5e7039d8da6d",
+          "code_length": 5
+        },
+        {
+          "name": "position",
+          "descriptor": "(J)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 33,
+          "code_sha256": "babaf6b02f7aa6281c2df8a1be90e627914a065905606a164690d14a7ed40a1d",
+          "code_length": 165,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "position",
+          "descriptor": "(JJ)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 33,
+          "code_sha256": "ffffad77771688132c0cb7d3cd63cb4259b3b7424f6e1b8f28c621c5edbfab8f",
+          "code_length": 66,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 33,
+          "code_sha256": "b5b70cbb149a290b3221e017dbca398c5b7678bf61cb42068b5eff5d57cc65e9",
+          "code_length": 147,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "size",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7330c62cdeeeddef24235b68e3baebffd6dabf1c7c9e541878a299112e26ac24",
+          "code_length": 62,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "truncate",
+          "descriptor": "(J)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 1,
+          "code_sha256": "33f2ec0dbc53e90a9f0e86a3fdbd2996c35059d587f9b715a4c522c141f7768b",
+          "code_length": 8
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 1,
+          "code_sha256": "33f2ec0dbc53e90a9f0e86a3fdbd2996c35059d587f9b715a4c522c141f7768b",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "87e8b81d6096e58cf19c6747957d907309935e51742743234ce059c398e0b709",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/nio/channels/SeekableByteChannel;",
+        "[Ljava/nio/file/Path;",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/Channel",
+        "java/nio/channels/ClosedChannelException",
+        "java/nio/channels/NonWritableChannelException",
+        "java/nio/channels/SeekableByteChannel",
+        "java/nio/file/Files",
+        "java/nio/file/OpenOption",
+        "java/nio/file/Path",
+        "java/nio/file/StandardOpenOption",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Objects",
+        "java/util/stream/Stream",
+        "org/apache/commons/compress/utils/MultiReadOnlySeekableByteChannel"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/OsgiUtils.class",
+      "occurrence": 0,
+      "sha256": "826cf1fe34a2513d82028b35c0dc73d33005ff130b265b4ec9bc75b18899a492",
+      "name": "org/apache/commons/compress/utils/OsgiUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "inOsgiEnvironment",
+          "descriptor": "Z",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isBundleReference",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 10,
+          "code_sha256": "e09bd16bf6737986b6b2895fc3c04f79f7f7d8ea1f56e1aad4764e37b4ad3f12",
+          "code_length": 69,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "isRunningInOsgiEnvironment",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "8acb278afe683d446e56b3f2d9df9545a0b8ee653bbe06b54738a68b27e6b739",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "87e792f9c947005129bd2a77cc2b38e345197099da901a2c776e777f35e75be2",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/compress/utils/OsgiUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ParsingUtils.class",
+      "occurrence": 0,
+      "sha256": "04d00ad1e660f465a1655a2d3aa4b7eaeae154a4aec2f1945fd8ce6923c5ef72",
+      "name": "org/apache/commons/compress/utils/ParsingUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "parseIntValue",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "20cadb636f9cbb9829d6e2e5c7b0be7d7e274e4e6e4c0930afc0f5483b7ab831",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseIntValue",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 9,
+          "code_sha256": "9553be1d6ba6840d1edbcea9b0add7ae2ec5dbefdbc562bcc4c55fcbea5bb868",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseLongValue",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 9,
+          "code_sha256": "328476c8ae2fb4cfb799ae0357f99464cbcdd0a0ec626209089ff071f4e25114",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseLongValue",
+          "descriptor": "(Ljava/lang/String;I)J",
+          "access": 9,
+          "code_sha256": "f767ac5c2050940157803a608e61a5bb31021d4367b81f1a4ed7de7788d60e96",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "77fa275fd1b5894e2c1a7fda717e62bd14ac958f4ae8ef30f488211ab09fe121",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/compress/utils/ParsingUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/SeekableInMemoryByteChannel.class",
+      "occurrence": 0,
+      "sha256": "4acbb334ded7187b9c8714d70d8e87def8d75707512b8fee2b6f1eb373c0db73",
+      "name": "org/apache/commons/compress/utils/SeekableInMemoryByteChannel",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/nio/channels/SeekableByteChannel"
+      ],
+      "fields": [
+        {
+          "name": "NAIVE_RESIZE_LIMIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "data",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "closed",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 18
+        },
+        {
+          "name": "position",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "88f6e1bbc445bafc2845d8c1de9f0f9fde47b7186a00483c8265bbd343351df3",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "8acf682623be27fb7da0cc349de5bef03cfcc3c2d1d7d613b5e481a2a917a647",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "068e4c49d7db61d63910eb6933ac206acf644e936c5367de234ba0a43ea35f95",
+          "code_length": 8
+        },
+        {
+          "name": "array",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c579115938fc0aa0892b690872de8495d0b1cc578e9b737c8f95e99fb746bc12",
+          "code_length": 9
+        },
+        {
+          "name": "ensureOpen",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "683cc35c36f3341251d5487f34261635a392da6dd41b4e12d99484e56400803d",
+          "code_length": 16,
+          "throws": [
+            "java/nio/channels/ClosedChannelException"
+          ]
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ecbb25887168e99afa114f65b00734e966a7c4b8676f6d04edb0b4ada77c1d9a",
+          "code_length": 16
+        },
+        {
+          "name": "position",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "53480bdeb262547c30216b867c642f723c16fab912d6a7e2b68bec0f3f04cbc4",
+          "code_length": 6
+        },
+        {
+          "name": "position",
+          "descriptor": "(J)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 1,
+          "code_sha256": "64f9ff04269601aff59e2305d9b1e19165f71aa62484c4b690f4ace172215d10",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 1,
+          "code_sha256": "16bec4a88a38e9ecd394ce60998bde35c2099fc2f0c2e7115b17914609f43eee",
+          "code_length": 58,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "d93ee77cddeddffa7b7b1be681bb59683696998ea2415ee5a09c4ddd50a31d45",
+          "code_length": 45
+        },
+        {
+          "name": "size",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "bfd774989c09b45ed83e7b2a25308a4cfb8d36868f7d8013a260a80b0df6a37b",
+          "code_length": 6
+        },
+        {
+          "name": "truncate",
+          "descriptor": "(J)Ljava/nio/channels/SeekableByteChannel;",
+          "access": 1,
+          "code_sha256": "445de9cfa0ec5bcd998a97c22f5edbb17ea02ce3fe040a82ccf21bd8d34419cf",
+          "code_length": 58
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 1,
+          "code_sha256": "f62bee4f78ec8cb12cf6b728c710006eed3fabc75b87a86ddf0741a4c5129146",
+          "code_length": 105,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/ClosedChannelException",
+        "java/nio/channels/SeekableByteChannel",
+        "java/util/Arrays",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/SeekableInMemoryByteChannel"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ServiceLoaderIterator.class",
+      "occurrence": 0,
+      "sha256": "bd99c2c262570a7b30fc8926a14070036eadc87247b7473954d7dca1fab050d4",
+      "name": "org/apache/commons/compress/utils/ServiceLoaderIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "nextServiceLoader",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TE;"
+        },
+        {
+          "name": "service",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TE;>;"
+        },
+        {
+          "name": "serviceLoaderIterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TE;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "e8ca1d3dbada2a31a1fabcda8fdda577715b1cd972149e78a630802b18182ed4",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/Class<TE;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/ClassLoader;)V",
+          "access": 1,
+          "code_sha256": "3b01b65c1461be5b5cb32123cd826ee249e58e6c17b5e2b1e89a3da05a6406eb",
+          "code_length": 22,
+          "generic_signature": "(Ljava/lang/Class<TE;>;Ljava/lang/ClassLoader;)V"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "af60344395cb80386e27cb2c85daa1c66b90aa6979557458040415baa5f01a3f",
+          "code_length": 55
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5aba1cc0fba44116d51d52e146b3a9b5ab8f62a7dedebb304f34aa641bbbaca8",
+          "code_length": 52,
+          "generic_signature": "()TE;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698f3f1f181eb10da6912763d8c3b84e9ca789471cea0e0776fc3a5c252027c1",
+          "code_length": 33
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/Iterator<TE;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "java/util/ServiceConfigurationError",
+        "java/util/ServiceLoader",
+        "org/apache/commons/compress/utils/ServiceLoaderIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/Sets.class",
+      "occurrence": 0,
+      "sha256": "7ab1d9d7ab8d3dd2eea3fb09b0767cae859580a15ad1827b4383a07e93b5fa3b",
+      "name": "org/apache/commons/compress/utils/Sets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newHashSet",
+          "descriptor": "([Ljava/lang/Object;)Ljava/util/HashSet;",
+          "access": 137,
+          "code_sha256": "d40a0a7cd4139846006d64367d67c6a5964723bcb2597be931e98cabbd31b0ca",
+          "code_length": 30,
+          "generic_signature": "<E:Ljava/lang/Object;>([TE;)Ljava/util/HashSet<TE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "63ceef94c0fbb4d351362de466a4c2dda3bbc7ddf10a43482e2b7685a23a47be",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Object",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "org/apache/commons/compress/utils/Sets"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/SkipShieldingInputStream.class",
+      "occurrence": 0,
+      "sha256": "1c65037a0f5615104186849c89b24fc0180270232b475486a44a19e927541762",
+      "name": "org/apache/commons/compress/utils/SkipShieldingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SKIP_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SKIP_BUFFER",
+          "descriptor": "[B",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "skip",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "935e07b2df2e94e7b5cf8467f73b06f9e44517921755f6023fec9bf6f16b046c",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "36a763959a4fc063033fe1fc40b06aeff773f8f35dc2b2816979a9eee26512a4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "java/lang/Math",
+        "org/apache/commons/compress/utils/SkipShieldingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/TimeUtils.class",
+      "occurrence": 0,
+      "sha256": "b2d16b0781c88c93f79f4725912c57ac1fe345e36578b4cdc6c414ca8c93227b",
+      "name": "org/apache/commons/compress/utils/TimeUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "HUNDRED_NANOS_PER_MILLISECOND",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "WINDOWS_EPOCH_OFFSET",
+          "descriptor": "J",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "isUnixTime",
+          "descriptor": "(Ljava/nio/file/attribute/FileTime;)Z",
+          "access": 9,
+          "code_sha256": "88f0955eba59e7116fb83250cf2c2dd9e72ab714c71913c3deca174f96aafaf5",
+          "code_length": 5
+        },
+        {
+          "name": "isUnixTime",
+          "descriptor": "(J)Z",
+          "access": 9,
+          "code_sha256": "ffe80a8f1ea43157f8b3cab69d262d8155f6208e8d0f400874550f3ffdfe096b",
+          "code_length": 5
+        },
+        {
+          "name": "ntfsTimeToDate",
+          "descriptor": "(J)Ljava/util/Date;",
+          "access": 9,
+          "code_sha256": "a1e9075d4a3a7457ee73bcd16cce2006d284a7e5ff9db5e1f18563456b05777e",
+          "code_length": 5
+        },
+        {
+          "name": "ntfsTimeToFileTime",
+          "descriptor": "(J)Ljava/nio/file/attribute/FileTime;",
+          "access": 9,
+          "code_sha256": "706bdd418a1ea8b97e6afb84c83c26ff9aec7d97a11f833d73ba4fdd2216161a",
+          "code_length": 5
+        },
+        {
+          "name": "toDate",
+          "descriptor": "(Ljava/nio/file/attribute/FileTime;)Ljava/util/Date;",
+          "access": 9,
+          "code_sha256": "760f9e9bc8a88747d9bdc8f683404e7c2759196bc00478baef61b595a95a5c0b",
+          "code_length": 5
+        },
+        {
+          "name": "toFileTime",
+          "descriptor": "(Ljava/util/Date;)Ljava/nio/file/attribute/FileTime;",
+          "access": 9,
+          "code_sha256": "0eb42e625767ec67c968edbd2381139b02d88c754e6373fdef03ea96152d5291",
+          "code_length": 5
+        },
+        {
+          "name": "toNtfsTime",
+          "descriptor": "(Ljava/util/Date;)J",
+          "access": 9,
+          "code_sha256": "e81ad3a5b2398637dbde7ea1b2c7860d295641717094347eed082900ad4980e6",
+          "code_length": 5
+        },
+        {
+          "name": "toNtfsTime",
+          "descriptor": "(Ljava/nio/file/attribute/FileTime;)J",
+          "access": 9,
+          "code_sha256": "3b48026f8c592c8e7402abef555410aab665a20cb09efee09477e4f5e5358112",
+          "code_length": 5
+        },
+        {
+          "name": "toNtfsTime",
+          "descriptor": "(J)J",
+          "access": 9,
+          "code_sha256": "1ece638e6474753641199ad1ae66e8c01a138c353260f016af59779733f914c8",
+          "code_length": 5
+        },
+        {
+          "name": "toUnixTime",
+          "descriptor": "(Ljava/nio/file/attribute/FileTime;)J",
+          "access": 9,
+          "code_sha256": "8acc7071e13997549ab683bf56e65db60795da7a2d691b24ee29afafe1052c89",
+          "code_length": 5
+        },
+        {
+          "name": "truncateToHundredNanos",
+          "descriptor": "(Ljava/nio/file/attribute/FileTime;)Ljava/nio/file/attribute/FileTime;",
+          "access": 9,
+          "code_sha256": "cf5f28ac40bba84b21c9800a7c3e3f65130a981e300b447de4a6ee25fab5f0e3",
+          "code_length": 27
+        },
+        {
+          "name": "unixTimeToFileTime",
+          "descriptor": "(J)Ljava/nio/file/attribute/FileTime;",
+          "access": 9,
+          "code_sha256": "50e5094206ca3849a33407fe3f8cf24ac0d43dd96c39bf30d522ac60f5250333",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d7d0dd437f8737dfe13fdb8d80f029ae78d100b5b171223d6ebb956e8e7cc5af",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "577839040bc14ebfa5363881c448626a128ccffe1dd6a1567731e41994d1562f",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/nio/file/attribute/FileTime",
+        "java/time/Instant",
+        "java/util/concurrent/TimeUnit",
+        "org/apache/commons/compress/utils/TimeUtils",
+        "org/apache/commons/io/file/attribute/FileTimes"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/package-info.class",
+      "occurrence": 0,
+      "sha256": "7b49a14742f5de1738d5fa690201f4fd9194e123167f58411d92c919372b37d1",
+      "name": "org/apache/commons/compress/utils/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/package-info"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "f99e2e9badda831a8dd0dc4c719c2d55a96261da16e20faed2d661c6c3660404",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info",
+        "org/apache/commons/compress/archivers/ArchiveStreamProvider",
+        "org/apache/commons/compress/compressors/CompressorStreamProvider"
+      ]
+    }
+  ]
+}

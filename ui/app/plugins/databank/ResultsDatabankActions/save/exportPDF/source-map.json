@@ -1,56 +1,66 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only Save/exportPDF bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/exportPDF",
-    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
-    "review":  {
-                   "version":  1,
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan"
-               },
-    "owner":  {
-                  "requirements":  [
-                                       "FR-UI-DATABANK-source-mapping",
-                                       "FR-UI-DATABANK-workflow-preservation",
-                                       "FR-UI-DATABANK-clean-room"
-                                   ],
-                  "domain":  "plugins/databank",
-                  "decision":  "DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP",
-                  "feature":  "FEAT-UI-DATABANK_BUILDER"
-              },
-    "clean_room":  {
-                       "paraphrased_behavior_only":  true,
-                       "contains_personal_data":  false,
-                       "contains_proprietary_source":  false,
-                       "contains_sensitive_data":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultsdatabankactions-save-exportpdf-ui",
-                               "family":  "bounded installed Save artifacts",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-save-exportpdf-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural inventory and scoped responsibility inspection",
-                        "inspection_method":  "local SHA-256 inventory and independent target audit",
-                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "b2ef84313a6936248b564bcd20402a33dfb04303788288f7e2ca47e60b63ce51",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Structural manifest; not behavioral ledger"
-                        }
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only Save/exportPDF bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/exportPDF",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "domain": "plugins/databank",
+    "decision": "DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP",
+    "feature": "FEAT-UI-DATABANK_BUILDER"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-save-exportpdf-ui",
+      "family": "bounded installed Save artifacts",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-save-exportpdf-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/exportPDF/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "Existing independent simulated frontend responsibility or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "55cfc1955dd2e9eb6be0d6f7e5b9c1bf5abd5b5e98458aa601246c5b3b42fcf0",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent Save menu/dialog/draft/deferred action responsibility Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest; not behavioral ledger"
+    }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ]
 }

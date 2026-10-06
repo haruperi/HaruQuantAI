@@ -1,0 +1,94 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
+  "sha256": "c5d8346793a02923de19a4dbe7d146e21772af3f2d8bb29460d636be16892373",
+  "class_count": 10,
+  "unique_class_entries": 10,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/SQXBusiness/EAParameter.class": "e989aa1ad8ace0e6149b15a72c48d73b88473c071e7b75c9f7450c7875ea511e",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/EAParameters.class": "bfd722ad42b5ccd8753c18a3bbed2d1e05b027ffcfc013f895dbd28f4d1aba0d",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildExecutor$1.class": "a43db3169b335d0c23b38a22d998d3c0d6c7560b54b3bb604ebcba694a77a9b1",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildExecutor.class": "aef8c818b3914768344b2bc14f577f331eecf11958bbbbde2fcb7162d7cfbab6",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildJob.class": "aae76e1e80071fe4708f78d6da36592a73b9a95c9460566ad6b8b387e8f7f85e",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketProjects.class": "b12c00fd3531ab5278d4fa8662370b1a22cc49301a587452fdb31c00eb78b713",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessBuildReporter$1.class": "d1372b32d5f5772fd89ec36dbe022045048624b571e96c19b6578f3957e7b6f6",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessBuildReporter.class": "5a697364405f7847211c27e1403465942841d6d6bc174c1f0287d999b889413a",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessPlugin.class": "64c9ea783c9113e5784f9016e91c51a3af02db5d8a48fed91b6a2ed67d1eb081",
+    "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessServlet.class": "3732f9d659730b92e1c5e0acc11f08e7b9527fb4bfaa73596c22a1f572dd6d33"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/EAParameter.class",
+      "occurrence": 0,
+      "sha256": "e989aa1ad8ace0e6149b15a72c48d73b88473c071e7b75c9f7450c7875ea511e",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/EAParameters.class",
+      "occurrence": 0,
+      "sha256": "bfd722ad42b5ccd8753c18a3bbed2d1e05b027ffcfc013f895dbd28f4d1aba0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "a43db3169b335d0c23b38a22d998d3c0d6c7560b54b3bb604ebcba694a77a9b1",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildExecutor.class",
+      "occurrence": 0,
+      "sha256": "aef8c818b3914768344b2bc14f577f331eecf11958bbbbde2fcb7162d7cfbab6",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketBuildJob.class",
+      "occurrence": 0,
+      "sha256": "aae76e1e80071fe4708f78d6da36592a73b9a95c9460566ad6b8b387e8f7f85e",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/MQLMarketProjects.class",
+      "occurrence": 0,
+      "sha256": "b12c00fd3531ab5278d4fa8662370b1a22cc49301a587452fdb31c00eb78b713",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessBuildReporter$1.class",
+      "occurrence": 0,
+      "sha256": "d1372b32d5f5772fd89ec36dbe022045048624b571e96c19b6578f3957e7b6f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessBuildReporter.class",
+      "occurrence": 0,
+      "sha256": "5a697364405f7847211c27e1403465942841d6d6bc174c1f0287d999b889413a",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessPlugin.class",
+      "occurrence": 0,
+      "sha256": "64c9ea783c9113e5784f9016e91c51a3af02db5d8a48fed91b6a2ed67d1eb081",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessServlet.class",
+      "occurrence": 0,
+      "sha256": "3732f9d659730b92e1c5e0acc11f08e7b9527fb4bfaa73596c22a1f572dd6d33",
+      "member_shard": "docs/dev/evidence/sqx145/members/137/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/137/001.json",
+      "sha256": "406eceae68cb8977e6fbfcfa55d797be13cb40b6947b6e577e3fc78dfd02c326"
+    }
+  ]
+}

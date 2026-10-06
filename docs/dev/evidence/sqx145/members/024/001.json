@@ -1,0 +1,5034 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-math3-3.6.1.jar",
+  "archive_sha256": "1e56d7b058d28b65abd256b8458e3885b674c1d588fa43cd7d1cbb9c7ef2b308",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/MapUtils.class",
+      "occurrence": 0,
+      "sha256": "8495df478bb3403c29ec295b78f22da3b5244e1cfff461960c96dc2b77df61d3",
+      "name": "org/apache/commons/math3/ml/neuralnet/MapUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "findBest",
+          "descriptor": "([DLjava/lang/Iterable;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 9,
+          "code_sha256": "34d12adf458114f2e7a22631ff6c6b45884da0d9198366873f6b8d45e047a427",
+          "code_length": 71,
+          "generic_signature": "([DLjava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)Lorg/apache/commons/math3/ml/neuralnet/Neuron;"
+        },
+        {
+          "name": "findBestAndSecondBest",
+          "descriptor": "([DLjava/lang/Iterable;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)Lorg/apache/commons/math3/util/Pair;",
+          "access": 9,
+          "code_sha256": "aa4f87ed8a593bb8374f2a05d17741c436346f5d7423c251f94c2a63ba599a52",
+          "code_length": 150,
+          "generic_signature": "([DLjava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)Lorg/apache/commons/math3/util/Pair<Lorg/apache/commons/math3/ml/neuralnet/Neuron;Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "sort",
+          "descriptor": "([DLjava/lang/Iterable;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)[Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 9,
+          "code_sha256": "7dd7d5cd1053eb721ad071c041ce3cacdcb7426249cf5ed93117e3b73bf0ea07",
+          "code_length": 133,
+          "generic_signature": "([DLjava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)[Lorg/apache/commons/math3/ml/neuralnet/Neuron;"
+        },
+        {
+          "name": "computeU",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)[[D",
+          "access": 9,
+          "code_sha256": "fc2f2cee97be900bf344bb5e167e428918cb15939074f758d864a47057d0fd68",
+          "code_length": 158
+        },
+        {
+          "name": "computeHitHistogram",
+          "descriptor": "(Ljava/lang/Iterable;Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)[[I",
+          "access": 9,
+          "code_sha256": "dfd0686fa7055101f7a7d3be3cdc146f23f275dfb8ed7315ba974b052626642c",
+          "code_length": 212,
+          "generic_signature": "(Ljava/lang/Iterable<[D>;Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)[[I"
+        },
+        {
+          "name": "computeQuantizationError",
+          "descriptor": "(Ljava/lang/Iterable;Ljava/lang/Iterable;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)D",
+          "access": 9,
+          "code_sha256": "80bffb066004c6039c8a04d6ca4d4c99f2f4badb7056ae063558855650829261",
+          "code_length": 81,
+          "generic_signature": "(Ljava/lang/Iterable<[D>;Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)D"
+        },
+        {
+          "name": "computeTopographicError",
+          "descriptor": "(Ljava/lang/Iterable;Lorg/apache/commons/math3/ml/neuralnet/Network;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)D",
+          "access": 9,
+          "code_sha256": "2bb3303840154e9191864eef86d1b926d33c2023e7151f58723e04b3bef64175",
+          "code_length": 98,
+          "generic_signature": "(Ljava/lang/Iterable<[D>;Lorg/apache/commons/math3/ml/neuralnet/Network;Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)D"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[[D",
+        "[[I",
+        "java/lang/Integer",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/exception/NoDataException",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/util/Pair"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/Network$NeuronIdentifierComparator.class",
+      "occurrence": 0,
+      "sha256": "4ab9aa26dc57e3883f05caadd19a06104ced3014e11c2654d2f13babbdfe7b65",
+      "name": "org/apache/commons/math3/ml/neuralnet/Network$NeuronIdentifierComparator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;Lorg/apache/commons/math3/ml/neuralnet/Neuron;)I",
+          "access": 1,
+          "code_sha256": "73c4e27e859ed88835b7895e28938c3f7eb94db13c661e835c12a1ed47233aaf",
+          "code_length": 35
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "3d194ab7ea49e829ad898786d3577cc2c4e56603f3124bafb82337ca4e0700cf",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Ljava/io/Serializable;",
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Network$NeuronIdentifierComparator",
+        "org/apache/commons/math3/ml/neuralnet/Neuron"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/FeatureInitializer.class",
+      "occurrence": 0,
+      "sha256": "ca347cf5a46040f4dd79d2387423c1c8d619850fc4093ffb4db1453d11cb354b",
+      "name": "org/apache/commons/math3/ml/neuralnet/FeatureInitializer",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/UpdateAction.class",
+      "occurrence": 0,
+      "sha256": "4f77a8daf58e7a857ba68b20f73ad3dd1b084ebb930c006e1a5d01c6a9d1d78f",
+      "name": "org/apache/commons/math3/ml/neuralnet/UpdateAction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "update",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Network;[D)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/UpdateAction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/Neuron$SerializationProxy.class",
+      "occurrence": 0,
+      "sha256": "d821ff2ab03cbc20f52f25b1fdd29bf18957e6f64177a0960271706dabaf4c75",
+      "name": "org/apache/commons/math3/ml/neuralnet/Neuron$SerializationProxy",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "features",
+          "descriptor": "[D",
+          "access": 18
+        },
+        {
+          "name": "identifier",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J[D)V",
+          "access": 0,
+          "code_sha256": "473eea968bd44245080a1bcef4414f4f81ba31bf493fb5ab26e7f6a66322c473",
+          "code_length": 15
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "d2fb8777d2c35e1f8fbf01ceb5defa5b81ab03ee5d182063efa6b62cbb7c0fd4",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/Neuron$SerializationProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/Network$SerializationProxy.class",
+      "occurrence": 0,
+      "sha256": "b4baef49ff0c09d7b0c22f82db854fc43cdbe8ced6bbb3f18dc63bd77b8b1565",
+      "name": "org/apache/commons/math3/ml/neuralnet/Network$SerializationProxy",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "nextId",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "featureSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "neuronList",
+          "descriptor": "[Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 18
+        },
+        {
+          "name": "neighbourIdList",
+          "descriptor": "[[J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JI[Lorg/apache/commons/math3/ml/neuralnet/Neuron;[[J)V",
+          "access": 0,
+          "code_sha256": "60558f24efad682e533721dd99405f89153df44745b743a56edd3e3032f69d1d",
+          "code_length": 27
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "3ffe9c6d413a24a48a05a8690399604f84077d95075e4a24efef5fc5995881f0",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Network$SerializationProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/SquareNeighbourhood.class",
+      "occurrence": 0,
+      "sha256": "e357fb2c2c11e4836dbb2bdde7ec0d963c266a1accbb4121b2f9284ed47e688d",
+      "name": "org/apache/commons/math3/ml/neuralnet/SquareNeighbourhood",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VON_NEUMANN",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 16409
+        },
+        {
+          "name": "MOORE",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/ml/neuralnet/SquareNeighbourhood"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$SerializationProxy.class",
+      "occurrence": 0,
+      "sha256": "88e2fa49f55dba22772e45ef859c0a974e5a395b893aaaa76af909b54b3a4267",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$SerializationProxy",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "wrapRows",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "wrapColumns",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "neighbourhood",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 18
+        },
+        {
+          "name": "featuresList",
+          "descriptor": "[[[D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZZLorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;[[[D)V",
+          "access": 0,
+          "code_sha256": "dc4f02d52549aaef14fbfecf37f5ede96655d00280af256e8195ca5c7ad2111a",
+          "code_length": 26
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "3ffe9c6d413a24a48a05a8690399604f84077d95075e4a24efef5fc5995881f0",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$SerializationProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D.class",
+      "occurrence": 0,
+      "sha256": "2525f9a01114db14b94114374a634253c386e338b9ac81b3999ab3c4b7ef853d",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "network",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 18
+        },
+        {
+          "name": "numberOfRows",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "numberOfColumns",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "wrapRows",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "wrapColumns",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "neighbourhood",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;",
+          "access": 18
+        },
+        {
+          "name": "identifiers",
+          "descriptor": "[[J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZZLorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;[[[D)V",
+          "access": 0,
+          "code_sha256": "35c74050b1aa0adaa57520cc61186fc20d4c0e747cd371361705837d04f8cc55",
+          "code_length": 196
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IZIZLorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;[Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;)V",
+          "access": 1,
+          "code_sha256": "20a1a83f4569f1dd4721d3a2ef1764e9f29dc0ba69c987b202be2cfbf3f85e69",
+          "code_length": 201
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZZLorg/apache/commons/math3/ml/neuralnet/SquareNeighbourhood;Lorg/apache/commons/math3/ml/neuralnet/Network;[[J)V",
+          "access": 2,
+          "code_sha256": "b84b7a611e0a940009cd717a88a41d10c3aae94423d16b3703644c5ef9c07e55",
+          "code_length": 48
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;",
+          "access": 33,
+          "code_sha256": "42e8de9c6d4257c4814b6722a89eaa96561b8bdc3744aac41a3bdbeeace86aba",
+          "code_length": 86
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "939ebf20f0a8eedcca7dbab7f32269e6f23cf70445bd21c20c6fed9923601049",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Iterator<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "getNetwork",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "getNumberOfRows",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getNumberOfColumns",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getNeuron",
+          "descriptor": "(II)Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 1,
+          "code_sha256": "658dea8da2d4d1197f1aeeda2753e12034877e1a46d92ba9fa6f7e979442a399",
+          "code_length": 90
+        },
+        {
+          "name": "getNeuron",
+          "descriptor": "(IILorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;)Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 1,
+          "code_sha256": "9d5dea0b0c07aee1d587f2ba7261ec31c006f93d2a6f5dfe8bcde0e785d1da12",
+          "code_length": 33
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "(IILorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;)[I",
+          "access": 2,
+          "code_sha256": "4b6c5ef08a33e5316eb78e390254f379207c7605d6747bcaac4074d3a0f0c4b9",
+          "code_length": 245
+        },
+        {
+          "name": "createLinks",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "15e14d5246685e490859e038a2838b480fad37ab53090fc3b65e849c8905ad10",
+          "code_length": 939
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "663fbec297cd8485a8d31efb8109135f8664e8c4d64c9b00bcb6f6948cd7b10b",
+          "code_length": 8
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "24498ba15a076c6e3810e5126bce59db79441dbca8e92de4041a52d2142a2fc0",
+          "code_length": 80
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Ljava/io/Serializable;",
+      "class_references": [
+        "[[J",
+        "[[[D",
+        "java/io/Serializable",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Iterable",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/exception/MathInternalError",
+        "org/apache/commons/math3/exception/NumberIsTooSmallException",
+        "org/apache/commons/math3/exception/OutOfRangeException",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/SquareNeighbourhood",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$1",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$SerializationProxy",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection.class",
+      "occurrence": 0,
+      "sha256": "1f727ba2b3c4b2beb86a1961617af35667d355f7ede7e24bde561df3bc49847c",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RIGHT",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "CENTER",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "LEFT",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$1.class",
+      "occurrence": 0,
+      "sha256": "f8d634b3daffd019354246ff4fe76ec23ccd19666883e51737b331252d6518f9",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$commons$math3$ml$neuralnet$twod$NeuronSquareMesh2D$HorizontalDirection",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$org$apache$commons$math3$ml$neuralnet$twod$NeuronSquareMesh2D$VerticalDirection",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$org$apache$commons$math3$ml$neuralnet$SquareNeighbourhood",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b3657951211a5167ec847e86bf0f5aacfcb554bf1d01e3c796faf7bee883a860",
+          "code_length": 148
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/SquareNeighbourhood",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$1",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection.class",
+      "occurrence": 0,
+      "sha256": "59096fab7d4eb1dbbef059cebba1458dd699cb07604ee9e420381f36d61b3f82",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UP",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "CENTER",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "DOWN",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/TopographicErrorHistogram.class",
+      "occurrence": 0,
+      "sha256": "ff3181483a8c39ed4c6bf18843787818aaddfb33e5f3f6d2defafbf3973c8857",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/TopographicErrorHistogram",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ],
+      "fields": [
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        },
+        {
+          "name": "relativeCount",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable;)[[D",
+          "access": 1,
+          "code_sha256": "25df3eff9377a453b2c1f8916720d9148490f0da67c28b905c98c166a0f477fa",
+          "code_length": 228,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable<[D>;)[[D"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[[D",
+        "[[I",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/TopographicErrorHistogram",
+        "org/apache/commons/math3/util/Pair"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization.class",
+      "occurrence": 0,
+      "sha256": "bba1835b05d0c99393da356814be79b1822cd870fe8aea1a54c19773b492577a",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable;)[[D",
+          "access": 1025,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable<[D>;)[[D"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/UnifiedDistanceMatrix.class",
+      "occurrence": 0,
+      "sha256": "d0e34111c311e992016c9f226a7973b0d4a3c3b33746d3ee6f1217a3cf9a4f0f",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/UnifiedDistanceMatrix",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapVisualization"
+      ],
+      "fields": [
+        {
+          "name": "individualDistances",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;)[[D",
+          "access": 1,
+          "code_sha256": "c2e303f85ccacf4120d1e69d88764c2ac11a703337d0a5e8cd2461e30202fd22",
+          "code_length": 19
+        },
+        {
+          "name": "individualDistances",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;)[[D",
+          "access": 2,
+          "code_sha256": "340bc1f1a6bf3051480ba8234b30a382e580ffa12bf4a28df80c939f064b2177",
+          "code_length": 428
+        },
+        {
+          "name": "averageDistances",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;)[[D",
+          "access": 2,
+          "code_sha256": "fc7914755be802e5827c1318b19c10c3d91c6b6beb45e1eda93378d55977145d",
+          "code_length": 161
+        }
+      ],
+      "class_references": [
+        "[[D",
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$HorizontalDirection",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D$VerticalDirection",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapVisualization",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/UnifiedDistanceMatrix"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location.class",
+      "occurrence": 0,
+      "sha256": "03ea2bd1b8dea12c61f832c1dd7fea922c421fa21b852eebe958f896c49fdfa8",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "row",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "column",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "getRow",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getColumn",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/MapVisualization.class",
+      "occurrence": 0,
+      "sha256": "d356a454c68aa82edc1ef6eb19b12c4ecc9de8ce4f3e2cba46977e160bb371d2",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/MapVisualization",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;)[[D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapVisualization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder.class",
+      "occurrence": 0,
+      "sha256": "f864cd7bba27e1a9c0e3b84327b5c569ebf651b8cda2ebff4cdcce59ef8b114e",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "locations",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Long;Lorg/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;)V",
+          "access": 1,
+          "code_sha256": "85505a1bd3c9c687c896bd9fd66800bc4ae08c59efe3fd63a44850a97957678a",
+          "code_length": 117
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;)Lorg/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location;",
+          "access": 1,
+          "code_sha256": "0266ee7160f577bc039f2529521a5cefe17602695363cc4d4a3c3150fc7c36fe",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/apache/commons/math3/exception/MathIllegalStateException",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/SmoothedDataHistogram.class",
+      "occurrence": 0,
+      "sha256": "028696d96cd179981b3b759dd17068a179f19065b17abd36c5fe9097380c1751",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/SmoothedDataHistogram",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ],
+      "fields": [
+        {
+          "name": "smoothingBins",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        },
+        {
+          "name": "membershipNormalization",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "25b95298fc19b31e70a1b9ce97865d0795c7ff56af8a2db2308c2d8ff574c93b",
+          "code_length": 47
+        },
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable;)[[D",
+          "access": 1,
+          "code_sha256": "a3b4bef13f38a25063522296fc0d673da2deae395e237372e366649d0846c192",
+          "code_length": 185,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable<[D>;)[[D"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[[D",
+        "java/lang/Integer",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/commons/math3/exception/NumberIsTooSmallException",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/SmoothedDataHistogram"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/HitHistogram.class",
+      "occurrence": 0,
+      "sha256": "3a9273b3ce5bd3cadf0024873e22e2901938a7ad59b90a4cd4f439d21d178ef2",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/HitHistogram",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ],
+      "fields": [
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        },
+        {
+          "name": "normalizeCount",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable;)[[D",
+          "access": 1,
+          "code_sha256": "e5093d3ece3e28e3df32c25ffeb25a79d959967c48dcc65a28642e7bf23cc84c",
+          "code_length": 171,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable<[D>;)[[D"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[[D",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/HitHistogram",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/twod/util/QuantizationError.class",
+      "occurrence": 0,
+      "sha256": "8b37a3aeb48ec06a98739cd7b9f6d6e8d00b4195b69918aa216b7717f5ea2695",
+      "name": "org/apache/commons/math3/ml/neuralnet/twod/util/QuantizationError",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization"
+      ],
+      "fields": [
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "computeImage",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable;)[[D",
+          "access": 1,
+          "code_sha256": "e7b65aedbcae8a9926e326f6afe4767a73902084f93657bdb75b26bfd87cc19d",
+          "code_length": 209,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D;Ljava/lang/Iterable<[D>;)[[D"
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[[D",
+        "[[I",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/twod/NeuronSquareMesh2D",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/LocationFinder$Location",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/MapDataVisualization",
+        "org/apache/commons/math3/ml/neuralnet/twod/util/QuantizationError"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/oned/NeuronString.class",
+      "occurrence": 0,
+      "sha256": "2d301023fa8b71a8c21f1bbb139ce35d101966a843f69fee926665a0a67c51a9",
+      "name": "org/apache/commons/math3/ml/neuralnet/oned/NeuronString",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "network",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 18
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "wrap",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "identifiers",
+          "descriptor": "[J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z[[D)V",
+          "access": 0,
+          "code_sha256": "b4fa1fdc6f113f70ee6fedacd6d0fee44b65d1d55a498e9f01a046739b40353e",
+          "code_length": 112
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IZ[Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;)V",
+          "access": 1,
+          "code_sha256": "c35df78ccf7a859ef8e211cea9849fe0b341b1abead04b8e9e08de0008e52b42",
+          "code_length": 133
+        },
+        {
+          "name": "getNetwork",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getFeatures",
+          "descriptor": "(I)[D",
+          "access": 1,
+          "code_sha256": "42e8fcb7cb1689d30023bcd7538602a95fe74613190569468156da7d77bfcb1b",
+          "code_length": 54
+        },
+        {
+          "name": "createLinks",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b40cdd94691e3ab7b6b1982005efa51d37b1f21f6252e38348132e75701578eb",
+          "code_length": 155
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "2daaeb196176bb9456c44b9d05f9f7f9f66cce854f34adb351df12ed6b9183aa",
+          "code_length": 8
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "f4e40e0641562d2f1ee1f2a6de06693520d7a3c5af9fbb94e77563ee5d0aa099",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/io/Serializable",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/NumberIsTooSmallException",
+        "org/apache/commons/math3/exception/OutOfRangeException",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/oned/NeuronString",
+        "org/apache/commons/math3/ml/neuralnet/oned/NeuronString$SerializationProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/oned/NeuronString$SerializationProxy.class",
+      "occurrence": 0,
+      "sha256": "7d2286907983232aec75e2192aa8d453d8bc2bc69dcec55564d56cc8e0f01651",
+      "name": "org/apache/commons/math3/ml/neuralnet/oned/NeuronString$SerializationProxy",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "wrap",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "featuresList",
+          "descriptor": "[[D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z[[D)V",
+          "access": 0,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "d2fb8777d2c35e1f8fbf01ceb5defa5b81ab03ee5d182063efa6b62cbb7c0fd4",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/oned/NeuronString",
+        "org/apache/commons/math3/ml/neuralnet/oned/NeuronString$SerializationProxy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$2.class",
+      "occurrence": 0,
+      "sha256": "d84fea3579a76055836b29f4056af66e5288b7295e76599cc79f569c054cf970",
+      "name": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$2",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer"
+      ],
+      "fields": [
+        {
+          "name": "val$orig",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;",
+          "access": 4112
+        },
+        {
+          "name": "val$random",
+          "descriptor": "Lorg/apache/commons/math3/distribution/RealDistribution;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;Lorg/apache/commons/math3/distribution/RealDistribution;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "value",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "37daabe79df9d34b5380b46d0906421abd71f3d141ac8dc0f16d37eff8201717",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/distribution/RealDistribution",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/KohonenTrainingTask.class",
+      "occurrence": 0,
+      "sha256": "bfb9e2406b7ce76100ee276686a5d7bc5598142ed87a7a63c07bf7ced33f1569",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/KohonenTrainingTask",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "net",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 18
+        },
+        {
+          "name": "featuresIterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<[D>;"
+        },
+        {
+          "name": "updateAction",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Network;Ljava/util/Iterator;Lorg/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction;)V",
+          "access": 1,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/Network;Ljava/util/Iterator<[D>;Lorg/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction;)V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fa12a435bbb8bb12aa2662d68e15817bab971d2fa504e3cc12addd18d66d2c9b",
+          "code_length": 39
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/Iterator",
+        "org/apache/commons/math3/ml/neuralnet/sofm/KohonenTrainingTask",
+        "org/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory.class",
+      "occurrence": 0,
+      "sha256": "3081af312603972da641f045f0782fc97c46c461be00043b65f6fc84fbaf28e4",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exponentialDecay",
+          "descriptor": "(DDJ)Lorg/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction;",
+          "access": 9,
+          "code_sha256": "5e6a198469fd089f263ea9fc7a0e7cf035b4ebc1d929d07ce48ef03d17a1b675",
+          "code_length": 12
+        },
+        {
+          "name": "quasiSigmoidDecay",
+          "descriptor": "(DDJ)Lorg/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction;",
+          "access": 9,
+          "code_sha256": "d43b44c6bcffe1c13085b2dcb0dda07a529a1726d93dd18cd0fb5bcb3aa9d2b4",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$1",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$1.class",
+      "occurrence": 0,
+      "sha256": "155ced78d4aed2e6d804310bd31c109e6b1d2159dad04ad9ea03fcc64c48d1c3",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction"
+      ],
+      "fields": [
+        {
+          "name": "decay",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction;",
+          "access": 18
+        },
+        {
+          "name": "val$initValue",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$valueAtNumCall",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$numCall",
+          "descriptor": "J",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 0,
+          "code_sha256": "67b5881e5e1a8cfdf77a36a49ebe4458c4a5c904859e418b0c1f72b491abdfe2",
+          "code_length": 44
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)D",
+          "access": 1,
+          "code_sha256": "160edf92567647106f1741ba0cf54386d6f24f922f2f804216a0380f9d2212ce",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$1",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$1.class",
+      "occurrence": 0,
+      "sha256": "7dd5c6a7480b0ed09f978ea88095059b72618d92f007567eb4454eb42b30100c",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction"
+      ],
+      "fields": [
+        {
+          "name": "decay",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction;",
+          "access": 18
+        },
+        {
+          "name": "val$initValue",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$valueAtNumCall",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$numCall",
+          "descriptor": "J",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 0,
+          "code_sha256": "67b5881e5e1a8cfdf77a36a49ebe4458c4a5c904859e418b0c1f72b491abdfe2",
+          "code_length": 44
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)I",
+          "access": 1,
+          "code_sha256": "41b2db7ca358778990b3af36c4dffcd1e4b5ba812683ca4920dbc5cbc6397cfc",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$1",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction",
+        "org/apache/commons/math3/util/FastMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction.class",
+      "occurrence": 0,
+      "sha256": "06f09eb5063c1c3b2ceef5edb8a36983d02f659843e937e3f5b0c7fa0e8b0f2f",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "(J)D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$2.class",
+      "occurrence": 0,
+      "sha256": "a285348c6e309ee51bb7f8fe310b004a6ff2418efc5849d5215804b7777707c9",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$2",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction"
+      ],
+      "fields": [
+        {
+          "name": "decay",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction;",
+          "access": 18
+        },
+        {
+          "name": "val$initValue",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$slope",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$numCall",
+          "descriptor": "J",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 0,
+          "code_sha256": "67b5881e5e1a8cfdf77a36a49ebe4458c4a5c904859e418b0c1f72b491abdfe2",
+          "code_length": 44
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)I",
+          "access": 1,
+          "code_sha256": "41b2db7ca358778990b3af36c4dffcd1e4b5ba812683ca4920dbc5cbc6397cfc",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunctionFactory$2",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction",
+        "org/apache/commons/math3/util/FastMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction.class",
+      "occurrence": 0,
+      "sha256": "692ebbe8aa3517c9f4d11bcce7dab9bbb7dc92a5598418970181abec57091cb2",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "(J)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction.class",
+      "occurrence": 0,
+      "sha256": "da8cb37a4971ce6c474920fd52142e7e6f6fe49b644b137a37ced6eb73375ab5",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/UpdateAction"
+      ],
+      "fields": [
+        {
+          "name": "distance",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        },
+        {
+          "name": "learningFactor",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction;",
+          "access": 18
+        },
+        {
+          "name": "neighbourhoodSize",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction;",
+          "access": 18
+        },
+        {
+          "name": "numberOfCalls",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/distance/DistanceMeasure;Lorg/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction;Lorg/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction;)V",
+          "access": 1,
+          "code_sha256": "c506235e8a23671bda1e606fe65682e4d40580729f301a8971d5cf34ec902c52",
+          "code_length": 32
+        },
+        {
+          "name": "update",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Network;[D)V",
+          "access": 1,
+          "code_sha256": "87ee1cf3befd39225ab601682a0a73f330bf7a6b986cb2062fc5bd2d6765d397",
+          "code_length": 181
+        },
+        {
+          "name": "getNumberOfCalls",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "2b0e5db3964857aba5d41f3b935e90512a08feca241f2ff7204bd4de0210d0c9",
+          "code_length": 8
+        },
+        {
+          "name": "attemptNeuronUpdate",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;[DD)Z",
+          "access": 2,
+          "code_sha256": "bc1bdd326ae863ff19ebebc32567283ecadf832da06232a44e849921e7f1bfc7",
+          "code_length": 25
+        },
+        {
+          "name": "updateNeighbouringNeuron",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;[DD)V",
+          "access": 2,
+          "code_sha256": "dbf4b5e542eb24af7f53e79c2c0dafcb7b0a872c840177157b49f71127bf4bff",
+          "code_length": 14
+        },
+        {
+          "name": "findAndUpdateBestNeuron",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Network;[DD)Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 2,
+          "code_sha256": "45bfefec29e57b71dd711d5b222796f113157ad250d936499b6cda9a37846e70",
+          "code_length": 28
+        },
+        {
+          "name": "computeFeatures",
+          "descriptor": "([D[DD)[D",
+          "access": 2,
+          "code_sha256": "19f616929e7a2c548f4e2f185f3dd7dd51d88490868f47b6111c2e2f489000e5",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/commons/math3/analysis/function/Gaussian",
+        "org/apache/commons/math3/linear/ArrayRealVector",
+        "org/apache/commons/math3/linear/RealVector",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/UpdateAction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/KohonenUpdateAction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/NeighbourhoodSizeFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$2.class",
+      "occurrence": 0,
+      "sha256": "82d81cd75200f1e060f6229e06a88c53459d84db162c634239a090f0d592c0e4",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$2",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction"
+      ],
+      "fields": [
+        {
+          "name": "decay",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction;",
+          "access": 18
+        },
+        {
+          "name": "val$initValue",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$slope",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$numCall",
+          "descriptor": "J",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 0,
+          "code_sha256": "67b5881e5e1a8cfdf77a36a49ebe4458c4a5c904859e418b0c1f72b491abdfe2",
+          "code_length": 44
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)D",
+          "access": 1,
+          "code_sha256": "160edf92567647106f1741ba0cf54386d6f24f922f2f804216a0380f9d2212ce",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$2",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction.class",
+      "occurrence": 0,
+      "sha256": "57cc8cfb7aed0cca56b67a41b6a3d9764ee0e25b88ba16e2000e57bca279fbe1",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sigmoid",
+          "descriptor": "Lorg/apache/commons/math3/analysis/function/Logistic;",
+          "access": 18
+        },
+        {
+          "name": "scale",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 1,
+          "code_sha256": "5cacb53abc26e570a1f884ed6af09628ca4159d8a5d3ca12050789250ae40325",
+          "code_length": 131
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)D",
+          "access": 1,
+          "code_sha256": "e30a8f314df2caf7036030428dc08d1d131a7f2137d232b3312727c5965dbd58",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/function/Logistic",
+        "org/apache/commons/math3/exception/NotStrictlyPositiveException",
+        "org/apache/commons/math3/exception/NumberIsTooLargeException",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/QuasiSigmoidDecayFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction.class",
+      "occurrence": 0,
+      "sha256": "b48b459895947dcfabe977a0444bb880270b936eb82ac253d2a1da072229d620",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "a",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "oneOverB",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDJ)V",
+          "access": 1,
+          "code_sha256": "17f5dc5da1a3ca3ea75d9d29084e77ae556f6f80f5f5e015fd0b754bd7046fd0",
+          "code_length": 104
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)D",
+          "access": 1,
+          "code_sha256": "8eab07430e87897814d48b8ce11117fad001e58f7ccf7a7780c8113ec6d0e086",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Long",
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/NotStrictlyPositiveException",
+        "org/apache/commons/math3/exception/NumberIsTooLargeException",
+        "org/apache/commons/math3/ml/neuralnet/sofm/util/ExponentialDecayFunction",
+        "org/apache/commons/math3/util/FastMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory.class",
+      "occurrence": 0,
+      "sha256": "1c0cff233f6cb89effad837eab368e6542ace6c5d96346d75d0b312e97e0aed4",
+      "name": "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exponentialDecay",
+          "descriptor": "(DDJ)Lorg/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction;",
+          "access": 9,
+          "code_sha256": "bce647c5c2e99c8ea1e4b11d50fa442a7edc26c588c2a137a2f3089c7ae43568",
+          "code_length": 44
+        },
+        {
+          "name": "quasiSigmoidDecay",
+          "descriptor": "(DDJ)Lorg/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunction;",
+          "access": 9,
+          "code_sha256": "0bb7f024f5a4fe497093109feb743267596ebf55bc49e87fee034fa439a9e668",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/OutOfRangeException",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$1",
+        "org/apache/commons/math3/ml/neuralnet/sofm/LearningFactorFunctionFactory$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble.class",
+      "occurrence": 0,
+      "sha256": "75c3ed484d860eed0469340daa2ea809586e77fd68dba714f7424e1d2b187b55",
+      "name": "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "COMPARATOR",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 24,
+          "generic_signature": "Ljava/util/Comparator<Lorg/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble;>;"
+        },
+        {
+          "name": "neuron",
+          "descriptor": "Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 18
+        },
+        {
+          "name": "value",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;D)V",
+          "access": 0,
+          "code_sha256": "ba11b949eebaf89977d76fe94b46c764a471e2bcb29d88c18bfd58a93d6643b0",
+          "code_length": 15
+        },
+        {
+          "name": "getNeuron",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble;)D",
+          "access": 4104,
+          "code_sha256": "c6a80478add7a7af2afa5683db925d363340473c9ece5cea7919c19f131a7875",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ae306cf026389d4d33b1de029f81e4b997091849f231825a8ac312ca2653fb00",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$1.class",
+      "occurrence": 0,
+      "sha256": "837d9fd55bb43cc33e2d157d67f78a9e430d609d36a9f5c3790713de8eeae7cf",
+      "name": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer"
+      ],
+      "fields": [
+        {
+          "name": "arg",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "val$init",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$f",
+          "descriptor": "Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 4112
+        },
+        {
+          "name": "val$inc",
+          "descriptor": "D",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DLorg/apache/commons/math3/analysis/UnivariateFunction;D)V",
+          "access": 0,
+          "code_sha256": "3f176089c5a8b068b87fc386c89702a3bfe196968e1a9243d01fcec8c55f13b1",
+          "code_length": 29
+        },
+        {
+          "name": "value",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "3ee0d910109bae92bb3b8a25624adfbe08aa35eb6bde649711464032b3fdacd6",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/UnivariateFunction",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializer",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/Network.class",
+      "occurrence": 0,
+      "sha256": "1d7d67ae8908e1130f1368ab1ce9dfa76a1e88afc3746ae3e0b25a481700e39b",
+      "name": "org/apache/commons/math3/ml/neuralnet/Network",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "neuronMap",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Ljava/lang/Long;Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "nextId",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        },
+        {
+          "name": "featureSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "linkMap",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Ljava/lang/Long;Ljava/util/Set<Ljava/lang/Long;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JI[Lorg/apache/commons/math3/ml/neuralnet/Neuron;[[J)V",
+          "access": 0,
+          "code_sha256": "5d69a2f65fb8b055a096775545ce287cbe142a7e0bb94547e6284f2fb4e9e3aa",
+          "code_length": 257
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(JI)V",
+          "access": 1,
+          "code_sha256": "f377f8d208c189cec40ac64ff7a66708a826d8eef24ef4a7ea2967f12dc50679",
+          "code_length": 44
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/Network;",
+          "access": 33,
+          "code_sha256": "b583c829c5db03c142ccba9c95ec479617c4e5e9dd0ae407df8548c814e98ce0",
+          "code_length": 147
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "0ef869364beed9a864290b36b7375e89ab5ede071ceb7c0ee4e222b3b40e510e",
+          "code_length": 13,
+          "generic_signature": "()Ljava/util/Iterator<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "getNeurons",
+          "descriptor": "(Ljava/util/Comparator;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "2b9a682d94f603dcedb716f17e27136e566f5745d0ac1112d1bcde23bc6e804a",
+          "code_length": 29,
+          "generic_signature": "(Ljava/util/Comparator<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;)Ljava/util/Collection<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "createNeuron",
+          "descriptor": "([D)J",
+          "access": 1,
+          "code_sha256": "af89c5f27c7a9f95ebc9ddca237c451fa1365b4817ad92678e6f4246322b124f",
+          "code_length": 73
+        },
+        {
+          "name": "deleteNeuron",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;)V",
+          "access": 1,
+          "code_sha256": "b52db1a0527f27b3bd95248cebb070e9ca1690bbfe8474a218226c59bd1f85ce",
+          "code_length": 59
+        },
+        {
+          "name": "getFeaturesSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c82aed037c5afb54cd1235f0acbd9e50ea5462301ecc01f1e215873f28b1fa33",
+          "code_length": 5
+        },
+        {
+          "name": "addLink",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;Lorg/apache/commons/math3/ml/neuralnet/Neuron;)V",
+          "access": 1,
+          "code_sha256": "53a874e5782d191b9ddefae1af3ff8bbd8b80ab127fe4203947b4f11ec5ea0bc",
+          "code_length": 76
+        },
+        {
+          "name": "addLinkToLinkSet",
+          "descriptor": "(Ljava/util/Set;J)V",
+          "access": 2,
+          "code_sha256": "33239dd5834e4c1c8ad35e7d01d3ac95051dd46d6a88a0ec15d9222054f2f9a2",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/Long;>;J)V"
+        },
+        {
+          "name": "deleteLink",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;Lorg/apache/commons/math3/ml/neuralnet/Neuron;)V",
+          "access": 1,
+          "code_sha256": "2bb1002eb45c8311b8620b04cb6e64409232fbda41b0dfd2b81ecfbfc9aa06f8",
+          "code_length": 76
+        },
+        {
+          "name": "deleteLinkFromLinkSet",
+          "descriptor": "(Ljava/util/Set;J)V",
+          "access": 2,
+          "code_sha256": "7c08c9cf04a4b6d50e05cb52c64e62fdf279e486340753a82c02915f74c0b226",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/Long;>;J)V"
+        },
+        {
+          "name": "getNeuron",
+          "descriptor": "(J)Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 1,
+          "code_sha256": "cb70fc020255558cf9fcd3a80943b7e4ef1667ec39ffa61310251d258d9c4d8e",
+          "code_length": 33
+        },
+        {
+          "name": "getNeighbours",
+          "descriptor": "(Ljava/lang/Iterable;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "769f6b834f7419d496689ceec5f862741f355f4523f0dbb5f8023fb4202ca708",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;)Ljava/util/Collection<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "getNeighbours",
+          "descriptor": "(Ljava/lang/Iterable;Ljava/lang/Iterable;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "6651c611d2c7388a8da0e5f0c6505e01c9d0bb35d56dffb23b609d7b725a3ff3",
+          "code_length": 180,
+          "generic_signature": "(Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;)Ljava/util/Collection<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "getNeighbours",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "3e7963ea43f063db43b3f961636f67e0ef815152c13adb97081104977a320a1d",
+          "code_length": 7,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;)Ljava/util/Collection<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "getNeighbours",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;Ljava/lang/Iterable;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "6443b725df501a58133243c5f6f4bd856cac79fe0726587f7d36af008744583b",
+          "code_length": 132,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/neuralnet/Neuron;Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;)Ljava/util/Collection<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;"
+        },
+        {
+          "name": "createNextId",
+          "descriptor": "()Ljava/lang/Long;",
+          "access": 2,
+          "code_sha256": "a0dfbc7c89ec6fe8089e3668ff1de626665deacfd1e277d10e3815f33a449a03",
+          "code_length": 11
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "8b1d2c986d73f5b921d1b63b01917e41fae0bc97cd17522fd81d0c45548dbae2",
+          "code_length": 8
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "0465818d66aed6cdb563b1a01a291a22f6f407c0e26dd4f848c36813acb45298",
+          "code_length": 136
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Lorg/apache/commons/math3/ml/neuralnet/Neuron;>;Ljava/io/Serializable;",
+      "class_references": [
+        "[J",
+        "[Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+        "java/io/Serializable",
+        "java/lang/IllegalStateException",
+        "java/lang/Iterable",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/NoSuchElementException",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/MathIllegalStateException",
+        "org/apache/commons/math3/ml/neuralnet/Network",
+        "org/apache/commons/math3/ml/neuralnet/Network$NeuronIdentifierComparator",
+        "org/apache/commons/math3/ml/neuralnet/Network$SerializationProxy",
+        "org/apache/commons/math3/ml/neuralnet/Neuron"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/Neuron.class",
+      "occurrence": 0,
+      "sha256": "c559d06ffde7ef1aaed31047397e8d51e55cdc88b7f5ae8f5c57394d89e44627",
+      "name": "org/apache/commons/math3/ml/neuralnet/Neuron",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "identifier",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "features",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReference;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReference<[D>;"
+        },
+        {
+          "name": "numberOfAttemptedUpdates",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        },
+        {
+          "name": "numberOfSuccessfulUpdates",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J[D)V",
+          "access": 0,
+          "code_sha256": "2b3ac79c33d972a7cd7c83825edc9d40f1856295ac845c21d886485330f55947",
+          "code_length": 55
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/apache/commons/math3/ml/neuralnet/Neuron;",
+          "access": 33,
+          "code_sha256": "caea311ea613a0cc061590dae737369367765516b958d1b969762fff470dcda3",
+          "code_length": 46
+        },
+        {
+          "name": "getIdentifier",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getFeatures",
+          "descriptor": "()[D",
+          "access": 1,
+          "code_sha256": "08f51f8bccc50187ce45820b067f344948f59aa4f65a5430bce7359cfb003839",
+          "code_length": 17
+        },
+        {
+          "name": "compareAndSetFeatures",
+          "descriptor": "([D[D)Z",
+          "access": 1,
+          "code_sha256": "3433e1581d31e61f57923c41bed72bcc82b43f1bfebc0011d09319aed51f9390",
+          "code_length": 80
+        },
+        {
+          "name": "getNumberOfAttemptedUpdates",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "36f36ef5ea845da44ade20aa4f5bcf87364a500aab9c376d7e4c3fdda90bdb97",
+          "code_length": 8
+        },
+        {
+          "name": "getNumberOfSuccessfulUpdates",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "60d99d455ea54885dd46d2d895f7a056ce87febde2dd4d27daca334902aded5c",
+          "code_length": 8
+        },
+        {
+          "name": "containSameValues",
+          "descriptor": "([D[D)Z",
+          "access": 2,
+          "code_sha256": "a04a81467d11072ea2d7d0eb63d646d66ad87b4bf3af354ab3d95120bdab2bb4",
+          "code_length": 55
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "29f1a1fad4fedb04bac4e574cf6a2001bb054740306ad5f7b5061f8692e4d082",
+          "code_length": 8
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "84a109e1edba017f0595d6fb3005d5390e7be9ee21cf291b66fa008e42e88fbc",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/io/Serializable",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/concurrent/atomic/AtomicLong",
+        "java/util/concurrent/atomic/AtomicReference",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/neuralnet/Neuron",
+        "org/apache/commons/math3/ml/neuralnet/Neuron$SerializationProxy",
+        "org/apache/commons/math3/util/Precision"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble$1.class",
+      "occurrence": 0,
+      "sha256": "a12fc32959d7d09215e1e8e081825c4b3b8372b6e2de1ef903d5fd2573ddb8e2",
+      "name": "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble;Lorg/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble;)I",
+          "access": 1,
+          "code_sha256": "dc868fdb7eed2435e9e7b9b63f1b55d035d5e465bec15c9939725df8cc036e5e",
+          "code_length": 12
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "46b87983c3b52081cee336b621cf46e5b2497ad76bb93c6c359bb24f32a67a4c",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble",
+        "org/apache/commons/math3/ml/neuralnet/MapUtils$PairNeuronDouble$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory.class",
+      "occurrence": 0,
+      "sha256": "29c332adec899f7f3a02a5c46b7f6cd318ef8a29c7f16ddf1782f38848882bed",
+      "name": "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "uniform",
+          "descriptor": "(Lorg/apache/commons/math3/random/RandomGenerator;DD)Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;",
+          "access": 9,
+          "code_sha256": "4e35b10e165b26b7252363991cb249057060f048b5aa59cf8313b06dcd46ffc2",
+          "code_length": 27
+        },
+        {
+          "name": "uniform",
+          "descriptor": "(DD)Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;",
+          "access": 9,
+          "code_sha256": "0fba034ef2865192216a653098eb519494f788b148d037534eb9d7483109b7df",
+          "code_length": 26
+        },
+        {
+          "name": "function",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DD)Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;",
+          "access": 9,
+          "code_sha256": "ca49ba3d2eff57c4566fc905b8660c91ee5227899c1b2dc05dced149bc8f2591",
+          "code_length": 11
+        },
+        {
+          "name": "randomize",
+          "descriptor": "(Lorg/apache/commons/math3/distribution/RealDistribution;Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;)Lorg/apache/commons/math3/ml/neuralnet/FeatureInitializer;",
+          "access": 9,
+          "code_sha256": "634e1b5f04b5a534ce05ee21cddff3014e26f03bdde3946eebf1e4e3e0f428e8",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/function/Constant",
+        "org/apache/commons/math3/distribution/UniformRealDistribution",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$1",
+        "org/apache/commons/math3/ml/neuralnet/FeatureInitializerFactory$2"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/DBSCANClusterer.class",
+      "occurrence": 0,
+      "sha256": "f3648fbc27f0a3edcabfa6292d636ff0f560e92b32941868a9c965c2eda261cb",
+      "name": "org/apache/commons/math3/ml/clustering/DBSCANClusterer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/Clusterer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "eps",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "minPts",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DI)V",
+          "access": 1,
+          "code_sha256": "444df740d8ddd59b553758e76bc9895b08475c05e3188656c3e9ab7b03d71852",
+          "code_length": 14,
+          "throws": [
+            "org/apache/commons/math3/exception/NotPositiveException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(DILorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "47c8cfefb5989f658545e73e808491a529e1e6bb9de97a0c6f539b8a1bb73cbd",
+          "code_length": 51,
+          "throws": [
+            "org/apache/commons/math3/exception/NotPositiveException"
+          ]
+        },
+        {
+          "name": "getEps",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "fb5002192b14f1a1c88e4d78b3f1cc36d46ef02d9135416c2548b9116c5c6fd7",
+          "code_length": 5
+        },
+        {
+          "name": "getMinPts",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "cluster",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0b9115f0c3d3c7b42bffda920e119175ed59a446f4cf3b8c80d7e1c55a442221",
+          "code_length": 135,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;>;"
+        },
+        {
+          "name": "expandCluster",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Cluster;Lorg/apache/commons/math3/ml/clustering/Clusterable;Ljava/util/List;Ljava/util/Collection;Ljava/util/Map;)Lorg/apache/commons/math3/ml/clustering/Cluster;",
+          "access": 2,
+          "code_sha256": "ddb6ecfa6277c94208c52bf48591129c6a6aa424237f05dd12589ce5abceb5ab",
+          "code_length": 144,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;TT;Ljava/util/List<TT;>;Ljava/util/Collection<TT;>;Ljava/util/Map<Lorg/apache/commons/math3/ml/clustering/Clusterable;Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;>;)Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;"
+        },
+        {
+          "name": "getNeighbors",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Clusterable;Ljava/util/Collection;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "033cb592430116a30821764122720e635589f436d5fb8f2796963aaba28d00c6",
+          "code_length": 73,
+          "generic_signature": "(TT;Ljava/util/Collection<TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "9ff6ec1bebf783215bd30fcdfa58383ec8cd534934022b8c12489da6dc587132",
+          "code_length": 64,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/List<TT;>;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/Clusterer<TT;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/apache/commons/math3/exception/NotPositiveException",
+        "org/apache/commons/math3/exception/NullArgumentException",
+        "org/apache/commons/math3/ml/clustering/Cluster",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/Clusterer",
+        "org/apache/commons/math3/ml/clustering/DBSCANClusterer",
+        "org/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus",
+        "org/apache/commons/math3/ml/distance/EuclideanDistance",
+        "org/apache/commons/math3/util/MathUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy.class",
+      "occurrence": 0,
+      "sha256": "73801a9f6e589d4ec1a3bbf6e1a170e5fc2e6064f79370b028060e8948cf2c15",
+      "name": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LARGEST_VARIANCE",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 16409
+        },
+        {
+          "name": "LARGEST_POINTS_NUMBER",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 16409
+        },
+        {
+          "name": "FARTHEST_POINT",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 16409
+        },
+        {
+          "name": "ERROR",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/Clusterer.class",
+      "occurrence": 0,
+      "sha256": "99446dc8dea53d1541f00d8e76eae855cffc4b925e60dbf5c70a4e7b9166fbd7",
+      "name": "org/apache/commons/math3/ml/clustering/Clusterer",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "measure",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "cluster",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException",
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<+Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;>;"
+        },
+        {
+          "name": "getDistanceMeasure",
+          "descriptor": "()Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "distance",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Clusterable;Lorg/apache/commons/math3/ml/clustering/Clusterable;)D",
+          "access": 4,
+          "code_sha256": "b31d87d48b9041d2839bae27dc5cca8eb7d4ca6765c163c284e913b6b5229ac2",
+          "code_length": 22
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/ConvergenceException",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/Clusterer",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$1.class",
+      "occurrence": 0,
+      "sha256": "66d380fd81212a22ef057a85c892c78fd5d332bb9fe0c5319389381595bb5a69",
+      "name": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$commons$math3$ml$clustering$KMeansPlusPlusClusterer$EmptyClusterStrategy",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7c53a443d64ed56a47f0e1e96e2f35f7686a6c0ae5ee7cf66ec1a2455d8ddc23",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$1",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus.class",
+      "occurrence": 0,
+      "sha256": "dc21007084e0ce773719ab5c7e31aac623d825390fcf73400204e2c5821f6f3b",
+      "name": "org/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus",
+      "major": 49,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NOISE",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+          "access": 16409
+        },
+        {
+          "name": "PART_OF_CLUSTER",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/ml/clustering/DBSCANClusterer",
+        "org/apache/commons/math3/ml/clustering/DBSCANClusterer$PointStatus"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/evaluation/SumOfClusterVariances.class",
+      "occurrence": 0,
+      "sha256": "ef8e725c7be6b673edb6c162a62e49c386909b4a82df635917d1974f9df81712",
+      "name": "org/apache/commons/math3/ml/clustering/evaluation/SumOfClusterVariances",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "score",
+          "descriptor": "(Ljava/util/List;)D",
+          "access": 1,
+          "code_sha256": "8d8c5e6f80814ca46004dcc1ce32ac6d68183793d29181a44eb7da35e14bdd09",
+          "code_length": 125,
+          "generic_signature": "(Ljava/util/List<+Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;>;)D"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator<TT;>;",
+      "class_references": [
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/ml/clustering/Cluster",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator",
+        "org/apache/commons/math3/ml/clustering/evaluation/SumOfClusterVariances",
+        "org/apache/commons/math3/stat/descriptive/moment/Variance"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator.class",
+      "occurrence": 0,
+      "sha256": "1d6afffae8bfde469fb8bf7d37d20f6551c14d9ad82c40e1b01319dae69b7e3e",
+      "name": "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "measure",
+          "descriptor": "Lorg/apache/commons/math3/ml/distance/DistanceMeasure;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "94fd53187f855976600c6c4f7325eb202c464decd4fac2c62bb1a6c40de54c23",
+          "code_length": 10
+        },
+        {
+          "name": "score",
+          "descriptor": "(Ljava/util/List;)D",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/List<+Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;>;)D"
+        },
+        {
+          "name": "isBetterScore",
+          "descriptor": "(DD)Z",
+          "access": 1,
+          "code_sha256": "cd30f08f9c26fda246725b634586f184d2460210ccfcf1048031274fdc4e50b3",
+          "code_length": 12
+        },
+        {
+          "name": "distance",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Clusterable;Lorg/apache/commons/math3/ml/clustering/Clusterable;)D",
+          "access": 4,
+          "code_sha256": "62f528405d7ffed94d8f4edbfdb89a6571b02be5bef6282072782fb334c3a8b9",
+          "code_length": 22
+        },
+        {
+          "name": "centroidOf",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Cluster;)Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 4,
+          "code_sha256": "d783f1741583175f9bb1d5ccb5adfda91c8e1c6370ca09fd75ad77499e407c67",
+          "code_length": 167,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;)Lorg/apache/commons/math3/ml/clustering/Clusterable;"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/ml/clustering/CentroidCluster",
+        "org/apache/commons/math3/ml/clustering/Cluster",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/DoublePoint",
+        "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/distance/EuclideanDistance"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/DoublePoint.class",
+      "occurrence": 0,
+      "sha256": "ba6d1453a3f026cd7239a6aa911dcdbf69cf85209799f79eeca941407da9d4bf",
+      "name": "org/apache/commons/math3/ml/clustering/DoublePoint",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "point",
+          "descriptor": "[D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "985a0f68236bbeb82a7dac807210674d997aa9cc2b2614d9990a8dfca4f57194",
+          "code_length": 37
+        },
+        {
+          "name": "getPoint",
+          "descriptor": "()[D",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "baf92c60fea47accbe32a8ba44c99f416b84275b0155c0378e87b793737b8f63",
+          "code_length": 24
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "91fd7a132eda6a353274a208120e15ea51b5f57a03434196c2d61b6139c83a30",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0465c9428ab679ce549fda36f1956b9a7a8a34eee4c155e8cdce1085bdf77c56",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/util/Arrays",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/DoublePoint"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/FuzzyKMeansClusterer.class",
+      "occurrence": 0,
+      "sha256": "a6aec64afcb86b6893656cec3f7945f2bc52c660ea134d0edc4e66d8fa0b39ec",
+      "name": "org/apache/commons/math3/ml/clustering/FuzzyKMeansClusterer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/Clusterer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_EPSILON",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "k",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "maxIterations",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "fuzziness",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "epsilon",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "random",
+          "descriptor": "Lorg/apache/commons/math3/random/RandomGenerator;",
+          "access": 18
+        },
+        {
+          "name": "membershipMatrix",
+          "descriptor": "[[D",
+          "access": 2
+        },
+        {
+          "name": "points",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "clusters",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ID)V",
+          "access": 1,
+          "code_sha256": "1fadb6dbdecdb1f1145b6eec51934d4497325fda22b46139c865b0f7b0969a1e",
+          "code_length": 15,
+          "throws": [
+            "org/apache/commons/math3/exception/NumberIsTooSmallException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IDILorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "3a7803dea7ae6bec92cd9d54f4afdb6e4ef4fb274171c3f12c54679b49b7a2a7",
+          "code_length": 21,
+          "throws": [
+            "org/apache/commons/math3/exception/NumberIsTooSmallException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IDILorg/apache/commons/math3/ml/distance/DistanceMeasure;DLorg/apache/commons/math3/random/RandomGenerator;)V",
+          "access": 1,
+          "code_sha256": "60ce0e379d0875c2b2d14d919ae18b17c889323ec4c72f401f329bdc862ae776",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/math3/exception/NumberIsTooSmallException"
+          ]
+        },
+        {
+          "name": "getK",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "getFuzziness",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "d111959a017de4ea5d916029ef1c42a6ac15748412022d0a8c18833fe6ef6ba1",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxIterations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f71c0e37ea3da5d4fd1a485105c71cfe89cdd2a717078a1b00ea19e11626bf1b",
+          "code_length": 5
+        },
+        {
+          "name": "getEpsilon",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "b7c2e440fa5c8e4019325a4790c87fb1d178cc8d062d2517b94fbebacc53833d",
+          "code_length": 5
+        },
+        {
+          "name": "getRandomGenerator",
+          "descriptor": "()Lorg/apache/commons/math3/random/RandomGenerator;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        },
+        {
+          "name": "getMembershipMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "d3f99b98dd186447d30e30b290c9a3568684f63f776393a997db5ecfd3b594cf",
+          "code_length": 23
+        },
+        {
+          "name": "getDataPoints",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "getClusters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        },
+        {
+          "name": "getObjectiveFunctionValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "f509b8ae866c923cb1e659aa5500b92acdfbb339ce59b629482a8343601aecfe",
+          "code_length": 147
+        },
+        {
+          "name": "cluster",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "ce6486d0bd2b7925f11f09a52b936acf92cb9445d8a1b27f702546e06acbc457",
+          "code_length": 237,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        },
+        {
+          "name": "updateClusterCenters",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "583cfadb9c496f6ed1cc9bac4650210d7a48c07e62ece0e02bd42c9db6f30ac1",
+          "code_length": 228
+        },
+        {
+          "name": "updateMembershipMatrix",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "774bac3f5cce9ae8c9a09b36f0d8896e902d697f7c3368fb3998c840a2fd2cf9",
+          "code_length": 283
+        },
+        {
+          "name": "initializeMembershipMatrix",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c5cc442c872b4fca4b4590391a18721f9553de2061f43c88a1c6b93e33670624",
+          "code_length": 71
+        },
+        {
+          "name": "calculateMaxMembershipChange",
+          "descriptor": "([[D)D",
+          "access": 2,
+          "code_sha256": "fde980a301c7ea5ebff1fa362c6ad71ee01f456689d7321eff95d03b28971bfd",
+          "code_length": 80
+        },
+        {
+          "name": "saveMembershipMatrix",
+          "descriptor": "([[D)V",
+          "access": 2,
+          "code_sha256": "4abe58e6352e7d0977ab40589be1dc5b493392b8db8b3caef072f7b5835b0582",
+          "code_length": 45
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/Clusterer<TT;>;",
+      "class_references": [
+        "[[D",
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/MathIllegalStateException",
+        "org/apache/commons/math3/exception/NumberIsTooSmallException",
+        "org/apache/commons/math3/linear/MatrixUtils",
+        "org/apache/commons/math3/ml/clustering/CentroidCluster",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/Clusterer",
+        "org/apache/commons/math3/ml/clustering/DoublePoint",
+        "org/apache/commons/math3/ml/clustering/FuzzyKMeansClusterer",
+        "org/apache/commons/math3/ml/distance/EuclideanDistance",
+        "org/apache/commons/math3/random/JDKRandomGenerator",
+        "org/apache/commons/math3/random/RandomGenerator",
+        "org/apache/commons/math3/util/FastMath",
+        "org/apache/commons/math3/util/MathArrays",
+        "org/apache/commons/math3/util/MathUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer.class",
+      "occurrence": 0,
+      "sha256": "4b70c6a5fa79fdbaa23d2de593136a82a5a0c53fc3f1ceea3a8f16c1cf31f8d3",
+      "name": "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/Clusterer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "k",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "maxIterations",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "random",
+          "descriptor": "Lorg/apache/commons/math3/random/RandomGenerator;",
+          "access": 18
+        },
+        {
+          "name": "emptyStrategy",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "38476fc5fa19a398096244c6e23eecac47cfd20851fa0ff40aa3afe93cd18a21",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "0e930e6ec5073c2a324f3d7745a15d6062d993394c7f14463db41c5a641e92e8",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IILorg/apache/commons/math3/ml/distance/DistanceMeasure;)V",
+          "access": 1,
+          "code_sha256": "5339f9bd4517bafbde10d63f9a330304409d668820bff2684b50f5ab9c6b0a1e",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IILorg/apache/commons/math3/ml/distance/DistanceMeasure;Lorg/apache/commons/math3/random/RandomGenerator;)V",
+          "access": 1,
+          "code_sha256": "5a407f8363fdc76639960628944f3213058889b95998351aa969d3250f4feb39",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IILorg/apache/commons/math3/ml/distance/DistanceMeasure;Lorg/apache/commons/math3/random/RandomGenerator;Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;)V",
+          "access": 1,
+          "code_sha256": "68dc366450632c0c743862d8acc1c66dcf6adf3e1c43e8051c66a9e218ff36d2",
+          "code_length": 28
+        },
+        {
+          "name": "getK",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxIterations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c4be5d4e2bc69b8b56edcc530b23f83be000df4423c40efe0643a11c4f79b40",
+          "code_length": 5
+        },
+        {
+          "name": "getRandomGenerator",
+          "descriptor": "()Lorg/apache/commons/math3/random/RandomGenerator;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "getEmptyClusterStrategy",
+          "descriptor": "()Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "cluster",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "27dbe8a3f21b32502261617afa191aa6d851322f8758157b2e9a1dc7b927c0df",
+          "code_length": 310,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException",
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        },
+        {
+          "name": "assignPointsToClusters",
+          "descriptor": "(Ljava/util/List;Ljava/util/Collection;[I)I",
+          "access": 2,
+          "code_sha256": "728e83a8c239c55725da4a289a43e2f436417d8958222a1f3783bb3fabf9517d",
+          "code_length": 92,
+          "generic_signature": "(Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;Ljava/util/Collection<TT;>;[I)I"
+        },
+        {
+          "name": "chooseInitialCenters",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "8ec3a831f7c2482650a8ffb4596af8d3c61a4bd74d5d25e2b9c692a99100fe14",
+          "code_length": 420,
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        },
+        {
+          "name": "getPointFromLargestVarianceCluster",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 2,
+          "code_sha256": "5e359cd8d238824a0f5f5489a10cebeec94a1426d1b348700bca6ff5f345324d",
+          "code_length": 194,
+          "throws": [
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;)TT;"
+        },
+        {
+          "name": "getPointFromLargestNumberCluster",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 2,
+          "code_sha256": "740679603d6d096456adb5be16adb3ed71c1900f4c5d5c1ce5c54f8443b3b130",
+          "code_length": 113,
+          "throws": [
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<+Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;>;)TT;"
+        },
+        {
+          "name": "getFarthestPoint",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 2,
+          "code_sha256": "14f9e6f617394cf0f385f416b2545a29c521b3609defd8e5390ef1bc65660d5d",
+          "code_length": 152,
+          "throws": [
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;)TT;"
+        },
+        {
+          "name": "getNearestCluster",
+          "descriptor": "(Ljava/util/Collection;Lorg/apache/commons/math3/ml/clustering/Clusterable;)I",
+          "access": 2,
+          "code_sha256": "c624b2f8c51e5e2d9b8680185097cccbeef45e031041776cc419b568ee2b0a6d",
+          "code_length": 75,
+          "generic_signature": "(Ljava/util/Collection<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;TT;)I"
+        },
+        {
+          "name": "centroidOf",
+          "descriptor": "(Ljava/util/Collection;I)Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 2,
+          "code_sha256": "e913701e3c3761e2b8655ea57e8b7c2099be01370620aad52d9fa8f786400985",
+          "code_length": 113,
+          "generic_signature": "(Ljava/util/Collection<TT;>;I)Lorg/apache/commons/math3/ml/clustering/Clusterable;"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/Clusterer<TT;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/math3/exception/ConvergenceException",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/NumberIsTooSmallException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/ml/clustering/CentroidCluster",
+        "org/apache/commons/math3/ml/clustering/Cluster",
+        "org/apache/commons/math3/ml/clustering/Clusterable",
+        "org/apache/commons/math3/ml/clustering/Clusterer",
+        "org/apache/commons/math3/ml/clustering/DoublePoint",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$1",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer$EmptyClusterStrategy",
+        "org/apache/commons/math3/ml/distance/EuclideanDistance",
+        "org/apache/commons/math3/random/JDKRandomGenerator",
+        "org/apache/commons/math3/random/RandomGenerator",
+        "org/apache/commons/math3/stat/descriptive/moment/Variance",
+        "org/apache/commons/math3/util/MathUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/Clusterable.class",
+      "occurrence": 0,
+      "sha256": "138884dfe425b856c23e007512a697650ded505e1763d435f262e5cb639d56d4",
+      "name": "org/apache/commons/math3/ml/clustering/Clusterable",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPoint",
+          "descriptor": "()[D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/ml/clustering/Clusterable"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/CentroidCluster.class",
+      "occurrence": 0,
+      "sha256": "01b871976e53d93a1d806adc974a59eeb5e5dcd0c1a9610640aa88e807fa1fda",
+      "name": "org/apache/commons/math3/ml/clustering/CentroidCluster",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/Cluster",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "center",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Clusterable;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getCenter",
+          "descriptor": "()Lorg/apache/commons/math3/ml/clustering/Clusterable;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/Cluster<TT;>;",
+      "class_references": [
+        "org/apache/commons/math3/ml/clustering/CentroidCluster",
+        "org/apache/commons/math3/ml/clustering/Cluster"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/MultiKMeansPlusPlusClusterer.class",
+      "occurrence": 0,
+      "sha256": "10718d3054a69154970ba4d32cf0ba68c28b7e58827f52ee48ed507901a5b791",
+      "name": "org/apache/commons/math3/ml/clustering/MultiKMeansPlusPlusClusterer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/math3/ml/clustering/Clusterer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "clusterer",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer<TT;>;"
+        },
+        {
+          "name": "numTrials",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "evaluator",
+          "descriptor": "Lorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer;I)V",
+          "access": 1,
+          "code_sha256": "f78ae2ca5cd21018aa1e9db02b8c9f0a394e7d0ec8f947fdd636500e4b5db493",
+          "code_length": 18,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer<TT;>;I)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer;ILorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator;)V",
+          "access": 1,
+          "code_sha256": "b1a7aa90639c2c5714a47349d6b0072ec41e405fe19232b4717df673625befb4",
+          "code_length": 24,
+          "generic_signature": "(Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer<TT;>;ILorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator<TT;>;)V"
+        },
+        {
+          "name": "getClusterer",
+          "descriptor": "()Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lorg/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer<TT;>;"
+        },
+        {
+          "name": "getNumTrials",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getClusterEvaluator",
+          "descriptor": "()Lorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5,
+          "generic_signature": "()Lorg/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator<TT;>;"
+        },
+        {
+          "name": "cluster",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d13e73cd94333e242603f3f857c314c1a6d6cfa9c9283f408d5e368a58788e4e",
+          "code_length": 66,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException",
+            "org/apache/commons/math3/exception/ConvergenceException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<TT;>;)Ljava/util/List<Lorg/apache/commons/math3/ml/clustering/CentroidCluster<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Lorg/apache/commons/math3/ml/clustering/Clusterer<TT;>;",
+      "class_references": [
+        "org/apache/commons/math3/exception/ConvergenceException",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/ml/clustering/Clusterer",
+        "org/apache/commons/math3/ml/clustering/KMeansPlusPlusClusterer",
+        "org/apache/commons/math3/ml/clustering/MultiKMeansPlusPlusClusterer",
+        "org/apache/commons/math3/ml/clustering/evaluation/ClusterEvaluator",
+        "org/apache/commons/math3/ml/clustering/evaluation/SumOfClusterVariances"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/clustering/Cluster.class",
+      "occurrence": 0,
+      "sha256": "bf757a235cdca6818e533b775b49f0ab2d97d6374b6ae1e05545248cfbd780e9",
+      "name": "org/apache/commons/math3/ml/clustering/Cluster",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "points",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "addPoint",
+          "descriptor": "(Lorg/apache/commons/math3/ml/clustering/Clusterable;)V",
+          "access": 1,
+          "code_sha256": "b29c1de0aedc795126db959d2c8d9c55eea4ad6af81178d72843a69898648ed8",
+          "code_length": 12,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "getPoints",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T::Lorg/apache/commons/math3/ml/clustering/Clusterable;>Ljava/lang/Object;Ljava/io/Serializable;",
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/commons/math3/ml/clustering/Cluster"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/EuclideanDistance.class",
+      "occurrence": 0,
+      "sha256": "d5b59b5b8fcbf6e407d122a332c2935039c7ba8299251ddc53add4cd6cddda38",
+      "name": "org/apache/commons/math3/ml/distance/EuclideanDistance",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1,
+          "code_sha256": "a5db97535ba4b0b7b5652995c858c8fd47cd97379cac195678709e2a83c050dc",
+          "code_length": 6,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/distance/EuclideanDistance",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/ChebyshevDistance.class",
+      "occurrence": 0,
+      "sha256": "c52c26cd08d2eea0d65feb57f268d7030fa855f62796968e535c9229c2b696e1",
+      "name": "org/apache/commons/math3/ml/distance/ChebyshevDistance",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1,
+          "code_sha256": "a5db97535ba4b0b7b5652995c858c8fd47cd97379cac195678709e2a83c050dc",
+          "code_length": 6,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/ChebyshevDistance",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/ManhattanDistance.class",
+      "occurrence": 0,
+      "sha256": "68c054e8a8967952fd44e0566ed437174866af1d533659f03cbaed9df5ecda29",
+      "name": "org/apache/commons/math3/ml/distance/ManhattanDistance",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1,
+          "code_sha256": "a5db97535ba4b0b7b5652995c858c8fd47cd97379cac195678709e2a83c050dc",
+          "code_length": 6,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/distance/ManhattanDistance",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/EarthMoversDistance.class",
+      "occurrence": 0,
+      "sha256": "f764b18bc9845314836e04a579d9e739ec8b384ac74e056c83c57ce2567935dc",
+      "name": "org/apache/commons/math3/ml/distance/EarthMoversDistance",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1,
+          "code_sha256": "e67b123b2a655ab5cc266035c36bd36ce0961cfb0e9a2c9e65314784827803fb",
+          "code_length": 55,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/ml/distance/EarthMoversDistance",
+        "org/apache/commons/math3/util/FastMath",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/DistanceMeasure.class",
+      "occurrence": 0,
+      "sha256": "f4217449011923f743a99c370a227ae38afd61a5dc4aab311669e115f9772c60",
+      "name": "org/apache/commons/math3/ml/distance/DistanceMeasure",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/ml/distance/CanberraDistance.class",
+      "occurrence": 0,
+      "sha256": "3f4ff12fda161b877f4a22baa3aafe7438f10b5a37623ff73d03831a0172fee3",
+      "name": "org/apache/commons/math3/ml/distance/CanberraDistance",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/ml/distance/DistanceMeasure"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "([D[D)D",
+          "access": 1,
+          "code_sha256": "19200dcde42f424cf380c47d2b117c2c0475d448bf5eec485d0e08e9bbe3b78a",
+          "code_length": 82,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/ml/distance/CanberraDistance",
+        "org/apache/commons/math3/ml/distance/DistanceMeasure",
+        "org/apache/commons/math3/util/FastMath",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$1.class",
+      "occurrence": 0,
+      "sha256": "088e18e0d6bb90f43a09e8faa49cd0d39463716a677ec2731a67e370aa88d394",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "[Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/UnivariateFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "7d5008f577365edfb7d416f44cdaf9d733311fde4259f90f1a1eb1c85c0a2426",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$1",
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/ParametricUnivariateFunction.class",
+      "occurrence": 0,
+      "sha256": "0d90163bdea08784d038d06926c3e64a5375feee36946e2d8a465d9a6f11bdf9",
+      "name": "org/apache/commons/math3/analysis/ParametricUnivariateFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "(D[D)D",
+          "access": 1153
+        },
+        {
+          "name": "gradient",
+          "descriptor": "(D[D)[D",
+          "access": 1153
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/ParametricUnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$6.class",
+      "occurrence": 0,
+      "sha256": "767271bef374ea490435dc518b63f76cd0ed580ff973d0fa10b9684f0179b233",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$6",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "[Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "f0b3b133ab6cc614ae223f5755de2238e41f256a525297ab43735902edbd1f34",
+          "code_length": 50
+        },
+        {
+          "name": "derivative",
+          "descriptor": "()Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 1,
+          "code_sha256": "e9e859f5f923431d058feb3a5d97892fe83d9015fb1f71d59b48aa523270a267",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$6",
+        "org/apache/commons/math3/analysis/FunctionUtils$6$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$3$1.class",
+      "occurrence": 0,
+      "sha256": "e36a6200be2fccaa5ac6bc0c4afc7e3fa10ca5944a0f8c4c7dac69007cbeb1ce",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$3$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/math3/analysis/FunctionUtils$3;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/FunctionUtils$3;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "33b8daee3e3d061fbc0f1d07311ab0318db3ed75a24b8fa00f444ae607aa21cb",
+          "code_length": 74
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils$3",
+        "org/apache/commons/math3/analysis/FunctionUtils$3$1",
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$6$1.class",
+      "occurrence": 0,
+      "sha256": "3a605abf532dd9c36b2b72026843f6d88482d0d6fe066313f3a90771693375aa",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$6$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/math3/analysis/FunctionUtils$6;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/FunctionUtils$6;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "9da8f565fdd462aeed6b9ebc2f4a114f2604b669da77c5ae2b69f7c1e6d65607",
+          "code_length": 69
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils$6",
+        "org/apache/commons/math3/analysis/FunctionUtils$6$1",
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/UnivariateMatrixFunction.class",
+      "occurrence": 0,
+      "sha256": "dfb1a57637a125a948a2abedaac8fb2cb12d2bc3f2d8e4d7023e440caab72ba7",
+      "name": "org/apache/commons/math3/analysis/UnivariateMatrixFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "(D)[[D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/UnivariateMatrixFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/TrivariateFunction.class",
+      "occurrence": 0,
+      "sha256": "7adc8b68c4bef87b55323707c717d19016f6cb800d829d65d6c31bbb219e3f11",
+      "name": "org/apache/commons/math3/analysis/TrivariateFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "(DDD)D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/TrivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction.class",
+      "occurrence": 0,
+      "sha256": "8de1925814adf1bc79d162e0b6c8a538c25b634d66aa6d178efcdb25ac7e0eb0",
+      "name": "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "derivative",
+          "descriptor": "()Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$8.class",
+      "occurrence": 0,
+      "sha256": "c1a18c2b92832735f984302ea0708129fcfe5254f95b619227b495a0ec2096d0",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$8",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "[Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "e091d2040363d2db755d6329fddc1a21015eeb4fab90f3ede198ff7c54038f94",
+          "code_length": 50
+        },
+        {
+          "name": "value",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/DerivativeStructure;)Lorg/apache/commons/math3/analysis/differentiation/DerivativeStructure;",
+          "access": 1,
+          "code_sha256": "7a819f6d054aa56a0d6419b5ce73bd20835126418a714093b0b3c6b8e043ebf1",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$8",
+        "org/apache/commons/math3/analysis/differentiation/DerivativeStructure",
+        "org/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$18.class",
+      "occurrence": 0,
+      "sha256": "4e228c517b40fc3c792b628423752ac413398b3445353ec9dc55237bf271b2a1",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$18",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/DifferentiableMultivariateVectorFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "([D)[D",
+          "access": 1,
+          "code_sha256": "2804602b2a0358c96e618b6c7803331fe1bd5eeb3eac200368ae6321f0e5ac3d",
+          "code_length": 11
+        },
+        {
+          "name": "jacobian",
+          "descriptor": "()Lorg/apache/commons/math3/analysis/MultivariateMatrixFunction;",
+          "access": 1,
+          "code_sha256": "e9e859f5f923431d058feb3a5d97892fe83d9015fb1f71d59b48aa523270a267",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableMultivariateVectorFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$18",
+        "org/apache/commons/math3/analysis/FunctionUtils$18$1",
+        "org/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/MultivariateVectorFunction.class",
+      "occurrence": 0,
+      "sha256": "ff4446f1dd99439e18c86feadc63a136cc34833f64c89f03f1f4ea2f3c469363",
+      "name": "org/apache/commons/math3/analysis/MultivariateVectorFunction",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "([D)[D",
+          "access": 1025,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/MultivariateVectorFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$17.class",
+      "occurrence": 0,
+      "sha256": "42132049390ee0543c182392851dd08e52c840e84da92ca60703a4df8678c2e4",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$17",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "Lorg/apache/commons/math3/analysis/DifferentiableMultivariateFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/DifferentiableMultivariateFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "([D)D",
+          "access": 1,
+          "code_sha256": "2cff10e17dd292b0497800cc03a4d0aee165bd1f1feda3984facb79b11bbfffa",
+          "code_length": 11
+        },
+        {
+          "name": "value",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/differentiation/DerivativeStructure;)Lorg/apache/commons/math3/analysis/differentiation/DerivativeStructure;",
+          "access": 1,
+          "code_sha256": "a121b525d28be65bc17943a85ceb02c58933721588d3bd52b5dc85f832bc1528",
+          "code_length": 273,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException",
+            "org/apache/commons/math3/exception/NumberIsTooLargeException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableMultivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$17",
+        "org/apache/commons/math3/analysis/MultivariateVectorFunction",
+        "org/apache/commons/math3/analysis/differentiation/DerivativeStructure",
+        "org/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableFunction",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/NumberIsTooLargeException"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$9.class",
+      "occurrence": 0,
+      "sha256": "e7223c7db351236228dcf510c701152da24fca74511a6ac89127d7d6df94d9e3",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$9",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "[Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "e091d2040363d2db755d6329fddc1a21015eeb4fab90f3ede198ff7c54038f94",
+          "code_length": 50
+        },
+        {
+          "name": "derivative",
+          "descriptor": "()Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 1,
+          "code_sha256": "e9e859f5f923431d058feb3a5d97892fe83d9015fb1f71d59b48aa523270a267",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$9",
+        "org/apache/commons/math3/analysis/FunctionUtils$9$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$14.class",
+      "occurrence": 0,
+      "sha256": "e8f7f3730c39fde9a2cd46d05769b1a5832b39c4e95aacfd89790b54d2f01411",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$14",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "cd799fb4777378dba2c89b9747ee6fd81864cec64a39112afbf1ccc74380aca3",
+          "code_length": 11
+        },
+        {
+          "name": "derivative",
+          "descriptor": "()Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 1,
+          "code_sha256": "e9e859f5f923431d058feb3a5d97892fe83d9015fb1f71d59b48aa523270a267",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/DifferentiableUnivariateFunction",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$14",
+        "org/apache/commons/math3/analysis/FunctionUtils$14$1",
+        "org/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$16$2.class",
+      "occurrence": 0,
+      "sha256": "e74ef4e5f626249eb86f13b96b0a85d0e1b70bf14468a5c8a488c3f4c26703ec",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$16$2",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/MultivariateVectorFunction"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/math3/analysis/FunctionUtils$16;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/FunctionUtils$16;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "([D)[D",
+          "access": 1,
+          "code_sha256": "82465112c22845aad4289a599e1be9f758e15a81505cb059f5b04a83f9e1a0b8",
+          "code_length": 109
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils$16",
+        "org/apache/commons/math3/analysis/FunctionUtils$16$2",
+        "org/apache/commons/math3/analysis/MultivariateVectorFunction",
+        "org/apache/commons/math3/analysis/differentiation/DerivativeStructure",
+        "org/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$7.class",
+      "occurrence": 0,
+      "sha256": "a81c0599cc5782a35b22ecc7e2f154b220c309c4b644141412caee7a311a19ec",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$7",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "[Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/UnivariateFunction;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "e091d2040363d2db755d6329fddc1a21015eeb4fab90f3ede198ff7c54038f94",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$7",
+        "org/apache/commons/math3/analysis/UnivariateFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils$18$1.class",
+      "occurrence": 0,
+      "sha256": "b64b4125280bc8d066c6e8adfe74e7bf0d79c621baffb89abba77cb1abf9c2a6",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils$18$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/analysis/MultivariateMatrixFunction"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/math3/analysis/FunctionUtils$18;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/FunctionUtils$18;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "value",
+          "descriptor": "([D)[[D",
+          "access": 1,
+          "code_sha256": "4d5ed99a8465738d3fbb7e76bf13cff072fa2a55fd0cef6b6303bee0d8b8b2a4",
+          "code_length": 137
+        }
+      ],
+      "class_references": [
+        "[[D",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils$18",
+        "org/apache/commons/math3/analysis/FunctionUtils$18$1",
+        "org/apache/commons/math3/analysis/MultivariateMatrixFunction",
+        "org/apache/commons/math3/analysis/differentiation/DerivativeStructure",
+        "org/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/analysis/FunctionUtils.class",
+      "occurrence": 0,
+      "sha256": "91182fc0fd7f502c00558bc258bbddf3cab625055d5ebf200a2c88652a9a4b5b",
+      "name": "org/apache/commons/math3/analysis/FunctionUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compose",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/UnivariateFunction;)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 137,
+          "code_sha256": "b6d8d2811609d5ad6163077aca9d9d8f920f04ceacff7af9b90c5e8e6edd3915",
+          "code_length": 9
+        },
+        {
+          "name": "compose",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 137,
+          "code_sha256": "e9e859f5f923431d058feb3a5d97892fe83d9015fb1f71d59b48aa523270a267",
+          "code_length": 9
+        },
+        {
+          "name": "compose",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 137,
+          "code_sha256": "d4a3687b8e15a45269a31a28af3a4aaba50c96ce812c43da858820343c5e8960",
+          "code_length": 9
+        },
+        {
+          "name": "add",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/UnivariateFunction;)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 137,
+          "code_sha256": "8d05ff0af289c8721432f8781f77d25d559f0612d8481dd90133b2da4d62a841",
+          "code_length": 9
+        },
+        {
+          "name": "add",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 137,
+          "code_sha256": "4141d0b74be02a22e8cca4affc69d01bb71af1d1ebbe3a63c78f131dcd868884",
+          "code_length": 9
+        },
+        {
+          "name": "add",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 137,
+          "code_sha256": "9f73c6127e4cc725fdbb409419256731ab7007f35ccb79aa5bf681125640ce95",
+          "code_length": 9
+        },
+        {
+          "name": "multiply",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/UnivariateFunction;)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 137,
+          "code_sha256": "258c00be308a1e24b4e36030097c98295c0c484717166943647b5e2def020fbb",
+          "code_length": 9
+        },
+        {
+          "name": "multiply",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 137,
+          "code_sha256": "aed78545204f6843726a1399debfc076a4d6331e967ad12a70f8c5c06d4d4e81",
+          "code_length": 9
+        },
+        {
+          "name": "multiply",
+          "descriptor": "([Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 137,
+          "code_sha256": "6b171f46e3282d6471e994220ffb45779e3c6a9adb2e3e15c1a9eb3544da43db",
+          "code_length": 9
+        },
+        {
+          "name": "combine",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/BivariateFunction;Lorg/apache/commons/math3/analysis/UnivariateFunction;Lorg/apache/commons/math3/analysis/UnivariateFunction;)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 9,
+          "code_sha256": "9b57cb1f3e2c4034fb98bb91fd11dfb7a4cf42a258a5591fecbb1e0f2a2c1f74",
+          "code_length": 11
+        },
+        {
+          "name": "collector",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/BivariateFunction;Lorg/apache/commons/math3/analysis/UnivariateFunction;D)Lorg/apache/commons/math3/analysis/MultivariateFunction;",
+          "access": 9,
+          "code_sha256": "2289c3a956e92503d3165888d003e8cfb8a1354326de99944cc75dde0533f5ff",
+          "code_length": 11
+        },
+        {
+          "name": "collector",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/BivariateFunction;D)Lorg/apache/commons/math3/analysis/MultivariateFunction;",
+          "access": 9,
+          "code_sha256": "63e89fb26660dfa7d0f6f19857c094387aabd4a007396c2a8db82c75b89310be",
+          "code_length": 13
+        },
+        {
+          "name": "fix1stArgument",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/BivariateFunction;D)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 9,
+          "code_sha256": "ef43d3bd5b5669db3fdc98d798bc1c90a0d99debf94a91f8e9d0bcd9a87ecc42",
+          "code_length": 10
+        },
+        {
+          "name": "fix2ndArgument",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/BivariateFunction;D)Lorg/apache/commons/math3/analysis/UnivariateFunction;",
+          "access": 9,
+          "code_sha256": "c702ed75e63bd4b2226558381a6ef848d3d5e5e8e2f13dd4a185796fdde1295f",
+          "code_length": 10
+        },
+        {
+          "name": "sample",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDI)[D",
+          "access": 9,
+          "code_sha256": "5e2dedaebfe681d1f47a01f36978d0eb88f72f9107f03fbf8f20ada4543c59c3",
+          "code_length": 97,
+          "throws": [
+            "org/apache/commons/math3/exception/NumberIsTooLargeException",
+            "org/apache/commons/math3/exception/NotStrictlyPositiveException"
+          ]
+        },
+        {
+          "name": "toDifferentiableUnivariateFunction",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;)Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;",
+          "access": 9,
+          "code_sha256": "eec653f7f0188f80dfe80c8ac71619533319d1dfba305470b9256a6acd89fa4c",
+          "code_length": 9
+        },
+        {
+          "name": "toUnivariateDifferential",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/DifferentiableUnivariateFunction;)Lorg/apache/commons/math3/analysis/differentiation/UnivariateDifferentiableFunction;",
+          "access": 9,
+          "code_sha256": "cca31f5b00ebc2ada6318ae374e3661ba87e6ec1664ee9d86f2c7d7587f73c0e",
+          "code_length": 9
+        },
+        {
+          "name": "toDifferentiableMultivariateFunction",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableFunction;)Lorg/apache/commons/math3/analysis/DifferentiableMultivariateFunction;",
+          "access": 9,
+          "code_sha256": "bd0b36ad30643373a4de502fd8b9b9a34a49e6ab455b51ee8a222ecc97357857",
+          "code_length": 9
+        },
+        {
+          "name": "toMultivariateDifferentiableFunction",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/DifferentiableMultivariateFunction;)Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableFunction;",
+          "access": 9,
+          "code_sha256": "8d6f8140d0f3b7d4c6909191f0a69cd99473e0c2a205dd1e422f6ce5b5670561",
+          "code_length": 9
+        },
+        {
+          "name": "toDifferentiableMultivariateVectorFunction",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction;)Lorg/apache/commons/math3/analysis/DifferentiableMultivariateVectorFunction;",
+          "access": 9,
+          "code_sha256": "512b3554383e1abcf3bdc41d7079831f734e63b596d88245b781b4c7f471633e",
+          "code_length": 9
+        },
+        {
+          "name": "toMultivariateDifferentiableVectorFunction",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/DifferentiableMultivariateVectorFunction;)Lorg/apache/commons/math3/analysis/differentiation/MultivariateDifferentiableVectorFunction;",
+          "access": 9,
+          "code_sha256": "b524cd70cccebba34394411945277a92351be2f9e730f19eb133cff5251740d4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/analysis/FunctionUtils$1",
+        "org/apache/commons/math3/analysis/FunctionUtils$10",
+        "org/apache/commons/math3/analysis/FunctionUtils$11",
+        "org/apache/commons/math3/analysis/FunctionUtils$12",
+        "org/apache/commons/math3/analysis/FunctionUtils$13",
+        "org/apache/commons/math3/analysis/FunctionUtils$14",
+        "org/apache/commons/math3/analysis/FunctionUtils$15",
+        "org/apache/commons/math3/analysis/FunctionUtils$16",
+        "org/apache/commons/math3/analysis/FunctionUtils$17",
+        "org/apache/commons/math3/analysis/FunctionUtils$18",
+        "org/apache/commons/math3/analysis/FunctionUtils$19",
+        "org/apache/commons/math3/analysis/FunctionUtils$2",
+        "org/apache/commons/math3/analysis/FunctionUtils$3",
+        "org/apache/commons/math3/analysis/FunctionUtils$4",
+        "org/apache/commons/math3/analysis/FunctionUtils$5",
+        "org/apache/commons/math3/analysis/FunctionUtils$6",
+        "org/apache/commons/math3/analysis/FunctionUtils$7",
+        "org/apache/commons/math3/analysis/FunctionUtils$8",
+        "org/apache/commons/math3/analysis/FunctionUtils$9",
+        "org/apache/commons/math3/analysis/UnivariateFunction",
+        "org/apache/commons/math3/analysis/function/Identity",
+        "org/apache/commons/math3/exception/NotStrictlyPositiveException",
+        "org/apache/commons/math3/exception/NumberIsTooLargeException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats"
+      ]
+    }
+  ]
+}

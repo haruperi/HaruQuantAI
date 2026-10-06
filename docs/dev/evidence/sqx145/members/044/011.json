@@ -1,0 +1,1215 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jackson-databind-2.21.1.jar",
+  "archive_sha256": "b011eb5202d9ec889e27f1dcbdf6c63f06a76e7a16c0a1b30c6048d556c9a28e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeySet.class",
+      "occurrence": 0,
+      "sha256": "c881184995eeeaca5ba3b6e7eb45d425ee51d615b3efce6313b9fc638be79f56",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeySet",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "map",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 16,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap<TK;TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;)V",
+          "access": 0,
+          "code_sha256": "0650b2cf902c3348c1627d7f1b9fdadfbe439082a17be5355c23301100a4a283",
+          "code_length": 18
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad4897a227293229968fab59337da5296807a18a08660035ab7f89b5c74cba27",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f5317d1f249df4aa215b4407834561df42247daaff85aed36ac6075eb7c1fa0d",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "7f7ae37d59311b566ba8ac8cccc87fa4f42d5f7bc15995d6bc378e526e8efa84",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TK;>;"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "58f779664cbc60d1262216f02f621ded5cbd99bc59e8c36fc862bd9c258ed45c",
+          "code_length": 9
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e3b967d2d0751f6dc9e3481a8ba1f3a7cae328aba0f3bf9f6b5d39f73502324d",
+          "code_length": 17
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a5f198c64a6fd2ea84596224ac4a45857ea2ecf52475d817a7f2d36a6713beab",
+          "code_length": 18
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a11256fb933bb8af1b9cd209f93ed84ce4df20ed65a7130b1077e6f323dcdbe0",
+          "code_length": 19,
+          "generic_signature": "<T:Ljava/lang/Object;>([TT;)[TT;"
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractSet<TK;>;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeyIterator",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeySet",
+        "java/util/AbstractSet",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentMap"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node.class",
+      "occurrence": 0,
+      "sha256": "b02dc325f70c74c6c512de340a00c6f57df4ba47ce885c0b394a37000f5b5b58",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/concurrent/atomic/AtomicReference",
+      "interfaces": [
+        "com/fasterxml/jackson/databind/util/internal/Linked"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "prev",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 0,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "next",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 0,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue;)V",
+          "access": 0,
+          "code_sha256": "d674765ef47d7f2213e175fb8becf76694887ff9e0b2af8a86f1819b0d631bf0",
+          "code_length": 11,
+          "generic_signature": "(TK;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue<TV;>;)V"
+        },
+        {
+          "name": "getPrevious",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "generic_signature": "()Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "setPrevious",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "getNext",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "setNext",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "61fa75446c69f2eb6c32330bf44867ffc834fba52ea245b4696cfc906f26b38a",
+          "code_length": 11,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "setNext",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/Linked;)V",
+          "access": 4161,
+          "code_sha256": "1c8627c3e4712bac0b28e3e97922bb1c24bad500e67a5f952483bcb5e1a7f4fc",
+          "code_length": 9
+        },
+        {
+          "name": "getNext",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/util/internal/Linked;",
+          "access": 4161,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        },
+        {
+          "name": "setPrevious",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/Linked;)V",
+          "access": 4161,
+          "code_sha256": "d9cc09b49d449b169d7e8e73a3b2147639e6db8ab718d8d2d3b6d3a9ec15e6b6",
+          "code_length": 9
+        },
+        {
+          "name": "getPrevious",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/util/internal/Linked;",
+          "access": 4161,
+          "code_sha256": "33baff9e7ac9d0a40e05a7d31d9f13b63246343be73222eef8a6d5840d6f34a2",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/util/concurrent/atomic/AtomicReference<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue<TV;>;>;Lcom/fasterxml/jackson/databind/util/internal/Linked<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;>;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/Linked",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue",
+        "java/util/concurrent/atomic/AtomicReference"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$RemovalTask.class",
+      "occurrence": 0,
+      "sha256": "bab0b453f23a9d0c290fe19bd0ff88a02a0e92d64e51bbdd4b27af9661fc3eae",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$RemovalTask",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "node",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 16,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "bdef3a801c9fac2d204639287b3f2c393bfe5499d476e4c8eb205b5310a92ff4",
+          "code_length": 15,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3a986c2590f13aeabef9b05e69de8a52edb008461854128491b6686ce77c0de4",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/LinkedDeque",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$RemovalTask",
+        "java/lang/Object",
+        "java/lang/Runnable"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$SerializationProxy.class",
+      "occurrence": 0,
+      "sha256": "a7fbd475803c90d06886d980a7ac0cca0a55ef1ba468a6b776f136e8ef471289",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$SerializationProxy",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "concurrencyLevel",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "data",
+          "descriptor": "Ljava/util/Map;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Map<TK;TV;>;"
+        },
+        {
+          "name": "capacity",
+          "descriptor": "J",
+          "access": 16
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;)V",
+          "access": 0,
+          "code_sha256": "d81e05c609b346729de9bcda121b8c4021d1effcd9fd20f272387e3fd0e41d40",
+          "code_length": 36,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap<TK;TV;>;)V"
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "307319ff417f602692e1d2af81906a8bbdc85d183e6b822fe9b035e56b973021",
+          "code_length": 28
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Ljava/io/Serializable;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Builder",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$SerializationProxy",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/util/HashMap",
+        "java/util/concurrent/atomic/AtomicLong"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$UpdateTask.class",
+      "occurrence": 0,
+      "sha256": "b07706c09999389e8095c3db4aeab64fa3b4d0dc923fdc157ffb1085f8bd3208",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$UpdateTask",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "weightDifference",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "node",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 16,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;I)V",
+          "access": 0,
+          "code_sha256": "d9334da26f0401bf84172dfb9cdf2478bdc06042b18aaa991e028a17f83bc43f",
+          "code_length": 20,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;I)V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "688add17d616130f20e0389bc7a2a7caaef10d9795e686e0676593eb154304e3",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$UpdateTask",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/atomic/AtomicLong"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$ValueIterator.class",
+      "occurrence": 0,
+      "sha256": "2674974759b9064af06dac6c793547764228d34d3b6879d25a562d566584f901",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$ValueIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Iterator<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;>;"
+        },
+        {
+          "name": "current",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;",
+          "access": 0,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;)V",
+          "access": 0,
+          "code_sha256": "57a1e089fc87157434ec8cea7a0d25c855bfca504a487a3d3660df8102fe9689",
+          "code_length": 31
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e835e2a50c48a10c25d2a024bbc3f80adeb0a796993ec49e8faec8f28caf1335",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9a605f56ba85d1dbfa6b487ec5b52ccb57a24022ca91436e67a91ba79b06e2c9",
+          "code_length": 24,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fe72afe2ecc418710e4f67ba6f362a071daba7dbe35fb2041ff3f444668108cf",
+          "code_length": 36
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TV;>;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$ValueIterator",
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/concurrent/ConcurrentMap"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Values.class",
+      "occurrence": 0,
+      "sha256": "c20eca5e17b78419a1dc6bc0230c4872598f615e575678f08756c705799ccd44",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Values",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7d54c10fd2ace87ea6f303548abd6d2cb84f7e5b4b8c7219a9cf7c238b53aab0",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b5c560b7dac86229fa5f4ef49b6a2fd8c9536620e3d5bc939d0345bb615b09dc",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "d5fb4285684fdb3563bf0317f62f89f2a947dd83481aa5c70bb66b9c78e17a0d",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TV;>;"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e48bd58ed024b204053df732e3e47295e44240108f8f178b06032184fb776dfb",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractCollection<TV;>;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$ValueIterator",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Values",
+        "java/util/AbstractCollection"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue.class",
+      "occurrence": 0,
+      "sha256": "63a96f9715a368db196c0600b1cdbf367e5c0ad7c78d28c36a08823133570f64",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "weight",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TV;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 0,
+          "code_sha256": "6cdd1146b45ac79335f051090bbf78fad2a89dd156862f3f9d0c4ddfe74416c7",
+          "code_length": 15,
+          "generic_signature": "(TV;I)V"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 0,
+          "code_sha256": "792ea65935359f515f6d24890139b092623ac03a73d70c54d0c840e26f106baf",
+          "code_length": 25
+        },
+        {
+          "name": "isAlive",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "c03c52bbfc376802389f19de34540bc9428d4e69b9badea94c21226c0e64c48b",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WriteThroughEntry.class",
+      "occurrence": 0,
+      "sha256": "ff099fb26b2569b436e8f2d815d74f00484716a6e2e00cea444976f3f22fe2c7",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WriteThroughEntry",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/AbstractMap$SimpleEntry",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "efc797a18e59afb93fb39dab58c2f0262d1ca1cd6de4325a59f8ccd2f66c96c0",
+          "code_length": 18,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1f91a49c1fd7dc700de23fd8cd93c672d921ab29fd207bab30ac25f5b3c51275",
+          "code_length": 19,
+          "generic_signature": "(TV;)TV;"
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "8d05ff0af289c8721432f8781f77d25d559f0612d8481dd90133b2da4d62a841",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractMap$SimpleEntry<TK;TV;>;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WriteThroughEntry",
+        "java/util/AbstractMap",
+        "java/util/AbstractMap$SimpleEntry",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap.class",
+      "occurrence": 0,
+      "sha256": "11b537376d4ea34456fbd231ba341527eae8d2bf87f3823be16cdd3ac98719aa",
+      "name": "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/util/AbstractMap",
+      "interfaces": [
+        "java/util/concurrent/ConcurrentMap",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "NCPU",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MAXIMUM_CAPACITY",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "NUMBER_OF_READ_BUFFERS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "READ_BUFFERS_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "READ_BUFFER_THRESHOLD",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "READ_BUFFER_DRAIN_THRESHOLD",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "READ_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "READ_BUFFER_INDEX_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "WRITE_BUFFER_DRAIN_THRESHOLD",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "data",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<TK;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;>;"
+        },
+        {
+          "name": "concurrencyLevel",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "readBufferReadCount",
+          "descriptor": "[J",
+          "access": 16
+        },
+        {
+          "name": "evictionDeque",
+          "descriptor": "Lcom/fasterxml/jackson/databind/util/internal/LinkedDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/fasterxml/jackson/databind/util/internal/LinkedDeque<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;>;"
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 16
+        },
+        {
+          "name": "capacity",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 16
+        },
+        {
+          "name": "evictionLock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 16
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Ljava/util/Queue;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Queue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "readBufferWriteCount",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLongArray;",
+          "access": 16
+        },
+        {
+          "name": "readBufferDrainAtWriteCount",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLongArray;",
+          "access": 16
+        },
+        {
+          "name": "readBuffers",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReferenceArray;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReferenceArray<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;>;"
+        },
+        {
+          "name": "drainStatus",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReference;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReference<Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$DrainStatus;>;"
+        },
+        {
+          "name": "keySet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 128,
+          "generic_signature": "Ljava/util/Set<TK;>;"
+        },
+        {
+          "name": "values",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 128,
+          "generic_signature": "Ljava/util/Collection<TV;>;"
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 128,
+          "generic_signature": "Ljava/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;"
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "ceilingNextPowerOfTwo",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "3cafb1bb0433d15fe797c9448ae4cd95b275aefa07a3ec53f8a3cff62f2539ad",
+          "code_length": 12
+        },
+        {
+          "name": "readBufferIndex",
+          "descriptor": "(II)I",
+          "access": 10,
+          "code_sha256": "5a4baa67bdb03200db3f207c5b57d80bca0eedda2bd1b6d83d04f61bdefa6c88",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Builder;)V",
+          "access": 0,
+          "code_sha256": "8884d7f0975269ebdd9ae1b9e8c35ea9f6425c9c5c526b57697c90ce572b1d1e",
+          "code_length": 167,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Builder<TK;TV;>;)V"
+        },
+        {
+          "name": "checkNotNull",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 8,
+          "code_sha256": "992f41430f6f6b9819086d06d226ee8f14e43378e951a90adf0018b4f0bf4878",
+          "code_length": 13
+        },
+        {
+          "name": "checkArgument",
+          "descriptor": "(Z)V",
+          "access": 8,
+          "code_sha256": "0663e33dd0ea50b4ff03baa078742c11af7bfae360a32b0ef2593ae691b548fe",
+          "code_length": 13
+        },
+        {
+          "name": "checkState",
+          "descriptor": "(Z)V",
+          "access": 8,
+          "code_sha256": "fced5a057ed3d98f69c7786a1a9dbe47b5addce0cb8355068d39066977cdee73",
+          "code_length": 13
+        },
+        {
+          "name": "capacity",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "2d49480f8ac6210bfbe4c13c9235c9ec115848c38ba3fde56d48b07837d969e3",
+          "code_length": 8
+        },
+        {
+          "name": "setCapacity",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "7aa8b3e84e66023130e3a0c2d941ffb3e179e037fe36578160b9644d7575e086",
+          "code_length": 70
+        },
+        {
+          "name": "hasOverflowed",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "26adc29c7bf4c2bf898f99e59c723e31fbec91c3adaee93c68871ba3f4a22280",
+          "code_length": 24
+        },
+        {
+          "name": "evict",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "6a19cae9ac861eba76cad89e3ace0dbf3a314343daf351d374ee1ea95d20bb30",
+          "code_length": 47
+        },
+        {
+          "name": "afterRead",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "14bfdf4f116322dbb7d842fdd669dc1a7b475a5a8d57215758e1bcce221d2671",
+          "code_length": 18,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "readBufferIndex",
+          "descriptor": "()I",
+          "access": 8,
+          "code_sha256": "2c7b448c8ca7a8abf72a1643cf84709ce0bbd5c867b0cd557883fb951bfa79ce",
+          "code_length": 12
+        },
+        {
+          "name": "recordRead",
+          "descriptor": "(ILcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)J",
+          "access": 0,
+          "code_sha256": "db2316f90336b842ba9cf1583432b2653cad06f48941417c521f9fb583071c57",
+          "code_length": 44,
+          "generic_signature": "(ILcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)J"
+        },
+        {
+          "name": "drainOnReadIfNeeded",
+          "descriptor": "(IJ)V",
+          "access": 0,
+          "code_sha256": "c28a18134a9e5fa72aabedbe985697f046a1297eac7bf1ff753028f32ddc0b31",
+          "code_length": 55
+        },
+        {
+          "name": "afterWrite",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 0,
+          "code_sha256": "d38d88f5307677d6477a4ba80e9a97224188cbfd5afc509610aea17acc5db7e1",
+          "code_length": 26
+        },
+        {
+          "name": "tryToDrainBuffers",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6a398a405cb7e1bc6248f7dbabf671f333b919ffcb28b5e46d475ed6263fb50",
+          "code_length": 79
+        },
+        {
+          "name": "drainBuffers",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e28b22e1bdf7018b813594be59fd1d0da57e77574829889bcb5eba40df3c2c6b",
+          "code_length": 9
+        },
+        {
+          "name": "drainReadBuffers",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "13c330ef0dadd7b9eeeea8384fa920da4bc1fc54b5322d7075cc5758a84f2df4",
+          "code_length": 37
+        },
+        {
+          "name": "drainReadBuffer",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "c21a375177cce70224cab300c118eb613712130355b3f283a8b1661b47b067c0",
+          "code_length": 104
+        },
+        {
+          "name": "applyRead",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "fe4ec73d3794d14be93bdfbf0983c97521e6f8d373b504b54867ade3339d5e85",
+          "code_length": 20,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "drainWriteBuffer",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "f1d7756c0b66e6f253a8f8c301882d9d51cf27f364fa5bcb3a716b4c17174dba",
+          "code_length": 41
+        },
+        {
+          "name": "tryToRetire",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue;)Z",
+          "access": 0,
+          "code_sha256": "fc1b418c0a0c77a341f48ec79dd5cde27dd3801c74b7d0c10fa247380f986355",
+          "code_length": 33,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue<TV;>;)Z"
+        },
+        {
+          "name": "makeRetired",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "f3b359704faa60773981e6391acd3f82a4ab7e81327f60a3bbb2a94ffafd9297",
+          "code_length": 46,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "makeDead",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node;)V",
+          "access": 0,
+          "code_sha256": "d35e176dc77ea534f317edbceb0aaabad582bb405e23e948f034888ec41cae73",
+          "code_length": 57,
+          "generic_signature": "(Lcom/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node<TK;TV;>;)V"
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "50acb80e491fb5cd3bcf264dd164cea0406f936a8d43c912b13e52eb29eb452d",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ece134811a8a7c5e782357c77f77aaf0c5a1087c8cefd2a5645f5fba899e15dc",
+          "code_length": 10
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "86b12f8c5a0084104f82690a783e1d73957d3f45410f58028d043e62fbb85595",
+          "code_length": 126
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4a057b6a62c3e582735df5e4776d377e226a25c99987846d99a7b99065eb3223",
+          "code_length": 11
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "6cb7be6b7b30f81e5c4406d3af8edc8d0f2274000b3914497620293a49510496",
+          "code_length": 56
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fde002f0ab4ad41c93707708e081a4a1904da9661139a3d9de1a5b31419b5acd",
+          "code_length": 30,
+          "generic_signature": "(Ljava/lang/Object;)TV;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "126d1626ec7b6be2d170d3d5ea530dce8e0d63c3e41dbeb252bebbfc90f8c6e9",
+          "code_length": 8,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "putIfAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "449064ba49d595d57867520d66373078c557f85a1028be757c334447b9cbb8d3",
+          "code_length": 8,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Z)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "6da41b0b17feab85abc382dae1586ff648290c48068a1162e0ed713252da0ed3",
+          "code_length": 177,
+          "generic_signature": "(TK;TV;Z)TV;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0c83e74cdc31627f7a626f5f239062bfe59349c2858589bd76f73de7294d3309",
+          "code_length": 43,
+          "generic_signature": "(Ljava/lang/Object;)TV;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e2109d8fe381a8b0c7a4b65ee85a3f40dd222313829b881306b90c2fd66099d1",
+          "code_length": 103
+        },
+        {
+          "name": "replace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "75b08283a9cc24e9d10ce62b73645e05d517f15816f282d9ea35a23e60ebf853",
+          "code_length": 123,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "replace",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0d8d8b1908efab10f2e4048a535542e6337b08137e0377a3dfe12df8ae313e89",
+          "code_length": 133,
+          "generic_signature": "(TK;TV;TV;)Z"
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "3fb39fba601335221598d32f75ee56bbb7108eda3f09fc407f24d8c041ac68ab",
+          "code_length": 27,
+          "generic_signature": "()Ljava/util/Set<TK;>;"
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "ae08bebaaf7c96f971ca761fb43c8b482a725d0a3bce15ebecaad6a763e85f8b",
+          "code_length": 27,
+          "generic_signature": "()Ljava/util/Collection<TV;>;"
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "d90b60d0dd3d65bb13171187f9660589e621cf1208cf9fbde4f74d4bf5b5b36e",
+          "code_length": 27,
+          "generic_signature": "()Ljava/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;"
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "1d6aba5797bb79e643db91ade58b77557cf44a2beaf134cb2af97390acf2e336",
+          "code_length": 9
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "dd5b61160039a848d300e1903fdcbe6f5371e217d72f022840464c56206855e4",
+          "code_length": 10,
+          "throws": [
+            "java/io/InvalidObjectException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "44ad3586463b47624bf1e2a9cb1c1cda73364f14a34cba3762f594c9dd5fc8a9",
+          "code_length": 31
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/util/AbstractMap<TK;TV;>;Ljava/util/concurrent/ConcurrentMap<TK;TV;>;Ljava/io/Serializable;",
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/LinkedDeque",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$1",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$AddTask",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Builder",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$DrainStatus",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$EntryIterator",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$EntrySet",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeyIterator",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$KeySet",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Node",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$RemovalTask",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$SerializationProxy",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$UpdateTask",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$ValueIterator",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$Values",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WeightedValue",
+        "com/fasterxml/jackson/databind/util/internal/PrivateMaxEntriesMap$WriteThroughEntry",
+        "java/io/InvalidObjectException",
+        "java/io/Serializable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Runtime",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/AbstractMap",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Queue",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentLinkedQueue",
+        "java/util/concurrent/ConcurrentMap",
+        "java/util/concurrent/atomic/AtomicLong",
+        "java/util/concurrent/atomic/AtomicLongArray",
+        "java/util/concurrent/atomic/AtomicReference",
+        "java/util/concurrent/atomic/AtomicReferenceArray",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/internal/package-info.class",
+      "occurrence": 0,
+      "sha256": "d3d77c0d642014116401148edf6a65f7f83ce2fbd715fa0a566dfd90d5aea842",
+      "name": "com/fasterxml/jackson/databind/util/internal/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/internal/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/databind/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "2fd647769b9a443375fef8b766c5e8f4652c0b9f6deb90f89d36451074269e56",
+      "name": "com/fasterxml/jackson/databind/util/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/databind/util/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "6e4bec7bad8dfdbd94027321060bf5d5555eaad64f662f796b74e788b1e20984",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/databind/Module",
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "module-info"
+      ]
+    }
+  ]
+}

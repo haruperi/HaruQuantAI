@@ -2,7 +2,7 @@ import { useRankingController } from '../RankingCtrl';
 import { FitnessFunction } from '../FitnessFunction/fitnessFunction';
 import { SqdFieldset, SqdHelpLink, SqdRadio, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
 
-/** "Ranking" tab (donor evidence SQX144-EV-000043). */
+/** "Ranking" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function RankingTab({task='Build'}:{task?:'Build'|'Retest'|'Optimize'}={}) {
   const { state, patch, stop, fitness } = useRankingController();
 

@@ -1,0 +1,109 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/j2objc-annotations-1.1.jar",
+  "sha256": "2994a7eb78f2710bd3d3bfb639b2c94e219cedac0d4d084d516e78c16dddecf6",
+  "class_count": 12,
+  "unique_class_entries": 12,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "com/google/j2objc/annotations/AutoreleasePool.class": "33379f0e255f7302a49e1074ce99f437e670ea48f9c6bc013bd1440101e70a3d",
+    "com/google/j2objc/annotations/J2ObjCIncompatible.class": "863ab293db2ab6329bcacb944f517c6137e3492e7856813b354b1da4587465f6",
+    "com/google/j2objc/annotations/LoopTranslation$LoopStyle.class": "af9d32914400cc41e194cd7b6ee6abd77687bc03518846bd0d9d891ed5c17677",
+    "com/google/j2objc/annotations/LoopTranslation.class": "fe90372da3440dbf5f1354d5f8cc96022a4d6c9328b1f95d2682b06cf2ef38c5",
+    "com/google/j2objc/annotations/ObjectiveCName.class": "b5c1d062542a7a9b085a318d3950f14060cf8178b00635b37d43ca18362543af",
+    "com/google/j2objc/annotations/Property.class": "3859b3ebb40a663278b3d12e1adbbdb8b8c5e3f9ea0f3dc18c3172223ac1c4b2",
+    "com/google/j2objc/annotations/ReflectionSupport$Level.class": "db43f12f488b4527a3b46da1a114d93b454f19995d7460087259ce7c0eaa8361",
+    "com/google/j2objc/annotations/ReflectionSupport.class": "956c68d3241d486d60d8d2167ff6af5070f8edbc136ff128c81958c93635a2dc",
+    "com/google/j2objc/annotations/RetainedLocalRef.class": "b437b24085cd09c3cab228cf2beab9c6cfce241102dd5941c784aac09c8ad268",
+    "com/google/j2objc/annotations/RetainedWith.class": "f0e2b0e3f44a46bf581e91d68f3462eb8cc7afbfad0068e71ce6b6e725699958",
+    "com/google/j2objc/annotations/Weak.class": "cd3d3bb49f656a760273c70b8085c7ec48f28113bd2f8040459641274783b2a9",
+    "com/google/j2objc/annotations/WeakOuter.class": "06a79cd9d52453cf853b5bd9ff7dafbaaa7d184971ac242f69e143caf0d14307"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "88b5b938fb9f408000b5a697d27a8051a9e354da3657853829f7a5531b3eaba8",
+    "META-INF/maven/com.google.j2objc/j2objc-annotations/pom.xml": "f0c98c571e93a7cb4dd18df0fa308f0963e7a0620ac2d4244e61e709d03ad6be",
+    "META-INF/maven/com.google.j2objc/j2objc-annotations/pom.properties": "130aec2ed608e7d54b5d3ca19e0b584f47806fc1de05167ceb71d227306165a0"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/google/j2objc/annotations/AutoreleasePool.class",
+      "occurrence": 0,
+      "sha256": "33379f0e255f7302a49e1074ce99f437e670ea48f9c6bc013bd1440101e70a3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/J2ObjCIncompatible.class",
+      "occurrence": 0,
+      "sha256": "863ab293db2ab6329bcacb944f517c6137e3492e7856813b354b1da4587465f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/LoopTranslation$LoopStyle.class",
+      "occurrence": 0,
+      "sha256": "af9d32914400cc41e194cd7b6ee6abd77687bc03518846bd0d9d891ed5c17677",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/LoopTranslation.class",
+      "occurrence": 0,
+      "sha256": "fe90372da3440dbf5f1354d5f8cc96022a4d6c9328b1f95d2682b06cf2ef38c5",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ObjectiveCName.class",
+      "occurrence": 0,
+      "sha256": "b5c1d062542a7a9b085a318d3950f14060cf8178b00635b37d43ca18362543af",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/Property.class",
+      "occurrence": 0,
+      "sha256": "3859b3ebb40a663278b3d12e1adbbdb8b8c5e3f9ea0f3dc18c3172223ac1c4b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ReflectionSupport$Level.class",
+      "occurrence": 0,
+      "sha256": "db43f12f488b4527a3b46da1a114d93b454f19995d7460087259ce7c0eaa8361",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ReflectionSupport.class",
+      "occurrence": 0,
+      "sha256": "956c68d3241d486d60d8d2167ff6af5070f8edbc136ff128c81958c93635a2dc",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/RetainedLocalRef.class",
+      "occurrence": 0,
+      "sha256": "b437b24085cd09c3cab228cf2beab9c6cfce241102dd5941c784aac09c8ad268",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/RetainedWith.class",
+      "occurrence": 0,
+      "sha256": "f0e2b0e3f44a46bf581e91d68f3462eb8cc7afbfad0068e71ce6b6e725699958",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/Weak.class",
+      "occurrence": 0,
+      "sha256": "cd3d3bb49f656a760273c70b8085c7ec48f28113bd2f8040459641274783b2a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    },
+    {
+      "entry": "com/google/j2objc/annotations/WeakOuter.class",
+      "occurrence": 0,
+      "sha256": "06a79cd9d52453cf853b5bd9ff7dafbaaa7d184971ac242f69e143caf0d14307",
+      "member_shard": "docs/dev/evidence/sqx145/members/041/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/041/001.json",
+      "sha256": "2dd0b87c4cf7055147fba928c0353fe6638c8f38102be37c0a43646d2593792b"
+    }
+  ]
+}

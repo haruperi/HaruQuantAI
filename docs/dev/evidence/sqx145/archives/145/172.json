@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
+  "sha256": "3873aeab1b04f6beafaae0d1f99ae5ddf962651861cf0777e3aeb08d4414c4e3",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServlet$1.class": "3626dec06b412df03af8b39d0c4ca6a24525dc393e0706d40dcc4217c23adad4",
+    "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServlet.class": "5dddbf1a4fbb9bc2b34c9407402e2298088fb5f2efd96e04527a1f3368868f5d",
+    "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServletPlugin.class": "3a7468b6804509f2de49673001a66fbe0f9d217e8bce65572c362a9d3b831658"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServlet$1.class",
+      "occurrence": 0,
+      "sha256": "3626dec06b412df03af8b39d0c4ca6a24525dc393e0706d40dcc4217c23adad4",
+      "member_shard": "docs/dev/evidence/sqx145/members/172/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServlet.class",
+      "occurrence": 0,
+      "sha256": "5dddbf1a4fbb9bc2b34c9407402e2298088fb5f2efd96e04527a1f3368868f5d",
+      "member_shard": "docs/dev/evidence/sqx145/members/172/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Sessions/SessionsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "3a7468b6804509f2de49673001a66fbe0f9d217e8bce65572c362a9d3b831658",
+      "member_shard": "docs/dev/evidence/sqx145/members/172/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/172/001.json",
+      "sha256": "15478c65f73e86ab10b41c5fadde9d8bb8e167b38b90e54740a9e134907efd7d"
+    }
+  ]
+}

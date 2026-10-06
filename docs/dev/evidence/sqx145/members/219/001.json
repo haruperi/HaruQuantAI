@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+  "archive_sha256": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer.class",
+      "occurrence": 0,
+      "sha256": "48238041caaa8a169e852e4c507e9f6ac941d4ffe6275ade299ca93fd1e08fd1",
+      "name": "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "YEAR_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "twoDFormat",
+          "descriptor": "Ljava/text/DecimalFormat;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "67b989122744f255ce408dad4b2f3bcfffb3f7afb0c65aa5c43d27c41b006de4",
+          "code_length": 18
+        },
+        {
+          "name": "compute",
+          "descriptor": "(ILcom/strategyquant/tradinglib/OrdersList;BB)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "c1213294472124ed7c6f16e843dc69f65ebabd52a8f828befac937e04d2e3316",
+          "code_length": 297
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "java/io/Serializable",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/text/DecimalFormat",
+        "org/json/JSONArray"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisPlugin.class",
+      "occurrence": 0,
+      "sha256": "fdbc5e6e725d101d68a589a4fc4b85a10bace9a6f00ddfa053a7b7b35a3bb057",
+      "name": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b12ee0a05ad060c8b5c6768f8669c76fe677db4443389cb9314ef30227c66ad",
+          "code_length": 15,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "1c2717288becf0184f767805cbb584012a3d7045e0f844b032e5dc55263e93ba",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d775afee5b09d52c2d596c6042b8c7e4f32e956070bc9a6a04129459251078fc",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "81cf23e0b4e7e0d53ab931c211e99fed600b96e15f2ffcb15869629e52600b0d",
+          "code_length": 38,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "c1c033b033853cbd7c7a8f0a2f8bea13d5ee01e9aa4cab28f47b13adb6a97ff8",
+          "code_length": 63,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisPlugin",
+        "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet.class",
+      "occurrence": 0,
+      "sha256": "2574c3641d85cd1d2d102e7c0609e7be3e21e05fa991a112d935dd75fce9f1b7",
+      "name": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_TRADEANALYSISSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "statsComputer",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer;",
+          "access": 2
+        },
+        {
+          "name": "SettingKey",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rg",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "23ab726e7fcd6ed19bb1476d90af356603734dfe373df1f18c775bc0f2f73d23",
+          "code_length": 25
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "babf53e36b9d6c8c6e602b3e18948d33a11606efb8d2a39e85f01327b06280ac",
+          "code_length": 136,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "loadLastSettings",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "7d564db91e7af43e88de0e3882871f7f87bf921e7d2115f279263167961935a2",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getTypes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "461512fabd0b2b75d1356967a22a0f16f7594fd768bbbef1ab480a6f67198475",
+          "code_length": 104,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7369a12bf2a0c104556ca5fa92b16219c1cf65e659eaf1932953c16485cc4ac2",
+          "code_length": 439,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "printChart",
+          "descriptor": "(Ljava/util/Map;Lcom/strategyquant/tradinglib/OrdersList;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "e3b7326944bf21fd16454b6d1ab38eb7444b845a553fd54dac6d2d258541c2e0",
+          "code_length": 172,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Lcom/strategyquant/tradinglib/OrdersList;Ljava/lang/String;)Lorg/json/JSONObject;"
+        },
+        {
+          "name": "onGetAnnualStats",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "cb7fd2e5c47c9a296274698901c3b11d867a6bb347185fc02c4b432b75d95802",
+          "code_length": 458,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "calculateAnnualStats",
+          "descriptor": "(ILcom/strategyquant/tradinglib/OrdersList;BB)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "2a3acd6de6cd73cfac8b06c1e95067de4aca7e93850e4f52ba68c1af1a4b666d",
+          "code_length": 67
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a5115d53a49845cd5b561da7a0cb359912316a955919d216fea7f35f2e450afe",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Results/impl/TradeAnalysis/AnnualStatsComputer",
+        "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet",
+        "com/strategyquant/tradinglib/AbstractChart",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/TradeAnalysisChart",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/tradeanalysis/TradeAnalysisChartsList",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Byte",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

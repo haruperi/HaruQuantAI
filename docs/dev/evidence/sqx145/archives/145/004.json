@@ -1,0 +1,2793 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/agentscope-harness-2.0.3.jar",
+  "sha256": "e6f6f5c39d8e16ca5c2ea3727b56dbcfa8fd408ef54a0018c0c9416251beb1a0",
+  "class_count": 393,
+  "unique_class_entries": 393,
+  "resource_count": 4,
+  "duplicate_entries": [],
+  "classes": {
+    "io/agentscope/harness/agent/middleware/WorkspaceContextMiddleware$1.class": "134e9833a2f67d02020c2bbc4b4b59f962c79ab10d26522119e31e817858c4e2",
+    "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$ConversationKey.class": "f14a732d71a9bc84e087e979ba09643433a5c843cca2d948b5b2c4beb48aa49f",
+    "io/agentscope/harness/agent/middleware/SubagentsMiddleware.class": "1a41e2a4146715108c0d9c70c3bffff8e427442cbbef28f1404246b1cf3010ff",
+    "io/agentscope/harness/agent/middleware/TranscriptMiddleware.class": "052d1b0fa6d5506f300257dadd3e8b21035612b4bdf49bc827cbe4ce2d87a273",
+    "io/agentscope/harness/agent/middleware/SubagentEntry.class": "30ea8f720869b841658e5361a4384499bfc4a5123681ea27d8b9f38711e09779",
+    "io/agentscope/harness/agent/middleware/MemoryMaintenanceMiddleware.class": "2958ff40e069454f4d26c1a5664af3b4bdb79e3512707fe49fa1460dc685c0c3",
+    "io/agentscope/harness/agent/middleware/AtPathExpansionMiddleware.class": "dd104c74ff16e442768cb902aefd7a99aed45d0b58da6cf0ca667eac42476503",
+    "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware.class": "0f9beb9b3db58e20228863f8e988f1e1cf7d419e86053ed8bc06f9c7c89cd3be",
+    "io/agentscope/harness/agent/middleware/TeamsMiddleware.class": "5980fe5930a725de7e6757d03be036bed5769143f5f0a28a2d427b49df59b66b",
+    "io/agentscope/harness/agent/middleware/SandboxLifecycleMiddleware.class": "9044228f6980dfa04ced0054ef0755610b04778c599eff0528a4f21ad7a6f8b2",
+    "io/agentscope/harness/agent/middleware/HarnessSkillMiddleware.class": "5cf399c1adfa09c2fbdc33edb5384cd3ba0e8e32b48936779c42c56f9f359bf8",
+    "io/agentscope/harness/agent/middleware/AgentTraceMiddleware.class": "59ac18d75fea7edda71790119797822c5a211aea068cfbf4338589d149380d3c",
+    "io/agentscope/harness/agent/middleware/MemoryMaintenanceMiddleware$1.class": "6816a265c2780d1d73a1c47e805793f95c726db431cd7c7e1b9f97d519a31ef6",
+    "io/agentscope/harness/agent/middleware/InboxMiddleware.class": "e3c665e393e9350116efbca17c1092450cb4dd5568a1b35929b52246d41d1144",
+    "io/agentscope/harness/agent/middleware/HarnessRuntimeMiddleware.class": "dd9310b7badf31dbfe9d4a1ba5a3094db66a76b76d0f08fe68d80a5ee55d9cd5",
+    "io/agentscope/harness/agent/middleware/WorkspaceContextMiddleware.class": "e516cab3fdcd1e8fcc29abe928cc18add41a48426e7e7835393cfe2e574fde14",
+    "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware$ToolResultFingerprint.class": "3eda633ce0979d936f48819889544ddde594fa7b1c018177250a0cd2708ee0b3",
+    "io/agentscope/harness/agent/middleware/AsyncToolMiddleware.class": "8ee6df6f7bb65ce13cf70f6d23ae750912649ce0187b3af98b36116be8f1ca2a",
+    "io/agentscope/harness/agent/middleware/SubagentsMiddleware$1.class": "956928cc9b52ab9b653dc701256a86b415c3fe6e7c0431757fffb1aefe8f16d4",
+    "io/agentscope/harness/agent/middleware/PlanModeMiddleware.class": "20ae22caa633feac86b94954378c4adc44a62b5ec43305e174688c88eba54b6d",
+    "io/agentscope/harness/agent/middleware/SkillUsageMiddleware.class": "ccb7b154d7e60da98a9418a028312b477519746580bee707d43e5987f9284517",
+    "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$FlushQueue.class": "4d64ad03e2c945de4a82bdd5417f4eb16881e3c25eab9d6f95f0e85f80896c92",
+    "io/agentscope/harness/agent/middleware/SubagentsMiddleware$SubagentSnapshot.class": "4459ea7c264df1037e0a93922046f8a05db84c6e9045824b4d14aec194d35687",
+    "io/agentscope/harness/agent/middleware/HarnessSkillMiddleware$1.class": "a46aea0a3953db4b3fc89deddf8c802f9638b6de455d3c73e413f7592769f0b4",
+    "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware.class": "cc8303066e656082fcb80dbb55524c03f2fd2603e1866bf425a3606625aefde8",
+    "io/agentscope/harness/agent/middleware/SkillCuratorMiddleware.class": "406544bf14c7b24c8fb8e0d171fad263a28589efd9f39c9bd3d7553233f0a3a6",
+    "io/agentscope/harness/agent/middleware/DynamicSubagentsMiddleware.class": "c04b1fc74ac21bb33a5eb6fe8ea5387de060914b296ccc8e53ce26363f61ca92",
+    "io/agentscope/harness/agent/middleware/CompactionMiddleware.class": "0bd443aa195edeebd7ff5380f8e0968faee5901fed26b89e8e17545b09938788",
+    "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware$EvictionResult.class": "72a920efea86876db65af0e9dab58819f1e83f450fb34f2a1c3c32bba7e2dbd1",
+    "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$1.class": "dfc7d6cddc110636a1a0bc5e1a99be4c8279b82081643368f404295a1fc5a6be",
+    "io/agentscope/harness/agent/HarnessAgentBuilderSupport.class": "52318a524f450064fe81b12281ffd52529373ea84983fe8334e08f7f1844e959",
+    "io/agentscope/harness/agent/HarnessAgent.class": "6a6e3ff2db5401fc7bdb795a903c1ae6a65c3ee17c79e9884419dfc8c2b720ff",
+    "io/agentscope/harness/agent/tools/McpServerRegistrationListener.class": "aa248b4fe8ad8894967da68095f819fd617c5811a64fc22739553c5314591c65",
+    "io/agentscope/harness/agent/tools/ToolsConfigLoader.class": "558ac123d1cb03d7833599312db06d3496ef18df45d937c1e2059ca35fc7451d",
+    "io/agentscope/harness/agent/tools/McpServerRegistrar.class": "3c9271a96290b9be37e797577c04bc1d7edeb064ec8d20575a82f60e9f1ac5f8",
+    "io/agentscope/harness/agent/tools/ToolsConfig.class": "4817f834dcc873c3d2a0641ceae8b3fbfd4e0df9e73c8078e7272a0f5902408f",
+    "io/agentscope/harness/agent/tools/McpServerRegistrationResult$Status.class": "5803d6e4e26cb52f96375341fc9b06a6571ebea71aa0751ad302622150d05b12",
+    "io/agentscope/harness/agent/tools/ToolFilter.class": "ed4b048c5d1de954fb18a6d57f74fac4e94154e05e80c14ca1a5a5c9c06227b3",
+    "io/agentscope/harness/agent/tools/McpServerConfig.class": "0b95dbdb9c3543c2f61d27bb8e03be8cb1ce2014522075b1720b15370bf2e684",
+    "io/agentscope/harness/agent/tools/McpServerRegistrationResult.class": "be598241a2d40ddeffc0264ddccc0a0bec16be43a1afded6132031e0c440f35c",
+    "io/agentscope/harness/agent/tools/HarnessPlatformTools.class": "193beefb59243de1effde56e9f03bc16ec3aae021549eb4e9d8f1f4b0a4b3391",
+    "io/agentscope/harness/agent/DistributedStore$Builder.class": "97446c7b2138f6c71c9f5b8176e2197ff0a7bc6d18d205c64cf9363e967aee72",
+    "io/agentscope/harness/agent/coordination/LocalPeriodicGate.class": "69508b2f1630e77874c1a143307c1fa2d325be66677ac68a635afe1e81099be5",
+    "io/agentscope/harness/agent/coordination/PeriodicGate.class": "30951d47a6113169d5b7b514d8d39d7cb4d3160f24e0b634d510079df43c0126",
+    "io/agentscope/harness/agent/coordination/StoreBackedPeriodicGate.class": "adc8c4a735f8c154912c02883e78a4a71fea7167f4ef9957541f558848f1a21f",
+    "io/agentscope/harness/agent/memory/MemoryFlushManager.class": "a41af968a297625c79647a8c9335d977f062efdc8d1f4d12a7b2895f39521df8",
+    "io/agentscope/harness/agent/memory/MemoryConsolidator.class": "0c586f4a443c42436bbc2731de7c08e71777a060e350eadd119f1d3936f41ec0",
+    "io/agentscope/harness/agent/memory/MemoryConfig$FlushTrigger.class": "520a8593e6b84dcf5d396c41d7daad5b1b7e4871cd583d1772036ce91d1ded8e",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig$TruncateArgsConfig$TruncateArgsBuilder.class": "d3055d8e2cc501020a10fd89b1fd87c14bf1feb2059799d2e98683b4ecfd3845",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig$PruneConfig$PruneBuilder.class": "4c2e1914faba187ad7116450116f4d69f46b5c683080e88b6515e3947e13b4a6",
+    "io/agentscope/harness/agent/memory/compaction/ToolResultEvictionConfig.class": "1eb63268567b6a9fede06c82d9c868d511d6090ac1e9e7199d7242c8f45f906f",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig$TruncateArgsConfig.class": "c70d86369e8a3a13d2fc4e2c3c120701381ff8ff444854de7385263a8e722e10",
+    "io/agentscope/harness/agent/memory/compaction/TokenCounterUtil.class": "88ecedb3a04e6b82629f370810c593c49185902309ef0b8a06c7e835e975f5d2",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig$PruneConfig.class": "e57f0bda79b2c3e65dd6a546643439eaa044032d4569a50e4f6fd1e3879b2a02",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig$Builder.class": "64d660054ded54b7a9225010d3d58710ec573e489c19ca79f4dd6cf0a25ebc06",
+    "io/agentscope/harness/agent/memory/compaction/ConversationCompactor.class": "953b8b0f940bab9731af4b818447124343f414929cab3786384b61203650b278",
+    "io/agentscope/harness/agent/memory/compaction/CompactionConfig.class": "636e057b404d561c946d313af57767061d340e72b375f49b3c270bcef69b2983",
+    "io/agentscope/harness/agent/memory/compaction/ToolResultEvictionConfig$Builder.class": "0902538632c4e1374510c627c45b0ba83b3570ce092726cef218fa798adee966",
+    "io/agentscope/harness/agent/memory/compaction/ConversationCompactor$1.class": "4ea15ff11c08936d0f073ed19c9f392bef7a661485f63ce8203ab1f2aafc13a1",
+    "io/agentscope/harness/agent/memory/MemoryConfig.class": "75918621736bd25863dfd34db0bcfe19072c7b7cfbd155b7de64ea0568cbae4e",
+    "io/agentscope/harness/agent/memory/MemoryBackgroundTasks.class": "62664445f5c353f0ad3a29e0e0216b48c890cabc39646edd088a3b454a0c5331",
+    "io/agentscope/harness/agent/memory/MemoryConfig$FlushMode.class": "3933ee851f533e35e3539422fdf785cece44cf8a6cb3f254ca7f5b71a209a0b8",
+    "io/agentscope/harness/agent/memory/MemoryConfig$Builder.class": "8fc3154e909adf87c501809170b386a50b09ff613da44ad4be21421d08d6d354",
+    "io/agentscope/harness/agent/memory/session/SessionEntry$ToolUseEntry.class": "45eea74d77b98c92984204b7e4e5ca4136721425492de759215433d903957556",
+    "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter.class": "be509a952f3251dbfd6bd8230f641bf8b393b0f221cf1a56bc9d65f78bf0a30b",
+    "io/agentscope/harness/agent/memory/session/SessionFreshnessEvaluator.class": "e8e48d2441c989eeb8808a3b605755a001408eb694221300db108a1b8f0ae47e",
+    "io/agentscope/harness/agent/memory/session/SessionEntry$MessageEntry.class": "745227379733b12198de52e8694d977ef99c02ac1e1471459c3d63a39ff2e366",
+    "io/agentscope/harness/agent/memory/session/SessionEntry$ToolResultEntry.class": "b4902bd0551704a68044539fcbe844e10689d026b74ee65f9e1bb820f065c6fa",
+    "io/agentscope/harness/agent/memory/session/SessionTree.class": "ba0e5ae17b3d881c622491e990b50ebf5d31e193a6dd056eb640faae35d991cf",
+    "io/agentscope/harness/agent/memory/session/SessionEntry$CompactionEntry.class": "36431ee61ef81bfbee59e9f7f7ec25d9aef2e6f81217e22980b67273472a5471",
+    "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter$TruncatedOutput.class": "d0fe99678075f3e914af9482ab14e698da76fca035a9da97608cf35c2b248410",
+    "io/agentscope/harness/agent/memory/session/SessionEntry$SummaryEntry.class": "b9cff61b71b7b7afaf87e81cc24251a4cdfb2ea1d930694bcfdab0b070b203cb",
+    "io/agentscope/harness/agent/memory/session/SessionEntry.class": "a8b36f56c4d3ab17622b42aabd699ec6c3088c3f9d501f6e74eb714498c0dad6",
+    "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter$TruncatedMap.class": "0583b1d8708b964b1db1862d93b9ada403449cd0e2da97889caf93702ef75b33",
+    "io/agentscope/harness/agent/skill/RuntimeContextSkillRepository.class": "513a3435f19b903bc7838ef395a2b2ee4b162b8550ac4027953b07964f731915",
+    "io/agentscope/harness/agent/skill/SkillResources.class": "9ce99e10ca586c4255a0f00509e6996efbc85ddff193b1aaedc7f01c452f9541",
+    "io/agentscope/harness/agent/skill/runtime/ShellPathPolicy$Mode.class": "bb36e901640174d729a6fbcd3860393475017216837e4a5715e4dbd6cb95668c",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$None.class": "032b758dcbe5e70a181e998ceddb31c977975ca63cb42466e45252b5c7d8311f",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$Cached.class": "4d7af4bdd80f8622d39b31c6511590d89a322012c70e9512af7ad82c8d0d0ad1",
+    "io/agentscope/harness/agent/skill/runtime/ShellPathPolicy.class": "7244c5234d343e07f5c0775112f4e3e0ff5cd5b13767da9affa3c28c64735ee2",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$1.class": "41f92f5f65cc727756cd0495a15e110c0f14d72ed6bf4a804a333dc5907fd5fd",
+    "io/agentscope/harness/agent/skill/runtime/SkillPromptBuilder.class": "3c4e7e4846fb71d6a6ff1fc35bda5fd205b41845a2a9e407b10760bef2862734",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult.class": "538a147cd028d23afb75178efb62a39d2ad417bd508cb82087f4fc87ed6472e1",
+    "io/agentscope/harness/agent/skill/runtime/SkillRuntime.class": "c08744b72173e8a2f0a3def939dd5758c480aeacaa01dd3873ba70685c5339b2",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$RepoBound.class": "4031fa57dae3f7afa0d5716f22512d1e854088ccd72a8cc95fa7938da79f1b31",
+    "io/agentscope/harness/agent/skill/runtime/SkillCatalog.class": "7bfee5a41b0d0519220fd30dbdfb7592528bc5820d4e85717b7c1a2900b468a5",
+    "io/agentscope/harness/agent/skill/runtime/HarnessSkillEntry.class": "36c505c734e79dd5de1d0b32a6b2e2fef6019ab7daad8a4cd460fff827c3077a",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$WorkspaceNative.class": "4d9c81a3c64c749b3a0719351d02e4200d509d12de162cc580c062e849b9d07a",
+    "io/agentscope/harness/agent/skill/runtime/MarketplaceStager.class": "92fb011a20f398e6ef0e371e7f73eb4ea8da484fc0fdcf30c49503ee6fd6a413",
+    "io/agentscope/harness/agent/skill/runtime/SkillLoadTool.class": "a11706f5a11beeda59e8bf3516a8f704baf70591df9cab469f144f6fef10e4c9",
+    "io/agentscope/harness/agent/skill/curator/LocalApprovalGate$Prompter.class": "b3fc9cdbdb4eb54c664481b2047a782fa777c7c8495b0a1147e8ef2f1dc48768",
+    "io/agentscope/harness/agent/skill/curator/AllowListFilter.class": "7c87f147bb6bf7fe68455105f2576bb4df36bde1128f0c6e8abac0e3c6ed2775",
+    "io/agentscope/harness/agent/skill/curator/EnvironmentFilter.class": "88d4e4d14aa95dc7b77c1a18c7e3f2e02b9b1d7ad8fb7620dd730d5737d821d5",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Rule.class": "c1d5643da0b0fb6b85c6e6eb25ef40793fbd8ce48639007fad1bce72321725df",
+    "io/agentscope/harness/agent/skill/curator/SkillVisibilityFilter.class": "a264559bd88686f82aa7aebe72f1d1886c3ba548619966e3389304f079904bab",
+    "io/agentscope/harness/agent/skill/curator/LocalApprovalGate.class": "690d55eecb2d7db73cedba92cc45a46312fe4102125cb4174e489b75c35e9021",
+    "io/agentscope/harness/agent/skill/curator/FilesystemSkillUsageBackend$1.class": "92a334a32eea365e27d8a9728e61fb6c4912cf8643b753fca1ca0a80a091284c",
+    "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision.class": "75a1a9788bd168e4449fd73140ddde9cb582a2acfb70fd8349eddc657cd5ac66",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$ScanResult.class": "bc2487695731318b50f20bc80738c15f049102801b27a566cd98de7ae09f1039",
+    "io/agentscope/harness/agent/skill/curator/SkillAuditLog$Entry.class": "0c874bac58e141d65dbd4d0cd15903a4f6a7cd1b26addf39f964be38fcb993cb",
+    "io/agentscope/harness/agent/skill/curator/AbstractAgentCreatedFilter.class": "c54699171d3a9d599afda9ce3301ec57d12e118681bdbf9bdc5f28968920d060",
+    "io/agentscope/harness/agent/skill/curator/SkillUsageRecord.class": "2b552b82cba382182977c928d848eccdf371be07259c0de62cb6a57c9581675a",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Severity.class": "4d0eb4ba88a20c525a72eeaca06732f5433b9f8acaf496715bd4a9eb03100d03",
+    "io/agentscope/harness/agent/skill/curator/SkillCuratorState.class": "ce5dfc4d19ef73310b4a98df46fb8a68ca68cd25e3d20c0b0e0e8b0cb97a78c5",
+    "io/agentscope/harness/agent/skill/curator/SkillUsageRecord$State.class": "77e4b2fc73a2d919284be289c1f77af168ad860b236fd7db6c8d54bb63e0e251",
+    "io/agentscope/harness/agent/skill/curator/SkillAuditLog.class": "37364d0d8c6dde7e3094d0078cbf18da212db18465533b97379680e5f1c7dbdf",
+    "io/agentscope/harness/agent/skill/curator/SkillCurator$CuratorRunReport.class": "b5ded72cfc8c4f88b4a727fd59cd5e54bca9b96b270f99ee8d261d79635a6300",
+    "io/agentscope/harness/agent/skill/curator/FilesystemSkillUsageBackend.class": "81801511dbc70be6648249eb79ae51187128516e1d78c38134173f7eb5c5872c",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Verdict.class": "aef5342db63b2f281f3d923a5af057ac204b723fade71d8ef3617e3d03d687a5",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Finding.class": "9552ecb5738d89d19f0acd3f614e9862db080a2daea1aa07d50c24bd1b989fda",
+    "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig$Builder.class": "7943858f3feeaa2a3e1097766693e5d1f850ec009a8c5cc256786e8e705e8989",
+    "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig$UmbrellaPassMode.class": "4ec3953d7a3a73c2bc92bb8e2272416c9f191b481277cd4349a63cd1225e9961",
+    "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Reject.class": "2106cf38507bc12d4e83e661483e887612c637380d53be63045556d0ccdcfcfb",
+    "io/agentscope/harness/agent/skill/curator/RejectAllGate.class": "9a49ee5270d758af4dafab4e5a088da837e8e1ab43dd785e5bf55132ea2e01bb",
+    "io/agentscope/harness/agent/skill/curator/SkillCurator$TransitionCounts.class": "baa82d518bf8de056d7bba343320dae75cd64ed684c24bbb3da923feb4aebfbc",
+    "io/agentscope/harness/agent/skill/curator/SkillCandidate$ScriptFilePreview.class": "628c5da40a5de4efbd0c6acf79e710a9637867337c096a9cef1a01351b24a36c",
+    "io/agentscope/harness/agent/skill/curator/BaseStoreSkillUsageBackend.class": "4c2b7b236ac564726b02cbf1f23be1552d818832385c7313e9ece524bcb4f9dc",
+    "io/agentscope/harness/agent/skill/curator/CanaryFilter.class": "1f3357403af4357c7cd0281d5ea10ec3b7484d01ccdf813df098c306a9e24da5",
+    "io/agentscope/harness/agent/skill/curator/SkillPromoter$PromotionResult$Status.class": "7286cb02a5b23dac1e5c44bf7a107cdfbcc36c110f1c4f680012400e187f6df1",
+    "io/agentscope/harness/agent/skill/curator/CompositeFilter.class": "1144dde37e454ca999e6fc3494752ba343a642ceeb4c19d6b609a10a33620709",
+    "io/agentscope/harness/agent/skill/curator/SkillUsageStore.class": "c164e87f2c61c3ad7148fd66fdc44e115f083710c34c6734ab59b0e268064082",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner.class": "e3013c40e27fc589685d007424a31d648338a0197dade774d3bbae4915f3854b",
+    "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Defer.class": "4ad52d2672af021ad6c8774c6556925d86e92cda93da54d75fa5eb14ddd7c9ed",
+    "io/agentscope/harness/agent/skill/curator/SkillUsageBackend.class": "6cc46ddd99454c073037f589339be881050b1aa48b024bd5308ea6a512f6cd94",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Category.class": "70c9c7a53674c98b7d3247d707eb07a51ab51ff96494f64395a5ac833b636c77",
+    "io/agentscope/harness/agent/skill/curator/NotifyAndWaitGate.class": "73d907f1227dd66717e86b77605e7253e266c5a7edd15ba9c3259ec44d293486",
+    "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig.class": "46fddda8b80e16e5d6037e1fedf826f636cadc5a036fe039892bdbd31f4b58eb",
+    "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$TrustLevel.class": "42e6d5ffd2b05f180d44cbadf66bbd75eed2c63ff13cab904ae4ae6452fce3a1",
+    "io/agentscope/harness/agent/skill/curator/SkillPromoter$PromotionResult.class": "2411cc7f631f4e2e11b6bcd79781805839e54baea5ca602f7e4722ea5e662f71",
+    "io/agentscope/harness/agent/skill/curator/NotificationSink.class": "d529e5d4ca09b6009afceacf36d25667c017ac88d17cbc7947dcc3082d3ea2e6",
+    "io/agentscope/harness/agent/skill/curator/SkillCurator.class": "ada23576577236f793732c81ba25e5aa2e2b6e95c9465b4851ed671c8b49b1ec",
+    "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Approve.class": "0e3643d6177e08c95fb9957c357f9821e066adf874a5010c5a2799a49e8d2178",
+    "io/agentscope/harness/agent/skill/curator/SkillPromoter.class": "9f1349d3b2e8505f9779056c7f75b761d5afc99f03b1a2c7d8d312182a615ef1",
+    "io/agentscope/harness/agent/skill/curator/SkillCandidate.class": "a407d5e39c4a16d57265ff5aaaabd199329989bb9d627ad9b3e0228e8be56903",
+    "io/agentscope/harness/agent/skill/curator/SkillPromotionGate.class": "bb1b1ad063a9ef23b1da5dcd0c4afce2a8c4efce57448d70d163438114c15d6d",
+    "io/agentscope/harness/agent/skill/curator/BaseStoreSkillUsageBackend$1.class": "f699b3a2d0b2956debfdd33e377a483a80c7cf4fd97ea57409ccf98480cbc8f0",
+    "io/agentscope/harness/agent/skill/WorkspaceSkillRepository.class": "c3bda9946239c7e75a87321bf5fb237f8bcbde07f19f7db9c9af6b78afe88450",
+    "io/agentscope/harness/agent/skill/EmptySkillResources.class": "08038655ad3b5b4fd52b177cc7a05947da1dd8d14f5486f0fdb6bc60eeaf1885",
+    "io/agentscope/harness/agent/skill/LazyResourceCapable.class": "1dd729fdf62af46a64cdc8a95b16c3171a2ad4fa1419d4b908cd52223a599d04",
+    "io/agentscope/harness/agent/skill/WorkspaceSkillRepository$FilesystemSkillResources.class": "90e2f7963b886e147a617e0919b4a24ed703ef250bc0c8f1d17176629d60eeb0",
+    "io/agentscope/harness/agent/transcript/FilesystemTranscriptStore.class": "abb86882622aa2c457d6c5d3f05a67ace5777c70ae8cfb857c6d0c8f52d7e77a",
+    "io/agentscope/harness/agent/transcript/TranscriptStore.class": "c3ca5d77ddfdc66b9c0b8a63ffd76004b1d335aab0004d88573faca0591909fd",
+    "io/agentscope/harness/agent/transcript/ObjectStoreTranscriptStore.class": "650079baf047be1995dbd3fd831086d838d0ce3687151181087258e067ca58b5",
+    "io/agentscope/harness/agent/transcript/TranscriptStore$SegmentInfo.class": "68d2a9462a764701479c8d0e4dc0eb0e2c876cdd0fea82c6f25b5676cf1ddb50",
+    "io/agentscope/harness/agent/transcript/TranscriptRef.class": "06ba56474f93b64694b0eb4ac51f75c9d41a65ec45b24d6327e9fa3582e49d59",
+    "io/agentscope/harness/agent/workspace/PathPolicy.class": "122e2e79a84aa0225b288b0252cf70b980e72c71e815d361e676b3926416b394",
+    "io/agentscope/harness/agent/workspace/WorkspaceIndex.class": "30a88b4afddc50b79932325343056e1a5f59134608adc9ace7bdc036f9f41c48",
+    "io/agentscope/harness/agent/workspace/WorkspaceManager$1.class": "7979e46b8a1aef0baef1137aa449c20d8d855ba2c00de3cfc998361095673d79",
+    "io/agentscope/harness/agent/workspace/plan/PlanModeManager.class": "b430293904e50ca08434b10da3287dfbd0593744d25b83b04ccd38e36cf92c3a",
+    "io/agentscope/harness/agent/workspace/WorkspacePathNormalizer.class": "dac17d1a9956c70a1e0833ba1e6bf9899cc437eb1fbfb29e4bf43e529cfadac8",
+    "io/agentscope/harness/agent/workspace/WorkspaceConstants.class": "7a99e006482d031eaeec28019e9d96daafee6e8c5707bd6f633d5d0bbbc14a38",
+    "io/agentscope/harness/agent/workspace/LocalFsMode.class": "56bc81ee4a3168cec2c68c8bf936e2c3d45fe4b1aed49fc65ffe2391d992c1c3",
+    "io/agentscope/harness/agent/workspace/WorkspaceManager.class": "f031a686a08d5fb4db4692b9b6ba12385dbb70add8e031e3aef9464dba51ed47",
+    "io/agentscope/harness/agent/DistributedStore$CompositeDistributedStore.class": "90022de4c4ec1eefd2172193e0ba3622061187c7bd0724df42814894c7599dc9",
+    "io/agentscope/harness/agent/bus/BusEntry.class": "2a46149946b8e63698a0f8dea011711934375567df3a30c432468e7eaf7d7c6b",
+    "io/agentscope/harness/agent/bus/AsyncToolRegistry.class": "d47f34ee12c1429dee57ef67cc41dc6407f10fb4676970b9996c92c93b2fbc80",
+    "io/agentscope/harness/agent/bus/WorkspaceMessageBus.class": "438f5e6dfd45db0f40038a48c45417fd9d0256d5f5c296e9e739564917bcdf2f",
+    "io/agentscope/harness/agent/bus/WorkspaceAsyncToolRegistry.class": "80f58631d47fc55b6006b080f7e34d6ceebfe866d3dd21b4c2ed89d198065b7f",
+    "io/agentscope/harness/agent/bus/MessageBus.class": "7a43fa018a7a3196f5cca42164e09d904bb0e691b62e30dfb9da123851277c6e",
+    "io/agentscope/harness/agent/bus/AsyncToolRecord.class": "d1643383f9fbfa8e0be5536dc1d3afd59c8e62ed42006f8ca54024d507f4f49b",
+    "io/agentscope/harness/agent/filesystem/util/FilesystemUtils.class": "c4cd64c000d5ce9c21da478b41645a63e9a2ff5c9a3c0d4edee73beb56d04bed",
+    "io/agentscope/harness/agent/filesystem/spec/RemoteFilesystemSpec.class": "75f0ede0da2691d3e55c8e1ab81d445cc1f4473b33c612fe91461d461d78912d",
+    "io/agentscope/harness/agent/filesystem/spec/LocalFilesystemSpec.class": "5dfa6cc3e47321a15faa8dd301cbcacd26e458986356531c6a94ece702be5253",
+    "io/agentscope/harness/agent/filesystem/spec/SandboxFilesystemSpec.class": "253ed84982f11bd99e97046c4181039dc7c5846ecfc4e7650b0279eb0eaf24c6",
+    "io/agentscope/harness/agent/filesystem/spec/RemoteFilesystemSpec$1.class": "3ff6f986082edd342eebefffd3fb59b5ef4fb477efe74a30cdc36fde04fa9da3",
+    "io/agentscope/harness/agent/filesystem/OverlayFilesystem.class": "04bcae3c4efc0c5c892845f91a086b89954944d6ef659d6d820305a575f2d290",
+    "io/agentscope/harness/agent/filesystem/CompositeFilesystem.class": "5cbffe7eef151d0b02bcc34f500779c2c6ad4ef4b3a2c78e42cc4ed2ef88e987",
+    "io/agentscope/harness/agent/filesystem/CompositeFilesystem$RouteEntry.class": "9ed50efff305e6b099797d19b38973d8257658a9ff92f3e6c188eca99faf96db",
+    "io/agentscope/harness/agent/filesystem/OverlayFilesystem$ShellAwareOverlay.class": "0c0130432ea1bcc8c1303fe1372e45e91a7e9f53381a5c1331f199bcddb53a1c",
+    "io/agentscope/harness/agent/filesystem/local/LocalFilesystem.class": "0e3142424f2278922e069c03cb454d3b38ddfd76fd9704d8411246b6eedb3fa2",
+    "io/agentscope/harness/agent/filesystem/local/LocalFilesystem$1.class": "4ccaeca03d2a7e0e53dc75cb17439c90512a651deca2e855026606f106752302",
+    "io/agentscope/harness/agent/filesystem/local/LocalFilesystemWithShell.class": "77b2077c3ba9290f33089e5c6826d209154f8ed18cd4556292c9d85bae788d08",
+    "io/agentscope/harness/agent/filesystem/local/LocalFilesystem$2.class": "c635cea3b6bc053bc662e31d620e64f779518c8ee6cd6b4b5bed91979f202204",
+    "io/agentscope/harness/agent/filesystem/ProjectAwareOverlay.class": "84d33a2f7efadbf66acdd1215f5b9785b5b6855ffb148827f27056bc887deb88",
+    "io/agentscope/harness/agent/filesystem/sandbox/SandboxBackedFilesystem.class": "af2a993fbcb3d12a148eac1391d9558c514f98010e1d6657851b4011ab08fe2e",
+    "io/agentscope/harness/agent/filesystem/sandbox/BaseSandboxFilesystem.class": "e368b0bb1096c82687d8a4b99ac8d0fb345d7d882676c5d291a0071cce97356c",
+    "io/agentscope/harness/agent/filesystem/sandbox/PinnedSandboxFilesystem.class": "bc3c5e88ca4dedea493c7a311f577b065f38cfea1baba885bb276f1f1af41a9a",
+    "io/agentscope/harness/agent/filesystem/sandbox/AbstractSandboxFilesystem.class": "1c0a4383c135267a3026b03dcd577c2790d5019a415221f49cb1b2c2d65a995a",
+    "io/agentscope/harness/agent/filesystem/BakedContextFilesystem.class": "51b188d45ac40bdefaa513ce41a90f1d309f67f61278741683f024858aade616",
+    "io/agentscope/harness/agent/filesystem/model/FileData.class": "c2462aae3853d7af0eb91553402858786185a3fc3dca339f647c6d2c22d5ff68",
+    "io/agentscope/harness/agent/filesystem/model/LsResult.class": "e6c29cbdb3f9c6dcaa9011b8e79646fbc7b79ecf22dc636daad8f496d32e9840",
+    "io/agentscope/harness/agent/filesystem/model/ReadResult.class": "2ec00c8048b905180255aa0e1f091eba8ce10be5ca229b29ac1be5482348b69c",
+    "io/agentscope/harness/agent/filesystem/model/FileDownloadResponse.class": "c5c93ca26d4b4b59ae1115cf1f16412b82a1a0c019b8699acb29e31abe3d02b8",
+    "io/agentscope/harness/agent/filesystem/model/GrepResult.class": "181e7fa086caafa070853367d2b7638f8c8b25d141d020e3acbadba7df339687",
+    "io/agentscope/harness/agent/filesystem/model/ExecuteResponse.class": "a13b7458eddacdcbbff613b28c36d95845e3c66efcdc82c85104058e3f052652",
+    "io/agentscope/harness/agent/filesystem/model/FileUploadResponse.class": "0ad3271ef86c72d0043a1e558034fc36b1968504e83255ba0bdb27ac7804bf59",
+    "io/agentscope/harness/agent/filesystem/model/GlobResult.class": "d4b0e3bf6e28333ff7b71b9e23ac2c86f37b9625ac773239ad7476a3ba65314a",
+    "io/agentscope/harness/agent/filesystem/model/FileInfo.class": "8cfbdd5445006fe5a5091ff58d0d2067f3a1fe19f4a39fc60b9983740a7cc073",
+    "io/agentscope/harness/agent/filesystem/model/GrepMatch.class": "d6d3e9e7c927eb5be1c087c10c80971eb4ab6d5dd852ce50a428744226be3fa4",
+    "io/agentscope/harness/agent/filesystem/model/EditResult.class": "614eda22ba95ab611dc549ab19f8f46e3462b160d1fef2e9e05a05e86cf4d5d6",
+    "io/agentscope/harness/agent/filesystem/model/WriteResult.class": "c4cdb127bde9cb410300f7f23a970a4e1081ed3ad99b7b3e3d72cf946b0f7350",
+    "io/agentscope/harness/agent/filesystem/RoutedSandboxFilesystem.class": "1cc0b575b751731e0546a7daa3eb8a4dd79baf9fd5f107483623991f19077a8e",
+    "io/agentscope/harness/agent/filesystem/AbstractFilesystem.class": "6ff5c6f1d4620c7a3052ea823b935746447df7997399bcc06c745f1ba923c99f",
+    "io/agentscope/harness/agent/filesystem/CompositeFilesystem$IndexedFile.class": "37574ae028239b6baad2e8dc8e972951cd42f71083508619557ccc708ebb0bcf",
+    "io/agentscope/harness/agent/filesystem/CompositeFilesystem$RouteResult.class": "9bfce094fff75e7cea752afff23e055a382376276355f30a872d2bc923911d43",
+    "io/agentscope/harness/agent/filesystem/remote/RemoteFilesystem.class": "dcfd80d291f1914542b32edfb80c6568fd4f4cd5bc9a8526834f947254628756",
+    "io/agentscope/harness/agent/filesystem/remote/store/StoreItem.class": "0089bd532fb45c478ed75e6dcc3aa548a4d448453982c9673591b08a4ab60022",
+    "io/agentscope/harness/agent/filesystem/remote/store/NamespaceFactory.class": "d196eed15a45fb7df9f4e86957e9f12cbc2e35ac5314d4226dedbde99ae0e79c",
+    "io/agentscope/harness/agent/filesystem/remote/store/BaseStore.class": "16f51417937b5692e306bebf59d1eb93787bb715d99d2dc195dd119e77cdfa90",
+    "io/agentscope/harness/agent/filesystem/remote/store/InMemoryStore.class": "088bbf8eaa015f587402bdae0707a21b1fa344e992224fec732602ce0aa51c16",
+    "io/agentscope/harness/agent/HarnessAgentBuilderSupport$SubagentFactoryEntry.class": "edd03e0cb480dddfad11e9a4b12fdaa8ac65566d8009f6078143ea849773a6a5",
+    "io/agentscope/harness/agent/DistributedStore.class": "f92b4ed85fab0fd8127ffb82aa568c20e7cbb213861719e7cc08cb474c8e4328",
+    "io/agentscope/harness/agent/team/TeamMemberSpec.class": "2cb51601a347bb251dfcc3cb72d59494eb12049fc2791a67b596236c2873d1da",
+    "io/agentscope/harness/agent/team/TeamConflictException.class": "a4150cc81e5978951d5f5a17514fb30b00cc486a44557c47779e2adb54aa38bb",
+    "io/agentscope/harness/agent/team/TeamContext$InterruptedTask.class": "ee760b1e9b2db68195517549b3abffd21a48084b7d2c5467eec4a6246e35c758",
+    "io/agentscope/harness/agent/team/TeamContext$CompletedTask.class": "53fb591d17d23dcbf851964b5cf4601dd358a711a42b71ca0a8f2b8a151253ba",
+    "io/agentscope/harness/agent/team/TeamTask.class": "33ec2a11fad67f0d18773608809458f7af74237bbea5d5d2046718239e074cae",
+    "io/agentscope/harness/agent/team/TeamWakeups$Hook.class": "1e40d26c9880dfee58e285e95e38cedf278eecdb7d15aac927e88a8eaf7a6747",
+    "io/agentscope/harness/agent/team/TeamContext.class": "11e75c974ffe6f9288c774e0289bd7e54a52927c20216e6524266c639bf7d3c7",
+    "io/agentscope/harness/agent/team/TeamContext$RecentMessage.class": "ef96ea4c563085d793864c53fde99fb2706c264d0bb82ec1a50dbc0479853ec1",
+    "io/agentscope/harness/agent/team/TeamContext$RecoveryContext.class": "1c4e61c05c27f4213c1d6ca54a52efbdef65ff6fa69c91f9765ace3aef8da1dd",
+    "io/agentscope/harness/agent/team/TeamWakeups.class": "2874b63f89f78ed1340e2f2f3d964f625741cba3c96f770323704ceded56dd41",
+    "io/agentscope/harness/agent/team/TeamMessage.class": "77eeee538135a4e40d1c61c5fed5d5cf3422bd4ce0638c7ebed39e1930d8a8c0",
+    "io/agentscope/harness/agent/team/TeamMemberInfo.class": "10e073622e082681a855316f296b23712dd1bd415bb0bdb453d059040d6d4c16",
+    "io/agentscope/harness/agent/team/TeamInfo.class": "ac8a9fab0cf04a71169a806ef49a3374573e3abbb280b29f95e501cfb22b64fe",
+    "io/agentscope/harness/agent/team/TeamClient.class": "0015e557d4d06416b230c7af56720d02ffc1b02d595bed14478b2ea79d3d0d42",
+    "io/agentscope/harness/agent/team/LocalTeamClient.class": "fdb7c2ea582cd7b98d440b3c0a945030fd9f586b1eba0239af872b2118f0bd2e",
+    "io/agentscope/harness/agent/team/TeamCreateSpec.class": "4136f849922d6658a5a659bada01c7a02eda695496b2b93d94689b5a761f07a8",
+    "io/agentscope/harness/agent/team/TeamContext$MemberSnapshot.class": "b696dd18e4811325a3e60bce8c47484ecd3d20d11b9e08160525cb9cc07c1259",
+    "io/agentscope/harness/agent/team/LocalTeamClient$VersionedTask.class": "78583cff4ff96bf5cadaecab25658c18b804b82486e7689f18dba90254039c45",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandbox.class": "afe0d2dd5ba3237fed1ebcfef738e0aae0b3ce0c5328a22000f968a905094383",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandbox$ContainerState.class": "d1ba4eae29580899a7c24095f45a1e320aa89028aaa9f666d258620381ba945a",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerFilesystemSpec.class": "083077bb265375cb2796e40ea59010986bd11ad1db4d7c0a76464abb11588499",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxClient.class": "2e6aafcdd2e1125d778e0b5896294c9be437680f6bfde978ed3c72b1134d1781",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxState.class": "94cedcc2403ce34f7bcbc805706e887d28618ee95ecaa957321ffb76b7528d8d",
+    "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxClientOptions.class": "a5d9f951b6e9fa766d4c4a31ca7f125beb36a102d387175febfba3b799b64ca2",
+    "io/agentscope/harness/agent/sandbox/SandboxFileTransfer.class": "b08af022db6e87893a80a868b707e855fdbdda333ee833f1b0fd6e5fa4bcb621",
+    "io/agentscope/harness/agent/sandbox/WorkspaceSpec.class": "6cd5a4710be82cf7e52574e244d0a94e2cacae97af607df1e5db42f5ccc73a3b",
+    "io/agentscope/harness/agent/sandbox/SandboxException$SandboxConfigurationException.class": "afba58b1f47edc1f77973e6a3d51ecea25a12694dd3c30289498e7d58df9b5fd",
+    "io/agentscope/harness/agent/sandbox/SandboxState.class": "313971a3a2383083afe0cba1f006ddd6d0c1ba343a07dc33040b2dc9e38c3d3e",
+    "io/agentscope/harness/agent/sandbox/WorkspaceProjectionApplier.class": "91c904e4533403261ff9411e02c4e66dec2ad43d56665ac35f13270a54601a90",
+    "io/agentscope/harness/agent/sandbox/SandboxIsolationKey$1.class": "0060d4018fc21c6e85f17c5891e0f03e6f218390c51895dc09e8dc1821f5b9c9",
+    "io/agentscope/harness/agent/sandbox/snapshot/NoopSandboxSnapshot.class": "e2343811a7f2532773c093e0a112688adf3728925040051dc41520da8560ace8",
+    "io/agentscope/harness/agent/sandbox/snapshot/SandboxSnapshot.class": "ec5da2bb8db6e7c595f5cb176503655108a55137caed5af5293ada5dfedd2ffa",
+    "io/agentscope/harness/agent/sandbox/snapshot/LocalSandboxSnapshot.class": "c29c0fd06c43997ab661e6e92b242b74fee9d45461bd19c8febc2e7783d932cc",
+    "io/agentscope/harness/agent/sandbox/snapshot/NoopSnapshotSpec.class": "e2c8d50f34e1c69b27d90a7a8b62d762380f30098e8a0e54308ed3a48ae36caa",
+    "io/agentscope/harness/agent/sandbox/snapshot/RemoteSandboxSnapshot.class": "1f3b05b3a7e2aa93758ecf9db535515b6dfe89e10c1a538a3a33a8d9668bda91",
+    "io/agentscope/harness/agent/sandbox/snapshot/RemoteSnapshotSpec.class": "03d6f40d308f23fb2af5f3c744b518e8af8ba5709b3b7757f9496cc6c130db10",
+    "io/agentscope/harness/agent/sandbox/snapshot/SandboxSnapshotSpec.class": "f34b22a005ab655175fefdd35a2423d51d49676743cc237f3176aa29adbccd1e",
+    "io/agentscope/harness/agent/sandbox/snapshot/LocalSnapshotSpec.class": "8bbe42610920b4bc0b889603cae3635fbba09ac32369c2f6604805d9f636e199",
+    "io/agentscope/harness/agent/sandbox/snapshot/RemoteSnapshotClient.class": "57a0faea39900f1fa067393a3af62f562e47c4c2b821816f19536fe5ef73a852",
+    "io/agentscope/harness/agent/sandbox/ExecResult.class": "24e273704531fe2cbd3a36684f4ace49c4bd3e4aa95a57df1a40b95fdd4c533b",
+    "io/agentscope/harness/agent/sandbox/Sandbox.class": "8f04b42569db913b8e4a4a026a7da596f756cbf25f7e1f38d43f9c3ff055085e",
+    "io/agentscope/harness/agent/sandbox/SandboxClient.class": "6cf5021cd16acbc944c0226fdd04dd6deb10f7e8bf1e3e9c89049b6fcf3be610",
+    "io/agentscope/harness/agent/sandbox/SandboxExecutionGuard.class": "239d25c0f1616ac53685daea812fb131f7b16994f62e126ed1851d1aef27bb2b",
+    "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore$1.class": "e6309b74689334fae7072c30b1e4985d282c2b484bdea4baf5185d3b5a2fb237",
+    "io/agentscope/harness/agent/sandbox/SandboxManager.class": "42b4d90309412cc325e413283025409a02375d47768840a3290341fe2c003aca",
+    "io/agentscope/harness/agent/sandbox/SandboxLease.class": "6c2de3261d1e7837006fe39741d8c96866956ed0006ac0c9d5537e917b56efb1",
+    "io/agentscope/harness/agent/sandbox/layout/BindMountEntry.class": "63c788002266a3c3202bf0f1580528e337afd5742eaacfb8029c1ea121b91708",
+    "io/agentscope/harness/agent/sandbox/layout/GitRepoEntry.class": "a2866182d8017dccebbe1639fb8aea17b5633af9bacb92b94e89b470a99fddd8",
+    "io/agentscope/harness/agent/sandbox/layout/WorkspaceEntry.class": "d25e2feaaaf955a54b3df477d293d6678e2de474e4b24fac4b98f728246743af",
+    "io/agentscope/harness/agent/sandbox/layout/FileEntry.class": "cb0d1c504ef72ec2df6e7da4fc142ccedd75905ae0b611c8c58fcc03e511a8b0",
+    "io/agentscope/harness/agent/sandbox/layout/LocalFileEntry.class": "6d0b30bfa8190b238bbd8fe7e04ea8b728895064d7aabd20c75af183daeb9dbe",
+    "io/agentscope/harness/agent/sandbox/layout/LocalDirEntry.class": "a760fdc6edb50367ed47803ece0e8e004044e897edf0dc3f64e6e20f965ecdca",
+    "io/agentscope/harness/agent/sandbox/layout/WorkspaceProjectionEntry.class": "26390be5d49725aa32f2ca81eef8a8dce74aec6403bcd2db1e4b9c5535632a72",
+    "io/agentscope/harness/agent/sandbox/layout/DirEntry.class": "5381549aab8be4fd5f1c13d8d50f44dca98e1c255397618ee35d5099547871fb",
+    "io/agentscope/harness/agent/sandbox/WorkspaceSpecApplier.class": "5c6f57cfce46a57ec9fc67db11977fcceb59edad6b859fd25dd5e8be4d592194",
+    "io/agentscope/harness/agent/sandbox/SandboxException$ExecException.class": "bc3e5fb8afde7f0816efe526b93bc71d46b783121974134af674991b80b85b4a",
+    "io/agentscope/harness/agent/sandbox/SandboxException$SandboxRuntimeException.class": "6cfd3f750649581d070fd4a03864001b305b5f7900fa7c68289abfb168d53e6b",
+    "io/agentscope/harness/agent/sandbox/SandboxException$ExecTimeoutException.class": "1b1676b134d98d5507a2be408722f92e3e18f83d44e313f6ebe8c3fe1dc81269",
+    "io/agentscope/harness/agent/sandbox/SandboxLease$NoopSandboxLease.class": "7ba738d5c829e17d1fb46ac99e57f50506627654e3c536d86a6908adb85750a9",
+    "io/agentscope/harness/agent/sandbox/WorkspaceProjectionApplier$ProjectionPayload.class": "884d79e1f864608612b1e1925b9d97b494a92fa920180141249f8ceb72371b06",
+    "io/agentscope/harness/agent/sandbox/SandboxClientOptions.class": "ed2a705a19d0ff12c565158a7e4d50d30ab79f5c3b2cf14a3bfb14e8c7a37914",
+    "io/agentscope/harness/agent/sandbox/WorkspaceArchiveExtractor.class": "07d713bbc0002e17413c8d5dfc936aec119b71248874546542ee2fb67ef525a9",
+    "io/agentscope/harness/agent/sandbox/SandboxException$SnapshotException.class": "de3fcfbb8f5555621449d949b0e6a3c61da36463f0c41d3d463cdf044740b187",
+    "io/agentscope/harness/agent/sandbox/SandboxExecutionGuard$NoopSandboxExecutionGuard.class": "06fba011e25db0f7f3b176acf3d586fc9590f8d47fadeee2a9212e1fc0b94ae3",
+    "io/agentscope/harness/agent/sandbox/SandboxAware.class": "efb69d912c5a2dd344616fb3406477cba72757c00550a4fc146acfc2492a38a1",
+    "io/agentscope/harness/agent/sandbox/json/HarnessSandboxJacksonModule.class": "2b3ed33ef2edcce3e25cedf04368d40b3939cf18f10bb5b60a7c1b813e5740b2",
+    "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore.class": "ba0319589ca534b722f5e75ea5f85bb6bb9e11ebfa75269b15c5ece00ad361b3",
+    "io/agentscope/harness/agent/sandbox/SandboxException$WorkspaceStartException.class": "814c4f1faf6e5deb854e06dcbbc6beeb976eec96e825400631d9ecdcf7399d3f",
+    "io/agentscope/harness/agent/sandbox/SandboxIsolationKey.class": "314030dec30de8f957bd46a0e70fdc6a5525b78db84d2e4f29abf00d1ca736e2",
+    "io/agentscope/harness/agent/sandbox/WorkspaceMountSupport.class": "0a1a240b85d5ace9edfc8cd5504c2c3a317624afa90ee823fa16365029b4c135",
+    "io/agentscope/harness/agent/sandbox/SandboxException.class": "a587d8ca0681e7ae1c9f83a5d80d2e91e05ab8f6a54e29a44f87ee7ecb482c5c",
+    "io/agentscope/harness/agent/sandbox/SandboxErrorCode.class": "fff74d33426e149044ea9a54003930beb36106964f6e41a64f1d6c03fad97206",
+    "io/agentscope/harness/agent/sandbox/SandboxContext.class": "1403cb034bcfab0ccfc9b20ea440bb9d8a2416f214812ebb27e233b1ab4fa406",
+    "io/agentscope/harness/agent/sandbox/SandboxException$WorkspaceStopException.class": "7fdbd2e9b2f30ff16c27f395d65e967286cedc2aec5b63d42558f4b65caa6038",
+    "io/agentscope/harness/agent/sandbox/AbstractBaseSandbox.class": "2196c7bdd8b000af52a88603b451163c0e845af4d0aa4fde4010c80cc9e0d72f",
+    "io/agentscope/harness/agent/sandbox/SandboxContext$Builder.class": "e4ac1b68d2acf745c4029471bf8866a42b49dca93fa7346c238dce01d14d899b",
+    "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore$SandboxStateSlot.class": "f0605ea77024e246b8051d5a714a69de8be307e9a15463a58d0487cdaef05e19",
+    "io/agentscope/harness/agent/sandbox/SandboxAcquireResult.class": "dafe9f7837adbe10f781240b2a6c7c8c29a81554c31334ef424f62b0478a6396",
+    "io/agentscope/harness/agent/HarnessAgent$Builder.class": "98aa8eee6e4e75276eede3efa1fa607878d87b867f17d22715b15bada3f71107",
+    "io/agentscope/harness/agent/artifact/ArtifactDeliveryTarget.class": "f2d3453ae8e4dadfdeb0ac7ff83e7211f580587b31f13a6729fbe08d3b45f626",
+    "io/agentscope/harness/agent/artifact/ArtifactDeliveryResult.class": "d99b3dacf9c0b4e2877394d9fd2769ab3951afefccee48ca96e05abb8cfd12e5",
+    "io/agentscope/harness/agent/artifact/ArtifactDeliveryRequest.class": "d07cf698b037c2244bccd9791ea742b0c9c8c51abb9e378fe938084d2a124aca",
+    "io/agentscope/harness/agent/IsolationScope.class": "a8768e0c5d6498f8832e7f2e55b48ba5c4f5ab1903b06f4a782d413e5aaf857e",
+    "io/agentscope/harness/agent/subagent/SubagentSpecGenerator$GeneratedSpec.class": "d2cdb97ff8f76304876a2c12637ce4b90343a86019839d5370fb041a50cf1b08",
+    "io/agentscope/harness/agent/subagent/SubagentSpecGenerator.class": "4099e4ed8ece99e71faf43a317dd4f2e021ac4bbaec9b0f0019c3aaf560434a3",
+    "io/agentscope/harness/agent/subagent/SubagentDeclaration.class": "130cc011ba2967e689f57a4e930811f2f3300403020e89d0e292835fc58eed5b",
+    "io/agentscope/harness/agent/subagent/RemoteAskPolicy.class": "9b1db2d09facaf239e0bbac7f781362b30e237a99392a668a5ea1664b90aa418",
+    "io/agentscope/harness/agent/subagent/RemoteSubagentStub.class": "fbd868d5f2eeaf8cb71b85f5ca3ec04065b2641bb5042a15dae4b00b80e63958",
+    "io/agentscope/harness/agent/subagent/DefaultAgentManager.class": "3773cee213082c00cdbaa2a1188e77e627f980515c9cf6974333e9b94b3ff20c",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteStreamDetail.class": "8a7d92a29d844f04cabb8501d897a1fb7501a5d2555eccfd55f29b642b953598",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteConfirmDecision.class": "0d633a40e70be67e260b092ff8a40c7826ca2b99d012631ff6670fba9daeec17",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteEventCodec$1.class": "a4ea95994c39c3406c15cb002e8b3cb48ac7bc6d8f17ed27658db76247c1a015",
+    "io/agentscope/harness/agent/subagent/protocol/RemotePendingConfirm.class": "2f5ada37331b896298ff99df4722cb144cf6f9c13799235636641af90b475e9d",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteEventCodec.class": "5f27f9923132cd1ae6f0c8e1b4cadfe211c90fb6afcb78d32d39f07c266083d0",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteEventType.class": "4a202545087f310cca9ab2a07e040052d7772225f52b859e417b52c86011a7ab",
+    "io/agentscope/harness/agent/subagent/protocol/RemoteAgentEvent.class": "1f41fcbcd930c20e4b04749a7b7177721768310f7b92c5eaf7970481ca1d9977",
+    "io/agentscope/harness/agent/subagent/SubagentFactory.class": "98f8cbc69de1b8fd8db2084cd04df32e1028593f5c99c65715d8faf4e6ec8b85",
+    "io/agentscope/harness/agent/subagent/SubagentDeclaration$Mode.class": "9c40d9357efbf2d0dbac7826a81a35506aa3dfcf276c65688a39b8d260260396",
+    "io/agentscope/harness/agent/subagent/AgentSpecLoader.class": "ab5e45ba46c9bf6b27664cf8883313e09ead3c5d172d662666dfc6cb803a9dab",
+    "io/agentscope/harness/agent/subagent/task/TaskRepository$TaskCompletionCallback.class": "71388bad9e5351b7110a75e7f9b29e5cada62e10138ca8b5787e4cbe0bece5a3",
+    "io/agentscope/harness/agent/subagent/task/TaskRunSpec$LocalTaskRunSpec.class": "6e2e4870527a617543cd12bcc83d3cbf070e29f23b2bd22927e51b0af6f2a114",
+    "io/agentscope/harness/agent/subagent/task/RemoteSubmitContext$Builder.class": "5167b3032fcc90cf56fc0da7e38e6d5c5eadda9ab9e40477f224c39aa5fd50e7",
+    "io/agentscope/harness/agent/subagent/task/WorkspaceTaskRepository.class": "e852ab1848dc929c1c77fd3dae927d34b9cea3079dcd33b90a585e56a9902072",
+    "io/agentscope/harness/agent/subagent/task/TaskRepository.class": "63c59601d520084f16d1500857513ce7f64d72e8f9d970d544d04cfb692b1b45",
+    "io/agentscope/harness/agent/subagent/task/TaskRunSpec.class": "c9fe4074e55a01779613daf8918f85b56f8418770220957a4092481d748a021b",
+    "io/agentscope/harness/agent/subagent/task/TaskDelivery.class": "3807893696f4790a2e910e013fbc138ba9b98588a06f4c18dece0b368a41fe13",
+    "io/agentscope/harness/agent/subagent/task/WorkspaceTaskRepository$1.class": "0d45a27d2ffbf8fdcc7a7f6e6cabd89880ff9631794428399d943708b999cdf8",
+    "io/agentscope/harness/agent/subagent/task/RemoteSubmitContext.class": "b62b7328f3ef63f960781f94e88b80ed0b1060ce8974bf5d972d7fd588ea1137",
+    "io/agentscope/harness/agent/subagent/task/RemoteTaskStatus.class": "1ab8e455311803443d2dab34044234c045fd0457db68b4d40e2fd16af08278ca",
+    "io/agentscope/harness/agent/subagent/task/RemoteSubagentTransport.class": "aadfb976e8ace00ecb8cfdfb3a5c8c64aee875f50112b3674960b6bb11bdebc6",
+    "io/agentscope/harness/agent/subagent/task/TaskRecord.class": "43201292dd1b6541c374ac88ffc072799beeac72aa373a318508ef117bdc41c2",
+    "io/agentscope/harness/agent/subagent/task/TaskStatus.class": "1dce58d4ac2e7ff1bf2c241090aef6c4b84f51f0d8351c47ea9d829ac6275740",
+    "io/agentscope/harness/agent/subagent/task/BackgroundTask.class": "059b16e3ae48696d6b1d2985f7cdd0ab5e8e25267bfd3e04c4221542f07dbf5c",
+    "io/agentscope/harness/agent/subagent/task/AgentProtocolTaskClient.class": "b6dab3522fcc571e46c9f054a83751f2b820cbcb3e43e10967092f7df16a8c37",
+    "io/agentscope/harness/agent/subagent/task/TaskRunSpec$AdoptedTaskRunSpec.class": "ee445b18c0d9a028a63af5286a5632c63d6def9718797a712e9d38219793bc21",
+    "io/agentscope/harness/agent/subagent/task/TaskRunSpec$RemoteTaskRunSpec.class": "375c30d37198664d44659f8494da97147d19a43d2fc1988f16a57461c6311fb8",
+    "io/agentscope/harness/agent/subagent/task/RemoteTarget.class": "c25d5922cfecedc9f017359579eb2e0e37917e320dba06780bbcce75f6b216e4",
+    "io/agentscope/harness/agent/subagent/task/AgentProtocolTransport.class": "f8e7ee8185e7c8fa9a4e72f1a5882ebfc5247d9280b0d340494f9e41f54d42cc",
+    "io/agentscope/harness/agent/subagent/SubagentDeclaration$Builder.class": "9f29941a1717fecc5885f800f0b81e78f2c5c3619b44be80e670faf534063dd2",
+    "io/agentscope/harness/agent/subagent/WorkspaceMode.class": "fd969f21a3b685ba04d97dafe4439a0016eb9bdc86db3a9cfcf8ff4a7ac5eb41",
+    "io/agentscope/harness/agent/tool/FuzzyTextMatcher$SearchResult.class": "638478f87a65fb28f2a48d26c9b5e47a2fc0327918c0a7d43e7f087fbd95cd02",
+    "io/agentscope/harness/agent/tool/MemorySearchTool.class": "d9a149c16c868465754fb46824f61630f46ef8638facf49661204e03679d56dd",
+    "io/agentscope/harness/agent/tool/AgentSpawnTool$SpawnedAgent.class": "7ff3bfa1cd1ae2060515d35563afeba4fefc0a5c0ad51c6ca022836734f0c964",
+    "io/agentscope/harness/agent/tool/SkillManageTool.class": "481bd369177f794db561356a647fb88230a091ed3dd71e2566140b2e0f2ac07c",
+    "io/agentscope/harness/agent/tool/WaitAsyncResultsTool.class": "65a7222f65a26ba2a739d3c2b6e02a8b844ec5eec315f9e11a3c9e243ccd13d1",
+    "io/agentscope/harness/agent/tool/PlanModeTools$PlanExitTool.class": "38d1bfc451b33b45c1deb7f719104ac04165d41bacfd713e94b9b9426ad26a98",
+    "io/agentscope/harness/agent/tool/PlanModeTools$PlanEnterTool.class": "ed1ad4ac67e317de306b75908b94772a0f66df34ccba8b8ca8f0f53fb621ae0f",
+    "io/agentscope/harness/agent/tool/SessionSearchTool.class": "38c213a0b32ed4ed27d743c9bfbfd44c060dc2a4c82a5f7ce78a86afb42e3cbd",
+    "io/agentscope/harness/agent/tool/FuzzyTextMatcher$MatchRange.class": "11df2798c937848accb87a31ef304189d124431efcae51e20940bbe354b70185",
+    "io/agentscope/harness/agent/tool/FilesystemTool.class": "25ac0ed4a28b9c87d28d9f2ca6a1a6cb7be609b853dc4f0580c8d91d5f8d187e",
+    "io/agentscope/harness/agent/tool/WebTools$WebSearchTool.class": "d6be37e76f897f7f47e41d624137c468cf824619f706994110b2fd102764a38f",
+    "io/agentscope/harness/agent/tool/MemoryGetTool.class": "7d026a901faf61af2e9d0c5a61c406432f4da84495ad46c65b9c7b9e9c2d2cca",
+    "io/agentscope/harness/agent/tool/FuzzyTextMatcher.class": "56b63a38920918e3ab5936f2624bb6890d41bfeb39f315eee1a4dc59a98bcb40",
+    "io/agentscope/harness/agent/tool/ShellExecuteTool.class": "94a4acf7b06c44fae262b925f9ae5a709ee7e319c1d00a5ad322176cef22c86a",
+    "io/agentscope/harness/agent/tool/SkillManageConfig.class": "d64384d53c52f62f3dd782dd2e51543e502ba8d9357a1464fb69cf387dbdb8cc",
+    "io/agentscope/harness/agent/tool/PlanModeTools$PlanWriteTool.class": "fe4c0408c353c2054c07bb02ad2194cb8661381bf774400c73019404c288f1eb",
+    "io/agentscope/harness/agent/tool/ArtifactDeliveryTool.class": "2170baacc2255724056e782017cea050a3c10cfcb87a4c616661b6ff4797bbd8",
+    "io/agentscope/harness/agent/tool/SkillManageConfig$Builder.class": "a3096a17d36011ca03f2888b4fd0c10c1ba5dd711acc72ff47604e7e8dcc7b7b",
+    "io/agentscope/harness/agent/tool/TeamTool.class": "ea5943af092d8fad34cddf849d12bd309c9899899d726dccd80b80bbb3c77d2b",
+    "io/agentscope/harness/agent/tool/WebTools.class": "3644013764d1bedd64b68f331548cfb4aea4319c230be9df9da5a7e7a7477290",
+    "io/agentscope/harness/agent/tool/PlanModeTools.class": "5185a34364a17ab8a3cf62afb679b691cf131bc25468ee1089f0fc15c4b5ee74",
+    "io/agentscope/harness/agent/tool/TaskTool.class": "a2ff9dbd8e10e579ab4212fb93d445c52dff03443550ed47283825ef23f46526",
+    "io/agentscope/harness/agent/tool/FuzzyTextMatcher$Normalized.class": "506827ed76da001896207bccc7776a8f7fb10a78650112b3070ccb1b631786e5",
+    "io/agentscope/harness/agent/tool/ProposeSkillTool.class": "6ee325da9b3eca0b2e5369ca8d92c7161976a310746d12ab37e19767d27ed9e1",
+    "io/agentscope/harness/agent/tool/AgentGenerateTool.class": "f5633e6577cd98edb469b476b14b0b6ebe84c6605adf0d4386525d78f147aabe",
+    "io/agentscope/harness/agent/tool/MemorySaveTool.class": "c452f320ddb2d24941fb71e94ce7fa104a89a841651e18dbd010220a86d7eef2",
+    "io/agentscope/harness/agent/tool/FuzzyTextMatcher$Level.class": "16780d339a4e0a05c2f332c328109b0248ac971b8f5516ebba0f6fd4b7310057",
+    "io/agentscope/harness/agent/tool/AgentSpawnTool.class": "1a9b46693dea60d8841161540463bd10fd9674165abf84a5482e0864836ce757",
+    "io/agentscope/harness/agent/tool/WebTools$WebFetchTool.class": "18f76416b756623a1cc740587d6a3cf0b0dfbdbcfd75cc7baa754bbdfe99501b",
+    "io/agentscope/harness/agent/gateway/SessionTurnGate.class": "1aecd4693e7d7b558cd1e6a82d6c3a443d12c7935b432704d6a48e6fbfb4daef",
+    "io/agentscope/harness/agent/gateway/GatewayBootstrap.class": "866069690fdf28f6f6fdb104c74e1ed940cb30a153b75540ac37b39a43df83c3",
+    "io/agentscope/harness/agent/gateway/MsgContext.class": "37463b330fab41e369c8cc4964f21b338ce4497343d0157bb9f7c93910f22b9c",
+    "io/agentscope/harness/agent/gateway/WakeupDispatcher$WakeupTarget.class": "4876154277d40e8384c8942d212f25d2b451b652f368a83663415c54483c6de9",
+    "io/agentscope/harness/agent/gateway/SubagentGatewayBridge$ExposeResult.class": "ad0723a5993669a89c781e0ebd9aa7bb328b0cfa4bcb4223f3a52cf3be6d1b35",
+    "io/agentscope/harness/agent/gateway/Gateway.class": "a024f1ef19790ca2f7d806b659aca4195dc3de64b5a035ad0b95d119247c3540",
+    "io/agentscope/harness/agent/gateway/WakeupDispatcher.class": "78308c23f337aca95b24e79f2fcccbdd10563fdc331801bf0eb6e268782b55e5",
+    "io/agentscope/harness/agent/gateway/GatewayBootstrap$Builder.class": "0b6594cd989e901303e29de601670c8ebf8303baa6d5bb4b831518c814c40d70",
+    "io/agentscope/harness/agent/gateway/SubagentGatewayBridge.class": "f5d455ba3d94aebd2c2bf7adcf49e2048a4a306067b5b333b6d42249a5a3b441",
+    "io/agentscope/harness/agent/gateway/TurnBusyException.class": "6209fa04fd704573b1b322649811a9f2e507bc228a1bb8c6f568681e29f9b97c",
+    "io/agentscope/harness/agent/gateway/SubagentRegistry.class": "030fc78a5453f4997e0440f1e87ad78e5967e71683c0f29349cf95f5d4bde1ad",
+    "io/agentscope/harness/agent/gateway/ChannelManager.class": "a3c18c203f57ff0a3a2a9331469e8af2ae4f2f1dd76fc6a08fc1e35062511ff0",
+    "io/agentscope/harness/agent/gateway/HarnessGateway$1.class": "d543164b97f8e065c4bda6c5f36a7ea1bff219acf39d460a8f5bfd5c47eb8501",
+    "io/agentscope/harness/agent/gateway/channel/chatui/OutboundEnvelope.class": "a24729abd6ec15fd138e0775b1d4c466ece0c1c370f0435af34c8496431f1697",
+    "io/agentscope/harness/agent/gateway/channel/chatui/ChatUiRequest.class": "035d078209728f340e29f27e3c9accc5bee5746c756b5a95063dbdc364ec5e0e",
+    "io/agentscope/harness/agent/gateway/channel/chatui/ChatUiChannel.class": "fe0c0a70a5ee62286e4d1800a5656c7799dbd902aa65f69dca91d64e350667ee",
+    "io/agentscope/harness/agent/gateway/channel/chatui/SendOptions.class": "dce892495d75394459e61f81fd7f45b0a8831e2b3decf0111bb39647bcc91cdc",
+    "io/agentscope/harness/agent/gateway/channel/PeerKind.class": "0f5dd5f7e1094fec9b7e579f0a6ce2db0f15ebc854d2406e7fb7d6c306168fb0",
+    "io/agentscope/harness/agent/gateway/channel/ChannelRuntimeContextResolver.class": "97e790a698357ed50b63c24133baecbbc862a0142fef5680fa6d664dd9cdf350",
+    "io/agentscope/harness/agent/gateway/channel/Channel.class": "352531bbeaf11e2625f25b71b0539d7c7a885e0f9d606f8498292ae848eba78d",
+    "io/agentscope/harness/agent/gateway/channel/InboundMessage$Builder.class": "7a6d2faf6c313cfb86cd14ea2f9497258f5843629d10efc0d9948843b7ebe3f8",
+    "io/agentscope/harness/agent/gateway/channel/ChannelRouter.class": "b85340845f292e787d1b49b8d689f2300267ef6374837250615eefdedb5942f8",
+    "io/agentscope/harness/agent/gateway/channel/ChannelFactory.class": "5db750775a10172f4ef8533641e442592f17d8498f09a4ec47de56c5fd13aa42",
+    "io/agentscope/harness/agent/gateway/channel/InboundMessage.class": "289e1be3d5ab6af4ff3599d969a7cdb955959972f60069e4f262e37b57565832",
+    "io/agentscope/harness/agent/gateway/channel/ChannelBinding.class": "e30b8e36229143a6e48e96cc3e942579f7b0cecfb30f4797b5e0e27487cc3d09",
+    "io/agentscope/harness/agent/gateway/channel/ChannelConfig$Builder.class": "c3d58a7b62260d0f5c7acfcf6ebfd309455161490deaa2ac87b587a5819351ef",
+    "io/agentscope/harness/agent/gateway/channel/RouteResult.class": "3fe6f482860f1a5d6b5d97b7a02b9d2f2f37497f2dd9a7353d2bb1aa1af9787f",
+    "io/agentscope/harness/agent/gateway/channel/ChannelConfig.class": "481f5564945e9c3c5390108fe32076d65244853db3a58ef694903a0b089f69aa",
+    "io/agentscope/harness/agent/gateway/channel/DmScope.class": "632e004af787ed58671e378baafa42509fe683a5298df78deb10b0f56433b1a8",
+    "io/agentscope/harness/agent/gateway/channel/ChannelRouter$1.class": "f04e89fd60b78c543c2c013cfad34d1bfd76f6cabe98c032b6838eeb7fc24a05",
+    "io/agentscope/harness/agent/gateway/channel/OutboundAddress.class": "a26a10c4d4732f1de7c4d745c5297fec16a908f31df8b6dda54a2539dedca278",
+    "io/agentscope/harness/agent/gateway/channel/ChannelRuntimeContextRequest.class": "18d2990c1f7b5de652ccbc2396557a7aaaf283a52315680bf7cdb5773b7701c8",
+    "io/agentscope/harness/agent/gateway/channel/Peer.class": "bef1eabfa9962bc84cba8a7523b049dbbf0eca0f9feb0a711659a0c9cbb4e464",
+    "io/agentscope/harness/agent/gateway/InMemorySubagentRegistry.class": "718a02cf68b44a4a6137f98c009702846fac7b16c12cb53bc06c5f630d27f0e1",
+    "io/agentscope/harness/agent/gateway/SubagentRecord.class": "9016ef0ff24cdf795c7af931890edc517af58ae3b3dd027831fe52eef2c7b0e8",
+    "io/agentscope/harness/agent/gateway/HarnessGateway$ExposedSession.class": "149972b15600eb0f00958205296ea79ba6eec374e8c3091aeb1068925c23f238",
+    "io/agentscope/harness/agent/gateway/HarnessGateway.class": "846524e374fc113dd4b271fbdf633179d4850c8358a12bf8061917165b2f3d51",
+    "io/agentscope/harness/agent/gateway/TurnLease.class": "8a8b0946276cde8eebaa5cd7330ca55a823e9919be04f82b6cf0916619ae8b61",
+    "io/agentscope/harness/agent/gateway/SessionIdUtils.class": "8823b504820c6a0054e376b0c42084ef87c64cba5a69c8b5ceda08621ccd4a65",
+    "io/agentscope/harness/agent/gateway/SubagentMaterializer.class": "63b209da0bddf50e20363436c99ab11d55157b11bb0dc3daf14e1ad8c41f99b1",
+    "io/agentscope/harness/agent/gateway/StoreBackedSubagentRegistry.class": "5c223d00e8f9d1f6dffdeea286c05ba9bf907621f97342f75f7c22ef7a9dc2cb",
+    "io/agentscope/harness/agent/gateway/LocalSessionTurnGate.class": "38a42427ec776d27f4a647ac28d27966eb9559761c78e36f0f2048b3b9eef98f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "775cd413f955cbc283ff7f4045973d1224f2ade45d18cb6ff5f3d255052d4bbc",
+    "e2b-process-fdp.pb": "562fe50da53fca54841685c1fa02f2f336a779e7027cf6fe59df445b09fecaa6",
+    "META-INF/maven/io.agentscope/agentscope-harness/pom.xml": "722d14fe011f36ac9a3e4109a4ff9b3d30b8471d2d6a361f25f0afcfc6f61fea",
+    "META-INF/maven/io.agentscope/agentscope-harness/pom.properties": "5ae402a8a8a1ff6b69942e3967892b069f4a61e1e1bf5293f588190c3feb12c3"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/agentscope/harness/agent/middleware/WorkspaceContextMiddleware$1.class",
+      "occurrence": 0,
+      "sha256": "134e9833a2f67d02020c2bbc4b4b59f962c79ab10d26522119e31e817858c4e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$ConversationKey.class",
+      "occurrence": 0,
+      "sha256": "f14a732d71a9bc84e087e979ba09643433a5c843cca2d948b5b2c4beb48aa49f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SubagentsMiddleware.class",
+      "occurrence": 0,
+      "sha256": "1a41e2a4146715108c0d9c70c3bffff8e427442cbbef28f1404246b1cf3010ff",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/TranscriptMiddleware.class",
+      "occurrence": 0,
+      "sha256": "052d1b0fa6d5506f300257dadd3e8b21035612b4bdf49bc827cbe4ce2d87a273",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SubagentEntry.class",
+      "occurrence": 0,
+      "sha256": "30ea8f720869b841658e5361a4384499bfc4a5123681ea27d8b9f38711e09779",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryMaintenanceMiddleware.class",
+      "occurrence": 0,
+      "sha256": "2958ff40e069454f4d26c1a5664af3b4bdb79e3512707fe49fa1460dc685c0c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/AtPathExpansionMiddleware.class",
+      "occurrence": 0,
+      "sha256": "dd104c74ff16e442768cb902aefd7a99aed45d0b58da6cf0ca667eac42476503",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware.class",
+      "occurrence": 0,
+      "sha256": "0f9beb9b3db58e20228863f8e988f1e1cf7d419e86053ed8bc06f9c7c89cd3be",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/TeamsMiddleware.class",
+      "occurrence": 0,
+      "sha256": "5980fe5930a725de7e6757d03be036bed5769143f5f0a28a2d427b49df59b66b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SandboxLifecycleMiddleware.class",
+      "occurrence": 0,
+      "sha256": "9044228f6980dfa04ced0054ef0755610b04778c599eff0528a4f21ad7a6f8b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/HarnessSkillMiddleware.class",
+      "occurrence": 0,
+      "sha256": "5cf399c1adfa09c2fbdc33edb5384cd3ba0e8e32b48936779c42c56f9f359bf8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/AgentTraceMiddleware.class",
+      "occurrence": 0,
+      "sha256": "59ac18d75fea7edda71790119797822c5a211aea068cfbf4338589d149380d3c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryMaintenanceMiddleware$1.class",
+      "occurrence": 0,
+      "sha256": "6816a265c2780d1d73a1c47e805793f95c726db431cd7c7e1b9f97d519a31ef6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/InboxMiddleware.class",
+      "occurrence": 0,
+      "sha256": "e3c665e393e9350116efbca17c1092450cb4dd5568a1b35929b52246d41d1144",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/HarnessRuntimeMiddleware.class",
+      "occurrence": 0,
+      "sha256": "dd9310b7badf31dbfe9d4a1ba5a3094db66a76b76d0f08fe68d80a5ee55d9cd5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/WorkspaceContextMiddleware.class",
+      "occurrence": 0,
+      "sha256": "e516cab3fdcd1e8fcc29abe928cc18add41a48426e7e7835393cfe2e574fde14",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware$ToolResultFingerprint.class",
+      "occurrence": 0,
+      "sha256": "3eda633ce0979d936f48819889544ddde594fa7b1c018177250a0cd2708ee0b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/AsyncToolMiddleware.class",
+      "occurrence": 0,
+      "sha256": "8ee6df6f7bb65ce13cf70f6d23ae750912649ce0187b3af98b36116be8f1ca2a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SubagentsMiddleware$1.class",
+      "occurrence": 0,
+      "sha256": "956928cc9b52ab9b653dc701256a86b415c3fe6e7c0431757fffb1aefe8f16d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/PlanModeMiddleware.class",
+      "occurrence": 0,
+      "sha256": "20ae22caa633feac86b94954378c4adc44a62b5ec43305e174688c88eba54b6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SkillUsageMiddleware.class",
+      "occurrence": 0,
+      "sha256": "ccb7b154d7e60da98a9418a028312b477519746580bee707d43e5987f9284517",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$FlushQueue.class",
+      "occurrence": 0,
+      "sha256": "4d64ad03e2c945de4a82bdd5417f4eb16881e3c25eab9d6f95f0e85f80896c92",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SubagentsMiddleware$SubagentSnapshot.class",
+      "occurrence": 0,
+      "sha256": "4459ea7c264df1037e0a93922046f8a05db84c6e9045824b4d14aec194d35687",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/HarnessSkillMiddleware$1.class",
+      "occurrence": 0,
+      "sha256": "a46aea0a3953db4b3fc89deddf8c802f9638b6de455d3c73e413f7592769f0b4",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware.class",
+      "occurrence": 0,
+      "sha256": "cc8303066e656082fcb80dbb55524c03f2fd2603e1866bf425a3606625aefde8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/SkillCuratorMiddleware.class",
+      "occurrence": 0,
+      "sha256": "406544bf14c7b24c8fb8e0d171fad263a28589efd9f39c9bd3d7553233f0a3a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/DynamicSubagentsMiddleware.class",
+      "occurrence": 0,
+      "sha256": "c04b1fc74ac21bb33a5eb6fe8ea5387de060914b296ccc8e53ce26363f61ca92",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/CompactionMiddleware.class",
+      "occurrence": 0,
+      "sha256": "0bd443aa195edeebd7ff5380f8e0968faee5901fed26b89e8e17545b09938788",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/ToolResultEvictionMiddleware$EvictionResult.class",
+      "occurrence": 0,
+      "sha256": "72a920efea86876db65af0e9dab58819f1e83f450fb34f2a1c3c32bba7e2dbd1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/middleware/MemoryFlushMiddleware$1.class",
+      "occurrence": 0,
+      "sha256": "dfc7d6cddc110636a1a0bc5e1a99be4c8279b82081643368f404295a1fc5a6be",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/HarnessAgentBuilderSupport.class",
+      "occurrence": 0,
+      "sha256": "52318a524f450064fe81b12281ffd52529373ea84983fe8334e08f7f1844e959",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/HarnessAgent.class",
+      "occurrence": 0,
+      "sha256": "6a6e3ff2db5401fc7bdb795a903c1ae6a65c3ee17c79e9884419dfc8c2b720ff",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/McpServerRegistrationListener.class",
+      "occurrence": 0,
+      "sha256": "aa248b4fe8ad8894967da68095f819fd617c5811a64fc22739553c5314591c65",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/ToolsConfigLoader.class",
+      "occurrence": 0,
+      "sha256": "558ac123d1cb03d7833599312db06d3496ef18df45d937c1e2059ca35fc7451d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/McpServerRegistrar.class",
+      "occurrence": 0,
+      "sha256": "3c9271a96290b9be37e797577c04bc1d7edeb064ec8d20575a82f60e9f1ac5f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/ToolsConfig.class",
+      "occurrence": 0,
+      "sha256": "4817f834dcc873c3d2a0641ceae8b3fbfd4e0df9e73c8078e7272a0f5902408f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/McpServerRegistrationResult$Status.class",
+      "occurrence": 0,
+      "sha256": "5803d6e4e26cb52f96375341fc9b06a6571ebea71aa0751ad302622150d05b12",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/ToolFilter.class",
+      "occurrence": 0,
+      "sha256": "ed4b048c5d1de954fb18a6d57f74fac4e94154e05e80c14ca1a5a5c9c06227b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/McpServerConfig.class",
+      "occurrence": 0,
+      "sha256": "0b95dbdb9c3543c2f61d27bb8e03be8cb1ce2014522075b1720b15370bf2e684",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/McpServerRegistrationResult.class",
+      "occurrence": 0,
+      "sha256": "be598241a2d40ddeffc0264ddccc0a0bec16be43a1afded6132031e0c440f35c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tools/HarnessPlatformTools.class",
+      "occurrence": 0,
+      "sha256": "193beefb59243de1effde56e9f03bc16ec3aae021549eb4e9d8f1f4b0a4b3391",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/DistributedStore$Builder.class",
+      "occurrence": 0,
+      "sha256": "97446c7b2138f6c71c9f5b8176e2197ff0a7bc6d18d205c64cf9363e967aee72",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/coordination/LocalPeriodicGate.class",
+      "occurrence": 0,
+      "sha256": "69508b2f1630e77874c1a143307c1fa2d325be66677ac68a635afe1e81099be5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/coordination/PeriodicGate.class",
+      "occurrence": 0,
+      "sha256": "30951d47a6113169d5b7b514d8d39d7cb4d3160f24e0b634d510079df43c0126",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/coordination/StoreBackedPeriodicGate.class",
+      "occurrence": 0,
+      "sha256": "adc8c4a735f8c154912c02883e78a4a71fea7167f4ef9957541f558848f1a21f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryFlushManager.class",
+      "occurrence": 0,
+      "sha256": "a41af968a297625c79647a8c9335d977f062efdc8d1f4d12a7b2895f39521df8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryConsolidator.class",
+      "occurrence": 0,
+      "sha256": "0c586f4a443c42436bbc2731de7c08e71777a060e350eadd119f1d3936f41ec0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryConfig$FlushTrigger.class",
+      "occurrence": 0,
+      "sha256": "520a8593e6b84dcf5d396c41d7daad5b1b7e4871cd583d1772036ce91d1ded8e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig$TruncateArgsConfig$TruncateArgsBuilder.class",
+      "occurrence": 0,
+      "sha256": "d3055d8e2cc501020a10fd89b1fd87c14bf1feb2059799d2e98683b4ecfd3845",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig$PruneConfig$PruneBuilder.class",
+      "occurrence": 0,
+      "sha256": "4c2e1914faba187ad7116450116f4d69f46b5c683080e88b6515e3947e13b4a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/ToolResultEvictionConfig.class",
+      "occurrence": 0,
+      "sha256": "1eb63268567b6a9fede06c82d9c868d511d6090ac1e9e7199d7242c8f45f906f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig$TruncateArgsConfig.class",
+      "occurrence": 0,
+      "sha256": "c70d86369e8a3a13d2fc4e2c3c120701381ff8ff444854de7385263a8e722e10",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/TokenCounterUtil.class",
+      "occurrence": 0,
+      "sha256": "88ecedb3a04e6b82629f370810c593c49185902309ef0b8a06c7e835e975f5d2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig$PruneConfig.class",
+      "occurrence": 0,
+      "sha256": "e57f0bda79b2c3e65dd6a546643439eaa044032d4569a50e4f6fd1e3879b2a02",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "64d660054ded54b7a9225010d3d58710ec573e489c19ca79f4dd6cf0a25ebc06",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/ConversationCompactor.class",
+      "occurrence": 0,
+      "sha256": "953b8b0f940bab9731af4b818447124343f414929cab3786384b61203650b278",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/CompactionConfig.class",
+      "occurrence": 0,
+      "sha256": "636e057b404d561c946d313af57767061d340e72b375f49b3c270bcef69b2983",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/ToolResultEvictionConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "0902538632c4e1374510c627c45b0ba83b3570ce092726cef218fa798adee966",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/compaction/ConversationCompactor$1.class",
+      "occurrence": 0,
+      "sha256": "4ea15ff11c08936d0f073ed19c9f392bef7a661485f63ce8203ab1f2aafc13a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryConfig.class",
+      "occurrence": 0,
+      "sha256": "75918621736bd25863dfd34db0bcfe19072c7b7cfbd155b7de64ea0568cbae4e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryBackgroundTasks.class",
+      "occurrence": 0,
+      "sha256": "62664445f5c353f0ad3a29e0e0216b48c890cabc39646edd088a3b454a0c5331",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryConfig$FlushMode.class",
+      "occurrence": 0,
+      "sha256": "3933ee851f533e35e3539422fdf785cece44cf8a6cb3f254ca7f5b71a209a0b8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/MemoryConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "8fc3154e909adf87c501809170b386a50b09ff613da44ad4be21421d08d6d354",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry$ToolUseEntry.class",
+      "occurrence": 0,
+      "sha256": "45eea74d77b98c92984204b7e4e5ca4136721425492de759215433d903957556",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter.class",
+      "occurrence": 0,
+      "sha256": "be509a952f3251dbfd6bd8230f641bf8b393b0f221cf1a56bc9d65f78bf0a30b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionFreshnessEvaluator.class",
+      "occurrence": 0,
+      "sha256": "e8e48d2441c989eeb8808a3b605755a001408eb694221300db108a1b8f0ae47e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry$MessageEntry.class",
+      "occurrence": 0,
+      "sha256": "745227379733b12198de52e8694d977ef99c02ac1e1471459c3d63a39ff2e366",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry$ToolResultEntry.class",
+      "occurrence": 0,
+      "sha256": "b4902bd0551704a68044539fcbe844e10689d026b74ee65f9e1bb820f065c6fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionTree.class",
+      "occurrence": 0,
+      "sha256": "ba0e5ae17b3d881c622491e990b50ebf5d31e193a6dd056eb640faae35d991cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry$CompactionEntry.class",
+      "occurrence": 0,
+      "sha256": "36431ee61ef81bfbee59e9f7f7ec25d9aef2e6f81217e22980b67273472a5471",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter$TruncatedOutput.class",
+      "occurrence": 0,
+      "sha256": "d0fe99678075f3e914af9482ab14e698da76fca035a9da97608cf35c2b248410",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry$SummaryEntry.class",
+      "occurrence": 0,
+      "sha256": "b9cff61b71b7b7afaf87e81cc24251a4cdfb2ea1d930694bcfdab0b070b203cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionEntry.class",
+      "occurrence": 0,
+      "sha256": "a8b36f56c4d3ab17622b42aabd699ec6c3088c3f9d501f6e74eb714498c0dad6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/memory/session/SessionTranscriptWriter$TruncatedMap.class",
+      "occurrence": 0,
+      "sha256": "0583b1d8708b964b1db1862d93b9ada403449cd0e2da97889caf93702ef75b33",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/RuntimeContextSkillRepository.class",
+      "occurrence": 0,
+      "sha256": "513a3435f19b903bc7838ef395a2b2ee4b162b8550ac4027953b07964f731915",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/SkillResources.class",
+      "occurrence": 0,
+      "sha256": "9ce99e10ca586c4255a0f00509e6996efbc85ddff193b1aaedc7f01c452f9541",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/ShellPathPolicy$Mode.class",
+      "occurrence": 0,
+      "sha256": "bb36e901640174d729a6fbcd3860393475017216837e4a5715e4dbd6cb95668c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$None.class",
+      "occurrence": 0,
+      "sha256": "032b758dcbe5e70a181e998ceddb31c977975ca63cb42466e45252b5c7d8311f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$Cached.class",
+      "occurrence": 0,
+      "sha256": "4d7af4bdd80f8622d39b31c6511590d89a322012c70e9512af7ad82c8d0d0ad1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/ShellPathPolicy.class",
+      "occurrence": 0,
+      "sha256": "7244c5234d343e07f5c0775112f4e3e0ff5cd5b13767da9affa3c28c64735ee2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/001.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$1.class",
+      "occurrence": 0,
+      "sha256": "41f92f5f65cc727756cd0495a15e110c0f14d72ed6bf4a804a333dc5907fd5fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/SkillPromptBuilder.class",
+      "occurrence": 0,
+      "sha256": "3c4e7e4846fb71d6a6ff1fc35bda5fd205b41845a2a9e407b10760bef2862734",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult.class",
+      "occurrence": 0,
+      "sha256": "538a147cd028d23afb75178efb62a39d2ad417bd508cb82087f4fc87ed6472e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/SkillRuntime.class",
+      "occurrence": 0,
+      "sha256": "c08744b72173e8a2f0a3def939dd5758c480aeacaa01dd3873ba70685c5339b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$RepoBound.class",
+      "occurrence": 0,
+      "sha256": "4031fa57dae3f7afa0d5716f22512d1e854088ccd72a8cc95fa7938da79f1b31",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/SkillCatalog.class",
+      "occurrence": 0,
+      "sha256": "7bfee5a41b0d0519220fd30dbdfb7592528bc5820d4e85717b7c1a2900b468a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/HarnessSkillEntry.class",
+      "occurrence": 0,
+      "sha256": "36c505c734e79dd5de1d0b32a6b2e2fef6019ab7daad8a4cd460fff827c3077a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager$StageResult$WorkspaceNative.class",
+      "occurrence": 0,
+      "sha256": "4d9c81a3c64c749b3a0719351d02e4200d509d12de162cc580c062e849b9d07a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/MarketplaceStager.class",
+      "occurrence": 0,
+      "sha256": "92fb011a20f398e6ef0e371e7f73eb4ea8da484fc0fdcf30c49503ee6fd6a413",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/runtime/SkillLoadTool.class",
+      "occurrence": 0,
+      "sha256": "a11706f5a11beeda59e8bf3516a8f704baf70591df9cab469f144f6fef10e4c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/LocalApprovalGate$Prompter.class",
+      "occurrence": 0,
+      "sha256": "b3fc9cdbdb4eb54c664481b2047a782fa777c7c8495b0a1147e8ef2f1dc48768",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/AllowListFilter.class",
+      "occurrence": 0,
+      "sha256": "7c87f147bb6bf7fe68455105f2576bb4df36bde1128f0c6e8abac0e3c6ed2775",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/EnvironmentFilter.class",
+      "occurrence": 0,
+      "sha256": "88d4e4d14aa95dc7b77c1a18c7e3f2e02b9b1d7ad8fb7620dd730d5737d821d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Rule.class",
+      "occurrence": 0,
+      "sha256": "c1d5643da0b0fb6b85c6e6eb25ef40793fbd8ce48639007fad1bce72321725df",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillVisibilityFilter.class",
+      "occurrence": 0,
+      "sha256": "a264559bd88686f82aa7aebe72f1d1886c3ba548619966e3389304f079904bab",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/LocalApprovalGate.class",
+      "occurrence": 0,
+      "sha256": "690d55eecb2d7db73cedba92cc45a46312fe4102125cb4174e489b75c35e9021",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/FilesystemSkillUsageBackend$1.class",
+      "occurrence": 0,
+      "sha256": "92a334a32eea365e27d8a9728e61fb6c4912cf8643b753fca1ca0a80a091284c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision.class",
+      "occurrence": 0,
+      "sha256": "75a1a9788bd168e4449fd73140ddde9cb582a2acfb70fd8349eddc657cd5ac66",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$ScanResult.class",
+      "occurrence": 0,
+      "sha256": "bc2487695731318b50f20bc80738c15f049102801b27a566cd98de7ae09f1039",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillAuditLog$Entry.class",
+      "occurrence": 0,
+      "sha256": "0c874bac58e141d65dbd4d0cd15903a4f6a7cd1b26addf39f964be38fcb993cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/AbstractAgentCreatedFilter.class",
+      "occurrence": 0,
+      "sha256": "c54699171d3a9d599afda9ce3301ec57d12e118681bdbf9bdc5f28968920d060",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillUsageRecord.class",
+      "occurrence": 0,
+      "sha256": "2b552b82cba382182977c928d848eccdf371be07259c0de62cb6a57c9581675a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Severity.class",
+      "occurrence": 0,
+      "sha256": "4d0eb4ba88a20c525a72eeaca06732f5433b9f8acaf496715bd4a9eb03100d03",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCuratorState.class",
+      "occurrence": 0,
+      "sha256": "ce5dfc4d19ef73310b4a98df46fb8a68ca68cd25e3d20c0b0e0e8b0cb97a78c5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillUsageRecord$State.class",
+      "occurrence": 0,
+      "sha256": "77e4b2fc73a2d919284be289c1f77af168ad860b236fd7db6c8d54bb63e0e251",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillAuditLog.class",
+      "occurrence": 0,
+      "sha256": "37364d0d8c6dde7e3094d0078cbf18da212db18465533b97379680e5f1c7dbdf",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCurator$CuratorRunReport.class",
+      "occurrence": 0,
+      "sha256": "b5ded72cfc8c4f88b4a727fd59cd5e54bca9b96b270f99ee8d261d79635a6300",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/FilesystemSkillUsageBackend.class",
+      "occurrence": 0,
+      "sha256": "81801511dbc70be6648249eb79ae51187128516e1d78c38134173f7eb5c5872c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Verdict.class",
+      "occurrence": 0,
+      "sha256": "aef5342db63b2f281f3d923a5af057ac204b723fade71d8ef3617e3d03d687a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Finding.class",
+      "occurrence": 0,
+      "sha256": "9552ecb5738d89d19f0acd3f614e9862db080a2daea1aa07d50c24bd1b989fda",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "7943858f3feeaa2a3e1097766693e5d1f850ec009a8c5cc256786e8e705e8989",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig$UmbrellaPassMode.class",
+      "occurrence": 0,
+      "sha256": "4ec3953d7a3a73c2bc92bb8e2272416c9f191b481277cd4349a63cd1225e9961",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Reject.class",
+      "occurrence": 0,
+      "sha256": "2106cf38507bc12d4e83e661483e887612c637380d53be63045556d0ccdcfcfb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/RejectAllGate.class",
+      "occurrence": 0,
+      "sha256": "9a49ee5270d758af4dafab4e5a088da837e8e1ab43dd785e5bf55132ea2e01bb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCurator$TransitionCounts.class",
+      "occurrence": 0,
+      "sha256": "baa82d518bf8de056d7bba343320dae75cd64ed684c24bbb3da923feb4aebfbc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCandidate$ScriptFilePreview.class",
+      "occurrence": 0,
+      "sha256": "628c5da40a5de4efbd0c6acf79e710a9637867337c096a9cef1a01351b24a36c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/BaseStoreSkillUsageBackend.class",
+      "occurrence": 0,
+      "sha256": "4c2b7b236ac564726b02cbf1f23be1552d818832385c7313e9ece524bcb4f9dc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/CanaryFilter.class",
+      "occurrence": 0,
+      "sha256": "1f3357403af4357c7cd0281d5ea10ec3b7484d01ccdf813df098c306a9e24da5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromoter$PromotionResult$Status.class",
+      "occurrence": 0,
+      "sha256": "7286cb02a5b23dac1e5c44bf7a107cdfbcc36c110f1c4f680012400e187f6df1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/CompositeFilter.class",
+      "occurrence": 0,
+      "sha256": "1144dde37e454ca999e6fc3494752ba343a642ceeb4c19d6b609a10a33620709",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillUsageStore.class",
+      "occurrence": 0,
+      "sha256": "c164e87f2c61c3ad7148fd66fdc44e115f083710c34c6734ab59b0e268064082",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner.class",
+      "occurrence": 0,
+      "sha256": "e3013c40e27fc589685d007424a31d648338a0197dade774d3bbae4915f3854b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Defer.class",
+      "occurrence": 0,
+      "sha256": "4ad52d2672af021ad6c8774c6556925d86e92cda93da54d75fa5eb14ddd7c9ed",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillUsageBackend.class",
+      "occurrence": 0,
+      "sha256": "6cc46ddd99454c073037f589339be881050b1aa48b024bd5308ea6a512f6cd94",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$Category.class",
+      "occurrence": 0,
+      "sha256": "70c9c7a53674c98b7d3247d707eb07a51ab51ff96494f64395a5ac833b636c77",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/NotifyAndWaitGate.class",
+      "occurrence": 0,
+      "sha256": "73d907f1227dd66717e86b77605e7253e266c5a7edd15ba9c3259ec44d293486",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCuratorConfig.class",
+      "occurrence": 0,
+      "sha256": "46fddda8b80e16e5d6037e1fedf826f636cadc5a036fe039892bdbd31f4b58eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillSecurityScanner$TrustLevel.class",
+      "occurrence": 0,
+      "sha256": "42e6d5ffd2b05f180d44cbadf66bbd75eed2c63ff13cab904ae4ae6452fce3a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromoter$PromotionResult.class",
+      "occurrence": 0,
+      "sha256": "2411cc7f631f4e2e11b6bcd79781805839e54baea5ca602f7e4722ea5e662f71",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/NotificationSink.class",
+      "occurrence": 0,
+      "sha256": "d529e5d4ca09b6009afceacf36d25667c017ac88d17cbc7947dcc3082d3ea2e6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCurator.class",
+      "occurrence": 0,
+      "sha256": "ada23576577236f793732c81ba25e5aa2e2b6e95c9465b4851ed671c8b49b1ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromotionGate$PromotionDecision$Approve.class",
+      "occurrence": 0,
+      "sha256": "0e3643d6177e08c95fb9957c357f9821e066adf874a5010c5a2799a49e8d2178",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromoter.class",
+      "occurrence": 0,
+      "sha256": "9f1349d3b2e8505f9779056c7f75b761d5afc99f03b1a2c7d8d312182a615ef1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillCandidate.class",
+      "occurrence": 0,
+      "sha256": "a407d5e39c4a16d57265ff5aaaabd199329989bb9d627ad9b3e0228e8be56903",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/SkillPromotionGate.class",
+      "occurrence": 0,
+      "sha256": "bb1b1ad063a9ef23b1da5dcd0c4afce2a8c4efce57448d70d163438114c15d6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/curator/BaseStoreSkillUsageBackend$1.class",
+      "occurrence": 0,
+      "sha256": "f699b3a2d0b2956debfdd33e377a483a80c7cf4fd97ea57409ccf98480cbc8f0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/WorkspaceSkillRepository.class",
+      "occurrence": 0,
+      "sha256": "c3bda9946239c7e75a87321bf5fb237f8bcbde07f19f7db9c9af6b78afe88450",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/EmptySkillResources.class",
+      "occurrence": 0,
+      "sha256": "08038655ad3b5b4fd52b177cc7a05947da1dd8d14f5486f0fdb6bc60eeaf1885",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/LazyResourceCapable.class",
+      "occurrence": 0,
+      "sha256": "1dd729fdf62af46a64cdc8a95b16c3171a2ad4fa1419d4b908cd52223a599d04",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/skill/WorkspaceSkillRepository$FilesystemSkillResources.class",
+      "occurrence": 0,
+      "sha256": "90e2f7963b886e147a617e0919b4a24ed703ef250bc0c8f1d17176629d60eeb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/transcript/FilesystemTranscriptStore.class",
+      "occurrence": 0,
+      "sha256": "abb86882622aa2c457d6c5d3f05a67ace5777c70ae8cfb857c6d0c8f52d7e77a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/transcript/TranscriptStore.class",
+      "occurrence": 0,
+      "sha256": "c3ca5d77ddfdc66b9c0b8a63ffd76004b1d335aab0004d88573faca0591909fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/transcript/ObjectStoreTranscriptStore.class",
+      "occurrence": 0,
+      "sha256": "650079baf047be1995dbd3fd831086d838d0ce3687151181087258e067ca58b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/transcript/TranscriptStore$SegmentInfo.class",
+      "occurrence": 0,
+      "sha256": "68d2a9462a764701479c8d0e4dc0eb0e2c876cdd0fea82c6f25b5676cf1ddb50",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/transcript/TranscriptRef.class",
+      "occurrence": 0,
+      "sha256": "06ba56474f93b64694b0eb4ac51f75c9d41a65ec45b24d6327e9fa3582e49d59",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/PathPolicy.class",
+      "occurrence": 0,
+      "sha256": "122e2e79a84aa0225b288b0252cf70b980e72c71e815d361e676b3926416b394",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/WorkspaceIndex.class",
+      "occurrence": 0,
+      "sha256": "30a88b4afddc50b79932325343056e1a5f59134608adc9ace7bdc036f9f41c48",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/WorkspaceManager$1.class",
+      "occurrence": 0,
+      "sha256": "7979e46b8a1aef0baef1137aa449c20d8d855ba2c00de3cfc998361095673d79",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/plan/PlanModeManager.class",
+      "occurrence": 0,
+      "sha256": "b430293904e50ca08434b10da3287dfbd0593744d25b83b04ccd38e36cf92c3a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/WorkspacePathNormalizer.class",
+      "occurrence": 0,
+      "sha256": "dac17d1a9956c70a1e0833ba1e6bf9899cc437eb1fbfb29e4bf43e529cfadac8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/WorkspaceConstants.class",
+      "occurrence": 0,
+      "sha256": "7a99e006482d031eaeec28019e9d96daafee6e8c5707bd6f633d5d0bbbc14a38",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/LocalFsMode.class",
+      "occurrence": 0,
+      "sha256": "56bc81ee4a3168cec2c68c8bf936e2c3d45fe4b1aed49fc65ffe2391d992c1c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/workspace/WorkspaceManager.class",
+      "occurrence": 0,
+      "sha256": "f031a686a08d5fb4db4692b9b6ba12385dbb70add8e031e3aef9464dba51ed47",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/DistributedStore$CompositeDistributedStore.class",
+      "occurrence": 0,
+      "sha256": "90022de4c4ec1eefd2172193e0ba3622061187c7bd0724df42814894c7599dc9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/BusEntry.class",
+      "occurrence": 0,
+      "sha256": "2a46149946b8e63698a0f8dea011711934375567df3a30c432468e7eaf7d7c6b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/AsyncToolRegistry.class",
+      "occurrence": 0,
+      "sha256": "d47f34ee12c1429dee57ef67cc41dc6407f10fb4676970b9996c92c93b2fbc80",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/WorkspaceMessageBus.class",
+      "occurrence": 0,
+      "sha256": "438f5e6dfd45db0f40038a48c45417fd9d0256d5f5c296e9e739564917bcdf2f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/WorkspaceAsyncToolRegistry.class",
+      "occurrence": 0,
+      "sha256": "80f58631d47fc55b6006b080f7e34d6ceebfe866d3dd21b4c2ed89d198065b7f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/MessageBus.class",
+      "occurrence": 0,
+      "sha256": "7a43fa018a7a3196f5cca42164e09d904bb0e691b62e30dfb9da123851277c6e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/bus/AsyncToolRecord.class",
+      "occurrence": 0,
+      "sha256": "d1643383f9fbfa8e0be5536dc1d3afd59c8e62ed42006f8ca54024d507f4f49b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/002.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/util/FilesystemUtils.class",
+      "occurrence": 0,
+      "sha256": "c4cd64c000d5ce9c21da478b41645a63e9a2ff5c9a3c0d4edee73beb56d04bed",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/spec/RemoteFilesystemSpec.class",
+      "occurrence": 0,
+      "sha256": "75f0ede0da2691d3e55c8e1ab81d445cc1f4473b33c612fe91461d461d78912d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/spec/LocalFilesystemSpec.class",
+      "occurrence": 0,
+      "sha256": "5dfa6cc3e47321a15faa8dd301cbcacd26e458986356531c6a94ece702be5253",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/spec/SandboxFilesystemSpec.class",
+      "occurrence": 0,
+      "sha256": "253ed84982f11bd99e97046c4181039dc7c5846ecfc4e7650b0279eb0eaf24c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/spec/RemoteFilesystemSpec$1.class",
+      "occurrence": 0,
+      "sha256": "3ff6f986082edd342eebefffd3fb59b5ef4fb477efe74a30cdc36fde04fa9da3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/OverlayFilesystem.class",
+      "occurrence": 0,
+      "sha256": "04bcae3c4efc0c5c892845f91a086b89954944d6ef659d6d820305a575f2d290",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/CompositeFilesystem.class",
+      "occurrence": 0,
+      "sha256": "5cbffe7eef151d0b02bcc34f500779c2c6ad4ef4b3a2c78e42cc4ed2ef88e987",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/CompositeFilesystem$RouteEntry.class",
+      "occurrence": 0,
+      "sha256": "9ed50efff305e6b099797d19b38973d8257658a9ff92f3e6c188eca99faf96db",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/OverlayFilesystem$ShellAwareOverlay.class",
+      "occurrence": 0,
+      "sha256": "0c0130432ea1bcc8c1303fe1372e45e91a7e9f53381a5c1331f199bcddb53a1c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/local/LocalFilesystem.class",
+      "occurrence": 0,
+      "sha256": "0e3142424f2278922e069c03cb454d3b38ddfd76fd9704d8411246b6eedb3fa2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/local/LocalFilesystem$1.class",
+      "occurrence": 0,
+      "sha256": "4ccaeca03d2a7e0e53dc75cb17439c90512a651deca2e855026606f106752302",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/local/LocalFilesystemWithShell.class",
+      "occurrence": 0,
+      "sha256": "77b2077c3ba9290f33089e5c6826d209154f8ed18cd4556292c9d85bae788d08",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/local/LocalFilesystem$2.class",
+      "occurrence": 0,
+      "sha256": "c635cea3b6bc053bc662e31d620e64f779518c8ee6cd6b4b5bed91979f202204",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/ProjectAwareOverlay.class",
+      "occurrence": 0,
+      "sha256": "84d33a2f7efadbf66acdd1215f5b9785b5b6855ffb148827f27056bc887deb88",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/sandbox/SandboxBackedFilesystem.class",
+      "occurrence": 0,
+      "sha256": "af2a993fbcb3d12a148eac1391d9558c514f98010e1d6657851b4011ab08fe2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/sandbox/BaseSandboxFilesystem.class",
+      "occurrence": 0,
+      "sha256": "e368b0bb1096c82687d8a4b99ac8d0fb345d7d882676c5d291a0071cce97356c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/sandbox/PinnedSandboxFilesystem.class",
+      "occurrence": 0,
+      "sha256": "bc3c5e88ca4dedea493c7a311f577b065f38cfea1baba885bb276f1f1af41a9a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/sandbox/AbstractSandboxFilesystem.class",
+      "occurrence": 0,
+      "sha256": "1c0a4383c135267a3026b03dcd577c2790d5019a415221f49cb1b2c2d65a995a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/BakedContextFilesystem.class",
+      "occurrence": 0,
+      "sha256": "51b188d45ac40bdefaa513ce41a90f1d309f67f61278741683f024858aade616",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/FileData.class",
+      "occurrence": 0,
+      "sha256": "c2462aae3853d7af0eb91553402858786185a3fc3dca339f647c6d2c22d5ff68",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/LsResult.class",
+      "occurrence": 0,
+      "sha256": "e6c29cbdb3f9c6dcaa9011b8e79646fbc7b79ecf22dc636daad8f496d32e9840",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/ReadResult.class",
+      "occurrence": 0,
+      "sha256": "2ec00c8048b905180255aa0e1f091eba8ce10be5ca229b29ac1be5482348b69c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/FileDownloadResponse.class",
+      "occurrence": 0,
+      "sha256": "c5c93ca26d4b4b59ae1115cf1f16412b82a1a0c019b8699acb29e31abe3d02b8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/GrepResult.class",
+      "occurrence": 0,
+      "sha256": "181e7fa086caafa070853367d2b7638f8c8b25d141d020e3acbadba7df339687",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/ExecuteResponse.class",
+      "occurrence": 0,
+      "sha256": "a13b7458eddacdcbbff613b28c36d95845e3c66efcdc82c85104058e3f052652",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/FileUploadResponse.class",
+      "occurrence": 0,
+      "sha256": "0ad3271ef86c72d0043a1e558034fc36b1968504e83255ba0bdb27ac7804bf59",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/GlobResult.class",
+      "occurrence": 0,
+      "sha256": "d4b0e3bf6e28333ff7b71b9e23ac2c86f37b9625ac773239ad7476a3ba65314a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/FileInfo.class",
+      "occurrence": 0,
+      "sha256": "8cfbdd5445006fe5a5091ff58d0d2067f3a1fe19f4a39fc60b9983740a7cc073",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/GrepMatch.class",
+      "occurrence": 0,
+      "sha256": "d6d3e9e7c927eb5be1c087c10c80971eb4ab6d5dd852ce50a428744226be3fa4",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/EditResult.class",
+      "occurrence": 0,
+      "sha256": "614eda22ba95ab611dc549ab19f8f46e3462b160d1fef2e9e05a05e86cf4d5d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/model/WriteResult.class",
+      "occurrence": 0,
+      "sha256": "c4cdb127bde9cb410300f7f23a970a4e1081ed3ad99b7b3e3d72cf946b0f7350",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/RoutedSandboxFilesystem.class",
+      "occurrence": 0,
+      "sha256": "1cc0b575b751731e0546a7daa3eb8a4dd79baf9fd5f107483623991f19077a8e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/AbstractFilesystem.class",
+      "occurrence": 0,
+      "sha256": "6ff5c6f1d4620c7a3052ea823b935746447df7997399bcc06c745f1ba923c99f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/CompositeFilesystem$IndexedFile.class",
+      "occurrence": 0,
+      "sha256": "37574ae028239b6baad2e8dc8e972951cd42f71083508619557ccc708ebb0bcf",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/CompositeFilesystem$RouteResult.class",
+      "occurrence": 0,
+      "sha256": "9bfce094fff75e7cea752afff23e055a382376276355f30a872d2bc923911d43",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/remote/RemoteFilesystem.class",
+      "occurrence": 0,
+      "sha256": "dcfd80d291f1914542b32edfb80c6568fd4f4cd5bc9a8526834f947254628756",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/remote/store/StoreItem.class",
+      "occurrence": 0,
+      "sha256": "0089bd532fb45c478ed75e6dcc3aa548a4d448453982c9673591b08a4ab60022",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/remote/store/NamespaceFactory.class",
+      "occurrence": 0,
+      "sha256": "d196eed15a45fb7df9f4e86957e9f12cbc2e35ac5314d4226dedbde99ae0e79c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/remote/store/BaseStore.class",
+      "occurrence": 0,
+      "sha256": "16f51417937b5692e306bebf59d1eb93787bb715d99d2dc195dd119e77cdfa90",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/filesystem/remote/store/InMemoryStore.class",
+      "occurrence": 0,
+      "sha256": "088bbf8eaa015f587402bdae0707a21b1fa344e992224fec732602ce0aa51c16",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/HarnessAgentBuilderSupport$SubagentFactoryEntry.class",
+      "occurrence": 0,
+      "sha256": "edd03e0cb480dddfad11e9a4b12fdaa8ac65566d8009f6078143ea849773a6a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/DistributedStore.class",
+      "occurrence": 0,
+      "sha256": "f92b4ed85fab0fd8127ffb82aa568c20e7cbb213861719e7cc08cb474c8e4328",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamMemberSpec.class",
+      "occurrence": 0,
+      "sha256": "2cb51601a347bb251dfcc3cb72d59494eb12049fc2791a67b596236c2873d1da",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamConflictException.class",
+      "occurrence": 0,
+      "sha256": "a4150cc81e5978951d5f5a17514fb30b00cc486a44557c47779e2adb54aa38bb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext$InterruptedTask.class",
+      "occurrence": 0,
+      "sha256": "ee760b1e9b2db68195517549b3abffd21a48084b7d2c5467eec4a6246e35c758",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext$CompletedTask.class",
+      "occurrence": 0,
+      "sha256": "53fb591d17d23dcbf851964b5cf4601dd358a711a42b71ca0a8f2b8a151253ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamTask.class",
+      "occurrence": 0,
+      "sha256": "33ec2a11fad67f0d18773608809458f7af74237bbea5d5d2046718239e074cae",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamWakeups$Hook.class",
+      "occurrence": 0,
+      "sha256": "1e40d26c9880dfee58e285e95e38cedf278eecdb7d15aac927e88a8eaf7a6747",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext.class",
+      "occurrence": 0,
+      "sha256": "11e75c974ffe6f9288c774e0289bd7e54a52927c20216e6524266c639bf7d3c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext$RecentMessage.class",
+      "occurrence": 0,
+      "sha256": "ef96ea4c563085d793864c53fde99fb2706c264d0bb82ec1a50dbc0479853ec1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext$RecoveryContext.class",
+      "occurrence": 0,
+      "sha256": "1c4e61c05c27f4213c1d6ca54a52efbdef65ff6fa69c91f9765ace3aef8da1dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamWakeups.class",
+      "occurrence": 0,
+      "sha256": "2874b63f89f78ed1340e2f2f3d964f625741cba3c96f770323704ceded56dd41",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamMessage.class",
+      "occurrence": 0,
+      "sha256": "77eeee538135a4e40d1c61c5fed5d5cf3422bd4ce0638c7ebed39e1930d8a8c0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamMemberInfo.class",
+      "occurrence": 0,
+      "sha256": "10e073622e082681a855316f296b23712dd1bd415bb0bdb453d059040d6d4c16",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamInfo.class",
+      "occurrence": 0,
+      "sha256": "ac8a9fab0cf04a71169a806ef49a3374573e3abbb280b29f95e501cfb22b64fe",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamClient.class",
+      "occurrence": 0,
+      "sha256": "0015e557d4d06416b230c7af56720d02ffc1b02d595bed14478b2ea79d3d0d42",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/LocalTeamClient.class",
+      "occurrence": 0,
+      "sha256": "fdb7c2ea582cd7b98d440b3c0a945030fd9f586b1eba0239af872b2118f0bd2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamCreateSpec.class",
+      "occurrence": 0,
+      "sha256": "4136f849922d6658a5a659bada01c7a02eda695496b2b93d94689b5a761f07a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/TeamContext$MemberSnapshot.class",
+      "occurrence": 0,
+      "sha256": "b696dd18e4811325a3e60bce8c47484ecd3d20d11b9e08160525cb9cc07c1259",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/team/LocalTeamClient$VersionedTask.class",
+      "occurrence": 0,
+      "sha256": "78583cff4ff96bf5cadaecab25658c18b804b82486e7689f18dba90254039c45",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandbox.class",
+      "occurrence": 0,
+      "sha256": "afe0d2dd5ba3237fed1ebcfef738e0aae0b3ce0c5328a22000f968a905094383",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandbox$ContainerState.class",
+      "occurrence": 0,
+      "sha256": "d1ba4eae29580899a7c24095f45a1e320aa89028aaa9f666d258620381ba945a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerFilesystemSpec.class",
+      "occurrence": 0,
+      "sha256": "083077bb265375cb2796e40ea59010986bd11ad1db4d7c0a76464abb11588499",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxClient.class",
+      "occurrence": 0,
+      "sha256": "2e6aafcdd2e1125d778e0b5896294c9be437680f6bfde978ed3c72b1134d1781",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxState.class",
+      "occurrence": 0,
+      "sha256": "94cedcc2403ce34f7bcbc805706e887d28618ee95ecaa957321ffb76b7528d8d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/impl/docker/DockerSandboxClientOptions.class",
+      "occurrence": 0,
+      "sha256": "a5d9f951b6e9fa766d4c4a31ca7f125beb36a102d387175febfba3b799b64ca2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxFileTransfer.class",
+      "occurrence": 0,
+      "sha256": "b08af022db6e87893a80a868b707e855fdbdda333ee833f1b0fd6e5fa4bcb621",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceSpec.class",
+      "occurrence": 0,
+      "sha256": "6cd5a4710be82cf7e52574e244d0a94e2cacae97af607df1e5db42f5ccc73a3b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$SandboxConfigurationException.class",
+      "occurrence": 0,
+      "sha256": "afba58b1f47edc1f77973e6a3d51ecea25a12694dd3c30289498e7d58df9b5fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxState.class",
+      "occurrence": 0,
+      "sha256": "313971a3a2383083afe0cba1f006ddd6d0c1ba343a07dc33040b2dc9e38c3d3e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceProjectionApplier.class",
+      "occurrence": 0,
+      "sha256": "91c904e4533403261ff9411e02c4e66dec2ad43d56665ac35f13270a54601a90",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxIsolationKey$1.class",
+      "occurrence": 0,
+      "sha256": "0060d4018fc21c6e85f17c5891e0f03e6f218390c51895dc09e8dc1821f5b9c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/NoopSandboxSnapshot.class",
+      "occurrence": 0,
+      "sha256": "e2343811a7f2532773c093e0a112688adf3728925040051dc41520da8560ace8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/SandboxSnapshot.class",
+      "occurrence": 0,
+      "sha256": "ec5da2bb8db6e7c595f5cb176503655108a55137caed5af5293ada5dfedd2ffa",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/LocalSandboxSnapshot.class",
+      "occurrence": 0,
+      "sha256": "c29c0fd06c43997ab661e6e92b242b74fee9d45461bd19c8febc2e7783d932cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/NoopSnapshotSpec.class",
+      "occurrence": 0,
+      "sha256": "e2c8d50f34e1c69b27d90a7a8b62d762380f30098e8a0e54308ed3a48ae36caa",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/RemoteSandboxSnapshot.class",
+      "occurrence": 0,
+      "sha256": "1f3b05b3a7e2aa93758ecf9db535515b6dfe89e10c1a538a3a33a8d9668bda91",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/RemoteSnapshotSpec.class",
+      "occurrence": 0,
+      "sha256": "03d6f40d308f23fb2af5f3c744b518e8af8ba5709b3b7757f9496cc6c130db10",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/SandboxSnapshotSpec.class",
+      "occurrence": 0,
+      "sha256": "f34b22a005ab655175fefdd35a2423d51d49676743cc237f3176aa29adbccd1e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/LocalSnapshotSpec.class",
+      "occurrence": 0,
+      "sha256": "8bbe42610920b4bc0b889603cae3635fbba09ac32369c2f6604805d9f636e199",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/003.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/snapshot/RemoteSnapshotClient.class",
+      "occurrence": 0,
+      "sha256": "57a0faea39900f1fa067393a3af62f562e47c4c2b821816f19536fe5ef73a852",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/ExecResult.class",
+      "occurrence": 0,
+      "sha256": "24e273704531fe2cbd3a36684f4ace49c4bd3e4aa95a57df1a40b95fdd4c533b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/Sandbox.class",
+      "occurrence": 0,
+      "sha256": "8f04b42569db913b8e4a4a026a7da596f756cbf25f7e1f38d43f9c3ff055085e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxClient.class",
+      "occurrence": 0,
+      "sha256": "6cf5021cd16acbc944c0226fdd04dd6deb10f7e8bf1e3e9c89049b6fcf3be610",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxExecutionGuard.class",
+      "occurrence": 0,
+      "sha256": "239d25c0f1616ac53685daea812fb131f7b16994f62e126ed1851d1aef27bb2b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore$1.class",
+      "occurrence": 0,
+      "sha256": "e6309b74689334fae7072c30b1e4985d282c2b484bdea4baf5185d3b5a2fb237",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxManager.class",
+      "occurrence": 0,
+      "sha256": "42b4d90309412cc325e413283025409a02375d47768840a3290341fe2c003aca",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxLease.class",
+      "occurrence": 0,
+      "sha256": "6c2de3261d1e7837006fe39741d8c96866956ed0006ac0c9d5537e917b56efb1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/BindMountEntry.class",
+      "occurrence": 0,
+      "sha256": "63c788002266a3c3202bf0f1580528e337afd5742eaacfb8029c1ea121b91708",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/GitRepoEntry.class",
+      "occurrence": 0,
+      "sha256": "a2866182d8017dccebbe1639fb8aea17b5633af9bacb92b94e89b470a99fddd8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/WorkspaceEntry.class",
+      "occurrence": 0,
+      "sha256": "d25e2feaaaf955a54b3df477d293d6678e2de474e4b24fac4b98f728246743af",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/FileEntry.class",
+      "occurrence": 0,
+      "sha256": "cb0d1c504ef72ec2df6e7da4fc142ccedd75905ae0b611c8c58fcc03e511a8b0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/LocalFileEntry.class",
+      "occurrence": 0,
+      "sha256": "6d0b30bfa8190b238bbd8fe7e04ea8b728895064d7aabd20c75af183daeb9dbe",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/LocalDirEntry.class",
+      "occurrence": 0,
+      "sha256": "a760fdc6edb50367ed47803ece0e8e004044e897edf0dc3f64e6e20f965ecdca",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/WorkspaceProjectionEntry.class",
+      "occurrence": 0,
+      "sha256": "26390be5d49725aa32f2ca81eef8a8dce74aec6403bcd2db1e4b9c5535632a72",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/layout/DirEntry.class",
+      "occurrence": 0,
+      "sha256": "5381549aab8be4fd5f1c13d8d50f44dca98e1c255397618ee35d5099547871fb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceSpecApplier.class",
+      "occurrence": 0,
+      "sha256": "5c6f57cfce46a57ec9fc67db11977fcceb59edad6b859fd25dd5e8be4d592194",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$ExecException.class",
+      "occurrence": 0,
+      "sha256": "bc3e5fb8afde7f0816efe526b93bc71d46b783121974134af674991b80b85b4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$SandboxRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "6cfd3f750649581d070fd4a03864001b305b5f7900fa7c68289abfb168d53e6b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$ExecTimeoutException.class",
+      "occurrence": 0,
+      "sha256": "1b1676b134d98d5507a2be408722f92e3e18f83d44e313f6ebe8c3fe1dc81269",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxLease$NoopSandboxLease.class",
+      "occurrence": 0,
+      "sha256": "7ba738d5c829e17d1fb46ac99e57f50506627654e3c536d86a6908adb85750a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceProjectionApplier$ProjectionPayload.class",
+      "occurrence": 0,
+      "sha256": "884d79e1f864608612b1e1925b9d97b494a92fa920180141249f8ceb72371b06",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxClientOptions.class",
+      "occurrence": 0,
+      "sha256": "ed2a705a19d0ff12c565158a7e4d50d30ab79f5c3b2cf14a3bfb14e8c7a37914",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceArchiveExtractor.class",
+      "occurrence": 0,
+      "sha256": "07d713bbc0002e17413c8d5dfc936aec119b71248874546542ee2fb67ef525a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$SnapshotException.class",
+      "occurrence": 0,
+      "sha256": "de3fcfbb8f5555621449d949b0e6a3c61da36463f0c41d3d463cdf044740b187",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxExecutionGuard$NoopSandboxExecutionGuard.class",
+      "occurrence": 0,
+      "sha256": "06fba011e25db0f7f3b176acf3d586fc9590f8d47fadeee2a9212e1fc0b94ae3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxAware.class",
+      "occurrence": 0,
+      "sha256": "efb69d912c5a2dd344616fb3406477cba72757c00550a4fc146acfc2492a38a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/json/HarnessSandboxJacksonModule.class",
+      "occurrence": 0,
+      "sha256": "2b3ed33ef2edcce3e25cedf04368d40b3939cf18f10bb5b60a7c1b813e5740b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore.class",
+      "occurrence": 0,
+      "sha256": "ba0319589ca534b722f5e75ea5f85bb6bb9e11ebfa75269b15c5ece00ad361b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$WorkspaceStartException.class",
+      "occurrence": 0,
+      "sha256": "814c4f1faf6e5deb854e06dcbbc6beeb976eec96e825400631d9ecdcf7399d3f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxIsolationKey.class",
+      "occurrence": 0,
+      "sha256": "314030dec30de8f957bd46a0e70fdc6a5525b78db84d2e4f29abf00d1ca736e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/WorkspaceMountSupport.class",
+      "occurrence": 0,
+      "sha256": "0a1a240b85d5ace9edfc8cd5504c2c3a317624afa90ee823fa16365029b4c135",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException.class",
+      "occurrence": 0,
+      "sha256": "a587d8ca0681e7ae1c9f83a5d80d2e91e05ab8f6a54e29a44f87ee7ecb482c5c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxErrorCode.class",
+      "occurrence": 0,
+      "sha256": "fff74d33426e149044ea9a54003930beb36106964f6e41a64f1d6c03fad97206",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxContext.class",
+      "occurrence": 0,
+      "sha256": "1403cb034bcfab0ccfc9b20ea440bb9d8a2416f214812ebb27e233b1ab4fa406",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxException$WorkspaceStopException.class",
+      "occurrence": 0,
+      "sha256": "7fdbd2e9b2f30ff16c27f395d65e967286cedc2aec5b63d42558f4b65caa6038",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/AbstractBaseSandbox.class",
+      "occurrence": 0,
+      "sha256": "2196c7bdd8b000af52a88603b451163c0e845af4d0aa4fde4010c80cc9e0d72f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxContext$Builder.class",
+      "occurrence": 0,
+      "sha256": "e4ac1b68d2acf745c4029471bf8866a42b49dca93fa7346c238dce01d14d899b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SessionSandboxStateStore$SandboxStateSlot.class",
+      "occurrence": 0,
+      "sha256": "f0605ea77024e246b8051d5a714a69de8be307e9a15463a58d0487cdaef05e19",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/sandbox/SandboxAcquireResult.class",
+      "occurrence": 0,
+      "sha256": "dafe9f7837adbe10f781240b2a6c7c8c29a81554c31334ef424f62b0478a6396",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/HarnessAgent$Builder.class",
+      "occurrence": 0,
+      "sha256": "98aa8eee6e4e75276eede3efa1fa607878d87b867f17d22715b15bada3f71107",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/artifact/ArtifactDeliveryTarget.class",
+      "occurrence": 0,
+      "sha256": "f2d3453ae8e4dadfdeb0ac7ff83e7211f580587b31f13a6729fbe08d3b45f626",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/artifact/ArtifactDeliveryResult.class",
+      "occurrence": 0,
+      "sha256": "d99b3dacf9c0b4e2877394d9fd2769ab3951afefccee48ca96e05abb8cfd12e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/artifact/ArtifactDeliveryRequest.class",
+      "occurrence": 0,
+      "sha256": "d07cf698b037c2244bccd9791ea742b0c9c8c51abb9e378fe938084d2a124aca",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/IsolationScope.class",
+      "occurrence": 0,
+      "sha256": "a8768e0c5d6498f8832e7f2e55b48ba5c4f5ab1903b06f4a782d413e5aaf857e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentSpecGenerator$GeneratedSpec.class",
+      "occurrence": 0,
+      "sha256": "d2cdb97ff8f76304876a2c12637ce4b90343a86019839d5370fb041a50cf1b08",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentSpecGenerator.class",
+      "occurrence": 0,
+      "sha256": "4099e4ed8ece99e71faf43a317dd4f2e021ac4bbaec9b0f0019c3aaf560434a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentDeclaration.class",
+      "occurrence": 0,
+      "sha256": "130cc011ba2967e689f57a4e930811f2f3300403020e89d0e292835fc58eed5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/RemoteAskPolicy.class",
+      "occurrence": 0,
+      "sha256": "9b1db2d09facaf239e0bbac7f781362b30e237a99392a668a5ea1664b90aa418",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/RemoteSubagentStub.class",
+      "occurrence": 0,
+      "sha256": "fbd868d5f2eeaf8cb71b85f5ca3ec04065b2641bb5042a15dae4b00b80e63958",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/DefaultAgentManager.class",
+      "occurrence": 0,
+      "sha256": "3773cee213082c00cdbaa2a1188e77e627f980515c9cf6974333e9b94b3ff20c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteStreamDetail.class",
+      "occurrence": 0,
+      "sha256": "8a7d92a29d844f04cabb8501d897a1fb7501a5d2555eccfd55f29b642b953598",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteConfirmDecision.class",
+      "occurrence": 0,
+      "sha256": "0d633a40e70be67e260b092ff8a40c7826ca2b99d012631ff6670fba9daeec17",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteEventCodec$1.class",
+      "occurrence": 0,
+      "sha256": "a4ea95994c39c3406c15cb002e8b3cb48ac7bc6d8f17ed27658db76247c1a015",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemotePendingConfirm.class",
+      "occurrence": 0,
+      "sha256": "2f5ada37331b896298ff99df4722cb144cf6f9c13799235636641af90b475e9d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteEventCodec.class",
+      "occurrence": 0,
+      "sha256": "5f27f9923132cd1ae6f0c8e1b4cadfe211c90fb6afcb78d32d39f07c266083d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteEventType.class",
+      "occurrence": 0,
+      "sha256": "4a202545087f310cca9ab2a07e040052d7772225f52b859e417b52c86011a7ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/protocol/RemoteAgentEvent.class",
+      "occurrence": 0,
+      "sha256": "1f41fcbcd930c20e4b04749a7b7177721768310f7b92c5eaf7970481ca1d9977",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentFactory.class",
+      "occurrence": 0,
+      "sha256": "98f8cbc69de1b8fd8db2084cd04df32e1028593f5c99c65715d8faf4e6ec8b85",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentDeclaration$Mode.class",
+      "occurrence": 0,
+      "sha256": "9c40d9357efbf2d0dbac7826a81a35506aa3dfcf276c65688a39b8d260260396",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/AgentSpecLoader.class",
+      "occurrence": 0,
+      "sha256": "ab5e45ba46c9bf6b27664cf8883313e09ead3c5d172d662666dfc6cb803a9dab",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRepository$TaskCompletionCallback.class",
+      "occurrence": 0,
+      "sha256": "71388bad9e5351b7110a75e7f9b29e5cada62e10138ca8b5787e4cbe0bece5a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRunSpec$LocalTaskRunSpec.class",
+      "occurrence": 0,
+      "sha256": "6e2e4870527a617543cd12bcc83d3cbf070e29f23b2bd22927e51b0af6f2a114",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/RemoteSubmitContext$Builder.class",
+      "occurrence": 0,
+      "sha256": "5167b3032fcc90cf56fc0da7e38e6d5c5eadda9ab9e40477f224c39aa5fd50e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/WorkspaceTaskRepository.class",
+      "occurrence": 0,
+      "sha256": "e852ab1848dc929c1c77fd3dae927d34b9cea3079dcd33b90a585e56a9902072",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRepository.class",
+      "occurrence": 0,
+      "sha256": "63c59601d520084f16d1500857513ce7f64d72e8f9d970d544d04cfb692b1b45",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRunSpec.class",
+      "occurrence": 0,
+      "sha256": "c9fe4074e55a01779613daf8918f85b56f8418770220957a4092481d748a021b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskDelivery.class",
+      "occurrence": 0,
+      "sha256": "3807893696f4790a2e910e013fbc138ba9b98588a06f4c18dece0b368a41fe13",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/WorkspaceTaskRepository$1.class",
+      "occurrence": 0,
+      "sha256": "0d45a27d2ffbf8fdcc7a7f6e6cabd89880ff9631794428399d943708b999cdf8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/RemoteSubmitContext.class",
+      "occurrence": 0,
+      "sha256": "b62b7328f3ef63f960781f94e88b80ed0b1060ce8974bf5d972d7fd588ea1137",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/RemoteTaskStatus.class",
+      "occurrence": 0,
+      "sha256": "1ab8e455311803443d2dab34044234c045fd0457db68b4d40e2fd16af08278ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/RemoteSubagentTransport.class",
+      "occurrence": 0,
+      "sha256": "aadfb976e8ace00ecb8cfdfb3a5c8c64aee875f50112b3674960b6bb11bdebc6",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRecord.class",
+      "occurrence": 0,
+      "sha256": "43201292dd1b6541c374ac88ffc072799beeac72aa373a318508ef117bdc41c2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskStatus.class",
+      "occurrence": 0,
+      "sha256": "1dce58d4ac2e7ff1bf2c241090aef6c4b84f51f0d8351c47ea9d829ac6275740",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/BackgroundTask.class",
+      "occurrence": 0,
+      "sha256": "059b16e3ae48696d6b1d2985f7cdd0ab5e8e25267bfd3e04c4221542f07dbf5c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/AgentProtocolTaskClient.class",
+      "occurrence": 0,
+      "sha256": "b6dab3522fcc571e46c9f054a83751f2b820cbcb3e43e10967092f7df16a8c37",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRunSpec$AdoptedTaskRunSpec.class",
+      "occurrence": 0,
+      "sha256": "ee445b18c0d9a028a63af5286a5632c63d6def9718797a712e9d38219793bc21",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/TaskRunSpec$RemoteTaskRunSpec.class",
+      "occurrence": 0,
+      "sha256": "375c30d37198664d44659f8494da97147d19a43d2fc1988f16a57461c6311fb8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/RemoteTarget.class",
+      "occurrence": 0,
+      "sha256": "c25d5922cfecedc9f017359579eb2e0e37917e320dba06780bbcce75f6b216e4",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/task/AgentProtocolTransport.class",
+      "occurrence": 0,
+      "sha256": "f8e7ee8185e7c8fa9a4e72f1a5882ebfc5247d9280b0d340494f9e41f54d42cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/004.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/SubagentDeclaration$Builder.class",
+      "occurrence": 0,
+      "sha256": "9f29941a1717fecc5885f800f0b81e78f2c5c3619b44be80e670faf534063dd2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/subagent/WorkspaceMode.class",
+      "occurrence": 0,
+      "sha256": "fd969f21a3b685ba04d97dafe4439a0016eb9bdc86db3a9cfcf8ff4a7ac5eb41",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FuzzyTextMatcher$SearchResult.class",
+      "occurrence": 0,
+      "sha256": "638478f87a65fb28f2a48d26c9b5e47a2fc0327918c0a7d43e7f087fbd95cd02",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/MemorySearchTool.class",
+      "occurrence": 0,
+      "sha256": "d9a149c16c868465754fb46824f61630f46ef8638facf49661204e03679d56dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/AgentSpawnTool$SpawnedAgent.class",
+      "occurrence": 0,
+      "sha256": "7ff3bfa1cd1ae2060515d35563afeba4fefc0a5c0ad51c6ca022836734f0c964",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/SkillManageTool.class",
+      "occurrence": 0,
+      "sha256": "481bd369177f794db561356a647fb88230a091ed3dd71e2566140b2e0f2ac07c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/WaitAsyncResultsTool.class",
+      "occurrence": 0,
+      "sha256": "65a7222f65a26ba2a739d3c2b6e02a8b844ec5eec315f9e11a3c9e243ccd13d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/PlanModeTools$PlanExitTool.class",
+      "occurrence": 0,
+      "sha256": "38d1bfc451b33b45c1deb7f719104ac04165d41bacfd713e94b9b9426ad26a98",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/PlanModeTools$PlanEnterTool.class",
+      "occurrence": 0,
+      "sha256": "ed1ad4ac67e317de306b75908b94772a0f66df34ccba8b8ca8f0f53fb621ae0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/SessionSearchTool.class",
+      "occurrence": 0,
+      "sha256": "38c213a0b32ed4ed27d743c9bfbfd44c060dc2a4c82a5f7ce78a86afb42e3cbd",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FuzzyTextMatcher$MatchRange.class",
+      "occurrence": 0,
+      "sha256": "11df2798c937848accb87a31ef304189d124431efcae51e20940bbe354b70185",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FilesystemTool.class",
+      "occurrence": 0,
+      "sha256": "25ac0ed4a28b9c87d28d9f2ca6a1a6cb7be609b853dc4f0580c8d91d5f8d187e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/WebTools$WebSearchTool.class",
+      "occurrence": 0,
+      "sha256": "d6be37e76f897f7f47e41d624137c468cf824619f706994110b2fd102764a38f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/MemoryGetTool.class",
+      "occurrence": 0,
+      "sha256": "7d026a901faf61af2e9d0c5a61c406432f4da84495ad46c65b9c7b9e9c2d2cca",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FuzzyTextMatcher.class",
+      "occurrence": 0,
+      "sha256": "56b63a38920918e3ab5936f2624bb6890d41bfeb39f315eee1a4dc59a98bcb40",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/ShellExecuteTool.class",
+      "occurrence": 0,
+      "sha256": "94a4acf7b06c44fae262b925f9ae5a709ee7e319c1d00a5ad322176cef22c86a",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/SkillManageConfig.class",
+      "occurrence": 0,
+      "sha256": "d64384d53c52f62f3dd782dd2e51543e502ba8d9357a1464fb69cf387dbdb8cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/PlanModeTools$PlanWriteTool.class",
+      "occurrence": 0,
+      "sha256": "fe4c0408c353c2054c07bb02ad2194cb8661381bf774400c73019404c288f1eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/ArtifactDeliveryTool.class",
+      "occurrence": 0,
+      "sha256": "2170baacc2255724056e782017cea050a3c10cfcb87a4c616661b6ff4797bbd8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/SkillManageConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "a3096a17d36011ca03f2888b4fd0c10c1ba5dd711acc72ff47604e7e8dcc7b7b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/TeamTool.class",
+      "occurrence": 0,
+      "sha256": "ea5943af092d8fad34cddf849d12bd309c9899899d726dccd80b80bbb3c77d2b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/WebTools.class",
+      "occurrence": 0,
+      "sha256": "3644013764d1bedd64b68f331548cfb4aea4319c230be9df9da5a7e7a7477290",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/PlanModeTools.class",
+      "occurrence": 0,
+      "sha256": "5185a34364a17ab8a3cf62afb679b691cf131bc25468ee1089f0fc15c4b5ee74",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/TaskTool.class",
+      "occurrence": 0,
+      "sha256": "a2ff9dbd8e10e579ab4212fb93d445c52dff03443550ed47283825ef23f46526",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FuzzyTextMatcher$Normalized.class",
+      "occurrence": 0,
+      "sha256": "506827ed76da001896207bccc7776a8f7fb10a78650112b3070ccb1b631786e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/ProposeSkillTool.class",
+      "occurrence": 0,
+      "sha256": "6ee325da9b3eca0b2e5369ca8d92c7161976a310746d12ab37e19767d27ed9e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/AgentGenerateTool.class",
+      "occurrence": 0,
+      "sha256": "f5633e6577cd98edb469b476b14b0b6ebe84c6605adf0d4386525d78f147aabe",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/MemorySaveTool.class",
+      "occurrence": 0,
+      "sha256": "c452f320ddb2d24941fb71e94ce7fa104a89a841651e18dbd010220a86d7eef2",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/FuzzyTextMatcher$Level.class",
+      "occurrence": 0,
+      "sha256": "16780d339a4e0a05c2f332c328109b0248ac971b8f5516ebba0f6fd4b7310057",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/AgentSpawnTool.class",
+      "occurrence": 0,
+      "sha256": "1a9b46693dea60d8841161540463bd10fd9674165abf84a5482e0864836ce757",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/tool/WebTools$WebFetchTool.class",
+      "occurrence": 0,
+      "sha256": "18f76416b756623a1cc740587d6a3cf0b0dfbdbcfd75cc7baa754bbdfe99501b",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SessionTurnGate.class",
+      "occurrence": 0,
+      "sha256": "1aecd4693e7d7b558cd1e6a82d6c3a443d12c7935b432704d6a48e6fbfb4daef",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/GatewayBootstrap.class",
+      "occurrence": 0,
+      "sha256": "866069690fdf28f6f6fdb104c74e1ed940cb30a153b75540ac37b39a43df83c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/MsgContext.class",
+      "occurrence": 0,
+      "sha256": "37463b330fab41e369c8cc4964f21b338ce4497343d0157bb9f7c93910f22b9c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/WakeupDispatcher$WakeupTarget.class",
+      "occurrence": 0,
+      "sha256": "4876154277d40e8384c8942d212f25d2b451b652f368a83663415c54483c6de9",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SubagentGatewayBridge$ExposeResult.class",
+      "occurrence": 0,
+      "sha256": "ad0723a5993669a89c781e0ebd9aa7bb328b0cfa4bcb4223f3a52cf3be6d1b35",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/Gateway.class",
+      "occurrence": 0,
+      "sha256": "a024f1ef19790ca2f7d806b659aca4195dc3de64b5a035ad0b95d119247c3540",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/WakeupDispatcher.class",
+      "occurrence": 0,
+      "sha256": "78308c23f337aca95b24e79f2fcccbdd10563fdc331801bf0eb6e268782b55e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/GatewayBootstrap$Builder.class",
+      "occurrence": 0,
+      "sha256": "0b6594cd989e901303e29de601670c8ebf8303baa6d5bb4b831518c814c40d70",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SubagentGatewayBridge.class",
+      "occurrence": 0,
+      "sha256": "f5d455ba3d94aebd2c2bf7adcf49e2048a4a306067b5b333b6d42249a5a3b441",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/TurnBusyException.class",
+      "occurrence": 0,
+      "sha256": "6209fa04fd704573b1b322649811a9f2e507bc228a1bb8c6f568681e29f9b97c",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SubagentRegistry.class",
+      "occurrence": 0,
+      "sha256": "030fc78a5453f4997e0440f1e87ad78e5967e71683c0f29349cf95f5d4bde1ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/ChannelManager.class",
+      "occurrence": 0,
+      "sha256": "a3c18c203f57ff0a3a2a9331469e8af2ae4f2f1dd76fc6a08fc1e35062511ff0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/HarnessGateway$1.class",
+      "occurrence": 0,
+      "sha256": "d543164b97f8e065c4bda6c5f36a7ea1bff219acf39d460a8f5bfd5c47eb8501",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/chatui/OutboundEnvelope.class",
+      "occurrence": 0,
+      "sha256": "a24729abd6ec15fd138e0775b1d4c466ece0c1c370f0435af34c8496431f1697",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/chatui/ChatUiRequest.class",
+      "occurrence": 0,
+      "sha256": "035d078209728f340e29f27e3c9accc5bee5746c756b5a95063dbdc364ec5e0e",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/chatui/ChatUiChannel.class",
+      "occurrence": 0,
+      "sha256": "fe0c0a70a5ee62286e4d1800a5656c7799dbd902aa65f69dca91d64e350667ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/chatui/SendOptions.class",
+      "occurrence": 0,
+      "sha256": "dce892495d75394459e61f81fd7f45b0a8831e2b3decf0111bb39647bcc91cdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/PeerKind.class",
+      "occurrence": 0,
+      "sha256": "0f5dd5f7e1094fec9b7e579f0a6ce2db0f15ebc854d2406e7fb7d6c306168fb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelRuntimeContextResolver.class",
+      "occurrence": 0,
+      "sha256": "97e790a698357ed50b63c24133baecbbc862a0142fef5680fa6d664dd9cdf350",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/Channel.class",
+      "occurrence": 0,
+      "sha256": "352531bbeaf11e2625f25b71b0539d7c7a885e0f9d606f8498292ae848eba78d",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/InboundMessage$Builder.class",
+      "occurrence": 0,
+      "sha256": "7a6d2faf6c313cfb86cd14ea2f9497258f5843629d10efc0d9948843b7ebe3f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelRouter.class",
+      "occurrence": 0,
+      "sha256": "b85340845f292e787d1b49b8d689f2300267ef6374837250615eefdedb5942f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelFactory.class",
+      "occurrence": 0,
+      "sha256": "5db750775a10172f4ef8533641e442592f17d8498f09a4ec47de56c5fd13aa42",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/InboundMessage.class",
+      "occurrence": 0,
+      "sha256": "289e1be3d5ab6af4ff3599d969a7cdb955959972f60069e4f262e37b57565832",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelBinding.class",
+      "occurrence": 0,
+      "sha256": "e30b8e36229143a6e48e96cc3e942579f7b0cecfb30f4797b5e0e27487cc3d09",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelConfig$Builder.class",
+      "occurrence": 0,
+      "sha256": "c3d58a7b62260d0f5c7acfcf6ebfd309455161490deaa2ac87b587a5819351ef",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/RouteResult.class",
+      "occurrence": 0,
+      "sha256": "3fe6f482860f1a5d6b5d97b7a02b9d2f2f37497f2dd9a7353d2bb1aa1af9787f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelConfig.class",
+      "occurrence": 0,
+      "sha256": "481f5564945e9c3c5390108fe32076d65244853db3a58ef694903a0b089f69aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/DmScope.class",
+      "occurrence": 0,
+      "sha256": "632e004af787ed58671e378baafa42509fe683a5298df78deb10b0f56433b1a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelRouter$1.class",
+      "occurrence": 0,
+      "sha256": "f04e89fd60b78c543c2c013cfad34d1bfd76f6cabe98c032b6838eeb7fc24a05",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/OutboundAddress.class",
+      "occurrence": 0,
+      "sha256": "a26a10c4d4732f1de7c4d745c5297fec16a908f31df8b6dda54a2539dedca278",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/ChannelRuntimeContextRequest.class",
+      "occurrence": 0,
+      "sha256": "18d2990c1f7b5de652ccbc2396557a7aaaf283a52315680bf7cdb5773b7701c8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/channel/Peer.class",
+      "occurrence": 0,
+      "sha256": "bef1eabfa9962bc84cba8a7523b049dbbf0eca0f9feb0a711659a0c9cbb4e464",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/InMemorySubagentRegistry.class",
+      "occurrence": 0,
+      "sha256": "718a02cf68b44a4a6137f98c009702846fac7b16c12cb53bc06c5f630d27f0e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SubagentRecord.class",
+      "occurrence": 0,
+      "sha256": "9016ef0ff24cdf795c7af931890edc517af58ae3b3dd027831fe52eef2c7b0e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/HarnessGateway$ExposedSession.class",
+      "occurrence": 0,
+      "sha256": "149972b15600eb0f00958205296ea79ba6eec374e8c3091aeb1068925c23f238",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/HarnessGateway.class",
+      "occurrence": 0,
+      "sha256": "846524e374fc113dd4b271fbdf633179d4850c8358a12bf8061917165b2f3d51",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/TurnLease.class",
+      "occurrence": 0,
+      "sha256": "8a8b0946276cde8eebaa5cd7330ca55a823e9919be04f82b6cf0916619ae8b61",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SessionIdUtils.class",
+      "occurrence": 0,
+      "sha256": "8823b504820c6a0054e376b0c42084ef87c64cba5a69c8b5ceda08621ccd4a65",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/SubagentMaterializer.class",
+      "occurrence": 0,
+      "sha256": "63b209da0bddf50e20363436c99ab11d55157b11bb0dc3daf14e1ad8c41f99b1",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/StoreBackedSubagentRegistry.class",
+      "occurrence": 0,
+      "sha256": "5c223d00e8f9d1f6dffdeea286c05ba9bf907621f97342f75f7c22ef7a9dc2cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    },
+    {
+      "entry": "io/agentscope/harness/agent/gateway/LocalSessionTurnGate.class",
+      "occurrence": 0,
+      "sha256": "38a42427ec776d27f4a647ac28d27966eb9559761c78e36f0f2048b3b9eef98f",
+      "member_shard": "docs/dev/evidence/sqx145/members/004/005.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/004/001.json",
+      "sha256": "9bf054f52c427911c8ae4fcd692faa2b303a22373fb7f9bb953feafbc7b4f21e"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/004/002.json",
+      "sha256": "39dd2d39985a8c1d36d7efeb0eb5215041ea05315d457fe76c29d0782fee5ff5"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/004/003.json",
+      "sha256": "a0c447a823ab24902dfe6ed78205b4deffdf406b5e5128615ce81ee415ac0bf6"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/004/004.json",
+      "sha256": "0236775cc5eab9873e5e0aa06bac1b66a6b076580b3e6db409165aa4bc9c712a"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/004/005.json",
+      "sha256": "cbd86a6df366876d2beaa4269e51e84950fa0119a8699c8213da2caa3730363b"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletGridControl/ServletGridControl.jar",
+  "sha256": "eb88c3bfc9a8fd1fc45f3556431d5161b48e3a23c29b23150adb02299d320f0d",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet.class": "1c73a33de3fd436de19622c99e3c8bc0425ac212decfab79e02e0084fc6fa637",
+    "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServletPlugin.class": "398191dcebd9bc655682c81d857d612d4d3a4fa710b0241722e21b850c4af0dd"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServlet.class",
+      "occurrence": 0,
+      "sha256": "1c73a33de3fd436de19622c99e3c8bc0425ac212decfab79e02e0084fc6fa637",
+      "member_shard": "docs/dev/evidence/sqx145/members/233/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/GridControl/GridControlServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "398191dcebd9bc655682c81d857d612d4d3a4fa710b0241722e21b850c4af0dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/233/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/233/001.json",
+      "sha256": "993aca217759f172bf2ba116e23688a660e1b2228286e0608ad50f49c518cdb6"
+    }
+  ]
+}

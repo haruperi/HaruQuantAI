@@ -1,0 +1,344 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+  "archive_sha256": "e59bc5ef621f7b03c02ae1f096b16056db67fe4ac50f8ad553a7b554d59006b5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet.class",
+      "occurrence": 0,
+      "sha256": "fd7a0c164928027a89d6563db96eff11bc5c5e3135453e7f0364dc9ca6028855",
+      "name": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_TRADELISTSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "MAX_CACHED_RESULTS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "dataCache",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/util/ArrayList<[Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "lastUsed",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Long;>;"
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/StampedLock;",
+          "access": 2
+        },
+        {
+          "name": "comparator",
+          "descriptor": "Lcom/strategyquant/tradinglib/table/TradelistOrdersComparator;",
+          "access": 2
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "formaterFullDateTime",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 2
+        },
+        {
+          "name": "exportRunning",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "81847c9a1e78935c6540a7278ebbd0e3fcfdd1f276b9b399739ca620440c335c",
+          "code_length": 67
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "473a4edfff92ef71e5de8b7055eb028ab1b3068b22645d8dddef33b66e2fc1ea",
+          "code_length": 204,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetTrades",
+          "descriptor": "([Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a116e3491dec0c0f56341b6e4c2d49a7403836ad1571d64282046682bad8202f",
+          "code_length": 374,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onExport",
+          "descriptor": "([Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "33c0c3ab5221c6ad48fbf85082ae474cc020610b1b9e907e37f391d140d14603",
+          "code_length": 425,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onExportCloud",
+          "descriptor": "([Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7f782d8f7d598b3eabbbc512b1d1b6b4a6c1763ef2059c0db0ae4b68ba6ec233",
+          "code_length": 435,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "loadTrades",
+          "descriptor": "(Ljava/util/Map;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Ljava/lang/String;ZLcom/strategyquant/lib/utils/JsonCreator;)V",
+          "access": 2,
+          "code_sha256": "ce051b5210d3c0e96174c1802629830271269aacf08279398f6b3020009eacfe",
+          "code_length": 681,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Ljava/lang/String;ZLcom/strategyquant/lib/utils/JsonCreator;)V"
+        },
+        {
+          "name": "generateNewData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Ljava/util/Map;Z)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "55828658c863b35f22c1c391f9f6b8906b66891b3995fa1f8a1316f16b59dc80",
+          "code_length": 313,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Z)Ljava/util/ArrayList<[Ljava/lang/Object;>;"
+        },
+        {
+          "name": "computeAccountBalance",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 2,
+          "code_sha256": "1ed38179b43807ce41949cd53922a14f5881048db83454909ab4aae3493bf591",
+          "code_length": 40
+        },
+        {
+          "name": "resetAccountBalance",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)V",
+          "access": 2,
+          "code_sha256": "929708168367d79b6aec2f20a3303f357733c92ddcb2a5b76d236417e1e43a52",
+          "code_length": 30
+        },
+        {
+          "name": "deleteOldestData",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "dbc394a8e7ab1c802d584315a6ddd494ade36ecf780815b761603b0111108567",
+          "code_length": 94
+        },
+        {
+          "name": "getDataIdentificator",
+          "descriptor": "(Ljava/util/Map;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b9ab743762094173649120252903e98fa115bb8f426e785981e721982f94e613",
+          "code_length": 225,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Lcom/strategyquant/tradinglib/tradelist/TradelistTableView;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;"
+        },
+        {
+          "name": "chartDataExists",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "11e68c822eabd669480705f7c44a6ce3a1399aa67e9f363cd696e0c63070f3fc",
+          "code_length": 156
+        },
+        {
+          "name": "shouldShowControlOrders",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "ecd012c42e199a5eaaf40c9f379404af58453390c995a8f2c43361aae3f55e0b",
+          "code_length": 24
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cda748d2dd294c3154456d75011675d443cf12ceae71b3abaab7968b16bceedf",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/stockchart/StockLoader",
+        "com/strategyquant/tradinglib/stockchart/StockLoaderForStockPicking",
+        "com/strategyquant/tradinglib/table/TradelistOrdersComparator",
+        "com/strategyquant/tradinglib/tradelist/TradelistExport",
+        "com/strategyquant/tradinglib/tradelist/TradelistTableColumnEntry",
+        "com/strategyquant/tradinglib/tradelist/TradelistTableView",
+        "com/strategyquant/tradinglib/tradelist/TradelistViewsManager",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Base64",
+        "java/util/Base64$Encoder",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/concurrent/locks/StampedLock",
+        "java/util/jar/JarFile",
+        "org/joda/time/format/DateTimeFormat",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "a78510e3a8218e10809ccc7e44aba739d40be8f6ff29d42ee99b8ab88dcbe1e6",
+      "name": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/TradeList/TradeListServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "e3593c81dbbd46c58041b2e510b493c1698c4fba324b602b3daf5baa752b138d",
+          "code_length": 75
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "81d06ee172d19c4e1f364803fc6f3c00042624eb7f5044624166a892a5d8f902",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet",
+        "com/strategyquant/plugin/Results/impl/TradeList/TradeListServletPlugin",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

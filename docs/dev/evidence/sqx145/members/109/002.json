@@ -1,0 +1,4301 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/sqlite-jdbc-3.51.2.0.jar",
+  "archive_sha256": "5454be00f3a04b4d67ef6179121aa900a904da53b9cbffea742d548d737f0ebc",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/sqlite/util/ResourceFinder.class",
+      "occurrence": 0,
+      "sha256": "5434592a7f92c7c57fc1ad2c9672ebda92d6945880f1742596fb931c61671560",
+      "name": "org/sqlite/util/ResourceFinder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "672158da274be3918e03f2618e6c5ac5eabc87b95a0ecf68a185001893ba37f5",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/net/URL;"
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/Package;Ljava/lang/String;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "95dbcb16e4a0ae489384a9d3e2dab015df7b4a2c557cd4467395d561a13c4f3f",
+          "code_length": 10
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;Ljava/lang/String;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "4aa5f0fd97fc41c9f498706897d227c1abb44246dee529bc44c24e8a305c5ecd",
+          "code_length": 64
+        },
+        {
+          "name": "packagePath",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "0d40e6fa3e0ab327018a8455c5f1cd4e2916de78ef17fc2bbf84fd7aafcb5c2d",
+          "code_length": 8,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/String;"
+        },
+        {
+          "name": "packagePath",
+          "descriptor": "(Ljava/lang/Package;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "33c4bc0b5450599370e3d9f4b21f2be37732f0db5e9279398f616790f15c0d85",
+          "code_length": 8
+        },
+        {
+          "name": "packagePath",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "dcb2d649e11876926c1c8e4a6c0abc47e537cda8fa98c89f3fa60f6b15c8e1dc",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/Package",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/sqlite/util/ResourceFinder"
+      ]
+    },
+    {
+      "entry": "org/sqlite/util/LoggerFactory$SLF4JLogger.class",
+      "occurrence": 0,
+      "sha256": "466a183e5985f90a4a51a651457119858671a01bff9b4fd8c241ad7e6519ca80",
+      "name": "org/sqlite/util/LoggerFactory$SLF4JLogger",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/util/Logger"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "74245f4d2255e32fdc070f3c65623d31a551c649326337f01443b800ca3e254c",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "c1bc8cab59fc63d0c9491169b69f6cf41b1fabe76ff368ea4b1ff2d5455b18d9",
+          "code_length": 31,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "1c27c0ba311d93f2dd7c1fbc36ee8ec75b8f234bc2b34eda56c9424e9bd228d4",
+          "code_length": 31,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "f54bdf0f5b6b26fe8c7f6516e6997f91bfef509249aa14319ef55bf02df688a5",
+          "code_length": 31,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/util/function/Supplier;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "28c8d99715a1f1c4db51520b434e9d02e4ddf78d8dc0bcea39c13d8da9d8e931",
+          "code_length": 32,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/function/Supplier",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "org/sqlite/util/Logger",
+        "org/sqlite/util/LoggerFactory",
+        "org/sqlite/util/LoggerFactory$SLF4JLogger"
+      ]
+    },
+    {
+      "entry": "org/sqlite/util/ProcessRunner.class",
+      "occurrence": 0,
+      "sha256": "a9e0795c81f585af73df73c5b0829ab6b74bf614f76e3568f8566ab88c88f031",
+      "name": "org/sqlite/util/ProcessRunner",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "runAndWaitFor",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "ce10759738635b0167a4d4be223873c48c3850e7177eda4e554f5b78241f3df7",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "runAndWaitFor",
+          "descriptor": "(Ljava/lang/String;JLjava/util/concurrent/TimeUnit;)Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "b11407af9e9bc2f50ded4884299bbf840ef32b399d11516a12f902fc1cc117e5",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "getProcessOutput",
+          "descriptor": "(Ljava/lang/Process;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "808bf1b38898db794eb270957305af896f235a9d36a531a284e5fe9c84ec9a90",
+          "code_length": 82,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "org/sqlite/util/ProcessRunner"
+      ]
+    },
+    {
+      "entry": "org/sqlite/util/LibraryLoaderUtil.class",
+      "occurrence": 0,
+      "sha256": "de7261a3e5f23da0e831eb4f2fff87540629d9249a2ce4e141c4e70e4fea197a",
+      "name": "org/sqlite/util/LibraryLoaderUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NATIVE_LIB_BASE_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getNativeLibResourcePath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "50178b797a19e029048921c407b406b14a65b72291a9694c3a7fa362cf199fc1",
+          "code_length": 36
+        },
+        {
+          "name": "getNativeLibName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4b5ce7e526f1bca91e3adcc23f5e5fca959d6d2c7f898181c0a790ede7f3d33f",
+          "code_length": 6
+        },
+        {
+          "name": "hasNativeLib",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "63c7ad8faa6667e2594977a96deae9198f911deb43fd7056e738ede11800b684",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Package",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "org/sqlite/SQLiteJDBCLoader",
+        "org/sqlite/util/LibraryLoaderUtil",
+        "org/sqlite/util/OSInfo"
+      ]
+    },
+    {
+      "entry": "org/sqlite/util/LoggerFactory.class",
+      "occurrence": 0,
+      "sha256": "1bc68d6f8baf988e07a9b841ae8164b468aecaa6fc0c0e9aee2dbff62ef46976",
+      "name": "org/sqlite/util/LoggerFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "USE_SLF4J",
+          "descriptor": "Z",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getLogger",
+          "descriptor": "(Ljava/lang/Class;)Lorg/sqlite/util/Logger;",
+          "access": 9,
+          "code_sha256": "ea05ac06e4855ac0514c4ca9a6cc5f2cd72e8c4e66ef282648ca1b74eb96cf81",
+          "code_length": 24,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lorg/sqlite/util/Logger;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cec5d2cd2a1f921d3a1f19ddcde8c381f14468521406b576904f1a70752f37bd",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/sqlite/util/LoggerFactory",
+        "org/sqlite/util/LoggerFactory$JDKLogger",
+        "org/sqlite/util/LoggerFactory$SLF4JLogger"
+      ]
+    },
+    {
+      "entry": "org/sqlite/util/LoggerFactory$JDKLogger.class",
+      "occurrence": 0,
+      "sha256": "ae590028a8e4357faa5bfd9e1b3f61e4194741758e4e5528fd48e893c1a69a61",
+      "name": "org/sqlite/util/LoggerFactory$JDKLogger",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/util/Logger"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "cc75081955a69a1a8a9c0c53bcdea244548832c062bc0fe6059dac0a890e7112",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "trace",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "2690f2a8caa8bdb01e501e61f7ddb7b6956b5146da392914330ce390c959216e",
+          "code_length": 33,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "info",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "3273db8eb3181d986cac9a0ff97412da58a3f5f21e41653a90cfee73e86d2453",
+          "code_length": 33,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "warn",
+          "descriptor": "(Ljava/util/function/Supplier;)V",
+          "access": 1,
+          "code_sha256": "2641d0b5fad03a9113509a5f632d8d0a802f048df804a4a88ee0af74ef34139b",
+          "code_length": 33,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/util/function/Supplier;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "61d1cc9444e5440690c8d79d255033f901e957b3d4433ba920e0d770e974a265",
+          "code_length": 34,
+          "generic_signature": "(Ljava/util/function/Supplier<Ljava/lang/String;>;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/function/Supplier",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "org/sqlite/util/Logger",
+        "org/sqlite/util/LoggerFactory",
+        "org/sqlite/util/LoggerFactory$JDKLogger"
+      ]
+    },
+    {
+      "entry": "org/sqlite/Function.class",
+      "occurrence": 0,
+      "sha256": "63d1605d365bb469391d536dcc7cc1c4fa88e727f0ea174c69d82ae46c2d393d",
+      "name": "org/sqlite/Function",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FLAG_DETERMINISTIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "conn",
+          "descriptor": "Lorg/sqlite/SQLiteConnection;",
+          "access": 2
+        },
+        {
+          "name": "db",
+          "descriptor": "Lorg/sqlite/core/DB;",
+          "access": 2
+        },
+        {
+          "name": "context",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "value",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "args",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "81d61685f14434816ef7471fd2fa720d364a3208a6408b93b9010e4057628422",
+          "code_length": 20
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;Lorg/sqlite/Function;)V",
+          "access": 9,
+          "code_sha256": "f73b865858a6e3d6742b5825ac2719aa6ef57250b7d03c7c6398f01530c87026",
+          "code_length": 8,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;Lorg/sqlite/Function;I)V",
+          "access": 9,
+          "code_sha256": "41d02124fb7d2798fccf99e56cc8905e537bc5d56820f23f626744b5b2028e62",
+          "code_length": 9,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;Lorg/sqlite/Function;II)V",
+          "access": 9,
+          "code_sha256": "58d1f39ef7b01ff79963d43ab2ec4efc526c4442312f2870025d57ec431b991e",
+          "code_length": 119,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "destroy",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;I)V",
+          "access": 9,
+          "code_sha256": "40c16c7afb4f0fd12416f0ee74e66f293a3f1360c6ac697dc005645792f29172",
+          "code_length": 30,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "destroy",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "d6f644d3ae81c50ef3dcc50ecad01cbc15cedd84299aedbb59b3a3cd5aebc167",
+          "code_length": 7,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "xFunc",
+          "descriptor": "()V",
+          "access": 1028,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "args",
+          "descriptor": "()I",
+          "access": 52,
+          "code_sha256": "072c87605651a22e6450bbaab0b2c7f4fa0ffc6a50f06b573bbdece05d039980",
+          "code_length": 9,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "([B)V",
+          "access": 52,
+          "code_sha256": "fc153bcf9dc9466ab1c547932518600353c3c6a4f89e392331df874700425060",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "(D)V",
+          "access": 52,
+          "code_sha256": "ce3cec811ac52160192440e9cc2327d0ecb7970b324a17a9f3f008a374ea0171",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "(I)V",
+          "access": 52,
+          "code_sha256": "03790be668bb889876c605cc69cc7fc35fdb044ed970af8c870ef6ecf2131540",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "(J)V",
+          "access": 52,
+          "code_sha256": "b11bd36e334e2d8d67ef9a6d3e41eb54cfb70b1006d384dc5ce2f21e37153f4d",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "()V",
+          "access": 52,
+          "code_sha256": "65ed3455aae3e3e0ed9bbe7d80873fd496653e5d75bb27b150261d7931296d2d",
+          "code_length": 16,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "result",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 52,
+          "code_sha256": "3e79f82566d55574d5b8e666e32a16e76becf13868fc86f3c017a0cc0cb6c1f7",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 52,
+          "code_sha256": "95f7ba36534a804cca744a0a6592f4e4c8c6ece235625b6c4d03d39f00be2070",
+          "code_length": 17,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_text",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 52,
+          "code_sha256": "af86b95525ac637067d6ffb5fbc044f5b8d615dbe30b44d447f28679e998e238",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_blob",
+          "descriptor": "(I)[B",
+          "access": 52,
+          "code_sha256": "500000cd22a59a6f0718416d28880e6401192f6dd711ce0eae4c456d7e2fd95b",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_double",
+          "descriptor": "(I)D",
+          "access": 52,
+          "code_sha256": "9712677ebdd6386d5a1d4ed5a86d20c4bf273856f0fb629a29b954c1c01fd7c2",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_int",
+          "descriptor": "(I)I",
+          "access": 52,
+          "code_sha256": "1a308595d2308e8f0e44470d56eebaa0181f838ede47521088737b26a224eebb",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_long",
+          "descriptor": "(I)J",
+          "access": 52,
+          "code_sha256": "bb3c260b87f99397f77f3c148dea06d4b7e297aba757ec1d9f80b0116ae66ae9",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "value_type",
+          "descriptor": "(I)I",
+          "access": 52,
+          "code_sha256": "2578172575334638877dd2f45c8d896eae8cab2f98e71613d484d82cc904875e",
+          "code_length": 15,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "checkContext",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "850b46a3ed1710978f139a8c8a35e94386f3f7480f5785ac1c96363a49ece8ea",
+          "code_length": 37,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "checkValue",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "1ad3907c50b135ebd8ef266147e55b4665b0c2490c31ea7db4f97180d35688d9",
+          "code_length": 89,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/sql/Connection",
+        "java/sql/SQLException",
+        "org/sqlite/Function",
+        "org/sqlite/Function$Aggregate",
+        "org/sqlite/Function$Window",
+        "org/sqlite/SQLiteConnection",
+        "org/sqlite/core/DB"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$CharacterLiteral.class",
+      "occurrence": 0,
+      "sha256": "b5ebab3f7640b3f526e66302664c098e4ca8209d71dd9ef86f0e19d3f3cd2481",
+      "name": "org/sqlite/date/FastDatePrinter$CharacterLiteral",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "mValue",
+          "descriptor": "C",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(C)V",
+          "access": 0,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "4eae13646c9af803d57304a06b55b331dc9848b8cf832ed2612982165ca328f0",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$CharacterLiteral",
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$UnpaddedMonthField.class",
+      "occurrence": 0,
+      "sha256": "066f8a30341f145889d89150a92ce529baff3fab1dcc9b631c93f9504f99ddbc",
+      "name": "org/sqlite/date/FastDatePrinter$UnpaddedMonthField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$UnpaddedMonthField;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "8d5ae9f8d824f5d32f362b0bb94f18254fd7ade682d93b687e8347504315c01c",
+          "code_length": 13
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "730985644750617e67972a124f1cbe2b2a440d6765e38aaeb8ef9900fb946502",
+          "code_length": 25
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "63f8c6bb5a8971636580a2472fce57c17e24e32f7241710ad8727d31ec77eafb",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$UnpaddedMonthField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$2.class",
+      "occurrence": 0,
+      "sha256": "df93fa2c6e13b9c126d540f5751a4a407407f2e0980166186496c71fac35bbbb",
+      "name": "org/sqlite/date/FastDateParser$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$NumberStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "30bb1e04d4a1d03a8a6137208d139809d8f19d6b14a4645862901554a440e8d0",
+          "code_length": 6
+        },
+        {
+          "name": "modify",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "7ecda530f50d9c13cbc0ba4dc5c81aa514b43d44e937d8d8c88ff2f9770bcc49",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$2",
+        "org/sqlite/date/FastDateParser$NumberStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TextField.class",
+      "occurrence": 0,
+      "sha256": "2f664a6fe52d1e42d875be8d9ca345a0700ecaa560a525eb43ec5d8adb9d5488",
+      "name": "org/sqlite/date/FastDatePrinter$TextField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "mField",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "mValues",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "06cd37aab4bf267a278a23dcc86ad5cb02cc050f0f0ed4a2b04303a0cef242e0",
+          "code_length": 37
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "29913a77f76396b67e32ad4dab537162a14e637801287b9a8f558985f2636b01",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Rule",
+        "org/sqlite/date/FastDatePrinter$TextField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TwoDigitNumberField.class",
+      "occurrence": 0,
+      "sha256": "74447bd810edcef6dfaa380cd6f9ffc637ab3ff57000c5df2b9e4f923576e6da",
+      "name": "org/sqlite/date/FastDatePrinter$TwoDigitNumberField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "mField",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "f00cc1ebdfc614137993fa2d3ee63f1076f54ffb10b0bfb54fc050a60c0af436",
+          "code_length": 14
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "7633f2911a2dae0dfbf6e4ca23330e29d5b234a77863c01835149b4f964a09ef",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$TwoDigitNumberField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TwelveHourField.class",
+      "occurrence": 0,
+      "sha256": "346b6b2e1482623a69f45f647a8f00a004c0aec81ab10993243ec9b1e336b79d",
+      "name": "org/sqlite/date/FastDatePrinter$TwelveHourField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "mRule",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$NumberRule;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/sqlite/date/FastDatePrinter$NumberRule;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2f56b73133f9ffdb96c980cbf94cd26807b779cd38d0feb2ff35a8b5de7ac20f",
+          "code_length": 10
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "da0ab7ca654f7c45732a3710cf36bcc51a8f5ae5c0df3d1057b98c7d6b4b547a",
+          "code_length": 32
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 1,
+          "code_sha256": "e6e41b947a8dc3fac16171591ffa8a37090c12d70ce56d4ba78f5063e6103889",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$TwelveHourField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FormatCache.class",
+      "occurrence": 0,
+      "sha256": "1a4e83a2047be64b77b1c8db6d32876524d90947c9d192cabce904fd944c6a71",
+      "name": "org/sqlite/date/FormatCache",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "cInstanceCache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Lorg/sqlite/date/FormatCache$MultipartKey;TF;>;"
+        },
+        {
+          "name": "cDateTimeInstanceCache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 26,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Lorg/sqlite/date/FormatCache$MultipartKey;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "000ffc428e7c560e004ac21a2edad5af55421b54b1f7e1a051b800c6443bc0e8",
+          "code_length": 18
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Ljava/text/Format;",
+          "access": 1,
+          "code_sha256": "a70c88c89145864a3191ef858fd0768fbbe577b9e6160fba3449040aee4deda9",
+          "code_length": 13,
+          "generic_signature": "()TF;"
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 1,
+          "code_sha256": "b37072682ddc927ac39dc0c18a91706ee80935edbf466317124cf472bfe13f29",
+          "code_length": 115,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "createInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 1028,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 2,
+          "code_sha256": "2209a8ff41c4b3114afabae3a75cd74d93f1847f97ab053ed054611cca90fea7",
+          "code_length": 29,
+          "generic_signature": "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(IILjava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 0,
+          "code_sha256": "d329ca47f713f21f18299e883de7711459d2b78d3a61d4852b683c9a91669155",
+          "code_length": 16,
+          "generic_signature": "(IILjava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "getDateInstance",
+          "descriptor": "(ILjava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 0,
+          "code_sha256": "740427e841aaebe1b29f53eb920619b047ab8ba10499b459019afee6867d0d8d",
+          "code_length": 12,
+          "generic_signature": "(ILjava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "getTimeInstance",
+          "descriptor": "(ILjava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 0,
+          "code_sha256": "bfdee1c785ef154834e39344392c02579ae1c9fc73cb447da42afd89ee93eb31",
+          "code_length": 12,
+          "generic_signature": "(ILjava/util/TimeZone;Ljava/util/Locale;)TF;"
+        },
+        {
+          "name": "getPatternForStyle",
+          "descriptor": "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "b7b7e05671b2fad40eaf7602d05e311417b01a09ae50022cda224d44b10c1043",
+          "code_length": 161
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4f725ca3997f69a23fead97842a129461d10606158b8eddf1c77332ad63d5875",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "<F:Ljava/text/Format;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/ClassCastException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/DateFormat",
+        "java/text/Format",
+        "java/text/SimpleDateFormat",
+        "java/util/Locale",
+        "java/util/TimeZone",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "org/sqlite/date/FormatCache",
+        "org/sqlite/date/FormatCache$MultipartKey"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FormatCache$MultipartKey.class",
+      "occurrence": 0,
+      "sha256": "5388751417cbc6e80fc4f699daf30a26a9bbe092a09a8ad586fb464b50b1bc99",
+      "name": "org/sqlite/date/FormatCache$MultipartKey",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "keys",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 129,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "7490ea692e1fb40473c6a8eac5cf11bf5a7042cc61458d6ce75518073f0ae788",
+          "code_length": 15
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7ea537bd00feed0edbd5b3158b20b4a1ac314411c06418ec18dacfde90c8a0fe",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Object",
+        "java/util/Arrays",
+        "org/sqlite/date/FormatCache",
+        "org/sqlite/date/FormatCache$MultipartKey"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$Rule.class",
+      "occurrence": 0,
+      "sha256": "f91bfabfe62a3a734fe8ba5130e3b0a09b972da272bfd5e863aaf98a8c423421",
+      "name": "org/sqlite/date/FastDatePrinter$Rule",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/DateParser.class",
+      "occurrence": 0,
+      "sha256": "63d1ab923157cfe4442da76a60020fcb8096542984dd4c80d0e4a3aa92294715",
+      "name": "org/sqlite/date/DateParser",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Date;",
+          "access": 1025,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/util/Date;",
+          "access": 1025
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getTimeZone",
+          "descriptor": "()Ljava/util/TimeZone;",
+          "access": 1025
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1025
+        },
+        {
+          "name": "parseObject",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "parseObject",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/lang/Object;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/text/ParseException",
+        "org/sqlite/date/DateParser"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/package-info.class",
+      "occurrence": 0,
+      "sha256": "91a0dd92a3f71ef808e9c7b3d353ed8fe5db54bca082cfc4a8fa3fbe7bcd2b55",
+      "name": "org/sqlite/date/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/sqlite/date/package-info"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$Iso8601_Rule.class",
+      "occurrence": 0,
+      "sha256": "ad32e5de606e8d35009ebcda72d9068c51f942d42ba60ab43a5c5d1136caba6f",
+      "name": "org/sqlite/date/FastDatePrinter$Iso8601_Rule",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "ISO8601_HOURS",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$Iso8601_Rule;",
+          "access": 24
+        },
+        {
+          "name": "ISO8601_HOURS_MINUTES",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$Iso8601_Rule;",
+          "access": 24
+        },
+        {
+          "name": "ISO8601_HOURS_COLON_MINUTES",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$Iso8601_Rule;",
+          "access": 24
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRule",
+          "descriptor": "(I)Lorg/sqlite/date/FastDatePrinter$Iso8601_Rule;",
+          "access": 8,
+          "code_sha256": "94396a47ecce7f08d835fdf3215106432f43e0ccf21a0a1f3ce14089cc231234",
+          "code_length": 50
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "bb0dcb0ecf1c8918a895d6edf0c39dc9b1aae23a93980b47d60bcd87006159d3",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "553cd8ef0357229a296f8e39b2dede7c0676c2ad527c2d9b17d543421560dc28",
+          "code_length": 114
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "16477b3fbc79e275cc7a64c8ecab88899aec53e5b29b6f5d6cff6be3be1cf007",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Iso8601_Rule",
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$PaddedNumberField.class",
+      "occurrence": 0,
+      "sha256": "d9ed06e0616e16eb3850701ef597cd7e3d1ebf9e3eace8df86f02a4cc23556cc",
+      "name": "org/sqlite/date/FastDatePrinter$PaddedNumberField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "mField",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "mSize",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 0,
+          "code_sha256": "88afadfa55857a0724f07c85d4787d3189944c656a5277eccfd9d2825c570b9c",
+          "code_length": 28
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "17fe3d70807590810f5261615c59551f1f34da03a59212dc5a21775b8fbac9d4",
+          "code_length": 14
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "20237cbdb98ead83181a959bde2cedb8f313dc3e5d514dbf7aa5758bb287d602",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$PaddedNumberField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TimeZoneNameRule.class",
+      "occurrence": 0,
+      "sha256": "9d0c0aadd0ce45519fc216596504705a1d8b031df74f82e1afe92a119b08e36e",
+      "name": "org/sqlite/date/FastDatePrinter$TimeZoneNameRule",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "mLocale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 18
+        },
+        {
+          "name": "mStyle",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "mStandard",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "mDaylight",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/TimeZone;Ljava/util/Locale;I)V",
+          "access": 0,
+          "code_sha256": "f57640f06a181b93c5c50a462abc434f49d749ed1dc2f92b1ab33da6113c9cfc",
+          "code_length": 37
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "811e8d014ff465aadef27894f6c836bd3933a5e5f47f7b0eae3f8d478cc570f5",
+          "code_length": 18
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "62a0d31e7ecdb52634067a3264b04936a9086cb451b4e352fb49dc77560f5e56",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "java/util/TimeZone",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Rule",
+        "org/sqlite/date/FastDatePrinter$TimeZoneNameRule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$UnpaddedNumberField.class",
+      "occurrence": 0,
+      "sha256": "a2bf5d4487985128fadc532282e3afe3373b611c9c93ec1a011e5d5572dd2111",
+      "name": "org/sqlite/date/FastDatePrinter$UnpaddedNumberField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "mField",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "f00cc1ebdfc614137993fa2d3ee63f1076f54ffb10b0bfb54fc050a60c0af436",
+          "code_length": 14
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "5d7803ac3a8dca7bb28e0449e02fa533421bba65dfcc2de17d33b354b4c40dda",
+          "code_length": 40
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$UnpaddedNumberField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TimeZoneNumberRule.class",
+      "occurrence": 0,
+      "sha256": "c54d0619677f7582df7b4158678d4384f49dc50469a9d59233e6757167e1f221",
+      "name": "org/sqlite/date/FastDatePrinter$TimeZoneNumberRule",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE_COLON",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$TimeZoneNumberRule;",
+          "access": 24
+        },
+        {
+          "name": "INSTANCE_NO_COLON",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$TimeZoneNumberRule;",
+          "access": 24
+        },
+        {
+          "name": "INSTANCE_ISO_8601",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$TimeZoneNumberRule;",
+          "access": 24
+        },
+        {
+          "name": "mColon",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "mISO8601",
+          "descriptor": "Z",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZZ)V",
+          "access": 0,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "84abad56e1dbb7b0a3fb49218b5277aaa689b3358eb1b09b5c630281ef147a9e",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "50cc2c4d822761f790c9431a2dd683de7b0b3a481f5eae3fa4345984ee8a935c",
+          "code_length": 113
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d0d9609cccacccf40db0b350cbe2fe8aa20afac03afca8e110ee401080b793df",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Calendar",
+        "java/util/TimeZone",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Rule",
+        "org/sqlite/date/FastDatePrinter$TimeZoneNumberRule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/ExceptionUtils.class",
+      "occurrence": 0,
+      "sha256": "a7ba37683c95cdf46a9e4f23eeb80bafc5757111a357fb978e46fb46e03a53b3",
+      "name": "org/sqlite/date/ExceptionUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "rethrow",
+          "descriptor": "(Ljava/lang/Throwable;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "d05eb223bd29bacc6c35275aab2e78568435ec9d94fab20cd5c3bd1a6ce55664",
+          "code_length": 5,
+          "generic_signature": "<R:Ljava/lang/Object;>(Ljava/lang/Throwable;)TR;"
+        },
+        {
+          "name": "typeErasure",
+          "descriptor": "(Ljava/lang/Throwable;)Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "83e863e416e1aee9f9330bb60e382e85eeb997b95d2bc7654c785d8e62c2ab42",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<R:Ljava/lang/Object;T:Ljava/lang/Throwable;>(Ljava/lang/Throwable;)TR;^TT;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "org/sqlite/date/ExceptionUtils"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$ISO8601TimeZoneStrategy.class",
+      "occurrence": 0,
+      "sha256": "0275165ad148325bd28206c167060bc220f4d2ce79a79d0bc2e1b615fc8d8be4",
+      "name": "org/sqlite/date/FastDateParser$ISO8601TimeZoneStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pattern",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "ISO_8601_1_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "ISO_8601_2_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "ISO_8601_3_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9ecfe26dea8f497555d252b4472355cb7d44b3eeb35e18d12d2e1d22bfc4ea3d",
+          "code_length": 11
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 0,
+          "code_sha256": "212d4c5d17b63801f5899bef000f6edea556d8ee94b30a07a44aacea1f9dc21b",
+          "code_length": 11
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b669771a1d763073f61badfb96704fb776f0b802118cf6856c0382a45b019380",
+          "code_length": 48
+        },
+        {
+          "name": "getStrategy",
+          "descriptor": "(I)Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 8,
+          "code_sha256": "e0db2ae1700cff0852ac83eea95efee5dc37efa7c7e780362529a1593b96d29b",
+          "code_length": 50
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "abc5f4a1746dd949e79020f57fedfa424f8a189fb4918299544e9903e81050c5",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Calendar",
+        "java/util/TimeZone",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$ISO8601TimeZoneStrategy",
+        "org/sqlite/date/FastDateParser$Strategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateFormat.class",
+      "occurrence": 0,
+      "sha256": "9d02c1744f8885838c101bc4952215cd2618d0af44db2fba89b42c3087115c91",
+      "name": "org/sqlite/date/FastDateFormat",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/text/Format",
+      "interfaces": [
+        "org/sqlite/date/DateParser",
+        "org/sqlite/date/DatePrinter"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "FULL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MEDIUM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SHORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "cache",
+          "descriptor": "Lorg/sqlite/date/FormatCache;",
+          "access": 26,
+          "generic_signature": "Lorg/sqlite/date/FormatCache<Lorg/sqlite/date/FastDateFormat;>;"
+        },
+        {
+          "name": "printer",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter;",
+          "access": 18
+        },
+        {
+          "name": "parser",
+          "descriptor": "Lorg/sqlite/date/FastDateParser;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "getInstance",
+          "descriptor": "()Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "9f94e7b77da06caca2af7bfe0ea04c54a76d8cf9d79a7f3e5807dc3967e23ab8",
+          "code_length": 13
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "8fd63d1c52048ddddbbefa16f7484740027369c02cbfa4af67809c12198bff58",
+          "code_length": 13
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "21f71af010763e1baa8ab981de9d116bc4b3afb56d013f6273fc7929f388af11",
+          "code_length": 13
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "cb840a432e6594e81654e82574b8bcbd4ad718cdfa7419dcd0beedc9efa6ffe4",
+          "code_length": 13
+        },
+        {
+          "name": "getDateInstance",
+          "descriptor": "(I)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "bda5a9ce4a18eecf0a9510540bfbe41fba4001d2f95c8c023fbb20d5807b6f62",
+          "code_length": 13
+        },
+        {
+          "name": "getDateInstance",
+          "descriptor": "(ILjava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "a2158c646405d18aed85824b0bacf868016e005f182b569a8049876e40579927",
+          "code_length": 13
+        },
+        {
+          "name": "getDateInstance",
+          "descriptor": "(ILjava/util/TimeZone;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "766756f1251a23bc0a7c13dc26bada80ae87be700af751b9640cfca41c42d8f6",
+          "code_length": 13
+        },
+        {
+          "name": "getDateInstance",
+          "descriptor": "(ILjava/util/TimeZone;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "6ace6fb6871e4aadceeec15b629efc7eef32d644d9c8dae76b874954d282791a",
+          "code_length": 13
+        },
+        {
+          "name": "getTimeInstance",
+          "descriptor": "(I)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "45b080196109658da9ba7f6d37331517f3f354e31251bbdb91c1304e796c246b",
+          "code_length": 13
+        },
+        {
+          "name": "getTimeInstance",
+          "descriptor": "(ILjava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "2d2f18aa4c0f94e7fd819dd68c686fc6760a7ac6c2b88f2aa524e11356e4553b",
+          "code_length": 13
+        },
+        {
+          "name": "getTimeInstance",
+          "descriptor": "(ILjava/util/TimeZone;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "90351b4a67652df924c62423b247de44b0d6870f4b203ce971b558c76329276d",
+          "code_length": 13
+        },
+        {
+          "name": "getTimeInstance",
+          "descriptor": "(ILjava/util/TimeZone;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "2ed8753cb329eee31c5909a8f12e3a56f0852db7907e4655e6b6d269696b9c33",
+          "code_length": 13
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(II)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "5d8a7c88241f6f96a42363592fa6b37c26c46f52fa38e9aab350fc6a37453a3e",
+          "code_length": 14
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(IILjava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "2c7b415deef6b5828e90b99835265d8feece1cb2c5827b6a54b56cdcbf38d62b",
+          "code_length": 14
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(IILjava/util/TimeZone;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "97da8d3fc939b1da407946cbdf9d7dde9f2ea3d50cca2680e34b8b36a849bc4e",
+          "code_length": 8
+        },
+        {
+          "name": "getDateTimeInstance",
+          "descriptor": "(IILjava/util/TimeZone;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 9,
+          "code_sha256": "4dde7a20baad19b8f4d888c0a5bdacb5cd7eaea08857cfc20808af360db4bd33",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)V",
+          "access": 4,
+          "code_sha256": "fa2cdfa4cd7e63f01f26cc2bc2529a828a98191eb3eec8c217f434685ff4bfe5",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;Ljava/util/Date;)V",
+          "access": 4,
+          "code_sha256": "9d73f1935908158c44584d0f746d9c1f048dfcca31bdab45b3a132dabaa2d897",
+          "code_length": 35
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/StringBuffer;Ljava/text/FieldPosition;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "c29c9b126b6027ebb8a70586a9a5ead208f48d1d8ed1369b961b2cb893a49351",
+          "code_length": 11
+        },
+        {
+          "name": "format",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ed2c8226e6e301bad9ee54e56ffb4b1126816414e3a17ecb7e667f9c4694f7c3",
+          "code_length": 9
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b4e30274904608230cf051f4f6907c88c439c341d0de990546839cb4df6d80ab",
+          "code_length": 9
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "02586d9bed9f0c17866330b83a99c0128a30a96aeae411e9ac07cd4ae35e919a",
+          "code_length": 9
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "1f90467cf14e0f572c1174f4e842a5c4f0f0090ab430848316e9e5b1fb464658",
+          "code_length": 10
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "c90b2fdb817a67a8822f17825eb918aba564799566e2df02a1539a627f884692",
+          "code_length": 10
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "c7230cdb56ab66af9f3c3deed95008d58451d2c99af3394939b4baa4973e30d6",
+          "code_length": 10
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "a378d7bbc6cde89f17fd1df60ac9f7b17032b89b4226f927df436839011455d0",
+          "code_length": 9,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "84728e61d1e1551996537703a86e971994a55abbcb69ba50bbf776ca306f53c4",
+          "code_length": 10
+        },
+        {
+          "name": "parseObject",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8c72e941c96a7d4b52a0d712c020bead2d5540cb33b2d22cc0a7e7efdb84b179",
+          "code_length": 10
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "72c62fa027b32d911a35505b91bfb30563124cf94b40ba891f6994dcfbf7562f",
+          "code_length": 8
+        },
+        {
+          "name": "getTimeZone",
+          "descriptor": "()Ljava/util/TimeZone;",
+          "access": 1,
+          "code_sha256": "c9474d88afaa173473480381e0fea51a82cf31d4eff6fa53e151edad6ff8251a",
+          "code_length": 8
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1,
+          "code_sha256": "047fe8aa7ec4561d53d5c5ca7b969b250e12a4b00308aa84962169b476b93159",
+          "code_length": 8
+        },
+        {
+          "name": "getMaxLengthEstimate",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7bdbba2d7a662930610b6457e227f52f15f2f147ecbedc33231df7de77db5842",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "7830be2fbd85eaa9d1e1ac3da21017e94fdf9fc05ece7ec296b0eea9770a7361",
+          "code_length": 26
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f8bca8f9b783c267e2d8fe59e5403f7ba274faa9c73885ef01089969168b385d",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "58b8b56dd238288e5701bb12f3d64ed67a29d10265764dc557672b698d43f2be",
+          "code_length": 64
+        },
+        {
+          "name": "applyRules",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 4,
+          "code_sha256": "19832c93f303d2efca2c24fb99ea79cb47d7b76d77cce8efa1baf8996a4bc02a",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "dbd4807211d64b76aae2a69bea21a831c95e4076de2458b95df36a612ebcafbb",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/StringBuilder",
+        "java/text/DateFormat",
+        "java/text/Format",
+        "java/text/ParseException",
+        "java/util/TimeZone",
+        "org/sqlite/date/DateParser",
+        "org/sqlite/date/DatePrinter",
+        "org/sqlite/date/FastDateFormat",
+        "org/sqlite/date/FastDateFormat$1",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FormatCache"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$4.class",
+      "occurrence": 0,
+      "sha256": "642defe6d71fad7716c55f1620405f42fe76aa8f73238ca54abd479d6f7a51cf",
+      "name": "org/sqlite/date/FastDateParser$4",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$NumberStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "30bb1e04d4a1d03a8a6137208d139809d8f19d6b14a4645862901554a440e8d0",
+          "code_length": 6
+        },
+        {
+          "name": "modify",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "0c426a24078df38b75a63cdf3acbc347317daa0cf265bf81ca79d403d7aef6f4",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$4",
+        "org/sqlite/date/FastDateParser$NumberStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TimeZoneDisplayKey.class",
+      "occurrence": 0,
+      "sha256": "e243000ca74664f78bc47f180b7c490a9701da6ec5caca8d2a6c48f9890fd30e",
+      "name": "org/sqlite/date/FastDatePrinter$TimeZoneDisplayKey",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "mTimeZone",
+          "descriptor": "Ljava/util/TimeZone;",
+          "access": 18
+        },
+        {
+          "name": "mStyle",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "mLocale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/TimeZone;ZILjava/util/Locale;)V",
+          "access": 0,
+          "code_sha256": "51ec751a5def91f4ee8cc762420901e153820a252c1e0d9a2cf63fe218001719",
+          "code_length": 36
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7db0ec14a25258da5eb11ac9c7cc365f18a70ff6cef9894e245a45a0ed01a54c",
+          "code_length": 27
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "a9cc920cca0d85c8231e9d91dc0bcf243c52c64c0c2fdcc509cacc5446bb6bc7",
+          "code_length": 66
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Locale",
+        "java/util/TimeZone",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$TimeZoneDisplayKey"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateFormat$1.class",
+      "occurrence": 0,
+      "sha256": "bb705eda12c4ce0a90a9cd2c67ce30e1188f53dab9835c5e243b24a74a8993c7",
+      "name": "org/sqlite/date/FastDateFormat$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FormatCache",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Lorg/sqlite/date/FastDateFormat;",
+          "access": 4,
+          "code_sha256": "734e20df5c39e442c8132e37bdad1de547e319beaf6f5eb42ded94052615651f",
+          "code_length": 11
+        },
+        {
+          "name": "createInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/text/Format;",
+          "access": 4164,
+          "code_sha256": "daaafd3e4ee60a931a199e134a1fe89ba949b5244ae8ceed11563b98267dae92",
+          "code_length": 8
+        }
+      ],
+      "generic_signature": "Lorg/sqlite/date/FormatCache<Lorg/sqlite/date/FastDateFormat;>;",
+      "class_references": [
+        "org/sqlite/date/FastDateFormat",
+        "org/sqlite/date/FastDateFormat$1",
+        "org/sqlite/date/FormatCache"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$Strategy.class",
+      "occurrence": 0,
+      "sha256": "d094a4315b24996f2e31d1b3406794f4fd74cedbda6eb9fc990b31d9de052e2e",
+      "name": "org/sqlite/date/FastDateParser$Strategy",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "isNumber",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 1024
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$Strategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/DatePrinter.class",
+      "occurrence": 0,
+      "sha256": "1a3b3d5cf236a7c6ece70587804786d1e5af02be73c577bc9b7e850be31d210b",
+      "name": "org/sqlite/date/DatePrinter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "format",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getTimeZone",
+          "descriptor": "()Ljava/util/TimeZone;",
+          "access": 1025
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1025
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/StringBuffer;Ljava/text/FieldPosition;)Ljava/lang/StringBuffer;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/sqlite/date/DatePrinter"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$NumberRule.class",
+      "occurrence": 0,
+      "sha256": "e025c4e7221fdef0e4b19e75a1e11372d78a8fa81f282523351bc2033ac0a595",
+      "name": "org/sqlite/date/FastDatePrinter$NumberRule",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$TimeZoneStrategy.class",
+      "occurrence": 0,
+      "sha256": "4abcfccb358e5fd0e69652497aa10fa795e69cb2037273c4b0dbf8838a323544",
+      "name": "org/sqlite/date/FastDateParser$TimeZoneStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "validTimeZoneChars",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "tzNames",
+          "descriptor": "Ljava/util/SortedMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/SortedMap<Ljava/lang/String;Ljava/util/TimeZone;>;"
+        },
+        {
+          "name": "ID",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LONG_STD",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SHORT_STD",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LONG_DST",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SHORT_DST",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Locale;)V",
+          "access": 0,
+          "code_sha256": "7e9e091b35c2549616671ae106fd9417142987ce32c81214ac4f62e6c6a21e8e",
+          "code_length": 322
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 0,
+          "code_sha256": "d56e74cbbda18b081581b3410e41462f83b7c19e5ce1826aa481f3b3ec83728d",
+          "code_length": 11
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "2f436c0e7748656c9aac7a2e6952383fdb085b5a9fa414d666de1757e89516c2",
+          "code_length": 119
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[[Ljava/lang/String;",
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/DateFormatSymbols",
+        "java/util/Calendar",
+        "java/util/Iterator",
+        "java/util/Locale",
+        "java/util/Set",
+        "java/util/SortedMap",
+        "java/util/TimeZone",
+        "java/util/TreeMap",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$Strategy",
+        "org/sqlite/date/FastDateParser$TimeZoneStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/DateFormatUtils.class",
+      "occurrence": 0,
+      "sha256": "0ef4aae41c03b190bfc9b779702418b3be4de86f81cc68384f72bd5e15e9e587",
+      "name": "org/sqlite/date/DateFormatUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UTC_TIME_ZONE",
+          "descriptor": "Ljava/util/TimeZone;",
+          "access": 26
+        },
+        {
+          "name": "ISO_DATETIME_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_DATETIME_TIME_ZONE_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_DATE_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_DATE_TIME_ZONE_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_TIME_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_TIME_TIME_ZONE_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_TIME_NO_T_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "ISO_TIME_NO_T_TIME_ZONE_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        },
+        {
+          "name": "SMTP_DATETIME_FORMAT",
+          "descriptor": "Lorg/sqlite/date/FastDateFormat;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "formatUTC",
+          "descriptor": "(JLjava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f96c568ff4adfae0dda28990f64c0535544996f85d23cdfa44e205c58ea0bc8b",
+          "code_length": 17
+        },
+        {
+          "name": "formatUTC",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a212d55b0205d9ae4f977d01641938e8e4a1fe7ae0f60d80a5424b0a761fd8b9",
+          "code_length": 10
+        },
+        {
+          "name": "formatUTC",
+          "descriptor": "(JLjava/lang/String;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f8a6919fff9d96efa087bc5fb521ec4fe739027b8c9aeae01dd057889906bfea",
+          "code_length": 17
+        },
+        {
+          "name": "formatUTC",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "336a895240f89b6279613b9fee4c88b4d918e2ef5cb9cf06473b0deceb17c495",
+          "code_length": 10
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "3911c54b0751e4c881e86c391e0207a6c55a7020fdfb5079fe04a255ef5a47e3",
+          "code_length": 15
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f63dc69bbd7e40e1d529297e26bd96c6ee5049847f4760cd3bd8a6496e20e277",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "91f4d94d9c77c6c010f605f07b8e5828feb2df47da7a7a5fcd0b88ff375ad729",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/String;Ljava/util/TimeZone;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2c086c5f98d4b4e5b0499707a14592dfcd415486218cb0620fb02ec881bef8b9",
+          "code_length": 15
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;Ljava/util/TimeZone;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "66ed9797e743407b0a34eca1464ccbaf5cbd88354e4145635e51f99da3fe9e5d",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/String;Ljava/util/TimeZone;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "9dce71a1d79d1e5ecfb30d02a143e21891a22473b2de28c8ac22da6a025955d9",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/String;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4cc4bb7184b03e3a7df677359bc7e3ad89d70c427232fecc798fcf26b31a5c1b",
+          "code_length": 15
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b433cff2ba75467493a816dce92d3f59ae86c772aa3d80e7105a156f9832d8d5",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "490cf71f033c45dc940783047550f5291bc757a033a14d5217c3c296727c7909",
+          "code_length": 8
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f3a8b5e552ff939da0acf0f9fab817f773269d9cfaba3ca65238fd5e5e01d6cc",
+          "code_length": 16
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "0c4138f69e61da1af0406d93924cbcaaa53ea375ed11d01781fed6fefebd20c5",
+          "code_length": 15
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4a763d3a8aa47808c108a4e7661e638625eafcf776dc85a820679b07d7f51a13",
+          "code_length": 15
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "658b9f49efce861c1c264a92edb3215a8e6e0e8c1574ea392c742ab985808d28",
+          "code_length": 84
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Date",
+        "java/util/Locale",
+        "java/util/TimeZone",
+        "org/sqlite/date/DateFormatUtils",
+        "org/sqlite/date/FastDateFormat"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$CopyQuotedStrategy.class",
+      "occurrence": 0,
+      "sha256": "a916439a2d0bb97892f099e9ec3b2b78fe9b88956739777f7b9b811fa6d5b6e4",
+      "name": "org/sqlite/date/FastDateParser$CopyQuotedStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formatField",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9ecfe26dea8f497555d252b4472355cb7d44b3eeb35e18d12d2e1d22bfc4ea3d",
+          "code_length": 11
+        },
+        {
+          "name": "isNumber",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "ae3b5c6cccc8588b9f935c7294c4303bc0bc24e6ab432268cf5b9db24c2abb37",
+          "code_length": 29
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 0,
+          "code_sha256": "fb1c8d9c005cfce81f1ad5f861fa6eafbdc889963217e7710e1170ceb2a1700d",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/String",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$CopyQuotedStrategy",
+        "org/sqlite/date/FastDateParser$Strategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser.class",
+      "occurrence": 0,
+      "sha256": "32b9ffa554cfac78911f2cd9e61515ca4acbb8a52454c12bc9314be4efbe2364",
+      "name": "org/sqlite/date/FastDateParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/DateParser",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "JAPANESE_IMPERIAL",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 24
+        },
+        {
+          "name": "pattern",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "timeZone",
+          "descriptor": "Ljava/util/TimeZone;",
+          "access": 18
+        },
+        {
+          "name": "locale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 18
+        },
+        {
+          "name": "century",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "startYear",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "parsePattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 130
+        },
+        {
+          "name": "strategies",
+          "descriptor": "[Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 130
+        },
+        {
+          "name": "currentFormatField",
+          "descriptor": "Ljava/lang/String;",
+          "access": 130
+        },
+        {
+          "name": "nextStrategy",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 130
+        },
+        {
+          "name": "formatPattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 26
+        },
+        {
+          "name": "caches",
+          "descriptor": "[Ljava/util/concurrent/ConcurrentMap;",
+          "access": 26,
+          "generic_signature": "[Ljava/util/concurrent/ConcurrentMap<Ljava/util/Locale;Lorg/sqlite/date/FastDateParser$Strategy;>;"
+        },
+        {
+          "name": "ABBREVIATED_YEAR_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "NUMBER_MONTH_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "LITERAL_YEAR_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "WEEK_OF_YEAR_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "WEEK_OF_MONTH_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "DAY_OF_YEAR_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "DAY_OF_MONTH_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "DAY_OF_WEEK_IN_MONTH_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "HOUR_OF_DAY_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "HOUR24_OF_DAY_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "HOUR12_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "HOUR_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "MINUTE_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "SECOND_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "MILLISECOND_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        },
+        {
+          "name": "ISO_8601_STRATEGY",
+          "descriptor": "Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)V",
+          "access": 4,
+          "code_sha256": "16734f808d4b9eb173111952823f4ab34be8abfdc0811697d6b95c9f4d8da7d0",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;Ljava/util/Date;)V",
+          "access": 4,
+          "code_sha256": "b362a2b98d62975d0eaae56425f71873865f5170092072b895a17dc0305c6d14",
+          "code_length": 118
+        },
+        {
+          "name": "init",
+          "descriptor": "(Ljava/util/Calendar;)V",
+          "access": 2,
+          "code_sha256": "668a330a1fb1d4f15e2e2d29ec2d204431aa8acd9b1a80c1f2ad316502ae537d",
+          "code_length": 297
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getTimeZone",
+          "descriptor": "()Ljava/util/TimeZone;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getParsePattern",
+          "descriptor": "()Ljava/util/regex/Pattern;",
+          "access": 0,
+          "code_sha256": "c87a1dd9ad6383794f6ecd456748534f6913483eb9355f5530396eceac5206e3",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2bc0b0c9743c0926ec5179873357ffc6d83913841477469fe873fbb648eaebed",
+          "code_length": 62
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2338afe90c934678a4bde98bc8b312eddf64684cb07ef61f4ee99d7192754c69",
+          "code_length": 30
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c7883cc97d8a1ae8c78f8d2595d11f2c7ebb49d0020d1ebdd27d63dc0df81a48",
+          "code_length": 55
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "d2030527a4066e9775d76928850d18a65988eca622973ac9429de399c11cdda2",
+          "code_length": 22,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "parseObject",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "95e0542ac00aa48004e2625812c9c81d2625ef5d0cc01a0a887102c9f72d086a",
+          "code_length": 6,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "2909b26d17e89cbaf193cc3cb93d8d92f15604417722dd617c06827cce997f70",
+          "code_length": 164,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "parseObject",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a68ebd01b55318b685df6fdd882ec097f0c260f9ca5df502f581e22d1b0b07e4",
+          "code_length": 7
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "abe6c00ebf1ce5944b2f58bcf1b8c0537b56fed9864fa220f48698eda120ea5b",
+          "code_length": 107
+        },
+        {
+          "name": "escapeRegex",
+          "descriptor": "(Ljava/lang/StringBuilder;Ljava/lang/String;Z)Ljava/lang/StringBuilder;",
+          "access": 10,
+          "code_sha256": "a692f080532e3cefd6abab74e15b343072afe12b560c7483f2c1e530a18ea0e6",
+          "code_length": 150
+        },
+        {
+          "name": "getDisplayNames",
+          "descriptor": "(ILjava/util/Calendar;Ljava/util/Locale;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "43fef6b0a7a88dcbb1da72fec9a05cb2a8e79a7d97b44b50cac01daca5ad9d96",
+          "code_length": 8,
+          "generic_signature": "(ILjava/util/Calendar;Ljava/util/Locale;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "adjustYear",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "7dbcb01ce8a072ddde33283e2f4856d602aa14d19cfbd4daf33e009eaf878d2c",
+          "code_length": 24
+        },
+        {
+          "name": "isNextNumber",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "103ac6cb90a3348c6c404162a7e042563fea007aa4cd19d28dedd17155411984",
+          "code_length": 23
+        },
+        {
+          "name": "getFieldWidth",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "534e323b77acf30699a1c914975e1211a786eef0b53fafa75fede0c5265324b9",
+          "code_length": 8
+        },
+        {
+          "name": "getStrategy",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Calendar;)Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 2,
+          "code_sha256": "16a6e3161ed193010d2c6a3a1dcd7f5b49ef6e152805fd2431c1c3f84e352c70",
+          "code_length": 531
+        },
+        {
+          "name": "getCache",
+          "descriptor": "(I)Ljava/util/concurrent/ConcurrentMap;",
+          "access": 10,
+          "code_sha256": "565808c5b9ad2349c4b96d572ef5b06beb31fa2dfafd5733c5f1f80cd16bd744",
+          "code_length": 40,
+          "generic_signature": "(I)Ljava/util/concurrent/ConcurrentMap<Ljava/util/Locale;Lorg/sqlite/date/FastDateParser$Strategy;>;"
+        },
+        {
+          "name": "getLocaleSpecificStrategy",
+          "descriptor": "(ILjava/util/Calendar;)Lorg/sqlite/date/FastDateParser$Strategy;",
+          "access": 2,
+          "code_sha256": "10ed740d797320094987462f7c9c01e2d670c2d2ea512f60f631f793cb80e874",
+          "code_length": 88
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Ljava/lang/StringBuilder;Ljava/lang/String;Z)Ljava/lang/StringBuilder;",
+          "access": 4104,
+          "code_sha256": "6c7ef24f918cd197e59b1da7c8a9d4f7381ceac6f92cf54a2288116bc449ac7d",
+          "code_length": 7
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(ILjava/util/Calendar;Ljava/util/Locale;)Ljava/util/Map;",
+          "access": 4104,
+          "code_sha256": "75156853b345e4cfb279504eb66344cddb3ecd44cb8bb70afb25534ce9eaabc3",
+          "code_length": 7
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;I)I",
+          "access": 4104,
+          "code_sha256": "eb9cd2ec24fe271eeb660b6ffce890d7d4507346071b41487b6723c0c44e3436",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "140d4649c71ee16e0c684ae009773001c4fc33a61dd6ebfc8dc647de45b48fd2",
+          "code_length": 219
+        }
+      ],
+      "class_references": [
+        "[Lorg/sqlite/date/FastDateParser$Strategy;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/text/ParseException",
+        "java/text/ParsePosition",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/Date",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/TimeZone",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/sqlite/date/DateParser",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$2",
+        "org/sqlite/date/FastDateParser$3",
+        "org/sqlite/date/FastDateParser$4",
+        "org/sqlite/date/FastDateParser$CaseInsensitiveTextStrategy",
+        "org/sqlite/date/FastDateParser$CopyQuotedStrategy",
+        "org/sqlite/date/FastDateParser$ISO8601TimeZoneStrategy",
+        "org/sqlite/date/FastDateParser$NumberStrategy",
+        "org/sqlite/date/FastDateParser$Strategy",
+        "org/sqlite/date/FastDateParser$TimeZoneStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$StringLiteral.class",
+      "occurrence": 0,
+      "sha256": "dfedaab1f9f7b75f970e37b51204d9333eb3964ca5913907689986965d6b95d0",
+      "name": "org/sqlite/date/FastDatePrinter$StringLiteral",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$Rule"
+      ],
+      "fields": [
+        {
+          "name": "mValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "1e9c385c52d2051661492f5ba67fc5ab62b411a96ff47276a559a632bde87e80",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$Rule",
+        "org/sqlite/date/FastDatePrinter$StringLiteral"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$1.class",
+      "occurrence": 0,
+      "sha256": "5d90847e858ab7a5f28b89f5c6332b9228d14a8a22f7139a86f7aec772a53a87",
+      "name": "org/sqlite/date/FastDateParser$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$NumberStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "30bb1e04d4a1d03a8a6137208d139809d8f19d6b14a4645862901554a440e8d0",
+          "code_length": 6
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "6bea79e1bc6d0954a0547973c28d01cef758c559e28d1befbd5284e5ec96350e",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$NumberStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TwoDigitYearField.class",
+      "occurrence": 0,
+      "sha256": "a92241706fdbdcf1c26c5d1b1221148cb5a3a57a373119d5cc047e4416dba616",
+      "name": "org/sqlite/date/FastDatePrinter$TwoDigitYearField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$TwoDigitYearField;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "5f644671146b3f43555362fd2465107516fd97f12bcb365d021bfb18dc37ba35",
+          "code_length": 14
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "0d01ccc015d4b27ff11bbf2a7c2b22b06a02eb08dcc54d3d49bb7d2c01763f21",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1e6d95a36527cecbd9ba38ec97bf9c3b6cdd69d4b129aa35bbf18681a8b8b615",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$TwoDigitYearField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$3.class",
+      "occurrence": 0,
+      "sha256": "16b3255af55e0da257910799331189e06e4621892f42666757e4fefb32fd8b42",
+      "name": "org/sqlite/date/FastDateParser$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$NumberStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "30bb1e04d4a1d03a8a6137208d139809d8f19d6b14a4645862901554a440e8d0",
+          "code_length": 6
+        },
+        {
+          "name": "modify",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "6410676aea3e63618d6c4326052d004eb9714fc58de03b318505aa99e955e074",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$3",
+        "org/sqlite/date/FastDateParser$NumberStrategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TwoDigitMonthField.class",
+      "occurrence": 0,
+      "sha256": "89765d1dd034a0b0c17143ad42fd00a98700e27634f2b3d3ed72914607fbad42",
+      "name": "org/sqlite/date/FastDatePrinter$TwoDigitMonthField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$TwoDigitMonthField;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "8d5ae9f8d824f5d32f362b0bb94f18254fd7ade682d93b687e8347504315c01c",
+          "code_length": 13
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 17,
+          "code_sha256": "0d01ccc015d4b27ff11bbf2a7c2b22b06a02eb08dcc54d3d49bb7d2c01763f21",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1e6d95a36527cecbd9ba38ec97bf9c3b6cdd69d4b129aa35bbf18681a8b8b615",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$TwoDigitMonthField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$CaseInsensitiveTextStrategy.class",
+      "occurrence": 0,
+      "sha256": "e4a84b0952704d9cfb866c0a137a14af9cf31a7481f3ccbfa416a2bc0d7283fa",
+      "name": "org/sqlite/date/FastDateParser$CaseInsensitiveTextStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "field",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "locale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 18
+        },
+        {
+          "name": "lKeyValues",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/util/Calendar;Ljava/util/Locale;)V",
+          "access": 0,
+          "code_sha256": "3d0ba2588ca9c14f3f782734aa06a919652feadb3eaae48149634e4cedab49b1",
+          "code_length": 108
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 0,
+          "code_sha256": "4e76228a238277ad7b1c66e26f755b56038ab438b4c5bddaad72817924ae43ee",
+          "code_length": 72
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "fb1ceed4228d67604b21d3b40a331efdd6eb07f1d08e95a7591f7fb625055209",
+          "code_length": 140
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Calendar",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$CaseInsensitiveTextStrategy",
+        "org/sqlite/date/FastDateParser$Strategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDateParser$NumberStrategy.class",
+      "occurrence": 0,
+      "sha256": "bb8611e20c10d3ae56dd0d401b46ced6bddcc6ccc1e16aea7ae72751702497ad",
+      "name": "org/sqlite/date/FastDateParser$NumberStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/sqlite/date/FastDateParser$Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "field",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "25d7190788e6ca6cffad3a9f556de08fa82a421abb5b9c39b99cd846960548ad",
+          "code_length": 11
+        },
+        {
+          "name": "isNumber",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "addRegex",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/lang/StringBuilder;)Z",
+          "access": 0,
+          "code_sha256": "bdccfc0e6482b44a8bc87fe0ab344aaedb97ea0f2fc0a9f886f992f27ac5ae75",
+          "code_length": 38
+        },
+        {
+          "name": "setCalendar",
+          "descriptor": "(Lorg/sqlite/date/FastDateParser;Ljava/util/Calendar;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b087af18e4842313152c141b170fe23ac493e07edf9ff89abc15d7b61f1cc892",
+          "code_length": 17
+        },
+        {
+          "name": "modify",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "bddc352a97e0af2e2267d80a1c7c27e2265e5306a3ca194598448c0a3cbb8fc5",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDateParser",
+        "org/sqlite/date/FastDateParser$1",
+        "org/sqlite/date/FastDateParser$NumberStrategy",
+        "org/sqlite/date/FastDateParser$Strategy"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter.class",
+      "occurrence": 0,
+      "sha256": "9d7a15ebb596541c3fa456f0146ef06e577a1e7d6918e7968fe77460d58de1ad",
+      "name": "org/sqlite/date/FastDatePrinter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/DatePrinter",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "FULL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MEDIUM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SHORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "mPattern",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "mTimeZone",
+          "descriptor": "Ljava/util/TimeZone;",
+          "access": 18
+        },
+        {
+          "name": "mLocale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 18
+        },
+        {
+          "name": "mRules",
+          "descriptor": "[Lorg/sqlite/date/FastDatePrinter$Rule;",
+          "access": 130
+        },
+        {
+          "name": "mMaxLengthEstimate",
+          "descriptor": "I",
+          "access": 130
+        },
+        {
+          "name": "cTimeZoneDisplayCache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 26,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Lorg/sqlite/date/FastDatePrinter$TimeZoneDisplayKey;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/TimeZone;Ljava/util/Locale;)V",
+          "access": 4,
+          "code_sha256": "21e6beaeaf8e4ffa09963d9e7cb69a2dd41077f27596bba6f1cde54d7a0399cf",
+          "code_length": 24
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a921a44d9b6870649fbb8952948d72e0d3cfc27297c6484799cfeff34429e077",
+          "code_length": 65
+        },
+        {
+          "name": "parsePattern",
+          "descriptor": "()Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "4c77bf5a54e640aac4bca098c877a312d69adb964d0ad41e3c45744f554dbf7d",
+          "code_length": 992,
+          "generic_signature": "()Ljava/util/List<Lorg/sqlite/date/FastDatePrinter$Rule;>;"
+        },
+        {
+          "name": "parseToken",
+          "descriptor": "(Ljava/lang/String;[I)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "87c1cc9424ce616d55ac1cd8de3b7cfb16628343d9b60cd635fd55d0ab779b71",
+          "code_length": 245
+        },
+        {
+          "name": "selectNumberRule",
+          "descriptor": "(II)Lorg/sqlite/date/FastDatePrinter$NumberRule;",
+          "access": 4,
+          "code_sha256": "b5bd56dfe12ad182c222c425a445d2250ef34ce3fcfdb217d795039e30e80e70",
+          "code_length": 56
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/StringBuffer;Ljava/text/FieldPosition;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "e58d2b290feb7f267574a8202ff0c43a3ac7ae61c8cffb9f2f39061cf9964111",
+          "code_length": 96
+        },
+        {
+          "name": "format",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5eb0651c65109a884d85422fabb78826a31bf4d503a9a7e767a2ad61d3f5cd0b",
+          "code_length": 16
+        },
+        {
+          "name": "applyRulesToString",
+          "descriptor": "(Ljava/util/Calendar;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2d1f5d5aeb27448e89d29fd95f6d23068d1f7bc0fdec485e9716b8682ab7a224",
+          "code_length": 20
+        },
+        {
+          "name": "newCalendar",
+          "descriptor": "()Ljava/util/GregorianCalendar;",
+          "access": 2,
+          "code_sha256": "c47154de7c5d45357cb976997999626a5d7f75866c47c1ecfc9619985d1702b4",
+          "code_length": 16
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0f4ecaa010087cecefbd3cb05d4e4e20e46dd214d86d74f24eea19257c4809e6",
+          "code_length": 16
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0cace06b101bf46a8832a34d04d26a8f75300b14254ad12521f2c5e2d6bfbf1c",
+          "code_length": 20
+        },
+        {
+          "name": "format",
+          "descriptor": "(JLjava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "c80120185db3a09cd820dae9f93ebf06be585421315fc1c57d885a340622d174",
+          "code_length": 14
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Date;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "a6ce0253745df5a02758fe269f44492b365d10fa1705b70636b262830b3641e4",
+          "code_length": 17
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 1,
+          "code_sha256": "3fe15e82a5b1f6be9c339711c389b87559df9e0079e8cf70353265883f95120f",
+          "code_length": 7
+        },
+        {
+          "name": "applyRules",
+          "descriptor": "(Ljava/util/Calendar;Ljava/lang/StringBuffer;)Ljava/lang/StringBuffer;",
+          "access": 4,
+          "code_sha256": "35b92b63a6001aea419aaeb8f30bd205eb7a5a7a49c653ad7f693e03ec948201",
+          "code_length": 42
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getTimeZone",
+          "descriptor": "()Ljava/util/TimeZone;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxLengthEstimate",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f71c0e37ea3da5d4fd1a485105c71cfe89cdd2a717078a1b00ea19e11626bf1b",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2582772077b25a5f7240058e61fc38b51f75a175a20b1d5927c6bd8eb5c23815",
+          "code_length": 62
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ce1e31d10d1123cd3abaac992e868986ded40c00acc39c31fb6a747cfe37e555",
+          "code_length": 30
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d79caebeefc0d27910d8fa82b6b7bcb04256a9c166010362063d8a6fc6c3d5d",
+          "code_length": 55
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "4048ed18070a427a8fcd4e27f25987d95ca3538f38fe04575cef4c010cdbdc42",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "appendDigits",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 10,
+          "code_sha256": "70b3a67259ac5545f4215b1581a6ca0434c3472362bb81b4dccc24992f38d55f",
+          "code_length": 27
+        },
+        {
+          "name": "getTimeZoneDisplay",
+          "descriptor": "(Ljava/util/TimeZone;ZILjava/util/Locale;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "e4e6e25761ece38dbbf88edc73a39fe9266d89b68fdecd194820f546c168bc0f",
+          "code_length": 71
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 4104,
+          "code_sha256": "3d18335cbadf1e7e02d3a3556efde9fba48ecd4bd81d4c469efe1c391ee05d23",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d19d71f5037a902299163c803b1c21d6aa21d82e9f469efb60cb5b75b4755fb3",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/lang/String;",
+        "[Lorg/sqlite/date/FastDatePrinter$Rule;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/text/DateFormat",
+        "java/text/DateFormatSymbols",
+        "java/text/FieldPosition",
+        "java/util/ArrayList",
+        "java/util/Calendar",
+        "java/util/Date",
+        "java/util/GregorianCalendar",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/TimeZone",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "org/sqlite/date/DatePrinter",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$CharacterLiteral",
+        "org/sqlite/date/FastDatePrinter$Iso8601_Rule",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$PaddedNumberField",
+        "org/sqlite/date/FastDatePrinter$Rule",
+        "org/sqlite/date/FastDatePrinter$StringLiteral",
+        "org/sqlite/date/FastDatePrinter$TextField",
+        "org/sqlite/date/FastDatePrinter$TimeZoneDisplayKey",
+        "org/sqlite/date/FastDatePrinter$TimeZoneNameRule",
+        "org/sqlite/date/FastDatePrinter$TimeZoneNumberRule",
+        "org/sqlite/date/FastDatePrinter$TwelveHourField",
+        "org/sqlite/date/FastDatePrinter$TwentyFourHourField",
+        "org/sqlite/date/FastDatePrinter$TwoDigitMonthField",
+        "org/sqlite/date/FastDatePrinter$TwoDigitNumberField",
+        "org/sqlite/date/FastDatePrinter$TwoDigitYearField",
+        "org/sqlite/date/FastDatePrinter$UnpaddedMonthField",
+        "org/sqlite/date/FastDatePrinter$UnpaddedNumberField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/date/FastDatePrinter$TwentyFourHourField.class",
+      "occurrence": 0,
+      "sha256": "50bda3ce128cade0c37669a4425828124c4f01b4e47af510f8ce54cc23dc5f97",
+      "name": "org/sqlite/date/FastDatePrinter$TwentyFourHourField",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/sqlite/date/FastDatePrinter$NumberRule"
+      ],
+      "fields": [
+        {
+          "name": "mRule",
+          "descriptor": "Lorg/sqlite/date/FastDatePrinter$NumberRule;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/sqlite/date/FastDatePrinter$NumberRule;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "estimateLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2f56b73133f9ffdb96c980cbf94cd26807b779cd38d0feb2ff35a8b5de7ac20f",
+          "code_length": 10
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;Ljava/util/Calendar;)V",
+          "access": 1,
+          "code_sha256": "da9a2f056b01acbe70fdb4792a066d2bf9a52ce58b320cbd99c0fc388ff46554",
+          "code_length": 32
+        },
+        {
+          "name": "appendTo",
+          "descriptor": "(Ljava/lang/StringBuffer;I)V",
+          "access": 1,
+          "code_sha256": "e6e41b947a8dc3fac16171591ffa8a37090c12d70ce56d4ba78f5063e6103889",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Calendar",
+        "org/sqlite/date/FastDatePrinter",
+        "org/sqlite/date/FastDatePrinter$NumberRule",
+        "org/sqlite/date/FastDatePrinter$TwentyFourHourField"
+      ]
+    },
+    {
+      "entry": "org/sqlite/Collation.class",
+      "occurrence": 0,
+      "sha256": "75a20390e9460a065d136b8bad53c75c5b7e9c707eebd460cbda43bb6b6bf34a",
+      "name": "org/sqlite/Collation",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "conn",
+          "descriptor": "Lorg/sqlite/SQLiteConnection;",
+          "access": 2
+        },
+        {
+          "name": "db",
+          "descriptor": "Lorg/sqlite/core/DB;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;Lorg/sqlite/Collation;)V",
+          "access": 25,
+          "code_sha256": "61e042c241e499cff51a5799f29593f710a8413ee886acb330d44f2d89d694fc",
+          "code_length": 82,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "destroy",
+          "descriptor": "(Ljava/sql/Connection;Ljava/lang/String;)V",
+          "access": 25,
+          "code_sha256": "3f4c78616d1869b014ab38bb546d350bfe47a2adaeb33fa1224c6849b2e8cb85",
+          "code_length": 34,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "xCompare",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)I",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/sql/Connection",
+        "java/sql/SQLException",
+        "org/sqlite/Collation",
+        "org/sqlite/SQLiteConnection",
+        "org/sqlite/core/DB"
+      ]
+    },
+    {
+      "entry": "org/sqlite/Function$Aggregate.class",
+      "occurrence": 0,
+      "sha256": "faecff0ec4fbae0b0de40a1742b2283e7c7f2028481fafa9d572f97f09cab9b6",
+      "name": "org/sqlite/Function$Aggregate",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/sqlite/Function",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "xFunc",
+          "descriptor": "()V",
+          "access": 20,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "xStep",
+          "descriptor": "()V",
+          "access": 1028,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "xFinal",
+          "descriptor": "()V",
+          "access": 1028,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ed2b8254e0ba5a4243ea4b6f3d71ddfe0edc73225edd6f928618cb103449edb9",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "java/sql/SQLException",
+        "org/sqlite/Function",
+        "org/sqlite/Function$Aggregate"
+      ]
+    },
+    {
+      "entry": "org/sqlite/SQLiteJDBCLoader.class",
+      "occurrence": 0,
+      "sha256": "01406a18fd2f5a16f64f36e66d57a74a119172b914a5eef9032b3ed362201949",
+      "name": "org/sqlite/SQLiteJDBCLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/sqlite/util/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_EXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "extracted",
+          "descriptor": "Z",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "initialize",
+          "descriptor": "()Z",
+          "access": 41,
+          "code_sha256": "37167090ef11e8626a0782679f473e382fd554fcf7b246cf36016ca483016e7d",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getTempDir",
+          "descriptor": "()Ljava/io/File;",
+          "access": 10,
+          "code_sha256": "4a428f3450c85bc51a03e949e2c800d553afd9733c1ea8f7f5ebf6ea879e0650",
+          "code_length": 18
+        },
+        {
+          "name": "cleanup",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "61baeca84a9363aae5465a4660bb56b5c2296f2403ff91e05c0421f723f7a805",
+          "code_length": 108
+        },
+        {
+          "name": "isNativeMode",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "23a6330de58792aed9b9a5db678c960c2aae89a1add2ecaa05f7df27a67c31b3",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "md5sum",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "925f7a6a366d9f0536e21a94d42a5c72ca74eb4bb64d7a46fe071dedf180d638",
+          "code_length": 104,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "contentsEquals",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/InputStream;)Z",
+          "access": 10,
+          "code_sha256": "8955cf7fafe3eda47a7eb4eea905445bf9e7bdb9d06871f27e60a80dcf46db17",
+          "code_length": 78,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "extractAndLoadLibraryFile",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "346b3ae863ba528b5f9067355a1adfb0c26958a4182ee48d808740f83009d270",
+          "code_length": 436,
+          "throws": [
+            "org/sqlite/FileException"
+          ]
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 10,
+          "code_sha256": "2e7bb7ce8cff0c91bb654ace50a3a56aef3cb8ab9466a057dc41648c3be79d8b",
+          "code_length": 61
+        },
+        {
+          "name": "loadNativeLibrary",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "c9c044c2b7e1edc9c2b528f7c2f37d978b72085274c3a21eb4617507dbe5aff8",
+          "code_length": 54
+        },
+        {
+          "name": "loadNativeLibraryJdk",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "7238e5c31c62c88a1cc0ef29c79f650f315be19115ac47de7415b76984caf934",
+          "code_length": 24
+        },
+        {
+          "name": "loadSQLiteNativeLibrary",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "f063fda829f3dab40a63813046c9e2ae0e9a2fd44c2bc8cc1653a1513b09af73",
+          "code_length": 240,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getNativeLibraryFolderForTheCurrentOS",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "93aba5f3abeadd731beb32d766dadd6cf2854a0c16a5c39c688dfa76ea364127",
+          "code_length": 9
+        },
+        {
+          "name": "getMajorVersion",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "cac1d410ea70afb33524a2d19a228696eb82417cfcbb4b540ed64cb24d80bd20",
+          "code_length": 25
+        },
+        {
+          "name": "getMinorVersion",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "3b9364435fa36e39dfd053ca2c0b9d8cb856fc9d4654cbe0c4df482544f42d3c",
+          "code_length": 26
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "83175291f8542d1e933de34a9db0787ec4cbcb8010e7208ed73e9eabdabb3f8a",
+          "code_length": 4
+        },
+        {
+          "name": "lambda$loadNativeLibraryJdk$7",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "38b8e10a6823d5cafb98e83672344d2b0b76ac589bcba69eecb494de846cba4c",
+          "code_length": 3
+        },
+        {
+          "name": "lambda$loadNativeLibrary$6",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "b46178b27e474c7037dd1512831642e3503d2e9658c028dad4b680785470b128",
+          "code_length": 20
+        },
+        {
+          "name": "lambda$getResourceAsStream$5",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "2bb8c424b4e4ecf164b7a26be53de460770fa6ccbc8211dda016bf0b71672473",
+          "code_length": 3
+        },
+        {
+          "name": "lambda$extractAndLoadLibraryFile$4",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "f4d053df176b9a921d0f4f99fdc60604dd64c71a7359919f99344b894c917a8b",
+          "code_length": 3
+        },
+        {
+          "name": "lambda$cleanup$3",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "fa77b41dda53a422c2dfd254b4cd2d67e8dc97f1c1fdaae3f1c15eb129b84135",
+          "code_length": 3
+        },
+        {
+          "name": "lambda$cleanup$2",
+          "descriptor": "(Ljava/nio/file/Path;)V",
+          "access": 4106,
+          "code_sha256": "36cdda7b6813b217f4b2959a69eb7873640e808d87fbdd384d733bf59d46a7c2",
+          "code_length": 61
+        },
+        {
+          "name": "lambda$cleanup$1",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "96359307a3962b1369e1c770dd6c2ed67e1e742b1d7a237c73fd5b0fe8fbae8b",
+          "code_length": 3
+        },
+        {
+          "name": "lambda$cleanup$0",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/file/Path;)Z",
+          "access": 4106,
+          "code_sha256": "810b5d5148833e89d51aabd3487186ed72b74c7de7c6898d6a9c986f167bbb20",
+          "code_length": 43
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "91bfa3d8f45f49984dbcde2691a32d72edbbc85b7134a00d4040a092b21cf245",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/BufferedInputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/UnsatisfiedLinkError",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/net/URL",
+        "java/net/URLConnection",
+        "java/nio/file/CopyOption",
+        "java/nio/file/Files",
+        "java/nio/file/LinkOption",
+        "java/nio/file/OpenOption",
+        "java/nio/file/Path",
+        "java/nio/file/Paths",
+        "java/nio/file/StandardCopyOption",
+        "java/nio/file/attribute/FileAttribute",
+        "java/security/DigestInputStream",
+        "java/security/MessageDigest",
+        "java/security/NoSuchAlgorithmException",
+        "java/text/MessageFormat",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/UUID",
+        "java/util/stream/Stream",
+        "org/sqlite/FileException",
+        "org/sqlite/NativeLibraryNotFoundException",
+        "org/sqlite/SQLiteJDBCLoader",
+        "org/sqlite/SQLiteJDBCLoader$VersionHolder",
+        "org/sqlite/util/LibraryLoaderUtil",
+        "org/sqlite/util/Logger",
+        "org/sqlite/util/LoggerFactory",
+        "org/sqlite/util/OSInfo",
+        "org/sqlite/util/StringUtils"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "5bbd5e8c389ab1eb0404ded02c662db434ca0291bd881f284c1d0830752f2356",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/sql/Driver",
+        "module-info",
+        "org/sqlite/JDBC"
+      ]
+    }
+  ]
+}

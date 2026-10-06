@@ -1,0 +1,81 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/mcp-json-0.17.2.jar",
+  "sha256": "6df99ef400836bd213d63895684eb066d36e1a9b759bd38342c32a6b9b0b6e4f",
+  "class_count": 8,
+  "unique_class_entries": 8,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "io/modelcontextprotocol/json/McpJsonMapperSupplier.class": "fa578ef33837fcbc9a9033cc8e6c0de74e96902a9e75a7f6993285efb568ae0d",
+    "io/modelcontextprotocol/json/schema/JsonSchemaInternal.class": "d9056e4a2b4ad96430149b782e3a16624defb682d02b8f11216eb7c79657035e",
+    "io/modelcontextprotocol/json/schema/JsonSchemaValidator.class": "b4ab17b4a858e4168edba948c37b9e9aa1fdeab7aca117cee2c44e3c47f6a1e0",
+    "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse.class": "d3df0a5b44b147d76a31c94f0b787df5c82ae489fcb84f106993a7648d8ab7a3",
+    "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier.class": "657d9a5def6f2ccaf259ee948c6e06b6e8aa270f95f54ce385f5617a022ff008",
+    "io/modelcontextprotocol/json/McpJsonInternal.class": "eaf94b264f865e6cc6c120e9b09eca3709ebbe83c64a1aa8607f455b462341f8",
+    "io/modelcontextprotocol/json/McpJsonMapper.class": "e625202251154d75cb493ea23967896b780dff8e8013de996b700fa06081ab90",
+    "io/modelcontextprotocol/json/TypeRef.class": "2fc4f10fbc5669f6bec86bf05cd144ddc02c0365afff850a0d5c7a7572a4fa1c"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "21f6195a5cceca267b2316604c2fd9c05727d71d46805b8e6503478af16e6718",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp-json/pom.xml": "989cb2cc9155326c20fe30b196329bb35c02f6c7e81f63a347514cde935708f1",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp-json/pom.properties": "ee3b7252c6f16b33d6472ccd9f3d6c60e86cd045133cf8004fa381187f74787a"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonMapperSupplier.class",
+      "occurrence": 0,
+      "sha256": "fa578ef33837fcbc9a9033cc8e6c0de74e96902a9e75a7f6993285efb568ae0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaInternal.class",
+      "occurrence": 0,
+      "sha256": "d9056e4a2b4ad96430149b782e3a16624defb682d02b8f11216eb7c79657035e",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidator.class",
+      "occurrence": 0,
+      "sha256": "b4ab17b4a858e4168edba948c37b9e9aa1fdeab7aca117cee2c44e3c47f6a1e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse.class",
+      "occurrence": 0,
+      "sha256": "d3df0a5b44b147d76a31c94f0b787df5c82ae489fcb84f106993a7648d8ab7a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier.class",
+      "occurrence": 0,
+      "sha256": "657d9a5def6f2ccaf259ee948c6e06b6e8aa270f95f54ce385f5617a022ff008",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonInternal.class",
+      "occurrence": 0,
+      "sha256": "eaf94b264f865e6cc6c120e9b09eca3709ebbe83c64a1aa8607f455b462341f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonMapper.class",
+      "occurrence": 0,
+      "sha256": "e625202251154d75cb493ea23967896b780dff8e8013de996b700fa06081ab90",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/TypeRef.class",
+      "occurrence": 0,
+      "sha256": "2fc4f10fbc5669f6bec86bf05cd144ddc02c0365afff850a0d5c7a7572a4fa1c",
+      "member_shard": "docs/dev/evidence/sqx145/members/079/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/079/001.json",
+      "sha256": "6495419c980e154de7db89ebd055557e1b0e53529a606b4d556c8e381085f806"
+    }
+  ]
+}

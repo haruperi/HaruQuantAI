@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
+  "sha256": "9417855649b74f0f06bd6756e06094edc6672442de5f49db062c9ec849cc56e1",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/DatabankViews/DatabankViewsPlugin.class": "10edeed168a95971d09111f59dacb6f69bc9455e31156adfb0d59247e41cf661",
+    "com/strategyquant/plugin/Results/impl/DatabankViews/DatabankViewsServlet.class": "2b0e79c8a7e9b14044673f43e0c611a0c22f48a585cec25982d669a2862918a0"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/DatabankViews/DatabankViewsPlugin.class",
+      "occurrence": 0,
+      "sha256": "10edeed168a95971d09111f59dacb6f69bc9455e31156adfb0d59247e41cf661",
+      "member_shard": "docs/dev/evidence/sqx145/members/202/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/DatabankViews/DatabankViewsServlet.class",
+      "occurrence": 0,
+      "sha256": "2b0e79c8a7e9b14044673f43e0c611a0c22f48a585cec25982d669a2862918a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/202/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/202/001.json",
+      "sha256": "4a63454ef10a2bf2b6a337a07064bd1d91995ebef472ae8b93ed4b5264847468"
+    }
+  ]
+}

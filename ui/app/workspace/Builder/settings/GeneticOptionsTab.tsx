@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { SqdCheckbox, SqdFieldset, SqdSelect, SqdSlider, SqdSpinner } from './SettingsControls';
 import { geneticOptionsDefaults, type GeneticOptionsState } from './settingsFixtures';
 
-/** "Genetic options" tab (donor evidence SQX144-EV-000040). */
+/** "Genetic options" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function GeneticOptionsTab() {
   const [restartType, setRestartType] = useState('bestInIsland');
   const [conditions, setConditions] = useState([{ metric: 'Net profit', comparison: '>', value: '0' }]);

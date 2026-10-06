@@ -1,0 +1,317 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/uncommons-maths-1.2.2a.jar",
+  "sha256": "eebe98f2f9d8cb5d2a030a1c3e52cfbb3ee0ff5b6a721a45e62092e3bbf83c5c",
+  "class_count": 42,
+  "unique_class_entries": 42,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "org/uncommons/maths/Maths.class": "f4d07966ac4d30dc92e4ce0bd3431c47c92037606d289c2bea1da3857747bea5",
+    "org/uncommons/maths/binary/BinaryUtils.class": "a7f04d5514d92b7a6e1046b4e32d036dd76cc49734c971c61c5b318a6408f501",
+    "org/uncommons/maths/binary/BitString.class": "4221501b42421b7e2aac709f3b8c43e5f0dd2ad09675ee3e39713521b21c448b",
+    "org/uncommons/maths/binary/package-info.class": "4890e967c3e6938e9f5bcbe574d6deb22c009393b04575842e208c4c736fac26",
+    "org/uncommons/maths/combinatorics/CombinationGenerator$1.class": "42e0237046c48ed3cdf02d23afb1b09eb8e30435fb3dcd3e61114b95b01966bb",
+    "org/uncommons/maths/combinatorics/CombinationGenerator.class": "c4a76a48408ea2a268c4a03dd7d282650df9b39c75222dd3bf199eacc63f6900",
+    "org/uncommons/maths/combinatorics/PermutationGenerator$1.class": "64f62d178150e3cc5974da94ef1c38f6f3c2cf50e5a5d191bd2a0496a66da813",
+    "org/uncommons/maths/combinatorics/PermutationGenerator.class": "43fbd645a3f521d08f47ac9859ff8c01e46cf3590acb627fd86610c4b428e9bf",
+    "org/uncommons/maths/combinatorics/package-info.class": "7865039bc233d29a3865fdc881e61d3cbdd3f0ad7ab8ac40560b60361680e6e0",
+    "org/uncommons/maths/number/AdjustableNumberGenerator.class": "b743a5dc07ff81f31f26d9c22e07ae2ebeffaadd6b4ffe7b5cc0a0c555834ae7",
+    "org/uncommons/maths/number/ConstantGenerator.class": "6b6c59b86d19838216da0ef85b04395a352c2eba9876e741e066d3f8aee549ae",
+    "org/uncommons/maths/number/NumberGenerator.class": "a95920a28f84701d983d17aa1617bfffad19562d9e314c876bf0b2e24dcc09ac",
+    "org/uncommons/maths/number/Rational.class": "4ede8fdd3a01fb829f914eb3438ca47c117e6f13f1ae503050b0144bea04d4eb",
+    "org/uncommons/maths/number/package-info.class": "4df9f5980616ace7e4a87cb80fd5db3efca885961acd4ae2e1904d424a3bda3a",
+    "org/uncommons/maths/package-info.class": "524963fc55fec4a1469869c75d9b8062fabf58c55a09bb5c86f49dcab7d693d3",
+    "org/uncommons/maths/random/AESCounterRNG$1.class": "a4413c62593a53e1ce12f67bbbc26e6420124015719bff0711db78f01921ce36",
+    "org/uncommons/maths/random/AESCounterRNG$AESKey.class": "5e58dd8b7c9a7c3c0b5e6b52cd84143e7cfb4cb4cea0bd323eb38068b740cd52",
+    "org/uncommons/maths/random/AESCounterRNG.class": "bf34f72925d95a49043ff17c1809ad7167c22109dd8e956ca2613e18ce910556",
+    "org/uncommons/maths/random/BinomialGenerator.class": "e55b60ae4b4e34fe193898a50fb7fcc946572b528a397b6613b252b3c9a11dad",
+    "org/uncommons/maths/random/CMWC4096RNG.class": "816219f24233c9a41d1bfe151fdfeb717f0734ad68befa62cf3363b8af38e020",
+    "org/uncommons/maths/random/CellularAutomatonRNG.class": "39a2a2fd6b9561bc3e90567337e66521d654c139f9d959ca7c41db1ba549034c",
+    "org/uncommons/maths/random/ContinuousUniformGenerator.class": "cb793803d0724d7476ba1bcfe187445ee9d5e5267e9355c0a1f30a7418a6962c",
+    "org/uncommons/maths/random/DefaultSeedGenerator.class": "248e48b07b809586c4fdeb80ef8c88cccd1da703af40c371396b9da5dcf6fa11",
+    "org/uncommons/maths/random/DevRandomSeedGenerator.class": "b9f7ea662012abdf64b259f451fd74139a2be0942b04426253814c1e483c506d",
+    "org/uncommons/maths/random/DiehardInputGenerator.class": "8a221dcc50c254345ab3f6faf4de5fd029f992463fdbb071834c79e1b7f17527",
+    "org/uncommons/maths/random/DiscreteUniformGenerator.class": "c285a941a79b5362fd604e012c8114d10d1ae96b47eb06be1c225831c5c4206a",
+    "org/uncommons/maths/random/ExponentialGenerator.class": "a98b0f9125f657ee818e9cc479a93faade1406b8e043725b6ab630914b9ccdb2",
+    "org/uncommons/maths/random/GaussianGenerator.class": "e53b78ad6325f878e49d82771f99f8ec532916304a2c971c3c8f8f03040433b6",
+    "org/uncommons/maths/random/JavaRNG.class": "e8122b506f6c4e0285d1d7e50945eb6c8d0d330a15f197d0f59782235f3d1057",
+    "org/uncommons/maths/random/MersenneTwisterRNG.class": "8949ba0f64e99128ac2ae12e604a568841a3776b703e8946484326635e7192a3",
+    "org/uncommons/maths/random/PoissonGenerator.class": "1c57841e73640ffb0c01b6199957edea6e7937577d7133082012822d13d001b7",
+    "org/uncommons/maths/random/Probability.class": "aefc77c802c3debe0d0e3c6348a4ea5cea78fcb9425d839c80590eaf5ddc2f0e",
+    "org/uncommons/maths/random/RandomDotOrgSeedGenerator.class": "b40120dde15f7b2b279dbe686ff3fde695cea514cec314bfea4a841f74a60e9a",
+    "org/uncommons/maths/random/RepeatableRNG.class": "963c446c2955ca6d77e9843a284f54a2abbb90806d5292a5ee739b13f89992cc",
+    "org/uncommons/maths/random/SecureRandomSeedGenerator.class": "63ae158cd04d4ed30798066c19c28e476ad853a8840e94ea295248b8d2517638",
+    "org/uncommons/maths/random/SeedException.class": "1fd680fdb506bb9691c3e390fc760879d2262afc48e63dcca2213852048be159",
+    "org/uncommons/maths/random/SeedGenerator.class": "dfde2eac3e99c64435fdce07762fe191af9bba57549e4e165b0f7a3e4d2d8c5a",
+    "org/uncommons/maths/random/XORShiftRNG.class": "b1f3a6c944ab030538423ee9a95c64f2241b4b7d8f7ade516accaa859ce1c57c",
+    "org/uncommons/maths/random/package-info.class": "1d4f522dd581e52029e15c37bcfe9e59d5ea1c957e652620123f79914e6f84ad",
+    "org/uncommons/maths/statistics/DataSet.class": "8eaeb78c3e9cbf00fb65ec567e0824e9dec3f629982f8dfd13de578d7a7db60d",
+    "org/uncommons/maths/statistics/EmptyDataSetException.class": "bad27e934fb45e98df1b2fd38edcf0a150efbcb7800a28d69ab4a7b46194ac7a",
+    "org/uncommons/maths/statistics/package-info.class": "1d5297d254086b62add50207cac54e13e89e8e5ac72faca746d60a29407223eb"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "f4f3896f4992e28d9a8cc8bd18f76f744b660d96207309c9c6b5fdcfd3e9cfb4"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/uncommons/maths/Maths.class",
+      "occurrence": 0,
+      "sha256": "f4d07966ac4d30dc92e4ce0bd3431c47c92037606d289c2bea1da3857747bea5",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/binary/BinaryUtils.class",
+      "occurrence": 0,
+      "sha256": "a7f04d5514d92b7a6e1046b4e32d036dd76cc49734c971c61c5b318a6408f501",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/binary/BitString.class",
+      "occurrence": 0,
+      "sha256": "4221501b42421b7e2aac709f3b8c43e5f0dd2ad09675ee3e39713521b21c448b",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/binary/package-info.class",
+      "occurrence": 0,
+      "sha256": "4890e967c3e6938e9f5bcbe574d6deb22c009393b04575842e208c4c736fac26",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/CombinationGenerator$1.class",
+      "occurrence": 0,
+      "sha256": "42e0237046c48ed3cdf02d23afb1b09eb8e30435fb3dcd3e61114b95b01966bb",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/CombinationGenerator.class",
+      "occurrence": 0,
+      "sha256": "c4a76a48408ea2a268c4a03dd7d282650df9b39c75222dd3bf199eacc63f6900",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/PermutationGenerator$1.class",
+      "occurrence": 0,
+      "sha256": "64f62d178150e3cc5974da94ef1c38f6f3c2cf50e5a5d191bd2a0496a66da813",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/PermutationGenerator.class",
+      "occurrence": 0,
+      "sha256": "43fbd645a3f521d08f47ac9859ff8c01e46cf3590acb627fd86610c4b428e9bf",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/package-info.class",
+      "occurrence": 0,
+      "sha256": "7865039bc233d29a3865fdc881e61d3cbdd3f0ad7ab8ac40560b60361680e6e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/number/AdjustableNumberGenerator.class",
+      "occurrence": 0,
+      "sha256": "b743a5dc07ff81f31f26d9c22e07ae2ebeffaadd6b4ffe7b5cc0a0c555834ae7",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/number/ConstantGenerator.class",
+      "occurrence": 0,
+      "sha256": "6b6c59b86d19838216da0ef85b04395a352c2eba9876e741e066d3f8aee549ae",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/number/NumberGenerator.class",
+      "occurrence": 0,
+      "sha256": "a95920a28f84701d983d17aa1617bfffad19562d9e314c876bf0b2e24dcc09ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/number/Rational.class",
+      "occurrence": 0,
+      "sha256": "4ede8fdd3a01fb829f914eb3438ca47c117e6f13f1ae503050b0144bea04d4eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/number/package-info.class",
+      "occurrence": 0,
+      "sha256": "4df9f5980616ace7e4a87cb80fd5db3efca885961acd4ae2e1904d424a3bda3a",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/package-info.class",
+      "occurrence": 0,
+      "sha256": "524963fc55fec4a1469869c75d9b8062fabf58c55a09bb5c86f49dcab7d693d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG$1.class",
+      "occurrence": 0,
+      "sha256": "a4413c62593a53e1ce12f67bbbc26e6420124015719bff0711db78f01921ce36",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG$AESKey.class",
+      "occurrence": 0,
+      "sha256": "5e58dd8b7c9a7c3c0b5e6b52cd84143e7cfb4cb4cea0bd323eb38068b740cd52",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG.class",
+      "occurrence": 0,
+      "sha256": "bf34f72925d95a49043ff17c1809ad7167c22109dd8e956ca2613e18ce910556",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/BinomialGenerator.class",
+      "occurrence": 0,
+      "sha256": "e55b60ae4b4e34fe193898a50fb7fcc946572b528a397b6613b252b3c9a11dad",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/CMWC4096RNG.class",
+      "occurrence": 0,
+      "sha256": "816219f24233c9a41d1bfe151fdfeb717f0734ad68befa62cf3363b8af38e020",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/CellularAutomatonRNG.class",
+      "occurrence": 0,
+      "sha256": "39a2a2fd6b9561bc3e90567337e66521d654c139f9d959ca7c41db1ba549034c",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/ContinuousUniformGenerator.class",
+      "occurrence": 0,
+      "sha256": "cb793803d0724d7476ba1bcfe187445ee9d5e5267e9355c0a1f30a7418a6962c",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/DefaultSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "248e48b07b809586c4fdeb80ef8c88cccd1da703af40c371396b9da5dcf6fa11",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/DevRandomSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "b9f7ea662012abdf64b259f451fd74139a2be0942b04426253814c1e483c506d",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/DiehardInputGenerator.class",
+      "occurrence": 0,
+      "sha256": "8a221dcc50c254345ab3f6faf4de5fd029f992463fdbb071834c79e1b7f17527",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/DiscreteUniformGenerator.class",
+      "occurrence": 0,
+      "sha256": "c285a941a79b5362fd604e012c8114d10d1ae96b47eb06be1c225831c5c4206a",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/ExponentialGenerator.class",
+      "occurrence": 0,
+      "sha256": "a98b0f9125f657ee818e9cc479a93faade1406b8e043725b6ab630914b9ccdb2",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/GaussianGenerator.class",
+      "occurrence": 0,
+      "sha256": "e53b78ad6325f878e49d82771f99f8ec532916304a2c971c3c8f8f03040433b6",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/JavaRNG.class",
+      "occurrence": 0,
+      "sha256": "e8122b506f6c4e0285d1d7e50945eb6c8d0d330a15f197d0f59782235f3d1057",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/MersenneTwisterRNG.class",
+      "occurrence": 0,
+      "sha256": "8949ba0f64e99128ac2ae12e604a568841a3776b703e8946484326635e7192a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/PoissonGenerator.class",
+      "occurrence": 0,
+      "sha256": "1c57841e73640ffb0c01b6199957edea6e7937577d7133082012822d13d001b7",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/Probability.class",
+      "occurrence": 0,
+      "sha256": "aefc77c802c3debe0d0e3c6348a4ea5cea78fcb9425d839c80590eaf5ddc2f0e",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/RandomDotOrgSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "b40120dde15f7b2b279dbe686ff3fde695cea514cec314bfea4a841f74a60e9a",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/RepeatableRNG.class",
+      "occurrence": 0,
+      "sha256": "963c446c2955ca6d77e9843a284f54a2abbb90806d5292a5ee739b13f89992cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/SecureRandomSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "63ae158cd04d4ed30798066c19c28e476ad853a8840e94ea295248b8d2517638",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/SeedException.class",
+      "occurrence": 0,
+      "sha256": "1fd680fdb506bb9691c3e390fc760879d2262afc48e63dcca2213852048be159",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/SeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "dfde2eac3e99c64435fdce07762fe191af9bba57549e4e165b0f7a3e4d2d8c5a",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/XORShiftRNG.class",
+      "occurrence": 0,
+      "sha256": "b1f3a6c944ab030538423ee9a95c64f2241b4b7d8f7ade516accaa859ce1c57c",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/random/package-info.class",
+      "occurrence": 0,
+      "sha256": "1d4f522dd581e52029e15c37bcfe9e59d5ea1c957e652620123f79914e6f84ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/DataSet.class",
+      "occurrence": 0,
+      "sha256": "8eaeb78c3e9cbf00fb65ec567e0824e9dec3f629982f8dfd13de578d7a7db60d",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/EmptyDataSetException.class",
+      "occurrence": 0,
+      "sha256": "bad27e934fb45e98df1b2fd38edcf0a150efbcb7800a28d69ab4a7b46194ac7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/package-info.class",
+      "occurrence": 0,
+      "sha256": "1d5297d254086b62add50207cac54e13e89e8e5ac72faca746d60a29407223eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/115/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/115/001.json",
+      "sha256": "e2de91eb02ae71d0949b71e1a0968f60373e5d105643c29204773d70f3bd3d01"
+    }
+  ]
+}

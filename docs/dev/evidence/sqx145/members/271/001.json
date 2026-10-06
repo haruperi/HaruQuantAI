@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskCallExternalScript/TaskCallExternalScript.jar",
+  "archive_sha256": "487d4460de5659572b1d9cb6f3d34e4b29593c428f97bf9af4847fab5199c46f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1.class",
+      "occurrence": 0,
+      "sha256": "418dbb5be8c406a3e449df50287ef96b611326611985c6e92bcea62a03719e65",
+      "name": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/TimerTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2bea7521780007249db1b48c0bb95768a2f657fbee1db700b4e17150b0fe5bb0",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript",
+        "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "java/util/TimerTask"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript.class",
+      "occurrence": 0,
+      "sha256": "6c5a4de777d18fad4af61408b1b5947dec35133d75ed365c0df277ca74063ae0",
+      "name": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "file",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "params",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "runTime",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d666f79918f4ad3c548766469fb38050a228321be78fa9ea55b3066a7d06f44c",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "2a162062f986c07bde42d217a5df41d4f4b0b724f3d8c1affb6d98522017ac0b",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "431034cbe64ce7aa669460b922771c46e391bad78e1f55810986f31765f72009",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8cbe09347bfbf721a262f4d4110604803a03b7627fd1fe6cd756120b7f474cb4",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "e4b9d82ff69783747c5956e12db1a3124c45fef2f6fb797229914dde05de20cd",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "1aba344a0b166ca3e3347d91eeb87a32ae8e275f9616a93064ab8a6b1716b6cb",
+          "code_length": 80
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b1f584edaa722c49ad19dd682be4a17b179720e60f2e7ed978a7070e33a426e",
+          "code_length": 269,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8e42080374d33b788e4b65acbadb6923011fd89ab3d998dd10b7b89a8f37d516",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "69de8ab51a559f830f2e3707381f883aa69e57ff3edd6029c4d3f9b5d4b01543",
+          "code_length": 3
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d024f27d8f8a04ee5d41668485563a8dc1211487ed6029c53b1387bb72c0ca10",
+          "code_length": 10
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "b4ac5981f8bb6c3cbd44111be77df115192c4b3bbebd431dc7008bbc0488332a",
+          "code_length": 14
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript;)Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript",
+        "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Timer"
+      ]
+    }
+  ]
+}

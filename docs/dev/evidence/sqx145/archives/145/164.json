@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DatabankRename/DatabankRename.jar",
+  "sha256": "599ccf09cfdbdd4eb4e56c8aef81b2a6dfebe73743a0106e92abde7c77a1dffa",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.class": "cebaed075f47eef7de9ca9eafa48b6dad2b6463b126b654f03aeb798f54448b3",
+    "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.class": "af6c01f27a18c605e26abe4fad524686b0a0896a2c9aeb3a4b2cece292874827"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.class",
+      "occurrence": 0,
+      "sha256": "cebaed075f47eef7de9ca9eafa48b6dad2b6463b126b654f03aeb798f54448b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/164/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.class",
+      "occurrence": 0,
+      "sha256": "af6c01f27a18c605e26abe4fad524686b0a0896a2c9aeb3a4b2cece292874827",
+      "member_shard": "docs/dev/evidence/sqx145/members/164/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/164/001.json",
+      "sha256": "e0908cff42add5aa69cfa2ec89227f7b3f6967c4b4ba19fc20656262d26975d2"
+    }
+  ]
+}

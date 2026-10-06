@@ -17,7 +17,7 @@ import {
   tradeListViews,
 } from '../../../../app/workspace/Builder/results/resultsFixtures';
 
-describe('Results tab fixtures (donor SQX144-EV-000045..000047)', () => {
+describe('Results tab fixtures (donor retained target UI; current donor equivalence unverified)', () => {
   it('registers the visible built-in tabs in the donor strip order', () => {
     expect(builtInResultTabs.map(t => t.title)).toEqual([
       'Overview',

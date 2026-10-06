@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+  "sha256": "0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoPlugin.class": "49537639ca9492b63aa3caf47fd8ef0bc39483772332013287aef91d47e30eff",
+    "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1.class": "91ff2d75570d49f5ade422ea3d83b581ec8a10f5160be759d414308bc61de760",
+    "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet.class": "c3b8314c8dcaefa1d19d2b79862eff45b12b6145765dc7dfc46968797e456a4c"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoPlugin.class",
+      "occurrence": 0,
+      "sha256": "49537639ca9492b63aa3caf47fd8ef0bc39483772332013287aef91d47e30eff",
+      "member_shard": "docs/dev/evidence/sqx145/members/173/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet$1.class",
+      "occurrence": 0,
+      "sha256": "91ff2d75570d49f5ade422ea3d83b581ec8a10f5160be759d414308bc61de760",
+      "member_shard": "docs/dev/evidence/sqx145/members/173/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet.class",
+      "occurrence": 0,
+      "sha256": "c3b8314c8dcaefa1d19d2b79862eff45b12b6145765dc7dfc46968797e456a4c",
+      "member_shard": "docs/dev/evidence/sqx145/members/173/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/173/001.json",
+      "sha256": "fc342096a76c70d304f25b87b6de380aa958820eb1fe44442bb48e92b93f1582"
+    }
+  ]
+}

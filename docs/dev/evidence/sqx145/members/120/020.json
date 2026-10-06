@@ -1,0 +1,1813 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/xmlbeans-2.6.0.jar",
+  "archive_sha256": "c77974359688b2823b48fa9a33da68559d64f8474441480d9df4f9e254332a96",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/xmlbeans/impl/inst2xsd/util/Attribute.class",
+      "occurrence": 0,
+      "sha256": "7cbf9c1e2717f48ac3ebd02f3f6610febe9d0e2e07a3d477a168b469f3b6af2a",
+      "name": "org/apache/xmlbeans/impl/inst2xsd/util/Attribute",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_name",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 2
+        },
+        {
+          "name": "_type",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 2
+        },
+        {
+          "name": "_ref",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+          "access": 2
+        },
+        {
+          "name": "_isGlobal",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_isOptional",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$org$apache$xmlbeans$impl$inst2xsd$util$Attribute",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7fe15a0c403e6258706aa458e73e36de3d0f39c0f8402fce0b41f633e4a53d6a",
+          "code_length": 20
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljavax/xml/namespace/QName;)V",
+          "access": 1,
+          "code_sha256": "cfbe938644294b083b0cc711c69496b4a235b8f0d50b61163d82f107bf8b36e8",
+          "code_length": 6
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 1,
+          "code_sha256": "2a531dacbef96106cbce4007574254892534a1d42d6e390ef294311c2b43d652",
+          "code_length": 22
+        },
+        {
+          "name": "setType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;)V",
+          "access": 1,
+          "code_sha256": "ec1ccec0855be2e9a1b46fe30e7714ad6df3a5f99d56a3ea7909475c6719a99b",
+          "code_length": 27
+        },
+        {
+          "name": "isRef",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b55eb3f0b83b4ad178d8952b9ea6b3db18ba53a5c06f687d2e26f7c7fd6c561a",
+          "code_length": 13
+        },
+        {
+          "name": "getRef",
+          "descriptor": "()Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "setRef",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;)V",
+          "access": 1,
+          "code_sha256": "7793676ab651eff0659d95d958ea9e327b1cc44e2e9811ad1771a6955c8be94e",
+          "code_length": 32
+        },
+        {
+          "name": "isGlobal",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "setGlobal",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c8c4752ca68104796797c33b65753bc9f43eed000b98189a2bfcc9110a8c39a9",
+          "code_length": 6
+        },
+        {
+          "name": "isOptional",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "setOptional",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "bc923f99163d4baaa3b8b15867e3f2a5696f8eee1eb5e2dae654a4f4bd8db0d5",
+          "code_length": 33
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d21308af384bbe9532002812375c1890ee108939641d340c83b09219ae80f157",
+          "code_length": 84
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "abdd12227c78fe3e34bc117e688fe8fa1a3d204dec83419d34ae003e544a5062",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Attribute"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/inst2xsd/util/Element.class",
+      "occurrence": 0,
+      "sha256": "3b3dbb7dc3e5d2b373f8628beedd69f3f1cc381bc626d8c75339bf9cf27c3d5c",
+      "name": "org/apache/xmlbeans/impl/inst2xsd/util/Element",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_name",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 2
+        },
+        {
+          "name": "_ref",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;",
+          "access": 2
+        },
+        {
+          "name": "_isGlobal",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_minOccurs",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_maxOccurs",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "UNBOUNDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "_isNillable",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_type",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 2
+        },
+        {
+          "name": "_comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$org$apache$xmlbeans$impl$inst2xsd$util$Element",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "93800d042c56529710120fe46d3ae8198f0ce4231088298e4e172ff200570f91",
+          "code_length": 45
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljavax/xml/namespace/QName;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "isRef",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0852841ac4cc8c354c5d0cf84e98769b146dcbbd21b38c53a558cb5ac366060b",
+          "code_length": 13
+        },
+        {
+          "name": "getRef",
+          "descriptor": "()Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "setRef",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;)V",
+          "access": 1,
+          "code_sha256": "34718d1ffc8ebcbfe2cd86155827cc95951a180ce4161f70dbbe40725adbd30b",
+          "code_length": 32
+        },
+        {
+          "name": "isGlobal",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "setGlobal",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "821ee5c4c70bd0d4823a11e30382bcb06e5727cf514e42b0e7cf0bf0d4b5f2cc",
+          "code_length": 16
+        },
+        {
+          "name": "getMinOccurs",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "setMinOccurs",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e07b26bc84cb04399f939d9b1dcecf2d6e991d8f9d2200e8f6be20389f064821",
+          "code_length": 6
+        },
+        {
+          "name": "getMaxOccurs",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "setMaxOccurs",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "5c6246d262e6798a3a2066d91fafc53bded277ef9cf167ecd50af07f6482dda5",
+          "code_length": 6
+        },
+        {
+          "name": "isNillable",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4c4be5d4e2bc69b8b56edcc530b23f83be000df4423c40efe0643a11c4f79b40",
+          "code_length": 5
+        },
+        {
+          "name": "setNillable",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "0acba6b145f96d875790d77e0b9b550787e5d7a81c980f0683eea76036b53120",
+          "code_length": 6
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 1,
+          "code_sha256": "a73081b471f317f5b5811ab5d11cb91f8d2a32d8ca89567f4f9260e2973c07c0",
+          "code_length": 22
+        },
+        {
+          "name": "setType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;)V",
+          "access": 1,
+          "code_sha256": "49fd9a35c0307e3b1106b6de56198a04a9b999b46713125a0b08fad20f1578a4",
+          "code_length": 27
+        },
+        {
+          "name": "getComment",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "setComment",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "357112b46d606be3030f83e27bd517dbb0e2e88b28fb5eb166beeb8eeaf6e331",
+          "code_length": 6
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ed1b776a2eb23d4a059130245455ac161938fbd3edb0cfe88c698c26f2a83bae",
+          "code_length": 158
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e3c4e91f8754ee8f7ca97a603d8ed79e6b2c0b0489aa1fbd436f2c828ecda3b8",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Element",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Type"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/inst2xsd/util/Type$1.class",
+      "occurrence": 0,
+      "sha256": "bae42b4245deccf95331a3eed5d5fdfb0bc691a70177d019a88610fae8adc18b",
+      "name": "org/apache/xmlbeans/impl/inst2xsd/util/Type$1",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/xmlbeans/impl/common/PrefixResolver"
+      ],
+      "fields": [
+        {
+          "name": "val$xc",
+          "descriptor": "Lorg/apache/xmlbeans/XmlCursor;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "getNamespaceForPrefix",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "334eea8a2e225ecd9a51cd8059d29d60468e51776a6db1f91ba7b4042d35fb85",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/xmlbeans/XmlCursor",
+        "org/apache/xmlbeans/impl/common/PrefixResolver",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Type$1"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/inst2xsd/util/Type.class",
+      "occurrence": 0,
+      "sha256": "6c480a073a50abefd491d1e04a127d38d213fd8b45ff640d406020bb61842a9c",
+      "name": "org/apache/xmlbeans/impl/inst2xsd/util/Type",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_name",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 2
+        },
+        {
+          "name": "_kind",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "SIMPLE_TYPE_SIMPLE_CONTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COMPLEX_TYPE_SIMPLE_CONTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COMPLEX_TYPE_COMPLEX_CONTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COMPLEX_TYPE_MIXED_CONTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COMPLEX_TYPE_EMPTY_CONTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "_topParticleForComplexOrMixedContent",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "PARTICLE_SEQUENCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PARTICLE_CHOICE_UNBOUNDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "_elements",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "_attributes",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "_extensionType",
+          "descriptor": "Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 2
+        },
+        {
+          "name": "_isGlobal",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_enumerationValues",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "_acceptsEnumerationValue",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_enumerationQNames",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$org$apache$xmlbeans$impl$inst2xsd$util$Type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "e1c623559c95a07a51aeb58925c8fc30667bcdafeff9baf8d4e1edad6a475002",
+          "code_length": 25
+        },
+        {
+          "name": "createNamedType",
+          "descriptor": "(Ljavax/xml/namespace/QName;I)Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 9,
+          "code_sha256": "5746e4a0aabbc9ab62ca02930841de20e16c8b001fda92603f982de7a3242d8c",
+          "code_length": 38
+        },
+        {
+          "name": "createUnnamedType",
+          "descriptor": "(I)Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 9,
+          "code_sha256": "e173318c2354f9e35f1314b7c7af5ea1e1f8ff3ce31d6030267886472b6dc748",
+          "code_length": 73
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljavax/xml/namespace/QName;",
+          "access": 1,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljavax/xml/namespace/QName;)V",
+          "access": 1,
+          "code_sha256": "dfb2510a46310a07b2b85cca8155c7f5f427b719b005efe7d9cc5a60007db820",
+          "code_length": 6
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "setContentType",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "dbf6b3f1c183e9edd237770d4eb6df9ed7c18a85984a7c8323f77292ccfa9f6f",
+          "code_length": 6
+        },
+        {
+          "name": "getElements",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "fae14d95eb00aff8631b3a9434c9a867fcdcdb4ddaebc589c58db4bab00dc280",
+          "code_length": 9
+        },
+        {
+          "name": "addElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;)V",
+          "access": 1,
+          "code_sha256": "a104d9d324863813bf0f533d7ee7c8b55f1fc0e14b34e4b02df9cf4fc984e193",
+          "code_length": 16
+        },
+        {
+          "name": "setElements",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "cb85bd81ca0cba561532e6abf84d002509f05da7f20f570f8d24fdf1319cc90b",
+          "code_length": 25
+        },
+        {
+          "name": "ensureElements",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9bc3b9c51b8b73bb773f5ec2e863de2ad747470702900906e1e0837def4c4b3c",
+          "code_length": 19
+        },
+        {
+          "name": "getAttributes",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d38f1cf89111ad01af6210b53d9e9144017140a28ec25ce27180bd27fd550349",
+          "code_length": 9
+        },
+        {
+          "name": "addAttribute",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;)V",
+          "access": 1,
+          "code_sha256": "44e8204d401ad0ecea97cb77410e041c0da34d8a14916e5676b2425b17ab4c4a",
+          "code_length": 16
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+          "access": 1,
+          "code_sha256": "c7d38d0f2bbb690e4a12f924135e0ffff0d4a389409addee7792487e211a1e86",
+          "code_length": 50
+        },
+        {
+          "name": "ensureAttributes",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "52973d9215de0ecb5beb3a7cf4014220bf088beeadca44d3eb4d43bbb7b2fa1a",
+          "code_length": 19
+        },
+        {
+          "name": "isComplexType",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "91736f70fe1a9b8d95d284fb2901fa23d4c01369133177ed1afc5acddb1b8837",
+          "code_length": 30
+        },
+        {
+          "name": "hasSimpleContent",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c33eee66dff33fe7dfa1d66b2acd0a02bdc83e9b64e23c16c29ccce3e0c05074",
+          "code_length": 22
+        },
+        {
+          "name": "getTopParticleForComplexOrMixedContent",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "setTopParticleForComplexOrMixedContent",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c8c4752ca68104796797c33b65753bc9f43eed000b98189a2bfcc9110a8c39a9",
+          "code_length": 6
+        },
+        {
+          "name": "isGlobal",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "setGlobal",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "a8f670d414fca704b8c861776b672516310cb42efe876254388f80275dcd061d",
+          "code_length": 31
+        },
+        {
+          "name": "getExtensionType",
+          "descriptor": "()Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 1,
+          "code_sha256": "edfd289239e98d935385427321a331b4a0af3d4fefb6812c5c783fc3e82b8792",
+          "code_length": 5
+        },
+        {
+          "name": "setExtensionType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;)V",
+          "access": 1,
+          "code_sha256": "2b20b68546b950432fc66226a9d88c532622dc6ea2f65ac2777457c9196de1d1",
+          "code_length": 57
+        },
+        {
+          "name": "getEnumerationValues",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "14f5f58f3182262105fea823e16f9e6fe066e8d4735469abeb7d18b24f84ead7",
+          "code_length": 9
+        },
+        {
+          "name": "getEnumerationQNames",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d7859574404a9a2a3e0181bb5ed588a660166f85ba82df31726e8f04260f3d38",
+          "code_length": 9
+        },
+        {
+          "name": "addEnumerationValue",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 1,
+          "code_sha256": "bad40b5df2697c056e6ff78bc5522b8621487d0b828931d7ebe0f9b36dd830ae",
+          "code_length": 137
+        },
+        {
+          "name": "ensureEnumerationValues",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c7dc1071c46cc2198c3e49c5425d07bc2e1596dc9112748464b5e28ef18d3ed0",
+          "code_length": 30
+        },
+        {
+          "name": "isEnumeration",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3ffb54cf9a4f7917c35efd06548afe6e5b1e2f10f3481605fdbc24804ef3cc7f",
+          "code_length": 33
+        },
+        {
+          "name": "isQNameEnumeration",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fbc44c48fa607c906849e54d499f68d6d2ad1833fca6c52233142f4095856817",
+          "code_length": 51
+        },
+        {
+          "name": "closeEnumeration",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6d70d03b3adf27cd59cdefe22f1792974497eeaefa98c897ba3a401c7c88f28f",
+          "code_length": 6
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "62bbe96248e755f3acd8497153b664b7c70ed341c81555e33576822d0ccc46eb",
+          "code_length": 76
+        },
+        {
+          "name": "addAllEnumerationsFrom",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;)V",
+          "access": 1,
+          "code_sha256": "b1affdddd3acfc2b86f0c7be3b9d3a18a6409043931590d515180948524cb466",
+          "code_length": 236
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6d95c98adf5faec01b14bfce133529d724353be580f6e8273459b845becfac4c",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/ArrayList",
+        "java/util/List",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/SchemaType",
+        "org/apache/xmlbeans/XmlQName",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Attribute",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Type",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Type$1",
+        "org/apache/xmlbeans/impl/values/XmlQNameImpl"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/inst2xsd/util/TypeSystemHolder.class",
+      "occurrence": 0,
+      "sha256": "a799c62e3d35dfd1a2d548c0221c78730624fe2ec9566d2ea009b2e58380afea",
+      "name": "org/apache/xmlbeans/impl/inst2xsd/util/TypeSystemHolder",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_globalElements",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0
+        },
+        {
+          "name": "_globalAttributes",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0
+        },
+        {
+          "name": "_globalTypes",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$org$apache$xmlbeans$impl$inst2xsd$util$TypeSystemHolder",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "563d4e16666670709dd7bf08ba40f7db5189cbf65e68861347ea377cf117987c",
+          "code_length": 38
+        },
+        {
+          "name": "addGlobalElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;)V",
+          "access": 1,
+          "code_sha256": "bb39366062965aa4a881b3f3cab21c4b4649878a52ad2309a1112c4320a367a3",
+          "code_length": 44
+        },
+        {
+          "name": "getGlobalElement",
+          "descriptor": "(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;",
+          "access": 1,
+          "code_sha256": "bfe374ac97bc4df220974c45b49463d09b272f945d4ddd0a242f5b12d2ddeacd",
+          "code_length": 14
+        },
+        {
+          "name": "getGlobalElements",
+          "descriptor": "()[Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;",
+          "access": 1,
+          "code_sha256": "b71991675365cd8ac34067a86ea558eb07a912ddf46b936e3a6a0231d80d4802",
+          "code_length": 32
+        },
+        {
+          "name": "addGlobalAttribute",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;)V",
+          "access": 1,
+          "code_sha256": "2b8557e6b5a9e603de9106696073b241cf1afe91394247f7a913f3294012cd9c",
+          "code_length": 44
+        },
+        {
+          "name": "getGlobalAttribute",
+          "descriptor": "(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+          "access": 1,
+          "code_sha256": "1196161f9f8de3fd2f93846d9c66acccc2f4a7e327061ce3795f1911370e32b7",
+          "code_length": 14
+        },
+        {
+          "name": "getGlobalAttributes",
+          "descriptor": "()[Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+          "access": 1,
+          "code_sha256": "96c8b42079b0aa107823fe83b12204f5818f5f09c126280dcf9c2f9cf733c719",
+          "code_length": 32
+        },
+        {
+          "name": "addGlobalType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;)V",
+          "access": 1,
+          "code_sha256": "87dee3aa8c75e5593ce1d1a498ee8cff576a2703dad1a9030df7c0b802877dd0",
+          "code_length": 46
+        },
+        {
+          "name": "getGlobalType",
+          "descriptor": "(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 1,
+          "code_sha256": "096a53f40ebd81bfec8a10146b46c6ba83e771441e6f5026533fac9a921b6452",
+          "code_length": 14
+        },
+        {
+          "name": "getGlobalTypes",
+          "descriptor": "()[Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+          "access": 1,
+          "code_sha256": "7fbfa37518e25a6e6e4b2805ca3048922591813e017a9e845d16a7a315dddaf5",
+          "code_length": 32
+        },
+        {
+          "name": "getSchemaDocuments",
+          "descriptor": "()[Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;",
+          "access": 1,
+          "code_sha256": "7514b2945d0e481568044be731ebf2e29dd045c8496014ee287dab721c2b7c66",
+          "code_length": 253
+        },
+        {
+          "name": "getSchemaDocumentForTNS",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;",
+          "access": 10,
+          "code_sha256": "84d97c890cf6cbf94bf8cdb6ed453cef778d9d5ae4387120eb541d3ed3196774",
+          "code_length": 30
+        },
+        {
+          "name": "getTopLevelSchemaElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;Ljava/lang/String;)Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument$Schema;",
+          "access": 10,
+          "code_sha256": "7e2a3480b3d937e0e93ddacc9760e0df6284c549f7a21fcc8b4c225dae06983e",
+          "code_length": 58
+        },
+        {
+          "name": "fillUpGlobalElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "a2377988fb67324e12c8e853fa5cc2678daa3f7cc4f4bc07b47733ed6ca135f2",
+          "code_length": 101
+        },
+        {
+          "name": "fillUpLocalElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;Lorg/apache/xmlbeans/impl/xb/xsdschema/LocalElement;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "676b2b6db0b31cc510f375cb900509943a093affeaae2e152fe6da3512659636",
+          "code_length": 190
+        },
+        {
+          "name": "fillUpTypeOnElement",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/Element;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "84e34ceed6285b6e3f6edae1bf66e478f88cb0b778d96ac9340076bb36a0fc80",
+          "code_length": 97
+        },
+        {
+          "name": "fillUpEnumeration",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/Element;)V",
+          "access": 2,
+          "code_sha256": "b95cf2178b9cd50f14156f04612fa9cf28a02191ab7db0ecdd24969ca09c6791",
+          "code_length": 231
+        },
+        {
+          "name": "fillUpAttributesInComplexTypesSimpleContent",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/SimpleExtensionType;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "83f2bec67340faa53ee658ee828c2f33b3bd67f84d974ee6126844151b64ad5a",
+          "code_length": 57
+        },
+        {
+          "name": "fillUpAttributesInComplexTypesComplexContent",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/ComplexType;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "07627810cfe59a7b9882a7819d176f3935f230b7e3d73879869cbac42ddb40c7",
+          "code_length": 57
+        },
+        {
+          "name": "fillUpLocalAttribute",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;Lorg/apache/xmlbeans/impl/xb/xsdschema/Attribute;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "5c7cf0e7a9133824422b457b3edc3a9365a3cd4b08021b8f99c1f3f4ea741029",
+          "code_length": 106
+        },
+        {
+          "name": "fillUpContentForComplexType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/ComplexType;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "7140a03816643c3d26f164ed10fed26e32a7fe748ba2092f57af7abc58c70947",
+          "code_length": 272
+        },
+        {
+          "name": "fillUpGlobalAttribute",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "7bbb464e4f55248707a1e116d06a5f076e085d734a02c1c5eae33f387eeb0f4f",
+          "code_length": 97
+        },
+        {
+          "name": "fillUpElementDocumentation",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/xb/xsdschema/Element;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "cd79597c5fddd14f5724fa83bdc4509d81d4e758b7f568e01c32884efd2238a7",
+          "code_length": 35
+        },
+        {
+          "name": "fillUpGlobalType",
+          "descriptor": "(Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "c66012ff18b788d3dae05576c952cfcd2a8eff4a8fe6e274b08b359113c22e53",
+          "code_length": 67
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5e780df26db32aab613c0d0d31b58f82d54407188605b8b023c75c107b2dc05d",
+          "code_length": 52
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f89dfc117308ddd76b5f85cf87523d93dd275d65d0d27a37994f6fb7c13ee55c",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/xmlbeans/impl/inst2xsd/util/Attribute;",
+        "[Lorg/apache/xmlbeans/impl/inst2xsd/util/Element;",
+        "[Lorg/apache/xmlbeans/impl/inst2xsd/util/Type;",
+        "[Lorg/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument;",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalStateException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/math/BigInteger",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/XmlCursor",
+        "org/apache/xmlbeans/XmlQName",
+        "org/apache/xmlbeans/XmlQName$Factory",
+        "org/apache/xmlbeans/XmlString",
+        "org/apache/xmlbeans/XmlString$Factory",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Attribute",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Element",
+        "org/apache/xmlbeans/impl/inst2xsd/util/Type",
+        "org/apache/xmlbeans/impl/inst2xsd/util/TypeSystemHolder",
+        "org/apache/xmlbeans/impl/xb/xsdschema/AnnotationDocument",
+        "org/apache/xmlbeans/impl/xb/xsdschema/AnnotationDocument$Annotation",
+        "org/apache/xmlbeans/impl/xb/xsdschema/Attribute",
+        "org/apache/xmlbeans/impl/xb/xsdschema/Attribute$Use",
+        "org/apache/xmlbeans/impl/xb/xsdschema/Attribute$Use$Enum",
+        "org/apache/xmlbeans/impl/xb/xsdschema/ComplexType",
+        "org/apache/xmlbeans/impl/xb/xsdschema/DocumentationDocument",
+        "org/apache/xmlbeans/impl/xb/xsdschema/DocumentationDocument$Documentation",
+        "org/apache/xmlbeans/impl/xb/xsdschema/Element",
+        "org/apache/xmlbeans/impl/xb/xsdschema/ExplicitGroup",
+        "org/apache/xmlbeans/impl/xb/xsdschema/FormChoice",
+        "org/apache/xmlbeans/impl/xb/xsdschema/FormChoice$Enum",
+        "org/apache/xmlbeans/impl/xb/xsdschema/LocalElement",
+        "org/apache/xmlbeans/impl/xb/xsdschema/LocalSimpleType",
+        "org/apache/xmlbeans/impl/xb/xsdschema/NoFixedFacet",
+        "org/apache/xmlbeans/impl/xb/xsdschema/RestrictionDocument",
+        "org/apache/xmlbeans/impl/xb/xsdschema/RestrictionDocument$Restriction",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument$Factory",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SchemaDocument$Schema",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SimpleContentDocument",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SimpleContentDocument$SimpleContent",
+        "org/apache/xmlbeans/impl/xb/xsdschema/SimpleExtensionType",
+        "org/apache/xmlbeans/impl/xb/xsdschema/TopLevelAttribute",
+        "org/apache/xmlbeans/impl/xb/xsdschema/TopLevelComplexType",
+        "org/apache/xmlbeans/impl/xb/xsdschema/TopLevelElement"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException.class",
+      "occurrence": 0,
+      "sha256": "663e05e3fdb0a15b52d10bb4476d1c352432cb2cff42b67f2ebd77904942cef6",
+      "name": "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/xmlbeans/XmlException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/xmlbeans/XmlException",
+        "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xpathgen/XPathGenerator$1.class",
+      "occurrence": 0,
+      "sha256": "b77e87eda03f6ccc33a5c61dd9d0f4f003232b2842ba218f6ea0c1d13e8175c5",
+      "name": "org/apache/xmlbeans/impl/xpathgen/XPathGenerator$1",
+      "major": 48,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/xml/namespace/NamespaceContext"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getNamespaceURI",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "314a5dfb055aba2b30092342aa84c5bd76856d992ba0b83b92042fef23e7d815",
+          "code_length": 14
+        },
+        {
+          "name": "getPrefix",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getPrefixes",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "javax/xml/namespace/NamespaceContext",
+        "org/apache/xmlbeans/impl/xpathgen/XPathGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xpathgen/XPathGenerator.class",
+      "occurrence": 0,
+      "sha256": "1bede377c87707531d4db6634f19b0d81679b78774bd7f9ba3339b61851f3f79",
+      "name": "org/apache/xmlbeans/impl/xpathgen/XPathGenerator",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$org$apache$xmlbeans$impl$xpathgen$XPathGenerator",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "generateXPath",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlCursor;Lorg/apache/xmlbeans/XmlCursor;Ljavax/xml/namespace/NamespaceContext;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "82319766d0ba9bc6d905eed638330fb9032879288519c015e3173b5873065199",
+          "code_length": 358,
+          "throws": [
+            "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException"
+          ]
+        },
+        {
+          "name": "generateInternal",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlCursor;Lorg/apache/xmlbeans/XmlCursor;Ljavax/xml/namespace/NamespaceContext;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "11a834bd195b307fb0b52f5450e715d809fc071ed3be23cf5443e493a8cd4f6f",
+          "code_length": 279,
+          "throws": [
+            "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException"
+          ]
+        },
+        {
+          "name": "qnameToString",
+          "descriptor": "(Ljavax/xml/namespace/QName;Ljavax/xml/namespace/NamespaceContext;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "26a0bc7061a19ba093fbbc0bb6df4670d8a5e127ca477fc8a1b28134ab107c7f",
+          "code_length": 183,
+          "throws": [
+            "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException"
+          ]
+        },
+        {
+          "name": "countTextTokens",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlCursor;)I",
+          "access": 10,
+          "code_sha256": "b42402a2219d09df3e5362f36164a7631dd83d2af908a4af1df9cb42edf9602d",
+          "code_length": 113
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "31add2bf3fc2b7312ca06ac0f18b8fbacc051a22f1f4deaf0e4d37ccc6562a94",
+          "code_length": 401,
+          "throws": [
+            "org/apache/xmlbeans/XmlException"
+          ]
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "19df7bac348eac95394d071a5bcefca6d981a98736876c1c1f83f4e2a45fef5b",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "javax/xml/namespace/NamespaceContext",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/XmlCursor",
+        "org/apache/xmlbeans/XmlCursor$TokenType",
+        "org/apache/xmlbeans/XmlException",
+        "org/apache/xmlbeans/XmlObject",
+        "org/apache/xmlbeans/XmlObject$Factory",
+        "org/apache/xmlbeans/impl/xpathgen/XPathGenerationException",
+        "org/apache/xmlbeans/impl/xpathgen/XPathGenerator",
+        "org/apache/xmlbeans/impl/xpathgen/XPathGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xsd2inst/SampleXmlUtil.class",
+      "occurrence": 0,
+      "sha256": "4758c2534fd3a37782cb98d621602f25c5233e738d63eaeba728d8c257699f73",
+      "name": "org/apache/xmlbeans/impl/xsd2inst/SampleXmlUtil",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_soapEnc",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "MAX_ELEMENTS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "_nElements",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_picker",
+          "descriptor": "Ljava/util/Random;",
+          "access": 0
+        },
+        {
+          "name": "WORDS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DNS1",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DNS2",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HREF",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 26
+        },
+        {
+          "name": "ID",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 26
+        },
+        {
+          "name": "XSI_TYPE",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 26
+        },
+        {
+          "name": "ENC_ARRAYTYPE",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 26
+        },
+        {
+          "name": "ENC_OFFSET",
+          "descriptor": "Ljavax/xml/namespace/QName;",
+          "access": 26
+        },
+        {
+          "name": "SKIPPED_SOAP_ATTRS",
+          "descriptor": "Ljava/util/Set;",
+          "access": 26
+        },
+        {
+          "name": "_typeStack",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 2,
+          "code_sha256": "8d227381069e927968e8086e4151e9f71fa8d45b69661007a905968ba590e266",
+          "code_length": 33
+        },
+        {
+          "name": "createSampleForType",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4226b9482daf0f43f9ee41a3ec90398cd8ad4d8631d74c1be547542adac02643",
+          "code_length": 70
+        },
+        {
+          "name": "createSampleForType",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 2,
+          "code_sha256": "0dac81d265fa277568d1042a8c53f7b91ef26675da7e16d787f1957c4acbe70d",
+          "code_length": 250
+        },
+        {
+          "name": "processSimpleType",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 2,
+          "code_sha256": "0e242e28da08a444af45f216b2e95acf4d05f9527f77e9b252b50d604a560f3f",
+          "code_length": 14
+        },
+        {
+          "name": "sampleDataForSimpleType",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d58a1b1fdc99bc8992e7d62daf19134c0988e1a5aa7f0c197d33fe0d8914efe4",
+          "code_length": 774
+        },
+        {
+          "name": "pick",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "d03f79ecebf34c24a7eb331f62c6f69f268f2f181abcff703706ab272f82c044",
+          "code_length": 9
+        },
+        {
+          "name": "pick",
+          "descriptor": "([Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9f44fb5d4bb99696a1344175bca6004e5866b38b17e1857ed909b3bbe077e07a",
+          "code_length": 9
+        },
+        {
+          "name": "pick",
+          "descriptor": "([Ljava/lang/String;I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1bbbd6ad2280b4403b330385b482bbc93539f02c183794704c4f0004b2be7ded",
+          "code_length": 70
+        },
+        {
+          "name": "pickDigits",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3037119ab9a0c8995644981e7ff0825afa0b27046fa719428e1468fb09679a2d",
+          "code_length": 37
+        },
+        {
+          "name": "pickLength",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)I",
+          "access": 2,
+          "code_sha256": "f8ad87f7c13317718bea925389f106a51620649e83137b4b945d01b3a13aea97",
+          "code_length": 146
+        },
+        {
+          "name": "formatToLength",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "14362bc3fe6d93d7194f43c25b1cfd905ba1226a30a6baccc12fbf7268d57050",
+          "code_length": 143
+        },
+        {
+          "name": "formatDecimal",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "39c13b55b3c5691d82ee733e63b2181001792faac467b179eb735f5d25d8a675",
+          "code_length": 677
+        },
+        {
+          "name": "formatDuration",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c1a15027e90e25d44116c90cb37a9266511e8e3bc7e9dca791f174731d83417c",
+          "code_length": 831
+        },
+        {
+          "name": "formatDate",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7e6057eb21d17886b925c68c18a31dfb0f82cee743f9dd401897046ccac63903",
+          "code_length": 1558
+        },
+        {
+          "name": "closestBuiltin",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Lorg/apache/xmlbeans/SchemaType;",
+          "access": 2,
+          "code_sha256": "64361c87a2ce2e29abf9ef216842a658e74abcfc829adc34c1be55aba741395c",
+          "code_length": 21
+        },
+        {
+          "name": "crackQName",
+          "descriptor": "(Ljava/lang/String;)Ljavax/xml/namespace/QName;",
+          "access": 9,
+          "code_sha256": "8eeeb8c908bbd73fc7b5466e7c6b213fc474fc44a4cc7abaa55bf035d419d92a",
+          "code_length": 44
+        },
+        {
+          "name": "processParticle",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "1c30cbe116c6dd4de1e5d4bd81706faf7ba032fb5699035ff03588db82a2d5f3",
+          "code_length": 110
+        },
+        {
+          "name": "determineMinMaxForSample",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;)I",
+          "access": 2,
+          "code_sha256": "242124862021cc26304292ccc253196e83c1561efe985a76c52007aa4d3633f4",
+          "code_length": 175
+        },
+        {
+          "name": "getItemNameOrType",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f70b79e028624bc8919c37fbda723d7f019e6a6cda2d4efabb28ff8d71ebb8e8",
+          "code_length": 61
+        },
+        {
+          "name": "processElement",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "e22df479068f9163bd3ece7fff710da41a2b4f9d68bc499da1a4e517e9de92ff",
+          "code_length": 95
+        },
+        {
+          "name": "moveToken",
+          "descriptor": "(ILorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 2,
+          "code_sha256": "8198023fa0c6e5bbaf2e49ba21cfcbd6d097c6fe65853dee38c9f761c34a6f4e",
+          "code_length": 38
+        },
+        {
+          "name": "formatQName",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlCursor;Ljavax/xml/namespace/QName;)Ljava/lang/String;",
+          "access": 26,
+          "code_sha256": "8b6edaf44642b68cbc775f548d46a703a4f3a62627d461d2b609ef23a32a0a3f",
+          "code_length": 82
+        },
+        {
+          "name": "processAttributes",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlCursor;)V",
+          "access": 2,
+          "code_sha256": "92e19b917d082f2b1124bfe0590f9243a9db8fc83f2416aabcdc9eb971c1dfb1",
+          "code_length": 228
+        },
+        {
+          "name": "processSequence",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "60cf78fb19e709967570a6815697e917cd180942bd3b1fb69254166a65a203c1",
+          "code_length": 64
+        },
+        {
+          "name": "processChoice",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "dccd40bf50a3ba81c8b83ab8780a310f14a1fabda87f259b14e4ddd7631d46f6",
+          "code_length": 74
+        },
+        {
+          "name": "processAll",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "60cf78fb19e709967570a6815697e917cd180942bd3b1fb69254166a65a203c1",
+          "code_length": 64
+        },
+        {
+          "name": "processWildCard",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaParticle;Lorg/apache/xmlbeans/XmlCursor;Z)V",
+          "access": 2,
+          "code_sha256": "b0779a8576accc1b86dc9c83db3d680a87463c4fbe61313d71038a82c1eae822",
+          "code_length": 19
+        },
+        {
+          "name": "getClosestName",
+          "descriptor": "(Lorg/apache/xmlbeans/SchemaType;)Ljavax/xml/namespace/QName;",
+          "access": 10,
+          "code_sha256": "445b789b4cd4eb8de8ed9dda4d6a618055879cca4da1154346a08be7808f9fc4",
+          "code_length": 26
+        },
+        {
+          "name": "printParticleType",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0ad6a209db20e3d1db5ffbcd924e4d960ee81c804941fae6c06359b4a423c788",
+          "code_length": 120
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "eb4f6283471ead668d4a4b248fe6deac14d4e73415c56d3ec4aa1b152146bc62",
+          "code_length": 1245
+        }
+      ],
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Calendar",
+        "java/util/Date",
+        "java/util/HashSet",
+        "java/util/Random",
+        "java/util/Set",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/GDate",
+        "org/apache/xmlbeans/GDateBuilder",
+        "org/apache/xmlbeans/GDuration",
+        "org/apache/xmlbeans/GDurationBuilder",
+        "org/apache/xmlbeans/SchemaAttributeModel",
+        "org/apache/xmlbeans/SchemaLocalElement",
+        "org/apache/xmlbeans/SchemaParticle",
+        "org/apache/xmlbeans/SchemaProperty",
+        "org/apache/xmlbeans/SchemaType",
+        "org/apache/xmlbeans/SimpleValue",
+        "org/apache/xmlbeans/XmlAnySimpleType",
+        "org/apache/xmlbeans/XmlCursor",
+        "org/apache/xmlbeans/XmlCursor$TokenType",
+        "org/apache/xmlbeans/XmlDate",
+        "org/apache/xmlbeans/XmlDateTime",
+        "org/apache/xmlbeans/XmlDecimal",
+        "org/apache/xmlbeans/XmlDuration",
+        "org/apache/xmlbeans/XmlGDay",
+        "org/apache/xmlbeans/XmlGMonth",
+        "org/apache/xmlbeans/XmlGMonthDay",
+        "org/apache/xmlbeans/XmlGYear",
+        "org/apache/xmlbeans/XmlGYearMonth",
+        "org/apache/xmlbeans/XmlInteger",
+        "org/apache/xmlbeans/XmlObject",
+        "org/apache/xmlbeans/XmlObject$Factory",
+        "org/apache/xmlbeans/XmlOptions",
+        "org/apache/xmlbeans/XmlTime",
+        "org/apache/xmlbeans/impl/util/Base64",
+        "org/apache/xmlbeans/impl/util/HexBin",
+        "org/apache/xmlbeans/impl/xsd2inst/SampleXmlUtil",
+        "org/apache/xmlbeans/soap/SOAPArrayType",
+        "org/apache/xmlbeans/soap/SchemaWSDLArrayType"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions.class",
+      "occurrence": 0,
+      "sha256": "b9861bed53e98cd7e1f1b95a9bac4e4e8578223cc674801ee587efb8e11db113",
+      "name": "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_downloads",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_nopvr",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "_noupa",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "80955ac1f82f0a373c48b903610cf13982a8477a99fdff3b8aa077d6194b0783",
+          "code_length": 20
+        },
+        {
+          "name": "isNetworkDownloads",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setNetworkDownloads",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "isNopvr",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setNopvr",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "isNoupa",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "setNoupa",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "b3e47fd4f731e3841781a3d3b52ce0c6da61fa2723abf7f1372798b22e9cf810",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator",
+        "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions"
+      ]
+    },
+    {
+      "entry": "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator.class",
+      "occurrence": 0,
+      "sha256": "646baa1553588308b0e676a6378a2e4da60e86f4c33fa622f1bf72d37f0553b6",
+      "name": "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "printUsage",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "4075b6306e29a1b3b95a86bb97e8dbaa797aece92e0acb0365d0773dfe10b4d1",
+          "code_length": 113
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "96c9d4cfed2e7f0cda8a4d4e1ad26daf4a6dafe220dad9fe69476453c1e5ee42",
+          "code_length": 496
+        },
+        {
+          "name": "xsd2inst",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/String;Lorg/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "229db14a18f873c38b4eb7755b7da12b3bc29c82d2abd5ec079a616788ef54c4",
+          "code_length": 48,
+          "throws": [
+            "org/apache/xmlbeans/XmlException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "xsd2inst",
+          "descriptor": "([Ljava/io/Reader;Ljava/lang/String;Lorg/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "6d3f1d73313b01515c1d351f22c004a0a49d439ef35b3c0123d1568adcf88588",
+          "code_length": 135
+        },
+        {
+          "name": "xsd2inst",
+          "descriptor": "([Lorg/apache/xmlbeans/XmlObject;Ljava/lang/String;Lorg/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "41fd07692ee519f33bf26e7d07344855794181d314d864ef302bc79eda81f7d9",
+          "code_length": 264
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "java/io/IOException",
+        "java/io/PrintStream",
+        "java/io/Reader",
+        "java/io/StringReader",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "javax/xml/namespace/QName",
+        "org/apache/xmlbeans/SchemaType",
+        "org/apache/xmlbeans/SchemaTypeSystem",
+        "org/apache/xmlbeans/XmlBeans",
+        "org/apache/xmlbeans/XmlException",
+        "org/apache/xmlbeans/XmlObject",
+        "org/apache/xmlbeans/XmlObject$Factory",
+        "org/apache/xmlbeans/XmlOptions",
+        "org/apache/xmlbeans/impl/tool/CommandLine",
+        "org/apache/xmlbeans/impl/xsd2inst/SampleXmlUtil",
+        "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator",
+        "org/apache/xmlbeans/impl/xsd2inst/SchemaInstanceGenerator$Xsd2InstOptions"
+      ]
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "UI-only FileImport structural traceability with unsupported application import excluded",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/FileImport",
-  "source_head": "f2746536411cb532db460b8885bc12edc1207733",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_131808_data-source-files-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
       "id": "sqx-files-ui",
       "family": "installed plugin UI artifacts"
     }
@@ -35,224 +35,309 @@
   "sources": [
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/addPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/addPopup.html",
       "relative_path": "add/addPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "c2d2a1cb7fc093d8d3b9e9cd4fb78956004098dac921a454136624a5d214f3a6",
+      "sha256": "6e2625866e46e3cda2f1cbef113a44a817ff911f1fbf50af0b7f5fe17c89190c",
       "target": "add/addPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/DataSourceFilesAddCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/DataSourceFilesAddCtrl.js",
       "relative_path": "add/DataSourceFilesAddCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "222817a52518adbe297bde50c68ef05c47782ffa6f5316a6f0b41af229a7f0e2",
+      "sha256": "085d4236c1fd0a399519e6f20def601ceb895aa4636f64447ff156b81097a8c7",
       "target": "add/DataSourceFilesAddCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/module.js",
       "relative_path": "add/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "bc552529031cb4ef93bc3d5873c4ab73595f9d5392ae62bb931f57547710b22f",
+      "sha256": "94e7367d726bec3bc5a415b9fd4ebfefdd8303c08289175d6a386477e5e1fb57",
       "target": "add/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/appImportPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/appImportPopup.html",
       "relative_path": "appImport/appImportPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
       "access_date": "2026-10-06",
-      "sha256": "5a49a72e552520d0ee89002de2b3998a5e0f0a973ded83acd858ef089f9d13d5",
+      "sha256": "46438134290851cbf1142c1b3ca27ca22834f5a403cf5dd2d88b9a0d0e11a638",
       "target": null,
       "classification": "excluded",
-      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/DataSourceFilesAppImportCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/DataSourceFilesAppImportCtrl.js",
       "relative_path": "appImport/DataSourceFilesAppImportCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
       "access_date": "2026-10-06",
-      "sha256": "ef95c5afdd3bc37da6831d8500833791307a27bab07adafbf74aeae710247a81",
+      "sha256": "4b1533b21fa2804852af4ab33707797bb3655b65526156ed48f4951aaa5ceb28",
       "target": null,
       "classification": "excluded",
-      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/module.js",
       "relative_path": "appImport/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
       "access_date": "2026-10-06",
-      "sha256": "876a22c718fcdc41903e574c9bbddbb30eb31420f7f10d5e92c95a05d113de6c",
+      "sha256": "befa6f4824bad5bf4bd6eefd2c50ec38abf96d311baba9bf266cb96d7130d8b6",
       "target": null,
       "classification": "excluded",
-      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFiles.jar",
       "relative_path": "DataSourceFiles.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Backend binary outside frontend scope.",
       "access_date": "2026-10-06",
-      "sha256": "9a92311be05e36e7cdf68dfc0b916751e0ed2bac7302c465db60d2d75eaaf686",
+      "sha256": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary outside frontend scope."
+      "limitation": "Backend binary outside frontend scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFilesService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFilesService.js",
       "relative_path": "DataSourceFilesService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9731953ed361fa2656c12a4e31a851dfd2e31cc10813c79f719dd96c05071772",
+      "sha256": "7fba6126706980d4c8fdde630dbe05b3f0d79f2a7a4861f7c8e49a85b8d6ed24",
       "target": "DataSourceFilesService.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/DataSourceFilesImportCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/DataSourceFilesImportCtrl.js",
       "relative_path": "import/DataSourceFilesImportCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "161b1f76cfcd433dc3fbdf88f4749b7f5167608a69e9e679ccaa1408331b7bc5",
+      "sha256": "1b19b4a75b52ccb37f145e7546cf0a2689164ebd3edd8c51838127bab5b8ce73",
       "target": "import/DataSourceFilesImportCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/importPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/importPopup.html",
       "relative_path": "import/importPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "1d4c85703a0d734398e5248e9793e57fa719e8b5b8017d8f95171cc7fca697ba",
+      "sha256": "01b9871a2c7ce0b0a3c915b8e6f4039fa2504b9876edd8cfa8e35dff5f2cece8",
       "target": "import/importPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/module.js",
       "relative_path": "import/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "d089376f7031ae3923e17110bd5686fd656f8cddae64404955c347df98c2344e",
+      "sha256": "a7531f0e9d4c6d871af3a267b70580a97a5fba405e27a19e5268cfc0cb9c57c6",
       "target": "import/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/newFormatPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/newFormatPopup.html",
       "relative_path": "import/newFormatPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "7810b7211d087248af7c42d5bdb47fe05b1c3a936beb18c2b28d13504b077b47",
+      "sha256": "b55466d8e2b5ea431726a507ba94eacf7255a6e27db4b90318a7c06d099ce173",
       "target": "import/newFormatPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/DataSourceFilesMassImportCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/DataSourceFilesMassImportCtrl.js",
       "relative_path": "massImport/DataSourceFilesMassImportCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3a92219c4e4954ae03b7889ee6239c66c169fd5d7db6a4d4a2e8ca20075a7c11",
+      "sha256": "1ec3086dcc4b90f632b2e472917b40ae6665fd8ce5fd0c795b3dfc0dbc5fdd9d",
       "target": "massImport/DataSourceFilesMassImportCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/massImportPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/massImportPopup.html",
       "relative_path": "massImport/massImportPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "da09447bf30eaff0ccfd8f462b424243f30bfe84f50249265504420eb993b5fc",
+      "sha256": "2e78db9c22f728b0c83755fc45d3753d3cb7938de1e32063cb63f78aa6ddc6c4",
       "target": "massImport/massImportPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/module.js",
       "relative_path": "massImport/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "7d33926fbd6e6cc8039e03a72985e23fe299ede93243161104bfbbee7388e231",
+      "sha256": "68a31ffba1bebe740e16ac16664bb95d1b95152b9787efae0be51fe03a420c63",
       "target": "massImport/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "bc497c4e2dedf6245549056590bec60e688a94fc0f5a28eb41b97cf3a4a58e2e",
+      "sha256": "14a19094f4d10464ee5d493433bf09a2f20d819d13e95df0b74a90d1417ff432",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-files-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceFiles/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
       "sha256": "091530480960d55f1cb542da994f9530d404ccd021a9374ddb99ce4eec0669b9",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -280,5 +365,10 @@
       "path": "source-map.json",
       "reason": "Structural manifest, not behavioral evidence ledger."
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

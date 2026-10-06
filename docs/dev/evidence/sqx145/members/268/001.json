@@ -1,0 +1,2748 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
+  "archive_sha256": "63a15c31d3c44356a360c32c988b22e30b8c8ddfe581a9bc7ac62050e887e8ce",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder.class",
+      "occurrence": 0,
+      "sha256": "9831510756e8232bf5193b0100ff49ae8549e50eaef22e9cc58da3d8d29b8653",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LockName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "start",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/project/ProgressEngine;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "8d7280e44623867d944c03595f840c6ca62b70d03da45894bcd40b657f0e898d",
+          "code_length": 341,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getClonedStrategies",
+          "descriptor": "(Ljava/util/ArrayList;Lcom/strategyquant/tradinglib/Databank;)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "a0922bf4652460724b8a945139b5408577e1f541159a28890d731e8088850ca1",
+          "code_length": 488,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Ljava/lang/String;>;Lcom/strategyquant/tradinglib/Databank;)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "addParam",
+          "descriptor": "(Lorg/jdom2/Element;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "51701bb0cc7ac1ed1a7c1900195d4a6f8d34d8e06cc3346743dd66e20b2324ca",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterUtils",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/math/BigInteger",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Attribute",
+        "org/jdom2/Content",
+        "org/jdom2/Element"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilderTask.class",
+      "occurrence": 0,
+      "sha256": "c2b5c0ce1d62fe2e059344aff4ac50443d36123a6027c0c89fb983184c4259b9",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilderTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "projectLogMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5fe5b8cefc7a3630f5dfc1505c81af274b6d4e07faebed0ba480af8fabe3251c",
+          "code_length": 13,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "77fcfda784796e2588732ceace93a5a2d55d10889bb307d1ec15267da00c275b",
+          "code_length": 13,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "936cf2f127dff3cd48557193ee82f4671fdba79720e562d8635d1e69aba4bb7c",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "fb78c7fa618c59e324c4c5dddf524c0bbfc418788f00ff259a5a29a3b471227a",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9e62e7f5c8573b47050f2c0b004d02a89dd80e24314df3e15aca2a14757d4050",
+          "code_length": 106,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printToLog",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "9bee414180531a5a451f42a238c165575e4f07a89ce73ea65078ee7a930e814c",
+          "code_length": 31
+        },
+        {
+          "name": "printToBothLogs",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "4c63dc3846799a9865f5899af36423c75e6be780ebc21a9cd8848d0692a9bd92",
+          "code_length": 44
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2bb8c424b4e4ecf164b7a26be53de460770fa6ccbc8211dda016bf0b71672473",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2aa3b8c641f9fb2da52054da18aeb7ce8524fd71d21f4ce9d042f43f527cc675",
+          "code_length": 2
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "77b52103c7d7a5f3e200393e712ec985a5babb66ae90ea062227c235c3fa0a59",
+          "code_length": 15
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "f8a094cd69d3eb8bf7d6b9f36ce08be7c3b4c3cf61d26b0d338d2b0335194017",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilderTask",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/OutOfMemoryError",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask.class",
+      "occurrence": 0,
+      "sha256": "610c8e00f3953ab3141c5f42565f167dfe5e82819a0f7e35570c986a8a529067",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;",
+          "access": 2
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;",
+          "access": 2
+        },
+        {
+          "name": "indexes",
+          "descriptor": "[I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([ILcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;",
+          "access": 1,
+          "code_sha256": "a48192d683e1b1ecb59b80330a90eb0de42a8e28224c1f4dd2950eebdc742eba",
+          "code_length": 191,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "61fea742fcb6404faa7a2559b63bbf296d318c7d637c1712187994d4441132b8",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/concurrent/Callable<Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;>;",
+      "class_references": [
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/concurrent/Callable"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "57826be5a6e0d68548a4ba2b2c1da2dd80d1005f751b028a460c56c622bd831e",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+      "interfaces": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener"
+      ],
+      "fields": [
+        {
+          "name": "minStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "numberOfPossiblePortfolios",
+          "descriptor": "Ljava/math/BigInteger;",
+          "access": 2
+        },
+        {
+          "name": "startTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "genStartTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "period",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 2
+        },
+        {
+          "name": "maxCorrelation",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "allowNegativeCorrelation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "addEmptyPeriods",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "fitnessFunction",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness;",
+          "access": 2
+        },
+        {
+          "name": "maxFromSector",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "portfolioChecker",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker;",
+          "access": 2
+        },
+        {
+          "name": "numberOfProcessors",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 2
+        },
+        {
+          "name": "futureList",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/util/concurrent/Future<Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;>;>;"
+        },
+        {
+          "name": "portfolioResult",
+          "descriptor": "Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/ArrayList;Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/project/ProgressEngine;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "1ae7fc076feaa08720e7f8487fb2ac9be008ed03877e482549cd606ace8549e2",
+          "code_length": 167,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/project/ProgressEngine;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V"
+        },
+        {
+          "name": "execute",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cfd2f3efd9a390dc84b8dee6c78c71042a7380442b694576abc31b0aea5baf3e",
+          "code_length": 192,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "deinit",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "356d7cab294c6c649bf8f2c2d95390c055a659298d766d30d20da501bf539a16",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computePortfolio",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "5f1936db80344b4a98b5a24fc2cce5bcfb33d18c9179deae64887de20aa4b562",
+          "code_length": 53,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_compute",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9db0f60e4a5151795632c286c709940291dbcff6657361fad9934bb39ed35aa2",
+          "code_length": 73,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkPortfolio",
+          "descriptor": "([I)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination;",
+          "access": 33,
+          "code_sha256": "26995e0fba66cc672de2ebba5b383b0a9326b2c57f9eda176ea5938a0bacdf8f",
+          "code_length": 57,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "portfolioComputed",
+          "descriptor": "(Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;)V",
+          "access": 33,
+          "code_sha256": "a585b585cdf9cfa59090fa712904ac19c89a440fdd1f6c6d5f0018958c1d7039",
+          "code_length": 233,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "done",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "4b87dc89756a66303b90fb5dd06db4e8865f9928c5f8f939fe56eace574ed9d1",
+          "code_length": 55
+        },
+        {
+          "name": "printLog",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 33,
+          "code_sha256": "fdab68eb01a91c016bae2e13888cf30f92457095258237d5365e67533591da73",
+          "code_length": 9
+        },
+        {
+          "name": "resetStats",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isStopped",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0a1de87419c27c12069ec9e8005ca005c49ac8b3a0841e455203732c930ca821",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/conditions/DismissStruct",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener.class",
+      "occurrence": 0,
+      "sha256": "a3c1a8c12321c3216763554300158f8fc6aeb405385ee399806452bd6e0fddcc",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "checkPortfolio",
+          "descriptor": "([I)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getResults",
+          "descriptor": "([I)Ljava/util/ArrayList;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([I)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "portfolioComputed",
+          "descriptor": "(Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printLog",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "resetStats",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "isStopped",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "java/lang/Exception",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter.class",
+      "occurrence": 0,
+      "sha256": "5b515e2a6ec5ba3d9d837f277e8002bb707021b7d985218090baa71501b54702",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/databank/DefaultDatabankFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sampleType",
+          "descriptor": "B",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IZB)V",
+          "access": 1,
+          "code_sha256": "af7d351e2984c3f5caa0fcdebff49d09734563e30f55b681f5eda5826f477da9",
+          "code_length": 12
+        },
+        {
+          "name": "getRankValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)D",
+          "access": 1,
+          "code_sha256": "990d51570115afe78a9543d412a51133c0b1bdf9e676cfebedc78efd0bffbb78",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/DefaultDatabankFilter",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer.class",
+      "occurrence": 0,
+      "sha256": "185d5ea7314493e303dd06d8188ffb8a7f2142b7ab7a3799c3d803ad09b87d78",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createPortfolio",
+          "descriptor": "(Ljava/util/ArrayList;Ljava/lang/String;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1,
+          "code_sha256": "6b235fb7b2ebbda70935baf3d021044dc505c19e44fefb1b41073ef5a53c466a",
+          "code_length": 29,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;Ljava/lang/String;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)Lcom/strategyquant/tradinglib/ResultsGroup;"
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer",
+        "com/strategyquant/tradinglib/MoneyManagementMethod",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/strategy/StrategyMerger",
+        "java/lang/Exception",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker.class",
+      "occurrence": 0,
+      "sha256": "60049f2d5f86f11adfe80cd8d0179b2060a26fb45b15b7efb47a2365bd72c541",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "RESULT_OK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RESULT_INDEX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "correlationPeriod",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "correlationType",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 2
+        },
+        {
+          "name": "maxCorrelation",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "allowNegativeCorrelation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "addEmptyPeriods",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "maxFromSector",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;",
+          "access": 2
+        },
+        {
+          "name": "correlationComputer",
+          "descriptor": "Lcom/strategyquant/tradinglib/correlation/CorrelationComputer;",
+          "access": 2
+        },
+        {
+          "name": "correlationsMap",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Double;>;"
+        },
+        {
+          "name": "results",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILcom/strategyquant/tradinglib/CorrelationType;DZZILcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "3735fcf1c21daed39fded1e8d7e351770feefdaa24753285abc79118c98c1f21",
+          "code_length": 71
+        },
+        {
+          "name": "setResults",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 33,
+          "code_sha256": "426ae263500f080b5cc781296359ccd73b815bb336a838d6718d26512d4563e5",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;)V"
+        },
+        {
+          "name": "checkCorrectness",
+          "descriptor": "([ILjava/lang/String;)Lcom/strategyquant/tradinglib/conditions/DismissStruct;",
+          "access": 33,
+          "code_sha256": "b630782a557bcd5889e42dfe0de181db3d56e715c0b92ffbf148b26a80f0d0a9",
+          "code_length": 147
+        },
+        {
+          "name": "checkMaxFromSector",
+          "descriptor": "(Ljava/util/List;)Z",
+          "access": 34,
+          "code_sha256": "a923c5930dbdf94ee795533ff6f1ce0e3b08558476c643a0efc483fe8c6f3d10",
+          "code_length": 129,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;)Z"
+        },
+        {
+          "name": "checkCorrelation",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "c4027e0891784d7ceae16569a5386e989b70240cafa3c972fd6fd1de946a9378",
+          "code_length": 204,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "computeCorrelation",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;)D",
+          "access": 34,
+          "code_sha256": "fea53bf638a319e1eac1b6b3d4dfde0925632314ae88622c53188b1d9bf35908",
+          "code_length": 120
+        },
+        {
+          "name": "key",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "38f92672fefffc0579455b72f8a72021112df25166e62fa25528498793662e4d",
+          "code_length": 79
+        },
+        {
+          "name": "printCombination",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "c9a0214fbc1add32901127a05c61c06e0f19eb9f2b910a99f1dff939d130b3a7",
+          "code_length": 30
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1984643c0e2e560d0f0c9781e10ca5bc4923102c8f36d751c6f1d0278e56813b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/conditions/DismissStruct",
+        "com/strategyquant/tradinglib/correlation/CorrelationComputer",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination.class",
+      "occurrence": 0,
+      "sha256": "bb223e9ba005178c600ba3ef37400fd1904b076d06d74499b57b663001b37bb0",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "portfolioIndexes",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "portfolioName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "dismiss",
+          "descriptor": "Lcom/strategyquant/tradinglib/conditions/DismissStruct;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator.class",
+      "occurrence": 0,
+      "sha256": "8d89f7907fce71a1d0c0d3e93fe43588cd3af2f2172affd49346cca376131f01",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "computer",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer;",
+          "access": 0
+        },
+        {
+          "name": "results",
+          "descriptor": "Ljava/util/List;",
+          "access": 0,
+          "generic_signature": "Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer;Ljava/util/List<Lcom/strategyquant/tradinglib/ResultsGroup;>;)V"
+        },
+        {
+          "name": "combination",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "880343d1a45ce8f50fa2d612cef45b6ab0acd68accc7ffda6dbc3b4652a4d542",
+          "code_length": 138,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "cloneCombination",
+          "descriptor": "([I)[I",
+          "access": 2,
+          "code_sha256": "fa8969e1ba0f3eefaf09f93ae40b44eea068bfe0054e8a2e5ac2b6f9f417d7ca",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ac9e2c2d755c4f3dc08f4785bcf70f5a46aae687cc1929097394772ef1ef9cb2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/List",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1.class",
+      "occurrence": 0,
+      "sha256": "df7f77ab6ad98b12bb5867e90e2ab3801e76d44238c7e789a28db477aeb2ad64",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/databank/IProgressListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "onProgress",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "f0d9d540fa6040e6359e4ac8d31bb7cdfa7fe1d42ca4a8d6a8440284a3b798aa",
+          "code_length": 18
+        },
+        {
+          "name": "onError",
+          "descriptor": "(DLjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d90c8e449208164f0b69d5ed1090aebdb5180efa1a7752bd2eae151cc4246095",
+          "code_length": 18
+        },
+        {
+          "name": "onDone",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "02dcfeafec5a06abc8d1c0f5fdfebbccc1fcb1948241f582618329d3b7eaf06b",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/databank/IProgressListener",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/project/ProjectProgress",
+        "com/strategyquant/tradinglib/project/ProjectProgressInfo",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "e3777a18cfbcc8e66f0254ad603b6a6be5c8d474bfd9a4e59ec7d4fc39b75f5a",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "originalResults",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 4,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "conditionsChecker",
+          "descriptor": "Lcom/strategyquant/tradinglib/conditions/ConditionsChecker;",
+          "access": 4
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;",
+          "access": 4
+        },
+        {
+          "name": "progressEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4
+        },
+        {
+          "name": "project",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/SQProject;",
+          "access": 4
+        },
+        {
+          "name": "portfolioIndex",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "72bdef4ead8bb2745ef2167011573fe39c6a0614c9bff11fb04bd96791160d43",
+          "code_length": 21
+        },
+        {
+          "name": "execute",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "indexesToString",
+          "descriptor": "([I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0c58952b53a2caf166b3e673653aa3563d3db13de89178452c8b49f40de9368c",
+          "code_length": 77
+        },
+        {
+          "name": "getPortfolioIndexes",
+          "descriptor": "([I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3c41f639d7cb7aad7f0ad039f064439d58335dc4ccb4053aab49de1f545114f5",
+          "code_length": 24
+        },
+        {
+          "name": "getPortfolioName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "65ecb31f9cf00f46b5edc03b54d1a80bbe6b9ab5c9e9d44f6fc921ede424de64",
+          "code_length": 20
+        },
+        {
+          "name": "computePortfolio",
+          "descriptor": "([I)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getResults",
+          "descriptor": "([I)Ljava/util/ArrayList;",
+          "access": 33,
+          "code_sha256": "4b35c72cfb51753f7d8bae5cf1a0d74f38dcc35051004338c520acc72049aef2",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([I)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "beforeStart",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d51ce48b146545e6811b47840d8e3fda5a6710ab4091410a9dbd6971b41f41cd",
+          "code_length": 164,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "limitMaxStrategiesInDatabank",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e40bb53f625cadb7b4e6f7e21aed5a824534c737a3d2cba866726144ec1887be",
+          "code_length": 78,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkCustomConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Lcom/strategyquant/tradinglib/conditions/DismissStruct;",
+          "access": 36,
+          "code_sha256": "4aa188f89f3de68bbfe6259dfa595de62fc113b3538e912052c3917144b6a5ff",
+          "code_length": 145
+        },
+        {
+          "name": "limitDataRange",
+          "descriptor": "(Ljava/util/ArrayList;JJ)V",
+          "access": 1,
+          "code_sha256": "c52651dc283de8eb9b83e151612b5ae0cb9abc9afe4f1dd86ab7d6823adff4cc",
+          "code_length": 220,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;JJ)V"
+        },
+        {
+          "name": "setSampleParts",
+          "descriptor": "(Ljava/util/ArrayList;)V",
+          "access": 1,
+          "code_sha256": "44d62f5021cbde0e680ace46d7ef0890e61bcba534a1c6715c5c02c7cf4d9272",
+          "code_length": 241,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;)V"
+        },
+        {
+          "name": "setSampleParts",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;J)V",
+          "access": 2,
+          "code_sha256": "9d5ddd7a60eb9d958131b2b30bf57a0a2bb63562ee5156ab37e5dbed81aa842e",
+          "code_length": 102,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isStopped",
+          "descriptor": "()Z",
+          "access": 1028
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9764a7220e78f15c8cfeb2a1f515b31cc9bcd9b1d158864a3ce6982ab1edc7f1",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/conditions/ConditionsChecker",
+        "com/strategyquant/tradinglib/conditions/DismissStruct",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger.class",
+      "occurrence": 0,
+      "sha256": "0faa8ddbc7f0e5089f1366bdcd0b54b28904330efa853d2773f4fb8fab451ab4",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionObserver"
+      ],
+      "fields": [
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "populationUpdate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 1,
+          "code_sha256": "ec253be131b48a2da4be7648e3361f814ef65d81ff526d385d285b784c6527ef",
+          "code_length": 60,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<+Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;)V"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionObserver<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/uncommons/watchmaker/framework/EvolutionObserver",
+        "org/uncommons/watchmaker/framework/PopulationData"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker.class",
+      "occurrence": 0,
+      "sha256": "617bd07aafc5bffb84a40e89438bc68a5666802bf35d6845bad207516f417c6c",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WORKER_ID_SOURCE",
+          "descriptor": "Lorg/uncommons/util/id/IDSource;",
+          "access": 26,
+          "generic_signature": "Lorg/uncommons/util/id/IDSource<Ljava/lang/String;>;"
+        },
+        {
+          "name": "workQueue",
+          "descriptor": "Ljava/util/concurrent/LinkedBlockingQueue;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/LinkedBlockingQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/ThreadPoolExecutor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 2,
+          "code_sha256": "0d506635a155d2192fb80a06eaf7361381cdf7d98a051175876ade78a6be6e2d",
+          "code_length": 79
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "1f12fa25cfff7768bce2e028a3d59df65bb5ccc5509e8bcc088998af152d7786",
+          "code_length": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask<TT;>;)Ljava/util/concurrent/Future<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "6458307278c36fce191c350acdbc5d8fd16453cc8ccd69854691f693a4d96374",
+          "code_length": 10
+        },
+        {
+          "name": "finalize",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "5319acba9fb65b06875dc6bb7851e12a6434b46475bbb9b209432f7c59b0e613",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Throwable"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cd3983eae637b6229655b3b0e4a9d87ad9cf910b65cd5ae7745555c05d983f5d",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/concurrent/LinkedBlockingQueue",
+        "java/util/concurrent/ThreadPoolExecutor",
+        "java/util/concurrent/TimeUnit",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IntSequenceIDSource",
+        "org/uncommons/util/id/StringPrefixIDSource"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask.class",
+      "occurrence": 0,
+      "sha256": "113e1f6b4230368cd4b46a38a758a43c386877fdbb003437e9c54d7c45e4b17f",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "candidate",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "population",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Ljava/lang/Object;Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;TT;Ljava/util/List<TT;>;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lorg/uncommons/watchmaker/framework/EvaluatedCandidate;",
+          "access": 1,
+          "code_sha256": "dc42ed88367c91489dbfca34764fa8c86a2c4b7fabc75391c3267a7206cb3d93",
+          "code_length": 29,
+          "generic_signature": "()Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "4b8fcfd7fbb533988899d3f7153f2cf3fa90d2cd792107f3ec7981e30cbb3926",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Callable<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/concurrent/Callable",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "862faf0340ee60a21299feb15a4abc5e658377bf814466dddd952c594692ab51",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "userAbort",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/termination/UserAbort;",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness;IIILcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 9,
+          "code_sha256": "9917a8a3bfd88e0dba458222798e7a36a190797d459b111171528f68c27ff5da",
+          "code_length": 469
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b37041ed7bf20a93101c55907c4cad4adcd9f6b3222e3796219e32fd930eb9f9",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/uncommons/maths/random/MersenneTwisterRNG",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/operators/EvolutionPipeline",
+        "org/uncommons/watchmaker/framework/selection/RouletteWheelSelection",
+        "org/uncommons/watchmaker/framework/termination/GenerationCount",
+        "org/uncommons/watchmaker/framework/termination/Stagnation",
+        "org/uncommons/watchmaker/framework/termination/UserAbort"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "4201a9f1482ed45e0eb410290ecdb5a3b764cda6083c47262fbc1e46d36a3d6d",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+      "interfaces": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/tradinglib/project/ProjectStatusListener"
+      ],
+      "fields": [
+        {
+          "name": "minStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "numberOfPossiblePortfolios",
+          "descriptor": "Ljava/math/BigInteger;",
+          "access": 2
+        },
+        {
+          "name": "startTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "genStartTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "period",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 2
+        },
+        {
+          "name": "maxCorrelation",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "allowNegativeCorrelation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "addEmptyPeriods",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "fitnessFunction",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness;",
+          "access": 2
+        },
+        {
+          "name": "maxFromSector",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "portfolioChecker",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/ArrayList;Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/project/ProgressEngine;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "fd9d33d049e6e6fb18c895386cf6ef26e3846078f03df11db0735d665d5ebb55",
+          "code_length": 142,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;Lcom/strategyquant/tradinglib/project/SQProject;Lcom/strategyquant/tradinglib/project/ProgressEngine;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V"
+        },
+        {
+          "name": "execute",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a4e6af143ae185730f50881bd65a6264ad40e98f221e9680ea3205d4bd87ea04",
+          "code_length": 168,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkPortfolio",
+          "descriptor": "([I)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination;",
+          "access": 33,
+          "code_sha256": "f9d4733af93c09e324cb0506b1a2381a720d101b680e1b9a3d967427b29d669f",
+          "code_length": 57,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "portfolioComputed",
+          "descriptor": "(Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;)V",
+          "access": 33,
+          "code_sha256": "39b7fd64a3e83c91f2b09df4df7c1f4982abcf33d195099f2ccad44fc1e65b6e",
+          "code_length": 230,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "done",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "b428cba44c023f9de22a9f8f7a2fdd143cd3213542763b8d8a4ee062cefe8b9d",
+          "code_length": 55
+        },
+        {
+          "name": "isStopped",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b1e3cd918f417f1c09ef0dc42f9e1f1d247bf316008a7a83f20c78cf37e76a7a",
+          "code_length": 8
+        },
+        {
+          "name": "printLog",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 33,
+          "code_sha256": "a311041b3f69c500fb0af0259c98100dc6ae221e4efc5fd367a1aef2368df3dc",
+          "code_length": 9
+        },
+        {
+          "name": "resetStats",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "computePortfolio",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "projectStatusChanged",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "bfa95b8c9ceabcd01c00e0aca9ea1fd491829247970f6e6e7e6a0ffd902c23f4",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/conditions/DismissStruct",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectStatusListener",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "org/slf4j/Logger",
+        "org/uncommons/watchmaker/framework/termination/UserAbort"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings.class",
+      "occurrence": 0,
+      "sha256": "7e5baeb68736535aaa4657f30dc74adb60f7a013338d0e83d2411fdb338b2aa1",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "numberOfStrategies",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "minStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "maxStrategiesInPortfolio",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 1
+        },
+        {
+          "name": "crossoverPoints",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "crossoverProbability",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 1
+        },
+        {
+          "name": "mutationPoints",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "mutationProbability",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 1
+        },
+        {
+          "name": "mutationResizeProbability",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 1
+        },
+        {
+          "name": "fitnessMaximize",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "populationSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "elitism",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "singleThreaded",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "userAbort",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/termination/UserAbort;",
+          "access": 1
+        },
+        {
+          "name": "islands",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "IsPct",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "reverseSample",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "037eb763f90ac03a9cd24d367a01e3d339f93c7c29f96293852e1857d3aead99",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache.class",
+      "occurrence": 0,
+      "sha256": "47529a22c100746c3f2e89be1def5fb5f6465be127b7cdc80ef4548323e0b38f",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_CACHE_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Integer;Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e35bdbc0d380c55149114da595af211d0c67baf7f214212edb549da72786af2e",
+          "code_length": 8
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(I)D",
+          "access": 33,
+          "code_sha256": "070601a0b28400d1b2df5a6733294349e028406052f1f92ad2c625055df1f386",
+          "code_length": 36
+        },
+        {
+          "name": "setFitness",
+          "descriptor": "(ID)V",
+          "access": 33,
+          "code_sha256": "b9483b7a7463c025cc88d739bed640b6dac968739f92566ac958cbd3757dbc22",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache",
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/HashMap"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene.class",
+      "occurrence": 0,
+      "sha256": "f4fedb93f5bd457c96e5c54b7d2cf39bead55c2adaf7910b8aceef6ffdf97677",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "number",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "ee2a028916d985d6fc3891a3af7d2f576382108c2b6f5eba07cef1dbb47f8a48",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4357070bec26ec84684c6469330f6d27b3cc83e21ecfdca36ef5aecaae681a66",
+          "code_length": 47
+        },
+        {
+          "name": "getNumber",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 1,
+          "code_sha256": "60aee66fd87abc39a118d906ada008248b600070bb3f252e61d2c652afdced64",
+          "code_length": 16
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1bdd923b807f36a70ea15053c1c4738d3d8adefe099dea2d8b4aa066b6101c6a",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)I",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator.class",
+      "occurrence": 0,
+      "sha256": "a9415309992925670550b63d40aac87ddf40d30a0bac30b45ebaa8dca8b63da6",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)I",
+          "access": 1,
+          "code_sha256": "e0b37e4c7694d7b14871dc178433133b53f19054ca3faf22828a1825f570fa4b",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "8e9b2ad65f101c043d55f6cf489afba2ac95915371d417392899e78f5ad13218",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome.class",
+      "occurrence": 0,
+      "sha256": "908b229e96a2be927d13674177ec896c1ed7be0e0f2f268bdf23dbc1ce3494bc",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "strategyGenes",
+          "descriptor": "[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 18
+        },
+        {
+          "name": "comparator",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator;",
+          "access": 18
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "generation",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "fitness",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)V",
+          "access": 1,
+          "code_sha256": "aa2286b9c9db082f7e43bc312793c5404bdc22f539d9203b13addf370a45e979",
+          "code_length": 38
+        },
+        {
+          "name": "computeHash",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "155462c6eeccb644a687039df82060cf0a5cfcdd3714b8e6842cb87df5d72761",
+          "code_length": 42
+        },
+        {
+          "name": "getGenes",
+          "descriptor": "()[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 1,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0de69a648be52ada3625475e4d48b2329dea0dc69c67c577a53b02c305419d8f",
+          "code_length": 96
+        },
+        {
+          "name": "cloneGenes",
+          "descriptor": "()[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 1,
+          "code_sha256": "b533b47e80f5543413c74e9421fda351ef138fd117fbb3fb513be88ca2982540",
+          "code_length": 8
+        },
+        {
+          "name": "cloneGenes",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 9,
+          "code_sha256": "b3f897bd3277a27f313be78cbe7bdc23408c708f1c4b81dba543bc8985c00009",
+          "code_length": 31
+        },
+        {
+          "name": "checkPortfolioIsCorrect",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)Z",
+          "access": 9,
+          "code_sha256": "97461e6b0d1eb43c361405259c944dc046bada616fc46e623dda26c130b74a5c",
+          "code_length": 57
+        },
+        {
+          "name": "getHash",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9bcb244defc50bbabfd2dd1d7b5d2d56007edc817c09fae83f8cc4ce6c06a85d",
+          "code_length": 5
+        },
+        {
+          "name": "setGeneration",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "244a0e81a041c28a2d5e6a5eb9cb00b4371e2d6ce106b857e8f536124cce06c2",
+          "code_length": 6
+        },
+        {
+          "name": "setFitness",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "2af569d513426a07cb2d1b919b7f027f7f1cada1104de8ff1bac42b620ed13e4",
+          "code_length": 6
+        },
+        {
+          "name": "getGeneration",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "30f1c585ea99fac1633463174fcd43e856016741f2183d8ae28192bee0ed8712",
+          "code_length": 5
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "46039b69e0e7d4b50db401d68db307000e83171260037e00b145ef8c14acbc66",
+          "code_length": 5
+        },
+        {
+          "name": "findXthAvailableGeneNumber",
+          "descriptor": "(I[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;II)I",
+          "access": 9,
+          "code_sha256": "9161012aff2d7f52f105357ec965652bc3a3e8dffb6addf51cd08d1a02a3aef7",
+          "code_length": 42
+        },
+        {
+          "name": "containsNumber",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;II)Z",
+          "access": 10,
+          "code_sha256": "696f51309b9f27af802b4462c4f6cc523923724138253068b4fbf47a01361394",
+          "code_length": 27
+        },
+        {
+          "name": "getIndexes",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "a3f7510104dc39e5115389017468f9b531288f797f28b17c6d48f1575782b19b",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeCrossover.class",
+      "occurrence": 0,
+      "sha256": "1a478d8ca3b201cd5839f7c020b90eb8a45a9179be76fb2b7f75197e9e12f67b",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeCrossover",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;)V",
+          "access": 1,
+          "code_sha256": "195cf8ebd8fc94cb94c94100d501619d5761c717443f819b00011515aa99512a",
+          "code_length": 18
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "3653c5b8cfa36dfc36968aab3204c93ef7bd80fed2abed3ecb0f6c0084828d60",
+          "code_length": 67,
+          "generic_signature": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;ILjava/util/Random;)Ljava/util/List<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;"
+        },
+        {
+          "name": "mateOnce",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;ILjava/util/Random;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "16995b0028fdb2a5be594d01f4ba7b8c243b048b617aa5676e375405dae7ee50",
+          "code_length": 185,
+          "generic_signature": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;ILjava/util/Random;)Ljava/util/List<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;"
+        },
+        {
+          "name": "fixGenome",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 2,
+          "code_sha256": "a31abb7df70820614a0ba59ae4a9fbd9d5662592ea1a845d92e1dfee96abfc4b",
+          "code_length": 69
+        },
+        {
+          "name": "copyGenes",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;II)V",
+          "access": 2,
+          "code_sha256": "88fa02f3b1d247aca6ce2b9b6f92ae5f9b14ab3f1d10530029a4a1ff9a1356d5",
+          "code_length": 44
+        },
+        {
+          "name": "copyParent",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;)[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 2,
+          "code_sha256": "afff37ca0d5a6f85ab1f4dbf92771ab8cdccc3c0360992e0a7532898956d3d4a",
+          "code_length": 45
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "844fd7bd7ec0f3e10acd265cd3c0585a12656419c1d15195fe9d0c3c20a6dbd0",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;",
+      "class_references": [
+        "[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeCrossover",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator.class",
+      "occurrence": 0,
+      "sha256": "3d9601bc13ad2ae23c0495638c9a7ab395eebfef90d8db32e6d7ae638d578582",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;",
+          "access": 2
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;",
+          "access": 2
+        },
+        {
+          "name": "portfolioComputer",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer;",
+          "access": 2
+        },
+        {
+          "name": "fitnessCache",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache;",
+          "access": 10
+        },
+        {
+          "name": "pmSettings",
+          "descriptor": "Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener;Lcom/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings;)V",
+          "access": 1,
+          "code_sha256": "3febf8ac0b4190e2b4b0c073b3c3416f9757480a4c465ec1f1c7977fbb583f9b",
+          "code_length": 42
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Ljava/util/List;)D",
+          "access": 1,
+          "code_sha256": "c4cf59d136031b2054d394213f42c485035bf1cacc3a08eca34ea52eb8adb466",
+          "code_length": 287,
+          "generic_signature": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Ljava/util/List<+Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;)D"
+        },
+        {
+          "name": "isNatural",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9eabdc40fb1218c1b7c4f1d458816f2b6e9c21b2a1e7fe434da15ddd2147dedd",
+          "code_length": 8
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/List;)D",
+          "access": 4161,
+          "code_sha256": "c2f31e38fb87571c17a31bcbb836e4b0b9fad2214dc20ab817fe762fd761647c",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3f3787e48edd7dc607e67c1b64b783c1a336025f6a3af2570d1e5d299b46375c",
+          "code_length": 19
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;",
+      "class_references": [
+        "[I",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/List",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory.class",
+      "occurrence": 0,
+      "sha256": "16a55c27c7be0d67464a94eb434d4fe047de96a54d52b7ae2045a2b2d7b76171",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;",
+          "access": 1,
+          "code_sha256": "4fc5c10ea13e1e455c16b6a280097a031d280a02ec160dca2be86c495fa850de",
+          "code_length": 106
+        },
+        {
+          "name": "generatePortfolio",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)V",
+          "access": 2,
+          "code_sha256": "9d30fc2cc1d62c5dfdf0468b77632d50ff3f1544c515f6aafa5488fe2dfa284d",
+          "code_length": 58
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a867d4372171cf6d37eb20f8f983c4a06f92844726ec63536454c7213891bc41",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/factories/AbstractCandidateFactory<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;",
+      "class_references": [
+        "[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory",
+        "java/lang/IllegalArgumentException",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation.class",
+      "occurrence": 0,
+      "sha256": "0ad9e072c7d044efcd2f14a95c19eba148a5ed884f597d341328d6d1a6c0ab6c",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "settings",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "6b85d44e356f22b1317126ac8a2b1c8ee2c7ad7630db820da8a369a5b102c1ab",
+          "code_length": 63,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;Ljava/util/Random;)Ljava/util/List<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;"
+        },
+        {
+          "name": "mutate",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;Ljava/util/Random;)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;",
+          "access": 2,
+          "code_sha256": "8f6ae3888963cbf189fee04f39bc69f6b2ad9a2e1e2832860c2d51f7efbda3b7",
+          "code_length": 160
+        },
+        {
+          "name": "addGene",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;Ljava/util/Random;)[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 2,
+          "code_sha256": "a7c30dc225541068a2fba1f1d1fcba715e4ba5e52a468ee3f69b7db30643f31e",
+          "code_length": 82
+        },
+        {
+          "name": "removeGene",
+          "descriptor": "([Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;I)[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 2,
+          "code_sha256": "8e3fe00866d26b1ff15875392e1ba30731e4cf998c10d9aa6c7508aa361d9061",
+          "code_length": 46
+        },
+        {
+          "name": "mutateGene",
+          "descriptor": "(I[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;)Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+          "access": 2,
+          "code_sha256": "3a26e754238af74f58a2598526bc5c0435a9d7d926a01754ad78f00e4a95f19c",
+          "code_length": 43
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome;>;",
+      "class_references": [
+        "[Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene;",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "394ab526dedde39d7f7f62c0794b249097bfe05c42522de2e75bf859e965dbab",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionEngine"
+      ],
+      "fields": [
+        {
+          "name": "concurrentWorker",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker;",
+          "access": 10
+        },
+        {
+          "name": "observers",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;>;"
+        },
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "candidateFactory",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/CandidateFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;"
+        },
+        {
+          "name": "singleThreaded",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "satisfiedTerminationConditions",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        },
+        {
+          "name": "evolutionScheme",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "selectionStrategy",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/SelectionStrategy;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;"
+        },
+        {
+          "name": "userAbort",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/termination/UserAbort;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Lorg/uncommons/watchmaker/framework/SelectionStrategy;Ljava/util/Random;Lorg/uncommons/watchmaker/framework/termination/UserAbort;)V",
+          "access": 1,
+          "code_sha256": "e78bb01f4c0b10e02004c6464642e9ce738de83a66f674fcbce953ff14327911",
+          "code_length": 54,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;Ljava/util/Random;Lorg/uncommons/watchmaker/framework/termination/UserAbort;)V"
+        },
+        {
+          "name": "nextEvolutionStep",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "14f01de3de9c15eadeedaa2e22d814daefb0e67c27cb026ec8f39e050c9aef8d",
+          "code_length": 135,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "32bb947bb6ac7252b5add78a7a7c8c912ffc93e959cd89da18c6933220affea0",
+          "code_length": 11,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "b1d81a5139ebe5d6f19a44efe5ea48590594e5ebd2eefdf8955c02220f66b83e",
+          "code_length": 33,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 129,
+          "code_sha256": "12e71a02325c8bd191ac257febda3502df46e97901d2452643128c9408c0de54",
+          "code_length": 11,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 129,
+          "code_sha256": "bed80e1dc3d55975093bfd6c0837b17aa3ce5c73458f04f034de36dac47e07c1",
+          "code_length": 220,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evaluatePopulation",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "313fad7c30ffcc0bbcd85ffac6ca3c5b6776a90a51a9970479f7c31257f79792",
+          "code_length": 301,
+          "generic_signature": "(Ljava/util/List<TT;>;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "cancelResults",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "305349588a122219c4e367c7e4a95e796de6688b0a35777a1bae0835c410e8bc",
+          "code_length": 38,
+          "generic_signature": "(Ljava/util/List<Ljava/util/concurrent/Future<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;>;)V"
+        },
+        {
+          "name": "getSatisfiedTerminationConditions",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8adddaacdf66312b607a814fdc0ebc4e63e97102a5c8e9df6df56ffe9a0cb7ae",
+          "code_length": 25,
+          "generic_signature": "()Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        },
+        {
+          "name": "addEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "2118638603fdd9553ee2686d2cccaf8d72c6efa1e13be36ac9bcc2c5ad9acba8",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "removeEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "ee8463860c64162cc7c78654b72e1d08adb4e96be893843b9da00fb0d13d377e",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "notifyPopulationChange",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 2,
+          "code_sha256": "2279c4d2ae3efcb89ac8321880473fbcb4cf376c1df90e46cd512a253167b2f0",
+          "code_length": 40,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<TT;>;)V"
+        },
+        {
+          "name": "setSingleThreaded",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "a090c9f259dbb29e5de86248c5fcc724cb33fd7b8180414584fc289e0c599b27",
+          "code_length": 6
+        },
+        {
+          "name": "getSharedWorker",
+          "descriptor": "()Lcom/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker;",
+          "access": 42,
+          "code_sha256": "9dbb43234af43fd1ab938d625fb69f549b21fe93f3e985f38f9770ab6fdc0069",
+          "code_length": 20
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8d85dcb21d0f2ab277c70abd30e683d9904c78d2f3f67f89116d981b6695fcc8",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;",
+      "class_references": [
+        "[Lorg/uncommons/watchmaker/framework/TerminationCondition;",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/concurrent/CopyOnWriteArraySet",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/Future",
+        "org/uncommons/watchmaker/framework/CandidateFactory",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvolutionObserver",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/termination/UserAbort"
+      ]
+    }
+  ]
+}

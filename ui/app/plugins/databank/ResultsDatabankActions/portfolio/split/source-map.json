@@ -1,61 +1,69 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only portfolio/split bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/split",
-    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
-    "review":  {
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan",
-                   "version":  1
-               },
-    "owner":  {
-                  "domain":  "plugins/databank",
-                  "feature":  "FEAT-UI-DATABANK_BUILDER",
-                  "decision":  "DEC-UI-DATABANK-PORTFOLIO-SPLIT-STRUCTURAL-OWNERSHIP",
-                  "requirements":  [
-                                       "FR-UI-DATABANK-source-mapping",
-                                       "FR-UI-DATABANK-workflow-preservation",
-                                       "FR-UI-DATABANK-clean-room"
-                                   ]
-              },
-    "clean_room":  {
-                       "paraphrased_behavior_only":  true,
-                       "contains_personal_data":  false,
-                       "contains_sensitive_data":  false,
-                       "contains_proprietary_source":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultsdatabankactions-portfolio-split-ui",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split",
-                               "family":  "bounded installed portfolio composition-action frontend artifacts"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-split-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target menu/deferred-dispatch counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "3b832164972d561c75b4a1b0794d6c67cf728105ad8c067a8e13d076386cb3b4",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing action remains a generic deferred notice, without donor guards/selection semantics/backend execution; no runtime parity."
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Bounded structural manifest, not behavioral ledger."
-                        }
-                    ],
-    "limitations":  [
-                        "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity claims.",
-                        "Action only sends its existing deferred label; no selection/running guard, dialog, portfolio mutation or quantitative algorithm.",
-                        "Coordinator parent aggregation/consumer/registry integration pending."
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only portfolio/split bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/split",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-PORTFOLIO-SPLIT-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-portfolio-split-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split",
+      "family": "bounded installed portfolio composition-action frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-portfolio-split-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/split/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity and scoped menu/dispatch responsibility",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target menu/deferred-dispatch counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "4231d9ca8baf203da72380369f5f0e09e9f72a4c192a97f0c52a2224e132a52e",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing action remains a generic deferred notice, without donor guards/selection semantics/backend execution; no runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger."
+    }
+  ],
+  "limitations": [
+    "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity claims.",
+    "Action only sends its existing deferred label; no selection/running guard, dialog, portfolio mutation or quantitative algorithm.",
+    "Coordinator parent aggregation/consumer/registry integration pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

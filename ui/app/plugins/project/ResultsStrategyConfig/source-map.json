@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsStrategyConfig bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsStrategyConfig",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,88 +28,118 @@
   "source_catalog": [
     {
       "id": "sqx-resultsstrategyconfig-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig",
       "family": "bounded installed frontend plugin artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a7e8f7034865f509a0a0e08d10d046503122a94518eed39e73885f542ef740d4",
+      "sha256": "fd5ef7d1ce14bd9e9ed121ac607e7b8bf38b9346950979c87bb0546b6a3b18ca",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
       "relative_path": "ResultsStrategyConfig.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "6409614e40da9c8afeee39bbde288ca87194eba4c77fbf1c7104d6c0f7dfba2d",
+      "sha256": "2b2ffee19ff286f637a317db951feb515d473e4ede01057b83ea8db705c8876f",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/strategyconfig.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/strategyconfig.html",
       "relative_path": "strategyconfig.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "1fd5beb3e86b3fef64137f1964285069697a1588fedd09d23f1d2bf41c46855c",
+      "sha256": "c4f30d713adccea2598b9cc85b9e1de3ac342e784fea9d7146934de0b9388032",
       "target": "strategyconfig.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigCtrl.js",
       "relative_path": "StrategyConfigCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "b830db379df5855e8abb0641b10178b63b775986c517b85b0b75dfefd5252a1f",
+      "sha256": "de902dd0b0116c8c0a1fcf1f96e029b112c9608b2f45ff8d6d85a6202b22538a",
       "target": null,
       "classification": "excluded",
-      "limitation": "Target has fixed JSON preview only; donor apply/task/expand configuration lifecycle has no counterpart."
+      "limitation": "Target has fixed JSON preview only; donor apply/task/expand configuration lifecycle has no counterpart. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js",
       "relative_path": "StrategyConfigService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "3391672ea9af5d4e5e31edd28556750cf48ff54bc7137fdf90b4e1d179a415ed",
+      "sha256": "942961e2cd401cd2f15d3086070a2432fe9b94cc00f1d2c25de9ad7063d8fe7d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsstrategyconfig-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3aa087cf62da1c244b9ef45902bdb25b0ecd36bca6a53a0615c2ea3c9012c359",
+      "sha256": "4b31a7a20d2e93a0c35f5b656663f20bf1efd00c327ff631f9203a50cd03793d",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -151,6 +181,9 @@
   "limitations": [
     "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
     "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
-    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
-  ]
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

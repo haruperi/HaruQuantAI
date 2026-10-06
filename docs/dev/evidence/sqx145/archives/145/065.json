@@ -1,0 +1,151 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/json-20150729.jar",
+  "sha256": "38c21b9c3d6d24919cd15d027d20afab0a019ac9205f7ed9083b32bdd42a2353",
+  "class_count": 18,
+  "unique_class_entries": 18,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "org/json/CDL.class": "c97d016f30f0a7c7033fabdf33bad340122132cf7ff54d4ed74ca19be520fd06",
+    "org/json/Cookie.class": "971c83b065b6e97d4f74a82b6dd3fdb5429f40d2742a24c85b12c057cc4ad155",
+    "org/json/CookieList.class": "ac13f473376cc56a29c704c45d290194ee750448da385a8161444877104c50c3",
+    "org/json/HTTP.class": "f9815a8166eb57662df6dff8bab3d8c4ec49642ce7445974af96144de733c9be",
+    "org/json/HTTPTokener.class": "8e6202a6d338f56161083c20258f9f4148f0103f2741238b8bbadb5039f98d57",
+    "org/json/JSONArray.class": "d55abdfd2ff9e55a98588356d0ffc50a5ac9c0cb2d3bc7c865a19bde9e0fc22f",
+    "org/json/JSONException.class": "5a65422db9837458667d6a3b4479e9b8a5c277eef54850594f6b9407400ab089",
+    "org/json/JSONML.class": "2651e9731bd3536ad9363f8952cda53166b4fd513ae4b4d15a6048040c504ebc",
+    "org/json/JSONObject$1.class": "03940249a07e07c1f7413e34dcaec4b294350d3b6f6b83b7a814c6071ed9e978",
+    "org/json/JSONObject$Null.class": "2e6bda684c377a9a6d20eeeb2257a4175223095a24ce008f0adcc2f794e665db",
+    "org/json/JSONObject.class": "aa689272b058821b9c8d9dd52d03de72484876477f7efdf383626839ac16bd28",
+    "org/json/JSONString.class": "2bf18f8028554a8dc09bf53caa4902350ddbb8ed1b4b29c65dcd3983ba6c15b8",
+    "org/json/JSONStringer.class": "042868b2a3cfe66577cc838f1f38b6c496e4c9acbf90089a84a36ce0776ad30a",
+    "org/json/JSONTokener.class": "2ed657345c1e9c5ae47cddb9e47e354b4d1173b5e4a465efe189fb69fef29faf",
+    "org/json/JSONWriter.class": "55a1175ca0013a926ebd6ff63b3f227db322efc9495a608faaccbfcb02364741",
+    "org/json/Property.class": "f0ce9854eb9cf796c24f01efa792e4405aa2b2a33fd6ba9378be87b410001629",
+    "org/json/XML.class": "3435a9715a9a89205b01c0c069c6bcfa675ede0e000e45623bed17f3c10ef780",
+    "org/json/XMLTokener.class": "b87fba960312ff54e68a788c24947a6b3cf438ac6b89dc1a76a4074e20e0db82"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "a36d83297f4444350a77031e28b14cc97519e1c7a1c8f9922c4293458f776eaa",
+    "META-INF/maven/org.json/json/pom.xml": "7b7ce5ac5fe48af2208386f66e4cb321e4f7e5931f295f80a98b7d6554e46bfc",
+    "META-INF/maven/org.json/json/pom.properties": "03c2aa2e4c345ddb96fc80cd09096baf646e11d99b5f9ac8c7598d2c20c30917"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/json/CDL.class",
+      "occurrence": 0,
+      "sha256": "c97d016f30f0a7c7033fabdf33bad340122132cf7ff54d4ed74ca19be520fd06",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/Cookie.class",
+      "occurrence": 0,
+      "sha256": "971c83b065b6e97d4f74a82b6dd3fdb5429f40d2742a24c85b12c057cc4ad155",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/CookieList.class",
+      "occurrence": 0,
+      "sha256": "ac13f473376cc56a29c704c45d290194ee750448da385a8161444877104c50c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/HTTP.class",
+      "occurrence": 0,
+      "sha256": "f9815a8166eb57662df6dff8bab3d8c4ec49642ce7445974af96144de733c9be",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/HTTPTokener.class",
+      "occurrence": 0,
+      "sha256": "8e6202a6d338f56161083c20258f9f4148f0103f2741238b8bbadb5039f98d57",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONArray.class",
+      "occurrence": 0,
+      "sha256": "d55abdfd2ff9e55a98588356d0ffc50a5ac9c0cb2d3bc7c865a19bde9e0fc22f",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONException.class",
+      "occurrence": 0,
+      "sha256": "5a65422db9837458667d6a3b4479e9b8a5c277eef54850594f6b9407400ab089",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONML.class",
+      "occurrence": 0,
+      "sha256": "2651e9731bd3536ad9363f8952cda53166b4fd513ae4b4d15a6048040c504ebc",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONObject$1.class",
+      "occurrence": 0,
+      "sha256": "03940249a07e07c1f7413e34dcaec4b294350d3b6f6b83b7a814c6071ed9e978",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONObject$Null.class",
+      "occurrence": 0,
+      "sha256": "2e6bda684c377a9a6d20eeeb2257a4175223095a24ce008f0adcc2f794e665db",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONObject.class",
+      "occurrence": 0,
+      "sha256": "aa689272b058821b9c8d9dd52d03de72484876477f7efdf383626839ac16bd28",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONString.class",
+      "occurrence": 0,
+      "sha256": "2bf18f8028554a8dc09bf53caa4902350ddbb8ed1b4b29c65dcd3983ba6c15b8",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONStringer.class",
+      "occurrence": 0,
+      "sha256": "042868b2a3cfe66577cc838f1f38b6c496e4c9acbf90089a84a36ce0776ad30a",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONTokener.class",
+      "occurrence": 0,
+      "sha256": "2ed657345c1e9c5ae47cddb9e47e354b4d1173b5e4a465efe189fb69fef29faf",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/JSONWriter.class",
+      "occurrence": 0,
+      "sha256": "55a1175ca0013a926ebd6ff63b3f227db322efc9495a608faaccbfcb02364741",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/Property.class",
+      "occurrence": 0,
+      "sha256": "f0ce9854eb9cf796c24f01efa792e4405aa2b2a33fd6ba9378be87b410001629",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/XML.class",
+      "occurrence": 0,
+      "sha256": "3435a9715a9a89205b01c0c069c6bcfa675ede0e000e45623bed17f3c10ef780",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    },
+    {
+      "entry": "org/json/XMLTokener.class",
+      "occurrence": 0,
+      "sha256": "b87fba960312ff54e68a788c24947a6b3cf438ac6b89dc1a76a4074e20e0db82",
+      "member_shard": "docs/dev/evidence/sqx145/members/065/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/065/001.json",
+      "sha256": "f98a1f76cbad9172d0c95ac178fe80acb4e5a7e80d446e743338b039e60fe9e2"
+    }
+  ]
+}

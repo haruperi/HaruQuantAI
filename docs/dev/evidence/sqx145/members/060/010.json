@@ -1,0 +1,6120 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/win32/Pdh$PDH_TIME_INFO.class",
+      "occurrence": 0,
+      "sha256": "b95fbed2c407f2b87a334aae1e658a9daa7e9ae81cd3e6ba7fea401757dfbedc",
+      "name": "com/sun/jna/platform/win32/Pdh$PDH_TIME_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "StartTime",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "EndTime",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "SampleCount",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Pdh",
+        "com/sun/jna/platform/win32/Pdh$PDH_TIME_INFO"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Pdh.class",
+      "occurrence": 0,
+      "sha256": "d8b52b7c41f332c5c885e7e4f60b7dfce3392489fb1a0ae3c317835ca8b409a5",
+      "name": "com/sun/jna/platform/win32/Pdh",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Pdh;",
+          "access": 25
+        },
+        {
+          "name": "PDH_MAX_COUNTER_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MAX_INSTANCE_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MAX_COUNTER_PATH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MAX_DATASOURCE_PATH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MORE_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INSUFFICIENT_BUFFER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_ARGUMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MEMORY_ALLOCATION_FAILURE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_MACHINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_OBJECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CVERSION_WIN40",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CVERSION_WIN50",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PATH_WBEM_RESULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PATH_WBEM_INPUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_RAW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_ANSI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_UNICODE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_LONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_DOUBLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_LARGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_NOSCALE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_1000",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_NODATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FMT_NOCAP100",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PERF_DETAIL_COSTLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PERF_DETAIL_STANDARD",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "PdhConnectMachine",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhGetDllVersion",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhOpenQuery",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/BaseTSD$DWORD_PTR;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhCloseQuery",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhMakeCounterPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Pdh$PDH_COUNTER_PATH_ELEMENTS;[CLcom/sun/jna/platform/win32/WinDef$DWORDByReference;I)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhAddCounter",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Ljava/lang/String;Lcom/sun/jna/platform/win32/BaseTSD$DWORD_PTR;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhAddEnglishCounter",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Ljava/lang/String;Lcom/sun/jna/platform/win32/BaseTSD$DWORD_PTR;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhRemoveCounter",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhGetRawCounterValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;Lcom/sun/jna/platform/win32/Pdh$PDH_RAW_COUNTER;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhValidatePath",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhCollectQueryData",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhCollectQueryDataEx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;ILcom/sun/jna/platform/win32/WinNT$HANDLE;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhCollectQueryDataWithTime",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$LONGLONGByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhSetQueryTimeRange",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/Pdh$PDH_TIME_INFO;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhEnumObjectItems",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;II)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhLookupPerfIndexByName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "PdhLookupPerfNameByIndex",
+          "descriptor": "(Ljava/lang/String;ILcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "933f2a5e3150b701fe9331d886e66cf4d49049a399ffb7b3aebeff16cbd380cd",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$DWORD_PTR",
+        "com/sun/jna/platform/win32/Pdh",
+        "com/sun/jna/platform/win32/Pdh$PDH_COUNTER_PATH_ELEMENTS",
+        "com/sun/jna/platform/win32/Pdh$PDH_RAW_COUNTER",
+        "com/sun/jna/platform/win32/Pdh$PDH_TIME_INFO",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORDByReference",
+        "com/sun/jna/platform/win32/WinDef$LONGLONGByReference",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PdhMsg.class",
+      "occurrence": 0,
+      "sha256": "7a7b96c861d2c440df18645aa33cdbe1ec7746880378e3131415760329c6b4ba",
+      "name": "com/sun/jna/platform/win32/PdhMsg",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PDH_CSTATUS_VALID_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NEW_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_MACHINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_INSTANCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MORE_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_ITEM_NOT_VALIDATED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_RETRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_NO_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CALC_NEGATIVE_DENOMINATOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CALC_NEGATIVE_TIMEBASE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CALC_NEGATIVE_VALUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_DIALOG_CANCELLED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_END_OF_LOG_FILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_ASYNC_QUERY_TIMEOUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CANNOT_SET_DEFAULT_REALTIME_DATASOURCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_OBJECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_COUNTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_INVALID_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_MEMORY_ALLOCATION_FAILURE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_HANDLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_ARGUMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FUNCTION_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_NO_COUNTERNAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CSTATUS_BAD_COUNTERNAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_BUFFER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INSUFFICIENT_BUFFER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CANNOT_CONNECT_MACHINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_PATH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_INSTANCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_NO_DIALOG_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CANNOT_READ_NAME_STRINGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOG_FILE_CREATE_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOG_FILE_OPEN_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOG_TYPE_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_NO_MORE_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_ENTRY_NOT_IN_LOG_FILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_DATA_SOURCE_IS_LOG_FILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_DATA_SOURCE_IS_REAL_TIME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_UNABLE_READ_LOG_HEADER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FILE_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_FILE_ALREADY_EXISTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_NOT_IMPLEMENTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_STRING_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_UNABLE_MAP_NAME_FILES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_UNKNOWN_LOG_FORMAT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_UNKNOWN_LOGSVC_COMMAND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOGSVC_QUERY_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOGSVC_NOT_OPENED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_WBEM_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_ACCESS_DENIED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOG_FILE_TOO_SMALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_DATASOURCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_SQLDB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_NO_COUNTERS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_ALLOC_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_ALLOCCON_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_EXEC_DIRECT_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_FETCH_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_ROWCOUNT_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_CONNECT_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_BIND_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_CANNOT_CONNECT_WMI_SERVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_COLLECTION_ALREADY_RUNNING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_SCHEDULE_OVERLAP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_COLLECTION_NOT_FOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_SCHEDULE_ELAPSED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_NOSTART",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_ALREADY_EXISTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_TYPE_MISMATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_FILEPATH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_SERVICE_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_VALIDATION_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_VALIDATION_WARNING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_PLA_ERROR_NAME_TOO_LONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INVALID_SQL_LOG_FORMAT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_COUNTER_ALREADY_IN_QUERY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_BINARY_LOG_CORRUPT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_LOG_SAMPLE_TOO_SMALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_OS_LATER_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_OS_EARLIER_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_INCORRECT_APPEND_TIME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_UNMATCHED_APPEND_COUNTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_SQL_ALTER_DETAIL_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PDH_QUERY_PERF_DATA_TIMEOUT",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/PdhMsg",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PdhUtil$PdhEnumObjectItems.class",
+      "occurrence": 0,
+      "sha256": "abd1597bd3a325ed0fbefd2608bba5859e1cf120ab0c8622375af13c94328d1f",
+      "name": "com/sun/jna/platform/win32/PdhUtil$PdhEnumObjectItems",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "counters",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "instances",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "e0244a0ca6c9bb6b0d853f3e116c4361377a6702367ed446cc03649ebe09d8e6",
+          "code_length": 23,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "getCounters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getInstances",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "copyAndEmptyListForNullList",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "6f38c82a6debbb631261af8c94f2fdcdea70f23fd9d2d30d63e08c4661940cf9",
+          "code_length": 21,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ce17be4e4fd6d0e154d27f2ab9e006384d17aa7d1f49a3559512daf17e9d16a4",
+          "code_length": 40
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/PdhUtil",
+        "com/sun/jna/platform/win32/PdhUtil$PdhEnumObjectItems",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PdhUtil$PdhException.class",
+      "occurrence": 0,
+      "sha256": "70410b2df756c99c0cbce48d31a1aa82fe9f55cf2c74e3a8e7298c6d2b0fbb00",
+      "name": "com/sun/jna/platform/win32/PdhUtil$PdhException",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "errorCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "540d6ff10ecd1282b4366cb3b89503b234828fcd774c46343767aa9d0db55116",
+          "code_length": 26
+        },
+        {
+          "name": "getErrorCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/PdhUtil",
+        "com/sun/jna/platform/win32/PdhUtil$PdhException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PdhUtil.class",
+      "occurrence": 0,
+      "sha256": "464e4735d4563ca973a0f7976733bf5a4815cc679fa4fc8dc5e2bbe548eaa178",
+      "name": "com/sun/jna/platform/win32/PdhUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CHAR_TO_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ENGLISH_COUNTER_KEY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ENGLISH_COUNTER_VALUE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "PdhLookupPerfNameByIndex",
+          "descriptor": "(Ljava/lang/String;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b3c604c263dbb7dad653c864004afb8dfa35939c9bce4eedb07bc8fc4fc58bec",
+          "code_length": 227
+        },
+        {
+          "name": "PdhLookupPerfIndexByEnglishName",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "09c31549fd40eefec72d8ff7159c88de3947d8a34712b08ba622ab7b239a3612",
+          "code_length": 49
+        },
+        {
+          "name": "PdhEnumObjectItems",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Lcom/sun/jna/platform/win32/PdhUtil$PdhEnumObjectItems;",
+          "access": 9,
+          "code_sha256": "d67ab60d120927a1f115a8c57f6414360507e57c27393315677b39b7a73b24f2",
+          "code_length": 497
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6c96d955a0819326839b8b65992e73ac15a56108fa9252bcaddfa51c3d16b7ab",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Advapi32Util",
+        "com/sun/jna/platform/win32/Pdh",
+        "com/sun/jna/platform/win32/PdhMsg",
+        "com/sun/jna/platform/win32/PdhUtil",
+        "com/sun/jna/platform/win32/PdhUtil$PdhEnumObjectItems",
+        "com/sun/jna/platform/win32/PdhUtil$PdhException",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$DWORDByReference",
+        "com/sun/jna/platform/win32/WinReg",
+        "com/sun/jna/platform/win32/WinReg$HKEY",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI$PHYSICAL_MONITOR.class",
+      "occurrence": 0,
+      "sha256": "b746beb770f3dd42cca2fd28de009ff0dc68795271fdb09a5b5c702f91c7511a",
+      "name": "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI$PHYSICAL_MONITOR",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hPhysicalMonitor",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1
+        },
+        {
+          "name": "szPhysicalMonitorDescription",
+          "descriptor": "[C",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "808494f009a67f69673d0221267c0779bb1bcc995fbfd9bc35c8ee98c004fdae",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI",
+        "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI$PHYSICAL_MONITOR",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI.class",
+      "occurrence": 0,
+      "sha256": "239cfb6ba34e7673a6a916fbecaa56151d290362728069112e0a9e2113ff6ae1",
+      "name": "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PHYSICAL_MONITOR_DESCRIPTION_SIZE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI",
+        "com/sun/jna/platform/win32/PhysicalMonitorEnumerationAPI$PHYSICAL_MONITOR",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PowrProf$POWER_INFORMATION_LEVEL.class",
+      "occurrence": 0,
+      "sha256": "f63e7d0d090e9ecca45222d90f723267e52af44174ecb1b92bfb7a1960b117aa",
+      "name": "com/sun/jna/platform/win32/PowrProf$POWER_INFORMATION_LEVEL",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LastSleepTime",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LastWakeTime",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ProcessorInformation",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemBatteryState",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemExecutionState",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemPowerCapabilities",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemPowerInformation",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemPowerPolicyAc",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemPowerPolicyCurrent",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemPowerPolicyDc",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SystemReserveHiberFile",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/PowrProf",
+        "com/sun/jna/platform/win32/PowrProf$POWER_INFORMATION_LEVEL",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PowrProf.class",
+      "occurrence": 0,
+      "sha256": "99acf6f610c0f92d7beb05d7f0b6101f741e0cdd6eab9d9222198f339aeaa33e",
+      "name": "com/sun/jna/platform/win32/PowrProf",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/PowrProf;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "CallNtPowerInformation",
+          "descriptor": "(ILcom/sun/jna/Pointer;ILcom/sun/jna/Pointer;I)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/PowrProf",
+        "com/sun/jna/platform/win32/PowrProf$POWER_INFORMATION_LEVEL",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Psapi$MODULEINFO.class",
+      "occurrence": 0,
+      "sha256": "f666b3a31424320295e32b2905033e1a229b7221b2ce5c43f7dc7c4571280f6e",
+      "name": "com/sun/jna/platform/win32/Psapi$MODULEINFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EntryPoint",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "lpBaseOfDll",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "SizeOfImage",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Psapi",
+        "com/sun/jna/platform/win32/Psapi$MODULEINFO"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Psapi$PERFORMANCE_INFORMATION.class",
+      "occurrence": 0,
+      "sha256": "2937629bef095a3a861ccb531013edbeb9cf5cc1ef98f2ed9c2f4e18df5b9d34",
+      "name": "com/sun/jna/platform/win32/Psapi$PERFORMANCE_INFORMATION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cb",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "CommitTotal",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "CommitLimit",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "CommitPeak",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "PhysicalTotal",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "PhysicalAvailable",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "SystemCache",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "KernelTotal",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "KernelPaged",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "KernelNonpaged",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "PageSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+          "access": 1
+        },
+        {
+          "name": "HandleCount",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "ProcessCount",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "ThreadCount",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$SIZE_T",
+        "com/sun/jna/platform/win32/Psapi",
+        "com/sun/jna/platform/win32/Psapi$PERFORMANCE_INFORMATION",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Psapi$PSAPI_WORKING_SET_EX_INFORMATION.class",
+      "occurrence": 0,
+      "sha256": "594e0e0d7e7b2a6425386ddb53e44575a446c4884dd0595c70a0767931402901",
+      "name": "com/sun/jna/platform/win32/Psapi$PSAPI_WORKING_SET_EX_INFORMATION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VirtualAddress",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "VirtualAttributes",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$ULONG_PTR;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isValid",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "835a1e2339d68835d51048207fda453668ced049e98369f5e1f73502dbaa9b04",
+          "code_length": 16
+        },
+        {
+          "name": "getShareCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "94f48fded541d7172d59f9291833627db980c7ea47c9a019a7e7e5930743c9d6",
+          "code_length": 7
+        },
+        {
+          "name": "getWin32Protection",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "91f01b75b8880a5d10de154955655315863c57a9192a89cec71e747e98a0ae98",
+          "code_length": 8
+        },
+        {
+          "name": "isShared",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "59b4cbf1b72870233bb24f025bb0d45ced85871c165ab8d557d3494d0b3f6f81",
+          "code_length": 17
+        },
+        {
+          "name": "getNode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "18ed680851138b1ddbaca4b64e01950f85c8559bb7e6dd241c5d4b5182e373b6",
+          "code_length": 9
+        },
+        {
+          "name": "isLocked",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0e7a02e7babfa00a130fe8e3d53bead29c86850c676c2c37be69a61519fc5539",
+          "code_length": 17
+        },
+        {
+          "name": "isLargePage",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a482203621265e30991ace20f54aa1dad0d289e2af62c9ace7d35ce79168bf61",
+          "code_length": 17
+        },
+        {
+          "name": "isBad",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7c9637558003522189156fc60f918a09398555771f7aa50ecf7d08f8c4afed93",
+          "code_length": 17
+        },
+        {
+          "name": "getBitFieldValue",
+          "descriptor": "(II)I",
+          "access": 2,
+          "code_sha256": "6ae6e59ba4ce09d0f86d64a5a8cac72296f9ef6e337c85d0ad5035d210f5e198",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$ULONG_PTR",
+        "com/sun/jna/platform/win32/Psapi",
+        "com/sun/jna/platform/win32/Psapi$PSAPI_WORKING_SET_EX_INFORMATION"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Psapi.class",
+      "occurrence": 0,
+      "sha256": "0f331290d8b943d0184897619aaf1e08297f9fb2afc85d0de8fb761fd65bc026",
+      "name": "com/sun/jna/platform/win32/Psapi",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Psapi;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "GetModuleFileNameExA",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinNT$HANDLE;[BI)I",
+          "access": 1025
+        },
+        {
+          "name": "GetModuleFileNameExW",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinNT$HANDLE;[CI)I",
+          "access": 1025
+        },
+        {
+          "name": "GetModuleFileNameEx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/Pointer;I)I",
+          "access": 1025
+        },
+        {
+          "name": "EnumProcessModules",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;[Lcom/sun/jna/platform/win32/WinDef$HMODULE;ILcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "GetModuleInformation",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$HMODULE;Lcom/sun/jna/platform/win32/Psapi$MODULEINFO;I)Z",
+          "access": 1025
+        },
+        {
+          "name": "GetProcessImageFileName",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;[CI)I",
+          "access": 1025
+        },
+        {
+          "name": "GetPerformanceInfo",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Psapi$PERFORMANCE_INFORMATION;I)Z",
+          "access": 1025
+        },
+        {
+          "name": "EnumProcesses",
+          "descriptor": "([IILcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "QueryWorkingSetEx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/Pointer;I)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Psapi",
+        "com/sun/jna/platform/win32/Psapi$MODULEINFO",
+        "com/sun/jna/platform/win32/Psapi$PERFORMANCE_INFORMATION",
+        "com/sun/jna/platform/win32/Psapi$PSAPI_WORKING_SET_EX_INFORMATION",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HMODULE",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/PsapiUtil.class",
+      "occurrence": 0,
+      "sha256": "8e8ed7aa344b66465851759b148d767fff310d178803a9764998db6bba436b4f",
+      "name": "com/sun/jna/platform/win32/PsapiUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "enumProcesses",
+          "descriptor": "()[I",
+          "access": 9,
+          "code_sha256": "18380fe99dd3bdc45f629f07132ecfc2fa8028c87125d0bd1c7745d6c3bac5d8",
+          "code_length": 75
+        },
+        {
+          "name": "GetProcessImageFileName",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4dfbcbe44b48e8a00dc24e0a9f5aee11b2540cf206be107e3248ead622470618",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "[C",
+        "[I",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/Psapi",
+        "com/sun/jna/platform/win32/PsapiUtil",
+        "com/sun/jna/platform/win32/Win32Exception",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinError",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/Object",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Rasapi32.class",
+      "occurrence": 0,
+      "sha256": "a393c42ed7ffce507e262222255928254b8383891a3f79dc9e6bf81163f45c79",
+      "name": "com/sun/jna/platform/win32/Rasapi32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Rasapi32;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "RasDial",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinRas$RASDIALEXTENSIONS$ByReference;Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASDIALPARAMS$ByReference;ILcom/sun/jna/platform/win32/WinRas$RasDialFunc2;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasEnumConnections",
+          "descriptor": "([Lcom/sun/jna/platform/win32/WinRas$RASCONN;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetConnectionStatistics",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/Structure$ByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetConnectStatus",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/Structure$ByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetCredentials",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASCREDENTIALS$ByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetEntryProperties",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASENTRY$ByReference;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetProjectionInfo",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;ILcom/sun/jna/Pointer;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasHangUp",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasSetEntryProperties",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASENTRY$ByReference;I[BI)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetEntryDialParams",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASDIALPARAMS$ByReference;Lcom/sun/jna/platform/win32/WinDef$BOOLByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "RasGetErrorString",
+          "descriptor": "(I[CI)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Rasapi32",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$BOOLByReference",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/platform/win32/WinRas",
+        "com/sun/jna/platform/win32/WinRas$RASCONN",
+        "com/sun/jna/platform/win32/WinRas$RASCREDENTIALS",
+        "com/sun/jna/platform/win32/WinRas$RASCREDENTIALS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASDIALEXTENSIONS",
+        "com/sun/jna/platform/win32/WinRas$RASDIALEXTENSIONS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASDIALPARAMS",
+        "com/sun/jna/platform/win32/WinRas$RASDIALPARAMS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASENTRY",
+        "com/sun/jna/platform/win32/WinRas$RASENTRY$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RasDialFunc2",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception.class",
+      "occurrence": 0,
+      "sha256": "03ef568cc63f738517ac9f93100497302e0c320c02e728ec66d132b85ebd733a",
+      "name": "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "code",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "getCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "85a1f9988591ac5449ae4e45dfd7bbee0c600c26e185b353b6d33a31d00edc6f",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Rasapi32Util",
+        "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Rasapi32Util.class",
+      "occurrence": 0,
+      "sha256": "28780ad1711272dce5911928bceb720e78a685a7ac510db08a1c8197cb0c53e8",
+      "name": "com/sun/jna/platform/win32/Rasapi32Util",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RASP_PppIp",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "phoneBookMutex",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 10
+        },
+        {
+          "name": "CONNECTION_STATE_TEXT",
+          "descriptor": "Ljava/util/Map;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRasErrorString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7f78d1fe25ece68c7aaf0b75f061ba4fb173931591ff7825f8e3803f41541295",
+          "code_length": 77
+        },
+        {
+          "name": "getRasConnectionStatusText",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7d94ae26ac5097957663f6e75e8c89d81245f172efb2b6e637f693a6093f442c",
+          "code_length": 36
+        },
+        {
+          "name": "getRasConnection",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 9,
+          "code_sha256": "20c1f01674de6ba7d5fccabb25164bc36c5c00e155044ca25f5d8bc16cb84fb2",
+          "code_length": 194,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "hangupRasConnection",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "d2fbd6ad3ece2eb9c2aec41d468c5646ad3944f6f871e431b977466c372761f1",
+          "code_length": 34,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "hangupRasConnection",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)V",
+          "access": 9,
+          "code_sha256": "88d63d07fab55c17e304e448815a8d25324ee83f3fa01fc81ec68e5d7173e236",
+          "code_length": 29,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "getIPProjection",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Lcom/sun/jna/platform/win32/WinRas$RASPPPIP;",
+          "access": 9,
+          "code_sha256": "cdb52cb08bc0f297133c7b483efbae5f61b4e5f6361ff0c10d529ba45db191b2",
+          "code_length": 60,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "getPhoneBookEntry",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/WinRas$RASENTRY$ByReference;",
+          "access": 9,
+          "code_sha256": "63e6aaedceba146d554bef9117b390fd9fe539002de1552e49dda95994f8a180",
+          "code_length": 68,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "setPhoneBookEntry",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RASENTRY$ByReference;)V",
+          "access": 9,
+          "code_sha256": "8bc2f89d9785eeb620b3ffc40f8985e2ecf5904a6fb4ba0a550636b527794c69",
+          "code_length": 50,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "getPhoneBookDialingParams",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/WinRas$RASDIALPARAMS;",
+          "access": 9,
+          "code_sha256": "f900a2d84765ffdbbf5f110f9782a8e3a78a8b338adda2acfce021e251a73750",
+          "code_length": 78,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "dialEntry",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 9,
+          "code_sha256": "b7cc7014d7a394a572899ff377c6a5a1cb0afe6c73d4d68d37b883f57ec31cb8",
+          "code_length": 200,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "dialEntry",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/WinRas$RasDialFunc2;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 9,
+          "code_sha256": "b2aba75f23e2718809de44d4277cdc07fe7ee4d9360b5e7281e28ba05d158490",
+          "code_length": 208,
+          "throws": [
+            "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c2c9bc4b3c0065d915c39493af51f34bc37422a63128cb165cbf563b2e855887",
+          "code_length": 518
+        }
+      ],
+      "class_references": [
+        "[C",
+        "[Lcom/sun/jna/platform/win32/WinRas$RASCONN;",
+        "com/sun/jna/platform/win32/Rasapi32",
+        "com/sun/jna/platform/win32/Rasapi32Util",
+        "com/sun/jna/platform/win32/Rasapi32Util$Ras32Exception",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$BOOLByReference",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/platform/win32/WinRas",
+        "com/sun/jna/platform/win32/WinRas$RASCONN",
+        "com/sun/jna/platform/win32/WinRas$RASCREDENTIALS",
+        "com/sun/jna/platform/win32/WinRas$RASCREDENTIALS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASDIALEXTENSIONS",
+        "com/sun/jna/platform/win32/WinRas$RASDIALEXTENSIONS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASDIALPARAMS",
+        "com/sun/jna/platform/win32/WinRas$RASDIALPARAMS$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASENTRY",
+        "com/sun/jna/platform/win32/WinRas$RASENTRY$ByReference",
+        "com/sun/jna/platform/win32/WinRas$RASPPPIP",
+        "com/sun/jna/platform/win32/WinRas$RasDialFunc2",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/HashMap",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Secur32$EXTENDED_NAME_FORMAT.class",
+      "occurrence": 0,
+      "sha256": "539aa24591db3cb3fe6cb0dbe421824f994d2565a76a05df717a037ca4b01a86",
+      "name": "com/sun/jna/platform/win32/Secur32$EXTENDED_NAME_FORMAT",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NameUnknown",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameFullyQualifiedDN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameSamCompatible",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameDisplay",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameUniqueId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameCanonical",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameUserPrincipal",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameCanonicalEx",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameServicePrincipal",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NameDnsDomain",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Secur32$EXTENDED_NAME_FORMAT",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Secur32.class",
+      "occurrence": 0,
+      "sha256": "5e6edcab10d417c7039c76af24b84f065ed3dea946ba999b5b0bb8e610bbe3e5",
+      "name": "com/sun/jna/platform/win32/Secur32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Secur32;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "GetUserNameEx",
+          "descriptor": "(I[CLcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "AcquireCredentialsHandle",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ILcom/sun/jna/platform/win32/WinNT$LUID;Lcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/Sspi$CredHandle;Lcom/sun/jna/platform/win32/Sspi$TimeStamp;)I",
+          "access": 1025
+        },
+        {
+          "name": "InitializeSecurityContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CredHandle;Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Ljava/lang/String;IIILcom/sun/jna/platform/win32/Sspi$SecBufferDesc;ILcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/platform/win32/Sspi$TimeStamp;)I",
+          "access": 1025
+        },
+        {
+          "name": "DeleteSecurityContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;)I",
+          "access": 1025
+        },
+        {
+          "name": "FreeCredentialsHandle",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CredHandle;)I",
+          "access": 1025
+        },
+        {
+          "name": "AcceptSecurityContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CredHandle;Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;IILcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/platform/win32/Sspi$TimeStamp;)I",
+          "access": 1025
+        },
+        {
+          "name": "CompleteAuthToken",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;)I",
+          "access": 1025
+        },
+        {
+          "name": "EnumerateSecurityPackages",
+          "descriptor": "(Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/platform/win32/Sspi$PSecPkgInfo;)I",
+          "access": 1025
+        },
+        {
+          "name": "FreeContextBuffer",
+          "descriptor": "(Lcom/sun/jna/Pointer;)I",
+          "access": 1025
+        },
+        {
+          "name": "QuerySecurityContextToken",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "ImpersonateSecurityContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;)I",
+          "access": 1025
+        },
+        {
+          "name": "RevertSecurityContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;)I",
+          "access": 1025
+        },
+        {
+          "name": "QueryContextAttributes",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;ILcom/sun/jna/Structure;)I",
+          "access": 1025
+        },
+        {
+          "name": "QueryCredentialsAttributes",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CredHandle;ILcom/sun/jna/Structure;)I",
+          "access": 1025
+        },
+        {
+          "name": "QuerySecurityPackageInfo",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/Sspi$PSecPkgInfo;)I",
+          "access": 1025
+        },
+        {
+          "name": "EncryptMessage",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;ILcom/sun/jna/platform/win32/Sspi$SecBufferDesc;I)I",
+          "access": 1025
+        },
+        {
+          "name": "VerifySignature",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;ILcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "MakeSignature",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;ILcom/sun/jna/platform/win32/Sspi$SecBufferDesc;I)I",
+          "access": 1025
+        },
+        {
+          "name": "DecryptMessage",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$CtxtHandle;Lcom/sun/jna/platform/win32/Sspi$SecBufferDesc;ILcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Secur32$EXTENDED_NAME_FORMAT",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$CredHandle",
+        "com/sun/jna/platform/win32/Sspi$CtxtHandle",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecBufferDesc",
+        "com/sun/jna/platform/win32/Sspi$TimeStamp",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/platform/win32/WinNT$LUID",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Secur32Util$SecurityPackage.class",
+      "occurrence": 0,
+      "sha256": "3585b93ef1df3b1f193920f85d2a661c3fe0e81f03b75044aea1b563778bff14",
+      "name": "com/sun/jna/platform/win32/Secur32Util$SecurityPackage",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Secur32Util",
+        "com/sun/jna/platform/win32/Secur32Util$SecurityPackage",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Secur32Util.class",
+      "occurrence": 0,
+      "sha256": "a3344c6daa488ec38f85147a5df8844faa21e1b38817a46061da061f1ca7675e",
+      "name": "com/sun/jna/platform/win32/Secur32Util",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getUserNameEx",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "be036c429b47408479dd42c466e0802bbb8c9287263a1d61cac8c47e81cb5344",
+          "code_length": 119
+        },
+        {
+          "name": "getSecurityPackages",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Secur32Util$SecurityPackage;",
+          "access": 9,
+          "code_sha256": "dcc52edb278737ab2f242f0ee38bb61c411d8c98f9e6d025fbdb7daadf1d1d51",
+          "code_length": 180
+        }
+      ],
+      "class_references": [
+        "[C",
+        "[Lcom/sun/jna/platform/win32/Secur32Util$SecurityPackage;",
+        "[Lcom/sun/jna/platform/win32/Sspi$SecPkgInfo;",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Secur32Util",
+        "com/sun/jna/platform/win32/Secur32Util$SecurityPackage",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference",
+        "com/sun/jna/platform/win32/W32Errors",
+        "com/sun/jna/platform/win32/Win32Exception",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "8a4566882aaedb5e1e5eb084e67801dad9c7453969a13f263b4d44b848e228b5",
+      "name": "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/SetupApi",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA$ByReference",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA.class",
+      "occurrence": 0,
+      "sha256": "978d24aa18b99a0e9cf6b83de780dab81dae7acaf377dcb0a0963b4a4a8bcba8",
+      "name": "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "InterfaceClassGuid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 1
+        },
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Reserved",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5d3813ceb1dfbe8c6a8ee6859f28d935f333513a8e43d600566db289f04609e",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f171e6a7a5622d7feb5112a2f9913f6713f9cbf7a7e3557451c18114e9581692",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/SetupApi",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "f63b24905edba5554e610c93c6b18f145cb8a52c181d2278cb5cfc7a3f780b8d",
+      "name": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/SetupApi",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA.class",
+      "occurrence": 0,
+      "sha256": "d2a12573bd54715620e07b208dc6d06470ce6daeee497d38c18789305d492481",
+      "name": "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "InterfaceClassGuid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 1
+        },
+        {
+          "name": "DevInst",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Reserved",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5d3813ceb1dfbe8c6a8ee6859f28d935f333513a8e43d600566db289f04609e",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f171e6a7a5622d7feb5112a2f9913f6713f9cbf7a7e3557451c18114e9581692",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/SetupApi",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SetupApi.class",
+      "occurrence": 0,
+      "sha256": "9bee236216f981d87ccb4eaa4115c6b8002c6a55739a3d1ef393bacb0b1e9d03",
+      "name": "com/sun/jna/platform/win32/SetupApi",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/SetupApi;",
+          "access": 25
+        },
+        {
+          "name": "GUID_DEVINTERFACE_DISK",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 25
+        },
+        {
+          "name": "GUID_DEVINTERFACE_COMPORT",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 25
+        },
+        {
+          "name": "DIGCF_DEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIGCF_PRESENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIGCF_ALLCLASSES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIGCF_PROFILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIGCF_DEVICEINTERFACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPDRP_REMOVAL_POLICY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CM_DEVCAP_REMOVABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DICS_FLAG_GLOBAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DICS_FLAG_CONFIGSPECIFIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DICS_FLAG_CONFIGGENERAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIREG_DEV",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIREG_DRV",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIREG_BOTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPDRP_DEVICEDESC",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "SetupDiGetClassDevs",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;Lcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;I)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiDestroyDeviceInfoList",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Z",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiEnumDeviceInterfaces",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/Guid$GUID;ILcom/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA;)Z",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiGetDeviceInterfaceDetail",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA;Lcom/sun/jna/Pointer;ILcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA;)Z",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiGetDeviceRegistryProperty",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA;ILcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/Pointer;ILcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiOpenDevRegKey",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA;IIII)Lcom/sun/jna/platform/win32/WinReg$HKEY;",
+          "access": 1025
+        },
+        {
+          "name": "SetupDiEnumDeviceInfo",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;ILcom/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA;)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "26b35b27df4d8bf1d68aa007123a23dc926f74c9edf8b2f878db071eb9551035",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/SetupApi",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVICE_INTERFACE_DATA",
+        "com/sun/jna/platform/win32/SetupApi$SP_DEVINFO_DATA",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinReg",
+        "com/sun/jna/platform/win32/WinReg$HKEY",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShTypes$STRRET$UNION$ByReference.class",
+      "occurrence": 0,
+      "sha256": "ff53e28f0e83c125b889c63654a83241e570869c72fabbb906bc63362f353fed",
+      "name": "com/sun/jna/platform/win32/ShTypes$STRRET$UNION$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/ShTypes$STRRET$UNION",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/ShTypes",
+        "com/sun/jna/platform/win32/ShTypes$STRRET",
+        "com/sun/jna/platform/win32/ShTypes$STRRET$UNION",
+        "com/sun/jna/platform/win32/ShTypes$STRRET$UNION$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShTypes$STRRET$UNION.class",
+      "occurrence": 0,
+      "sha256": "fbce58131317d48bbb1a33350ed026c7a20740ffe3e45c5c48f681087d460149",
+      "name": "com/sun/jna/platform/win32/ShTypes$STRRET$UNION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pOleStr",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$LPWSTR;",
+          "access": 1
+        },
+        {
+          "name": "uOffset",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cStr",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e5991c63460fb6a385fc060a24c2b416ac6865d911424db59386c0dcb0bcc686",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/ShTypes",
+        "com/sun/jna/platform/win32/ShTypes$STRRET",
+        "com/sun/jna/platform/win32/ShTypes$STRRET$UNION",
+        "com/sun/jna/platform/win32/ShTypes$STRRET$UNION$ByReference",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$LPWSTR"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShTypes$STRRET.class",
+      "occurrence": 0,
+      "sha256": "f6530d6077366a531c2d7b218ca4aa5aa7f701d9c016730e396ae284ccb1888b",
+      "name": "com/sun/jna/platform/win32/ShTypes$STRRET",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TYPE_WSTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPE_OFFSET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPE_CSTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "uType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "u",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShTypes$STRRET$UNION;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5074acd5ffb5a5df550a6b0412160531e659e2b6614890350afe32fb329a946b",
+          "code_length": 77
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/ShTypes",
+        "com/sun/jna/platform/win32/ShTypes$STRRET",
+        "com/sun/jna/platform/win32/ShTypes$STRRET$UNION"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShTypes.class",
+      "occurrence": 0,
+      "sha256": "e749421d8fc0195660caf65ebf66c46e859a78e6b881c45d2f7fcbc3f1a21cae",
+      "name": "com/sun/jna/platform/win32/ShTypes",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/ShTypes",
+        "com/sun/jna/platform/win32/ShTypes$STRRET",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Shell32.class",
+      "occurrence": 0,
+      "sha256": "1edb9bdfdf078c444d721f6b9ec3f9e5dc93e5d9cb5dd2a1d458abf945d811cd",
+      "name": "com/sun/jna/platform/win32/Shell32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Shell32;",
+          "access": 25
+        },
+        {
+          "name": "SHERB_NOCONFIRMATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SHERB_NOPROGRESSUI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SHERB_NOSOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEE_MASK_NOCLOSEPROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEE_MASK_FLAG_NO_UI",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "SHFileOperation",
+          "descriptor": "(Lcom/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT;)I",
+          "access": 1025
+        },
+        {
+          "name": "SHGetFolderPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;ILcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$DWORD;[C)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SHGetKnownFolderPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;ILcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SHGetDesktopFolder",
+          "descriptor": "(Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "ShellExecute",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Lcom/sun/jna/platform/win32/WinDef$INT_PTR;",
+          "access": 1025
+        },
+        {
+          "name": "SHGetSpecialFolderPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;[CIZ)Z",
+          "access": 1025
+        },
+        {
+          "name": "SHAppBarMessage",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORD;Lcom/sun/jna/platform/win32/ShellAPI$APPBARDATA;)Lcom/sun/jna/platform/win32/WinDef$UINT_PTR;",
+          "access": 1025
+        },
+        {
+          "name": "SHEmptyRecycleBin",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "ShellExecuteEx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO;)Z",
+          "access": 1025
+        },
+        {
+          "name": "SHGetSpecialFolderLocation",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;ILcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "ExtractIconEx",
+          "descriptor": "(Ljava/lang/String;I[Lcom/sun/jna/platform/win32/WinDef$HICON;[Lcom/sun/jna/platform/win32/WinDef$HICON;I)I",
+          "access": 1025
+        },
+        {
+          "name": "GetCurrentProcessExplicitAppUserModelID",
+          "descriptor": "(Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SetCurrentProcessExplicitAppUserModelID",
+          "descriptor": "(Lcom/sun/jna/WString;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CommandLineToArgvW",
+          "descriptor": "(Lcom/sun/jna/WString;Lcom/sun/jna/ptr/IntByReference;)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/Shell32",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+        "com/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO",
+        "com/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$HICON",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinDef$INT_PTR",
+        "com/sun/jna/platform/win32/WinDef$UINT_PTR",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Shell32Util.class",
+      "occurrence": 0,
+      "sha256": "aa2fb4ab57256782dea1b20fcddf2bdb3a65905b8e007b74879d3ff9692e45c0",
+      "name": "com/sun/jna/platform/win32/Shell32Util",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getFolderPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;ILcom/sun/jna/platform/win32/WinDef$DWORD;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "339ad0dcfa140f9459c8d6fc49c40cc8e3176c957b017192fd9f541ae30e13f3",
+          "code_length": 47
+        },
+        {
+          "name": "getFolderPath",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "76b5701767dd82c12742b35c7f98dc4ef280212853308896f3fd3a5e2dd1a422",
+          "code_length": 9
+        },
+        {
+          "name": "getKnownFolderPath",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c44e0453965089047e9d21b115af5dc00eecdc19626617b5e68e15c29b8cb135",
+          "code_length": 77,
+          "throws": [
+            "com/sun/jna/platform/win32/Win32Exception"
+          ]
+        },
+        {
+          "name": "getSpecialFolderPath",
+          "descriptor": "(IZ)Ljava/lang/String;",
+          "access": 25,
+          "code_sha256": "53154497f79aa90bde832d664346ccf8c4b8ad16df8b990ca0ae3c695b1ec040",
+          "code_length": 42
+        },
+        {
+          "name": "CommandLineToArgv",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 25,
+          "code_sha256": "b83df8703d1b3567599cc5fd504e62158fea1a84d8db2dbbff07f88f24b9c99d",
+          "code_length": 87
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/WString",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/Ole32",
+        "com/sun/jna/platform/win32/Shell32",
+        "com/sun/jna/platform/win32/Shell32Util",
+        "com/sun/jna/platform/win32/ShlObj",
+        "com/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG",
+        "com/sun/jna/platform/win32/W32Errors",
+        "com/sun/jna/platform/win32/Win32Exception",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/ptr/IntByReference",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShellAPI$APPBARDATA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "6de4ea6dc0e5b849682dc9c2bdf233e86e436a65bb18007c2ff95254dcade721",
+      "name": "com/sun/jna/platform/win32/ShellAPI$APPBARDATA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShellAPI$APPBARDATA.class",
+      "occurrence": 0,
+      "sha256": "d173046c0793e10c897c38451592bc2f97c498a9b85fcf04013d8fc1ce767003",
+      "name": "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "hWnd",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$HWND;",
+          "access": 1
+        },
+        {
+          "name": "uCallbackMessage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1
+        },
+        {
+          "name": "uEdge",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1
+        },
+        {
+          "name": "rc",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$RECT;",
+          "access": 1
+        },
+        {
+          "name": "lParam",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LPARAM;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinDef$LPARAM",
+        "com/sun/jna/platform/win32/WinDef$RECT",
+        "com/sun/jna/platform/win32/WinDef$UINT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO.class",
+      "occurrence": 0,
+      "sha256": "91934e1f1092fcbd41a7dbcd43f035eefe5c9ee1a6cf5ee67b90cab5038af4e9",
+      "name": "com/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "fMask",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hwnd",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$HWND;",
+          "access": 1
+        },
+        {
+          "name": "lpVerb",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpFile",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpParameters",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpDirectory",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "nShow",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hInstApp",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$HINSTANCE;",
+          "access": 1
+        },
+        {
+          "name": "lpIDList",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "lpClass",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "hKeyClass",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinReg$HKEY;",
+          "access": 1
+        },
+        {
+          "name": "dwHotKey",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hMonitor",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1
+        },
+        {
+          "name": "hProcess",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5d3813ceb1dfbe8c6a8ee6859f28d935f333513a8e43d600566db289f04609e",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HINSTANCE",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinReg",
+        "com/sun/jna/platform/win32/WinReg$HKEY"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT.class",
+      "occurrence": 0,
+      "sha256": "dc2c5d90baacb24f00b3ada2cf386c065998425adeb4d63debd209bbab250de5",
+      "name": "com/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hwnd",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1
+        },
+        {
+          "name": "wFunc",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pFrom",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pTo",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "fFlags",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "fAnyOperationsAborted",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "pNameMappings",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "lpszProgressTitle",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "encodePaths",
+          "descriptor": "([Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "07fe0b3effbf3f1094805238d5ebac5eda316a1a6f5d983012cff5e76b47b893",
+          "code_length": 78
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShellAPI.class",
+      "occurrence": 0,
+      "sha256": "6a4c676fb316d9ae318ce5f20179473171a13d573aa9a11493a5cb6efe7237d0",
+      "name": "com/sun/jna/platform/win32/ShellAPI",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "STRUCTURE_ALIGNMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPE_MAPPER",
+          "descriptor": "Lcom/sun/jna/TypeMapper;",
+          "access": 25
+        },
+        {
+          "name": "FO_MOVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FO_COPY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FO_DELETE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FO_RENAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_MULTIDESTFILES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_CONFIRMMOUSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_SILENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_RENAMEONCOLLISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NOCONFIRMATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_WANTMAPPINGHANDLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_ALLOWUNDO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_FILESONLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_SIMPLEPROGRESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NOCONFIRMMKDIR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NOERRORUI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NOCOPYSECURITYATTRIBS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NORECURSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NO_CONNECTED_ELEMENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_WANTNUKEWARNING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NORECURSEREPARSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FOF_NO_UI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PO_DELETE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PO_RENAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PO_PORTCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PO_REN_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_NEW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_REMOVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_QUERYPOS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_SETPOS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_GETSTATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_GETTASKBARPOS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_ACTIVATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_GETAUTOHIDEBAR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_SETAUTOHIDEBAR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_WINDOWPOSCHANGED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABM_SETSTATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABE_LEFT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABE_TOP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABE_RIGHT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABE_BOTTOM",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7f30f5097cb4404a0279d6d9b9adc76ab8c8d6765eac497535b4864ab2ee2f61",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Platform",
+        "com/sun/jna/Structure",
+        "com/sun/jna/TypeMapper",
+        "com/sun/jna/platform/win32/ShellAPI",
+        "com/sun/jna/platform/win32/ShellAPI$APPBARDATA",
+        "com/sun/jna/platform/win32/ShellAPI$SHELLEXECUTEINFO",
+        "com/sun/jna/platform/win32/ShellAPI$SHFILEOPSTRUCT",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/Boolean",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG.class",
+      "occurrence": 0,
+      "sha256": "2ad311f242ff0da8508038eef03df3b41f2191db3b29069629cc3cc7dd95f2a9",
+      "name": "com/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "SIMPLE_IDLIST",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "NOT_PARENT_RELATIVE",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "DEFAULT_PATH",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "INIT",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "NO_ALIAS",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "DONT_UNEXPAND",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "DONT_VERIFY",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "CREATE",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "NO_APPCONTAINER_REDIRECTION",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "ALIAS_ONLY",
+          "descriptor": "Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 16409
+        },
+        {
+          "name": "flag",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 2,
+          "code_sha256": "a0ebab726cde8af73b1a2ca45237ea2322601078e012a4afd66ab371e18c6435",
+          "code_length": 12,
+          "generic_signature": "(I)V"
+        },
+        {
+          "name": "getFlag",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ad1503dbc745626ff198eb10722e03984b213c991673b4301fd38f74860635c7",
+          "code_length": 256
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;>;",
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG;",
+        "com/sun/jna/platform/win32/ShlObj",
+        "com/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ShlObj.class",
+      "occurrence": 0,
+      "sha256": "d0e3c19c9f503964675b67fa08c6c5e253a401445b42499fcad51835f90688df",
+      "name": "com/sun/jna/platform/win32/ShlObj",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SHGFP_TYPE_CURRENT",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 25
+        },
+        {
+          "name": "SHGFP_TYPE_DEFAULT",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_DESKTOP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_INTERNET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROGRAMS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_CONTROLS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PRINTERS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PERSONAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_FAVORITES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_STARTUP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_RECENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_SENDTO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_BITBUCKET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_STARTMENU",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_MYDOCUMENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_MYMUSIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_MYVIDEO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_DESKTOPDIRECTORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_DRIVES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_NETWORK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_NETHOOD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_FONTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_TEMPLATES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_STARTMENU",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_PROGRAMS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_STARTUP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_DESKTOPDIRECTORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_APPDATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PRINTHOOD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_LOCAL_APPDATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_ALTSTARTUP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_ALTSTARTUP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_FAVORITES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_INTERNET_CACHE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COOKIES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_HISTORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_APPDATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_WINDOWS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROGRAM_FILES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_MYPICTURES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROFILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_SYSTEMX86",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROGRAM_FILESX86",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROGRAM_FILES_COMMON",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_PROGRAM_FILES_COMMONX86",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_TEMPLATES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_DOCUMENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_ADMINTOOLS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_ADMINTOOLS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_CONNECTIONS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_MUSIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_PICTURES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_VIDEO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_RESOURCES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_RESOURCES_LOCALIZED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMMON_OEM_LINKS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_CDBURN_AREA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CSIDL_COMPUTERSNEARME",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4add9b0755e70a4f8d41387baefb422142d5649cc9d0d8ca128fad96acea811b",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/ShlObj",
+        "com/sun/jna/platform/win32/ShlObj$KNOWN_FOLDER_FLAG",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Shlwapi.class",
+      "occurrence": 0,
+      "sha256": "aec1a073ff8b2ebaa6caa01d83050be0503e0bfc86fd0964afbd83943219e4f0",
+      "name": "com/sun/jna/platform/win32/Shlwapi",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Shlwapi;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "StrRetToStr",
+          "descriptor": "(Lcom/sun/jna/platform/win32/ShTypes$STRRET;Lcom/sun/jna/Pointer;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "PathIsUNC",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/ShTypes",
+        "com/sun/jna/platform/win32/ShTypes$STRRET",
+        "com/sun/jna/platform/win32/Shlwapi",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$CredHandle.class",
+      "occurrence": 0,
+      "sha256": "f2f9c23bca270f299562a15e49d067c91f88d84623628be6aeade423eb80bb66",
+      "name": "com/sun/jna/platform/win32/Sspi$CredHandle",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecHandle",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$CredHandle",
+        "com/sun/jna/platform/win32/Sspi$SecHandle"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$CtxtHandle.class",
+      "occurrence": 0,
+      "sha256": "798ef70722d9e1dbc933136e2e4a68c4f1fa55ab539fa5cafa26a4f56a6d0f47",
+      "name": "com/sun/jna/platform/win32/Sspi$CtxtHandle",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecHandle",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$CtxtHandle",
+        "com/sun/jna/platform/win32/Sspi$SecHandle"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$PSecHandle$ByReference.class",
+      "occurrence": 0,
+      "sha256": "822f8adc079588f945a5a9832ddf2cda3998f2991fc02f8053f8dd567ddcc8a1",
+      "name": "com/sun/jna/platform/win32/Sspi$PSecHandle$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$PSecHandle",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecHandle",
+        "com/sun/jna/platform/win32/Sspi$PSecHandle$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$PSecHandle.class",
+      "occurrence": 0,
+      "sha256": "09019d3be096ab77152d11c62ce201b19d8c36a707de3615b1e12ce9eec5824e",
+      "name": "com/sun/jna/platform/win32/Sspi$PSecHandle",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "secHandle",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$SecHandle$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Sspi$SecHandle;)V",
+          "access": 1,
+          "code_sha256": "a078565c90c6af3f840e1b3fbca8c9fef4348287c3e915c01ef348985b94f3d6",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecHandle",
+        "com/sun/jna/platform/win32/Sspi$PSecHandle$ByReference",
+        "com/sun/jna/platform/win32/Sspi$SecHandle",
+        "com/sun/jna/platform/win32/Sspi$SecHandle$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$PSecPkgInfo$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e570bf7b1eba756960090297dc64a156ebd47646155e9d0fecd0380b9e27122c",
+      "name": "com/sun/jna/platform/win32/Sspi$PSecPkgInfo$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toArray",
+          "descriptor": "(I)[Lcom/sun/jna/Structure;",
+          "access": 4161,
+          "code_sha256": "0d81fd3cb97e10ac79617e19f801065d3d1f84d1b3c529267c4084f3e5db1987",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo$ByReference",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$PSecPkgInfo.class",
+      "occurrence": 0,
+      "sha256": "2051b0fb31606e2ac7bbb04ced459f9642c0ad5a56d8680d2d868470c4107174",
+      "name": "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pPkgInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toArray",
+          "descriptor": "(I)[Lcom/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference;",
+          "access": 1,
+          "code_sha256": "61b3b7e3b512672f4ecb7ca4867b82a9ef94c68458772f79e8dd87c7d703c4c6",
+          "code_length": 15
+        },
+        {
+          "name": "toArray",
+          "descriptor": "(I)[Lcom/sun/jna/Structure;",
+          "access": 4161,
+          "code_sha256": "3c27e2c85f905412414102ffaea0ea172d418fcf5eb14c6184cfdbd441244c91",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo$ByReference",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER.class",
+      "occurrence": 0,
+      "sha256": "384de2a19ab19b5ac1d6d040fe3b16113db632e8dd6e18d8716747b3db73fbc1",
+      "name": "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwLower",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwUpper",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SEC_WINNT_AUTH_IDENTITY.class",
+      "occurrence": 0,
+      "sha256": "7dcfe0ce43615e2352bd77e766a4f63778141e56d6511ba15f32bdf786b607fb",
+      "name": "com/sun/jna/platform/win32/Sspi$SEC_WINNT_AUTH_IDENTITY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "User",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "UserLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Domain",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "DomainLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Password",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "PasswordLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2bbab28b94992cda74cb192af33d502b2f5e9f358a7902a02ae6e4f0d6c08ada",
+          "code_length": 13
+        },
+        {
+          "name": "write",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "92fa2f17b083d540514596700e828962f1729db786da4519aa0d7eb708d27a3f",
+          "code_length": 71
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SEC_WINNT_AUTH_IDENTITY",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecBuffer$ByReference.class",
+      "occurrence": 0,
+      "sha256": "5094ece13b662e4326a3a0dba95dc5283aba6c6b473269bdfc6a777c73bea69a",
+      "name": "com/sun/jna/platform/win32/Sspi$SecBuffer$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecBuffer",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "cf6f042d0453dbc751a95d036c74424d106cd0d394160334c15a01850a1ac8b7",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecBuffer.class",
+      "occurrence": 0,
+      "sha256": "b5927e4f93d00f0bd0d94031d0ab61a8ff42614182ccc23c0ed8be45d76bacfe",
+      "name": "com/sun/jna/platform/win32/Sspi$SecBuffer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbBuffer",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "BufferType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pvBuffer",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "db52a00499bd593e76fa5befa8c7748cf7f167a4f8cbdaa7b261ee0b33819e92",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "ea2e6a5d6ec8f6229aed8a0b61fb2358b6940ed9be339230a8749d2518113749",
+          "code_length": 33
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "04837fb9218311611029ec21ecd5554ee390a641acbebff9d3969692a36213df",
+          "code_length": 47
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "2f20dcaa4fd2b52467deecdbd72fa6b9345c7286860da345e530e9e47cc81b10",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecBufferDesc.class",
+      "occurrence": 0,
+      "sha256": "ced2ca2893b843990102866c09a1d2dfc93db37ff747a8dcded50bbc1f45ab85",
+      "name": "com/sun/jna/platform/win32/Sspi$SecBufferDesc",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ulVersion",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cBuffers",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pBuffers",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "263aad118d0d74f4f21bee4c1fa85d4f031d5139d8df04956b7438c8b190b160",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecBufferDesc"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecHandle$ByReference.class",
+      "occurrence": 0,
+      "sha256": "fe8679e2c99860245c8d08324af4efd0a97b1033f38cd1daf9f15c6d7b2c61e3",
+      "name": "com/sun/jna/platform/win32/Sspi$SecHandle$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecHandle",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecHandle",
+        "com/sun/jna/platform/win32/Sspi$SecHandle$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecHandle.class",
+      "occurrence": 0,
+      "sha256": "7c963b15913af9bed8c521e1abcc9cf9414bc8788a473b23868bb01b6da6f913",
+      "name": "com/sun/jna/platform/win32/Sspi$SecHandle",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwLower",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "dwUpper",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isNull",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d9efe9834d95e6e1f2670c75497203af2b3f34e7ebc59943f256649b641c5631",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecHandle",
+        "com/sun/jna/platform/win32/Sspi$SecHandle$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags$ByReference.class",
+      "occurrence": 0,
+      "sha256": "4fce85839648048266db8432f1786237f038d5f798996af638696f12fc23688e",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags.class",
+      "occurrence": 0,
+      "sha256": "fe74b68f4e701f685e0f3c0f45b969a80760967b3336fc642234bdb155c7930f",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_KeyInfo.class",
+      "occurrence": 0,
+      "sha256": "055f9ae85163cad230a5c3331cac296f29b759fded31f71bf590e212b6cb531f",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_KeyInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sSignatureAlgorithmName",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "sEncryptAlgorithmName",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "KeySize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SignatureAlgorithm",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "EncryptAlgorithm",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getSignatureAlgorithmName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "69e09ea2f9aaeaebcd16f4bb5a14ad255207a09b4b3b7cf7e6d1d67286b177c6",
+          "code_length": 37
+        },
+        {
+          "name": "getEncryptAlgorithmName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "15b7efcdd17195829fc8189266d4115cb18254f700d5d330c4cfcf35b7e3ac65",
+          "code_length": 37
+        },
+        {
+          "name": "free",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "01dda343bd7efaf5efa30fae0b452cf42de556920f3c25fe673860d576cc344c",
+          "code_length": 51
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_KeyInfo",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/Boolean",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan$ByReference.class",
+      "occurrence": 0,
+      "sha256": "9af47c905d084be0c56873723fe9e9178a6d776d2ead4267643c46f4bc6e2080",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan.class",
+      "occurrence": 0,
+      "sha256": "0df0b74c9d741f8fe689762cac36ad93680aa8e37bc2c6ed64a36af4ad8dcb2b",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tsStart",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$TimeStamp;",
+          "access": 1
+        },
+        {
+          "name": "tsExpiry",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$TimeStamp;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan$ByReference",
+        "com/sun/jna/platform/win32/Sspi$TimeStamp",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo$ByReference.class",
+      "occurrence": 0,
+      "sha256": "cea6f49f340110ce67c571a7ff96879cbe5c1e9be5acfcf0b4aa218be64203ca",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo.class",
+      "occurrence": 0,
+      "sha256": "111a1e51daa54bd505c20e69ef4ec63607e7fb63c99ac00cca7ccf5c0fb299f5",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PackageInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$PSecPkgInfo;",
+          "access": 1
+        },
+        {
+          "name": "NegotiationState",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "free",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "ffc8273aed3decaae56f9d8b7a0951cbb7d9b6b45778ab5a9492c1e9c06c4d66",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo$ByReference",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo$ByReference.class",
+      "occurrence": 0,
+      "sha256": "18d63c22e526b231157ad8f4f2d2cf3ea26f580d7bd5c6d5c8b48c7601f9346d",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo.class",
+      "occurrence": 0,
+      "sha256": "204d48c4690cf6d5b13c353560001e51371d383b499d52263cf807199450a841",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PackageInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo$ByReference",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey$ByReference.class",
+      "occurrence": 0,
+      "sha256": "ee15d1b5494e7395f73cd8e0cc52434251d8d21576967c5b0c642667f3d34367",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey.class",
+      "occurrence": 0,
+      "sha256": "dd75b8ec5e75619dca00947c1039824b05eb21c738dd920d53dbb00e60a17ab0",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SessionKeyLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SessionKey",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getSessionKey",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "5e3ac846e866e7ff727646c0301e1c2a14b472a58070a4493b7cc2e734d2c533",
+          "code_length": 22
+        },
+        {
+          "name": "free",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "759fea6195d9991dc22d902884a0099223be0b176d50a173a281b57c95a8f5ab",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes$ByReference.class",
+      "occurrence": 0,
+      "sha256": "6d68570a42db02580d4264d5d3969d60875ce924eebac10863c78b33954f6186",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes.class",
+      "occurrence": 0,
+      "sha256": "144d93677f9af52cb6384e6461b3e7f9c8b574cc1d48993011f4c47565ee5ab4",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbMaxToken",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cbMaxSignature",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cbBlockSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cbSecurityTrailer",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7a1658037646ae0317aca3d30d0554e77d706dc1fd9de2248f910e759f2eda37",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0f9bcf2b56b04af1a823cd0f92f561ac9252eee734d600eeea7d5c7f3bb42690",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names",
+        "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names.class",
+      "occurrence": 0,
+      "sha256": "05ff4e84e67f4e2f5b904839b8dfb2a7cef4ad014b9fef4fe47163edb20ea6fe",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "sUserName",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getUserName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "69e09ea2f9aaeaebcd16f4bb5a14ad255207a09b4b3b7cf7e6d1d67286b177c6",
+          "code_length": 37
+        },
+        {
+          "name": "free",
+          "descriptor": "()I",
+          "access": 33,
+          "code_sha256": "f7c2ac6d3fc1958136a9d045ed1d812e858f7b0c50ad66058246974b4f0e4cc7",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Secur32",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names",
+        "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names$ByReference",
+        "com/sun/jna/platform/win32/WinError",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/Boolean",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference.class",
+      "occurrence": 0,
+      "sha256": "fb77ccef55647831fdef58f55fabaffa2cc4ed5fdc15cb5807b5f0691eda3edb",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$SecPkgInfo.class",
+      "occurrence": 0,
+      "sha256": "9671e0ea28a5d943dc41473387ea621678ce9b2c1de55c38cf062b8467d517f0",
+      "name": "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fCapabilities",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "wVersion",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "wRPCID",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "cbMaxToken",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "033fd770df7bf5372c9cdecad396fa1cb17054dd15fc287a0d61269a54dd9395",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi$TimeStamp.class",
+      "occurrence": 0,
+      "sha256": "f35be2ef7ffb263c299d3d9b9ced8c5a9aed1fdd53cb971192bc2a1eaf0d6565",
+      "name": "com/sun/jna/platform/win32/Sspi$TimeStamp",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER",
+        "com/sun/jna/platform/win32/Sspi$TimeStamp"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Sspi.class",
+      "occurrence": 0,
+      "sha256": "32ba16d46b6ecb3b55842ba796178e726b7d3b5c901664cd1f782649762e50e3",
+      "name": "com/sun/jna/platform/win32/Sspi",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_TOKEN_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_CRED_INBOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_CRED_OUTBOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECURITY_NATIVE_DREP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECURITY_NETWORK_DREP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_ALLOCATE_MEMORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_CONFIDENTIALITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_CONNECTION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_DELEGATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_EXTENDED_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_INTEGRITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_MUTUAL_AUTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_REPLAY_DETECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_SEQUENCE_DETECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ISC_REQ_STREAM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECBUFFER_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECBUFFER_EMPTY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECBUFFER_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECBUFFER_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_SIZES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NAMES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_LIFESPAN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_DCE_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_STREAM_SIZES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_KEY_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_AUTHORITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_PROTO_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_PASSWORD_EXPIRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_SESSION_KEY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_PACKAGE_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_USER_FLAGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NEGOTIATION_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NATIVE_NAMES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_FLAGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_USE_VALIDATED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_CREDENTIAL_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_TARGET_INFORMATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_ACCESS_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_TARGET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_AUTHENTICATION_ID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_LOGOFF_TIME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NEGO_KEYS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_PROMPTING_NEEDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_UNIQUE_BINDINGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_ENDPOINT_BINDINGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_CLIENT_SPECIFIED_TARGET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_LAST_CLIENT_TOKEN_STATUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NEGO_PKG_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_NEGO_STATUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_CONTEXT_DELETED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_ATTR_SUBJECT_SECURITY_ATTRIBUTES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_NEGOTIATION_COMPLETE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_NEGOTIATION_OPTIMISTIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_NEGOTIATION_IN_PROGRESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_NEGOTIATION_DIRECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_NEGOTIATION_TRY_MULTICRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_INTEGRITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_PRIVACY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_TOKEN_ONLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_DATAGRAM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_CONNECTION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_MULTI_REQUIRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_CLIENT_ONLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_EXTENDED_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_IMPERSONATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_ACCEPT_WIN32_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_STREAM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_NEGOTIABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_GSS_COMPATIBLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_LOGON",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_ASCII_BUFFERS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_FRAGMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_MUTUAL_AUTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_DELEGATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_RESTRICTED_TOKENS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_NEGO_EXTENDER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_NEGOTIABLE2",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_APPCONTAINER_PASSTHROUGH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_FLAG_APPCONTAINER_CHECKS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECPKG_CRED_ATTR_NAMES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECQOP_WRAP_NO_ENCRYPT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECQOP_WRAP_OOB_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEC_WINNT_AUTH_IDENTITY_ANSI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEC_WINNT_AUTH_IDENTITY_UNICODE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "924266e5d1f64f0460c81a0888aa23c214575766c4b9dd08a8ec608f807a2d0c",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$CredHandle",
+        "com/sun/jna/platform/win32/Sspi$CtxtHandle",
+        "com/sun/jna/platform/win32/Sspi$PSecHandle",
+        "com/sun/jna/platform/win32/Sspi$PSecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$SECURITY_INTEGER",
+        "com/sun/jna/platform/win32/Sspi$SEC_WINNT_AUTH_IDENTITY",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer",
+        "com/sun/jna/platform/win32/Sspi$SecBufferDesc",
+        "com/sun/jna/platform/win32/Sspi$SecHandle",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Flags",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_KeyInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Lifespan",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_NegotiationInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_PackageInfo",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_SessionKey",
+        "com/sun/jna/platform/win32/Sspi$SecPkgContext_Sizes",
+        "com/sun/jna/platform/win32/Sspi$SecPkgCredentials_Names",
+        "com/sun/jna/platform/win32/Sspi$SecPkgInfo",
+        "com/sun/jna/platform/win32/Sspi$TimeStamp",
+        "com/sun/jna/platform/win32/VersionHelpers",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SspiUtil$ManagedSecBufferDesc.class",
+      "occurrence": 0,
+      "sha256": "545515006603805aaf08e8bff3a6a0ee95e3e6a533494e1c58ce3a1adf9e7d2a",
+      "name": "com/sun/jna/platform/win32/SspiUtil$ManagedSecBufferDesc",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Sspi$SecBufferDesc",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "secBuffers",
+          "descriptor": "[Lcom/sun/jna/platform/win32/Sspi$SecBuffer;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "adca17186317bf9729bbec65db9992600e7ef73999f370ba4a09a02410a11530",
+          "code_length": 47
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "8d9b4cba28267f1383bbfb385339cedb67ca6adff41f16d4d619867771c19430",
+          "code_length": 47
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f7026a227115e62dac0ce3fcab5530c0254bf79b0e3aa37bb2ad6be817bdf156",
+          "code_length": 53
+        },
+        {
+          "name": "getBuffer",
+          "descriptor": "(I)Lcom/sun/jna/platform/win32/Sspi$SecBuffer;",
+          "access": 1,
+          "code_sha256": "9608e79074fac3c61065549889e1ae57838e9c7f3eb8df432a0330d145538fb1",
+          "code_length": 7
+        },
+        {
+          "name": "write",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "290b9ea0322665ad9a2f629fc0542235b432302f0d676b5617269c6d3b89cbc1",
+          "code_length": 50
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a021ae75d44951b23daeea40c370279f05e3cc9abf0f0cd01e39c2c8014a1c93",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/Sspi$SecBuffer;",
+        "com/sun/jna/platform/win32/Sspi",
+        "com/sun/jna/platform/win32/Sspi$SecBuffer",
+        "com/sun/jna/platform/win32/Sspi$SecBufferDesc",
+        "com/sun/jna/platform/win32/SspiUtil",
+        "com/sun/jna/platform/win32/SspiUtil$ManagedSecBufferDesc"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/SspiUtil.class",
+      "occurrence": 0,
+      "sha256": "5d3774f4cecb3c9a72fe657011a549a8e84fd6f461b76352ff8358b879d5c9df",
+      "name": "com/sun/jna/platform/win32/SspiUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/SspiUtil",
+        "com/sun/jna/platform/win32/SspiUtil$ManagedSecBufferDesc",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W$ByReference.class",
+      "occurrence": 0,
+      "sha256": "22f5d9ef68c5ac50695e4406cf3a4b6a06803e32754e0a4dc5bcc269cb168660",
+      "name": "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Tlhelp32",
+        "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W",
+        "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W.class",
+      "occurrence": 0,
+      "sha256": "16232c8f280957e40c2c4866432b5dc273ff616af1c590e3ba3f6ca11d3474f1",
+      "name": "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "th32ModuleID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "th32ProcessID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "GlblcntUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "ProccntUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "modBaseAddr",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "modBaseSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "hModule",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$HMODULE;",
+          "access": 1
+        },
+        {
+          "name": "szModule",
+          "descriptor": "[C",
+          "access": 1
+        },
+        {
+          "name": "szExePath",
+          "descriptor": "[C",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b6578fcd43245bf769cea1443221edae80253c667dddebb3a940aee8c710b195",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "d8edfaadf659978e81fc96165fc19d9086d07c35110fa54cf9c31e5a9bffd56f",
+          "code_length": 28
+        },
+        {
+          "name": "szModule",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c3d2ffdf14660332e9b7b5456286cfa93635fa7070dd13ccefd92dd93f2fca1",
+          "code_length": 8
+        },
+        {
+          "name": "szExePath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "45e0f226dba12d0f5be4f7c5a146bcc0aeb41c1f3fb793497a69da151e2b3f5f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/Tlhelp32",
+        "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W",
+        "com/sun/jna/platform/win32/Tlhelp32$MODULEENTRY32W$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$HMODULE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32$ByReference.class",
+      "occurrence": 0,
+      "sha256": "b05cb3f4ff85d48309d0c4df1f567c42145d920f7ae68b017e0fbc321a6cc266",
+      "name": "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Tlhelp32",
+        "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32",
+        "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32.class",
+      "occurrence": 0,
+      "sha256": "5113b2b6a0b5a19cb2421fb2d1b0d4e8923e399ab56815b86f64b805fb4cf16b",
+      "name": "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "cntUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "th32ProcessID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "th32DefaultHeapID",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$ULONG_PTR;",
+          "access": 1
+        },
+        {
+          "name": "th32ModuleID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "cntThreads",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "th32ParentProcessID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "pcPriClassBase",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        },
+        {
+          "name": "dwFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "szExeFile",
+          "descriptor": "[C",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b3785455da88d6aea6b37923f67b36890d5dc32f3cba15b46ef28e7ca1d67b68",
+          "code_length": 30
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "6f3ee1d803a8988f5880dc530a9b495afbfb1e8c2d7ab41bedb687f7a496cb37",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$ULONG_PTR",
+        "com/sun/jna/platform/win32/Tlhelp32",
+        "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32",
+        "com/sun/jna/platform/win32/Tlhelp32$PROCESSENTRY32$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$LONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Tlhelp32$THREADENTRY32$ByReference.class",
+      "occurrence": 0,
+      "sha256": "4d7a325348424e348dce837a369d852d0fb06cec80e08417a90d18205c75ed3c",
+      "name": "com/sun/jna/platform/win32/Tlhelp32$THREADENTRY32$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Tlhelp32$THREADENTRY32",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Tlhelp32",
+        "com/sun/jna/platform/win32/Tlhelp32$THREADENTRY32",
+        "com/sun/jna/platform/win32/Tlhelp32$THREADENTRY32$ByReference"
+      ]
+    }
+  ]
+}

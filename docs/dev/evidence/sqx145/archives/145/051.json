@@ -1,0 +1,1496 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jcommon-1.0.12.jar",
+  "sha256": "34dd367ad34ae0baa5d5430fc9a13db1d12d66e29477cbb453ca92f5084a4e7b",
+  "class_count": 208,
+  "unique_class_entries": 208,
+  "resource_count": 10,
+  "duplicate_entries": [],
+  "classes": {
+    "com/keypoint/PngEncoder.class": "30953bed02fe8d17884761083e0beab3c8697724e3513ef80f8a0814b0cafb72",
+    "org/jfree/base/AbstractBoot.class": "61e4b79860cb22a0591b14d1389193f31b15954a82b7c84246705ce871f744ff",
+    "org/jfree/base/BaseBoot.class": "fce69621444839946f273d258172704c58bab47d2e75ce77eeafe20dc5200da7",
+    "org/jfree/base/BasicProjectInfo$OptionalLibraryHolder.class": "d7d53432f5d9d759a1fa22f3678acd3cd684d45b9d1764346005cb3fd4988e92",
+    "org/jfree/base/BasicProjectInfo.class": "eb64cc8c53163a29d8cc37605a7dbab3aa1746fd7b9ca3c7bd090fd479c1f9e6",
+    "org/jfree/base/BootableProjectInfo.class": "0adec8260d745c27a28b10829b81ea98272e57b792fe10f48db4770b23370cd5",
+    "org/jfree/base/ClassPathDebugger.class": "00aaa05ee196970aa0eeaf7dc16ba8d9e960b7da61a9b3ae8cb38b79aeb07a54",
+    "org/jfree/base/config/HierarchicalConfiguration.class": "26908f2fad6a5558a112626047fa90cafc3466561a6d2db5a3917882efc58093",
+    "org/jfree/base/config/ModifiableConfiguration.class": "8def3587fa16f3efabb5732ce1c49334868ffcece45b90220f46e18e5cba1e60",
+    "org/jfree/base/config/PropertyFileConfiguration.class": "1f9c07198ef10f6bfe21076ec17c787a322712d3fcd955ce64e0d820f1ab2193",
+    "org/jfree/base/config/SystemPropertyConfiguration.class": "4a4692a32aede51b45e10710824a599fd03f0fbe9d5727864e0b85d64296d86e",
+    "org/jfree/base/Library.class": "dc8b0247ba8d103b3989cb8d1f048493e3d206740c285624e1df04407b44c9a4",
+    "org/jfree/base/log/DefaultLog.class": "30bcc691281a1cf328db2cbe7a080764f99a9dd6acd8bd8762cbd507d424c20a",
+    "org/jfree/base/log/DefaultLogModule.class": "3b9df539f263cda3f16317556b8b05dd77723812ea1b6aa1acfb0d0dc982a520",
+    "org/jfree/base/log/LogConfiguration.class": "1a0a43fa0cca1e4d63a2ddd0eb3290cbbf6fa9b47c4331cd1a4087e00b61cbdd",
+    "org/jfree/base/log/MemoryUsageMessage.class": "91571781f9f2c4f5f99ea15d9780aa3bbc982bedbb45a0989e0cf61f23726491",
+    "org/jfree/base/log/PadMessage.class": "8820ea6c1dccf491d5d4ab77ff9708e471a890c1f5eb7365a29ae7c0dd8b0e0b",
+    "org/jfree/base/modules/AbstractModule$ReaderHelper.class": "7e7784fe63ef4e79df976deb73b9a340af72c1571f20f5bf3786d9ecdf474734",
+    "org/jfree/base/modules/AbstractModule.class": "ec042a624f22257a2bab31bded7ce375a0e18bcc55b3ab2c641d881b683d1309",
+    "org/jfree/base/modules/DefaultModuleInfo.class": "7fbe2f6209c122e244ad5ff9fe652315b22da151f7e16790b0f1b8cb8c6f0714",
+    "org/jfree/base/modules/Module.class": "2d9cbb0134e7c48aa474d2f49da592d927dc2c7888633c7a66aa604bc9dd3cf8",
+    "org/jfree/base/modules/ModuleInfo.class": "f466f03cb3514105ff0ee997912b0ecbfe434ca0be75e3cf78eeb7cf61d11f91",
+    "org/jfree/base/modules/ModuleInitializeException.class": "1484bbd71324f30b6481d749d1ef70da2e8eb5e839d6c6493d94bf8f3059e398",
+    "org/jfree/base/modules/ModuleInitializer.class": "3325c069d5e64e13398d3aa584a0c95ae4c0d5f45e038d754ef17b3865bfa249",
+    "org/jfree/base/modules/PackageManager$PackageConfiguration.class": "b1bd7e8b6ff4acc33d9e285d5e7b4343769530b924f10a68bdb252ae910a19e3",
+    "org/jfree/base/modules/PackageManager.class": "c5df1367749d40f80edf7174cac1c0f40584a3d4b323a9eca0927c176d5f1a65",
+    "org/jfree/base/modules/PackageSorter$SortModule.class": "1f9265df3636fde9b8868afea3bc2793cdd2dde898aec52f6d6f617911791fd9",
+    "org/jfree/base/modules/PackageSorter.class": "e78e93c75de554b154c2672e1fbb01dbfe735ceb3bd5c7c96c1d8b84c1f4afb2",
+    "org/jfree/base/modules/PackageState.class": "e8160f2d72223f1a28772ee8813e4d88f0ea61e5daa3cd37b68ac64e7a4b8c6d",
+    "org/jfree/base/modules/SubSystem.class": "4b3c6e2b0fb95fa4173f213075538ec9f6bb5d38416d361a24f90dd63e86c0d4",
+    "org/jfree/date/AnnualDateRule.class": "a43a80d05ad6b1b26a1a164eb56e03a5fd4b4088746a4e6be23f430e6b9bd6e3",
+    "org/jfree/date/DateUtilities.class": "f197552bf469b2d201d355cba9013bee50ae6edda8f3597082c1232896f737f7",
+    "org/jfree/date/DayAndMonthRule.class": "52663d10f19b13e189d58c2b0e1255fc33752d85a1e903080510f60dcab1cdf7",
+    "org/jfree/date/DayOfWeekInMonthRule.class": "905e23489d60f2e83f52b933a1e82aed6ff88a281f87c14826fa3c5ff36ded7c",
+    "org/jfree/date/EasterSundayRule.class": "8c6cf3b15cfef21c81c93c9e054400858b96b7a15fcabd8591df904c3f01f967",
+    "org/jfree/date/MonthConstants.class": "560a5373df5f60730837f14894c3c5186307a63f88c3f22d1d3ead0c5d15329a",
+    "org/jfree/date/RelativeDayOfWeekRule.class": "e661ae8fc0216a6977730c6afd83226722628b36075fdc5319eb52e4832adbaa",
+    "org/jfree/date/SerialDate.class": "1e6ff55e18381d624030fd36730c0e1a5e0851b58d162cb273f35df830a46193",
+    "org/jfree/date/SerialDateUtilities.class": "b21864c883f019593456b9611d4a8dad50cc581146d64b8bd79614ecc345af22",
+    "org/jfree/date/SpreadsheetDate.class": "b068e5562505e93c72ddb1db1ae1a0345e54fb66f4dad49eb75c6383b316cade",
+    "org/jfree/io/FileUtilities.class": "58fa77cc9bcc15d2b9bffa780094539badff4ffd2810c6fb47a6244e9987e29f",
+    "org/jfree/io/IOUtils.class": "3aea55a223b46c9b408caf7285827d29f206c41823194c84d7f2e093ed87f7d5",
+    "org/jfree/io/SerialUtilities.class": "20ad45d5f116f9a9b684d522f170986166d7c18c246d75760e6732d53acf3935",
+    "org/jfree/JCommon.class": "10e12d2172cfef3daec0f36cb8c8e878e1692ceb3df6f922125d021ff6eff01a",
+    "org/jfree/JCommonInfo.class": "70adc4d3cd1525c9aaf4122877f9339e3d765c57005fc0e5c33d37448369567d",
+    "org/jfree/layout/CenterLayout.class": "0eaa60444ce52039a33034152de11767611f15797dd40057eefea22b194f580f",
+    "org/jfree/layout/FormatLayout.class": "174bee9293a818328c5b38c751309e49cf7f1ddac3a48c3009b106331313d751",
+    "org/jfree/layout/LCBLayout.class": "b2bfba77a9f6bfda08210c5456f2cf8b75913d5ce6512b2578a1e40b77e77a49",
+    "org/jfree/layout/RadialLayout.class": "6142ee8d508ddfa7c31d6b1d65972c8ed1fb8a6d5dc760b313de21ca85e3801a",
+    "org/jfree/resources/JCommonResources.class": "845bda3687421ebb74a1eea41a5a39ac67723d36e1900f709a96083bcd34542b",
+    "org/jfree/text/G2TextMeasurer.class": "0bdba81409a0926f423f471cab99fa1bc52856cfeb56205f400356f96cc63250",
+    "org/jfree/text/TextBlock.class": "9f5dfec28e7c4f1d01c4753de899f6087905272d1d7c41853ea528d7e94bb611",
+    "org/jfree/text/TextBlockAnchor.class": "0e52723b54e84a44afcc529a309c8de8c12d0499f479cd07339a604a7542a08a",
+    "org/jfree/text/TextBox.class": "d59968e9bb224cd1e31143a34a5a00a2281da1f18294fd5ab00382829aee614a",
+    "org/jfree/text/TextFragment.class": "5f6884f59ca7ae9d4a90add935dcec2f82b5f33c4e6bae873936f332781d02a3",
+    "org/jfree/text/TextLine.class": "7498f33350bcd892421ee4582d318af9e316aa925c87d0ad8df43bc817d44c8c",
+    "org/jfree/text/TextMeasurer.class": "f748672c3b365a839871d0533e5ef53a11cf38d0a0e003024adead866fec2498",
+    "org/jfree/text/TextUtilities.class": "69eb0f8f85d27ce48a37e8af02b130a9a4855a324de43b38c2890fc02c736867",
+    "org/jfree/threads/ReaderWriterLock$1.class": "5a1dfec81f2d36df8a166162829087af4ad400a199e40c1ab312b4c879e53b5b",
+    "org/jfree/threads/ReaderWriterLock$ReaderWriterNode.class": "d442651bc9b484d955c484ddafe48918f36175befc30e01fed420d3134f99678",
+    "org/jfree/threads/ReaderWriterLock.class": "c55a5fd6f4629bf7776f02787b6a3d021511653b4b04515299f66c96355fef2f",
+    "org/jfree/ui/about/AboutDialog.class": "c77784244fcff7ac11e6e5687678f76d4760350a0baee7392c9692d78d540893",
+    "org/jfree/ui/about/AboutFrame.class": "70eebc06f6549998316ed0b66217962648db6f51bff8ae083995a430e587c6e5",
+    "org/jfree/ui/about/AboutPanel.class": "97591a58863eef6c31610d30f14c1252976bad8460112e72fc0762d98ff479e8",
+    "org/jfree/ui/about/Contributor.class": "2ab624aa1682ca711d953ce7278dbef409e63c1a69c8ab532f694272f6042bd7",
+    "org/jfree/ui/about/ContributorsPanel.class": "00436c7f72e4da4730e89bb180ceea3377417dbbf2132d9878d28e9668da81cb",
+    "org/jfree/ui/about/ContributorsTableModel.class": "f1f1435c0fd8ea2ac62cfd0f741a0d795079aa4a638da49189917e11afc1251a",
+    "org/jfree/ui/about/Library.class": "7d28a806d6557890d26e0f86935911340b33fabf60a315a095f96ef268f2304c",
+    "org/jfree/ui/about/LibraryPanel.class": "f15392bf63dc897fa653e848da1f735ef3fdb25cf7458497a212929b1d41c8f2",
+    "org/jfree/ui/about/LibraryTableModel.class": "12389df10695a31ceccdf6b0629cbb02f09d44c230458af409b5dce40ed3b433",
+    "org/jfree/ui/about/Licences.class": "f5aeec75e4da0948aef88c9a8ef83678e37a5e1f90fd45cca4d9e585f30faf71",
+    "org/jfree/ui/about/ProjectInfo.class": "ef54971deaa20bbdfa26820bb37f0f93136d84694c99532ae18d670f20d53344",
+    "org/jfree/ui/about/resources/AboutResources.class": "a4db1beb17f0faeb3a703b82363f85d9cdfe45544da5982f6e3249a7176aaae1",
+    "org/jfree/ui/about/resources/AboutResources_de.class": "def63a2dcc77aec63b6164b88e67ed069ea4b083895e84badd6861a4ff9d184d",
+    "org/jfree/ui/about/resources/AboutResources_es.class": "0660fb50efdd67dfe317a5e094689f63cc503721b1c70773e9a3f4b2094f1f5b",
+    "org/jfree/ui/about/resources/AboutResources_fr.class": "ad77e0e2c0cef57e62a42913b72657dc9a51389149a32daf0d49aba9d595a442",
+    "org/jfree/ui/about/resources/AboutResources_pl.class": "115dd28ac6ca0848bea4a91f67f6cd4d22988b0d0c1302d8dfdb7eb4fefabafc",
+    "org/jfree/ui/about/SystemProperties.class": "23a3ad4da53137adbbcca370793ff8c5642a5e98640ffa76063e1e577f352d28",
+    "org/jfree/ui/about/SystemPropertiesFrame.class": "39d0b165215fab935471eaca1c08cc4165179eca2ce58f1277d4a27ad521e491",
+    "org/jfree/ui/about/SystemPropertiesPanel$1.class": "590e497cab66134c61b7e03d3c6730c78fc143442284b494ca5f084d3e532d6e",
+    "org/jfree/ui/about/SystemPropertiesPanel$PopupListener.class": "83959db23973ba37bb7c9a684d2ccadf1947962cd17936a2dd1ed4b0ae34ed56",
+    "org/jfree/ui/about/SystemPropertiesPanel.class": "2841877f7205ac7149e2a939e4333e8f5aca829fb123b33d49d8b78fbfecd105",
+    "org/jfree/ui/about/SystemPropertiesTableModel$SystemProperty.class": "003bab4c332dff6f84313711d67f8a5cf350db0f2ab0672f7c458ce3d4ed5500",
+    "org/jfree/ui/about/SystemPropertiesTableModel$SystemPropertyComparator.class": "69acc03e0f9abd177c1245dfeaa94b3fcd280e3447699f50d50d6f0d425d65ad",
+    "org/jfree/ui/about/SystemPropertiesTableModel.class": "428c6b8ec74b4569d5edfcb666659a224b8b2f9a545e343445a55fd00860307a",
+    "org/jfree/ui/action/AbstractActionDowngrade.class": "623326882d57bb6127d93f949fce99b11e2b4131de9823249fa48f290a930c83",
+    "org/jfree/ui/action/AbstractFileSelectionAction.class": "ad832bfe47e091d74542696df8b06da8452a50ab25494bbd2f4ba2b3d2b712be",
+    "org/jfree/ui/action/ActionButton$ActionEnablePropertyChangeHandler.class": "3a9a0852bc96e5662b0df556fe5e7e0232afd357614673f3189566802a7d46b3",
+    "org/jfree/ui/action/ActionButton.class": "67e2b54082b5710f00b317763c7335a68dd9c87b15fe10ff8353661a428f418c",
+    "org/jfree/ui/action/ActionConcentrator.class": "731444ba7f8d9e68af24ed965cbfa4393446cceeb9ec35e4b10efdb930b6b9ca",
+    "org/jfree/ui/action/ActionDowngrade.class": "e6e095e262f62728b4744f033b163cddcb76469bf7b91dfc00a6ddebc268fbae",
+    "org/jfree/ui/action/ActionMenuItem$ActionEnablePropertyChangeHandler.class": "617c46d15688f50658e8ddf8955c58924341afc6c490400b2a6630520685ed5b",
+    "org/jfree/ui/action/ActionMenuItem.class": "6523c8a43bf5211b8764a23d28c53a7e48feead6f6b461ead37b663a3809a471",
+    "org/jfree/ui/action/ActionRadioButton$1.class": "62b6d45a310e4c51ced3305181f8d90eaa1c0a0f12f9c97917b6b12fca6bfa66",
+    "org/jfree/ui/action/ActionRadioButton$ActionEnablePropertyChangeHandler.class": "2bc87cac1eadeef2a5a858c8868ad95e9091048c8d92611eaf8b8bcc448c1fea",
+    "org/jfree/ui/action/ActionRadioButton.class": "c03ddf7d482a8cd0bd0f8d651e6c6fe353a85e96d7a45bd6e6afb777531951f7",
+    "org/jfree/ui/action/DowngradeActionMap.class": "f2a5de9701ca378ff214132824028065928aabfc9a40ab8e9bac711cbe6069d0",
+    "org/jfree/ui/Align.class": "f2298fa6bd67e72014413df375921279355f8c96c1b0f2ef32cb71507d6e9e4d",
+    "org/jfree/ui/ApplicationFrame.class": "5a0ecc303ecbdca7b0d587e718ffe9e085559475caf258175ae8d967f842773a",
+    "org/jfree/ui/ArrowPanel.class": "e9f1e508f8988d7ea99330fef51491567a0af1cad8cfb2b943eaa1daef055d88",
+    "org/jfree/ui/BevelArrowIcon.class": "875a88b93b26cf7830783bbdc35834fe6cefd39ccfb86dbf34b6cc30cffcb99c",
+    "org/jfree/ui/DateCellRenderer.class": "a895195c2f39a54e26ea4140561fcf023b6b947cb61c7aed231ac64eb2b814d9",
+    "org/jfree/ui/DateChooserPanel.class": "d8fa5ad14e7ba4da595aa20e351e3f44150453ef2b63cf22639767cd274a5a02",
+    "org/jfree/ui/Drawable.class": "6a053d38f8f8106b0e6a36dffe6428b702b54e2317798d1ba0c989576d297521",
+    "org/jfree/ui/DrawablePanel.class": "5e57499a5c42092e084aec289a9b90e3368d7e0bc750e05b6ed09769b93416f6",
+    "org/jfree/ui/ExtendedDrawable.class": "d0144e2b2b97ac269c8c2775e2f710dc2690843f8d557746802b60afcf8e0cdd",
+    "org/jfree/ui/ExtensionFileFilter.class": "48f8fe39e9d7c16865bfa4defd00cbf029181db7bf5bad8c144d322628bf498f",
+    "org/jfree/ui/FilesystemFilter.class": "d9ae3daf956579f28c0a435d5467e57ebcf1ea2de96ea59216b1efd85722b7fd",
+    "org/jfree/ui/FloatDimension.class": "61946deb845b0697c467f01f0b67c0118d6cda4e201f117d6c7f8a54eae4344b",
+    "org/jfree/ui/FloatingButtonEnabler.class": "b229a2594cf2be4e3c6161db477760a103aff8525d0857a6e05cb23fa7b1606f",
+    "org/jfree/ui/FontChooserDialog.class": "cc3163a76363bbd8337137082262d54d3ebf1d6b3e7cf41c5264599c4c9ed1c8",
+    "org/jfree/ui/FontChooserPanel.class": "2503ceaa519d85df6caa35b376eae3c67e98cb46d2c813e8753b3915f1ab18be",
+    "org/jfree/ui/FontDisplayField.class": "7bfb347f64aef2e65b137f6422915d813c0a3e9a0ae94172ebb263b4ed4c8511",
+    "org/jfree/ui/GradientPaintTransformer.class": "d7282777308db9f66e3134961c513b62f03ffee0a3d608de8b18bf2484f6f66b",
+    "org/jfree/ui/GradientPaintTransformType.class": "ac46f83e838f2b1e89b813ac3ef844b8c20e416f460ef2c477cc541d2f7c7a09",
+    "org/jfree/ui/HorizontalAlignment.class": "a5111ae24bd7bbcbd2b810c5a02f03447ea65de878e9247ee627a7a226f894ed",
+    "org/jfree/ui/InsetsChooserPanel.class": "332e16d11dee6072b10a5dd1ebd5690b4a778c44759cebabdd9928b13c7ae31e",
+    "org/jfree/ui/InsetsTextField.class": "c567b7bbd6b6a4f76331f4e5046e4efef58537b5a219106cd358f9e874735d57",
+    "org/jfree/ui/IntegerDocument.class": "48c1c4618549cd3af53f424b3c1749725d7f1135b7d2a2efbb6d6a9233dc2700",
+    "org/jfree/ui/JTextObserver.class": "9fa69814b675c5fc6f9b12e839ac9faa2fc71a187bd7995bbec31c8c496ab9a6",
+    "org/jfree/ui/KeyedComboBoxModel$ComboBoxItemPair.class": "354114f26a1bc48d338e6c1c512e8d7fd85719c69115f2b29bd4c15005436a88",
+    "org/jfree/ui/KeyedComboBoxModel.class": "ff17ba5f405da2b543eef4cb2cdf5fa0b8e772b1f9999e8b24235ffef1376795",
+    "org/jfree/ui/L1R1ButtonPanel.class": "734f88b10172afa52e4f0bec06c282b630e8a0ceb2a06835cbdf320d85bde0d0",
+    "org/jfree/ui/L1R2ButtonPanel.class": "7f396d2370ed9e8d4f46706c2989315826b36c867b91503574cef6d77f5485ca",
+    "org/jfree/ui/L1R3ButtonPanel.class": "ae5ed33984bf8c66994a69132cbfd2c225c6c92398a350aa265cb424f5fbbe64",
+    "org/jfree/ui/Layer.class": "27e3aee15af579022c995b9d270605d0f51749a935ba5ce47b8f6e5fb6ac4907",
+    "org/jfree/ui/LengthAdjustmentType.class": "84ae76c9795de482e240a428450b917c2d2b3dee7a46227d517945ec72c960ad",
+    "org/jfree/ui/LengthLimitingDocument.class": "ea2cce942f7e4f8f96cc12f60479855030fa0d540235fbf35ff07acb9756aeec",
+    "org/jfree/ui/NumberCellRenderer.class": "0ca2c7fa29de451beb7152e771f27029228f8f2fa20c8ddeb9fcb7da03b438f6",
+    "org/jfree/ui/OverlayLayout.class": "3830b9a44b13dc99bdcad8910a48be5c97050ac5cda4ef0bf490d040e2888faa",
+    "org/jfree/ui/PaintSample.class": "cfff1c3fb62348825d83a8e59a784c9b3371f5d7f097e39640ffaabd6aa3a9f4",
+    "org/jfree/ui/RectangleAnchor.class": "9bd684d2a466e2575939dcb981888ac0d281076943c519f09f2bdb922e4ef7f1",
+    "org/jfree/ui/RectangleEdge.class": "005acb5163e5a7befee743dbd8a8d7c99033566e23c6038466d626e6a1d6cd45",
+    "org/jfree/ui/RectangleInsets.class": "8bf82e4e21a7c836c22f422546ddaa20c12cb97523f305fa83c7c978b3c358f9",
+    "org/jfree/ui/RefineryUtilities.class": "f28ae5c4798fca42d8ed44e99192f1b4b693dffcaa5dd74837391d5de184b7a1",
+    "org/jfree/ui/SerialDateChooserPanel.class": "549fe6daa4d0acfe41b89670ccbae87296234a75b640f7477dfbf811d7b45504",
+    "org/jfree/ui/Size2D.class": "e33059f828298fee2bfb0e6c9d8c3dfaef90cd7b5bf387b480a4a660a61c8a60",
+    "org/jfree/ui/SortableTable.class": "c122bc0c8f122a5c8bafaf32a84a370fc4fcbbde70ffe6ab960814658f8ac3d5",
+    "org/jfree/ui/SortableTableHeaderListener.class": "9dbd1351a91606ee92b4d36bcb8db4546da938e10410482ccd809a18af2ced85",
+    "org/jfree/ui/SortableTableModel.class": "64294af3de9fb8a7f463fb7b5e7f37e2f9453405ade08d5bda6001719b9f6f19",
+    "org/jfree/ui/SortButtonRenderer.class": "d028dba15fa932d8550a866e786f3fa76eabd626205eaaad7da2dea6ed4de998",
+    "org/jfree/ui/Spinner.class": "1f14bdbd73600e58bd5dc187346f5b26d96b0b2b6f72f54bbcd96115fbe4a9d8",
+    "org/jfree/ui/StandardDialog.class": "7303d067e47ad2078b30ff91c9d2c93b1c3bc16bb66df88aee9ac856f5dfe6b7",
+    "org/jfree/ui/StandardGradientPaintTransformer.class": "ffd68d680eeb128433ae46da8ccc7616199431988a68c232d8c49d3fc8ce5daa",
+    "org/jfree/ui/StrokeChooserPanel$1.class": "75656976a9019d7790921112b3ad7b55922294f9c397359fc67e618cc0b41d91",
+    "org/jfree/ui/StrokeChooserPanel.class": "c94fd6c2d1617230e46a2e5f2bf4b6fd965d8dca58d5460a3dc735c1b4683c65",
+    "org/jfree/ui/StrokeSample.class": "99214ccae12a16db52af89ab479b65ec5f2e5cc93594562f0f21ed4dc4fc389e",
+    "org/jfree/ui/tabbedui/AbstractTabbedUI$ExitAction.class": "76c5cf5325a139700f77a8f6dd54e9a6cda118ce221221f47ad90d9bf9d0e10c",
+    "org/jfree/ui/tabbedui/AbstractTabbedUI$TabChangeHandler.class": "2a58a85b62d21c4402b93107e4dc54c3201472309ec8943d051604d94d15707f",
+    "org/jfree/ui/tabbedui/AbstractTabbedUI$TabEnableChangeListener.class": "e7b95d3c3c4ea76c1ec30d142fbfb198ce40f0aeeda3dd0a2369fb8204fbecdc",
+    "org/jfree/ui/tabbedui/AbstractTabbedUI.class": "3b60af468021a81c7a5de7f8d103e7a5c8957df9285213747952e92d05e4b534",
+    "org/jfree/ui/tabbedui/DetailEditor.class": "48e09323f2c106856b722b7d742fea8b4ba74bb8f9abe6fe7907e71e11c027e7",
+    "org/jfree/ui/tabbedui/RootEditor.class": "001ff81019435c2261eecf564e8f1440ace57a71d960f2a691d2c7bf932f104c",
+    "org/jfree/ui/tabbedui/RootPanel.class": "2e4d35910435229e24f7aa283ab8034f9370b870b6951b14301aa976ffa1b8c0",
+    "org/jfree/ui/tabbedui/TabbedApplet$MenuBarChangeListener.class": "3ad6e5a238cdbb922cf1dc5d98e7d2266c188d8d669229be361b83ab26bfefb2",
+    "org/jfree/ui/tabbedui/TabbedApplet.class": "7b43b98f5fcfdb4ad5c5b7447f7fd536380d1e80800db89c2aae1f0f0f765e9f",
+    "org/jfree/ui/tabbedui/TabbedDialog$1.class": "654bd76b527eecf90768718e29070d1017871518e71ceae9dfc38754f748ac28",
+    "org/jfree/ui/tabbedui/TabbedDialog$MenuBarChangeListener.class": "a58a8ce435891d1b11cf37119302e79b916a56507b173878b66c98e77eea0e58",
+    "org/jfree/ui/tabbedui/TabbedDialog.class": "865e84721416a20517376ee7ac172d01ddd0dba2db0739bdf62f0a0846b3eea2",
+    "org/jfree/ui/tabbedui/TabbedFrame$1.class": "023c16cfbaea41e76d90dd7a131c223e73523a31ad751ea1f427ffd80140cef8",
+    "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener.class": "5896779d3cf1bd332a9fed529b1ec2198c2a4e5cedb0271ebec278f0eea259e0",
+    "org/jfree/ui/tabbedui/TabbedFrame.class": "121d2cd03396e9ccf30ebf3f435886df2052f9bdf2f1760592438f058601fcb6",
+    "org/jfree/ui/tabbedui/VerticalLayout.class": "f8f2f0b0cd28e1311efa300077b906cc161db343a8b5addfdff384e3d2794bbb",
+    "org/jfree/ui/TextAnchor.class": "fd185d2e1daec0abd40b29aa6d944268e13362901124a7a103117cda8e57c0f4",
+    "org/jfree/ui/UIUtilities.class": "3579af7c90f32ec933987cb2a9ae9d3090609c67d5c5e650a4bb6b41eb8e6687",
+    "org/jfree/ui/VerticalAlignment.class": "2504ed0fa5f6a96a988fffdc4aa46e0b3cc600a6ea2b3cd17272d87a4ae3656d",
+    "org/jfree/ui/WizardDialog.class": "b8a9b0216b30654cb115ce4390519329b540284efb3405cc4ff53967d72a36f9",
+    "org/jfree/ui/WizardPanel.class": "c78c73280c3ee81076c50ea35dd883d749d287f3f94dc35d1d600a57985f7e2f",
+    "org/jfree/util/AbstractObjectList.class": "a61756af828e77b656e72ff106078e723edf49425c2b25fed7f234d86e927911",
+    "org/jfree/util/ArrayUtilities.class": "89786e724bfd3fe8491538e7e0a52bed54ba8b5baa426cb1265f6a9f4a737250",
+    "org/jfree/util/AttributedStringUtilities.class": "292f04b984d0659239a912e9b216f872a1f8df7cc48c2dbf5e7cf857fbcdb744",
+    "org/jfree/util/BooleanList.class": "bb8cceb90aab03069672011d76091a1d8d757425fe7dd67cc45bbd97200abb97",
+    "org/jfree/util/BooleanUtilities.class": "1a9acc218f87f3b7b916e5ab086f63241b6deb951292ee38881ca43e4e01fd91",
+    "org/jfree/util/ClassComparator.class": "a6d86dd3947370808d0f282c12513188f9fbe57203bea3bc1f4f80568e2daf70",
+    "org/jfree/util/Configuration.class": "e9a6dcddb1ac0078b87db9b38eb82ef472c87bdd46a589375c263f436d626c78",
+    "org/jfree/util/DefaultConfiguration.class": "6059f8b97e4f02133a540dcc36096fc1eefc5c39a5efac4ec5cd4ae45086565f",
+    "org/jfree/util/ExtendedConfiguration.class": "89bd8130dd2252bfb531441de898fa36b0db4a8482a0ee34dd4467a8aab53700",
+    "org/jfree/util/ExtendedConfigurationWrapper.class": "3fd9a40ec8919061efaa1cd4eab5950ad5a88a67ac6bb83bddcf507a802f5d2f",
+    "org/jfree/util/FastStack.class": "e705425a3f490be566307d25f156af0a2ab19494e9d6d21dac7b703e0db5fb4f",
+    "org/jfree/util/HashNMap$1.class": "2020643bd3bf9e3eb5ea267c28751b8d3606a345ba1c452b22ce9ec84418935a",
+    "org/jfree/util/HashNMap$EmptyIterator.class": "e679454a6fc3424b5a2c92b4376cddfddb038771513e56c5e0836f3da6ae7c34",
+    "org/jfree/util/HashNMap.class": "1273a647880437f238e8fdd8b2ce215e41f246a4e222e11a4d58af9fb307e162",
+    "org/jfree/util/LineBreakIterator.class": "526d943037f52fadaee3813ed4c1623e69939638b0ded974e6853243f31299d1",
+    "org/jfree/util/Log$SimpleMessage.class": "b914fc9cabd83e749b7ea124e9ae1b030a2d0f00af8a02dc230974ff133d8a8d",
+    "org/jfree/util/Log.class": "6f01fd400e904f2c76e44318e1d54d079706be0a1d694827171440d462ac223a",
+    "org/jfree/util/LogContext.class": "3fe10ec7e92dc5d88446dacec9b4469083c4ca0f3b6e404c0c02cd177586a123",
+    "org/jfree/util/LogTarget.class": "5bb6c45cbae26fc7d77a896910a01e8b738221892c60392eb9c9e3d11f56cbb5",
+    "org/jfree/util/ObjectList.class": "e1cdfe3be81c68d068d70db540212ca51c5711fb53ff9ea6451fe7e510bb148e",
+    "org/jfree/util/ObjectTable.class": "b65391a5b34b8f9c459fa26bb81cb499a0548d60556aad51d414febfa96660c7",
+    "org/jfree/util/ObjectUtilities.class": "3c1b6cfdce7debcf8f198caaabddf8e6687e2462ca0d6caefddad83d7749ec0f",
+    "org/jfree/util/PaintList.class": "7b3b21bb0b8485cd244ac0d6b135322f1e465c79f5de707920b45b607bf62cc3",
+    "org/jfree/util/PaintUtilities.class": "75ddfacc03c1d8c1d6630e8c392037e94dd18694595812334427ac8464d08895",
+    "org/jfree/util/PrintStreamLogTarget.class": "bf87b9076fc8eea5038d47669229f4a397978d8ecef62ad21cd31955946cf8e8",
+    "org/jfree/util/PublicCloneable.class": "a60f78d6c57333b724af163491ef3b0940e78382613c686782b9a00290fd1684",
+    "org/jfree/util/ReadOnlyIterator.class": "1b083a2474af18fc892f41771ebf83e81c1c559606f8909782d5f03ae1787c3d",
+    "org/jfree/util/ResourceBundleSupport.class": "fb876bcf533e7d3ff8caeecc8b5c53950440fd7bf77d3586071ebd1ab4f4eaa7",
+    "org/jfree/util/Rotation.class": "5086a2b4ef2e38fb057fb76349dc649b87d229e750771881f828191eed1fec2d",
+    "org/jfree/util/ShapeList.class": "b7be3769c16346a7b090955425e0082c1d506b42a25682a1bf7daa6d6f06cb86",
+    "org/jfree/util/ShapeUtilities.class": "1c45fd2ab360c6dcc73eded560e81b4fe94c0977b6406dbd21decd75fa1b18a8",
+    "org/jfree/util/SortedConfigurationWriter.class": "b64b35ba2fdaae914e5bbe755112542bb0346119117f9fa4fc58db0d34a396dd",
+    "org/jfree/util/SortOrder.class": "d77080d7d950ef1c7a37a4987fea52a8a5418e62757d4ebbdfd586e360ea66cf",
+    "org/jfree/util/StackableException.class": "4c5cb560411d259c907e47ca9bfcaa8c646f409e44a5134879100b1c15f9f23b",
+    "org/jfree/util/StackableRuntimeException.class": "62dcfdb166a8b0b192a7c709dcf4c8c025c26cbbdca89d20db07bc96c9df4a3d",
+    "org/jfree/util/StringUtils.class": "39bf6939aa7c0e260e9163ab03f655db225361ec1cbd48fb20df6daca4d65d38",
+    "org/jfree/util/StrokeList.class": "9a0e39bb8e08e674e03df834d00c02d28513b40f97a68a9be99ebf6f398a1a92",
+    "org/jfree/util/TableOrder.class": "7b86736751cba71eb851a13a833d7385bc16f91cf1039717bc4e73d208934b88",
+    "org/jfree/util/UnitType.class": "c0315cac49c444ea74dffdc8ebcc66a7a36091f80b04bdd6322038c17b667155",
+    "org/jfree/util/WaitingImageObserver.class": "82055b6dde68483f92405a6c6fd59951f381e8e7b98e149e115912e62ce45274"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "6f66ce34a8212ff8573c68369e23bc2b41e2c42a281c7a9786f5c3af9cfeee57",
+    "org/jfree/base/jcommon.properties": "3d245ed7d231dff5cdd263e6ddc580f9e4ae7ab26dfd3b1bdbbc05892d7462d1",
+    "org/jfree/base/log/module.properties": "2fdd3230fed4177d1e6a80f8b28a54f2e2234558228764ecf758d91563b223d8",
+    "org/jfree/ui/LocalizationBundle.properties": "49d0c6bfd2a8c6cc66f47166648e4e5197e524a57ca6b2ad5f39789911131d31",
+    "org/jfree/ui/LocalizationBundle_de.properties": "9662fb1fc18949b6a63543787e3ed2a6337ac10bbf8bdd3910296ed4e194f671",
+    "org/jfree/ui/LocalizationBundle_es.properties": "a1018a9ca7349c0ac75f43ddd2c36d4f70cd0849794ea4d5c20a72a19e4a3efa",
+    "org/jfree/ui/LocalizationBundle_fr.properties": "2050e11c966bc0819194bea30b7def1df689683e683f6ee4c83463b150318b1f",
+    "org/jfree/ui/LocalizationBundle_pt_PT.properties": "c91d14b3d48c9eeb9a62f382612aa5a33038ed035f380be5eab09e8e371b8937",
+    "META-INF/maven/jfree/jcommon/pom.xml": "eab9db3cd132b59e3adc15f6885c86ed77b50731d351dbba24c994bdb1ee5d3e",
+    "META-INF/maven/jfree/jcommon/pom.properties": "6005668e78ec750a316278963c8c39ddd027d6f43721efced00aa64da7b73fe8"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/keypoint/PngEncoder.class",
+      "occurrence": 0,
+      "sha256": "30953bed02fe8d17884761083e0beab3c8697724e3513ef80f8a0814b0cafb72",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/AbstractBoot.class",
+      "occurrence": 0,
+      "sha256": "61e4b79860cb22a0591b14d1389193f31b15954a82b7c84246705ce871f744ff",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/BaseBoot.class",
+      "occurrence": 0,
+      "sha256": "fce69621444839946f273d258172704c58bab47d2e75ce77eeafe20dc5200da7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/BasicProjectInfo$OptionalLibraryHolder.class",
+      "occurrence": 0,
+      "sha256": "d7d53432f5d9d759a1fa22f3678acd3cd684d45b9d1764346005cb3fd4988e92",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/BasicProjectInfo.class",
+      "occurrence": 0,
+      "sha256": "eb64cc8c53163a29d8cc37605a7dbab3aa1746fd7b9ca3c7bd090fd479c1f9e6",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/BootableProjectInfo.class",
+      "occurrence": 0,
+      "sha256": "0adec8260d745c27a28b10829b81ea98272e57b792fe10f48db4770b23370cd5",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/ClassPathDebugger.class",
+      "occurrence": 0,
+      "sha256": "00aaa05ee196970aa0eeaf7dc16ba8d9e960b7da61a9b3ae8cb38b79aeb07a54",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/config/HierarchicalConfiguration.class",
+      "occurrence": 0,
+      "sha256": "26908f2fad6a5558a112626047fa90cafc3466561a6d2db5a3917882efc58093",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/config/ModifiableConfiguration.class",
+      "occurrence": 0,
+      "sha256": "8def3587fa16f3efabb5732ce1c49334868ffcece45b90220f46e18e5cba1e60",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/config/PropertyFileConfiguration.class",
+      "occurrence": 0,
+      "sha256": "1f9c07198ef10f6bfe21076ec17c787a322712d3fcd955ce64e0d820f1ab2193",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/config/SystemPropertyConfiguration.class",
+      "occurrence": 0,
+      "sha256": "4a4692a32aede51b45e10710824a599fd03f0fbe9d5727864e0b85d64296d86e",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/Library.class",
+      "occurrence": 0,
+      "sha256": "dc8b0247ba8d103b3989cb8d1f048493e3d206740c285624e1df04407b44c9a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/log/DefaultLog.class",
+      "occurrence": 0,
+      "sha256": "30bcc691281a1cf328db2cbe7a080764f99a9dd6acd8bd8762cbd507d424c20a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/log/DefaultLogModule.class",
+      "occurrence": 0,
+      "sha256": "3b9df539f263cda3f16317556b8b05dd77723812ea1b6aa1acfb0d0dc982a520",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/log/LogConfiguration.class",
+      "occurrence": 0,
+      "sha256": "1a0a43fa0cca1e4d63a2ddd0eb3290cbbf6fa9b47c4331cd1a4087e00b61cbdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/log/MemoryUsageMessage.class",
+      "occurrence": 0,
+      "sha256": "91571781f9f2c4f5f99ea15d9780aa3bbc982bedbb45a0989e0cf61f23726491",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/log/PadMessage.class",
+      "occurrence": 0,
+      "sha256": "8820ea6c1dccf491d5d4ab77ff9708e471a890c1f5eb7365a29ae7c0dd8b0e0b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/AbstractModule$ReaderHelper.class",
+      "occurrence": 0,
+      "sha256": "7e7784fe63ef4e79df976deb73b9a340af72c1571f20f5bf3786d9ecdf474734",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/AbstractModule.class",
+      "occurrence": 0,
+      "sha256": "ec042a624f22257a2bab31bded7ce375a0e18bcc55b3ab2c641d881b683d1309",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/DefaultModuleInfo.class",
+      "occurrence": 0,
+      "sha256": "7fbe2f6209c122e244ad5ff9fe652315b22da151f7e16790b0f1b8cb8c6f0714",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/Module.class",
+      "occurrence": 0,
+      "sha256": "2d9cbb0134e7c48aa474d2f49da592d927dc2c7888633c7a66aa604bc9dd3cf8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/ModuleInfo.class",
+      "occurrence": 0,
+      "sha256": "f466f03cb3514105ff0ee997912b0ecbfe434ca0be75e3cf78eeb7cf61d11f91",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/ModuleInitializeException.class",
+      "occurrence": 0,
+      "sha256": "1484bbd71324f30b6481d749d1ef70da2e8eb5e839d6c6493d94bf8f3059e398",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/ModuleInitializer.class",
+      "occurrence": 0,
+      "sha256": "3325c069d5e64e13398d3aa584a0c95ae4c0d5f45e038d754ef17b3865bfa249",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/PackageManager$PackageConfiguration.class",
+      "occurrence": 0,
+      "sha256": "b1bd7e8b6ff4acc33d9e285d5e7b4343769530b924f10a68bdb252ae910a19e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/PackageManager.class",
+      "occurrence": 0,
+      "sha256": "c5df1367749d40f80edf7174cac1c0f40584a3d4b323a9eca0927c176d5f1a65",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/PackageSorter$SortModule.class",
+      "occurrence": 0,
+      "sha256": "1f9265df3636fde9b8868afea3bc2793cdd2dde898aec52f6d6f617911791fd9",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/PackageSorter.class",
+      "occurrence": 0,
+      "sha256": "e78e93c75de554b154c2672e1fbb01dbfe735ceb3bd5c7c96c1d8b84c1f4afb2",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/PackageState.class",
+      "occurrence": 0,
+      "sha256": "e8160f2d72223f1a28772ee8813e4d88f0ea61e5daa3cd37b68ac64e7a4b8c6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/base/modules/SubSystem.class",
+      "occurrence": 0,
+      "sha256": "4b3c6e2b0fb95fa4173f213075538ec9f6bb5d38416d361a24f90dd63e86c0d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/AnnualDateRule.class",
+      "occurrence": 0,
+      "sha256": "a43a80d05ad6b1b26a1a164eb56e03a5fd4b4088746a4e6be23f430e6b9bd6e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/DateUtilities.class",
+      "occurrence": 0,
+      "sha256": "f197552bf469b2d201d355cba9013bee50ae6edda8f3597082c1232896f737f7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/DayAndMonthRule.class",
+      "occurrence": 0,
+      "sha256": "52663d10f19b13e189d58c2b0e1255fc33752d85a1e903080510f60dcab1cdf7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/DayOfWeekInMonthRule.class",
+      "occurrence": 0,
+      "sha256": "905e23489d60f2e83f52b933a1e82aed6ff88a281f87c14826fa3c5ff36ded7c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/EasterSundayRule.class",
+      "occurrence": 0,
+      "sha256": "8c6cf3b15cfef21c81c93c9e054400858b96b7a15fcabd8591df904c3f01f967",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/MonthConstants.class",
+      "occurrence": 0,
+      "sha256": "560a5373df5f60730837f14894c3c5186307a63f88c3f22d1d3ead0c5d15329a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/RelativeDayOfWeekRule.class",
+      "occurrence": 0,
+      "sha256": "e661ae8fc0216a6977730c6afd83226722628b36075fdc5319eb52e4832adbaa",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/SerialDate.class",
+      "occurrence": 0,
+      "sha256": "1e6ff55e18381d624030fd36730c0e1a5e0851b58d162cb273f35df830a46193",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/SerialDateUtilities.class",
+      "occurrence": 0,
+      "sha256": "b21864c883f019593456b9611d4a8dad50cc581146d64b8bd79614ecc345af22",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/date/SpreadsheetDate.class",
+      "occurrence": 0,
+      "sha256": "b068e5562505e93c72ddb1db1ae1a0345e54fb66f4dad49eb75c6383b316cade",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/io/FileUtilities.class",
+      "occurrence": 0,
+      "sha256": "58fa77cc9bcc15d2b9bffa780094539badff4ffd2810c6fb47a6244e9987e29f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/io/IOUtils.class",
+      "occurrence": 0,
+      "sha256": "3aea55a223b46c9b408caf7285827d29f206c41823194c84d7f2e093ed87f7d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/io/SerialUtilities.class",
+      "occurrence": 0,
+      "sha256": "20ad45d5f116f9a9b684d522f170986166d7c18c246d75760e6732d53acf3935",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/JCommon.class",
+      "occurrence": 0,
+      "sha256": "10e12d2172cfef3daec0f36cb8c8e878e1692ceb3df6f922125d021ff6eff01a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/JCommonInfo.class",
+      "occurrence": 0,
+      "sha256": "70adc4d3cd1525c9aaf4122877f9339e3d765c57005fc0e5c33d37448369567d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/layout/CenterLayout.class",
+      "occurrence": 0,
+      "sha256": "0eaa60444ce52039a33034152de11767611f15797dd40057eefea22b194f580f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/layout/FormatLayout.class",
+      "occurrence": 0,
+      "sha256": "174bee9293a818328c5b38c751309e49cf7f1ddac3a48c3009b106331313d751",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/layout/LCBLayout.class",
+      "occurrence": 0,
+      "sha256": "b2bfba77a9f6bfda08210c5456f2cf8b75913d5ce6512b2578a1e40b77e77a49",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/layout/RadialLayout.class",
+      "occurrence": 0,
+      "sha256": "6142ee8d508ddfa7c31d6b1d65972c8ed1fb8a6d5dc760b313de21ca85e3801a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/resources/JCommonResources.class",
+      "occurrence": 0,
+      "sha256": "845bda3687421ebb74a1eea41a5a39ac67723d36e1900f709a96083bcd34542b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/G2TextMeasurer.class",
+      "occurrence": 0,
+      "sha256": "0bdba81409a0926f423f471cab99fa1bc52856cfeb56205f400356f96cc63250",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextBlock.class",
+      "occurrence": 0,
+      "sha256": "9f5dfec28e7c4f1d01c4753de899f6087905272d1d7c41853ea528d7e94bb611",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextBlockAnchor.class",
+      "occurrence": 0,
+      "sha256": "0e52723b54e84a44afcc529a309c8de8c12d0499f479cd07339a604a7542a08a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextBox.class",
+      "occurrence": 0,
+      "sha256": "d59968e9bb224cd1e31143a34a5a00a2281da1f18294fd5ab00382829aee614a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextFragment.class",
+      "occurrence": 0,
+      "sha256": "5f6884f59ca7ae9d4a90add935dcec2f82b5f33c4e6bae873936f332781d02a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextLine.class",
+      "occurrence": 0,
+      "sha256": "7498f33350bcd892421ee4582d318af9e316aa925c87d0ad8df43bc817d44c8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextMeasurer.class",
+      "occurrence": 0,
+      "sha256": "f748672c3b365a839871d0533e5ef53a11cf38d0a0e003024adead866fec2498",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/text/TextUtilities.class",
+      "occurrence": 0,
+      "sha256": "69eb0f8f85d27ce48a37e8af02b130a9a4855a324de43b38c2890fc02c736867",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/threads/ReaderWriterLock$1.class",
+      "occurrence": 0,
+      "sha256": "5a1dfec81f2d36df8a166162829087af4ad400a199e40c1ab312b4c879e53b5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/threads/ReaderWriterLock$ReaderWriterNode.class",
+      "occurrence": 0,
+      "sha256": "d442651bc9b484d955c484ddafe48918f36175befc30e01fed420d3134f99678",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/threads/ReaderWriterLock.class",
+      "occurrence": 0,
+      "sha256": "c55a5fd6f4629bf7776f02787b6a3d021511653b4b04515299f66c96355fef2f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/AboutDialog.class",
+      "occurrence": 0,
+      "sha256": "c77784244fcff7ac11e6e5687678f76d4760350a0baee7392c9692d78d540893",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/AboutFrame.class",
+      "occurrence": 0,
+      "sha256": "70eebc06f6549998316ed0b66217962648db6f51bff8ae083995a430e587c6e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/AboutPanel.class",
+      "occurrence": 0,
+      "sha256": "97591a58863eef6c31610d30f14c1252976bad8460112e72fc0762d98ff479e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/Contributor.class",
+      "occurrence": 0,
+      "sha256": "2ab624aa1682ca711d953ce7278dbef409e63c1a69c8ab532f694272f6042bd7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/ContributorsPanel.class",
+      "occurrence": 0,
+      "sha256": "00436c7f72e4da4730e89bb180ceea3377417dbbf2132d9878d28e9668da81cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/ContributorsTableModel.class",
+      "occurrence": 0,
+      "sha256": "f1f1435c0fd8ea2ac62cfd0f741a0d795079aa4a638da49189917e11afc1251a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/Library.class",
+      "occurrence": 0,
+      "sha256": "7d28a806d6557890d26e0f86935911340b33fabf60a315a095f96ef268f2304c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/LibraryPanel.class",
+      "occurrence": 0,
+      "sha256": "f15392bf63dc897fa653e848da1f735ef3fdb25cf7458497a212929b1d41c8f2",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/LibraryTableModel.class",
+      "occurrence": 0,
+      "sha256": "12389df10695a31ceccdf6b0629cbb02f09d44c230458af409b5dce40ed3b433",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/Licences.class",
+      "occurrence": 0,
+      "sha256": "f5aeec75e4da0948aef88c9a8ef83678e37a5e1f90fd45cca4d9e585f30faf71",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/ProjectInfo.class",
+      "occurrence": 0,
+      "sha256": "ef54971deaa20bbdfa26820bb37f0f93136d84694c99532ae18d670f20d53344",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/resources/AboutResources.class",
+      "occurrence": 0,
+      "sha256": "a4db1beb17f0faeb3a703b82363f85d9cdfe45544da5982f6e3249a7176aaae1",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/resources/AboutResources_de.class",
+      "occurrence": 0,
+      "sha256": "def63a2dcc77aec63b6164b88e67ed069ea4b083895e84badd6861a4ff9d184d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/resources/AboutResources_es.class",
+      "occurrence": 0,
+      "sha256": "0660fb50efdd67dfe317a5e094689f63cc503721b1c70773e9a3f4b2094f1f5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/resources/AboutResources_fr.class",
+      "occurrence": 0,
+      "sha256": "ad77e0e2c0cef57e62a42913b72657dc9a51389149a32daf0d49aba9d595a442",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/resources/AboutResources_pl.class",
+      "occurrence": 0,
+      "sha256": "115dd28ac6ca0848bea4a91f67f6cd4d22988b0d0c1302d8dfdb7eb4fefabafc",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemProperties.class",
+      "occurrence": 0,
+      "sha256": "23a3ad4da53137adbbcca370793ff8c5642a5e98640ffa76063e1e577f352d28",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesFrame.class",
+      "occurrence": 0,
+      "sha256": "39d0b165215fab935471eaca1c08cc4165179eca2ce58f1277d4a27ad521e491",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesPanel$1.class",
+      "occurrence": 0,
+      "sha256": "590e497cab66134c61b7e03d3c6730c78fc143442284b494ca5f084d3e532d6e",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/001.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesPanel$PopupListener.class",
+      "occurrence": 0,
+      "sha256": "83959db23973ba37bb7c9a684d2ccadf1947962cd17936a2dd1ed4b0ae34ed56",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesPanel.class",
+      "occurrence": 0,
+      "sha256": "2841877f7205ac7149e2a939e4333e8f5aca829fb123b33d49d8b78fbfecd105",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesTableModel$SystemProperty.class",
+      "occurrence": 0,
+      "sha256": "003bab4c332dff6f84313711d67f8a5cf350db0f2ab0672f7c458ce3d4ed5500",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesTableModel$SystemPropertyComparator.class",
+      "occurrence": 0,
+      "sha256": "69acc03e0f9abd177c1245dfeaa94b3fcd280e3447699f50d50d6f0d425d65ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/about/SystemPropertiesTableModel.class",
+      "occurrence": 0,
+      "sha256": "428c6b8ec74b4569d5edfcb666659a224b8b2f9a545e343445a55fd00860307a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/AbstractActionDowngrade.class",
+      "occurrence": 0,
+      "sha256": "623326882d57bb6127d93f949fce99b11e2b4131de9823249fa48f290a930c83",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/AbstractFileSelectionAction.class",
+      "occurrence": 0,
+      "sha256": "ad832bfe47e091d74542696df8b06da8452a50ab25494bbd2f4ba2b3d2b712be",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionButton$ActionEnablePropertyChangeHandler.class",
+      "occurrence": 0,
+      "sha256": "3a9a0852bc96e5662b0df556fe5e7e0232afd357614673f3189566802a7d46b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionButton.class",
+      "occurrence": 0,
+      "sha256": "67e2b54082b5710f00b317763c7335a68dd9c87b15fe10ff8353661a428f418c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionConcentrator.class",
+      "occurrence": 0,
+      "sha256": "731444ba7f8d9e68af24ed965cbfa4393446cceeb9ec35e4b10efdb930b6b9ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionDowngrade.class",
+      "occurrence": 0,
+      "sha256": "e6e095e262f62728b4744f033b163cddcb76469bf7b91dfc00a6ddebc268fbae",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionMenuItem$ActionEnablePropertyChangeHandler.class",
+      "occurrence": 0,
+      "sha256": "617c46d15688f50658e8ddf8955c58924341afc6c490400b2a6630520685ed5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionMenuItem.class",
+      "occurrence": 0,
+      "sha256": "6523c8a43bf5211b8764a23d28c53a7e48feead6f6b461ead37b663a3809a471",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionRadioButton$1.class",
+      "occurrence": 0,
+      "sha256": "62b6d45a310e4c51ced3305181f8d90eaa1c0a0f12f9c97917b6b12fca6bfa66",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionRadioButton$ActionEnablePropertyChangeHandler.class",
+      "occurrence": 0,
+      "sha256": "2bc87cac1eadeef2a5a858c8868ad95e9091048c8d92611eaf8b8bcc448c1fea",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/ActionRadioButton.class",
+      "occurrence": 0,
+      "sha256": "c03ddf7d482a8cd0bd0f8d651e6c6fe353a85e96d7a45bd6e6afb777531951f7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/action/DowngradeActionMap.class",
+      "occurrence": 0,
+      "sha256": "f2a5de9701ca378ff214132824028065928aabfc9a40ab8e9bac711cbe6069d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/Align.class",
+      "occurrence": 0,
+      "sha256": "f2298fa6bd67e72014413df375921279355f8c96c1b0f2ef32cb71507d6e9e4d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/ApplicationFrame.class",
+      "occurrence": 0,
+      "sha256": "5a0ecc303ecbdca7b0d587e718ffe9e085559475caf258175ae8d967f842773a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/ArrowPanel.class",
+      "occurrence": 0,
+      "sha256": "e9f1e508f8988d7ea99330fef51491567a0af1cad8cfb2b943eaa1daef055d88",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/BevelArrowIcon.class",
+      "occurrence": 0,
+      "sha256": "875a88b93b26cf7830783bbdc35834fe6cefd39ccfb86dbf34b6cc30cffcb99c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/DateCellRenderer.class",
+      "occurrence": 0,
+      "sha256": "a895195c2f39a54e26ea4140561fcf023b6b947cb61c7aed231ac64eb2b814d9",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/DateChooserPanel.class",
+      "occurrence": 0,
+      "sha256": "d8fa5ad14e7ba4da595aa20e351e3f44150453ef2b63cf22639767cd274a5a02",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/Drawable.class",
+      "occurrence": 0,
+      "sha256": "6a053d38f8f8106b0e6a36dffe6428b702b54e2317798d1ba0c989576d297521",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/DrawablePanel.class",
+      "occurrence": 0,
+      "sha256": "5e57499a5c42092e084aec289a9b90e3368d7e0bc750e05b6ed09769b93416f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/ExtendedDrawable.class",
+      "occurrence": 0,
+      "sha256": "d0144e2b2b97ac269c8c2775e2f710dc2690843f8d557746802b60afcf8e0cdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/ExtensionFileFilter.class",
+      "occurrence": 0,
+      "sha256": "48f8fe39e9d7c16865bfa4defd00cbf029181db7bf5bad8c144d322628bf498f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FilesystemFilter.class",
+      "occurrence": 0,
+      "sha256": "d9ae3daf956579f28c0a435d5467e57ebcf1ea2de96ea59216b1efd85722b7fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FloatDimension.class",
+      "occurrence": 0,
+      "sha256": "61946deb845b0697c467f01f0b67c0118d6cda4e201f117d6c7f8a54eae4344b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FloatingButtonEnabler.class",
+      "occurrence": 0,
+      "sha256": "b229a2594cf2be4e3c6161db477760a103aff8525d0857a6e05cb23fa7b1606f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FontChooserDialog.class",
+      "occurrence": 0,
+      "sha256": "cc3163a76363bbd8337137082262d54d3ebf1d6b3e7cf41c5264599c4c9ed1c8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FontChooserPanel.class",
+      "occurrence": 0,
+      "sha256": "2503ceaa519d85df6caa35b376eae3c67e98cb46d2c813e8753b3915f1ab18be",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/FontDisplayField.class",
+      "occurrence": 0,
+      "sha256": "7bfb347f64aef2e65b137f6422915d813c0a3e9a0ae94172ebb263b4ed4c8511",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/GradientPaintTransformer.class",
+      "occurrence": 0,
+      "sha256": "d7282777308db9f66e3134961c513b62f03ffee0a3d608de8b18bf2484f6f66b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/GradientPaintTransformType.class",
+      "occurrence": 0,
+      "sha256": "ac46f83e838f2b1e89b813ac3ef844b8c20e416f460ef2c477cc541d2f7c7a09",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/HorizontalAlignment.class",
+      "occurrence": 0,
+      "sha256": "a5111ae24bd7bbcbd2b810c5a02f03447ea65de878e9247ee627a7a226f894ed",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/InsetsChooserPanel.class",
+      "occurrence": 0,
+      "sha256": "332e16d11dee6072b10a5dd1ebd5690b4a778c44759cebabdd9928b13c7ae31e",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/InsetsTextField.class",
+      "occurrence": 0,
+      "sha256": "c567b7bbd6b6a4f76331f4e5046e4efef58537b5a219106cd358f9e874735d57",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/IntegerDocument.class",
+      "occurrence": 0,
+      "sha256": "48c1c4618549cd3af53f424b3c1749725d7f1135b7d2a2efbb6d6a9233dc2700",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/JTextObserver.class",
+      "occurrence": 0,
+      "sha256": "9fa69814b675c5fc6f9b12e839ac9faa2fc71a187bd7995bbec31c8c496ab9a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/KeyedComboBoxModel$ComboBoxItemPair.class",
+      "occurrence": 0,
+      "sha256": "354114f26a1bc48d338e6c1c512e8d7fd85719c69115f2b29bd4c15005436a88",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/KeyedComboBoxModel.class",
+      "occurrence": 0,
+      "sha256": "ff17ba5f405da2b543eef4cb2cdf5fa0b8e772b1f9999e8b24235ffef1376795",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/L1R1ButtonPanel.class",
+      "occurrence": 0,
+      "sha256": "734f88b10172afa52e4f0bec06c282b630e8a0ceb2a06835cbdf320d85bde0d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/L1R2ButtonPanel.class",
+      "occurrence": 0,
+      "sha256": "7f396d2370ed9e8d4f46706c2989315826b36c867b91503574cef6d77f5485ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/L1R3ButtonPanel.class",
+      "occurrence": 0,
+      "sha256": "ae5ed33984bf8c66994a69132cbfd2c225c6c92398a350aa265cb424f5fbbe64",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/Layer.class",
+      "occurrence": 0,
+      "sha256": "27e3aee15af579022c995b9d270605d0f51749a935ba5ce47b8f6e5fb6ac4907",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/LengthAdjustmentType.class",
+      "occurrence": 0,
+      "sha256": "84ae76c9795de482e240a428450b917c2d2b3dee7a46227d517945ec72c960ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/LengthLimitingDocument.class",
+      "occurrence": 0,
+      "sha256": "ea2cce942f7e4f8f96cc12f60479855030fa0d540235fbf35ff07acb9756aeec",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/NumberCellRenderer.class",
+      "occurrence": 0,
+      "sha256": "0ca2c7fa29de451beb7152e771f27029228f8f2fa20c8ddeb9fcb7da03b438f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/OverlayLayout.class",
+      "occurrence": 0,
+      "sha256": "3830b9a44b13dc99bdcad8910a48be5c97050ac5cda4ef0bf490d040e2888faa",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/PaintSample.class",
+      "occurrence": 0,
+      "sha256": "cfff1c3fb62348825d83a8e59a784c9b3371f5d7f097e39640ffaabd6aa3a9f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/RectangleAnchor.class",
+      "occurrence": 0,
+      "sha256": "9bd684d2a466e2575939dcb981888ac0d281076943c519f09f2bdb922e4ef7f1",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/RectangleEdge.class",
+      "occurrence": 0,
+      "sha256": "005acb5163e5a7befee743dbd8a8d7c99033566e23c6038466d626e6a1d6cd45",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/RectangleInsets.class",
+      "occurrence": 0,
+      "sha256": "8bf82e4e21a7c836c22f422546ddaa20c12cb97523f305fa83c7c978b3c358f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/RefineryUtilities.class",
+      "occurrence": 0,
+      "sha256": "f28ae5c4798fca42d8ed44e99192f1b4b693dffcaa5dd74837391d5de184b7a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/SerialDateChooserPanel.class",
+      "occurrence": 0,
+      "sha256": "549fe6daa4d0acfe41b89670ccbae87296234a75b640f7477dfbf811d7b45504",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/Size2D.class",
+      "occurrence": 0,
+      "sha256": "e33059f828298fee2bfb0e6c9d8c3dfaef90cd7b5bf387b480a4a660a61c8a60",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/SortableTable.class",
+      "occurrence": 0,
+      "sha256": "c122bc0c8f122a5c8bafaf32a84a370fc4fcbbde70ffe6ab960814658f8ac3d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/SortableTableHeaderListener.class",
+      "occurrence": 0,
+      "sha256": "9dbd1351a91606ee92b4d36bcb8db4546da938e10410482ccd809a18af2ced85",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/SortableTableModel.class",
+      "occurrence": 0,
+      "sha256": "64294af3de9fb8a7f463fb7b5e7f37e2f9453405ade08d5bda6001719b9f6f19",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/SortButtonRenderer.class",
+      "occurrence": 0,
+      "sha256": "d028dba15fa932d8550a866e786f3fa76eabd626205eaaad7da2dea6ed4de998",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/Spinner.class",
+      "occurrence": 0,
+      "sha256": "1f14bdbd73600e58bd5dc187346f5b26d96b0b2b6f72f54bbcd96115fbe4a9d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/StandardDialog.class",
+      "occurrence": 0,
+      "sha256": "7303d067e47ad2078b30ff91c9d2c93b1c3bc16bb66df88aee9ac856f5dfe6b7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/StandardGradientPaintTransformer.class",
+      "occurrence": 0,
+      "sha256": "ffd68d680eeb128433ae46da8ccc7616199431988a68c232d8c49d3fc8ce5daa",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/StrokeChooserPanel$1.class",
+      "occurrence": 0,
+      "sha256": "75656976a9019d7790921112b3ad7b55922294f9c397359fc67e618cc0b41d91",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/StrokeChooserPanel.class",
+      "occurrence": 0,
+      "sha256": "c94fd6c2d1617230e46a2e5f2bf4b6fd965d8dca58d5460a3dc735c1b4683c65",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/StrokeSample.class",
+      "occurrence": 0,
+      "sha256": "99214ccae12a16db52af89ab479b65ec5f2e5cc93594562f0f21ed4dc4fc389e",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/AbstractTabbedUI$ExitAction.class",
+      "occurrence": 0,
+      "sha256": "76c5cf5325a139700f77a8f6dd54e9a6cda118ce221221f47ad90d9bf9d0e10c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/AbstractTabbedUI$TabChangeHandler.class",
+      "occurrence": 0,
+      "sha256": "2a58a85b62d21c4402b93107e4dc54c3201472309ec8943d051604d94d15707f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/AbstractTabbedUI$TabEnableChangeListener.class",
+      "occurrence": 0,
+      "sha256": "e7b95d3c3c4ea76c1ec30d142fbfb198ce40f0aeeda3dd0a2369fb8204fbecdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/AbstractTabbedUI.class",
+      "occurrence": 0,
+      "sha256": "3b60af468021a81c7a5de7f8d103e7a5c8957df9285213747952e92d05e4b534",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/DetailEditor.class",
+      "occurrence": 0,
+      "sha256": "48e09323f2c106856b722b7d742fea8b4ba74bb8f9abe6fe7907e71e11c027e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/RootEditor.class",
+      "occurrence": 0,
+      "sha256": "001ff81019435c2261eecf564e8f1440ace57a71d960f2a691d2c7bf932f104c",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/RootPanel.class",
+      "occurrence": 0,
+      "sha256": "2e4d35910435229e24f7aa283ab8034f9370b870b6951b14301aa976ffa1b8c0",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedApplet$MenuBarChangeListener.class",
+      "occurrence": 0,
+      "sha256": "3ad6e5a238cdbb922cf1dc5d98e7d2266c188d8d669229be361b83ab26bfefb2",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedApplet.class",
+      "occurrence": 0,
+      "sha256": "7b43b98f5fcfdb4ad5c5b7447f7fd536380d1e80800db89c2aae1f0f0f765e9f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedDialog$1.class",
+      "occurrence": 0,
+      "sha256": "654bd76b527eecf90768718e29070d1017871518e71ceae9dfc38754f748ac28",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedDialog$MenuBarChangeListener.class",
+      "occurrence": 0,
+      "sha256": "a58a8ce435891d1b11cf37119302e79b916a56507b173878b66c98e77eea0e58",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedDialog.class",
+      "occurrence": 0,
+      "sha256": "865e84721416a20517376ee7ac172d01ddd0dba2db0739bdf62f0a0846b3eea2",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedFrame$1.class",
+      "occurrence": 0,
+      "sha256": "023c16cfbaea41e76d90dd7a131c223e73523a31ad751ea1f427ffd80140cef8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/002.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedFrame$MenuBarChangeListener.class",
+      "occurrence": 0,
+      "sha256": "5896779d3cf1bd332a9fed529b1ec2198c2a4e5cedb0271ebec278f0eea259e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/TabbedFrame.class",
+      "occurrence": 0,
+      "sha256": "121d2cd03396e9ccf30ebf3f435886df2052f9bdf2f1760592438f058601fcb6",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/tabbedui/VerticalLayout.class",
+      "occurrence": 0,
+      "sha256": "f8f2f0b0cd28e1311efa300077b906cc161db343a8b5addfdff384e3d2794bbb",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/TextAnchor.class",
+      "occurrence": 0,
+      "sha256": "fd185d2e1daec0abd40b29aa6d944268e13362901124a7a103117cda8e57c0f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/UIUtilities.class",
+      "occurrence": 0,
+      "sha256": "3579af7c90f32ec933987cb2a9ae9d3090609c67d5c5e650a4bb6b41eb8e6687",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/VerticalAlignment.class",
+      "occurrence": 0,
+      "sha256": "2504ed0fa5f6a96a988fffdc4aa46e0b3cc600a6ea2b3cd17272d87a4ae3656d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/WizardDialog.class",
+      "occurrence": 0,
+      "sha256": "b8a9b0216b30654cb115ce4390519329b540284efb3405cc4ff53967d72a36f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/ui/WizardPanel.class",
+      "occurrence": 0,
+      "sha256": "c78c73280c3ee81076c50ea35dd883d749d287f3f94dc35d1d600a57985f7e2f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/AbstractObjectList.class",
+      "occurrence": 0,
+      "sha256": "a61756af828e77b656e72ff106078e723edf49425c2b25fed7f234d86e927911",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ArrayUtilities.class",
+      "occurrence": 0,
+      "sha256": "89786e724bfd3fe8491538e7e0a52bed54ba8b5baa426cb1265f6a9f4a737250",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/AttributedStringUtilities.class",
+      "occurrence": 0,
+      "sha256": "292f04b984d0659239a912e9b216f872a1f8df7cc48c2dbf5e7cf857fbcdb744",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/BooleanList.class",
+      "occurrence": 0,
+      "sha256": "bb8cceb90aab03069672011d76091a1d8d757425fe7dd67cc45bbd97200abb97",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/BooleanUtilities.class",
+      "occurrence": 0,
+      "sha256": "1a9acc218f87f3b7b916e5ab086f63241b6deb951292ee38881ca43e4e01fd91",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ClassComparator.class",
+      "occurrence": 0,
+      "sha256": "a6d86dd3947370808d0f282c12513188f9fbe57203bea3bc1f4f80568e2daf70",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/Configuration.class",
+      "occurrence": 0,
+      "sha256": "e9a6dcddb1ac0078b87db9b38eb82ef472c87bdd46a589375c263f436d626c78",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/DefaultConfiguration.class",
+      "occurrence": 0,
+      "sha256": "6059f8b97e4f02133a540dcc36096fc1eefc5c39a5efac4ec5cd4ae45086565f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ExtendedConfiguration.class",
+      "occurrence": 0,
+      "sha256": "89bd8130dd2252bfb531441de898fa36b0db4a8482a0ee34dd4467a8aab53700",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ExtendedConfigurationWrapper.class",
+      "occurrence": 0,
+      "sha256": "3fd9a40ec8919061efaa1cd4eab5950ad5a88a67ac6bb83bddcf507a802f5d2f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/FastStack.class",
+      "occurrence": 0,
+      "sha256": "e705425a3f490be566307d25f156af0a2ab19494e9d6d21dac7b703e0db5fb4f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/HashNMap$1.class",
+      "occurrence": 0,
+      "sha256": "2020643bd3bf9e3eb5ea267c28751b8d3606a345ba1c452b22ce9ec84418935a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/HashNMap$EmptyIterator.class",
+      "occurrence": 0,
+      "sha256": "e679454a6fc3424b5a2c92b4376cddfddb038771513e56c5e0836f3da6ae7c34",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/HashNMap.class",
+      "occurrence": 0,
+      "sha256": "1273a647880437f238e8fdd8b2ce215e41f246a4e222e11a4d58af9fb307e162",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/LineBreakIterator.class",
+      "occurrence": 0,
+      "sha256": "526d943037f52fadaee3813ed4c1623e69939638b0ded974e6853243f31299d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/Log$SimpleMessage.class",
+      "occurrence": 0,
+      "sha256": "b914fc9cabd83e749b7ea124e9ae1b030a2d0f00af8a02dc230974ff133d8a8d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/Log.class",
+      "occurrence": 0,
+      "sha256": "6f01fd400e904f2c76e44318e1d54d079706be0a1d694827171440d462ac223a",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/LogContext.class",
+      "occurrence": 0,
+      "sha256": "3fe10ec7e92dc5d88446dacec9b4469083c4ca0f3b6e404c0c02cd177586a123",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/LogTarget.class",
+      "occurrence": 0,
+      "sha256": "5bb6c45cbae26fc7d77a896910a01e8b738221892c60392eb9c9e3d11f56cbb5",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ObjectList.class",
+      "occurrence": 0,
+      "sha256": "e1cdfe3be81c68d068d70db540212ca51c5711fb53ff9ea6451fe7e510bb148e",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ObjectTable.class",
+      "occurrence": 0,
+      "sha256": "b65391a5b34b8f9c459fa26bb81cb499a0548d60556aad51d414febfa96660c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ObjectUtilities.class",
+      "occurrence": 0,
+      "sha256": "3c1b6cfdce7debcf8f198caaabddf8e6687e2462ca0d6caefddad83d7749ec0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/PaintList.class",
+      "occurrence": 0,
+      "sha256": "7b3b21bb0b8485cd244ac0d6b135322f1e465c79f5de707920b45b607bf62cc3",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/PaintUtilities.class",
+      "occurrence": 0,
+      "sha256": "75ddfacc03c1d8c1d6630e8c392037e94dd18694595812334427ac8464d08895",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/PrintStreamLogTarget.class",
+      "occurrence": 0,
+      "sha256": "bf87b9076fc8eea5038d47669229f4a397978d8ecef62ad21cd31955946cf8e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/PublicCloneable.class",
+      "occurrence": 0,
+      "sha256": "a60f78d6c57333b724af163491ef3b0940e78382613c686782b9a00290fd1684",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ReadOnlyIterator.class",
+      "occurrence": 0,
+      "sha256": "1b083a2474af18fc892f41771ebf83e81c1c559606f8909782d5f03ae1787c3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ResourceBundleSupport.class",
+      "occurrence": 0,
+      "sha256": "fb876bcf533e7d3ff8caeecc8b5c53950440fd7bf77d3586071ebd1ab4f4eaa7",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/Rotation.class",
+      "occurrence": 0,
+      "sha256": "5086a2b4ef2e38fb057fb76349dc649b87d229e750771881f828191eed1fec2d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ShapeList.class",
+      "occurrence": 0,
+      "sha256": "b7be3769c16346a7b090955425e0082c1d506b42a25682a1bf7daa6d6f06cb86",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/ShapeUtilities.class",
+      "occurrence": 0,
+      "sha256": "1c45fd2ab360c6dcc73eded560e81b4fe94c0977b6406dbd21decd75fa1b18a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/SortedConfigurationWriter.class",
+      "occurrence": 0,
+      "sha256": "b64b35ba2fdaae914e5bbe755112542bb0346119117f9fa4fc58db0d34a396dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/SortOrder.class",
+      "occurrence": 0,
+      "sha256": "d77080d7d950ef1c7a37a4987fea52a8a5418e62757d4ebbdfd586e360ea66cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/StackableException.class",
+      "occurrence": 0,
+      "sha256": "4c5cb560411d259c907e47ca9bfcaa8c646f409e44a5134879100b1c15f9f23b",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/StackableRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "62dcfdb166a8b0b192a7c709dcf4c8c025c26cbbdca89d20db07bc96c9df4a3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/StringUtils.class",
+      "occurrence": 0,
+      "sha256": "39bf6939aa7c0e260e9163ab03f655db225361ec1cbd48fb20df6daca4d65d38",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/StrokeList.class",
+      "occurrence": 0,
+      "sha256": "9a0e39bb8e08e674e03df834d00c02d28513b40f97a68a9be99ebf6f398a1a92",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/TableOrder.class",
+      "occurrence": 0,
+      "sha256": "7b86736751cba71eb851a13a833d7385bc16f91cf1039717bc4e73d208934b88",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/UnitType.class",
+      "occurrence": 0,
+      "sha256": "c0315cac49c444ea74dffdc8ebcc66a7a36091f80b04bdd6322038c17b667155",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    },
+    {
+      "entry": "org/jfree/util/WaitingImageObserver.class",
+      "occurrence": 0,
+      "sha256": "82055b6dde68483f92405a6c6fd59951f381e8e7b98e149e115912e62ce45274",
+      "member_shard": "docs/dev/evidence/sqx145/members/051/003.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/051/001.json",
+      "sha256": "618fdf465a334610161367dfb09f55c609cb3a8ab592f5785d3bde92eddc3ccd"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/051/002.json",
+      "sha256": "879b2ddd12d2cf4f553bf83a8b6a4975d2c41fed49e3dc25c27834a9da2d3769"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/051/003.json",
+      "sha256": "2975dd9df47154b026b9a0f036bf80888ba9bce6d5ef110cb534e508dd914e88"
+    }
+  ]
+}

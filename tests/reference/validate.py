@@ -1,15 +1,17 @@
 """Qualify evidence lineage and proposed ownership without donor execution.
 
 Description:
-    Offline qualification validates current and historical schemas, relationships,
-    provenance and owner registries. The CLI optionally compares actual donor
-    bytes through the manifest service. Missing runtime authority remains blocked;
-    historical passes do not qualify the current tree. No stores are opened.
+    Offline qualification validates the current schema, relationships,
+    provenance, exact current source pins, complete member indices and owner registries. The CLI
+    optionally compares actual bytes for the explicitly configured current donor
+    through the manifest service. Missing runtime authority remains blocked;
+    static passes do not qualify runtime behavior. No stores are opened.
 
 Purpose:
     FEAT-HOST-EVIDENCE: Make reference integrity checks repeatable and reviewable.
-    Implements DEC-HOST-P00-HISTORICAL-EVIDENCE, DEC-HOST-P00-SCHEMA-EVOLUTION,
+    Implements DEC-HOST-SQX145-REFERENCE, DEC-HOST-P00-SCHEMA-EVOLUTION,
     DEC-HOST-P00-REGISTRY-BOUNDARY and DEC-HOST-P00-VALIDATION-DEPENDENCY.
+    Current source/member checks follow DEC-HOST-SQX145-BYTE-IDENTITY.
 
 Key Capabilities:
     - FR-HOST-EVIDENCE-LEDGER-INTEGRITY: Check schemas, lineage and observation kinds.
@@ -60,6 +62,8 @@ from tests.reference.manifest import (
     load_manifest,
     logical_locator,
     read_json,
+    reconcile_metadata,
+    repository_source,
     resolve_locator,
     resolve_roots,
     verify_inventory,
@@ -170,17 +174,16 @@ def _source_checks(
             if entry["root"] is not None:
                 try:
                     locator = source["artifact_locator"]
-                    # Historical directory notation retains its original trailing /.
-                    logical_locator(locator if current else locator.rstrip("/"))
+                    logical_locator(locator)
                 except EvidenceError:
                     issues.append(_issue("SOURCE_LOCATOR", identity))
+                    continue
             if current and not any(source["location"].values()):
                 issues.append(_issue("SOURCE_LOCATION", identity))
             if current and entry["root"] == "HARUQUANTAI_ROOT":
                 try:
-                    actual = fingerprint(
-                        resolve_locator(root, source["artifact_locator"])
-                    )
+                    path = resolve_locator(root, source["artifact_locator"])
+                    actual = fingerprint(path)
                     if (
                         source["fingerprint"] is None
                         or actual != source["fingerprint"]["value"]
@@ -188,6 +191,30 @@ def _source_checks(
                         issues.append(_issue("SOURCE_HASH", identity))
                 except EvidenceError:
                     issues.append(_issue("SOURCE_ARTIFACT", identity))
+    return issues
+
+
+def _proposal_checks(
+    record: dict[str, Any], root: Path, identity: str
+) -> list[ValidationIssue]:
+    """Resolve explicit proposal mappings and deny unratified runtime passes."""
+    logger.debug("%s: proposal", LEDGER_FR, extra={"fr_id": LEDGER_FR})
+    ownership = cast(
+        "dict[str, Any]", read_json(root / EVIDENCE_DIRECTORY / "p00-ownership.json")
+    )
+    proposals = {
+        p["feature_id"]
+        for p in ownership["feature_proposals"]
+        + ownership["additional_resource_features"]
+    }
+    issues = []
+    if not set(record["target_mapping"]["feature_ids"]) <= proposals:
+        issues.append(_issue("PROPOSED_MAPPING", identity))
+    if (
+        record["validation"]["state"] == "passed"
+        and record["validation"]["kind"] == "runtime"
+    ):
+        issues.append(_issue("PROPOSED_RUNTIME_PASS", identity))
     return issues
 
 
@@ -208,8 +235,11 @@ def _current_checks(records: dict[str, Any], root: Path) -> list[ValidationIssue
             + mapping["requirement_ids"]
             + mapping["decision_ids"]
         )
-        if not set(mapped_ids) <= registered:
-            issues.append(_issue("REGISTRY_ID", identity))
+        if mapping["registration_status"] == "registered":
+            if not set(mapped_ids) <= registered:
+                issues.append(_issue("REGISTRY_ID", identity))
+        else:
+            issues.extend(_proposal_checks(record, root, identity))
         validation = record["validation"]
         if validation["state"] == "passed":
             if not validation["artifact_paths"]:
@@ -225,7 +255,7 @@ def _current_checks(records: dict[str, Any], root: Path) -> list[ValidationIssue
 
 
 def validate_evidence(repository: Path) -> list[ValidationIssue]:
-    """Validate both generations and global IDs without promoting history."""
+    """Validate sole-current schema, identities, sources and member metadata."""
     logger.debug("%s: begin", LEDGER_FR, extra={"fr_id": LEDGER_FR})
     directory = resolve_locator(repository, EVIDENCE_DIRECTORY)
     ledger = cast("dict[str, Any]", read_json(directory / "reimplementation.json"))
@@ -234,45 +264,56 @@ def validate_evidence(repository: Path) -> list[ValidationIssue]:
     )
     if _schema_errors(ledger, schema):
         return [_issue("LEDGER_SCHEMA")]
-    history = ledger["historical_snapshot"]
-    old_path = resolve_locator(repository, history["ledger_locator"])
-    old_schema_path = resolve_locator(repository, history["schema_locator"])
-    if (
-        fingerprint(old_path) != history["ledger_sha256"]
-        or fingerprint(old_schema_path) != history["schema_sha256"]
-    ):
-        return [_issue("HISTORY_HASH")]
-    old = cast("dict[str, Any]", read_json(old_path))
-    old_schema = cast("dict[str, Any]", read_json(old_schema_path))
-    if _schema_errors(old, old_schema):
-        return [_issue("HISTORY_SCHEMA")]
+    records = ledger["records"]
+    numbers = [int(k.rsplit("-", 1)[1]) for k in records]
     issues: list[ValidationIssue] = []
-    historical = old["records"]
-    current = ledger["records"]
-    if set(historical) & set(current):
-        issues.append(_issue("RECORD_ID_COLLISION"))
-    maximum = max(int(k.rsplit("-", 1)[1]) for k in historical)
-    if history["maximum_id"] != maximum or any(
-        int(k.rsplit("-", 1)[1]) <= maximum for k in current
+    if (
+        not numbers
+        or min(numbers) < ledger["minimum_record_number"]
+        or max(numbers) > ledger["allocation_high_water_mark"]
     ):
         issues.append(_issue("RECORD_ID_ALLOCATION"))
     issues.extend(
-        _source_checks(historical, old["source_catalog"], repository, current=False)
+        _source_checks(records, ledger["source_catalog"], repository, current=True)
     )
-    issues.extend(
-        _source_checks(current, ledger["source_catalog"], repository, current=True)
-    )
-    issues.extend(_current_checks(current, repository))
-    issues.extend(_relationships({**historical, **current}))
+    issues.extend(_current_checks(records, repository))
+    issues.extend(_relationships(records))
+    try:
+        issues.extend(_current_source_bindings(repository, ledger))
+        reconcile_metadata(repository, directory / "sqx145/metadata.json")
+    except EvidenceError as error:
+        issues.append(_issue(str(error)))
     logger.info(
-        "%s: checked",
+        "%s: checked current records",
         LEDGER_FR,
-        extra={
-            "fr_id": LEDGER_FR,
-            "historical": len(historical),
-            "current": len(current),
-        },
+        extra={"fr_id": LEDGER_FR, "records": len(records)},
     )
+    return issues
+
+
+def _current_source_bindings(
+    repository: Path, ledger: dict[str, Any]
+) -> list[ValidationIssue]:
+    """Bind local-source fingerprints to current archive/resource observations."""
+    logger.debug("%s: current source binding", LEDGER_FR, extra={"fr_id": LEDGER_FR})
+    directory = repository / EVIDENCE_DIRECTORY
+    manifest = load_manifest(directory / "p00-inventory.json")
+    expected = {a.locator: a.sha256 for a in manifest.artifacts}
+    resources = read_json(directory / "sqx145/resources-145.json")
+    files = cast("list[dict[str, Any]]", resources["files"])
+    for row in files:
+        if row["locator"] in expected:
+            return [_issue("SOURCE_INVENTORY_DUPLICATE")]
+        expected[row["locator"]] = row["sha256"]
+    issues = []
+    for identity, record in ledger["records"].items():
+        for source in record["sources"]:
+            catalog = ledger["source_catalog"].get(source["catalog_id"])
+            if catalog is None or catalog["root"] != "SQX_145_REFERENCE_ROOT":
+                continue
+            pin = source["fingerprint"]
+            if pin is None or expected.get(source["artifact_locator"]) != pin["value"]:
+                issues.append(_issue("SOURCE_DONOR_BINDING", identity))
     return issues
 
 
@@ -330,11 +371,11 @@ def _roadmap_checks(
     logger.debug("%s: roadmap", OWNER_FR, extra={"fr_id": OWNER_FR})
     issues = []
     seeds = ownership["requirement_seeds"]
-    roadmap = resolve_locator(repository, manifest.roadmap.locator).read_text(
+    roadmap = repository_source(repository, manifest.roadmap).read_text(
         encoding="utf-8"
     )
     if (
-        fingerprint(resolve_locator(repository, manifest.roadmap.locator))
+        fingerprint(repository_source(repository, manifest.roadmap))
         != manifest.roadmap.sha256
     ):
         issues.append(_issue("ROADMAP_HASH"))

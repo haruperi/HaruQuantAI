@@ -1,240 +1,313 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only SettingsCrossChecks recursive bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsCrossChecks",
-    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
-    "review":  {
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan",
-                   "version":  1
-               },
-    "owner":  {
-                  "domain":  "plugins/project",
-                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
-                  "decision":  "DEC-UI-PROJECT-CROSSCHECKS-STRUCTURAL-OWNERSHIP",
-                  "requirements":  [
-                                       "FR-UI-PROJECT-source-mapping",
-                                       "FR-UI-PROJECT-workflow-preservation",
-                                       "FR-UI-PROJECT-clean-room"
-                                   ]
-              },
-    "clean_room":  {
-                       "paraphrased_behavior_only":  true,
-                       "contains_personal_data":  false,
-                       "contains_sensitive_data":  false,
-                       "contains_proprietary_source":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-settingscrosschecks-ui",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks",
-                               "family":  "bounded installed project-settings frontend artifacts"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossCheckAcceptanceSettings.html",
-                        "relative_path":  "crossCheckAcceptanceSettings.html",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "22ffc754735ffee11c364b274c2f8b5dcecc3b254ca969426981d40e81ab090e",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No existing acceptance-condition editor; current Filters dialog only toggles Enabled."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsCtrl.js",
-                        "relative_path":  "CrossCheckAcceptanceSettingsCtrl.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "8073faf12e40bdb4e97b24e8ac048e313946a6ab2ccd213d84a182c0c8581bae",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No existing acceptance-condition controller, validation or grid state."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js",
-                        "relative_path":  "CrossCheckAcceptanceSettingsService.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "21e1d8422ecb87b6c5993ae26e0f9c0e58c0472b241a6d625674d8fc6c3fe289",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No native acceptance XML/schema/service counterpart."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossChecks.html",
-                        "relative_path":  "crossChecks.html",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "6f15852a8e623e22fc7ef8220ba42ce18d37c68d9c62a592f48f3338bdb4ba05",
-                        "target":  "crossChecks.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksCtrl.js",
-                        "relative_path":  "CrossChecksCtrl.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "f512797183ce7092fa2da090f21b42e58a0ece30dd7c8a9b93f79f9adb49ba84",
-                        "target":  "CrossChecksCtrl.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossCheckSettingsDialog.html",
-                        "relative_path":  "crossCheckSettingsDialog.html",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "7bc46f41271b8d0aee252a26c6cb3485778702b29bdee25b50dfd112d7d2ad26",
-                        "target":  "crossCheckSettingsDialog.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js",
-                        "relative_path":  "CrossChecksService.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "d15225f1c89d739ad639194809f731199569f88b80547d4f22161f0dfc815e8b",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No native cross-check catalogue/XML/backend service; local drafts remain independent."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "75d8a929ba5805e5a7dda8252f597a1f246e2c460f0ffa46d99d1306ceb536b5",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
-                        "relative_path":  "SettingsCrossChecks.jar",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "090d0d2f0a10bbbdb3b25602651594239b72033aa3e2588779040f6977faa51e",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend binary outside approved frontend scope."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/styles.css",
-                        "relative_path":  "styles.css",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "c8dbd15e0dabbea1107ba8149592dd78b05fd76fe14d5e0ea9ebcab77516a35e",
-                        "target":  "styles.css",
-                        "classification":  "counterpart",
-                        "limitation":  "Coordinator-owned independent retained unique style subset; creation and cascade verification pending integration."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/crossCheck.html",
-                        "relative_path":  "crosscheck/crossCheck.html",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "independently authored target structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "fdb6da183092c1cda622bdde88f8efdef6d09877e720f6524586b18fb2441671",
-                        "target":  "crosscheck/crossCheck.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/CrossCheck.js",
-                        "relative_path":  "crosscheck/CrossCheck.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "827199aef8b5f2eb8ba8c0a9641b94adaacad617c678e12a9e12b7065682a341",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Angular registration has no separate target responsibility; existing React row is directly composed."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/CrossCheckCtrl.js",
-                        "relative_path":  "crosscheck/CrossCheckCtrl.js",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "82d612be39a363af623b7926055c91cb87410e5af68f6079f61e24411078cd75",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Native unique-ID lifecycle and imperative bridge absent; retained row callbacks belong parent controller."
-                    },
-                    {
-                        "catalog_id":  "sqx-settingscrosschecks-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/styles.css",
-                        "relative_path":  "crosscheck/styles.css",
-                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
-                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
-                        "relation":  "justified exclusion from existing responsibilities",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "e4244f03887bb6398244b01406d78ce6f39d3961ddea5226bec5332a394aa883",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No current disabledLink counterpart; adding pointer-events restrictions changes preserved clickable links."
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Bounded structural manifest, not behavioral ledger."
-                        }
-                    ],
-    "external_dependencies":  [
-                                  {
-                                      "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/settings/sharedSettingsFixtures.ts",
-                                      "reason":  "Shared independent settings defaults/types and cross-consumers remain unchanged."
-                                  },
-                                  {
-                                      "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx",
-                                      "reason":  "Existing shared Escape/backdrop/modal shell unchanged."
-                                  }
-                              ],
-    "limitations":  [
-                        "Canonical behavioral ledger/schema absent; no new evidence IDs or parity claims.",
-                        "Existing mounted drafts, task filtering, session snapshots and formatting/Save feedback remain local prototype behavior.",
-                        "Coordinator CSS, registry and facade integration pending."
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only SettingsCrossChecks recursive bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsCrossChecks",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "decision": "DEC-UI-PROJECT-CROSSCHECKS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-settingscrosschecks-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks",
+      "family": "bounded installed project-settings frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossCheckAcceptanceSettings.html",
+      "relative_path": "crossCheckAcceptanceSettings.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "265ca5f5320f4b042371bee09c5c1f079833b4cb331358991d8684d4676e263e",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing acceptance-condition editor; current Filters dialog only toggles Enabled. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsCtrl.js",
+      "relative_path": "CrossCheckAcceptanceSettingsCtrl.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "b75f3eb754188a59abd49646cefdcaf4fa230f5bda39dad6126b66ea0ae7221b",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing acceptance-condition controller, validation or grid state. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js",
+      "relative_path": "CrossCheckAcceptanceSettingsService.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "44397526015f4f73553e553831471c517dfe7601fa5bd6f2963217dfb93268e9",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No native acceptance XML/schema/service counterpart. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossChecks.html",
+      "relative_path": "crossChecks.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "c466b2ddb8714c32b43415a401a2121e7d1154c6f85ae774cc76a9c50ffc352a",
+      "target": "crossChecks.tsx",
+      "classification": "counterpart",
+      "limitation": "Independently authored retained prototype responsibility only; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksCtrl.js",
+      "relative_path": "CrossChecksCtrl.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "1782a6aa5017f015f76facd65799ce5bef2e4953ceb46d594bbe4b581bdde6f0",
+      "target": "CrossChecksCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Independently authored retained prototype responsibility only; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crossCheckSettingsDialog.html",
+      "relative_path": "crossCheckSettingsDialog.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "3b5837682f7d3202eae1c462ce413453e28532cfba2840e0f27a0483f94595c2",
+      "target": "crossCheckSettingsDialog.tsx",
+      "classification": "counterpart",
+      "limitation": "Independently authored retained prototype responsibility only; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js",
+      "relative_path": "CrossChecksService.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "5e0e09b82e19fe7a2b276c99b81e1e2790349beae1c84f1306d1e0aee759f6ff",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No native cross-check catalogue/XML/backend service; local drafts remain independent. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "279b70e8c34c3ea2281633ccfedabfd09965777178c194df0692f7d3fc3eaf6b",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Independently authored retained prototype responsibility only; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+      "relative_path": "SettingsCrossChecks.jar",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "12ed3ab90da9476cdd55e57d00d67ef8f913a0af4963abe3a54070c03dc3515e",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary outside approved frontend scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "6ea394d9cb563e7e4e751af8ff4125a22bee785b484223a671480dc3c2c512e3",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Coordinator-owned independent retained unique style subset; creation and cascade verification pending integration. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/crossCheck.html",
+      "relative_path": "crosscheck/crossCheck.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "34e1f317c6019bef66797e070fd8063f36dd507a3c5f9759794dada26f541542",
+      "target": "crosscheck/crossCheck.tsx",
+      "classification": "counterpart",
+      "limitation": "Independently authored retained prototype responsibility only; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/CrossCheck.js",
+      "relative_path": "crosscheck/CrossCheck.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "54ebb9f3415fd57550699c1c3a72513d8b794bb84ca1954d2a6ae63f6ebd5dcd",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Angular registration has no separate target responsibility; existing React row is directly composed. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/CrossCheckCtrl.js",
+      "relative_path": "crosscheck/CrossCheckCtrl.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "3cb6232dd6891f419b6c7f68275e9bff0958a346fb55cce245865e626ab58972",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Native unique-ID lifecycle and imperative bridge absent; retained row callbacks belong parent controller. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-settingscrosschecks-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/crosscheck/styles.css",
+      "relative_path": "crosscheck/styles.css",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "justified exclusion from existing responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "9d9b866a2c023caebb9db762b18b3cf605759a5172e06bab80758810233ffe87",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No current disabledLink counterpart; adding pointer-events restrictions changes preserved clickable links. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger."
+    }
+  ],
+  "external_dependencies": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/settings/sharedSettingsFixtures.ts",
+      "reason": "Shared independent settings defaults/types and cross-consumers remain unchanged."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx",
+      "reason": "Existing shared Escape/backdrop/modal shell unchanged."
+    }
+  ],
+  "limitations": [
+    "Canonical behavioral ledger/schema absent; no new evidence IDs or parity claims.",
+    "Existing mounted drafts, task filtering, session snapshots and formatting/Save feedback remain local prototype behavior.",
+    "Coordinator CSS, registry and facade integration pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

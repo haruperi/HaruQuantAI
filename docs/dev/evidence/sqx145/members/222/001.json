@@ -1,0 +1,771 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+  "archive_sha256": "f35a0ece39d090656ace5996fadc12ae1c0ddfd028952054f2b8c6ddf801964a",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/WalkForward/WFParamsExport.class",
+      "occurrence": 0,
+      "sha256": "e2263776eba7ed388f4d648d59f306c34b23153dcfbd3f92cc33ed83854ec507",
+      "name": "com/strategyquant/plugin/Results/impl/WalkForward/WFParamsExport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toXlsx",
+          "descriptor": "(Ljava/lang/String;ZLcom/strategyquant/tradinglib/WalkForwardResult;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)V",
+          "access": 1,
+          "code_sha256": "03613fe1dd953198e649c2144289f33d1d19285201394e80c460c8b94d6e5d1a",
+          "code_length": 936
+        },
+        {
+          "name": "toCsv",
+          "descriptor": "(Ljava/lang/String;ZLcom/strategyquant/tradinglib/WalkForwardResult;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)V",
+          "access": 1,
+          "code_sha256": "463caf98540aeb980a554d36ba6f8fba703d191cd4671b1f9fe44cd2532c445a",
+          "code_length": 644
+        },
+        {
+          "name": "formatValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/databank/DatabankTableColumnEntry;Ljava/lang/String;Z)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c1cbb49533e02da619043f608a85118cc77045bf36a8b7605059e29d380d720f",
+          "code_length": 149
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "07d47387a4206be1273e22ec927a231a7fe582f4f61126230d9eb03f6cb87480",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/plugin/Results/impl/WalkForward/WFParamsExport",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/io/FileOutputStream",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "org/apache/poi/ss/usermodel/Cell",
+        "org/apache/poi/ss/usermodel/CellStyle",
+        "org/apache/poi/ss/usermodel/Font",
+        "org/apache/poi/ss/usermodel/IndexedColors",
+        "org/apache/poi/ss/usermodel/Row",
+        "org/apache/poi/ss/usermodel/Sheet",
+        "org/apache/poi/ss/usermodel/Workbook",
+        "org/apache/poi/xssf/usermodel/XSSFWorkbook",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardPlugin.class",
+      "occurrence": 0,
+      "sha256": "1f16a63c9821c627c9b4fc062a8fa109d10d6fec641319bc620163e6653a7b5b",
+      "name": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "7cfd60e919e56e32a7ddadb4903528cb9a71e94b6d53c35eb1e9491183db5271",
+          "code_length": 23,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "498ce7904e460308111cf0147c24f419248cfe0e342ea1acfff9fd15e1c15292",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardPlugin",
+        "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/optimization/WalkForwardMatrixResult",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet.class",
+      "occurrence": 0,
+      "sha256": "4fda18764b4bf6c1ea20c0c7a6fdb8c9c92e8bf539140eab55d3f67139d79659",
+      "name": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_WFSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "views",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/WalkForward/views/WFViews;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "26b06249f4037def7353d5014cc916e92a57df9ae3112c87f1c752a8e7788073",
+          "code_length": 41
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c21c4827bbe2dcf63193c2adefbe6c72830d2e1010066ced982342bf5cce4a85",
+          "code_length": 254,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onExport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "aa238c3c4b6eae219acdf9b2a91feccfb6118f98896881e4e98e82f1c89fe1e3",
+          "code_length": 350,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetConditions",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "fe1a579e29d6034088ebd8bcfd29e3704b30bcb3ca833f2cc360d1b5328859e8",
+          "code_length": 252,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "b2c6511b721c11b638e8a9c5fd5863a251037ab484478507c020d6d7a42c455d",
+          "code_length": 546,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getConditionsEl",
+          "descriptor": "(Lcom/strategyquant/tradinglib/optimization/WalkForwardMatrixResult;Ljava/lang/String;IIII)Lorg/jdom2/Element;",
+          "access": 2,
+          "code_sha256": "87294316b055abed5984d6db189e361dc311833038c4a7c7a73502463acc930d",
+          "code_length": 330
+        },
+        {
+          "name": "paramsChanged",
+          "descriptor": "(Lcom/strategyquant/tradinglib/optimization/WalkForwardMatrixResult;Ljava/util/ArrayList;IIII)Z",
+          "access": 2,
+          "code_sha256": "4d705350825298a2b3317c148d60fdf0472dae5fd4f3e8498d1961bc487a7710",
+          "code_length": 134,
+          "generic_signature": "(Lcom/strategyquant/tradinglib/optimization/WalkForwardMatrixResult;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/conditions/Condition;>;IIII)Z"
+        },
+        {
+          "name": "printRobustnessResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/optimization/WalkForwardMatrixResult;Ljava/lang/String;I)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "2a0ea30f0bb15c8e72edb44fae601e594bfacd645e5a1000cb209163ff145161",
+          "code_length": 259,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printConditionsTable",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/WalkForwardResult;Lorg/jdom2/Element;Ljava/util/ArrayList;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "23e6b093f359f2d4514045f47670bda632a2a51b28234362126f8101b594b8c9",
+          "code_length": 239,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/WalkForwardResult;Lorg/jdom2/Element;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/conditions/Condition;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrintCellConditions",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "0670716e10fa3eccbca96f8fe38f01ba641f4a2a5a57c7e35ea59d8f6253a914",
+          "code_length": 604,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "printChart",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/optimization/WalkForwardMatrixResult;Lorg/jdom2/Element;Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "a58d3d845572c003c2ee9692bd091a93427657555564c766709b886f03a2cd61",
+          "code_length": 901,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onPrintTable",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "e01c867d4f095a4eb7ac120836d53697b6d07b887203a889e5e41b4d1fa32117",
+          "code_length": 336,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "printTable",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;Lcom/strategyquant/tradinglib/databank/DatabankTableView;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "7fbf79fe488daac5b4d34b2b08cdba3e5061dc2c24c950bef580b442473e228a",
+          "code_length": 449
+        },
+        {
+          "name": "printHtmlFormatedValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/DatabankColumn;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e44fe741bd1c78e37f428a21bd2270261c453822244229d924264c770d8316ed",
+          "code_length": 41,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bf2ebd47ff6dff4391238a1e191e99a8f01774b6feb94fe0fc9903227e73b33e",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/plugin/Results/impl/WalkForward/WFParamsExport",
+        "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet",
+        "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViews",
+        "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+        "com/strategyquant/tradinglib/CustomCellFormat",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/conditions/IConditionValue",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckDataNotExistException",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/optimization/OptimizationConst",
+        "com/strategyquant/tradinglib/optimization/WalkForwardColumns",
+        "com/strategyquant/tradinglib/optimization/WalkForwardMatrixResult",
+        "com/strategyquant/tradinglib/optimization/WalkForwardParametersStability",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViews.class",
+      "occurrence": 0,
+      "sha256": "fafc82b70dc0f116c2a4750c01dd060d5bdeabd1b93fed79724b02524861ecdb",
+      "name": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViews",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "manager",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cf1aabe1e7cdf31c3983732c0a00731725cfddf245690b50addf202cd1fa2928",
+          "code_length": 17
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2f46780d2503a2c31af23ce9b92e1fb1b164191057f89757771df01b214dfc16",
+          "code_length": 232,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetColumns",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "79ef22b173466c6bc3adc237380bc258b9bafb23148f3d533c23e6c34fab569f",
+          "code_length": 130
+        },
+        {
+          "name": "onGetViews",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "72159647114b5d30efe2307120d3a24f95142c4d1ef820fc8ff3d1edbeafe551",
+          "code_length": 328,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAddView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d76fb34f01aacde2f03a21d8312ba26f1dc8068dfbb1c400218ef310f22dd1cc",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0414c3b94efcdc40583b508cef08505d581269de2191b1e649300665695c1f32",
+          "code_length": 70,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5c9c841136c3504b005ac7dec04afb5e4990706e138131751ab61d14632ab32a",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "tryGetParam",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "427244f28fadb1cdb40e8a266af4b2364c908ef65ea3bd1f7e1d1443a0a26815",
+          "code_length": 53,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)[Ljava/lang/String;"
+        },
+        {
+          "name": "getViewByName",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "69f5ad4db13a5bde94d181598e06affbeceb6e6be35f3d8a8a3de1a1ae53e9c2",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0b71e9cb8de285e9491b20df1d65548a97567154b9691fe403634c8a861b4854",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViews",
+        "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager.class",
+      "occurrence": 0,
+      "sha256": "a652ab385ec97f931705ceefd21397ad8a8f27605ebfaffd5342a6500efba408",
+      "name": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "views",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "viewsFolder",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "fileExtension",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "SettingsKey",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DefaultViewName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a1722c302baf634fb10a6fe80cbbef868414e200390248f2701462bb70e04c51",
+          "code_length": 37
+        },
+        {
+          "name": "loadViews",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fbdf4a5e1af906b19dc865560ec5f1e2606c0323df7230f0085bb2b512f14f9d",
+          "code_length": 136
+        },
+        {
+          "name": "getViews",
+          "descriptor": "()Ljava/util/HashMap;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/tradinglib/databank/DatabankTableView;>;"
+        },
+        {
+          "name": "getView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "842ffe1e2ccae8cc42c296f8e124075fa20d934a5323a5cd5d01c228cc515dfd",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "addView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "03b1e0dbfe8de3799dcc21c79f9a33926ac5e306b20e8be40e7e8d37f54a7964",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "_addView",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 2,
+          "code_sha256": "e731dd2bb238060d26108158c35731c8bee3d8b74b50540f3ff238937749b41b",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "66ae377e1158a105a5ed9b99198ce19d41169d7ada1adbc907d070c82e9dd674",
+          "code_length": 177,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "removeView",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1041373cd54efc8e6e7cb79aa597eb5f737bfbe820cc871d22d32efbb8a490bc",
+          "code_length": 111,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createDefaultView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "f524b9bc4def637522398ffc45e60579c60234f925926353c26bb016938ffeac",
+          "code_length": 174
+        },
+        {
+          "name": "getTableView",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 2,
+          "code_sha256": "484ed3bd68b1c38e07173cba627ce4bd06bccb0ff430147673e4f6c084613888",
+          "code_length": 23,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getViewFilePath",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ee592a8cc60817ca6dfed3a41e7d27ca85867209ad1fee2818f74d0d98a70396",
+          "code_length": 37
+        },
+        {
+          "name": "getSelectedView",
+          "descriptor": "()Lcom/strategyquant/tradinglib/databank/DatabankTableView;",
+          "access": 1,
+          "code_sha256": "8f69217dff9742dafbee9543de364b5cc9788f2f4616891b0247d0340f163cc2",
+          "code_length": 51
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "44c47269e316fb9f9d09b609208c12548cba1013418f1889f750443896de6d1e",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultTypes",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/databank/DatabankTableColumnEntry",
+        "com/strategyquant/tradinglib/databank/DatabankTableView",
+        "java/io/File",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

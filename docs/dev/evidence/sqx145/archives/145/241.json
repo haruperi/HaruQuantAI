@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsAutoRetestData/SettingsAutoRetestData.jar",
+  "sha256": "f2f6bd48ea64be3a858502972b50b5b5770847fba1432f201663c109478ef7ff",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/AutoRetestData/CustomDataSettingsPlugin.class": "16267cae16ebdf16619d7352020cada773c3cb41ecdaae494ef348a4e2f295ec"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/AutoRetestData/CustomDataSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "16267cae16ebdf16619d7352020cada773c3cb41ecdaae494ef348a4e2f295ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/241/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/241/001.json",
+      "sha256": "2a02affddc079e7fb4714ce2e68b9060f19b6ddb7f37a58ef8706b39bfcba4bf"
+    }
+  ]
+}

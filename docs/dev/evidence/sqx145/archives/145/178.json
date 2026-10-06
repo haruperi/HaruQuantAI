@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+  "sha256": "872584251e604ec4d6dc7a8837a5a674fc30daef5251891090d1fb0b85365e53",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataPlugin.class": "3a1272edff033bc31cd9711135b4b0dd5734abbcade67627442b8dd1dd983a0b",
+    "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$1.class": "48b9e0ec28bf83790673a5f77de2832b22f39f59384cf56d60ac3f876ffffe0d",
+    "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$2.class": "00588885266ceb41e610eacd152c00dc2eee7fc05466e90c854aea42582aac31",
+    "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$3.class": "a194cdf86fa5f86cc458839946b868cae86bc5355ca7001c321de36d34ab7d25",
+    "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet.class": "04fb97dc645da6db700f788ac06b176e58b254a610292ab893809e6bfb43c3c1"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataPlugin.class",
+      "occurrence": 0,
+      "sha256": "3a1272edff033bc31cd9711135b4b0dd5734abbcade67627442b8dd1dd983a0b",
+      "member_shard": "docs/dev/evidence/sqx145/members/178/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$1.class",
+      "occurrence": 0,
+      "sha256": "48b9e0ec28bf83790673a5f77de2832b22f39f59384cf56d60ac3f876ffffe0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/178/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$2.class",
+      "occurrence": 0,
+      "sha256": "00588885266ceb41e610eacd152c00dc2eee7fc05466e90c854aea42582aac31",
+      "member_shard": "docs/dev/evidence/sqx145/members/178/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$3.class",
+      "occurrence": 0,
+      "sha256": "a194cdf86fa5f86cc458839946b868cae86bc5355ca7001c321de36d34ab7d25",
+      "member_shard": "docs/dev/evidence/sqx145/members/178/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet.class",
+      "occurrence": 0,
+      "sha256": "04fb97dc645da6db700f788ac06b176e58b254a610292ab893809e6bfb43c3c1",
+      "member_shard": "docs/dev/evidence/sqx145/members/178/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/178/001.json",
+      "sha256": "910602a4d5dcdccbaeee2bbe4735c17614f8624b3f6e142ba03b4541991fae10"
+    }
+  ]
+}

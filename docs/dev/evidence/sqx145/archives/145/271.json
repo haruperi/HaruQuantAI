@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskCallExternalScript/TaskCallExternalScript.jar",
+  "sha256": "487d4460de5659572b1d9cb6f3d34e4b29593c428f97bf9af4847fab5199c46f",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1.class": "418dbb5be8c406a3e449df50287ef96b611326611985c6e92bcea62a03719e65",
+    "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript.class": "6c5a4de777d18fad4af61408b1b5947dec35133d75ed365c0df277ca74063ae0"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript$1.class",
+      "occurrence": 0,
+      "sha256": "418dbb5be8c406a3e449df50287ef96b611326611985c6e92bcea62a03719e65",
+      "member_shard": "docs/dev/evidence/sqx145/members/271/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CallExternalScript/CallExternalScript.class",
+      "occurrence": 0,
+      "sha256": "6c5a4de777d18fad4af61408b1b5947dec35133d75ed365c0df277ca74063ae0",
+      "member_shard": "docs/dev/evidence/sqx145/members/271/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/271/001.json",
+      "sha256": "fa913e7b53d3f3dfb29025ace4ca2d108ae1a5da1c04fac3bd05e5c810ae05cb"
+    }
+  ]
+}

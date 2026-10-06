@@ -1,8 +1,8 @@
 import { fitnessIslands } from './fixtures';
 
 /**
- * SQX-parity modal shell and the donor "Fitness evolution" popup
- * (donor evidence SQX144-EV-000034). Escape and backdrop click close it,
+ * SQX-style modal shell and the donor "Fitness evolution" popup
+ * (donor evidence retained target UI; current donor equivalence unverified). Escape and backdrop click close it,
  * matching the donor modal behavior.
  */
 

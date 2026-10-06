@@ -1,110 +1,69 @@
-# SQX implementation prompts
+# SQX145 implementation prompts
 
-Copy the relevant prompt and substitute its placeholder.
+Substitute `{FEATURE_ID}` or `{PHASE_PLAN_PATH}`. Both prompts follow [AGENTS.md](../../AGENTS.md), [PYTHON_MODULE.md](../templates/PYTHON_MODULE.md) and the [master checklist](phases/implementation_checklist.md).
 
-- Single feature: replace `{FEATURE_ID}`, for example `FEAT-HOST-COMMONS-LOGGING`.
-- Whole phase: replace `{PHASE_PLAN_PATH}`, for example `docs/dev/phases/phase-01-host-foundation.md`.
-- Both prompts follow [AGENTS.md](../../AGENTS.md) and [PYTHON_MODULE.md](../templates/PYTHON_MODULE.md).
-- Track progress in [implementation_checklist.md](phases/implementation_checklist.md); update it after every verified task.
-
-## Prompt 1 — Implement one feature
+## Prompt 1 — One feature task
 
 ```text
-Implement {FEATURE_ID} using its task in docs/dev/phases/.
+Implement {FEATURE_ID} from its numbered task in docs/dev/phases/.
 
-- Read AGENTS.md, docs/templates/PYTHON_MODULE.md, the owning domain README, and the relevant roadmap/task before doing any work.
-- Read docs/dev/phases/implementation_checklist.md and locate the matching feature row before planning.
-- Follow the required research → documented plan → owner approval → implementation → verification → walkthrough workflow. Approval applies only to the presented plan and exact ALLOWED_WRITE_PATHS.
-- Resolve SQX_REFERENCE_ROOT from the session/local configuration; HARUQUANTAI_ROOT is the current repository. Save only logical-root or repository-relative paths.
+- Read AGENTS.md, docs/templates/PYTHON_MODULE.md, owning domain READMEs, the current roadmap, task and master checklist before work.
+- Use only SQX145 Dev 1 under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
+- Read docs/dev/sqx145-baseline-audit.md and current inventory/ownership/member metadata. Verify exact donor SHA-256 and actual classes/functions before translation.
+- Inspect readable/decompiled implementation bodies or bytecode and actual callers. Preserve confirmed formulas, operation order, defaults, state transitions, I/O and failure semantics in independently written Python. Signatures, names and manifest descriptions cannot supply missing logic.
+- Enumerate all consumed classes/functions/resources, not merely representative FR seeds. Map each accepted behavior to descriptive FRs; classify JVM-only/unconsumed internals explicitly.
+- Include shipped UI/configuration/snippet/template/compiled-helper donors when relevant. Exclude live Q sessions/memory/accounts and generated caches; keep proprietary source text outside repository evidence.
+- Follow research → canonical documented plan with exact ALLOWED_WRITE_PATHS → owner approval → implementation → focused verification → walkthrough. Donor informs; the ratified specification owns. Resolve conflicts before coding affected behavior.
+- Use canonical Python module sections, typed public APIs, Ruff, strict Mypy and explicit observable FR logs. Use existing approved dependencies/host capabilities; obtain decisions for material contract/dependency changes.
+- Connect applicable features to the existing frontend after the backend works: feature-owned clients, commands/projections, loading/empty/denied/failure states, real job/resource IDs, cancellation and reconnect. Mocks cannot qualify completion; preserve prebuilt layouts.
+- Use isolated temporary stores; preserve live databases, junctions and unrelated work. No donor startup, schema restore, live provider mutation or trading is implied.
+- When ledger edits are approved, read ledger/schema in full, allocate the next SQX145-EV suffix above the high-water mark, record atomic claims/current sources/limits/mappings/review/commit and validate all IDs/hashes/relationships. Passes require actual observations/artifacts/time.
 
-Donor investigation:
-- Locate the feature’s exact donor JARs and verify their SHA-256 fingerprints.
-- Inspect readable/decompiled implementation text or bytecode, not merely class names, signatures, documentation, or roadmap FR seeds.
-- Trace the required classes, methods, dependencies, callers, configuration and resources until the feature’s actual implementation is understood.
-- Record exact algorithms, formulas, operation order, defaults, types, units, rounding, state transitions, side effects and failure behavior.
-- Distinguish observed behavior, inference, unresolved gaps and target decisions. Never guess missing donor logic.
+- Scope the canonical plan to this feature and its prerequisite/consumer/UI connections; stop for APPROVED: EXECUTE before implementation.
+- After qualification, produce the canonical feature walkthrough with donor traceability, registered FEAT/FR/DEC mappings and proposed commit message.
 
-Translation:
-- Produce a faithful, behavior-preserving Python translation of the inspected implementation.
-- Preserve donor class/function responsibilities and execution order wherever Python permits.
-- Change only what is necessary for Python syntax, runtime primitives and approved HaruQuantAI interfaces.
-- Do not redesign, optimize, simplify, substitute algorithms, invent defaults, introduce dependencies or omit behavior without an approved deviation.
-- Use documentation to clarify donor behavior; do not let generic documentation replace inspected implementation.
-- If donor behavior conflicts with repository authority or the approved specification, document the conflict and obtain a decision before implementing the affected behavior.
-- Do not paste proprietary Java/decompiled source into repository documentation or evidence.
+Mandatory completion tracking:
+- Include docs/dev/phases/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
+- Immediately after EACH task's implementation and required verification pass, check its numbered row; reconcile detailed steps, owning README status and walkthrough evidence. Leave partial/blocked/unverified tasks unchecked.
+- Recalculate Completed as checked child tasks / total child tasks; exclude phase-heading rows. Progress = round(100 * completed / total, 1)%; 20-cell bar fills floor(20 * completed / total) cells.
+- Check a phase only when all child tasks and phase completion gates pass. Set Current Task to the next pending task, or retain a blocked task with its reason; use None — complete only when all tasks pass.
+- Preserve other tasks' states/numbering/links. Report tracker totals, progress and Current Task in the walkthrough.
+- Run focused tests with explicit paths and --no-cov during iteration, independent normal/boundary/failure vectors, FR log checks and applicable lifecycle/resource tests. Run prescribed candidate coverage and UI typecheck/test/build plus isolated real-host acceptance when UI is connected.
+- Record exact commands/results, timestamped artifacts, deviations and unresolved gaps. Never infer SQX parity from static inventory, code coverage or matching screens.
+- Do not commit, merge, push, rebase or rewrite history without separate owner authorization after walkthrough review.
 
-Implementation and evidence:
-- Map every implemented class/function to the owning FEAT/FR and applicable decision IDs. Registration changes require approved scope.
-- Follow the canonical Python module docstring, typing, formatting and explicit FR logging requirements; verify log emissions.
-- Follow the complete evidence-ledger procedure, including reading both ledger/schema, atomic claims, unique IDs, exact source locations, fingerprints, limitations and validation observations. Missing authority is a gap to resolve, not permission to fabricate it.
-- Use isolated test stores. Preserve shared databases, junctions and unrelated working-tree changes.
-
-Completion:
-Checklist tracking (mandatory after every completed task):
-- Include docs/dev/phases/implementation_checklist.md in the plan's exact ALLOWED_WRITE_PATHS for progress updates.
-- When an approved task starts, set Current Task to its numbered checklist row and feature/task name.
-- Immediately after each task's required implementation and verification pass, check its matching row in docs/dev/phases/implementation_checklist.md; do not wait until the end of a phase batch.
-- Reconcile completion with the detailed phase steps, owning domain README and walkthrough evidence. Leave partial, blocked, failed or unverified tasks unchecked.
-- Recalculate Completed as checked child rows/total child rows; exclude phase-heading checkboxes. Update Progress Bar using round(100 * completed / total, 1)% and a 20-cell bar with floor(20 * completed / total) filled # cells.
-- Check a phase heading only when every child task and its phase completion gates pass.
-- After completion, set Current Task to the next pending task; if blocked, retain the blocked task and short reason; when everything passes, use None — complete.
-- Re-read the checklist before writing; preserve other tasks' existing states, numbering and links. Report the updated completed count, percentage and Current Task in the walkthrough.
-- Test donor-derived normal, boundary and failure cases; compare outputs with actual donor observations.
-- Run focused pytest with --no-cov during iteration, required lint/type checks, applicable UI checks and prescribed coverage qualification.
-- Do not claim parity or mark validation passed without recorded execution evidence.
-- Deliver the canonical walkthrough with changes, donor traceability, exact commands/results, deviations, remaining gaps and proposed commit message.
-- Do not commit, merge, push or rewrite history without separate owner authorization.
 ```
 
-## Prompt 2 — Implement a whole phase
+## Prompt 2 — Whole phase batch
 
 ```text
-Implement every feature task in {PHASE_PLAN_PATH} as one coordinated phase batch.
+Implement every feature/task in {PHASE_PLAN_PATH} as one approved phase batch.
 
-- Read AGENTS.md, docs/templates/PYTHON_MODULE.md, the phase file, its prerequisite phases, the roadmap and all relevant owning domain READMEs.
-- Read docs/dev/phases/implementation_checklist.md and identify every row belonging to the requested phase before planning.
-- Follow research → one documented batch plan → owner approval → implementation → verification → walkthrough.
-- Define exact ALLOWED_WRITE_PATHS for the complete batch. The phase checklist itself is not execution approval.
-- Resolve SQX_REFERENCE_ROOT locally; HARUQUANTAI_ROOT is the current repository. Save only logical-root or repository-relative paths.
+- Read AGENTS.md, docs/templates/PYTHON_MODULE.md, owning domain READMEs, the current roadmap, task and master checklist before work.
+- Use only SQX145 Dev 1 under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
+- Read docs/dev/sqx145-baseline-audit.md and current inventory/ownership/member metadata. Verify exact donor SHA-256 and actual classes/functions before translation.
+- Inspect readable/decompiled implementation bodies or bytecode and actual callers. Preserve confirmed formulas, operation order, defaults, state transitions, I/O and failure semantics in independently written Python. Signatures, names and manifest descriptions cannot supply missing logic.
+- Enumerate all consumed classes/functions/resources, not merely representative FR seeds. Map each accepted behavior to descriptive FRs; classify JVM-only/unconsumed internals explicitly.
+- Include shipped UI/configuration/snippet/template/compiled-helper donors when relevant. Exclude live Q sessions/memory/accounts and generated caches; keep proprietary source text outside repository evidence.
+- Follow research → canonical documented plan with exact ALLOWED_WRITE_PATHS → owner approval → implementation → focused verification → walkthrough. Donor informs; the ratified specification owns. Resolve conflicts before coding affected behavior.
+- Use canonical Python module sections, typed public APIs, Ruff, strict Mypy and explicit observable FR logs. Use existing approved dependencies/host capabilities; obtain decisions for material contract/dependency changes.
+- Connect applicable features to the existing frontend after the backend works: feature-owned clients, commands/projections, loading/empty/denied/failure states, real job/resource IDs, cancellation and reconnect. Mocks cannot qualify completion; preserve prebuilt layouts.
+- Use isolated temporary stores; preserve live databases, junctions and unrelated work. No donor startup, schema restore, live provider mutation or trading is implied.
+- When ledger edits are approved, read ledger/schema in full, allocate the next SQX145-EV suffix above the high-water mark, record atomic claims/current sources/limits/mappings/review/commit and validate all IDs/hashes/relationships. Passes require actual observations/artifacts/time.
 
-Batch investigation:
-- Build a complete feature/FR → donor JAR → class/function → Python file → test map.
-- Include every phase feature, resource contribution and integration task. Record prerequisite blockers and shared-file ownership.
-- Verify donor fingerprints and inspect readable/decompiled implementation text or bytecode for every required class/function.
-- Trace cross-JAR calls, dependencies, configuration and resources. Roadmap signatures and FR seeds are starting points, not a complete implementation specification.
-- Record algorithms, formulas, execution order, defaults, types, units, rounding, state, side effects and failure behavior.
-- Separate observations, inference, unresolved gaps and target decisions. Do not invent missing implementations.
+- Enumerate every numbered phase task and prerequisites; use one canonical phase plan with per-feature FRs, dependency order, shared ownership, exact write paths and independent acceptance. Stop for APPROVED: EXECUTE before implementation.
+- Execute in dependency order; do not silently skip blocked features or count placeholders as completion. Keep shared modules under one ratified owner.
+- Complete each feature's backend and applicable prebuilt UI connection before checking its row. Update the tracker immediately after each task, not only at the batch end.
+- Produce one canonical phase walkthrough with per-feature outcomes, real connected acceptance and explicit remaining blockers.
 
-Translation and integration:
-- Translate inspected donor behavior faithfully into Python; preserve class/function responsibilities and execution order wherever feasible.
-- Make only necessary language/runtime adaptations and approved HaruQuantAI interface changes.
-- Do not redesign, optimize, simplify, swap algorithms, invent defaults, add dependencies or silently skip features.
-- Resolve specification/repository conflicts through documented decisions before implementing affected behavior.
-- Implement in dependency order. Give shared modules one owner; use the approved host capabilities and domain contracts.
-- Connect the existing frontend to actual backend behavior. Do not count mocks, placeholders or fabricated results as completed functionality.
-- Keep proprietary Java/decompiled source out of repository documentation and evidence.
+Mandatory completion tracking:
+- Include docs/dev/phases/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
+- Immediately after EACH task's implementation and required verification pass, check its numbered row; reconcile detailed steps, owning README status and walkthrough evidence. Leave partial/blocked/unverified tasks unchecked.
+- Recalculate Completed as checked child tasks / total child tasks; exclude phase-heading rows. Progress = round(100 * completed / total, 1)%; 20-cell bar fills floor(20 * completed / total) cells.
+- Check a phase only when all child tasks and phase completion gates pass. Set Current Task to the next pending task, or retain a blocked task with its reason; use None — complete only when all tasks pass.
+- Preserve other tasks' states/numbering/links. Report tracker totals, progress and Current Task in the walkthrough.
+- Run focused tests with explicit paths and --no-cov during iteration, independent normal/boundary/failure vectors, FR log checks and applicable lifecycle/resource tests. Run prescribed candidate coverage and UI typecheck/test/build plus isolated real-host acceptance when UI is connected.
+- Record exact commands/results, timestamped artifacts, deviations and unresolved gaps. Never infer SQX parity from static inventory, code coverage or matching screens.
+- Do not commit, merge, push, rebase or rewrite history without separate owner authorization after walkthrough review.
 
-Project controls:
-- Follow canonical module docstrings, FEAT/FR mappings, strict typing, formatting and observable FR logging.
-- Apply the complete evidence-ledger procedure and validate ledger/schema, source links, related records and registered IDs when edited.
-- Use isolated stores; preserve live databases, junctions and unrelated changes. Do not perform concurrent schema changes or restores.
-- Record material scope/contract/dependency deviations as plan iterations and obtain renewed approval where required.
-
-Qualification and delivery:
-Checklist tracking (mandatory after every completed task):
-- Include docs/dev/phases/implementation_checklist.md in the plan's exact ALLOWED_WRITE_PATHS for progress updates.
-- When an approved task starts, set Current Task to its numbered checklist row and feature/task name.
-- Immediately after each task's required implementation and verification pass, check its matching row in docs/dev/phases/implementation_checklist.md; do not wait until the end of a phase batch.
-- Reconcile completion with the detailed phase steps, owning domain README and walkthrough evidence. Leave partial, blocked, failed or unverified tasks unchecked.
-- Recalculate Completed as checked child rows/total child rows; exclude phase-heading checkboxes. Update Progress Bar using round(100 * completed / total, 1)% and a 20-cell bar with floor(20 * completed / total) filled # cells.
-- Check a phase heading only when every child task and its phase completion gates pass.
-- After completion, set Current Task to the next pending task; if blocked, retain the blocked task and short reason; when everything passes, use None — complete.
-- Re-read the checklist before writing; preserve other tasks' existing states, numbering and links. Report the updated completed count, percentage and Current Task in the walkthrough.
-- Run focused feature tests during implementation, then cross-feature and real frontend/backend phase tests.
-- Verify donor-derived outputs, boundary cases, failures, cancellation, lifecycle cleanup and resource ownership.
-- Run required lint/type checks, applicable UI typecheck/test/build and prescribed coverage qualification.
-- Reconcile every phase checkbox with actual artifacts and timestamped observations. Keep blocked/unverified items visibly open.
-- Produce one canonical phase walkthrough with per-feature outcomes, donor traceability, exact commands/results, deviations, gaps and proposed commit message.
-- Do not claim phase completion or SQX parity while accepted requirements remain unverified.
-- Do not commit, merge, push or rewrite history without separate owner authorization.
 ```

@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskCustomAnalysis/TaskCustomAnalysis.jar",
+  "archive_sha256": "37dd9d562de654fdb9bd258399586fd1b33fa12c4c849b92b734e9846f3e622d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CustomAnalysis/CustomAnalysisTask.class",
+      "occurrence": 0,
+      "sha256": "8d45144ae9191f60c4bfbdbf6dc0bfa4867de696098fe83ffa426dd8f3493505",
+      "name": "com/strategyquant/plugin/Task/impl/CustomAnalysis/CustomAnalysisTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LockCustomAnalysisTask",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "projectLogMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "ca",
+          "descriptor": "Lcom/strategyquant/tradinglib/customanalysis/CustomAnalysisInfo;",
+          "access": 2
+        },
+        {
+          "name": "databankSource",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "databankTarget",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "823f7c56c2e137257bc8978479ff204392b2d82e122cc411e5f22cf65708dd2b",
+          "code_length": 28,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "634ba47a8ea3044c9c2bd3bfd0ad3cf7f2c5dfb74865b33fe9f97b7e7c06cb3c",
+          "code_length": 28,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8fdd8b3f26fdcf19216323bbbfcc67c5dcc4d527614fadc5fdd0e29257d54340",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c95aefbb357eee615dec7da342abcdfe20574bcde4b66a923e29f582fc5a18c",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "0957a2cc1e0f80a6f0cfef38018d8d8577cd95fa8a09d17aea06ef6dd25b8c0d",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "531deee9251d3cbdc7b9658a962a04080878cedc517376ae69a250370894dba0",
+          "code_length": 69,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8961ab7803f3978dc5b29a0e5491a0e19edf66f769dd9d18266da7bbee511ed9",
+          "code_length": 507,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runFullDatabankAnalysis",
+          "descriptor": "(Lcom/strategyquant/tradinglib/CustomAnalysisMethod;Ljava/util/ArrayList;Ljava/lang/String;)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "71d3a1fe7e188a50d898456d064f5c3cb30f4088aa18ac525434b98447dc6882",
+          "code_length": 49,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/CustomAnalysisMethod;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;Ljava/lang/String;)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "runPerStrategyAnalysis",
+          "descriptor": "(Lcom/strategyquant/tradinglib/CustomAnalysisMethod;Ljava/util/ArrayList;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "3fd51491f25b8f7855419cc1e130c531962d259eb3451807a1f68cf39f449eb0",
+          "code_length": 115,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/CustomAnalysisMethod;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c0506f76e9d5e738b58271be699859be31ff9c8496ed31086a622238310085",
+          "code_length": 4
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b98a8c0d08b97fb1e2428a61c99c6cfe1e61acdfd06fff3627b5bd12afd38162",
+          "code_length": 4
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "21c0aa3d17cec33c6939254aae2ccea6ab3ed1acd07fee4c519507edcaab5982",
+          "code_length": 16
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "printToLog",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "1e53f435a4363912369ddb24bc0387f2fe480032633702213311d45c0071a5d6",
+          "code_length": 40
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "17bf0b9a2b43c757eff7dd3959958c38cc4166d6d2dc2f391f35cf9548dbae44",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Task/impl/CustomAnalysis/CustomAnalysisTask",
+        "com/strategyquant/tradinglib/CustomAnalysisMethod",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/customanalysis/CustomAnalysisInfo",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap"
+      ]
+    }
+  ]
+}

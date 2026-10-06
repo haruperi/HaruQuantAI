@@ -1,0 +1,618 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+  "archive_sha256": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport.class",
+      "occurrence": 0,
+      "sha256": "d4b1e76279e8221d556621dc68a4c2bf609c627d2bff50e38826ed80ca34e696",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dateFrom",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "dateTo",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "targetFolder",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "filenamePrefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDateFrom",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "dc4302e4afb670f8cd2a9c021af6209bfeb99ab4725cf5e06028230aade73f84",
+          "code_length": 5
+        },
+        {
+          "name": "setDateFrom",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "2d2f9680c93fa06ff99cf3fb61f0d10ca50885dd5b58095b6d8a826bcdb17072",
+          "code_length": 6
+        },
+        {
+          "name": "getDateTo",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ea269802eef59ae40dafdde3d6de48574fb62589184008e761d829cccbce7427",
+          "code_length": 5
+        },
+        {
+          "name": "setDateTo",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "d3e5d6ec914f5256e5c66acbd4a2845dc57786f3c0408c08ecc9e37ac8fc0594",
+          "code_length": 6
+        },
+        {
+          "name": "getTargetFolder",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        },
+        {
+          "name": "setTargetFolder",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4e3569dc8868532fb771df30aa335eb9dfcaba2cf62ae42bd91beb5d5a334682",
+          "code_length": 6
+        },
+        {
+          "name": "getSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "setSymbol",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9f32e6ee360511d051cfeb97fb6a343ddc7d643bef2ec62aba13bf96a338357d",
+          "code_length": 6
+        },
+        {
+          "name": "getFilenamePrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d2aec6788db2b05a70890264c04f2cdb831396ab355947b95b7e2e0e5946927",
+          "code_length": 5
+        },
+        {
+          "name": "setFilenamePrefix",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "426ae263500f080b5cc781296359ccd73b815bb336a838d6718d26512d4563e5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1.class",
+      "occurrence": 0,
+      "sha256": "6c1ddffc04ad1100bce2bdb7f5ec3d00c96324770bd5ee28359b138a5057d041",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2c1714df34d9eebae621c9c12e7120e21324cd75cdf5631e9612bd5512ae9b68",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1",
+        "java/lang/Exception",
+        "java/lang/Thread",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2.class",
+      "occurrence": 0,
+      "sha256": "428219651a4184b12aaa4ff7d59d3290c72185557af9fdb61468199f9b95a02b",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class",
+      "occurrence": 0,
+      "sha256": "0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formaterDate",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 0
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "availableDataResponse",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7ee70214808db0783e7001e857b647a49be110e611daa8d7654049764d08d871",
+          "code_length": 28
+        },
+        {
+          "name": "preloadAvailableDataResponse",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "09235e4b04f4d51c13e10a65cc02c0c29c4be4d2c2ade2b594782c43819a5286",
+          "code_length": 18
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "93576d5839028c2af36a79f8adf76d68d33a82bec30b873cf3b925421a94deec",
+          "code_length": 356,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetParallelDownload",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6f658cb00e80fea79602cb63164d7d4ea5110212a7af24872fdf561b63e4049b",
+          "code_length": 74
+        },
+        {
+          "name": "onSetParallelDownload",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ae318df847438d0e112aca3e155c5e85e79aba8fa2fe8f5fc5b488acf04b8489",
+          "code_length": 110,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetDataList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f74eb3206cf1060ae45c3e2bccbe56657ca3e7cd48e1053e718b8c86069ee539",
+          "code_length": 500
+        },
+        {
+          "name": "onAddData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c99c86ace89aa3264b2d1fc3a6eb022bfb9cb770fac9ba745d62016c4d900aca",
+          "code_length": 76,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onAdd",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "bef7a0546150f6a62048b6e1219604ec357c620a95200f4163864dd7f180f9e8",
+          "code_length": 578,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onAddCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "283770f04be5151412e8412337951778ff6550c1a358457e4f2488e750adbaf0",
+          "code_length": 35,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onUpdateAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5e597b00c0cfa077f2a88934a2820488158a4c9ad4fdb3f87af4c12aa07fd44a",
+          "code_length": 361
+        },
+        {
+          "name": "onUpdateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4c75aa17a514e18426ac8d859aefaa6f1f990d11ca35c2522d283a63229299aa",
+          "code_length": 571,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4964d0b733c7817bf2c31ba3ffc87b03dc5f18760df6dc80fe10ea5879212c97",
+          "code_length": 745,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "sanitizeDates",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;ZLcom/strategyquant/datalib/SymbolData;)V",
+          "access": 2,
+          "code_sha256": "ad295b28477cb35a495d57bfa22454ea25c736e4179593650932c9f0a050fe9f",
+          "code_length": 48
+        },
+        {
+          "name": "fillCdnInfos",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/CdnInfo;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "111c31882fb662c394bbb78d2b7fe4083ae003757673581ecad6b6705322db3b",
+          "code_length": 211,
+          "throws": [
+            "org/apache/http/client/ClientProtocolException",
+            "java/io/IOException",
+            "java/lang/IllegalStateException",
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "onImportDataAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e1e543634c7a7c04330b146077ed0aa6cfde9789e0a079afc68c13d2d79086b6",
+          "code_length": 233,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "f70ba6461ad19b0505a49e8fd01720e3bb62a4e049fad970ed89d5009ea461d9",
+          "code_length": 7
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "0a9f4177a1664c971421212d82b6d82ad44843c35440027b2b3e0804f96cb7e8",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c12d1d86b475be64fa6d6591900119d6eda217082aea56f0433b09efbe622606",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/SymbolData",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/DukasDataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2",
+        "com/strategyquant/qdm/QDM",
+        "com/strategyquant/qdm/activity/QDMActivity",
+        "com/strategyquant/qdm/activity/QDMActivityTypes",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/dukascopy/CdnInfo",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/apache/http/HttpEntity",
+        "org/apache/http/HttpResponse",
+        "org/apache/http/client/ClientProtocolException",
+        "org/apache/http/client/methods/HttpGet",
+        "org/apache/http/impl/client/CloseableHttpClient",
+        "org/apache/http/impl/client/HttpClientBuilder",
+        "org/jdom2/Document",
+        "org/jdom2/Element",
+        "org/jdom2/JDOMException",
+        "org/jdom2/input/SAXBuilder",
+        "org/joda/time/format/DateTimeFormat",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "afa0ac47340cca2c01534ce9d702203f11c677065fc5edcb47834ac71167e363",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dukasServlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet;",
+          "access": 2
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates.class",
+      "occurrence": 0,
+      "sha256": "8538e185f97b7c6951f4135267bf69fce247ed3d8d5de4eb2c2a4ea4b25482e4",
+      "name": "com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "dateFrom",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "dateTo",
+          "descriptor": "J",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;JJ)V",
+          "access": 1,
+          "code_sha256": "952811f52f97e58fdb30d4a9fe8b67f5500a63a6da81b31edb497e8189b83cde",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

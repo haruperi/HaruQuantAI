@@ -5,7 +5,7 @@ import { FolderOpen, Save } from 'lucide-react';
 import { crossChecksTabSectionTitles } from '../ProjectWorkbench/settings/sharedSettingsFixtures';
 
 /**
- * "Cross checks (robustness)" tab (donor evidence SQX144-EV-000043): the
+ * "Cross checks (robustness)" tab (donor evidence retained target UI; current donor equivalence unverified): the
  * load/save buttons, Disable-all switch, the three speed sections with
  * their description lines, and cross-check rows with settings/filters
  * links opening donor-style dialogs.

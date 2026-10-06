@@ -1,0 +1,94 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+  "sha256": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783",
+  "class_count": 10,
+  "unique_class_entries": 10,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesPlugin.class": "3c9f5b644b4fedcf151134faa2fcc98a6e5741a1d24b728bcb993acd599ba54b",
+    "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet.class": "36ae89a1bbb1c894aef8384367b5d983e00f759ff63cf95fd4c9374b88c620ac",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob.class": "622c76e8a8b8da0962624ac51a2e89bf42c17515ef05e3faad642ad7a280667e",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter.class": "8c695fc3eb747de94b1857ef915b20f9ee9264ce807df0b558bd34f30ec62b68",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob.class": "3ad0910330a847aa6b43172d69c787d0d1dff9483b67402f4e754d8009cc9fdf",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter.class": "f7e222790094d086ed6d292d8b44fd04ef514274ad60e82967b83e002c46fd91",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob.class": "d334747a2bbe157ec661878deb36cd1580e53669b1cb51b45f279394016fba31",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1.class": "f694b1d9cc6a56332a8a1bf6d328a88ab2843f5e2c101cc80b69a348bf66332a",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2.class": "36766db2a50de7b360dff2fad564c69011042cbe64f601c9ae290b164792afb8",
+    "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob.class": "bcc42ef41aebd18ae5a0e1b828589a97fde90abe89699fee12b5767b84f691c2"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesPlugin.class",
+      "occurrence": 0,
+      "sha256": "3c9f5b644b4fedcf151134faa2fcc98a6e5741a1d24b728bcb993acd599ba54b",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet.class",
+      "occurrence": 0,
+      "sha256": "36ae89a1bbb1c894aef8384367b5d983e00f759ff63cf95fd4c9374b88c620ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataAppImporterJob.class",
+      "occurrence": 0,
+      "sha256": "622c76e8a8b8da0962624ac51a2e89bf42c17515ef05e3faad642ad7a280667e",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter.class",
+      "occurrence": 0,
+      "sha256": "8c695fc3eb747de94b1857ef915b20f9ee9264ce807df0b558bd34f30ec62b68",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporterJob.class",
+      "occurrence": 0,
+      "sha256": "3ad0910330a847aa6b43172d69c787d0d1dff9483b67402f4e754d8009cc9fdf",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter.class",
+      "occurrence": 0,
+      "sha256": "f7e222790094d086ed6d292d8b44fd04ef514274ad60e82967b83e002c46fd91",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterChildrenJob.class",
+      "occurrence": 0,
+      "sha256": "d334747a2bbe157ec661878deb36cd1580e53669b1cb51b45f279394016fba31",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$1.class",
+      "occurrence": 0,
+      "sha256": "f694b1d9cc6a56332a8a1bf6d328a88ab2843f5e2c101cc80b69a348bf66332a",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob$2.class",
+      "occurrence": 0,
+      "sha256": "36766db2a50de7b360dff2fad564c69011042cbe64f601c9ae290b164792afb8",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporterMasterJob.class",
+      "occurrence": 0,
+      "sha256": "bcc42ef41aebd18ae5a0e1b828589a97fde90abe89699fee12b5767b84f691c2",
+      "member_shard": "docs/dev/evidence/sqx145/members/176/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/176/001.json",
+      "sha256": "56a3e6a8ec8b7fb44697df16f179631b1d936202a4f196925a86624e3cbbd0be"
+    }
+  ]
+}

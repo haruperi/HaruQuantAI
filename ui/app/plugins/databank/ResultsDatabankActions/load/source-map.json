@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsDatabankActions/load bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/load",
-  "source_head": "3a9608544c56fbc8f1bb8997b4d3f3a473bb921f",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_151141_databank-actions-load-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,88 +28,118 @@
   "source_catalog": [
     {
       "id": "sqx-resultsdatabankactions-load-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
       "family": "bounded installed load-action frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadBtnCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadBtnCtrl.js",
       "relative_path": "loadBtnCtrl.js",
       "location": "lines 1-40; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "689b9f02d1243196ed779726090bdaa8498da5aa29979d2eb70e0b3af421896f",
+      "sha256": "65594abaf3d35b29c3a26150a09f2a5fe0915e8c724a1b718ad20c25b022bc60",
       "target": "loadBtnCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadPopup.html",
       "relative_path": "loadPopup.html",
       "location": "lines 1-31; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "f3a4662adc01313e7d526df09b157c6833e197f2819b6681994702ab00656f7e",
+      "sha256": "1f4122b28b711b6d60efd5144ad0273e933b16bd49556c32b30a52299cc0bf01",
       "target": "loadPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadPopupCtrl.js",
       "relative_path": "LoadPopupCtrl.js",
       "location": "lines 1-107; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "bd3796997ea8ee5e7137dc875a11ba0a2767d2042d813b998e7c87da8761fe00",
+      "sha256": "4423fabd5bd5bbde22fd7627683f942e643e4bd4ca12f3932e2b225895e7713b",
       "target": "LoadPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js",
       "relative_path": "LoadService.js",
       "location": "lines 1-52; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a52c62f5078b992b790cfd165c53c4d8403d43e6e1ae4df2d7eb339dc5df62b4",
+      "sha256": "7aa27a134929575e7b5701e474e45ec7706813413d86a2d0273f1d696603dccb",
       "target": "LoadService.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/module.js",
       "relative_path": "module.js",
       "location": "lines 1-16; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "b39d8a4e99ad3b0d8a76740ddd3a46ae404ed66a1f0b389e61d0a6a44508a45e",
+      "sha256": "05e02ec58436cf2545fa64edab889d003b7a1318d355ea949e5a3de3ff080a5a",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-load-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/styles.css",
       "relative_path": "styles.css",
       "location": "lines 1-7; frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "00a7dd68b6d3a77b0d79ab3623de7992990f99a5ff2b165ff67913bb996e21d2",
+      "sha256": "cdf4cf238d7aaa464f42f67995d8ab52c1a54d69e1850d20213822d29fa128d4",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -117,5 +147,10 @@
       "path": "source-map.json",
       "reason": "Bounded structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

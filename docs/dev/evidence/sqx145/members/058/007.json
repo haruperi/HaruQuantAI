@@ -1,0 +1,1285 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jline-3.25.1.jar",
+  "archive_sha256": "421efcde9db04c34b9c03cd66e0460e75e5cdd4a3cafde54ef370049ac092e7c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/jline/utils/package-info.class",
+      "occurrence": 0,
+      "sha256": "84271ed70aef1abe66aa5977e3a5fff22c1ff7624e38de53ffb8fa2838f5f2be",
+      "name": "org/jline/utils/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/jline/utils/package-info"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/AutopairWidgets.class",
+      "occurrence": 0,
+      "sha256": "b18f2b7237e52f51e47c29695ff30ec1c1743ca411d0dd17b5a9fc6c4f24e4a0",
+      "name": "org/jline/widget/AutopairWidgets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jline/widget/Widgets",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LBOUNDS",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "RBOUNDS",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "pairs",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "defaultBindings",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jline/reader/Binding;>;"
+        },
+        {
+          "name": "enabled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;)V",
+          "access": 1,
+          "code_sha256": "fbdf31ada53774e521b4fbb3c6eb2f902b4ae36ed0d59e099f0b3b5e0f8a52cf",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Z)V",
+          "access": 1,
+          "code_sha256": "aab1cfed3aefbd6fa10ee7cf920af4eab583edf7631aba5f4c9001a45996a99a",
+          "code_length": 340
+        },
+        {
+          "name": "enable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8aaa0b55bb34a32d4f5ca8932c2a91f7006028a57aa4215bca7878baac529eb3",
+          "code_length": 13
+        },
+        {
+          "name": "disable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "514ccab0e19b33dfc4097581d15cd256a7f5a7b556506d3509c6a075ab9d21ff",
+          "code_length": 13
+        },
+        {
+          "name": "toggle",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e22ede1aa0d7439bea2e2b7f1d716e1900dccf191e2c3c973a6560f1080150a7",
+          "code_length": 20
+        },
+        {
+          "name": "autopairInsert",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9583d70d13e7889a010ca5031a9cf12af94e271250b6547dafc1acbe1a02fc72",
+          "code_length": 99
+        },
+        {
+          "name": "autopairClose",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "18fcabe741f3e71f547dad4eb5edd6ed31099fecf4ea138d1295ac99199bb63c",
+          "code_length": 47
+        },
+        {
+          "name": "autopairDelete",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4f6344b897f43b4ba98e1af43a114899751f84ccea3eb148e31f62134f0f5834",
+          "code_length": 67
+        },
+        {
+          "name": "toggleKeyBindings",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9c3c17c37c3d6468aeb0335ccec695294f14381add9d02a55ea52e8035d8ba0f",
+          "code_length": 23
+        },
+        {
+          "name": "customBindings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9fde7d31ed093ddf469bf877683255f086ca1d95f9bd9e7072247de0a080998e",
+          "code_length": 151
+        },
+        {
+          "name": "defaultBindings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b600928d679aee6bebf16ef429afb002e5dc3df986ff34358f101417bec8688b",
+          "code_length": 158
+        },
+        {
+          "name": "tailtipEnabled",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "61c4b266a9d861cce662a01a48e97a2ce0c6eaf20c97cead4f1528dc7b4a4d14",
+          "code_length": 12
+        },
+        {
+          "name": "canPair",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "9ff8c73ef03ab9e1a823c7f50d43110c44d87b0184aa7f6ec3b822b43ee1c675",
+          "code_length": 57
+        },
+        {
+          "name": "canSkip",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "64988e7f2f9ce96ec8b9ca4dc49286c12bbf59c06e817c26300326149ed2b35f",
+          "code_length": 55
+        },
+        {
+          "name": "canDelete",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "d8af1d5fb5eee2699a40db625c37ab0f80fef3b330c6b7b9caee125b67047778",
+          "code_length": 6
+        },
+        {
+          "name": "balanced",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "bc00bc7344d5cfdab01b012f296a859cd806ae96980fa5f6df78bcbf813e0485",
+          "code_length": 327
+        },
+        {
+          "name": "boundary",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "31f4f9d7c89697ca23a29d41d811415d1d28b7dddddd424a3e1db71670491ee0",
+          "code_length": 42
+        },
+        {
+          "name": "nexToBoundary",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "0f7704d6364a58526fad745d9eeb94471398c0ca6df5ce13b3d974a8c2dd846b",
+          "code_length": 183
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9f850bbedefe942722b4189da32808acb44bc88b3edfae10e7191617d6d5c8e9",
+          "code_length": 217
+        }
+      ],
+      "class_references": [
+        "java/lang/CharSequence",
+        "java/lang/IllegalStateException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/jline/keymap/KeyMap",
+        "org/jline/reader/Binding",
+        "org/jline/reader/Buffer",
+        "org/jline/reader/LineReader",
+        "org/jline/reader/Reference",
+        "org/jline/widget/AutopairWidgets",
+        "org/jline/widget/Widgets"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/AutosuggestionWidgets.class",
+      "occurrence": 0,
+      "sha256": "377f42cd285c315d22ca17446dbe7ca2f5ffca47cdabfa1779a37cc549db6c76",
+      "name": "org/jline/widget/AutosuggestionWidgets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jline/widget/Widgets",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "enabled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;)V",
+          "access": 1,
+          "code_sha256": "1915ad7b6517e9aea3d83d355b04230e4de28a26ed84cc81f53a21ae31597335",
+          "code_length": 78
+        },
+        {
+          "name": "disable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "39d214aec40999e81a9543e9729a9fc9128c32e31e0858693d0e49c15625bf6d",
+          "code_length": 5
+        },
+        {
+          "name": "enable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "569f06c938b33dfb2837bdde7c9a28351cb790172ebf12882514c68dd39b72c1",
+          "code_length": 5
+        },
+        {
+          "name": "partialAccept",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aa3ea5d707f3e23698656bcbca8469e4f41ed99d7b5ed04cefd063ed16851d3c",
+          "code_length": 105
+        },
+        {
+          "name": "autosuggestForwardChar",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e9a90515c9065131e5d8c641c3370edd6787f5afca00f61c6e56c8ddc84f7cfa",
+          "code_length": 7
+        },
+        {
+          "name": "autosuggestEndOfLine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9f852eadda13afec63741a5afb5053cb56bd68354996836990c431ee9b2d342a",
+          "code_length": 7
+        },
+        {
+          "name": "toggleKeyBindings",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f3646cd521cdf287f8d5f3e4404f0b9b145acc60043d8cf7f86cce06754901f2",
+          "code_length": 23
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "41f661e9815e7b9a9cac53d5cb2d9c6d3fb5733512e254d319470df06ecf0378",
+          "code_length": 38
+        },
+        {
+          "name": "customBindings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "dfd243648e7affd32f6a82ec27c0ded08641a456e1d65eba9f3289532c964989",
+          "code_length": 45
+        },
+        {
+          "name": "defaultBindings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c4cad13990598b4668eb580cb0209e0cf250eec7f2ba81070a89b83cb1f7c6f2",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "org/jline/reader/Buffer",
+        "org/jline/reader/LineReader",
+        "org/jline/reader/LineReader$SuggestionType",
+        "org/jline/reader/impl/BufferImpl",
+        "org/jline/widget/AutosuggestionWidgets",
+        "org/jline/widget/Widgets"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/TailTipWidgets$CommandDescriptions.class",
+      "occurrence": 0,
+      "sha256": "e5af9966537cdccd8482f4c5dbdad8ca55e8a6bf2b923d37c131082bce559fac",
+      "name": "org/jline/widget/TailTipWidgets$CommandDescriptions",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "descriptions",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;"
+        },
+        {
+          "name": "temporaryDescs",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;"
+        },
+        {
+          "name": "volatileDescs",
+          "descriptor": "Ljava/util/Map;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;"
+        },
+        {
+          "name": "descFun",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 0,
+          "generic_signature": "Ljava/util/function/Function<Lorg/jline/console/CmdLine;Lorg/jline/console/CmdDesc;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/widget/TailTipWidgets;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "0a0a23a0fbfd87290d5c73e5362362aa4cbbd1c9fab80862e742d01d3c8e9f0d",
+          "code_length": 55,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/widget/TailTipWidgets;Ljava/util/function/Function;)V",
+          "access": 1,
+          "code_sha256": "0ff90f26708dec4f7742080bd5980ccdf72beaec0680d60b77eea975ec06a225",
+          "code_length": 48,
+          "generic_signature": "(Ljava/util/function/Function<Lorg/jline/console/CmdLine;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "setDescriptions",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "da76669b7a829ed324f2105aab514a79a92c99202746f79ee592a004a774fe51",
+          "code_length": 13,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "evaluateCommandLine",
+          "descriptor": "(Ljava/lang/String;I)Lorg/jline/widget/TailTipWidgets$Pair;",
+          "access": 1,
+          "code_sha256": "e1c2d85fd81ebe6af55f5f7554adca2692cfa01436d27f3b5bb9b56778c96a11",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/String;I)Lorg/jline/widget/TailTipWidgets$Pair<Ljava/lang/String;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "evaluateCommandLine",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)Lorg/jline/widget/TailTipWidgets$Pair;",
+          "access": 1,
+          "code_sha256": "8bf34e9da4be8ae77ff625e2d028582e6b4fa22e5fcc6c58c6594fb32c913270",
+          "code_length": 11,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)Lorg/jline/widget/TailTipWidgets$Pair<Ljava/lang/String;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "evaluateCommandLine",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;I)Lorg/jline/widget/TailTipWidgets$Pair;",
+          "access": 2,
+          "code_sha256": "d5fbfda55f4d5f70bab7c45bf7ca3b324ce505e484c26c200aecd53f25370a25",
+          "code_length": 471,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;I)Lorg/jline/widget/TailTipWidgets$Pair<Ljava/lang/String;Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "(Ljava/lang/String;)Lorg/jline/console/CmdDesc;",
+          "access": 1,
+          "code_sha256": "f81d35893eb077ba062826bda5c2740ecdc8a999f08a28c6146e8a6d67d8b53a",
+          "code_length": 76
+        },
+        {
+          "name": "clearTemporaryDescs",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "04fffea7ea155ce9edd6c3f1174c2bdfd40c33d18177f05a01eb9671612a6d3f",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/function/Function",
+        "org/jline/console/CmdDesc",
+        "org/jline/console/CmdLine",
+        "org/jline/console/CmdLine$DescriptionType",
+        "org/jline/reader/Parser",
+        "org/jline/widget/TailTipWidgets",
+        "org/jline/widget/TailTipWidgets$CommandDescriptions",
+        "org/jline/widget/TailTipWidgets$Pair"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/TailTipWidgets$Pair.class",
+      "occurrence": 0,
+      "sha256": "92324debfa27c0c574865acfcbe4abee85c3a996575ad0ace0ff0caf0215726f",
+      "name": "org/jline/widget/TailTipWidgets$Pair",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "u",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TU;"
+        },
+        {
+          "name": "v",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TV;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(TU;TV;)V"
+        },
+        {
+          "name": "getU",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5,
+          "generic_signature": "()TU;"
+        },
+        {
+          "name": "getV",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5,
+          "generic_signature": "()TV;"
+        }
+      ],
+      "generic_signature": "<U:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/jline/widget/TailTipWidgets",
+        "org/jline/widget/TailTipWidgets$Pair"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/TailTipWidgets$TipType.class",
+      "occurrence": 0,
+      "sha256": "4dd971d43eecbebd24cc2883dd8f37f35bbeb555dd6616f7f901a4a4064d8488",
+      "name": "org/jline/widget/TailTipWidgets$TipType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TAIL_TIP",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 16409
+        },
+        {
+          "name": "COMPLETER",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 16409
+        },
+        {
+          "name": "COMBINED",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 9,
+          "code_sha256": "8c10ce266d366dafc2cd88271b8e0cd1df5dbfc5d799e8d011a3815c8056dd70",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 9,
+          "code_sha256": "68ae78c33536ab58d922da581a00630293b2e89e1b86ff6967d4311c5cfb08f4",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "784c817ed48c3c8594071d6bd421854cfb5da454e2d9e5081dd82a845aa975a9",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 4106,
+          "code_sha256": "0f9deda2bc90cfe9d4a99c9a99b95dd6a7e7c78438d8147719304d04053b32df",
+          "code_length": 23
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7753a94ce14545e563e2a460811eb0e6e3808f66114dd00261d33b6044751669",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/jline/widget/TailTipWidgets$TipType;>;",
+      "class_references": [
+        "[Lorg/jline/widget/TailTipWidgets$TipType;",
+        "java/lang/Enum",
+        "org/jline/widget/TailTipWidgets",
+        "org/jline/widget/TailTipWidgets$TipType"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/TailTipWidgets.class",
+      "occurrence": 0,
+      "sha256": "8916401d70a03b36d8b88393ed44fb23cca69ced890f8d34d573daecdbe89043",
+      "name": "org/jline/widget/TailTipWidgets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jline/widget/Widgets",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "enabled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "cmdDescs",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets$CommandDescriptions;",
+          "access": 18
+        },
+        {
+          "name": "tipType",
+          "descriptor": "Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 2
+        },
+        {
+          "name": "descriptionSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "descriptionEnabled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "descriptionCache",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "readerErrors",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "cd31bfad8430a25f9fa42e48ed02892fb3954b1faf214e29b3d5b30e549ae1bc",
+          "code_length": 11,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/Map;Lorg/jline/widget/TailTipWidgets$TipType;)V",
+          "access": 1,
+          "code_sha256": "d708641fa9eced48a1229fcd6878f6512df7d3fe34885538a54790a0791a65f9",
+          "code_length": 9,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;Lorg/jline/widget/TailTipWidgets$TipType;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/Map;I)V",
+          "access": 1,
+          "code_sha256": "ca92938078d2127bc0c6553cd787f27a1f35b31441a9c56c848e5f3596b79df4",
+          "code_length": 11,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;I)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/Map;ILorg/jline/widget/TailTipWidgets$TipType;)V",
+          "access": 1,
+          "code_sha256": "af78d2519622f0b239dacb98e34126437cd9cc598d788c393ce9f2f5d4f33754",
+          "code_length": 11,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;ILorg/jline/widget/TailTipWidgets$TipType;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/function/Function;ILorg/jline/widget/TailTipWidgets$TipType;)V",
+          "access": 1,
+          "code_sha256": "1c902a44074e62b5567b1f6db24601fddbbc1c70368b6c787f3646c4289fd23d",
+          "code_length": 11,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/function/Function<Lorg/jline/console/CmdLine;Lorg/jline/console/CmdDesc;>;ILorg/jline/widget/TailTipWidgets$TipType;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;Ljava/util/Map;ILorg/jline/widget/TailTipWidgets$TipType;Ljava/util/function/Function;)V",
+          "access": 2,
+          "code_sha256": "20ffdc45c28d179928eb7c7f49e7dac33016553493d7368633ca99956853ea96",
+          "code_length": 201,
+          "generic_signature": "(Lorg/jline/reader/LineReader;Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;ILorg/jline/widget/TailTipWidgets$TipType;Ljava/util/function/Function<Lorg/jline/console/CmdLine;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "setTailTips",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "66c07367305c7c0d76ad50ac9876caa1a3c8a5a68985e635bf319f93ed1c5fb1",
+          "code_length": 9,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Lorg/jline/console/CmdDesc;>;)V"
+        },
+        {
+          "name": "setDescriptionSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a6ecb2c9a4f01f24dde8ac1c735962aeb2119d9ad4806a41f421919521d41cdb",
+          "code_length": 11
+        },
+        {
+          "name": "getDescriptionSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "44fbdd3829535ad3b630737eb0be5aaee063d75d79b65dac9955843a2e0efa82",
+          "code_length": 5
+        },
+        {
+          "name": "setTipType",
+          "descriptor": "(Lorg/jline/widget/TailTipWidgets$TipType;)V",
+          "access": 1,
+          "code_sha256": "c7bd0d8c3cf5e12b97a4fe01d3da009d49d4a02d6d4d9175ac5715cf33f1baa2",
+          "code_length": 33
+        },
+        {
+          "name": "getTipType",
+          "descriptor": "()Lorg/jline/widget/TailTipWidgets$TipType;",
+          "access": 1,
+          "code_sha256": "bd7d4a99544878db0893d2e2fc82f01c2509fd39b08c19d47cfd9a4431b18ef9",
+          "code_length": 5
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "107631c8d913debfdbdb949151ca3db4de6cf49c499be0981bb1521de6e6739a",
+          "code_length": 5
+        },
+        {
+          "name": "disable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e264b2b3a1567e021b436e422b2202019fdcfbaee404c05209cc591bf193654e",
+          "code_length": 13
+        },
+        {
+          "name": "enable",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9fa132075c2348673b2eccee36908f087f36e3913396747612db84ce39c8833e",
+          "code_length": 13
+        },
+        {
+          "name": "setDescriptionCache",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "7a852869cec692082e60784e6136a317a55fb903885f37812a9be1e06b034437",
+          "code_length": 6
+        },
+        {
+          "name": "tailtipComplete",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c8200273cf30a0d72f019a8c55f7b6e016b01de0c5fa2bcfe621a18abb11fd6d",
+          "code_length": 55
+        },
+        {
+          "name": "tailtipAcceptLine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2f4ce9b519626b438ce4b9569a3f98707e490dba3516ed4708dbc594ad65a2d6",
+          "code_length": 45
+        },
+        {
+          "name": "tailtipBackwardDelete",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "98098d5031922c4e92b7329a427eb1018bf81a2ba881dd5a0c48dc1f4b49e70d",
+          "code_length": 19
+        },
+        {
+          "name": "clearTailTip",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "4ed741f03ceb1f7d623fe10b4b09e01baea67c808441ce5e62c6d73f1a5f21e9",
+          "code_length": 11
+        },
+        {
+          "name": "tailtipDelete",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5ec9242ea04286c2752e977bc3936fdffc0b51860984558867637d84c4bec371",
+          "code_length": 11
+        },
+        {
+          "name": "tailtipKillLine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fc27ba00addd0524deda6c06b1083d6c10c9a698009f3b8c99cae72f2be53fe8",
+          "code_length": 11
+        },
+        {
+          "name": "tailtipKillWholeLine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b18cbfded3a2beb6295f1c7c96329c99feec1fc76fd98121133736f1f1dfa8c0",
+          "code_length": 13
+        },
+        {
+          "name": "tailtipInsert",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "43736531b721ea10e7b6c5c3c9c2997bff74d91b615d2a56a96aa03f89c8b206",
+          "code_length": 19
+        },
+        {
+          "name": "tailtipUpdateStatus",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6d5b82ddcff25934242b11da62522493474d0ca28c25faaa4be5fe59d5401afb",
+          "code_length": 7
+        },
+        {
+          "name": "doTailTip",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "cd4929d919bce7b5461e06b2067cb84db4ea6840697df336e2c2169f58271b78",
+          "code_length": 202
+        },
+        {
+          "name": "doCommandTailTip",
+          "descriptor": "(Ljava/lang/String;Lorg/jline/console/CmdDesc;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "77953a70ea4794264342d34d5b28c4e1099a6894f376e2b958e2783e539322db",
+          "code_length": 875,
+          "generic_signature": "(Ljava/lang/String;Lorg/jline/console/CmdDesc;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "resetTailTip",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aa23cdfc9c26a47899c2ede6e111764859ac0066a587b078d75601e1be5609b4",
+          "code_length": 25
+        },
+        {
+          "name": "doDescription",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "db9c23e3ab529c5def6df0cd135072ee4668a3ad5e8657080860d7c8afe13fa2",
+          "code_length": 188,
+          "generic_signature": "(Ljava/util/List<Lorg/jline/utils/AttributedString;>;)V"
+        },
+        {
+          "name": "autopairEnabled",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "b6507280500d60d3d0e46aec94de5a5ee7e10d185426bbed392903e735e4d1ee",
+          "code_length": 42
+        },
+        {
+          "name": "toggleWindow",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0e6f3d080d0d9a168d5eb9451d6e7f1d73faef89705676755109ba9249c82fab",
+          "code_length": 47
+        },
+        {
+          "name": "toggleKeyBindings",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aedfcf67ef100acf16079dc4b7ec3a6519f98605c642d3a0c8247321bcf2d23e",
+          "code_length": 102
+        },
+        {
+          "name": "defaultBindings",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "1e94ebb9c850dc65b8a07f68810cb72e8d142921e7a758acfd5c150e8557da72",
+          "code_length": 138
+        },
+        {
+          "name": "customBindings",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e290ed780e5f009515082b6738d3ae44322333209da449cba8a2b7c8f89b686e",
+          "code_length": 126
+        },
+        {
+          "name": "compileMainDescription",
+          "descriptor": "(Lorg/jline/console/CmdDesc;I)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "8f06ab85ea2a07c8af34c9a04f7473fefbd9ef7e9b24b342c2f0bac423e32af3",
+          "code_length": 8,
+          "generic_signature": "(Lorg/jline/console/CmdDesc;I)Ljava/util/List<Lorg/jline/utils/AttributedString;>;"
+        },
+        {
+          "name": "compileMainDescription",
+          "descriptor": "(Lorg/jline/console/CmdDesc;ILjava/lang/String;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "d2a87840d7c43f3da495e57e00acdd1df90b9e83035c4ea280f0d0473a51e6cd",
+          "code_length": 422,
+          "generic_signature": "(Lorg/jline/console/CmdDesc;ILjava/lang/String;)Ljava/util/List<Lorg/jline/utils/AttributedString;>;"
+        },
+        {
+          "name": "compileOptionDescription",
+          "descriptor": "(Lorg/jline/console/CmdDesc;Ljava/lang/String;I)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "3a766c9e3c77931bc7ba3a9cf0ab821a287262220014b0774188ee5da83227ba",
+          "code_length": 989,
+          "generic_signature": "(Lorg/jline/console/CmdDesc;Ljava/lang/String;I)Ljava/util/List<Lorg/jline/utils/AttributedString;>;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/jline/widget/TailTipWidgets;)Z",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/function/Function",
+        "org/jline/builtins/Options",
+        "org/jline/builtins/Options$HelpException",
+        "org/jline/console/ArgDesc",
+        "org/jline/console/CmdDesc",
+        "org/jline/keymap/KeyMap",
+        "org/jline/reader/Binding",
+        "org/jline/reader/Buffer",
+        "org/jline/reader/LineReader",
+        "org/jline/reader/LineReader$SuggestionType",
+        "org/jline/reader/Reference",
+        "org/jline/utils/AttributedString",
+        "org/jline/utils/AttributedStringBuilder",
+        "org/jline/utils/AttributedStyle",
+        "org/jline/utils/InfoCmp",
+        "org/jline/utils/InfoCmp$Capability",
+        "org/jline/utils/StyleResolver",
+        "org/jline/widget/TailTipWidgets",
+        "org/jline/widget/TailTipWidgets$CommandDescriptions",
+        "org/jline/widget/TailTipWidgets$Pair",
+        "org/jline/widget/TailTipWidgets$TipType",
+        "org/jline/widget/Widgets"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/Widgets$1.class",
+      "occurrence": 0,
+      "sha256": "4e3d64344d93e4cc82c1e239cdeac9be07bb6402f5bbab64f850fd7ae9caa0fe",
+      "name": "org/jline/widget/Widgets$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jline/reader/Widget"
+      ],
+      "fields": [
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$widget",
+          "descriptor": "Lorg/jline/reader/Widget;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/jline/widget/Widgets;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/widget/Widgets;Ljava/lang/String;Lorg/jline/reader/Widget;)V",
+          "access": 0,
+          "code_sha256": "7960c4690dde05c0aeec69413e6ddaccad55914e87c13f0afa1ede7f70c85524",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "apply",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6f195ec9e65f2bab1043b0e1bb6554d942ef0a9c1db39371fa773458dcb9e9b7",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jline/reader/Widget",
+        "org/jline/widget/Widgets",
+        "org/jline/widget/Widgets$1"
+      ]
+    },
+    {
+      "entry": "org/jline/widget/Widgets.class",
+      "occurrence": 0,
+      "sha256": "150989f3ad5774a219b19947914dfbc54bc403cc670165d8986ed18b5d9442e4",
+      "name": "org/jline/widget/Widgets",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TAILTIP_TOGGLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TAILTIP_PANE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "AUTOPAIR_TOGGLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "AUTOSUGGEST_TOGGLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "AP_INSERT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "AP_BACKWARD_DELETE_CHAR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "TT_ACCEPT_LINE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "reader",
+          "descriptor": "Lorg/jline/reader/LineReader;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jline/reader/LineReader;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "addWidget",
+          "descriptor": "(Ljava/lang/String;Lorg/jline/reader/Widget;)V",
+          "access": 1,
+          "code_sha256": "65b741a0ca0fd9dffd8e7b8438467f21b0a08308a7318901d5043e73d1005708",
+          "code_length": 23
+        },
+        {
+          "name": "namedWidget",
+          "descriptor": "(Ljava/lang/String;Lorg/jline/reader/Widget;)Lorg/jline/reader/Widget;",
+          "access": 2,
+          "code_sha256": "7479135d174e3d32c3a7f34bfad4aa9c742c0e912332238822e64d572d5cd78f",
+          "code_length": 11
+        },
+        {
+          "name": "callWidget",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8504694a26f15b162e61fb3a0d91b61b06b3566b474081ca8b013bd183c098c9",
+          "code_length": 49
+        },
+        {
+          "name": "executeWidget",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f33a29ff02b402dda2952900e0ac2a73ea020352176a3d777b147e67f6ef77a0",
+          "code_length": 85
+        },
+        {
+          "name": "aliasWidget",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3407ac02c9f8468841930c183bb6644e7e76391ac70b4de578aeaff1d6285509",
+          "code_length": 22
+        },
+        {
+          "name": "getWidget",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "82d00c7aeb28f6605f2a428d6364ad6252f59fcedcf9b1c93d4dba0e017e0bb6",
+          "code_length": 11
+        },
+        {
+          "name": "existsWidget",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "4b9dedd51cb78cf5bd687781c6ba286638bd74f9d8ddd490e25f72bde128b352",
+          "code_length": 11
+        },
+        {
+          "name": "widget",
+          "descriptor": "(Ljava/lang/String;)Lorg/jline/reader/Widget;",
+          "access": 2,
+          "code_sha256": "5f69acbed1c5b160c3a2b95e51bd08b07fb16f3b9a9a10dcb16c143a423dbeb4",
+          "code_length": 87
+        },
+        {
+          "name": "parser",
+          "descriptor": "()Lorg/jline/reader/Parser;",
+          "access": 1,
+          "code_sha256": "8f3cbbf3f6d6992af586355654ffba6d290e20738345ff53d94a4da58cf8d633",
+          "code_length": 10
+        },
+        {
+          "name": "getKeyMap",
+          "descriptor": "()Lorg/jline/keymap/KeyMap;",
+          "access": 1,
+          "code_sha256": "6499f57d3215c9e4caf68c8aa256b8793e8c664aa0fb95b831aedaf534379a2b",
+          "code_length": 20,
+          "generic_signature": "()Lorg/jline/keymap/KeyMap<Lorg/jline/reader/Binding;>;"
+        },
+        {
+          "name": "buffer",
+          "descriptor": "()Lorg/jline/reader/Buffer;",
+          "access": 1,
+          "code_sha256": "a7b4637cb0d3ae9ce738540a0dda41e45d7199930c61a21944f6567d443531f9",
+          "code_length": 10
+        },
+        {
+          "name": "replaceBuffer",
+          "descriptor": "(Lorg/jline/reader/Buffer;)V",
+          "access": 1,
+          "code_sha256": "96bcee3bf1fe7d4f6cdfcf40612f6e13ac9ff2cb5dd13081533977fcbca662f2",
+          "code_length": 16
+        },
+        {
+          "name": "args",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "4fdb98cb592c6c9464603c664262cf80d5005f225fea1cc157002b970a392af1",
+          "code_length": 33,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "prevChar",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "45f13ee74d94368fb8e1a7e005dd3aadc59d723d372a7bd2d5686c53759eb6f0",
+          "code_length": 19
+        },
+        {
+          "name": "currChar",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3d932c544029193f5702142a8c07729a6bbf227d25a167c95766ef1d6f1b97ce",
+          "code_length": 19
+        },
+        {
+          "name": "lastBinding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5c327a6befa5863fb87a0fee0758cc4bf9c331cf81b45ad082b3ec97826e9512",
+          "code_length": 10
+        },
+        {
+          "name": "putString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0273b79a9994e3a2013f9e4ca98518798b551429d3f866a1553758a7b26c9fd7",
+          "code_length": 16
+        },
+        {
+          "name": "tailTip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dec12a20c617905debb132d39e9c2293fbf40214d7c8cb0e3279934e4fbde80a",
+          "code_length": 10
+        },
+        {
+          "name": "setTailTip",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e5cc462728f591ac30d48ec0443703467bfc7ee735fc48fe58e26b3707c617ea",
+          "code_length": 11
+        },
+        {
+          "name": "setErrorPattern",
+          "descriptor": "(Ljava/util/regex/Pattern;)V",
+          "access": 1,
+          "code_sha256": "d8d67377da8702c26ed87c7129e577a307ccc2613815769c986f0cc0214599a3",
+          "code_length": 16
+        },
+        {
+          "name": "setErrorIndex",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f6d4b4abaf6739707794266544073a78cf4ba2ded32a265a6fe8921f501ea62a",
+          "code_length": 16
+        },
+        {
+          "name": "clearTailTip",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "23b52c001f2620d5c4fa14d5457788de62d1f936cca412e2ce7c6058724d2e63",
+          "code_length": 12
+        },
+        {
+          "name": "setSuggestionType",
+          "descriptor": "(Lorg/jline/reader/LineReader$SuggestionType;)V",
+          "access": 1,
+          "code_sha256": "3dcb765e645803afbd30039dbb149bfd08f6a3921a0a933f27e8ac74af9b1c20",
+          "code_length": 11
+        },
+        {
+          "name": "addDescription",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "458f0b1fa2188420fc77eb0c84422149da34b0e4ccaf5658eb52375ca084d9f5",
+          "code_length": 17,
+          "generic_signature": "(Ljava/util/List<Lorg/jline/utils/AttributedString;>;)V"
+        },
+        {
+          "name": "clearDescription",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6eef84bcc0336c45eefadfadcb5fda69c09b40ba6a4ff4ec6a53af1eec4072fd",
+          "code_length": 6
+        },
+        {
+          "name": "initDescription",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "9f523ec61d038e82bfe32a4587d544e9c71d5473d3ea2d755d94b32ffb4f985a",
+          "code_length": 108
+        },
+        {
+          "name": "destroyDescription",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f7f18cc22d5d4c1f39c4f165607698ebbc74c2ee3afd0ab40101ed192aae201b",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/security/InvalidParameterException",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Map",
+        "org/jline/keymap/KeyMap",
+        "org/jline/reader/Binding",
+        "org/jline/reader/Buffer",
+        "org/jline/reader/Highlighter",
+        "org/jline/reader/LineReader",
+        "org/jline/reader/LineReader$SuggestionType",
+        "org/jline/reader/ParsedLine",
+        "org/jline/reader/Parser",
+        "org/jline/reader/Parser$ParseContext",
+        "org/jline/reader/Reference",
+        "org/jline/reader/Widget",
+        "org/jline/utils/AttributedString",
+        "org/jline/utils/Status",
+        "org/jline/widget/Widgets",
+        "org/jline/widget/Widgets$1"
+      ]
+    }
+  ]
+}

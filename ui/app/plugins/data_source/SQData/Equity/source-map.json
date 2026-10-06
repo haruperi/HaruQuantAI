@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend structural Equity mapping",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/Equity",
-  "source_head": "7866f254378fac3b478537d3e59ba01c9976821b",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_133334_data-source-sqdata-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,164 +28,219 @@
   "source_catalog": [
     {
       "id": "sqx-sqequity-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData",
       "family": "installed plugin UI artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/addPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/addPopup.html",
       "relative_path": "add/addPopup.html",
       "location": "lines 1-246; provider form/conditions markup",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "a30d878e5579d6e1090086a897f67131a4fcac8e165f89d5183bd29f118eee32",
+      "sha256": "46d41a861717b0eb8ac55a5ff3ae7844edef21bac22ae9e9cd42ede0cf0774d1",
       "byte_size": 15182,
       "target": "add/addPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/dataUsageConditionsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/dataUsageConditionsPopup.html",
       "relative_path": "add/dataUsageConditionsPopup.html",
       "location": "lines 1-41; provider form/conditions markup",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "01ba1cb0e588b4a445edf79346d2188067cd7333527df5291fea10cd1d8057d1",
+      "sha256": "b81004e7873a152fde4b9307d23fb96046a258736896868ded853d1a0c84b22d",
       "byte_size": 3035,
       "target": "add/dataUsageConditionsPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/module.js",
       "relative_path": "add/module.js",
       "location": "lines 1-10; Angular module/contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "1fc216281d1b2eb1f85f67bb6485f286457b747f603c0a2f62e54cf7bae6965b",
+      "sha256": "532a250efd438fcac579c63408cbc9f17da2e303cb98031f3d12ba0a33580aa4",
       "byte_size": 450,
       "target": "add/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js",
       "relative_path": "add/SQEquityDataAddCtrl.js",
       "location": "lines 1-189; named Angular controller registration and UI state/actions",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "e530abff0ca28c88342deee3d7d585e0a0c264e10ccac55c1b77047598985149",
+      "sha256": "e714b749161a83b5df629b7a3a7f43d839038a22e08dd2800a13218fdbd4dd3d",
       "byte_size": 5844,
       "target": "add/SQEquityDataAddCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
       "relative_path": "DataSourceSQEquityData.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend binary excluded",
       "access_date": "2026-10-06",
-      "sha256": "4775cfdc7055c32fb6368e60d4e755f8e1c1e71945b316994b0db3038251107c",
+      "sha256": "872584251e604ec4d6dc7a8837a5a674fc30daef5251891090d1fb0b85365e53",
       "byte_size": 12905,
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/module.js",
       "relative_path": "module.js",
       "location": "lines 1-13; Angular module/contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "752b4dce3709cb08639fc587926f5ef7ba742c53f28a6db4dda4de22128208a0",
+      "sha256": "aa32ce84a9098f9eed88edecebcffdc27b1c96de3bad1489ad10e08ccb6d4f73",
       "byte_size": 407,
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/SQEquityDataService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/SQEquityDataService.js",
       "relative_path": "SQEquityDataService.js",
       "location": "lines 1-53; Angular service registration and lookup/add/update methods",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "a2f98acf67a59c052a449df26e828bf442c882ea4e170717b71683146ae61af8",
+      "sha256": "cd8ed00a37ac26769a00e486a2b217f1428f3ac1d090e350bd9e03c984a20ddf",
       "byte_size": 1739,
       "target": "SQEquityDataService.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/styles.css",
       "relative_path": "styles.css",
       "location": "lines 1-70; plugin stylesheet rules",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "b306957137623552848f85a3828e91266ff23191afe55c42f64ef968e5f3cc6d",
+      "sha256": "6ae1b6eb53a2c5ea5c1a4a5f90002343d8351438a2850c92b8fef2cdba285e9f",
       "byte_size": 1315,
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/module.js",
       "relative_path": "update/module.js",
       "location": "lines 1-10; Angular module/contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "4623adbe10442769e9e7c437e4bf4f31f92e4034b480331bba332cb64703c4d9",
+      "sha256": "080022812aa9e3a362411aca4da3d6fd39cd63e167c6d6d64d5ea73959f63695",
       "byte_size": 459,
       "target": "update/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/SQEquityDataUpdateCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/SQEquityDataUpdateCtrl.js",
       "relative_path": "update/SQEquityDataUpdateCtrl.js",
       "location": "lines 1-8; named Angular controller registration and UI state/actions",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored counterpart using existing target capabilities",
       "access_date": "2026-10-06",
-      "sha256": "fd1723d081dec2583b7e750216cfbb26ababade007e4569a5f21ea91adec16db",
+      "sha256": "77889f0d4d6cb7e98938773aaf89a1482b0c323160955c96e53cdedf4e223b05",
       "byte_size": 291,
       "target": "update/SQEquityDataUpdateCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-sqequity-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/updatePopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/updatePopup.html",
       "relative_path": "update/updatePopup.html",
       "location": "zero-byte template",
-      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "zero-byte update template excluded",
       "access_date": "2026-10-06",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
       "byte_size": 0,
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -193,5 +248,10 @@
       "path": "source-map.json",
       "reason": "Structural provenance manifest; ownership/status lives in parent README."
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

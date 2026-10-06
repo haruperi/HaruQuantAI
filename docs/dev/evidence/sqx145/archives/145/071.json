@@ -1,0 +1,65 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jspf.remote.jar",
+  "sha256": "9987cca1d084129a024a5c7132e561a039c9ec933cc8ebe8697bf89e79412652",
+  "class_count": 6,
+  "unique_class_entries": 6,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "net/xeoh/plugins/remote/ExportResult.class": "c3af98e2639742ed65e993291d4b692c82bf950592a12ad580461efe1729c4fc",
+    "net/xeoh/plugins/remote/PublishMethod.class": "256d297de341dffbc4f64c7cfeae7b6faba2e18f9cdea05771c6c6e5783de3df",
+    "net/xeoh/plugins/remote/RemoteAPI.class": "897467bffcf80650fbb70422f355b83380fbf38c36f255f7774ee75d1ab51eca",
+    "net/xeoh/plugins/remote/RemotePluginHandler.class": "5984997593037844dd5bc7fb83e6753c87fbe9896514fea1c53fbb62d28e15ab",
+    "net/xeoh/plugins/remote/util/internal/PluginExport.class": "7a158970c40d9d707028ad47c78f6f20a2d0e303ffa71616fa6aff33f49b326a",
+    "net/xeoh/plugins/remote/util/vanilla/ExportResultImpl.class": "f534456f6bc03343cda1c878b8669dc2adb20ce9fd576b101371916abeb3daca"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "e2963eabe3f6f3a32c7883525c73b426af18652c756a27016a06acf4a1485a1f"
+  },
+  "class_occurrences": [
+    {
+      "entry": "net/xeoh/plugins/remote/ExportResult.class",
+      "occurrence": 0,
+      "sha256": "c3af98e2639742ed65e993291d4b692c82bf950592a12ad580461efe1729c4fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/PublishMethod.class",
+      "occurrence": 0,
+      "sha256": "256d297de341dffbc4f64c7cfeae7b6faba2e18f9cdea05771c6c6e5783de3df",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/RemoteAPI.class",
+      "occurrence": 0,
+      "sha256": "897467bffcf80650fbb70422f355b83380fbf38c36f255f7774ee75d1ab51eca",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/RemotePluginHandler.class",
+      "occurrence": 0,
+      "sha256": "5984997593037844dd5bc7fb83e6753c87fbe9896514fea1c53fbb62d28e15ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/util/internal/PluginExport.class",
+      "occurrence": 0,
+      "sha256": "7a158970c40d9d707028ad47c78f6f20a2d0e303ffa71616fa6aff33f49b326a",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/util/vanilla/ExportResultImpl.class",
+      "occurrence": 0,
+      "sha256": "f534456f6bc03343cda1c878b8669dc2adb20ce9fd576b101371916abeb3daca",
+      "member_shard": "docs/dev/evidence/sqx145/members/071/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/071/001.json",
+      "sha256": "9b8984071fa6e2c196d6ea8f8a94d2f439304d842827afc447afa758b602e5b4"
+    }
+  ]
+}

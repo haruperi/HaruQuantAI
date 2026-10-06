@@ -1,248 +1,316 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only ResultsRobustnessTests bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsRobustnessTests",
-    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
-    "review":  {
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan",
-                   "version":  1
-               },
-    "owner":  {
-                  "domain":  "plugins/project",
-                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
-                  "decision":  "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
-                  "requirements":  [
-                                       "FR-UI-PROJECT-source-mapping",
-                                       "FR-UI-PROJECT-workflow-preservation",
-                                       "FR-UI-PROJECT-clean-room"
-                                   ]
-              },
-    "clean_room":  {
-                       "contains_proprietary_source":  false,
-                       "contains_sensitive_data":  false,
-                       "contains_personal_data":  false,
-                       "paraphrased_behavior_only":  true
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultsrobustnesstests-ui",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests",
-                               "family":  "bounded installed frontend plugin artifacts"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/manageviews.html",
-                        "relative_path":  "directives/manageviews/manageviews.html",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "22be429862ea056b07eae4f8e5a80de2527277624b77db37ef7f541c0ca130bf",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViews.js",
-                        "relative_path":  "directives/manageviews/ManageViews.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "1258e28b98d5e4f6a94a95feb48e231a632cdb35b901caecd33dedda566d4e7c",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsCtrlRt.js",
-                        "relative_path":  "directives/manageviews/ManageViewsCtrlRt.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "69169df17f69fbff4c92d20b45809d9c60217114499fe629228a1cf4ed909089",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js",
-                        "relative_path":  "directives/manageviews/ManageViewsService.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "61fa60b5ffc6f5dc13de56d8709502334d22db96959600db62b05533ef0cfeb7",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend/chart/report/view persistence operations absent; no services implemented."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/robustnessAnalysis.html",
-                        "relative_path":  "directives/robustnessAnalysis/robustnessAnalysis.html",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "5407476cf075d33097ba94d8ed30382bdd066a77383c6e821ccb79091f213470",
-                        "target":  "directives/robustnessAnalysis/robustnessAnalysis.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysis.js",
-                        "relative_path":  "directives/robustnessAnalysis/RobustnessAnalysis.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "3ea4d3ef8c69702b9df368c714534dd223fab2c721ad0bfdad39189cbdb5540a",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysisCtrl.js",
-                        "relative_path":  "directives/robustnessAnalysis/RobustnessAnalysisCtrl.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "521dec77f55be51bd06230fd9ca20fe6188652486048435bb59fc135fe8ce562",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "64f24cc8f5a68b9a4c086758fc6258ba22c765e71aaa8b267c6aa242d0cb3a9f",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
-                        "relative_path":  "ResultsRobustnessTests.jar",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "ca78fea41989e25555b43f2042b775befbe015807c5bc3de4b8416e3909bc0d9",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend binary excluded from frontend-only scope."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/robustnessTests.html",
-                        "relative_path":  "robustnessTests.html",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "37bc850329b0d4c7db59c2b360a4ac7a3cac28335ba45adfcbfcc87c554263a1",
-                        "target":  "robustnessTests.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/RobustnessTestsResultsCtrl.js",
-                        "relative_path":  "RobustnessTestsResultsCtrl.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "1de91d37d42293a137f8f1e18b98547fb1d82f0c1cdcce1c7ceca59a7ebb2b91",
-                        "target":  "RobustnessTestsResultsCtrl.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js",
-                        "relative_path":  "services/RTService.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "5e3878f41cc5202682885dda4b74a02e1738355861c92415301ae08eb8d44fde",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend/chart/report/view persistence operations absent; no services implemented."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultsrobustnesstests-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/styles/rt.css",
-                        "relative_path":  "styles/rt.css",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "04c5626dd15fdb99d5e3335d300dc332e2cb5c7b1bd0b1c6329db51517cd19c7",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted."
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Structural manifest, not behavioral ledger"
-                        },
-                        {
-                            "path":  "README.md",
-                            "reason":  "Coordinator-owned documentation/ownership"
-                        }
-                    ],
-    "retained_support":  [
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
-                                 "reason":  "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
-                                 "reason":  "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
-                                 "reason":  "Shared independent synthetic plots and TradesChart controls retained"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
-                                 "reason":  "Shared result capability flags and mock contracts"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
-                                 "reason":  "Shared conditional visibility/order/defaults"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
-                                 "reason":  "Shared session analysis rename/delete/export modal behavior retained"
-                             }
-                         ],
-    "limitations":  [
-                        "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
-                        "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
-                        "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
-                        "Structure and mock responsibilities do not establish SQX runtime parity."
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsRobustnessTests bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsRobustnessTests",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "decision": "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsrobustnesstests-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests",
+      "family": "bounded installed frontend plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/manageviews.html",
+      "relative_path": "directives/manageviews/manageviews.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "eed819f7d57ebe4842affd8ef9549c64321826ab66b105378bf2b2f3b690587d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViews.js",
+      "relative_path": "directives/manageviews/ManageViews.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "501ca7c510fc36bab86d696f41b378790a4932820a7c3d1fb2b444e499ecc7a2",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsCtrlRt.js",
+      "relative_path": "directives/manageviews/ManageViewsCtrlRt.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "dea5d746e7cd5cb87615dc57208011d8a56f840b3f041c54408cec60e86f2610",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js",
+      "relative_path": "directives/manageviews/ManageViewsService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "43130befcb48521bc700a58b253044693eb84dafc7f8bfd8979596b6d166d8c4",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/chart/report/view persistence operations absent; no services implemented. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/robustnessAnalysis.html",
+      "relative_path": "directives/robustnessAnalysis/robustnessAnalysis.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "6f0e6883d72c297f9c56d2acc63bd1798cef3ebf716ae4a4857731e4fce6f3d4",
+      "target": "directives/robustnessAnalysis/robustnessAnalysis.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysis.js",
+      "relative_path": "directives/robustnessAnalysis/RobustnessAnalysis.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "54942675c5ba43c12097a2245309a686dee20deacabc00963bec192630903749",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysisCtrl.js",
+      "relative_path": "directives/robustnessAnalysis/RobustnessAnalysisCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "a6a6780290a0dddd4e9317d2a6f1ac2b5c3f10f03c598f960d2b44b61598473a",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "90095b878fde5e467d8f271b27778dedd8f062498197c6c6757afb288d42d6b7",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+      "relative_path": "ResultsRobustnessTests.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/robustnessTests.html",
+      "relative_path": "robustnessTests.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "53230fa4af6ccf36a7776410cc8d6a37259b6e4a6046355656e5c793f790c191",
+      "target": "robustnessTests.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/RobustnessTestsResultsCtrl.js",
+      "relative_path": "RobustnessTestsResultsCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "ea4c5f97fc47f5e7b85ff1a617baa1f3f6a981dc53fb76f89ff1d8c39c61aaea",
+      "target": "RobustnessTestsResultsCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js",
+      "relative_path": "services/RTService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "5e3878f41cc5202682885dda4b74a02e1738355861c92415301ae08eb8d44fde",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/chart/report/view persistence operations absent; no services implemented. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsrobustnesstests-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/styles/rt.css",
+      "relative_path": "styles/rt.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "0efe3a695da548a4494558d5da850da5f48b68eb77bc774c3da09229701aebf5",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned documentation/ownership"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
+      "reason": "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+      "reason": "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independent synthetic plots and TradesChart controls retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+      "reason": "Shared result capability flags and mock contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+      "reason": "Shared conditional visibility/order/defaults"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
+      "reason": "Shared session analysis rename/delete/export modal behavior retained"
+    }
+  ],
+  "limitations": [
+    "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
+    "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
+    "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
+    "Structure and mock responsibilities do not establish SQX runtime parity.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

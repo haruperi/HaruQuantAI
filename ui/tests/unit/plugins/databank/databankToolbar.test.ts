@@ -8,7 +8,7 @@ import {
 import { DEFAULT_VIEW_PRESETS } from '../../../../app/plugins/databank/ProjectDatabanks/databankColumns';
 import { strategyPassesMockChecks } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankCtrl';
 
-describe('Databanks toolbar inventory (donor SQX144-EV-000028)', () => {
+describe('Databanks toolbar inventory (donor retained target UI; current donor equivalence unverified)', () => {
   it('orders toolbar buttons exactly as the donor plugin positions', () => {
     expect(TOOLBAR_BUTTON_ORDER.map(b => b.label)).toEqual([
       'Load',
@@ -61,7 +61,7 @@ describe('Databanks toolbar inventory (donor SQX144-EV-000028)', () => {
   });
 });
 
-describe('Databanks default grid view (donor SQX144-EV-000031)', () => {
+describe('Databanks default grid view (donor retained target UI; current donor equivalence unverified)', () => {
   it('names the default view as the donor does', () => {
     expect(DEFAULT_VIEW_PRESETS[0].name).toBe('Default - Main data');
   });

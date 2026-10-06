@@ -1,102 +1,39 @@
 # AppDebugConsole.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole/AppDebugConsole.jar`.
-- SHA-256: `67385f439772238bec088a089cc88437dfd58d29fae8ae397fb1dbacfb34e1da`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **1**; non-nested: **1**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppDebugConsole/AppDebugConsole.jar`.
+- **SHA-256:** `aaaf875f1a4897aa3ea0a415bdca4da672b166bd0ea117bad9f5276723330394`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 1 raw entries; 1 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-HOST-APP-DEBUG-CONSOLE`, P01; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [127.json](../../dev/evidence/sqx145/archives/145/127.json).
 
-The `DebugConsole` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/127/001.json) — SHA-256 `f3fb78add44358cf593b74e71fc73c7fb732393295fc4b35eba4acc06b614bdd`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.App.impl.DebugConsole`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class Cb3b57ea57684["DebugConsoleAppPlugin"] {
-        +Log
-        +getName()
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getContextPath()
-        +getAppCode()
-    }
-    class C1b6b4448b67b["IProgram"]
-    class C71ae2af47347["IAppPlugin"]
-    C71ae2af47347 <|.. Cb3b57ea57684 : declared interface
-    C1b6b4448b67b <|.. Cb3b57ea57684 : declared interface
+    class C0["DebugConsoleAppPlugin"]
+    class E0["IAppPlugin"]
+    E0 <|.. C0
+    class E1["IProgram"]
+    E1 <|.. C0
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `Cb3b57ea57684` | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` (this JAR) | this diagram |
-| `C1b6b4448b67b` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | referenced external type |
-| `C71ae2af47347` | [`com.strategyquant.tradinglib.plugindef.app.IAppPlugin`](../Shared/SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | [`com.strategyquant.tradinglib.plugindef.app.IAppPlugin`](../Shared/SQTradingLib.md) | implements | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / class declaration: `public class com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin implements com.strategyquant.tradinglib.plugindef.app.IAppPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | implements | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / class declaration: `public class com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin implements com.strategyquant.tradinglib.plugindef.app.IAppPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / field declaration: `public static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / method signature: `public java.lang.String getName();`<br>`public java.lang.String getProduct();`<br>`public java.lang.String getContextPath();`<br>`public java.lang.String getAppCode();`<br>`public java.lang.String getTooltip();`<br>`public java.lang.String getProject();`<br>`public java.lang.String getDefaultTaskType();`<br>`public java.lang.String getDefaultTaskName();`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` | `java.lang.Object` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin` / method signature: `public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin implements com.strategyquant.tradinglib.plugindef.app.IAppPlugin,com.strategyquant.pluginlib.program.IProgram
-    public static final org.slf4j.Logger Log;
-    public com.strategyquant.plugin.App.impl.DebugConsole.DebugConsoleAppPlugin();
-    public java.lang.String getName();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public java.lang.String getContextPath();
-    public java.lang.String getAppCode();
-    public java.lang.String getTooltip();
-    public java.lang.String getProject();
-    public java.lang.String getDefaultTaskType();
-    public java.lang.String getDefaultTaskName();
-    public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/App/impl/DebugConsole/DebugConsoleAppPlugin.class` | 0 | `fc02d688eaa04d743c4bf563fd2195155abb9734a43a9e3172ff1c89dba5f64b` | 1 | 13 |

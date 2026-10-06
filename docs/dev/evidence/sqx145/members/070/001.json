@@ -1,0 +1,5447 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jspf.core.jar",
+  "archive_sha256": "94f287909bc8fb0970819f165cf091b08f1787053c9875824b6deb9a12ea0185",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "net/jcores/CommonCore$1.class",
+      "occurrence": 0,
+      "sha256": "cb8ba47c93c16cf85f8c3f89089b42fdcfeb8a81cfd8d5046330e41002493106",
+      "name": "net/jcores/CommonCore$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ThreadFactory"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "newThread",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "5adba9b2e3ee7c2843b66fff1a69a07f0be5c2c1ffddb53d80bf8e4f95af41e4",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Thread",
+        "java/util/concurrent/ThreadFactory",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$1"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore$2$1.class",
+      "occurrence": 0,
+      "sha256": "777f9af4b9d331e14ff88260f0087f1884d213c25fee70ff04d891828046cc9e",
+      "name": "net/jcores/CommonCore$2$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lnet/jcores/CommonCore$2;",
+          "access": 4112
+        },
+        {
+          "name": "val$barrier",
+          "descriptor": "Ljava/util/concurrent/CyclicBarrier;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore$2;Ljava/util/concurrent/CyclicBarrier;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2e05319c08f4e59204413d494a3d7b395650312c895d4b9f4e819b1d435a3e1b",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/BrokenBarrierException",
+        "java/util/concurrent/CyclicBarrier",
+        "net/jcores/CommonCore$2",
+        "net/jcores/CommonCore$2$1"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore$2.class",
+      "occurrence": 0,
+      "sha256": "694c01e4d32f5ba464fe5261bb653f0767a411af5d9e2b33a0752662543f480e",
+      "name": "net/jcores/CommonCore$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F0"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2d4255f2bef3dfde437df546685121942a5fc1afa45320825b479ef4cdfe5e70",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/util/concurrent/BrokenBarrierException",
+        "java/util/concurrent/CyclicBarrier",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$2",
+        "net/jcores/CommonCore$2$1",
+        "net/jcores/interfaces/functions/F0"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore$3.class",
+      "occurrence": 0,
+      "sha256": "cd7a5942d9360aa4156175aab9f118a842b671b5e1b1f96879a3d34c3b49b803",
+      "name": "net/jcores/CommonCore$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 4112
+        },
+        {
+          "name": "val$f0",
+          "descriptor": "Lnet/jcores/interfaces/functions/F0;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;Lnet/jcores/interfaces/functions/F0;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2d317eb8560c463ef89279be96fc3300e9344f0cb38ad6e1382f94c795b6bdea",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$3",
+        "net/jcores/interfaces/functions/F0"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore$4.class",
+      "occurrence": 0,
+      "sha256": "299295840cf8c8bf5f0fab6df4e36cc66d7951142a1b8a6d8617070440576994",
+      "name": "net/jcores/CommonCore$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 4112
+        },
+        {
+          "name": "val$f0",
+          "descriptor": "Lnet/jcores/interfaces/functions/F0;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;Lnet/jcores/interfaces/functions/F0;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2d317eb8560c463ef89279be96fc3300e9344f0cb38ad6e1382f94c795b6bdea",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$4",
+        "net/jcores/interfaces/functions/F0"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore$5.class",
+      "occurrence": 0,
+      "sha256": "ac8b6f8a19d7a4d5907971935bad324f2492d2141cdc655d47fb4d1044f6cf71",
+      "name": "net/jcores/CommonCore$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/TimerTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 4112
+        },
+        {
+          "name": "val$f0",
+          "descriptor": "Lnet/jcores/interfaces/functions/F0;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;Lnet/jcores/interfaces/functions/F0;)V",
+          "access": 0,
+          "code_sha256": "d1e069c903e9675f9651b8523eb74104720343e582aa825f0f26127860f36e22",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cef51a124e4f2ef9f7b86fbe6b36ff5d52c3ca95ae3308fbc726b1407a3b32b1",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/util/TimerTask",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$5",
+        "net/jcores/interfaces/functions/F0"
+      ]
+    },
+    {
+      "entry": "net/jcores/CommonCore.class",
+      "occurrence": 0,
+      "sha256": "eb3cebb22d7becff561e3bea673d0df96ee60ac27d7d223887730140c8a32fed",
+      "name": "net/jcores/CommonCore",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        },
+        {
+          "name": "reporter",
+          "descriptor": "Lnet/jcores/utils/internal/Reporter;",
+          "access": 18
+        },
+        {
+          "name": "managers",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Ljava/lang/Class<+Lnet/jcores/managers/Manager;>;Lnet/jcores/managers/Manager;>;"
+        },
+        {
+          "name": "random",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "profileInformation",
+          "descriptor": "Lnet/jcores/utils/internal/system/ProfileInformation;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e23b73a5caeae5ae828ba3b468cf85bad45dcd0871d18c8714d7d691e474da0c",
+          "code_length": 117
+        },
+        {
+          "name": "profile",
+          "descriptor": "()Lnet/jcores/utils/internal/system/ProfileInformation;",
+          "access": 2,
+          "code_sha256": "3b30ec91635dfcac50462c7be731c2be345bd06adc8c3e46472c99364f8b1ef5",
+          "code_length": 97
+        },
+        {
+          "name": "box",
+          "descriptor": "([I)[Ljava/lang/Integer;",
+          "access": 129,
+          "code_sha256": "08a08a2ace196d7c729a1d62fb98b053555074c67b062682c99e5ad9407dc2bc",
+          "code_length": 51
+        },
+        {
+          "name": "edt",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F0;)V",
+          "access": 1,
+          "code_sha256": "d82a033a7fd0b0733de72d56c62ecf00b4391d6d4ee7cf74af318f8d7958cbf6",
+          "code_length": 13
+        },
+        {
+          "name": "edtnow",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F0;)V",
+          "access": 1,
+          "code_sha256": "2a6738d8c1f6c36cc5fbc2da3134403cf8ebe2bbc8da5dd62219d486885d262e",
+          "code_length": 29
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/Runnable;I)V",
+          "access": 1,
+          "code_sha256": "534f611c35e55bc5f9cb14f493f6ed96dcbebe69f0496902876cb3b937107adb",
+          "code_length": 24
+        },
+        {
+          "name": "manager",
+          "descriptor": "(Ljava/lang/Class;Lnet/jcores/managers/Manager;)Lnet/jcores/managers/Manager;",
+          "access": 1,
+          "generic_signature": "<T:Lnet/jcores/managers/Manager;>(Ljava/lang/Class<TT;>;TT;)TT;",
+          "code_sha256": "a5e6127d80b4cd3705534edec65413bec6e7eda68c33a30db2fcd0bedb0ecd98",
+          "code_length": 26
+        },
+        {
+          "name": "manager",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/managers/Manager;",
+          "access": 1,
+          "generic_signature": "<T:Lnet/jcores/managers/Manager;>(Ljava/lang/Class<TT;>;)TT;",
+          "code_sha256": "8d67bca8cf2a52a301c93ceb5b35e1290815c037dd032da0f829e8b3dfa72767",
+          "code_length": 14
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/lang/String;Ljava/util/logging/Level;)V",
+          "access": 1,
+          "code_sha256": "f6217156c2749af8fbcdb63b301d2973c8a10893a30998282637f0f7a1f93727",
+          "code_length": 20
+        },
+        {
+          "name": "measure",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F0;)J",
+          "access": 1,
+          "code_sha256": "5ee8807757b06f2cf7eefac39a300a8b5198bb60ba75c7e6f78995bc2b65ae2a",
+          "code_length": 20
+        },
+        {
+          "name": "oneTime",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F0;J)V",
+          "access": 1,
+          "code_sha256": "b025898644018a1dd4a96607f8b3fa760ad15d309dd4820c41d412e79a697000",
+          "code_length": 25
+        },
+        {
+          "name": "profileInformation",
+          "descriptor": "()Lnet/jcores/utils/internal/system/ProfileInformation;",
+          "access": 1,
+          "code_sha256": "64e13aaa97aec4d91d084db810fc74f50b20b310900b91ca4da7e5eb64fffe17",
+          "code_length": 5
+        },
+        {
+          "name": "range",
+          "descriptor": "(I)Lnet/jcores/cores/CoreNumber;",
+          "access": 1,
+          "code_sha256": "f4f3249b296a55cc538b3b14812533c861f1759357960f933d5244c35abd6e90",
+          "code_length": 8
+        },
+        {
+          "name": "range",
+          "descriptor": "(II)Lnet/jcores/cores/CoreNumber;",
+          "access": 1,
+          "code_sha256": "904aa12c49f09c4d8978b1bc54a4e2d96f79514300deb5d60b345e6eec4a586d",
+          "code_length": 17
+        },
+        {
+          "name": "range",
+          "descriptor": "(III)Lnet/jcores/cores/CoreNumber;",
+          "access": 1,
+          "code_sha256": "1bf7dde686ceb37adf087ab61125feb8e671e93be079bbb575b2d1bfd2158a18",
+          "code_length": 89
+        },
+        {
+          "name": "report",
+          "descriptor": "(Lnet/jcores/options/MessageType;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "84abfe856f63102cadbbd8e5342708235ad25ad8b899b584ac7907d76c06b669",
+          "code_length": 9
+        },
+        {
+          "name": "report",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "04975f022b092346ee0209fec73dcaf7faa0d59f6eceab6322ed12dd56aa4c70",
+          "code_length": 8
+        },
+        {
+          "name": "random",
+          "descriptor": "()Ljava/util/Random;",
+          "access": 1,
+          "code_sha256": "0256bbf2ee9b049b72c52c383a0ffd7278c47d2cd9bc11d1a1fb60fe8bf4f524",
+          "code_length": 5
+        },
+        {
+          "name": "sleep",
+          "descriptor": "(J)Z",
+          "access": 1,
+          "code_sha256": "b2011e213b0c77916a6600f8d566c78b9b41a084f1f122102926291c3c039ee6",
+          "code_length": 12
+        },
+        {
+          "name": "tempfile",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "0d3d171f2067e093bb27ee619bef172e23de5f411d083f3b3c984285eb14ddce",
+          "code_length": 44
+        },
+        {
+          "name": "tempdir",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "835c1508f1bcb138e47fe8f58bad4797a711e7a2504283a2b08083439a0c3e38",
+          "code_length": 41
+        },
+        {
+          "name": "unbox",
+          "descriptor": "([Ljava/lang/Integer;)[I",
+          "access": 129,
+          "code_sha256": "057a0a449c035e190b60c4687d9ec0e1734aad23eb2c5a1b7e12a3b68ddd1da7",
+          "code_length": 50
+        },
+        {
+          "name": "uniqueID",
+          "descriptor": "([Lnet/jcores/options/Option;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "ddf76bd6a224253336ba457104b8dd320f6162c3b1d5c2f445728f73be76064b",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[J",
+        "[Ljava/lang/Integer;",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/reflect/InvocationTargetException",
+        "java/util/Random",
+        "java/util/Timer",
+        "java/util/UUID",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "javax/swing/SwingUtilities",
+        "net/jcores/CommonCore",
+        "net/jcores/CommonCore$1",
+        "net/jcores/CommonCore$2",
+        "net/jcores/CommonCore$3",
+        "net/jcores/CommonCore$4",
+        "net/jcores/CommonCore$5",
+        "net/jcores/CoreKeeper",
+        "net/jcores/interfaces/functions/F0",
+        "net/jcores/interfaces/internal/logging/LoggingHandler",
+        "net/jcores/managers/Manager",
+        "net/jcores/managers/ManagerClass",
+        "net/jcores/managers/ManagerDebugGUI",
+        "net/jcores/managers/ManagerDeveloperFeedback",
+        "net/jcores/managers/ManagerLogging",
+        "net/jcores/utils/internal/Reporter",
+        "net/jcores/utils/internal/system/ProfileInformation"
+      ]
+    },
+    {
+      "entry": "net/jcores/CoreKeeper.class",
+      "occurrence": 0,
+      "sha256": "b2c4bf73d68f46a26a338529b10cfced387b48791d83a265558a909110867390",
+      "name": "net/jcores/CoreKeeper",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e121fef5da482d6c625ff5d34631bf571ddb648271f8b02e8e86ac1b6469f786",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3cbf10796c8b68343919f56bd75d1061d3aefdbd02f8763313f594d895cc67df",
+          "code_length": 5
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 137,
+          "generic_signature": "<T:Ljava/lang/Object;>([TT;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "494c8ae97f63f371958b227d564f5a4597495d0a8d1aa7bce7a64af9b587e126",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljavax/sound/sampled/AudioInputStream;)Lnet/jcores/cores/CoreAudioInputStream;",
+          "access": 137,
+          "code_sha256": "9f3394496b91b3edb9129777345db835e55e5da615f027c761b6e6a77ebcfbcf",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/lang/Number;)Lnet/jcores/cores/CoreNumber;",
+          "access": 137,
+          "code_sha256": "7df2e575166f5f222d2a1033e9a8b57078827b077b5f384d24011b3158c2ef00",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Lnet/jcores/utils/Compound;)Lnet/jcores/cores/CoreCompound;",
+          "access": 137,
+          "generic_signature": "<T:Ljava/lang/Object;>([Lnet/jcores/utils/Compound<TT;>;)Lnet/jcores/cores/CoreCompound<TT;>;",
+          "code_sha256": "c4a58313f0de8231f8e04c6fa4363290e7fa639a28c2b022446759f984796562",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/cores/CoreClass;",
+          "access": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lnet/jcores/cores/CoreClass<TT;>;",
+          "code_sha256": "9eb9c1470fc98a8c5ecaaaaa5bf4c37e4c7beefd6044f5366bd1e16802219622",
+          "code_length": 19
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/lang/Class;)Lnet/jcores/cores/CoreClass;",
+          "access": 137,
+          "generic_signature": "<T:Ljava/lang/Object;>([Ljava/lang/Class<TT;>;)Lnet/jcores/cores/CoreClass<TT;>;",
+          "code_sha256": "bf1a5cb63d85222c2e8b6741d58c1e494c79e55ee09b4815faaa62c7035c43c6",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/lang/String;)Lnet/jcores/cores/CoreString;",
+          "access": 137,
+          "code_sha256": "6f7b758d308b3b94327618f68e71d92529db5eb45fd7a0bc72c7d3ab96c8ca5f",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/net/URI;)Lnet/jcores/cores/CoreURI;",
+          "access": 137,
+          "code_sha256": "21672ea55cd788b11b4b267934465911c0fe137976770907dbd5392c55883d2e",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/net/URL;)Lnet/jcores/cores/CoreURI;",
+          "access": 137,
+          "code_sha256": "ff649f5c9ee0788315569b9fd57ead65e2edb369b9f5b4c1f6bc5ea87912a71e",
+          "code_length": 15
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/io/File;)Lnet/jcores/cores/CoreFile;",
+          "access": 137,
+          "code_sha256": "1e453dce49d8bb6ed3af1bec9862a051cb200ec22a5adbd5a14d34d5797d8db2",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/io/InputStream;)Lnet/jcores/cores/CoreInputStream;",
+          "access": 137,
+          "code_sha256": "cbee7943143bd3b8ba4fe9f9ec055980f008fb2f2416174c24e7839112743348",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/awt/image/BufferedImage;)Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 137,
+          "code_sha256": "36d56dbe3a6ef97d190f8b4d461775a5bafbdccb0a6033c5ed854c75344a8807",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljava/awt/Component;)Lnet/jcores/cores/CoreComponent;",
+          "access": 137,
+          "code_sha256": "b2b38c6c22b22bfc93abce4d2e2e64fe8b276b87534d759a5f3e4d67b56e140d",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "([Ljavax/swing/JComponent;)Lnet/jcores/cores/CoreJComponent;",
+          "access": 137,
+          "code_sha256": "671fedda7c9c132d70d4f98330b198e12971762f3a09a0b8c71be2021d8132e4",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "(Ljava/util/Collection;)Lnet/jcores/cores/CoreObject;",
+          "access": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "6718cf3e171fcd6d9a0264e3859437443c6cf2d93d1467489d5d60b1a152736d",
+          "code_length": 17
+        },
+        {
+          "name": "$",
+          "descriptor": "(Ljava/util/Map;)Lnet/jcores/cores/CoreMap;",
+          "access": 9,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/Map<TK;TV;>;)Lnet/jcores/cores/CoreMap<TK;TV;>;",
+          "code_sha256": "bffa52c65e3b02631edf6ebcd85475623b3c23740062ec3acbace89fb17d8b8a",
+          "code_length": 12
+        },
+        {
+          "name": "$",
+          "descriptor": "(Ljava/util/Collection;Lnet/jcores/interfaces/functions/F1;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 137,
+          "generic_signature": "<Y:Ljava/lang/Object;T:Ljava/lang/Object;>(Ljava/util/Collection<TT;>;Lnet/jcores/interfaces/functions/F1<TT;TY;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TY;>;",
+          "code_sha256": "8edf9a109609253b387d86b27546e0b811a01a6b3aa831a72dce9e6687051856",
+          "code_length": 66
+        }
+      ],
+      "class_references": [
+        "[Lnet/jcores/options/Option;",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/util/Collection",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreAudioInputStream",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreClass",
+        "net/jcores/cores/CoreComponent",
+        "net/jcores/cores/CoreCompound",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreJComponent",
+        "net/jcores/cores/CoreMap",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreURI",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/OptionMapType",
+        "net/jcores/utils/internal/Wrapper",
+        "net/jcores/utils/internal/io/URIUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/annotations/Thread.class",
+      "occurrence": 0,
+      "sha256": "7d0537e5a5797d3f21bb14bba8123e901bcdce1b3f37adee203e85a7c34f8760",
+      "name": "net/jcores/annotations/Thread",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/jcores/annotations/Thread"
+      ]
+    },
+    {
+      "entry": "net/jcores/annotations/package-info.class",
+      "occurrence": 0,
+      "sha256": "0db0c56d2c2d2b93d8c81e813be6b6778b03b0eb06c02e6c55d561c8f4f0699e",
+      "name": "net/jcores/annotations/package-info",
+      "major": 50,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/annotations/package-info"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/Core$1.class",
+      "occurrence": 0,
+      "sha256": "c9c6980620b0dfd38273555989c8e3484b9c26f5e10c49d53159164870845d17",
+      "name": "net/jcores/cores/Core$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/Core;",
+          "access": 4112
+        },
+        {
+          "name": "val$baseCount",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 4114
+        },
+        {
+          "name": "val$STEP_SIZE",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$index",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 4114
+        },
+        {
+          "name": "val$size",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$mapper",
+          "descriptor": "Lnet/jcores/utils/internal/Mapper;",
+          "access": 4114
+        },
+        {
+          "name": "val$barrier",
+          "descriptor": "Ljava/util/concurrent/CyclicBarrier;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/Core;Ljava/util/concurrent/atomic/AtomicInteger;ILjava/util/concurrent/atomic/AtomicInteger;ILnet/jcores/utils/internal/Mapper;Ljava/util/concurrent/CyclicBarrier;)V",
+          "access": 0,
+          "code_sha256": "0b758a994fff862c833dbaa4772c5178d85b0049fe2fe6dba8a5a5d0ab87011b",
+          "code_length": 44
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "82a0cf271fa3f3e7b219e81e13a4e5ebba35d908e07b3e0b798cfe5d5e839772",
+          "code_length": 123
+        }
+      ],
+      "class_references": [
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/BrokenBarrierException",
+        "java/util/concurrent/CyclicBarrier",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "net/jcores/cores/Core",
+        "net/jcores/cores/Core$1",
+        "net/jcores/utils/internal/Mapper"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/Core$2.class",
+      "occurrence": 0,
+      "sha256": "16538fc90aa0993d3036c08fa9b24faa1b718247366ab2fa17fbe1af418729ae",
+      "name": "net/jcores/cores/Core$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/Core;",
+          "access": 4112
+        },
+        {
+          "name": "val$level",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 4114
+        },
+        {
+          "name": "val$size",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$baseCount",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 4114
+        },
+        {
+          "name": "val$folder",
+          "descriptor": "Lnet/jcores/utils/internal/Folder;",
+          "access": 4114
+        },
+        {
+          "name": "val$levelbarrier",
+          "descriptor": "Ljava/util/concurrent/CyclicBarrier;",
+          "access": 4114
+        },
+        {
+          "name": "val$barrier",
+          "descriptor": "Ljava/util/concurrent/CyclicBarrier;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/Core;Ljava/util/concurrent/atomic/AtomicInteger;ILjava/util/concurrent/atomic/AtomicInteger;Lnet/jcores/utils/internal/Folder;Ljava/util/concurrent/CyclicBarrier;Ljava/util/concurrent/CyclicBarrier;)V",
+          "access": 0,
+          "code_sha256": "88f1b9b180a9473303ba6665ac511435f0d03cac4242169b68255019791fbbb0",
+          "code_length": 44
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2d572c752ae0ae3df0c571a7cd727b8ccbab9db3d1edcf9c59543d1947c511fd",
+          "code_length": 227
+        }
+      ],
+      "class_references": [
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/BrokenBarrierException",
+        "java/util/concurrent/CyclicBarrier",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "net/jcores/cores/Core",
+        "net/jcores/cores/Core$2",
+        "net/jcores/utils/internal/Folder"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/Core.class",
+      "occurrence": 0,
+      "sha256": "ea8452b555477f9b18aae68b4d2c6d4e0279d85f7adfa729b7014bcc3f6bd47d",
+      "name": "net/jcores/cores/Core",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "commonCore",
+          "descriptor": "Lnet/jcores/CommonCore;",
+          "access": 132
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;)V",
+          "access": 4,
+          "code_sha256": "b00c0dd57794ad8cd82150aa63d990888538f902a0f15dacdf63eaa74692abf1",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "map",
+          "descriptor": "(Lnet/jcores/utils/internal/Mapper;[Lnet/jcores/options/Option;)V",
+          "access": 132,
+          "code_sha256": "ced879b8269320b9e537d3aae5c36eb7211076562aefdaab7cfbdebc6d0d35bb",
+          "code_length": 272
+        },
+        {
+          "name": "fold",
+          "descriptor": "(Lnet/jcores/utils/internal/Folder;[Lnet/jcores/options/Option;)V",
+          "access": 132,
+          "code_sha256": "b560e9b150a4395450a7ed3dfc730914c2ef828b68c281b3ed2d3c2f812bff6a",
+          "code_length": 135
+        }
+      ],
+      "class_references": [
+        "[Lnet/jcores/options/Option;",
+        "java/io/Serializable",
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Runtime",
+        "java/lang/System",
+        "java/util/concurrent/BrokenBarrierException",
+        "java/util/concurrent/CyclicBarrier",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/Core",
+        "net/jcores/cores/Core$1",
+        "net/jcores/cores/Core$2",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/utils/internal/Folder",
+        "net/jcores/utils/internal/Mapper",
+        "net/jcores/utils/internal/system/ProfileInformation"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreAudioInputStream$1.class",
+      "occurrence": 0,
+      "sha256": "1fe918c43171d5491ab84682de70d016c28d42debd29d9d0d50a9c86341253f1",
+      "name": "net/jcores/cores/CoreAudioInputStream$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreAudioInputStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreAudioInputStream;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljavax/sound/sampled/AudioInputStream;)Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "8e708dd956fa6bdd54e967e35c833b9abeccd8e5495343b00cecf1fdfc1f8975",
+          "code_length": 6
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f7be018dd595fdd92cb43e51ba8f100cc721e7563c8902d94883c8851bab636f",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljavax/sound/sampled/AudioInputStream;Ljava/lang/Void;>;",
+      "class_references": [
+        "java/lang/Object",
+        "javax/sound/sampled/AudioInputStream",
+        "net/jcores/cores/CoreAudioInputStream",
+        "net/jcores/cores/CoreAudioInputStream$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/sound/SoundUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreAudioInputStream.class",
+      "occurrence": 0,
+      "sha256": "c477dc5cc2df20fb4fb75183b92148e8f35bfb7feb2d41ebacc18df33769466e",
+      "name": "net/jcores/cores/CoreAudioInputStream",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljavax/sound/sampled/AudioInputStream;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "play",
+          "descriptor": "()Lnet/jcores/cores/CoreAudioInputStream;",
+          "access": 1,
+          "code_sha256": "460e6fcaff0ee685272df2ad6897fb08f2c2b41fcc596ec710cdbc2b314bbbb0",
+          "code_length": 19
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljavax/sound/sampled/AudioInputStream;>;",
+      "class_references": [
+        "net/jcores/cores/CoreAudioInputStream",
+        "net/jcores/cores/CoreAudioInputStream$1",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreBufferedImage$1.class",
+      "occurrence": 0,
+      "sha256": "aa22a6592677fafa9128fd6c9729f42af32c4a581e171edd9912f0a8363fe8d6",
+      "name": "net/jcores/cores/CoreBufferedImage$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreBufferedImage;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "b6453d84d91ed1793c5404bb3c61158da640486bf12418fbcdf99582cd04ccef",
+          "code_length": 30
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "fd6f343f531770996f8aac997347171ae25d8bc990f9d037fe4a03c0d8d24bda",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;>;",
+      "class_references": [
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/lang/Object",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreBufferedImage$1",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreBufferedImage$2.class",
+      "occurrence": 0,
+      "sha256": "7593a0b25fcbc64dffe8adaeb58a40d68583838f688f51cee5d10cbe10f49140",
+      "name": "net/jcores/cores/CoreBufferedImage$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 4112
+        },
+        {
+          "name": "val$factor",
+          "descriptor": "F",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreBufferedImage;F)V",
+          "access": 0,
+          "code_sha256": "39c5320ed9332e43d9ebaaf6fa38b8718104fbaf17dfa883348753336052fc0c",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "abfd49116760dcf899d097aae93a925b9bcf2df8870d6de8994fd98547b5ce8b",
+          "code_length": 39
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "17eed034bda704d137a0de667ad8bc4ddfc7e97f8203837d91b560af9d7a9d6a",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;>;",
+      "class_references": [
+        "java/awt/geom/AffineTransform",
+        "java/awt/image/AffineTransformOp",
+        "java/awt/image/BufferedImage",
+        "java/lang/Object",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreBufferedImage$2",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreBufferedImage$3.class",
+      "occurrence": 0,
+      "sha256": "e6733af015f0a384f14c094bb683b400c8725f1f64da28127854d714aaa63a06",
+      "name": "net/jcores/cores/CoreBufferedImage$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 4112
+        },
+        {
+          "name": "val$width",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$height",
+          "descriptor": "I",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreBufferedImage;II)V",
+          "access": 0,
+          "code_sha256": "87bb0bc36fd33eb8bfa90c0325710b0fea400af537c1c4d4a42e60e678ebf096",
+          "code_length": 20
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "ba4c4dfefefd0b1b4e331f6e444bce0247d2bfac7bdaaaeb3e2db612bdf0ade2",
+          "code_length": 138
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "3330433d7c67fe3d06388972ce7db7d2ca614194c1777aa208e08e9239f0a1eb",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/awt/image/BufferedImage;Ljava/awt/image/BufferedImage;>;",
+      "class_references": [
+        "java/awt/geom/AffineTransform",
+        "java/awt/image/AffineTransformOp",
+        "java/awt/image/BufferedImage",
+        "java/lang/Object",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreBufferedImage$3",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreBufferedImage.class",
+      "occurrence": 0,
+      "sha256": "518a43199e97f9c864d4a69d3978ba38f461a0cbf34c1f3b2f7bd1f3fb6f3093",
+      "name": "net/jcores/cores/CoreBufferedImage",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/awt/image/BufferedImage;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 1,
+          "code_sha256": "6d4a00e5340631f9eade20a02a8a9ec51b33e302b72e502e1cbc48f45715e7c9",
+          "code_length": 36
+        },
+        {
+          "name": "scale",
+          "descriptor": "(F)Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 1,
+          "code_sha256": "5e32a8483b2ee52c02391107fb085f7391f41591cc09491cba5b20b317343fd0",
+          "code_length": 37
+        },
+        {
+          "name": "scale",
+          "descriptor": "(II)Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 1,
+          "code_sha256": "29d13b58455611d81c3aebe5e7dad8f09fe3042e9bd865c26936d2d05655ba12",
+          "code_length": 48
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;)Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 1,
+          "code_sha256": "01a5e38b7fb4426cf3af48ac127e6afc8f34e8f0116c941248c670fb67ba81ba",
+          "code_length": 177
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/awt/image/BufferedImage;>;",
+      "class_references": [
+        "[Ljava/awt/image/BufferedImage;",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/RenderedImage",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "javax/imageio/ImageIO",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreBufferedImage$1",
+        "net/jcores/cores/CoreBufferedImage$2",
+        "net/jcores/cores/CoreBufferedImage$3",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreByteBuffer$1.class",
+      "occurrence": 0,
+      "sha256": "08e5ed208a9574a07ca38130f95ed76d7df2a99e1c0f722e84d9b2a5ae06c7a4",
+      "name": "net/jcores/cores/CoreByteBuffer$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreByteBuffer;",
+          "access": 4112
+        },
+        {
+          "name": "val$method",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreByteBuffer;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/nio/ByteBuffer;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b1a3b828270123b44e05bb1e135f34d3cc3d3a96512461b5d5eff42b14585fd2",
+          "code_length": 9
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "8373a4613c3fc2203abd99e819a3b82039e11d61d96b366bbdf508c2909641bd",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/nio/ByteBuffer;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/nio/ByteBuffer",
+        "net/jcores/cores/CoreByteBuffer",
+        "net/jcores/cores/CoreByteBuffer$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/io/DataUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreByteBuffer.class",
+      "occurrence": 0,
+      "sha256": "e6afb3591908fb4fe19ba6f68b3804b23494279ed78a13932b03fc9ae3b18b01",
+      "name": "net/jcores/cores/CoreByteBuffer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/nio/ByteBuffer;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "hash",
+          "descriptor": "([Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreString;",
+          "access": 129,
+          "code_sha256": "1babc0e865ab81920eb944f7931c89e15867705a060c2b8a87ef88d00903f77c",
+          "code_length": 56
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/nio/ByteBuffer;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/String",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreByteBuffer",
+        "net/jcores/cores/CoreByteBuffer$1",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/options/Option",
+        "net/jcores/options/OptionHash"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreClass$1.class",
+      "occurrence": 0,
+      "sha256": "b89ac04a2e32305dea6e70dc05880791cd04fe9711a2b11051c6004198159789",
+      "name": "net/jcores/cores/CoreClass$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreClass;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreClass;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Class;)Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)Ljava/nio/ByteBuffer;",
+          "code_sha256": "4935d291d44c595822a8ddd02d4a9a2d0d76cbde14f60a0ce60474c908f35aac",
+          "code_length": 79
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "cfb15ac90c20fb61bfb8d4067ee3265b226e0df4f938f9fccfd23b2566a9a78b",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/Class<TT;>;Ljava/nio/ByteBuffer;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreClass",
+        "net/jcores/cores/CoreClass$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreClass$2$1.class",
+      "occurrence": 0,
+      "sha256": "285b4111a4b96569d9e9ba61ad0b8b5badd23823ae5a34d362e6e47ce5c9f764",
+      "name": "net/jcores/cores/CoreClass$2$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lnet/jcores/cores/CoreClass$2;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreClass$2;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Class;",
+          "access": 1,
+          "generic_signature": "(Ljava/lang/Object;)Ljava/lang/Class<*>;",
+          "code_sha256": "0179144d25ac0f86f302df6409ea8a4ef145825ec9b6555a624643f35d2abef0",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "205316ef397b917cf6e1f5f8d1a09fb5cae18ce367c499655cd0b992820b86d4",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/Object;Ljava/lang/Class<*>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/cores/CoreClass$2",
+        "net/jcores/cores/CoreClass$2$1",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreClass$2.class",
+      "occurrence": 0,
+      "sha256": "1fa3b6d6778ff82db37a4bf721b7adf1d78b3fa0629935b6352a4966f072b73c",
+      "name": "net/jcores/cores/CoreClass$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreClass;",
+          "access": 4112
+        },
+        {
+          "name": "val$args",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreClass;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)TT;",
+          "code_sha256": "f3f49799fe0aca1d10327f6c7701700259d19917fe3154c93dcc416d995370e1",
+          "code_length": 572
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "911f0792165180317f447f86e17d27458e4d3870edd17b971c3b3cf25dded3c4",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/Class<TT;>;TT;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/reflect/Constructor;",
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/util/Map",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreClass",
+        "net/jcores/cores/CoreClass$2",
+        "net/jcores/cores/CoreClass$2$1",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/managers/ManagerClass",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreClass.class",
+      "occurrence": 0,
+      "sha256": "0795f6b46fabca27848421fe59d1cdde1b5bc2bc9886ea74bbe5ac05e30a8b50",
+      "name": "net/jcores/cores/CoreClass",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "manager",
+          "descriptor": "Lnet/jcores/managers/ManagerClass;",
+          "access": 20
+        },
+        {
+          "name": "constructors",
+          "descriptor": "Ljava/util/Map;",
+          "access": 20,
+          "generic_signature": "Ljava/util/Map<[Ljava/lang/Class<*>;Ljava/lang/reflect/Constructor<TT;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/lang/Class;)V",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/CommonCore;[Ljava/lang/Class<TT;>;)V",
+          "code_sha256": "3d0680d564708e617de00017ef19fad191774c27c7bdcd4591694b3ce5130251",
+          "code_length": 31
+        },
+        {
+          "name": "bytecode",
+          "descriptor": "()Lnet/jcores/cores/CoreByteBuffer;",
+          "access": 1,
+          "code_sha256": "049c69c1a197c36c7fbe079e2ee14c7fc0b73c3c0037db981899ac2bb49b83d4",
+          "code_length": 36
+        },
+        {
+          "name": "spawn",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "678bd78cb4d2d14ebd92653830a6ecb0a10f1378a75e74b9c69c1afede55ef1d",
+          "code_length": 18
+        },
+        {
+          "name": "implementor",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "generic_signature": "(Ljava/lang/Class<*>;)V",
+          "code_sha256": "b01dd586cb9d1a0da5382d743908db2f9c9f1beee7243e2ddc8822ff15b3ab6f",
+          "code_length": 44
+        },
+        {
+          "name": "spawned",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "9ecbf11b32141a8cdd8ff09429fbcbc0daab091707a3a1bd9433d57013f7527c",
+          "code_length": 51
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lnet/jcores/cores/CoreObject<Ljava/lang/Class<TT;>;>;",
+      "class_references": [
+        "[Ljava/nio/ByteBuffer;",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/nio/ByteBuffer",
+        "java/util/HashMap",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreByteBuffer",
+        "net/jcores/cores/CoreClass",
+        "net/jcores/cores/CoreClass$1",
+        "net/jcores/cores/CoreClass$2",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/managers/ManagerClass",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreComponent$1.class",
+      "occurrence": 0,
+      "sha256": "1f81d7c4b190285d2c617e19ee841592655ff18df640f1556ad9f615ac1e3e0b",
+      "name": "net/jcores/cores/CoreComponent$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/event/KeyListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreComponent;",
+          "access": 4112
+        },
+        {
+          "name": "val$keyEvent",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$handler",
+          "descriptor": "Lnet/jcores/interfaces/java/KeyStroke;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreComponent;ILnet/jcores/interfaces/java/KeyStroke;)V",
+          "access": 0,
+          "code_sha256": "655e4283296bbde62300559470309a3e89da24ba6509d4f42e3d77de4ffe620f",
+          "code_length": 20
+        },
+        {
+          "name": "keyTyped",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "keyReleased",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "keyPressed",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "1c85b4f3d7afa35bce8793eba742fe553a7495c9b3f6c6e4c66dfae09dfb0bbb",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/event/KeyEvent",
+        "java/awt/event/KeyListener",
+        "java/lang/Object",
+        "net/jcores/cores/CoreComponent",
+        "net/jcores/cores/CoreComponent$1",
+        "net/jcores/interfaces/java/KeyStroke"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreComponent.class",
+      "occurrence": 0,
+      "sha256": "040902a6ba29b4c52c0b9f7813f071db910cc3b5a2c853efba74a6fd21fdeda2",
+      "name": "net/jcores/cores/CoreComponent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/awt/Component;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "keypress",
+          "descriptor": "(ILnet/jcores/interfaces/java/KeyStroke;)Lnet/jcores/cores/CoreComponent;",
+          "access": 1,
+          "code_sha256": "1060c57dc5b5b86038022e6b9f85dc430946318d9899c6ca74c542d6b816dada",
+          "code_length": 51
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/awt/Component;>;",
+      "class_references": [
+        "java/awt/Component",
+        "net/jcores/cores/CoreComponent",
+        "net/jcores/cores/CoreComponent$1",
+        "net/jcores/cores/CoreObject"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreCompound$1.class",
+      "occurrence": 0,
+      "sha256": "0694080116b78ef95bf516e06c38b7960f9de505e2fb392b75893aaf621b35f7",
+      "name": "net/jcores/cores/CoreCompound$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreCompound;",
+          "access": 4112
+        },
+        {
+          "name": "val$key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreCompound;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Lnet/jcores/utils/Compound;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/utils/Compound<TT;>;)TT;",
+          "code_sha256": "6fa7782506fceb789e62ce8ed59258170baa0472eff59dcdf99facaed002c2a9",
+          "code_length": 9
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "455107a0c092b054f5fbec3aad8088affea73696dd0a6f7bca85a48173a41bcc",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Lnet/jcores/utils/Compound<TT;>;TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/cores/CoreCompound",
+        "net/jcores/cores/CoreCompound$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/Compound"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreCompound.class",
+      "occurrence": 0,
+      "sha256": "6df018d15abb4526f4d4ea00300de441f2c5d746088cfd4d406bcb24fe35c2c2",
+      "name": "net/jcores/cores/CoreCompound",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Lnet/jcores/utils/Compound;)V",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/CommonCore;[Lnet/jcores/utils/Compound<TT;>;)V",
+          "code_sha256": "2f2d148e37112c07723f5f8b5ad3172592489db8ee4f36886bcfb8427c25c133",
+          "code_length": 7
+        },
+        {
+          "name": "value",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Class<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "7a6227c002e03f93f24c43ba482ebd978e945708eaa890a3d026aa58b3f8f69a",
+          "code_length": 25
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lnet/jcores/cores/CoreObject<Lnet/jcores/utils/Compound<TT;>;>;",
+      "class_references": [
+        "net/jcores/cores/CoreCompound",
+        "net/jcores/cores/CoreCompound$1",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$1.class",
+      "occurrence": 0,
+      "sha256": "7c9c5a69d913ddc94881f2a35eeccfadc7f93e933187fafe9e8598fa48eb5d8a",
+      "name": "net/jcores/cores/CoreFile$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        },
+        {
+          "name": "val$string",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d34f8d00c5da29582c17cb927f1ba88373fd5f2795e13eb341dc80a05b4974cd",
+          "code_length": 94
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "806c1dae8ff0dd3209aa223eab1b14a3998b5671eef070f518920121e21b4145",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/io/BufferedOutputStream",
+        "java/io/File",
+        "java/io/FileNotFoundException",
+        "java/io/FileOutputStream",
+        "java/io/OutputStreamWriter",
+        "java/io/PrintWriter",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$10.class",
+      "occurrence": 0,
+      "sha256": "1ec9c1b6ede823953c0d7bf1080b250d2822600e87b59719b763ea032995e3ee",
+      "name": "net/jcores/cores/CoreFile$10",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "8efbffb21d104166c1f20b0b2d99ca804fd1bd5decce05d91f87dd4dc184d8a7",
+          "code_length": 19
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "0ad8de4f078f6f340ca9b89cf7a9b6c53c5762872c6efe8823db5ced94712f90",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/io/InputStream;>;",
+      "class_references": [
+        "java/io/BufferedInputStream",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$10",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$11.class",
+      "occurrence": 0,
+      "sha256": "ed9a1b986fd2ceb52f76b94dab860b9d2aa7ab72d0d9250068dbe55e8fabc3d7",
+      "name": "net/jcores/cores/CoreFile$11",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2f8f21ff9c825d4c6f3de60889198b6eff43d87a391eafd8bb2286fb43b74438",
+          "code_length": 12
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "03b2e9d91da61746f60b20ed7c66a05909186687339e8f5bcb9bb4ad6dc31d8b",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$11",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/io/FileUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$12.class",
+      "occurrence": 0,
+      "sha256": "d6b0b790af24b40a02628c0d1671aeb2108af29a022cc62a797aa8b4e3e19acd",
+      "name": "net/jcores/cores/CoreFile$12",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "7f8aef730f13a4bec7ba0681248a841530cddc7da4b5f2f93361f73dac1aef0f",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a424ea8bac172a85e2c04356e9d9f09912e07498341da19774fa859c65cb010",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/net/URI;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$12",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$2.class",
+      "occurrence": 0,
+      "sha256": "cca8fdc46d79c22abd009718248bebe13ec35b25f81ae7ebecf2e0a02508b88d",
+      "name": "net/jcores/cores/CoreFile$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljavax/sound/sampled/AudioInputStream;",
+          "access": 1,
+          "code_sha256": "603c81cdebf017e6502c34ff301fe6ad7974caf02f4525abdd04e1185171ab28",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "05de17c34933a5402b869f0bf7eca3bdf6a60220dec447c5a68537edb6f199f8",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljavax/sound/sampled/AudioInputStream;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$2",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/sound/SoundUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$3.class",
+      "occurrence": 0,
+      "sha256": "d99952020c64cf2de72967a0326d5b136917067ef25bc229125f683a5feb7e40",
+      "name": "net/jcores/cores/CoreFile$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        },
+        {
+          "name": "val$dest",
+          "descriptor": "Ljava/io/File;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;Ljava/io/File;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)[Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "a79582d91329ea544048eedb45c39181a0075804a79c20c1eb242473674915b2",
+          "code_length": 16
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "6fd9e3d7d9498fa11a53bad584f35d4fa123d0053ad83008f499339820bea628",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;[Ljava/io/File;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$3",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/io/FileUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$4.class",
+      "occurrence": 0,
+      "sha256": "295b9d750862ad64545ee83b474841607930a4475ad9ec50e6cfec4f4b85f102",
+      "name": "net/jcores/cores/CoreFile$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "code_sha256": "708924d8ada0519f30e96905de8c6b39e323edd14f138ae73fec13d90ea642ce",
+          "code_length": 176
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "8c3a9b9c5d297e3c1fd7e066deb55e9aae6dfde0ae294cdcde8d1d6057908948",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/nio/ByteBuffer;>;",
+      "class_references": [
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/FileChannel",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$4",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$5.class",
+      "occurrence": 0,
+      "sha256": "8855ea6aec601bda6de44d649260ab31648db4c350c240c97acf647f9c44d128",
+      "name": "net/jcores/cores/CoreFile$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "e37836537bfb4709f9b5fedf190977eaa62d5fc879aae9dee98f1175b171ffd1",
+          "code_length": 125
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9b80e86bd5df61efc0d72c4cd1ac04de1c8e6909946571323c923f68983508a7",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/lang/Void;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/List",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$5",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$6.class",
+      "occurrence": 0,
+      "sha256": "abae81ea338f0b99e280e3e8588b4a661a6989faa82fe6d45e786224f0181730",
+      "name": "net/jcores/cores/CoreFile$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        },
+        {
+          "name": "val$listDirs",
+          "descriptor": "Z",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;Z)V",
+          "access": 0,
+          "code_sha256": "902a9e925445142e2731b656242d0931c03453e24faa83a4dcd4cdaaebf24b8c",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)[Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "b1a3b828270123b44e05bb1e135f34d3cc3d3a96512461b5d5eff42b14585fd2",
+          "code_length": 9
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "8373a4613c3fc2203abd99e819a3b82039e11d61d96b366bbdf508c2909641bd",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;[Ljava/io/File;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$6",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/io/FileUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$7.class",
+      "occurrence": 0,
+      "sha256": "830d21a52971b0f05123e8c382422372fecfac7e5d3d183abe3dff918d846582",
+      "name": "net/jcores/cores/CoreFile$7",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "831c592e48d0520b3f63c0fe41ef93fe1e73af556db387b59eeb8e8a9caae449",
+          "code_length": 8
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b0a52b6aa9736f2e5ae7ba57ea97493e1b4427e4204b54db524c5739acea813e",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/lang/Long;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Long",
+        "java/lang/Object",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$7",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$8.class",
+      "occurrence": 0,
+      "sha256": "7a41275593e5fe5b7581e5b5563f323b57bdce220a7df766d5759dedbf039ca1",
+      "name": "net/jcores/cores/CoreFile$8",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        },
+        {
+          "name": "val$p",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;Ljava/util/regex/Pattern;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 1,
+          "code_sha256": "f8477236c8c85f448d683edb095d0113720b80175417feb1fce97430c0bbfaab",
+          "code_length": 17
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "e3b7e078fd4b35d2d25f234d9f91840e35ab5ffb250d57fa2f02ff320e4a4011",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1Object2Bool<Ljava/io/File;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$8",
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile$9.class",
+      "occurrence": 0,
+      "sha256": "ac7cf9a1cf7b87f5d274bbb1ecfba0fad0f9582cff65ed97481cd0d97eefa4f9",
+      "name": "net/jcores/cores/CoreFile$9",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreFile;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreFile;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "5aaf52a0f49adff639cbce19b2a2973da7cdf70729ea06c0870fd974e4cf8b5e",
+          "code_length": 37
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "4a11a0045fac9721a4515afa52b45032b71e5786c944bc111216f3bbb56bbff7",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/awt/image/BufferedImage;>;",
+      "class_references": [
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "javax/imageio/ImageIO",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$9",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreFile.class",
+      "occurrence": 0,
+      "sha256": "e155e58a41540a2f8e15c4baed951be26e194bb24c3b732ebc10704431d66761",
+      "name": "net/jcores/cores/CoreFile",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/io/File;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "append",
+          "descriptor": "(Ljava/lang/Object;)Lnet/jcores/cores/CoreFile;",
+          "access": 1,
+          "code_sha256": "73d40589400790c49ec7b1e3e8a59b3479033cd06468a205404e3e1199a2185e",
+          "code_length": 31
+        },
+        {
+          "name": "audio",
+          "descriptor": "()Lnet/jcores/cores/CoreAudioInputStream;",
+          "access": 1,
+          "code_sha256": "6f3f377f1f563a054457a14948c4a98355a00bd163614823a06c3042d5ade937",
+          "code_length": 36
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Ljava/lang/String;)Lnet/jcores/cores/CoreFile;",
+          "access": 1,
+          "code_sha256": "da6a91cd530b13e7b4c8c4c6e0c30dad2b6e61a1d88cfe46f2c055b0d928f320",
+          "code_length": 69
+        },
+        {
+          "name": "data",
+          "descriptor": "()Lnet/jcores/cores/CoreByteBuffer;",
+          "access": 1,
+          "code_sha256": "eb0f2b896f3ac0566b887e6a6ec2949dee3435bae02e331b1b4bceabaf5a8a89",
+          "code_length": 36
+        },
+        {
+          "name": "delete",
+          "descriptor": "()Lnet/jcores/cores/CoreFile;",
+          "access": 1,
+          "code_sha256": "db7032e0d9dd669fe56a744883ae86049d0be9fb5af9c35746af3a072b77ff70",
+          "code_length": 19
+        },
+        {
+          "name": "deserialize",
+          "descriptor": "(Ljava/lang/Class;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "e5503f5b5707f154bb42d95c434706b9f4f694c00cc63c4fdc14373b5e61ef85",
+          "code_length": 73
+        },
+        {
+          "name": "dir",
+          "descriptor": "([Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreFile;",
+          "access": 129,
+          "code_sha256": "20bf5cc688eb99790ebd95a4cf78fdee9e143a89a17e1e010efb4493364e3231",
+          "code_length": 45
+        },
+        {
+          "name": "filesize",
+          "descriptor": "()Lnet/jcores/cores/CoreNumber;",
+          "access": 1,
+          "code_sha256": "7142f3e2185543fcf0fa42fd598dcee193d105194de9fc1f8760b12b0b359115",
+          "code_length": 36
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreFile;",
+          "access": 129,
+          "code_sha256": "59969a6bde86e6bcd67611f4ead9ea8a7eb717dd8e53db2ce086bab650d38661",
+          "code_length": 39
+        },
+        {
+          "name": "images",
+          "descriptor": "()Lnet/jcores/cores/CoreBufferedImage;",
+          "access": 1,
+          "code_sha256": "7f4bf0eff1be7180f4a22dada0b6d3274eb5db5cbdb35787f03e796b142cffb9",
+          "code_length": 36
+        },
+        {
+          "name": "input",
+          "descriptor": "()Lnet/jcores/cores/CoreInputStream;",
+          "access": 1,
+          "code_sha256": "4fe443b12e707e19be7f2cbf18dac414bba778a766c5510b232289058ed85643",
+          "code_length": 37
+        },
+        {
+          "name": "text",
+          "descriptor": "()Lnet/jcores/cores/CoreString;",
+          "access": 1,
+          "code_sha256": "1d6dd10a60c5cb08dba829be6c171fb463b77d3b4bc1cd44fc81fe85369b04f0",
+          "code_length": 37
+        },
+        {
+          "name": "uri",
+          "descriptor": "()Lnet/jcores/cores/CoreURI;",
+          "access": 1,
+          "code_sha256": "c5bcf0b889aed0bdb1815c842da522346b2d56d39cf53294b4469b08b36e9d89",
+          "code_length": 37
+        },
+        {
+          "name": "zip",
+          "descriptor": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreFile;",
+          "access": 129,
+          "code_sha256": "d739cc4f2d9cda1e2772196048d79ffe39a58483a3991ed91c362f53c8cd9e6c",
+          "code_length": 20
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 4289,
+          "code_sha256": "e778827051cc3142cfb90e7e961a02102e3b3eb0e04c4c9fb837edf8f1c7444a",
+          "code_length": 7
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/io/File;>;",
+      "class_references": [
+        "[Ljava/awt/image/BufferedImage;",
+        "[Ljava/io/File;",
+        "[Ljava/io/InputStream;",
+        "[Ljava/lang/Number;",
+        "[Ljava/lang/String;",
+        "[Ljava/net/URI;",
+        "[Ljava/nio/ByteBuffer;",
+        "[Ljavax/sound/sampled/AudioInputStream;",
+        "java/awt/image/BufferedImage",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/InputStream",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URI",
+        "java/nio/ByteBuffer",
+        "java/util/regex/Pattern",
+        "javax/sound/sampled/AudioInputStream",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreAudioInputStream",
+        "net/jcores/cores/CoreBufferedImage",
+        "net/jcores/cores/CoreByteBuffer",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreFile$1",
+        "net/jcores/cores/CoreFile$10",
+        "net/jcores/cores/CoreFile$11",
+        "net/jcores/cores/CoreFile$12",
+        "net/jcores/cores/CoreFile$2",
+        "net/jcores/cores/CoreFile$3",
+        "net/jcores/cores/CoreFile$4",
+        "net/jcores/cores/CoreFile$5",
+        "net/jcores/cores/CoreFile$6",
+        "net/jcores/cores/CoreFile$7",
+        "net/jcores/cores/CoreFile$8",
+        "net/jcores/cores/CoreFile$9",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreURI",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option",
+        "net/jcores/utils/internal/io/FileUtils",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$1.class",
+      "occurrence": 0,
+      "sha256": "e783848585be835bc3273c9d9fa636fe263d14b17f21cf6b3df132c69f66c794",
+      "name": "net/jcores/cores/CoreInputStream$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/sound/sampled/AudioInputStream;",
+          "access": 1,
+          "code_sha256": "603c81cdebf017e6502c34ff301fe6ad7974caf02f4525abdd04e1185171ab28",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "05de17c34933a5402b869f0bf7eca3bdf6a60220dec447c5a68537edb6f199f8",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljavax/sound/sampled/AudioInputStream;>;",
+      "class_references": [
+        "java/io/InputStream",
+        "java/lang/Object",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/sound/SoundUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$2.class",
+      "occurrence": 0,
+      "sha256": "e754663293e201a8854b8eccc26b4060300e534694fc5ad4d922aa55249f1ba6",
+      "name": "net/jcores/cores/CoreInputStream$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        },
+        {
+          "name": "val$destination",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "a4d2099c0e200b8f959223de23354d5e9f71aab461dcba0502e3a993040f9b27",
+          "code_length": 52
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "bb6fea9a75a4905b03f08a57ab0a79672f8d68a427bd04b36959f80f3f584759",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljava/lang/Void;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$2",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$3.class",
+      "occurrence": 0,
+      "sha256": "4e152b669f60eda8113199119d66663a07e57b5e46ac1e8da0531651e2c681ab",
+      "name": "net/jcores/cores/CoreInputStream$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/util/zip/ZipInputStream;",
+          "access": 1,
+          "code_sha256": "a6a66eb52e0681ab6fc2a2c931ab2f0307fde67c51abc5f12d87caf7292696a2",
+          "code_length": 9
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "05de17c34933a5402b869f0bf7eca3bdf6a60220dec447c5a68537edb6f199f8",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljava/util/zip/ZipInputStream;>;",
+      "class_references": [
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/util/zip/ZipInputStream",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$3",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$4.class",
+      "occurrence": 0,
+      "sha256": "d821539cd83f1c6fcc6df515cbcdc74a3eeb4cc2c3d7e28610a8dd1a56bfe181",
+      "name": "net/jcores/cores/CoreInputStream$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "76e4b3b92b3dd4cdb6a5a4ca64f9cfb1e5783472f98a44ec2381727bb45ba538",
+          "code_length": 56
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "6873841139ba9f0272a3e0610bf0e5e48c9fe23e08beb4fd2ae2c3cbd865d571",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$4",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$5.class",
+      "occurrence": 0,
+      "sha256": "49e73c8d503a6372454f5afa7aaabf8bf57465ae7d7693fb8dbea6959c1c6864",
+      "name": "net/jcores/cores/CoreInputStream$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        },
+        {
+          "name": "val$method",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9f5c50a9566d8664916e04a9c66df4a51a8de714df8f763e6112eb3f104fbca3",
+          "code_length": 53
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a4e1276bc33206197fb90031d801dc4f6af927bc3c4fed17ec3da1a1f4b3e598",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$5",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream$6.class",
+      "occurrence": 0,
+      "sha256": "6fec26ad0a6830e14b2c793af78beca7ab11e561e5e512a20048475cd5b43830",
+      "name": "net/jcores/cores/CoreInputStream$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreInputStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreInputStream;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "code_sha256": "dcf041ea2614d2ee66dd2e5e58aebae5f28fd20da9a9bf9c5330b4e6124bd810",
+          "code_length": 49
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "53fc53f610052d8db68d9926386c4f13aa9e81fb0492634f9206c90bbb80e2a3",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/InputStream;Ljava/nio/ByteBuffer;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/nio/ByteBuffer",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$6",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreInputStream.class",
+      "occurrence": 0,
+      "sha256": "5e69300c9c18a80878599e2478d92bf4f7d9d8d3074a57a76280d991a98ae7d1",
+      "name": "net/jcores/cores/CoreInputStream",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/io/InputStream;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "audio",
+          "descriptor": "()Lnet/jcores/cores/CoreAudioInputStream;",
+          "access": 1,
+          "code_sha256": "af463425248584cf81f081ccaa23de33e42914ece3035f63d90e341018a64dc8",
+          "code_length": 36
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b8796ea913c39c9f19906417c7a49d6584cdf9d2468eb0967a32639572110d06",
+          "code_length": 65
+        },
+        {
+          "name": "deserialize",
+          "descriptor": "(Ljava/lang/Class;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "685462a74f38a4da15b870725f3ea6efa0f01a219f9c1e0734feb6f2f8400af2",
+          "code_length": 61
+        },
+        {
+          "name": "unzip",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "337f582d1744629616cb6324955182efea2c770757b352d39c7e20f22063fd6f",
+          "code_length": 19
+        },
+        {
+          "name": "zipstream",
+          "descriptor": "()Lnet/jcores/cores/CoreZipInputStream;",
+          "access": 1,
+          "code_sha256": "606a4e4de7ecba6a03502640a79eed9f5f5dc5720e57508c08882b9ca3ede77f",
+          "code_length": 25
+        },
+        {
+          "name": "text",
+          "descriptor": "()Lnet/jcores/cores/CoreString;",
+          "access": 1,
+          "code_sha256": "2760e85e3f75387cb0c9ef87984d5902ef40ef45f5cdd160d24c34cbb12d4d94",
+          "code_length": 36
+        },
+        {
+          "name": "hash",
+          "descriptor": "([Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreString;",
+          "access": 129,
+          "code_sha256": "101f89314787f77e684de5daab9aebf3e7c79f38fec28b993f5d0a19051af9c4",
+          "code_length": 56
+        },
+        {
+          "name": "data",
+          "descriptor": "()Lnet/jcores/cores/CoreByteBuffer;",
+          "access": 1,
+          "code_sha256": "1162d150e9b727516ea49ec7c8fc5b1e91611094285607f13e8c586228f89d17",
+          "code_length": 36
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/io/InputStream;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Ljava/nio/ByteBuffer;",
+        "[Ljavax/sound/sampled/AudioInputStream;",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/ByteBuffer",
+        "javax/sound/sampled/AudioInputStream",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreAudioInputStream",
+        "net/jcores/cores/CoreByteBuffer",
+        "net/jcores/cores/CoreInputStream",
+        "net/jcores/cores/CoreInputStream$1",
+        "net/jcores/cores/CoreInputStream$2",
+        "net/jcores/cores/CoreInputStream$3",
+        "net/jcores/cores/CoreInputStream$4",
+        "net/jcores/cores/CoreInputStream$5",
+        "net/jcores/cores/CoreInputStream$6",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreZipInputStream",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option",
+        "net/jcores/options/OptionHash",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreJComponent$1.class",
+      "occurrence": 0,
+      "sha256": "8fbfdc121aeb87d92f7cbb1876125d51080fc3894b7c465b7ece971f48691122",
+      "name": "net/jcores/cores/CoreJComponent$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "net/jcores/utils/internal/ui/SimpleTransferHandler",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreJComponent;",
+          "access": 4112
+        },
+        {
+          "name": "val$handler",
+          "descriptor": "Lnet/jcores/interfaces/functions/F1;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreJComponent;[Lnet/jcores/options/Option;Lnet/jcores/interfaces/functions/F1;)V",
+          "access": 0,
+          "code_sha256": "3ef80afb9b98f494e25d3e2d3a0f2b07797f6c0efd8a1b5536c20e86b86f74ea",
+          "code_length": 16
+        },
+        {
+          "name": "files",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "generic_signature": "(Ljava/util/List<Ljava/io/File;>;)V",
+          "code_sha256": "a3f629947f9579afe704925a662a49a8b70199a7c88bd229f914f743576a5962",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "net/jcores/cores/CoreJComponent",
+        "net/jcores/cores/CoreJComponent$1",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/internal/Wrapper",
+        "net/jcores/utils/internal/ui/SimpleTransferHandler"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreJComponent.class",
+      "occurrence": 0,
+      "sha256": "9721a53db4afd38b7ec0673178e1c6f3f71869914f1066f906a9db3658deb21f",
+      "name": "net/jcores/cores/CoreJComponent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreComponent",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljavax/swing/JComponent;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "onDrop",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F1;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreJComponent;",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/interfaces/functions/F1<Lnet/jcores/cores/CoreObject<Ljava/lang/Object;>;Ljava/lang/Void;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreJComponent;",
+          "code_sha256": "6c0eafeb15383c2e0284350292c7af8a46059c1fd3c7ce6aa7fa7977eda4c4fc",
+          "code_length": 51
+        }
+      ],
+      "class_references": [
+        "javax/swing/JComponent",
+        "net/jcores/cores/CoreComponent",
+        "net/jcores/cores/CoreJComponent",
+        "net/jcores/cores/CoreJComponent$1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreMap.class",
+      "occurrence": 0,
+      "sha256": "be8936c49eaf62cb2af2ca1fc2cc361ca584c2be52c4ae53c61c0d2638671af9",
+      "name": "net/jcores/cores/CoreMap",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<TK;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;Ljava/util/Map;)V",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/CommonCore;Ljava/util/Map<TK;TV;>;)V",
+          "code_sha256": "1ee517cf406a0005a7d3a870c2d0d12810b0c452fbddc6dcdb0aba07a7197eee",
+          "code_length": 22
+        },
+        {
+          "name": "value",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TK;)TV;",
+          "code_sha256": "fb6cd69ba6cf37f6cc960a4ae3a21c921fb5072d45d7c220d63f5d60e9c7b00d",
+          "code_length": 11
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lnet/jcores/cores/CoreObject<TK;>;",
+      "class_references": [
+        "java/util/Map",
+        "java/util/Set",
+        "net/jcores/cores/CoreMap",
+        "net/jcores/cores/CoreObject"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreNumber$1.class",
+      "occurrence": 0,
+      "sha256": "938aa8175d16cedf8c186e772dcc0c0e4c811dfbf8bc6859f1512eea6e95e0e7",
+      "name": "net/jcores/cores/CoreNumber$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F2ReduceObjects"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreNumber;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreNumber;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Number;Ljava/lang/Number;)Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "34c8bee563f656433c9b75fea9debf6cdf6ecff1ee2d021b523eb90bc799965a",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "d0c2df6baffbf859afddb429dca279bde4fbdb516ede14b333ce79e0b5969563",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F2ReduceObjects<Ljava/lang/Number;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Number",
+        "java/lang/Object",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreNumber$1",
+        "net/jcores/interfaces/functions/F2ReduceObjects"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreNumber$2.class",
+      "occurrence": 0,
+      "sha256": "602c78c982b81ec1b4090d032c0bac9f1598901ce59b47a26f1a0f09738e3a47",
+      "name": "net/jcores/cores/CoreNumber$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F2ReduceObjects"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreNumber;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreNumber;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Number;Ljava/lang/Number;)Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "34c8bee563f656433c9b75fea9debf6cdf6ecff1ee2d021b523eb90bc799965a",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "d0c2df6baffbf859afddb429dca279bde4fbdb516ede14b333ce79e0b5969563",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F2ReduceObjects<Ljava/lang/Number;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Number",
+        "java/lang/Object",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreNumber$2",
+        "net/jcores/interfaces/functions/F2ReduceObjects"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreNumber.class",
+      "occurrence": 0,
+      "sha256": "c19e9b7c34fb878d3d06fcbee0fb3c01d63d9924178efa74e4d5bc1ebf608912",
+      "name": "net/jcores/cores/CoreNumber",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/CoreObject",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/lang/Number;)V",
+          "access": 129,
+          "code_sha256": "529df0e47f5899c52f4ed943006cac3b03a8e45930b6211bfed09da7d2f97c2c",
+          "code_length": 7
+        },
+        {
+          "name": "average",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "139be75dc36e74084caf7d3d9ca220d1e595e2eb9542c406c0c42c38d5dbd4be",
+          "code_length": 65
+        },
+        {
+          "name": "d",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "5ab4c9a4f6e387569ab7fed2cf417aabfed57a91fe1319d055046d441ac27a6a",
+          "code_length": 25
+        },
+        {
+          "name": "i",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "2cf5cae6b0e2d124774742b10834868f1836341c3f72812ad8dc088500d1da3b",
+          "code_length": 24
+        },
+        {
+          "name": "max",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "dcd2f5e8dcae1e7016848bb8e15e054d9f2b16048ac5f1c4f0c0887ffb68bf25",
+          "code_length": 32
+        },
+        {
+          "name": "min",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "46a85835f4d197f19ead0678d627e398583bc2bfece6a25fde9402964045660a",
+          "code_length": 32
+        },
+        {
+          "name": "standarddeviation",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "fe30b79c12d7bd027a7bb79295bd44a9371cef32d06e38391d771b3ada4ec4dc",
+          "code_length": 8
+        },
+        {
+          "name": "sum",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "84efba3727a18858d6e8c0678bd825e6ed073c72e37c3227928bc8b2eb96416c",
+          "code_length": 51
+        },
+        {
+          "name": "variance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "5fe0aa9c0dc57f9b4f7016f2481367e296ea037059b36345684ab1bc1bd0aef0",
+          "code_length": 87
+        }
+      ],
+      "generic_signature": "Lnet/jcores/cores/CoreObject<Ljava/lang/Number;>;",
+      "class_references": [
+        "[Ljava/lang/Number;",
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Number",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreNumber$1",
+        "net/jcores/cores/CoreNumber$2",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$1.class",
+      "occurrence": 0,
+      "sha256": "e4d0b703c7715678ec70d912d0d960517732711ffcefc4e212aff35ee0e4a243",
+      "name": "net/jcores/cores/CoreObject$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$string",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        },
+        {
+          "name": "val$types",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 4114
+        },
+        {
+          "name": "val$params",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Ljava/lang/String;[Ljava/lang/Class;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "b1cc4a6d9f1e1d567dc438d8a0378f86313cfb2f170deba856d093a554c35c0b",
+          "code_length": 26
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TT;)Ljava/lang/Object;",
+          "code_sha256": "8aeb2e30cb06ae732ccb50ccc73a91e79967445c86f514156f51c4017c066def",
+          "code_length": 275
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TT;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$1",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$10.class",
+      "occurrence": 0,
+      "sha256": "74fc2ebec9d4d2c45390e7b07df99882e27d3bdcc285432909ba5118bac715af",
+      "name": "net/jcores/cores/CoreObject$10",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "net/jcores/utils/internal/Mapper",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$f",
+          "descriptor": "Lnet/jcores/interfaces/functions/F1;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Lnet/jcores/cores/CoreObject;[Lnet/jcores/options/Option;Lnet/jcores/interfaces/functions/F1;)V",
+          "access": 128,
+          "code_sha256": "b3092f1a2954de659189c3c8231b4d329a24d1b4ccc35233e0a3f10c472500ed",
+          "code_length": 18
+        },
+        {
+          "name": "handle",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "801cfd82c1c647fe51cdd8215ee84239a34f1155f2335812fe49952114e69f02",
+          "code_length": 98
+        }
+      ],
+      "generic_signature": "Lnet/jcores/utils/internal/Mapper<TT;TR;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Object",
+        "java/lang/reflect/Array",
+        "java/util/concurrent/atomic/AtomicReference",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$10",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/OptionIndexer",
+        "net/jcores/utils/internal/Mapper",
+        "net/jcores/utils/internal/Mapper$MapOptions"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$2.class",
+      "occurrence": 0,
+      "sha256": "1e76da793aa3b55605f8ffd7461b6067106849a052f5da8cb08b93a154626789",
+      "name": "net/jcores/cores/CoreObject$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$target",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TT;)TN;",
+          "code_sha256": "f63e62f105003bb24c7714303a4e94d117d3e4d84a7afd08f6154dad2b4db4ea",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TT;TN;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$2",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$3.class",
+      "occurrence": 0,
+      "sha256": "560f365adb8882143bd6c62f1a7e8b1dd28b57944c19a0f53d14655b588d15ef",
+      "name": "net/jcores/cores/CoreObject$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Class;",
+          "access": 1,
+          "generic_signature": "(TT;)Ljava/lang/Class<TT;>;",
+          "code_sha256": "0179144d25ac0f86f302df6409ea8a4ef145825ec9b6555a624643f35d2abef0",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "79a4b909623b01e6d36d23e84e81f070cd9647713249de7ce7a0466882843c77",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TT;Ljava/lang/Class<TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$3",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$4.class",
+      "occurrence": 0,
+      "sha256": "f2a2396aaa099dfd8f507a71243091fdfef81c3def21c9672338e542c48e5451",
+      "name": "net/jcores/cores/CoreObject$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "net/jcores/utils/internal/Mapper",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$size",
+          "descriptor": "I",
+          "access": 4114
+        },
+        {
+          "name": "val$delta",
+          "descriptor": "Lnet/jcores/interfaces/functions/F2DeltaObjects;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Lnet/jcores/cores/CoreObject;[Lnet/jcores/options/Option;ILnet/jcores/interfaces/functions/F2DeltaObjects;)V",
+          "access": 128,
+          "code_sha256": "e90e69dc2abe85a7b26549b1373f887e2d14e674d21735132d01b188b8bee93d",
+          "code_length": 24
+        },
+        {
+          "name": "handle",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "663ef8b85a9c391402e8eeb73b43152c934ad021eb4f224098d862dff07ae45a",
+          "code_length": 105
+        }
+      ],
+      "generic_signature": "Lnet/jcores/utils/internal/Mapper<TT;TR;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Object",
+        "java/lang/reflect/Array",
+        "java/util/concurrent/atomic/AtomicReference",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$4",
+        "net/jcores/interfaces/functions/F2DeltaObjects",
+        "net/jcores/utils/internal/Mapper"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$5$1.class",
+      "occurrence": 0,
+      "sha256": "320877204893e453f192d0faa3e317d49e1838b1bf0b7fe9f56dfb8925bb2847",
+      "name": "net/jcores/cores/CoreObject$5$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lnet/jcores/cores/CoreObject$5;",
+          "access": 4112
+        },
+        {
+          "name": "val$method",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 4114
+        },
+        {
+          "name": "val$args",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject$5;Ljava/lang/reflect/Method;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "ca5dfe0186761b30aa7816d373981220ea6ca9e1cdcaabbecae5667998bea9ba",
+          "code_length": 20
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TX;)Ljava/lang/Object;",
+          "code_sha256": "54c386467f78a45913a373ef238b3daf25a5578df2329b04f879b2248e323179",
+          "code_length": 39
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TX;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "net/jcores/cores/CoreObject$5",
+        "net/jcores/cores/CoreObject$5$1",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$5.class",
+      "occurrence": 0,
+      "sha256": "9ed06abd2af667404c648aeb305531060351c6170840be87736fea0ac84e3be6",
+      "name": "net/jcores/cores/CoreObject$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/InvocationHandler"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$filtered",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Lnet/jcores/cores/CoreObject;)V",
+          "access": 0,
+          "code_sha256": "c0abfe2c6d3260617cf9370d21e4c88de3007c6c15d5897bbeef6ef501762425",
+          "code_length": 15
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "code_sha256": "d9d558430d9d6c50a01dd97806f38b787adcd9b21b5040ea6729d13b75aaecfe",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/reflect/InvocationHandler",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$5",
+        "net/jcores/cores/CoreObject$5$1",
+        "net/jcores/options/Option"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$6.class",
+      "occurrence": 0,
+      "sha256": "57882d4c581988d0eb13a027ed3e69d6c64e846f2c7337771a5f87e7f750fa49",
+      "name": "net/jcores/cores/CoreObject$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$f",
+          "descriptor": "Lnet/jcores/interfaces/functions/F1Object2Bool;",
+          "access": 4114
+        },
+        {
+          "name": "val$invert",
+          "descriptor": "Z",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Lnet/jcores/interfaces/functions/F1Object2Bool;Z)V",
+          "access": 0,
+          "code_sha256": "24e5eb7ddc62aff7bac58cf3a9c9316be52a71856ce569d537689c5a777630dd",
+          "code_length": 20
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TT;)TT;",
+          "code_sha256": "5b5251bd873def969ed5719c99e2b949cdb1985a94bd8a26794aa9cd299af683",
+          "code_length": 42
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TT;TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$6",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$7.class",
+      "occurrence": 0,
+      "sha256": "21f216a83d83af7b5c3e65539722ac5b29abcbd705dd6dc3e6bda8a2e73641d1",
+      "name": "net/jcores/cores/CoreObject$7",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$p",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Ljava/util/regex/Pattern;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "generic_signature": "(TT;)Z",
+          "code_sha256": "455376b1ad884742a9d95fd4078ebcc1bc67e3ec519084803fdab61eb6ba5719",
+          "code_length": 17
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1Object2Bool<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$7",
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$8.class",
+      "occurrence": 0,
+      "sha256": "53dec9e1f644d5006007e099a699431b39876fc62ee4895b4db5b6f46c7869e7",
+      "name": "net/jcores/cores/CoreObject$8",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "net/jcores/utils/internal/Folder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$array",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReferenceArray;",
+          "access": 4114
+        },
+        {
+          "name": "val$f",
+          "descriptor": "Lnet/jcores/interfaces/functions/F2ReduceObjects;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;Lnet/jcores/cores/CoreObject;Ljava/util/concurrent/atomic/AtomicReferenceArray;Lnet/jcores/interfaces/functions/F2ReduceObjects;)V",
+          "access": 0,
+          "code_sha256": "a1bcae5e0dec6dfa1bb2d4f6f66c20da80517fb42715f044afbafcb8f22bae86",
+          "code_length": 22
+        },
+        {
+          "name": "handle",
+          "descriptor": "(III)V",
+          "access": 1,
+          "code_sha256": "eae87112552ef7a020e89d2df5fedf62f0a10bd3a2e91d575d64617f941afb5f",
+          "code_length": 95
+        }
+      ],
+      "generic_signature": "Lnet/jcores/utils/internal/Folder<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/atomic/AtomicReferenceArray",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$8",
+        "net/jcores/interfaces/functions/F2ReduceObjects",
+        "net/jcores/utils/internal/Folder"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject$9.class",
+      "occurrence": 0,
+      "sha256": "77da73b9a6eaa61166ef835d91dc851dc228ea2c119c47f9ad34b158a839c284",
+      "name": "net/jcores/cores/CoreObject$9",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreObject;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "generic_signature": "(TT;)Ljava/lang/String;",
+          "code_sha256": "0179144d25ac0f86f302df6409ea8a4ef145825ec9b6555a624643f35d2abef0",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "79a4b909623b01e6d36d23e84e81f070cd9647713249de7ce7a0466882843c77",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<TT;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$9",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreObject.class",
+      "occurrence": 0,
+      "sha256": "c47855bddcbcd5b9c2019c932ab8a6f37e6b4e13837390cf241600c864b617c8",
+      "name": "net/jcores/cores/CoreObject",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/jcores/cores/Core",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "t",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 20,
+          "generic_signature": "[TT;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;Ljava/lang/Class;Ljava/lang/Object;)V",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/CommonCore;Ljava/lang/Class<*>;TT;)V",
+          "code_sha256": "dd733299aa950cfd8610d69bc808779189ad12c2adc5c9681f59eb5b74836a7f",
+          "code_length": 40
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/CommonCore;[Ljava/lang/Object;)V",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/CommonCore;[TT;)V",
+          "code_sha256": "013e6879b38946253d6bd741ab2aa812f5b23cd7e89e2ee734401d227a7714eb",
+          "code_length": 11
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/cores/CoreObject<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "71358ce09478c62e34b8414d6999baa270803ef5207318dc186c93b238891787",
+          "code_length": 93
+        },
+        {
+          "name": "add",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "([TT;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "cdb51d57b89e85c797a7add186707a3eb479cc9c8355e26eb896cd90852227b1",
+          "code_length": 17
+        },
+        {
+          "name": "array",
+          "descriptor": "(Ljava/lang/Class;)[Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "<N:Ljava/lang/Object;>(Ljava/lang/Class<TN;>;)[TN;",
+          "code_sha256": "93bedc9cf99616c7c98d5862e3b9fd3fed3309287fabec63627de15744bbb054",
+          "code_length": 42
+        },
+        {
+          "name": "as",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/cores/Core;",
+          "access": 1,
+          "generic_signature": "<C:Lnet/jcores/cores/Core;>(Ljava/lang/Class<TC;>;)TC;",
+          "code_sha256": "be54d28f9f08e74dab9bf4b1e65293e618f898fe6670992e471028de8e02447b",
+          "code_length": 279
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Ljava/lang/String;[Ljava/lang/Object;)Lnet/jcores/cores/CoreObject<Ljava/lang/Object;>;",
+          "code_sha256": "6792871157aa8a6348301a1bec8f528ae32cd56cd127c3e7860366df3226ec19",
+          "code_length": 81
+        },
+        {
+          "name": "cast",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "<N:Ljava/lang/Object;>(Ljava/lang/Class<TN;>;)Lnet/jcores/cores/CoreObject<TN;>;",
+          "code_sha256": "7a6fe25b15528667491f8377025f5617aaef03db450dd35d2bce7028baa81505",
+          "code_length": 29
+        },
+        {
+          "name": "clazz",
+          "descriptor": "()Lnet/jcores/cores/CoreClass;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreClass<TT;>;",
+          "code_sha256": "01b29a4035d06631850ad51fa61be348f2e38a2cb03c0ca4a71177b53508cb0d",
+          "code_length": 36
+        },
+        {
+          "name": "compact",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "1be434b21120a9d082178466138b97880e4e04abbe5224e0f80b5609000f9724",
+          "code_length": 82
+        },
+        {
+          "name": "compound",
+          "descriptor": "()Lnet/jcores/utils/Compound;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/utils/Compound<Ljava/lang/Object;>;",
+          "code_sha256": "a4d39e3bb3ac6d88c2f36d4c24f9a6194ab7badd9df34c88bcb33f13b5e200b7",
+          "code_length": 8
+        },
+        {
+          "name": "compound",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/utils/Compound;",
+          "access": 1,
+          "generic_signature": "<C:Ljava/lang/Object;>(Ljava/lang/Class<TC;>;)Lnet/jcores/utils/Compound<TC;>;",
+          "code_sha256": "a4d39e3bb3ac6d88c2f36d4c24f9a6194ab7badd9df34c88bcb33f13b5e200b7",
+          "code_length": 8
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "generic_signature": "(TT;)Z",
+          "code_sha256": "103a8a07c773385a2b28d66756e1716b9ee2161a60b33c90c59f8de0eec2c696",
+          "code_length": 42
+        },
+        {
+          "name": "debug",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "1b9c776c197349e6700cd9428df3b6db5ade8b0240c7ca00488b3fcd35eb0d5e",
+          "code_length": 27
+        },
+        {
+          "name": "delta",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F2DeltaObjects;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lnet/jcores/interfaces/functions/F2DeltaObjects<TT;TR;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TR;>;",
+          "code_sha256": "8921721ba5ca646a99f3219d1e3fd06ca807494cc78aa88fd5ec896bb6aa64b3",
+          "code_length": 43
+        },
+        {
+          "name": "each",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "<X:Ljava/lang/Object;>(Ljava/lang/Class<TX;>;)TX;",
+          "code_sha256": "90bb7254ebbf2577c72ae1264b8df69850705c2c253e586c5fd8992acc1db83e",
+          "code_length": 49
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ed06f84722f731d999563e56f49c634c1e36c6e36e8349939a7f7326ecc733f5",
+          "code_length": 30
+        },
+        {
+          "name": "expand",
+          "descriptor": "(Ljava/lang/Class;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "<N:Ljava/lang/Object;>(Ljava/lang/Class<TN;>;)Lnet/jcores/cores/CoreObject<TN;>;",
+          "code_sha256": "3ac2204667acd257c809e6560120ec86758176b32a2ede0fa35aeda7e1b1307a",
+          "code_length": 327
+        },
+        {
+          "name": "featurerequest",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "fdcca7f88589d5a0b903ec1a7e54c7b7f0083cbd4e2255303ae5eadbacde7c20",
+          "code_length": 23
+        },
+        {
+          "name": "fill",
+          "descriptor": "(Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(TT;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "db1160431dc35130dbf7ce2da161911e553c222671accf7aeeb362cb372d6cfa",
+          "code_length": 64
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F1Object2Bool;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/interfaces/functions/F1Object2Bool<TT;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "42dcbeba5092fe46eea5a6f121691c9d92617644a4c654e7df10bc2cabda7a40",
+          "code_length": 37
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "7b06aa4d0d0b0db2d7e278304cb9fc645533ccfda954f9a2af686c18c838d9e4",
+          "code_length": 20
+        },
+        {
+          "name": "fingerprint",
+          "descriptor": "(Z)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "86262a75caf97ade33bda3c65e66188b6f5941a1d682f5f0878fd5c26936cb4f",
+          "code_length": 251
+        },
+        {
+          "name": "fold",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F2ReduceObjects;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/interfaces/functions/F2ReduceObjects<TT;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "4acfc6a678282d76cc2843d27df87cc8f0371c250b3bb5ff2bce715dda93f4e1",
+          "code_length": 75
+        },
+        {
+          "name": "forEach",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F1;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lnet/jcores/interfaces/functions/F1<TT;TR;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TR;>;",
+          "code_sha256": "435fd30ab3afab4e099abdf16b2f60133a2248b8b7829fdbcee036bee5f66d52",
+          "code_length": 47
+        },
+        {
+          "name": "forEach",
+          "descriptor": "(Lnet/jcores/interfaces/functions/Fn;I)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lnet/jcores/interfaces/functions/Fn<TT;TR;>;I)Lnet/jcores/cores/CoreObject<TR;>;",
+          "code_sha256": "904297ab7da22760b686b8e99148d42fd7abb8f4a50a17649009f5271ef7edc0",
+          "code_length": 162
+        },
+        {
+          "name": "get",
+          "descriptor": "(DLjava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(DTT;)TT;",
+          "code_sha256": "c95e42854442284653677c29e706eb11b2b54470fe1829439b5ae9d899cd940b",
+          "code_length": 64
+        },
+        {
+          "name": "get",
+          "descriptor": "(D)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(D)TT;",
+          "code_sha256": "68477f96cc6eb6355f7e13b51649009ec654a2f1eeac6828141800eac2c64bdb",
+          "code_length": 7
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "<X:TT;>(Ljava/lang/Class<TX;>;TX;)TX;",
+          "code_sha256": "b283e49d89f8eea98d546c3f5ddb11ee62a071c59045ff21b5b9e10fc13297e8",
+          "code_length": 50
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(I)TT;",
+          "code_sha256": "d0c5e45aba0eab73721fa6d928402833d4285a6527dfc1488597f1843003be78",
+          "code_length": 26
+        },
+        {
+          "name": "get",
+          "descriptor": "(ILjava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(ITT;)TT;",
+          "code_sha256": "a7280411e4c7d07d0c93628fa476d110c797c756ec2d581e0cbc8050bce970d6",
+          "code_length": 16
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "(TT;)TT;",
+          "code_sha256": "87e558b928de6e443ce4249e24b035b88cb85cd45ef06f3841878e1b3cc91475",
+          "code_length": 7
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1303395319b2bea126a93960e65d383f22c660464e0fb21fe178478304416d85",
+          "code_length": 8
+        },
+        {
+          "name": "hasAll",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "66613ed3dfdb017af62ea1acd8a8f1e22d18642a4ca9d9335ef04998d4fe5c8a",
+          "code_length": 39
+        },
+        {
+          "name": "hasAny",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b898b422dd4259b787f6b8c56d5582466ee5ffede801aa1a14dd1e95f4e6aad9",
+          "code_length": 39
+        },
+        {
+          "name": "ifAll",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F0;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/interfaces/functions/F0;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "01372644ac567141da5b9665effe0672ea62498a6280818653f0a59c4005da8b",
+          "code_length": 15
+        },
+        {
+          "name": "index",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreNumber;",
+          "access": 129,
+          "generic_signature": "([TT;)Lnet/jcores/cores/CoreNumber;",
+          "code_sha256": "f58019c4b162f9e8e5e1f442141b16b8cd7d493c4c6876455d9a819cc5e39ca7",
+          "code_length": 109
+        },
+        {
+          "name": "intersect",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/cores/CoreObject<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "e1bb3d3a0c5e58b5ecb7fcdb70df466cb969dda2730900f4a603754fdc0ec1e8",
+          "code_length": 135
+        },
+        {
+          "name": "intersect",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "([TT;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "608d4cc9d82c23481770b1bd1a26b378ab99bdcc4518559d2e1a9dcb47622871",
+          "code_length": 17
+        },
+        {
+          "name": "list",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "generic_signature": "()Ljava/util/List<TT;>;",
+          "code_sha256": "4b46cbc7321532b683e9edfb8af481fe4dbe253fb052243c34cec9dfe682e018",
+          "code_length": 30
+        },
+        {
+          "name": "map",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F1;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lnet/jcores/interfaces/functions/F1<TT;TR;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TR;>;",
+          "code_sha256": "0a3186db8dd681312571da1d1225113bd4d5ddcf0348863cd3a2fd033a87682b",
+          "code_length": 29
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "e54107654b985aaefa5dbe1183205ea8fd4e5057ad2e5ef470fafeeb497d19d0",
+          "code_length": 52
+        },
+        {
+          "name": "random",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "()TT;",
+          "code_sha256": "e4fb9ce7a18e70f1522dcadc29d8d8e0d69d1d5b629b0c9be33fcb0811ff0d00",
+          "code_length": 28
+        },
+        {
+          "name": "random",
+          "descriptor": "(D)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(D)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "0be18ae007194b91da02b7d10ba4580054cbff7809ca2ecb185c3bf94f76e148",
+          "code_length": 23
+        },
+        {
+          "name": "random",
+          "descriptor": "(I)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(I)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "ce9bee1da3dc9766c16383c9cac0d3ab3c2d918a5c8832ee93fe44dc57aaf3c4",
+          "code_length": 92
+        },
+        {
+          "name": "reduce",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F2ReduceObjects;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Lnet/jcores/interfaces/functions/F2ReduceObjects<TT;>;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "1e3dfc88bf19858129b8a0abd356facc4de539f1fc48374c67cf2ce132fff91d",
+          "code_length": 86
+        },
+        {
+          "name": "serialize",
+          "descriptor": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "(Ljava/lang/String;[Lnet/jcores/options/Option;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "e917eb5b522b6f2a58d54224d0e4cbfa2c50e907d845d7b56cb238b015365c6a",
+          "code_length": 29
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "85d4eb7a1470f0bf37d91edc23ac1640f8c068d2cd8e61fbd8fb88baea93c05f",
+          "code_length": 15
+        },
+        {
+          "name": "slice",
+          "descriptor": "(II)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(II)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "9cac9d742cacf151c4ef2967ce730413d37266708f6cc0651e8d050c3432855e",
+          "code_length": 213
+        },
+        {
+          "name": "sort",
+          "descriptor": "(Ljava/util/Comparator;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Ljava/util/Comparator<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "6ea76903a43eec4ba08ab7db675a4f15758f762ef8663e9141010a9a913482f8",
+          "code_length": 39
+        },
+        {
+          "name": "sort",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "be709599e21397c4dbfa017fd537bf356c01323349b52d7f18f551581d7e7b88",
+          "code_length": 75
+        },
+        {
+          "name": "staple",
+          "descriptor": "(Ljava/lang/Object;Lnet/jcores/interfaces/functions/F2ReduceObjects;)Lnet/jcores/utils/Staple;",
+          "access": 1,
+          "generic_signature": "(TT;Lnet/jcores/interfaces/functions/F2ReduceObjects<TT;>;)Lnet/jcores/utils/Staple<TT;>;",
+          "code_sha256": "e0ef8619388550e6a716417f651356486e5d0315a0be7b15bc9ed9924154065a",
+          "code_length": 85
+        },
+        {
+          "name": "string",
+          "descriptor": "()Lnet/jcores/cores/CoreString;",
+          "access": 1,
+          "code_sha256": "05e2d31a74a1fb3e6bb5d3e56521da6456084e2973d75c062c7ba0dd4f4b6289",
+          "code_length": 26
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lnet/jcores/cores/CoreObject;)Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "(Lnet/jcores/cores/CoreObject<TT;>;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "89a831ebd8422d0af2b4d6a724a5ac9d4aa72a844e4e6a0d5611b33f4da30a97",
+          "code_length": 117
+        },
+        {
+          "name": "subtract",
+          "descriptor": "([Ljava/lang/Object;)Lnet/jcores/cores/CoreObject;",
+          "access": 129,
+          "generic_signature": "([TT;)Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "97f1ca6b221272a3d60721c171c0b0f767fc813637f5d3e14e298b2608a88593",
+          "code_length": 17
+        },
+        {
+          "name": "unique",
+          "descriptor": "()Lnet/jcores/cores/CoreObject;",
+          "access": 1,
+          "generic_signature": "()Lnet/jcores/cores/CoreObject<TT;>;",
+          "code_sha256": "079a1d22e90a21ecbb6f80d92b7f654033398a7e85e2217b6871ac5527273e7f",
+          "code_length": 92
+        },
+        {
+          "name": "unsafearray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "generic_signature": "()[TT;",
+          "code_sha256": "94c10be9ef1429505e27dc55ba055913827351da26b2a51f1b29d3098ac324c2",
+          "code_length": 20
+        },
+        {
+          "name": "indexToOffset",
+          "descriptor": "(I)I",
+          "access": 20,
+          "code_sha256": "ad5c77da872ef50b9c0b3ad47145797a36a9c3e9a4ca60fe20f89e3f4841e913",
+          "code_length": 30
+        },
+        {
+          "name": "mapper",
+          "descriptor": "(Lnet/jcores/interfaces/functions/F1;[Lnet/jcores/options/Option;)Lnet/jcores/utils/internal/Mapper;",
+          "access": 148,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lnet/jcores/interfaces/functions/F1<TT;TR;>;[Lnet/jcores/options/Option;)Lnet/jcores/utils/internal/Mapper;",
+          "code_sha256": "5579e0ec7bcbf904e3cbea2bbe24712e60476c0154508cf37fa11f4b26f41c86",
+          "code_length": 12
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lnet/jcores/cores/Core;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Integer;",
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/reflect/Constructor;",
+        "java/io/File",
+        "java/io/FileNotFoundException",
+        "java/io/FileOutputStream",
+        "java/io/PrintStream",
+        "java/lang/ArrayStoreException",
+        "java/lang/Class",
+        "java/lang/ClassCastException",
+        "java/lang/Double",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/InstantiationException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/NullPointerException",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/reflect/Array",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Random",
+        "java/util/concurrent/atomic/AtomicReferenceArray",
+        "java/util/regex/Pattern",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/Core",
+        "net/jcores/cores/CoreClass",
+        "net/jcores/cores/CoreNumber",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreObject$1",
+        "net/jcores/cores/CoreObject$10",
+        "net/jcores/cores/CoreObject$2",
+        "net/jcores/cores/CoreObject$3",
+        "net/jcores/cores/CoreObject$4",
+        "net/jcores/cores/CoreObject$5",
+        "net/jcores/cores/CoreObject$6",
+        "net/jcores/cores/CoreObject$7",
+        "net/jcores/cores/CoreObject$8",
+        "net/jcores/cores/CoreObject$9",
+        "net/jcores/cores/CoreString",
+        "net/jcores/interfaces/functions/F0",
+        "net/jcores/interfaces/functions/F2ReduceObjects",
+        "net/jcores/interfaces/functions/Fn",
+        "net/jcores/managers/ManagerDebugGUI",
+        "net/jcores/managers/ManagerDeveloperFeedback",
+        "net/jcores/options/MessageType",
+        "net/jcores/options/Option",
+        "net/jcores/options/OptionMapType",
+        "net/jcores/utils/Compound",
+        "net/jcores/utils/Staple",
+        "net/jcores/utils/internal/Mapper",
+        "net/jcores/utils/internal/io/StreamUtils",
+        "net/jcores/utils/internal/lang/ObjectUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$1.class",
+      "occurrence": 0,
+      "sha256": "7bb7f4dd6793ee8543fdecd8c43c24ce83986a30745552d64f4bebe17cbbf6a8",
+      "name": "net/jcores/cores/CoreString$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "code_sha256": "76e6f29fdc64a7be1adadf5369d9384e8a67924565e2dad1192823841d19919c",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "695e48c758801779396f1dde1c2560f878940ceedbdcb53ea02c035d7fd49e37",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/nio/ByteBuffer;>;",
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/nio/ByteBuffer",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$1",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$10.class",
+      "occurrence": 0,
+      "sha256": "4d0ae87c0b227d4a0033bf0fa59c6f81e94383537b703a10328e02902ecc112d",
+      "name": "net/jcores/cores/CoreString$10",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        },
+        {
+          "name": "val$level",
+          "descriptor": "Ljava/util/logging/Level;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;Ljava/util/logging/Level;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "bc4ded3e33dc7e63b247a13f8dfd83e3a71b59a9444a72b8f8e1dda4bad41bda",
+          "code_length": 17
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b15ae10bc48b393a629d183c979e236427afb0b08df32eaff8cde3379a9569f2",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "net/jcores/CommonCore",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$10",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$11.class",
+      "occurrence": 0,
+      "sha256": "e95972ec00bd3b4e51083123a1a1fe5cb8de68e163342160c416e2946f3e401d",
+      "name": "net/jcores/cores/CoreString$11",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "62766ef9dab646fe78384e1353fd3fc2ed599922eca1d3c169e1c91694e43b32",
+          "code_length": 13
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "3c498847e037766fab5fa5607e7a907eafc7da2a531c7650b43015b089d4c4ce",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$11",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$12.class",
+      "occurrence": 0,
+      "sha256": "5bac2fe1bedfcf71ab8f8c2a001b446fcb625e58abd4377116d1ad7803169257",
+      "name": "net/jcores/cores/CoreString$12",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        },
+        {
+          "name": "val$p",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 4114
+        },
+        {
+          "name": "val$with",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;Ljava/util/regex/Pattern;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "ca5dfe0186761b30aa7816d373981220ea6ca9e1cdcaabbecae5667998bea9ba",
+          "code_length": 20
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3c226a8525e1d9a91ccee6be5c2c1b16cf0ddfe30870cf0a20e56055297957a0",
+          "code_length": 16
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "95b7678102bf533929843d66db7375d4fe88733a6a4db0d095751473d040834f",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$12",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$13.class",
+      "occurrence": 0,
+      "sha256": "a8e5126fb3c33676618ed2518759e744c575d8161cddb1b917f6755602472865",
+      "name": "net/jcores/cores/CoreString$13",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7f8aef730f13a4bec7ba0681248a841530cddc7da4b5f2f93361f73dac1aef0f",
+          "code_length": 5
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a424ea8bac172a85e2c04356e9d9f09912e07498341da19774fa859c65cb010",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$13",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$14.class",
+      "occurrence": 0,
+      "sha256": "3667bc1cc5954648a28487d1571504c00940eb40627e57ad1b42e0da932bc81f",
+      "name": "net/jcores/cores/CoreString$14",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "4422d726ed067e466de328d7d463ec943ac7bbe1193db68e1089e5a54dba1cfe",
+          "code_length": 12
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "8373a4613c3fc2203abd99e819a3b82039e11d61d96b366bbdf508c2909641bd",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/net/URI;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URI",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$14",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$2.class",
+      "occurrence": 0,
+      "sha256": "90137a7fe4dfe0d3d9354eaeb2bca0d2dfe96405a7ef47782e3924c4cd818a57",
+      "name": "net/jcores/cores/CoreString$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7c7aebc87fc25cddfe63b5cf9095f246afea1416154e48e2dbcfee9624015750",
+          "code_length": 14
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b15ae10bc48b393a629d183c979e236427afb0b08df32eaff8cde3379a9569f2",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URLDecoder",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$2",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$3.class",
+      "occurrence": 0,
+      "sha256": "17a746454f47408fe4aff18199d5000cd22f9fe35eac19efc34ea4443d62fadf",
+      "name": "net/jcores/cores/CoreString$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7c7aebc87fc25cddfe63b5cf9095f246afea1416154e48e2dbcfee9624015750",
+          "code_length": 14
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b15ae10bc48b393a629d183c979e236427afb0b08df32eaff8cde3379a9569f2",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URLEncoder",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$3",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$4.class",
+      "occurrence": 0,
+      "sha256": "5180fb6ae1e9d5848a130a5fc2b0c6cac338f8a5007f9d74539d7b9bc0389c52",
+      "name": "net/jcores/cores/CoreString$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9d713abf6b92c483fa804d8e40dc074993dea5976697e9c7460fb5ed8e75909b",
+          "code_length": 105
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "edef2a0dc9517b57caa4d47d120eca78cdb8349f51e9c153230aeef7125cbec1",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/ProcessBuilder",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$4",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$5.class",
+      "occurrence": 0,
+      "sha256": "c85f298de5f9dc891e96f349c6e7b0482dd9b94d24fa788eb8d248a520fed631",
+      "name": "net/jcores/cores/CoreString$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        },
+        {
+          "name": "val$command",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "58bce953485f81ab86f74651d8d4c669ae9aade0352c82642f4bf1cf30541f3d",
+          "code_length": 121
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a2b6eb5111eaa606f3df4f1c1c2cd860f958a5364cabe33d1395bd551c3ee6bf",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/ProcessBuilder",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/jcores/CommonCore",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$5",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/options/MessageType",
+        "net/jcores/utils/internal/io/StreamUtils"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$6.class",
+      "occurrence": 0,
+      "sha256": "fb370d9d4a0d26013fe77042ff38377eb9a355414a15e3925f9dfcebf1aca137",
+      "name": "net/jcores/cores/CoreString$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "a6a66eb52e0681ab6fc2a2c931ab2f0307fde67c51abc5f12d87caf7292696a2",
+          "code_length": 9
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "05de17c34933a5402b869f0bf7eca3bdf6a60220dec447c5a68537edb6f199f8",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/io/File;>;",
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "java/lang/String",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$6",
+        "net/jcores/interfaces/functions/F1"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$7.class",
+      "occurrence": 0,
+      "sha256": "bd59d31d1b1423add579719c3567a27e9253991d0b03b2df23d076188dca546f",
+      "name": "net/jcores/cores/CoreString$7",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        },
+        {
+          "name": "val$p",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;Ljava/util/regex/Pattern;)V",
+          "access": 0,
+          "code_sha256": "5e94e289103ee0f69dda3159c0b4eba180fa5a96fc62c4bf901ab6c3b914b897",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "ff32a97b52e4f0bc170f23a272494ca22537fc8f0f946e5dbe14d9628a4e57f2",
+          "code_length": 14
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "a947230aa7c8f2c57a48fc1a5d6bb321438643661076741855369808fe9d1680",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1Object2Bool<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$7",
+        "net/jcores/interfaces/functions/F1Object2Bool"
+      ]
+    },
+    {
+      "entry": "net/jcores/cores/CoreString$8.class",
+      "occurrence": 0,
+      "sha256": "bf7b96a80246d5100917e58e136ff672b561a6ffe9aaaa7264603b01003b48ff",
+      "name": "net/jcores/cores/CoreString$8",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/jcores/cores/CoreString;",
+          "access": 4112
+        },
+        {
+          "name": "val$delimeters",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 4114
+        },
+        {
+          "name": "val$rval",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/jcores/cores/CoreString;[Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "ca5dfe0186761b30aa7816d373981220ea6ca9e1cdcaabbecae5667998bea9ba",
+          "code_length": 20
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "60da95c0a462d939cac6356393087986b0654ec8c7e230b05b8bf5804d662b48",
+          "code_length": 186
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "15500394b9c9d4e9a6bd8f9563bceb56582e1f9b756a74845be2c0f6d1e0582e",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/lang/String;Ljava/lang/Void;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreString$8",
+        "net/jcores/interfaces/functions/F1",
+        "net/jcores/utils/Compound"
+      ]
+    }
+  ]
+}

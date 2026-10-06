@@ -1,0 +1,1908 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/okhttp-jvm-5.3.2.jar",
+  "archive_sha256": "c771f48075b763f6c322055e21129a94b7de4c1faf3f8f58ace320b0c9517a30",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "okhttp3/internal/ws/MessageDeflater.class",
+      "occurrence": 0,
+      "sha256": "2558dafa9d15682f3f7e2db25161be9e28fe5749b2200db5d61a98208d29e11b",
+      "name": "okhttp3/internal/ws/MessageDeflater",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "noContextTakeover",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "deflatedBytes",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "deflater",
+          "descriptor": "Ljava/util/zip/Deflater;",
+          "access": 18
+        },
+        {
+          "name": "deflaterSink",
+          "descriptor": "Lokio/DeflaterSink;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "6d7ffd27011bf8f8e6150644e6a2d3dbda8054861dcbaa85b5058dd35a8a2ee3",
+          "code_length": 56
+        },
+        {
+          "name": "deflate",
+          "descriptor": "(Lokio/Buffer;)V",
+          "access": 17,
+          "code_sha256": "660882cdae8f576af4a52d36ab4e5f4b29042f1b649cb4ab58d99601f9e43b9c",
+          "code_length": 195,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "08ceab476cb7bc973fa0415894fb54fc06ff0aaee20547c429741ebb9d5665ca",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "endsWith",
+          "descriptor": "(Lokio/Buffer;Lokio/ByteString;)Z",
+          "access": 18,
+          "code_sha256": "d88976a4b8a4c0a8b317b9ec7c5807c95fbc59f747c3c3c9e1e445dda8fa2524",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/zip/Deflater",
+        "kotlin/io/CloseableKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/ws/MessageDeflater",
+        "okhttp3/internal/ws/MessageDeflaterKt",
+        "okio/Buffer",
+        "okio/Buffer$UnsafeCursor",
+        "okio/ByteString",
+        "okio/DeflaterSink",
+        "okio/Sink"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/MessageDeflaterKt.class",
+      "occurrence": 0,
+      "sha256": "e0153fd347a7af6a89cebdcf4a7dd1c21426b4549474d3f278d6b9eef7472262",
+      "name": "okhttp3/internal/ws/MessageDeflaterKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY_DEFLATE_BLOCK",
+          "descriptor": "Lokio/ByteString;",
+          "access": 26
+        },
+        {
+          "name": "LAST_OCTETS_COUNT_TO_REMOVE_AFTER_DEFLATION",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "access$getEMPTY_DEFLATE_BLOCK$p",
+          "descriptor": "()Lokio/ByteString;",
+          "access": 4121,
+          "code_sha256": "0ac07bf5152cfe6256aea6424660538f8d9747ef468d87e040c2ced7da1f997c",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a25c9564cc102dc6ed2524d46dd55f320b4ee0c3e6dfb24da478bed7b580cd84",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "okhttp3/internal/ws/MessageDeflaterKt",
+        "okio/ByteString",
+        "okio/ByteString$Companion"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/MessageInflater.class",
+      "occurrence": 0,
+      "sha256": "07a616f82eef3c7ac57bf983d575f1a26f7bfda022d269ca2204a7b86ec58de3",
+      "name": "okhttp3/internal/ws/MessageInflater",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "noContextTakeover",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "deflatedBytes",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "inflater",
+          "descriptor": "Ljava/util/zip/Inflater;",
+          "access": 2
+        },
+        {
+          "name": "inflaterSource",
+          "descriptor": "Lokio/InflaterSource;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "5fe74d8419b192d31f1ee3f8d5d0e0d551f82336950e8c3e05c7891c307dbdc4",
+          "code_length": 21
+        },
+        {
+          "name": "inflate",
+          "descriptor": "(Lokio/Buffer;)V",
+          "access": 17,
+          "code_sha256": "c3bc0ad2fc57af1733507ba99c896240a2af568a099a0aab3cc99d0cb9b9e013",
+          "code_length": 223,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2c6771012519a6542f70de7e3858ed0446d6ac7bf172f7bd432a2b4f4ecd90f6",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/zip/Inflater",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/ws/MessageInflater",
+        "okio/Buffer",
+        "okio/InflaterSource",
+        "okio/Source"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/MessageInflaterKt.class",
+      "occurrence": 0,
+      "sha256": "7d1a35a1c841850135a8c377647d80b55c3a815c3d1bf5f7e602f7fc471b20e5",
+      "name": "okhttp3/internal/ws/MessageInflaterKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OCTETS_TO_ADD_BEFORE_INFLATION",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "okhttp3/internal/ws/MessageInflaterKt"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket$Close.class",
+      "occurrence": 0,
+      "sha256": "3d103ebdc3108717b2dec0ab227ccb89686428768df3f838f9a8a65880bb880d",
+      "name": "okhttp3/internal/ws/RealWebSocket$Close",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "code",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "reason",
+          "descriptor": "Lokio/ByteString;",
+          "access": 18
+        },
+        {
+          "name": "cancelAfterCloseMillis",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILokio/ByteString;J)V",
+          "access": 1,
+          "code_sha256": "7156bd1ea64b5666e46ef6a3f2636a6d380becbbfbfbb30bdccdb046603349d4",
+          "code_length": 20
+        },
+        {
+          "name": "getCode",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "2ad01858457e03a189abd6a15f4e3cd0779d9c0d9e5c686467387584975d81bb",
+          "code_length": 5
+        },
+        {
+          "name": "getReason",
+          "descriptor": "()Lokio/ByteString;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "getCancelAfterCloseMillis",
+          "descriptor": "()J",
+          "access": 17,
+          "code_sha256": "c137a7409cea68f3a4fc803f80cad51ef910415d4e25a37c6d15731beec7ab19",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$Close"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket$Companion.class",
+      "occurrence": 0,
+      "sha256": "63f31b87035b58a399f5809331e17c5fcebfb7dc0f6fd26ebd280edcaef0d103",
+      "name": "okhttp3/internal/ws/RealWebSocket$Companion",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "aab13953f9d3feb5b9581e937786ec4c2ebbf1a0ebf7650fa7d8cd37fd68f2ec",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$Companion"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket$Message.class",
+      "occurrence": 0,
+      "sha256": "0b0775c755062ff793a065a884cb0366451f8191e8654b53c282cb673b16833f",
+      "name": "okhttp3/internal/ws/RealWebSocket$Message",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formatOpcode",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "data",
+          "descriptor": "Lokio/ByteString;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILokio/ByteString;)V",
+          "access": 1,
+          "code_sha256": "e503eb79ace9c8e1fc8a730e830f68622c1201a1084a8408e804a96931cbe7a0",
+          "code_length": 21
+        },
+        {
+          "name": "getFormatOpcode",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "85d26770fd4a48de59f70964ff3f08e2243f6d9c897910136273f9d9fa1dbbc0",
+          "code_length": 5
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lokio/ByteString;",
+          "access": 17,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$Message"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket$WriterTask.class",
+      "occurrence": 0,
+      "sha256": "8d9dc5f35363746b3f9942b29781875cb0fa561ff27181e62706438fb4e18980",
+      "name": "okhttp3/internal/ws/RealWebSocket$WriterTask",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "okhttp3/internal/concurrent/Task",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lokhttp3/internal/ws/RealWebSocket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;)V",
+          "access": 1,
+          "code_sha256": "53716e5199f2c78c34a4810e0f8ec79b37542c7c2bc1719a6e422c4893c586d6",
+          "code_length": 35,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "runOnce",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "e5634b8d65dff37b6a83060d9746d87bf56f58bcd1646678ae525e57cdbe1065",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "okhttp3/internal/concurrent/Task",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$WriterTask"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket$connect$1.class",
+      "occurrence": 0,
+      "sha256": "3e4c8f8416dc00e2b49b0ff1de9145774a5a36d60d1a1b37b387e1fc6c64f22d",
+      "name": "okhttp3/internal/ws/RealWebSocket$connect$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "okhttp3/Callback"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lokhttp3/internal/ws/RealWebSocket;",
+          "access": 4112
+        },
+        {
+          "name": "$request",
+          "descriptor": "Lokhttp3/Request;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;Lokhttp3/Request;)V",
+          "access": 0,
+          "code_sha256": "3019ad7fe6ac52aa322b7907b88a30ecf08ecde00a479a90ad117931d33edb28",
+          "code_length": 15
+        },
+        {
+          "name": "onResponse",
+          "descriptor": "(Lokhttp3/Call;Lokhttp3/Response;)V",
+          "access": 1,
+          "code_sha256": "eb4660087b055a04f4203959abda10868195032f450f8880445a73b987bf79b8",
+          "code_length": 258
+        },
+        {
+          "name": "onFailure",
+          "descriptor": "(Lokhttp3/Call;Ljava/io/IOException;)V",
+          "access": 1,
+          "code_sha256": "ebbc54f70586ae08c40552436098277819abff2bb40049fc6dc354dced8c4024",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayDeque",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/Call",
+        "okhttp3/Callback",
+        "okhttp3/HttpUrl",
+        "okhttp3/Request",
+        "okhttp3/Response",
+        "okhttp3/internal/_UtilCommonKt",
+        "okhttp3/internal/_UtilJvmKt",
+        "okhttp3/internal/connection/BufferedSocketKt",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$connect$1",
+        "okhttp3/internal/ws/WebSocketExtensions",
+        "okhttp3/internal/ws/WebSocketExtensions$Companion",
+        "okio/Socket"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/RealWebSocket.class",
+      "occurrence": 0,
+      "sha256": "d3fa9f8887fa70ee0866a2a14b5e1dc0af81e802aed9b0c915e058b6ed4107eb",
+      "name": "okhttp3/internal/ws/RealWebSocket",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "okhttp3/WebSocket",
+        "okhttp3/internal/ws/WebSocketReader$FrameCallback",
+        "okhttp3/internal/concurrent/Lockable"
+      ],
+      "fields": [
+        {
+          "name": "Companion",
+          "descriptor": "Lokhttp3/internal/ws/RealWebSocket$Companion;",
+          "access": 25
+        },
+        {
+          "name": "originalRequest",
+          "descriptor": "Lokhttp3/Request;",
+          "access": 18
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lokhttp3/WebSocketListener;",
+          "access": 18
+        },
+        {
+          "name": "random",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "pingIntervalMillis",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "extensions",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketExtensions;",
+          "access": 2
+        },
+        {
+          "name": "minimumDeflateSize",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "webSocketCloseTimeout",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "call",
+          "descriptor": "Lokhttp3/Call;",
+          "access": 2
+        },
+        {
+          "name": "writerTask",
+          "descriptor": "Lokhttp3/internal/concurrent/Task;",
+          "access": 2
+        },
+        {
+          "name": "reader",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketReader;",
+          "access": 2
+        },
+        {
+          "name": "writer",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketWriter;",
+          "access": 2
+        },
+        {
+          "name": "taskQueue",
+          "descriptor": "Lokhttp3/internal/concurrent/TaskQueue;",
+          "access": 2
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "socket",
+          "descriptor": "Lokio/Socket;",
+          "access": 2
+        },
+        {
+          "name": "pongQueue",
+          "descriptor": "Ljava/util/ArrayDeque;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayDeque<Lokio/ByteString;>;"
+        },
+        {
+          "name": "messageAndCloseQueue",
+          "descriptor": "Ljava/util/ArrayDeque;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayDeque<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "queueSize",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "enqueuedClose",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "receivedCloseCode",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "receivedCloseReason",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "failed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "sentPingCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "receivedPingCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "receivedPongCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "awaitingPong",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "ONLY_HTTP1",
+          "descriptor": "Ljava/util/List;",
+          "access": 26,
+          "generic_signature": "Ljava/util/List<Lokhttp3/Protocol;>;"
+        },
+        {
+          "name": "MAX_QUEUE_SIZE",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "CANCEL_AFTER_CLOSE_MILLIS",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_MINIMUM_DEFLATE_SIZE",
+          "descriptor": "J",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lokhttp3/internal/concurrent/TaskRunner;Lokhttp3/Request;Lokhttp3/WebSocketListener;Ljava/util/Random;JLokhttp3/internal/ws/WebSocketExtensions;JJ)V",
+          "access": 1,
+          "code_sha256": "08f50babb0e33f5343df386ca69b9d54534867c5e3836747ab3728e3693df766",
+          "code_length": 219
+        },
+        {
+          "name": "getListener$okhttp",
+          "descriptor": "()Lokhttp3/WebSocketListener;",
+          "access": 17,
+          "code_sha256": "5136ec714e63e3c9e21a7f5cdd62b8fed5a8e8258758f9ed53f72e624491087b",
+          "code_length": 5
+        },
+        {
+          "name": "getCall$okhttp",
+          "descriptor": "()Lokhttp3/Call;",
+          "access": 17,
+          "code_sha256": "e1c93e0bd34aeee6c8c1ca4209743eaf8aba73c7f3c571e7c2093e13dbf015d5",
+          "code_length": 5
+        },
+        {
+          "name": "setCall$okhttp",
+          "descriptor": "(Lokhttp3/Call;)V",
+          "access": 17,
+          "code_sha256": "ac75d4d7608cbf05344d54710b9c8a20fc853fe36043570582f84f9499459844",
+          "code_length": 6
+        },
+        {
+          "name": "request",
+          "descriptor": "()Lokhttp3/Request;",
+          "access": 1,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5
+        },
+        {
+          "name": "queueSize",
+          "descriptor": "()J",
+          "access": 33,
+          "code_sha256": "7e965b575ef59daf9e9275b0391ec37c7f27cdf758387f1561b5d6e9b14e1b4a",
+          "code_length": 5
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f1dd68f34de597e72d10cc848e2672d059f0eda33f995c44319e2c8ad35e2d8c",
+          "code_length": 14
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Lokhttp3/OkHttpClient;)V",
+          "access": 17,
+          "code_sha256": "c5a3680151b2065c046ea1b5077442bf2c5cb1893b198b46c16462f10abe97a9",
+          "code_length": 151
+        },
+        {
+          "name": "isValid",
+          "descriptor": "(Lokhttp3/internal/ws/WebSocketExtensions;)Z",
+          "access": 18,
+          "code_sha256": "c0254d8e15b4fdc118e51b3c487c472ba1ebd9f2633890592f9d07b06e484ec2",
+          "code_length": 61
+        },
+        {
+          "name": "checkUpgradeSuccess$okhttp",
+          "descriptor": "(Lokhttp3/Response;)Lokio/Socket;",
+          "access": 17,
+          "code_sha256": "7d547774cf8379e6c7148761d61a8ca3992f61344f769f75a4a7db20c3f1e8a8",
+          "code_length": 295,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "initReaderAndWriter",
+          "descriptor": "(Ljava/lang/String;Lokhttp3/internal/connection/BufferedSocket;Z)V",
+          "access": 17,
+          "code_sha256": "49155aabf4741b47ce4d13aceb0e0848e430b60198ba56d920b2e18b4191604d",
+          "code_length": 246
+        },
+        {
+          "name": "loopReader",
+          "descriptor": "(Lokhttp3/Response;)V",
+          "access": 17,
+          "code_sha256": "1d03fe5e758026ecef8de054e71bf9e2d05f6de41ec4fe736d1408e5db77c5b0",
+          "code_length": 75,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "processNextFrame",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "9114f9de486ae0958eb7c9fc3dbead2da954ff4f1f0e2750b692af9d9ce0b4b4",
+          "code_length": 44,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "finishReader",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "699a36fe2c257803165e11d3c7b34e9281c6f5eafbdceb6030e301848c6efb15",
+          "code_length": 207
+        },
+        {
+          "name": "tearDown",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "46cc642f4701e175a0eef800db37d9f75de14df919cca400104bc02a90b89e44",
+          "code_length": 25,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "sentPingCount",
+          "descriptor": "()I",
+          "access": 49,
+          "code_sha256": "eecb3b34149aebcc6f34074ad1f10475905113a99257e1c6b9713c74ba0d10de",
+          "code_length": 5
+        },
+        {
+          "name": "receivedPingCount",
+          "descriptor": "()I",
+          "access": 49,
+          "code_sha256": "f35295f66d3cb9d3abfb2563380faf392ea571caf7a16af58eb4a0c157e22dd7",
+          "code_length": 5
+        },
+        {
+          "name": "receivedPongCount",
+          "descriptor": "()I",
+          "access": 49,
+          "code_sha256": "b51dfa20318b6ba61afd0bf974c47e96eb795c80418f7fdb935a4bd540e2a138",
+          "code_length": 5
+        },
+        {
+          "name": "onReadMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "60e0776ead8921b2d6e5a50d8f9ce8a2e2b40525b839dd38cf46ac783e0a92d3",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "onReadMessage",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 1,
+          "code_sha256": "a2f7cb33bea6f3007f45eef322ee643918addfd0b4a38f75e6eb612aad0b5ea6",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "onReadPing",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 33,
+          "code_sha256": "99f24e0c578142e94d36ed22183d423411fee3938b77abfc7242d6fd23820822",
+          "code_length": 58
+        },
+        {
+          "name": "onReadPong",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 33,
+          "code_sha256": "ae6bda8d27c261a722bd06dbca756b1a0e7471930b0f6e7abd75c6ed676eb4da",
+          "code_length": 25
+        },
+        {
+          "name": "onReadClose",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e0005eea652adce8ea26e472b632cdb9d29edf3cef4fdeff1d17cd7615591c60",
+          "code_length": 125
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "0c23633505940a9aecbe1d432e2c414508a61c945bc00fcfd478ebab4cf4ec2f",
+          "code_length": 20
+        },
+        {
+          "name": "send",
+          "descriptor": "(Lokio/ByteString;)Z",
+          "access": 1,
+          "code_sha256": "ae604dae54fa0ce674ec7bc06dfd598cbc32432d588723bd85f592c73cca1a7f",
+          "code_length": 14
+        },
+        {
+          "name": "send",
+          "descriptor": "(Lokio/ByteString;I)Z",
+          "access": 50,
+          "code_sha256": "f8f492d6ed6a533c995a0d3adadb2f03f8b30c7c1f4e43fc3d1a118ab926a120",
+          "code_length": 81
+        },
+        {
+          "name": "pong",
+          "descriptor": "(Lokio/ByteString;)Z",
+          "access": 49,
+          "code_sha256": "436fda2df77a54cc54b476746d0500fb6ebe658ccfb15d83618126e6090d2ccb",
+          "code_length": 48
+        },
+        {
+          "name": "close",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "546f2d9da763f2bf531f8eac8c3bfc0f869e3edcf76538854170da8bbe9967eb",
+          "code_length": 11
+        },
+        {
+          "name": "close",
+          "descriptor": "(ILjava/lang/String;J)Z",
+          "access": 49,
+          "code_sha256": "2c072f9e6a0f4a3efe6121398a11868e0bc567319aad7959f5dfb71309c937a6",
+          "code_length": 128
+        },
+        {
+          "name": "runWriter",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "63137a828dc7244592396d756bc7d0b39a2b89241f0f5df6a9fe6606d5685a80",
+          "code_length": 85
+        },
+        {
+          "name": "writeOneFrame$okhttp",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "97a48245c92e58b7521ee2c432b9152a30e868cf86c90890f3bf86be9222b9e8",
+          "code_length": 449,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writePingFrame$okhttp",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "752cfbdd23a23ca03be4fb57a4bbd5d059e7e18bb870b25c043443b6d3a42750",
+          "code_length": 178
+        },
+        {
+          "name": "failWebSocket",
+          "descriptor": "(Ljava/lang/Exception;Lokhttp3/Response;Z)V",
+          "access": 17,
+          "code_sha256": "326db0c6bc4dcd036af98e80d7fe7c2ac05f742ed5aab7f6463e5895651f2db5",
+          "code_length": 256
+        },
+        {
+          "name": "failWebSocket$default",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;Ljava/lang/Exception;Lokhttp3/Response;ZILjava/lang/Object;)V",
+          "access": 4105,
+          "code_sha256": "d39357feeb9e1c2be6b0cec3d428e0afb2556d936cdc53e00a52f93d006ef829",
+          "code_length": 26
+        },
+        {
+          "name": "initReaderAndWriter$lambda$0$0",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;J)J",
+          "access": 26,
+          "code_sha256": "a484722de217c8a7091bcb03fb17eac8222fe0a5096178ba24b33ca94ca007e5",
+          "code_length": 6
+        },
+        {
+          "name": "finishReader$lambda$0$0",
+          "descriptor": "(Lokhttp3/internal/ws/WebSocketWriter;)Lkotlin/Unit;",
+          "access": 26,
+          "code_sha256": "fed1cd1e4d72281379a0c1aedf0aecca936115624483bf883b6bde16d465910d",
+          "code_length": 11
+        },
+        {
+          "name": "writeOneFrame$lambda$0$0",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;)Lkotlin/Unit;",
+          "access": 26,
+          "code_sha256": "b446c7a527e932bcaf76c5d17f752d9d024a92bdd9f1ff5f18f8687591324f5a",
+          "code_length": 8
+        },
+        {
+          "name": "failWebSocket$lambda$0$0",
+          "descriptor": "(Lkotlin/jvm/internal/Ref$ObjectRef;)Lkotlin/Unit;",
+          "access": 26,
+          "code_sha256": "0d9a69f8154d824e6ff7c4710e9a35cbdb597716b70842a2da0cf591ba146bf0",
+          "code_length": 14
+        },
+        {
+          "name": "access$setExtensions$p",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;Lokhttp3/internal/ws/WebSocketExtensions;)V",
+          "access": 4121,
+          "code_sha256": "83963e26cd49784d81457c0edfa67fb32a6b6360d5446b7a59a003d73a4ee8b0",
+          "code_length": 6
+        },
+        {
+          "name": "access$isValid",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;Lokhttp3/internal/ws/WebSocketExtensions;)Z",
+          "access": 4121,
+          "code_sha256": "570c57e33d6f0f64c87a095629ab0ce1172ccf66fba76781b76f656021eccff2",
+          "code_length": 6
+        },
+        {
+          "name": "access$getMessageAndCloseQueue$p",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;)Ljava/util/ArrayDeque;",
+          "access": 4121,
+          "code_sha256": "5306029e83e64272ba62c7c5f2899934ea6c94d747c087a80685dab03c7198b0",
+          "code_length": 5
+        },
+        {
+          "name": "access$getName$p",
+          "descriptor": "(Lokhttp3/internal/ws/RealWebSocket;)Ljava/lang/String;",
+          "access": 4121,
+          "code_sha256": "d40c899586925bcbbd7d0a8d2194b92ebc5a46b4849677c5bbb302a4aaff4693",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f2119dc027f64fe0d674da2e982345d9b6b6a6db3f2fae008d8aac50a76c7b72",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/net/ProtocolException",
+        "java/net/SocketTimeoutException",
+        "java/util/ArrayDeque",
+        "java/util/Collection",
+        "java/util/Random",
+        "java/util/concurrent/CountDownLatch",
+        "java/util/concurrent/TimeUnit",
+        "kotlin/Unit",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/internal/Ref",
+        "kotlin/jvm/internal/Ref$BooleanRef",
+        "kotlin/jvm/internal/Ref$IntRef",
+        "kotlin/jvm/internal/Ref$ObjectRef",
+        "kotlin/text/StringsKt",
+        "okhttp3/Call",
+        "okhttp3/Callback",
+        "okhttp3/EventListener",
+        "okhttp3/OkHttpClient",
+        "okhttp3/OkHttpClient$Builder",
+        "okhttp3/Protocol",
+        "okhttp3/Request",
+        "okhttp3/Request$Builder",
+        "okhttp3/Response",
+        "okhttp3/WebSocket",
+        "okhttp3/WebSocketListener",
+        "okhttp3/internal/_UtilCommonKt",
+        "okhttp3/internal/_UtilJvmKt",
+        "okhttp3/internal/concurrent/Lockable",
+        "okhttp3/internal/concurrent/Task",
+        "okhttp3/internal/concurrent/TaskQueue",
+        "okhttp3/internal/concurrent/TaskRunner",
+        "okhttp3/internal/connection/BufferedSocket",
+        "okhttp3/internal/connection/RealCall",
+        "okhttp3/internal/ws/RealWebSocket",
+        "okhttp3/internal/ws/RealWebSocket$Close",
+        "okhttp3/internal/ws/RealWebSocket$Companion",
+        "okhttp3/internal/ws/RealWebSocket$Message",
+        "okhttp3/internal/ws/RealWebSocket$WriterTask",
+        "okhttp3/internal/ws/RealWebSocket$connect$1",
+        "okhttp3/internal/ws/WebSocketExtensions",
+        "okhttp3/internal/ws/WebSocketProtocol",
+        "okhttp3/internal/ws/WebSocketReader",
+        "okhttp3/internal/ws/WebSocketReader$FrameCallback",
+        "okhttp3/internal/ws/WebSocketWriter",
+        "okio/BufferedSource",
+        "okio/ByteString",
+        "okio/ByteString$Companion",
+        "okio/Socket"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketExtensions$Companion.class",
+      "occurrence": 0,
+      "sha256": "7d9dcfcda02266ed20d1d8b18bba745d6122fd54cda9e8eaca6e5f2afb7ddae0",
+      "name": "okhttp3/internal/ws/WebSocketExtensions$Companion",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Lokhttp3/Headers;)Lokhttp3/internal/ws/WebSocketExtensions;",
+          "access": 17,
+          "code_sha256": "7dd64dcfd57c56ce5234e3e88f96540b2a723a7fd0d7763d9e9b3d05bbc982fc",
+          "code_length": 416,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "e00f44f4e9d56e9db7296285dd9e03353dd0e08c38df1a43ce96f68fc2dbfd51",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/CharSequence",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/text/StringsKt",
+        "okhttp3/Headers",
+        "okhttp3/internal/_UtilCommonKt",
+        "okhttp3/internal/ws/WebSocketExtensions",
+        "okhttp3/internal/ws/WebSocketExtensions$Companion"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketExtensions.class",
+      "occurrence": 0,
+      "sha256": "28006ba94b3e63018f467984b4851f21e5dc7089865f7dbddabe819fd347203d",
+      "name": "okhttp3/internal/ws/WebSocketExtensions",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Companion",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketExtensions$Companion;",
+          "access": 25
+        },
+        {
+          "name": "perMessageDeflate",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "clientMaxWindowBits",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 17
+        },
+        {
+          "name": "clientNoContextTakeover",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "serverMaxWindowBits",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 17
+        },
+        {
+          "name": "serverNoContextTakeover",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "unknownValues",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "HEADER_WEB_SOCKET_EXTENSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLjava/lang/Integer;ZLjava/lang/Integer;ZZ)V",
+          "access": 1,
+          "code_sha256": "71877de389b9375e73cd714bc3a6f5ed6f7035c14f934d36fb885229d7ab633e",
+          "code_length": 38
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZLjava/lang/Integer;ZLjava/lang/Integer;ZZILkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "c6b6944a843140c7b38c01f586dbeef0f11564bd59155633bf2926748d72a5e8",
+          "code_length": 74
+        },
+        {
+          "name": "noContextTakeover",
+          "descriptor": "(Z)Z",
+          "access": 17,
+          "code_sha256": "01eec645d662a88daf3abfa9220e23a740ad87f828700a5de064ab99f356d6c7",
+          "code_length": 16
+        },
+        {
+          "name": "component1",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "2ad01858457e03a189abd6a15f4e3cd0779d9c0d9e5c686467387584975d81bb",
+          "code_length": 5
+        },
+        {
+          "name": "component2",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "component3",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "4c3ee618f94f6d0a299215efb4305a6d1d2298178196a7dfce14be8f959a5200",
+          "code_length": 5
+        },
+        {
+          "name": "component4",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 17,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "component5",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "1303b7a23f14710775099bd675efa4bb2b3b27c255f762d4f4c83b928e86cc02",
+          "code_length": 5
+        },
+        {
+          "name": "component6",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "(ZLjava/lang/Integer;ZLjava/lang/Integer;ZZ)Lokhttp3/internal/ws/WebSocketExtensions;",
+          "access": 17,
+          "code_sha256": "a2cc9753da3885fd87531cc8a003ab58c8d854db78df037a789326e52bdb3f6c",
+          "code_length": 17
+        },
+        {
+          "name": "copy$default",
+          "descriptor": "(Lokhttp3/internal/ws/WebSocketExtensions;ZLjava/lang/Integer;ZLjava/lang/Integer;ZZILjava/lang/Object;)Lokhttp3/internal/ws/WebSocketExtensions;",
+          "access": 4105,
+          "code_sha256": "7a0c84e77db0f40757891bd652e1c269e3d7bd92a8d3b3423a948d8763af6c8e",
+          "code_length": 92
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "84e9facd519f0cdeea2110b9766c9eed8c47cb6ae4ca406e2bd16a5744c240d1",
+          "code_length": 88
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1063f726a4dbe7c931ce9dd73251e33425b367eb681961d531cf175e8d0e8ffd",
+          "code_length": 97
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "6c1f7038f2f97ae68290ce0765f1b8358d8daf3f5caa910f7d4265bdd57d4353",
+          "code_length": 107
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e28a641ff5be43f265e891a875ad24735218be948d363cd45a5ff2a7fe1d6d5c",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7da0c3bd1d663f6958dde750e57e0a2a6bba5c390c167f329e972dc7162e8fe0",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/ws/WebSocketExtensions",
+        "okhttp3/internal/ws/WebSocketExtensions$Companion"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketProtocol.class",
+      "occurrence": 0,
+      "sha256": "90efd37a4915a6ab239adfb14474b1f2560e5bd98ee0e033e684bc9168aa8a91",
+      "name": "okhttp3/internal/ws/WebSocketProtocol",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketProtocol;",
+          "access": 25
+        },
+        {
+          "name": "ACCEPT_MAGIC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "B0_FLAG_FIN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B0_FLAG_RSV1",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B0_FLAG_RSV2",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B0_FLAG_RSV3",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B0_MASK_OPCODE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_FLAG_CONTROL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B1_FLAG_MASK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "B1_MASK_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_CONTINUATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_TEXT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_BINARY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_CONTROL_CLOSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_CONTROL_PING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OPCODE_CONTROL_PONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PAYLOAD_BYTE_MAX",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "CLOSE_MESSAGE_MAX",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "PAYLOAD_SHORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PAYLOAD_SHORT_MAX",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "PAYLOAD_LONG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLOSE_CLIENT_GOING_AWAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLOSE_NO_STATUS_CODE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "toggleMask",
+          "descriptor": "(Lokio/Buffer$UnsafeCursor;[B)V",
+          "access": 17,
+          "code_sha256": "e9aaca92d91315e0eac3b4e696b4799691428f9748c2173c1ec62d442ef49b1f",
+          "code_length": 94
+        },
+        {
+          "name": "closeCodeExceptionMessage",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "53ba8aa5fc063141ef146c057f017ae0a51ccc2e00404bdcda5e018624eb045e",
+          "code_length": 117
+        },
+        {
+          "name": "validateCloseCode",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "656af7c1888cda4594babda28e600f76102959fa48ec216a026b41ae8df743be",
+          "code_length": 39
+        },
+        {
+          "name": "acceptHeader",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "970cd2f10e80639de5f9752b9fd634e7cf075c0e6eb68f21cfe2b584a75acec0",
+          "code_length": 38
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5805ce524ab340524fa648854096cc56a71a9de98e22624dbf607b5f1f14808f",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/ws/WebSocketProtocol",
+        "okio/Buffer",
+        "okio/Buffer$UnsafeCursor",
+        "okio/ByteString",
+        "okio/ByteString$Companion"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketReader$FrameCallback.class",
+      "occurrence": 0,
+      "sha256": "7d4add497de541f7964a25c45d9fb00d0e5c964f8e3045956e845da590f3111a",
+      "name": "okhttp3/internal/ws/WebSocketReader$FrameCallback",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onReadMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "onReadMessage",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "onReadPing",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 1025
+        },
+        {
+          "name": "onReadPong",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 1025
+        },
+        {
+          "name": "onReadClose",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "okhttp3/internal/ws/WebSocketReader",
+        "okhttp3/internal/ws/WebSocketReader$FrameCallback"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketReader.class",
+      "occurrence": 0,
+      "sha256": "25af93ec73979412dd6ecc3e63f23d451e2662d1fe6fd374fc39b3d34b9e5448",
+      "name": "okhttp3/internal/ws/WebSocketReader",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "isClient",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "source",
+          "descriptor": "Lokio/BufferedSource;",
+          "access": 18
+        },
+        {
+          "name": "frameCallback",
+          "descriptor": "Lokhttp3/internal/ws/WebSocketReader$FrameCallback;",
+          "access": 18
+        },
+        {
+          "name": "perMessageDeflate",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "noContextTakeover",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "opcode",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "frameLength",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "isFinalFrame",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "isControlFrame",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "readingCompressedMessage",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "controlFrameBuffer",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "messageFrameBuffer",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "messageInflater",
+          "descriptor": "Lokhttp3/internal/ws/MessageInflater;",
+          "access": 2
+        },
+        {
+          "name": "maskKey",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "maskCursor",
+          "descriptor": "Lokio/Buffer$UnsafeCursor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLokio/BufferedSource;Lokhttp3/internal/ws/WebSocketReader$FrameCallback;ZZ)V",
+          "access": 1,
+          "code_sha256": "4e010246d21e12d64e36cd74ee903ce872c5915c4ab3a5e5efbc28adc1c067a4",
+          "code_length": 106
+        },
+        {
+          "name": "getSource",
+          "descriptor": "()Lokio/BufferedSource;",
+          "access": 17,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "processNextFrame",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "46ce118aa2274dfde24a08de4dc15c7c49c17b7260e18498dd21dfd4ff6121fd",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readHeader",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "529268301757e0580e1d77692dfbf3781ff368455ff0516f198d954bf5f54644",
+          "code_length": 544,
+          "throws": [
+            "java/io/IOException",
+            "java/net/ProtocolException"
+          ]
+        },
+        {
+          "name": "readControlFrame",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "12a8cb1e804a55fa5875fe48efdb4d4a2ac6eb61862c39e0359e42c4b3b1f15e",
+          "code_length": 281,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readMessageFrame",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "12cc4c51a4a2a0d1f7eddca004604a32bcaa5de27317257f04a5f9419b8cba82",
+          "code_length": 141,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readUntilNonControlFrame",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "795144b733d8df88269898fbd7e9a47ff3a1858a7a61479ec1d385702ae32964",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readMessage",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "adeedbe4795a60019c0c09274207d2c7b5585334c11416976493d8f203860b67",
+          "code_length": 165,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aa7e81e4ee99360f3dde16092ce44700ea271a9f83f25d2141e0a02f394b3f06",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/net/ProtocolException",
+        "java/util/concurrent/TimeUnit",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/_UtilCommonKt",
+        "okhttp3/internal/_UtilJvmKt",
+        "okhttp3/internal/ws/MessageInflater",
+        "okhttp3/internal/ws/WebSocketProtocol",
+        "okhttp3/internal/ws/WebSocketReader",
+        "okhttp3/internal/ws/WebSocketReader$FrameCallback",
+        "okio/Buffer",
+        "okio/Buffer$UnsafeCursor",
+        "okio/BufferedSource",
+        "okio/Timeout"
+      ]
+    },
+    {
+      "entry": "okhttp3/internal/ws/WebSocketWriter.class",
+      "occurrence": 0,
+      "sha256": "d38f65c9e594a1a94fa5b750cac336529118506f4ab77854da1d5e9d1cbb3231",
+      "name": "okhttp3/internal/ws/WebSocketWriter",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "isClient",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "sink",
+          "descriptor": "Lokio/BufferedSink;",
+          "access": 18
+        },
+        {
+          "name": "random",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "perMessageDeflate",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "noContextTakeover",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "minimumDeflateSize",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "messageBuffer",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "sinkBuffer",
+          "descriptor": "Lokio/Buffer;",
+          "access": 18
+        },
+        {
+          "name": "writerClosed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "messageDeflater",
+          "descriptor": "Lokhttp3/internal/ws/MessageDeflater;",
+          "access": 2
+        },
+        {
+          "name": "maskKey",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "maskCursor",
+          "descriptor": "Lokio/Buffer$UnsafeCursor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLokio/BufferedSink;Ljava/util/Random;ZZJ)V",
+          "access": 1,
+          "code_sha256": "665408bdeae00b6cfaa375c6edd47fc00d23a162e42d9d826ca7cfc66f026060",
+          "code_length": 114
+        },
+        {
+          "name": "getSink",
+          "descriptor": "()Lokio/BufferedSink;",
+          "access": 17,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "getRandom",
+          "descriptor": "()Ljava/util/Random;",
+          "access": 17,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5
+        },
+        {
+          "name": "writePing",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 17,
+          "code_sha256": "bc41c9bf07bd3218bb04874993805ac7bfacb315db5ea34b5a610ffeb0a5c0c7",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writePong",
+          "descriptor": "(Lokio/ByteString;)V",
+          "access": 17,
+          "code_sha256": "90af3b03408ffbf1e5fe45f2fc4f0e064b0e396663b52e1bfc23c3bd92e5c697",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeClose",
+          "descriptor": "(ILokio/ByteString;)V",
+          "access": 17,
+          "code_sha256": "789efb45b9e38df245858bee06be9969efada8cc4d9e70bba67cc5a389f17f4f",
+          "code_length": 87,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeControlFrame",
+          "descriptor": "(ILokio/ByteString;)V",
+          "access": 18,
+          "code_sha256": "0d14f2a4d0cc8c2c77d0fd8f08352683a9fbab11a3d2a18e4779c38e655205be",
+          "code_length": 232,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeMessageFrame",
+          "descriptor": "(ILokio/ByteString;)V",
+          "access": 17,
+          "code_sha256": "d9e862f2a680f1e86914bf91368570c60d51d722c3a4c3ea21461067b3eede5b",
+          "code_length": 353,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "95f217979db7ffdc897fc0b586b33688ca113112550dfcb07b0997cf64cc9744",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/Random",
+        "kotlin/jvm/internal/Intrinsics",
+        "okhttp3/internal/_UtilCommonKt",
+        "okhttp3/internal/ws/MessageDeflater",
+        "okhttp3/internal/ws/WebSocketProtocol",
+        "okhttp3/internal/ws/WebSocketWriter",
+        "okio/Buffer",
+        "okio/Buffer$UnsafeCursor",
+        "okio/BufferedSink",
+        "okio/ByteString"
+      ]
+    }
+  ]
+}

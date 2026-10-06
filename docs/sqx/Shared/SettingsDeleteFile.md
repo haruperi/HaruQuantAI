@@ -1,97 +1,37 @@
 # SettingsDeleteFile.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile/SettingsDeleteFile.jar`.
-- SHA-256: `9b0097abd3e0fe10f963481171cb14e52b0d3538e73523316cd08e584d127d46`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **1**; non-nested: **1**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile/SettingsDeleteFile.jar`.
+- **SHA-256:** `d2e634544c965f7c1e7b9dfc91564e382d315ac11bbb3dfe2b7f6e109fed20fa`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 1 raw entries; 1 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-PROJECT-SETTINGS-DELETE-FILE`, P13; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [249.json](../../dev/evidence/sqx145/archives/145/249.json).
 
-Shared component: a single canonical document is linked from relevant workspace indexes. Its presence here does not establish which workspaces load it at runtime.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/249/001.json) — SHA-256 `9c7a317448d4c068e0f602998b82b5a09d1fa248fdfbfc46c4b3155816b21903`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Settings.impl.DeleteFile`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C046cf890c86f["SettingsDeleteFile"] {
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +readSettings()
-        +getStrategyConfigSettings()
-        +getSettingName()
-        +getName()
-    }
-    class C27734eb41505["ISettingTabPlugin"]
-    C27734eb41505 <|.. C046cf890c86f : declared interface
+    class C0["SettingsDeleteFile"]
+    class E0["ISettingTabPlugin"]
+    E0 <|.. C0
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C046cf890c86f` | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` (this JAR) | this diagram |
-| `C27734eb41505` | [`com.strategyquant.tradinglib.task.settings.ISettingTabPlugin`](SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | [`com.strategyquant.tradinglib.task.settings.ISettingTabPlugin`](SQTradingLib.md) | implements | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / class declaration: `public class com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile implements com.strategyquant.tradinglib.task.settings.ISettingTabPlugin` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public java.lang.String getProduct();`<br>`public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);`<br>`public java.lang.String getSettingName();`<br>`public java.lang.String getName();` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;`<br>`public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | [`com.strategyquant.tradinglib.taskImpl.ISQTask`](SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | `org.jdom2.Element` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);`<br>`public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | [`com.strategyquant.tradinglib.task.settings.TaskSettingsData`](SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | `org.json.JSONArray` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` | `org.json.JSONObject` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile` / method signature: `public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile</summary>
-
-```text
-public class com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile implements com.strategyquant.tradinglib.task.settings.ISettingTabPlugin
-    public com.strategyquant.plugin.Settings.impl.DeleteFile.SettingsDeleteFile();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public void readSettings(java.lang.String, com.strategyquant.tradinglib.taskImpl.ISQTask, org.jdom2.Element, com.strategyquant.tradinglib.task.settings.TaskSettingsData);
-    public void getStrategyConfigSettings(org.jdom2.Element, org.json.JSONArray) throws java.lang.Exception;
-    public java.lang.String getSettingName();
-    public java.lang.String getName();
-    public org.json.JSONObject getInitializationData() throws java.lang.Exception;
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Settings/impl/DeleteFile/SettingsDeleteFile.class` | 0 | `16dfc98dea0dbd936a36b15ae50c0abdb92d02dd4c4524112c45f697e3dcdea4` | 0 | 9 |

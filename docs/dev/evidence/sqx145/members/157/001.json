@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangeBinanceCoinM/CryptoExchangeBinanceCoinM.jar",
+  "archive_sha256": "c4c52e21237bbfa6ebbfb00c51aaba93e54e7d91cc96bc844ca5b48e9e81daa5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/BinanceCoinM/CryptoExchangeBinanceCoinMPlugin.class",
+      "occurrence": 0,
+      "sha256": "fa0425180aba5559c73fb60fa5667b481123969f7eecd89756a5fcc6c1c809ad",
+      "name": "com/strategyquant/plugin/CryptoExchange/impl/BinanceCoinM/CryptoExchangeBinanceCoinMPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/exchange/Exchange",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_BARS_PER_REQUEST",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "MAX_RANGE_MS",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "exchangeInfo",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "availableSymbols",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70e8411ed87192ad55eaaf582299ae93aae251f70e9c737839e631b2d4e4d677",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getSymbols",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "72ac39919713723d13aeb190a442b2c430b897113ca7a6e8a258a560e1512998",
+          "code_length": 99,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/exchange/IExchange;",
+          "access": 1,
+          "code_sha256": "a53438d6568ca511200b2312ea08523c9606adf44983ba7b6f8aa7842752cd8a",
+          "code_length": 8
+        },
+        {
+          "name": "download",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8adf80b80a513832cdd1463cc6da4af03565909f1933f4277692a20f9e412661",
+          "code_length": 440,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getStartEndParams",
+          "descriptor": "(JJ)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c00351435990ef7e6ed801cf3511f7b93fb36e3b5c8312cdd03e3b170a90d806",
+          "code_length": 57
+        },
+        {
+          "name": "parseData2",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "41903d8c505dd25c96b0ed6126c573da015b414ddc9a28594de23dfa5970387b",
+          "code_length": 121,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseData",
+          "descriptor": "(Lorg/json/JSONArray;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "05d9fbf245b2b1d25cc3eba0f36ebb37bd020f9fad65b781a37608453e491d5f",
+          "code_length": 64
+        },
+        {
+          "name": "availableTimeframes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "1cfea4442c6bebfafc41592fb054bb4982a62984f32066d8f96ac2562c649ea0",
+          "code_length": 80
+        },
+        {
+          "name": "convertTimeframe",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fd33e2982f565ed009a253aea6b32cca95bfd1efea453af71d1b22545dee092c",
+          "code_length": 253,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkSymbolExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getExchangeInfo",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "fd9d0abaaa0093d44b1472e83fedf940d429044a2b0815b1f8a3c1a059f78e40",
+          "code_length": 36,
+          "throws": [
+            "org/apache/http/client/ClientProtocolException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getSymbolInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 1,
+          "code_sha256": "72e1b2a3c2e91a7f68b183561ecc3fa208c6f77cd014d0471e528f83db032a07",
+          "code_length": 50
+        },
+        {
+          "name": "findSymbolInfo",
+          "descriptor": "(Lorg/json/JSONArray;Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 2,
+          "code_sha256": "bd43c43459c08c164cf3fdd5308948238b48d14838e417a0eb4b1355fa428a1c",
+          "code_length": 60
+        },
+        {
+          "name": "fillSymbolInfo",
+          "descriptor": "(Lcom/strategyquant/tradinglib/exchange/SymbolInfo;Lorg/json/JSONObject;)V",
+          "access": 2,
+          "code_sha256": "86c4840057a5e74e4d18b09601523984098ddeeff56774903aef4d7b72123977",
+          "code_length": 93
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "523dd4473b59e56ed5636c13d87a2de3e2aade04dd00a1d4b25176355071135e",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "799e3447606b5e7f1b8d5433ec60b5580b4556f7214263bb880cd2079e661287",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonFactory",
+        "com/fasterxml/jackson/core/JsonParser",
+        "com/fasterxml/jackson/core/JsonToken",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/CryptoExchange/impl/BinanceCoinM/CryptoExchangeBinanceCoinMPlugin",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/exchange/Exchange",
+        "com/strategyquant/tradinglib/exchange/SymbolInfo",
+        "com/strategyquant/tradinglib/historyData/HttpApacheManager",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/time/Duration",
+        "org/apache/http/client/ClientProtocolException",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    }
+  ]
+}

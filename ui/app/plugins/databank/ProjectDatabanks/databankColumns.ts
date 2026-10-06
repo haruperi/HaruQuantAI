@@ -771,7 +771,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     calculate: s => (s.metrics.stability / 100).toFixed(2),
   },
 
-  // --- Advanced Ratios & Quality Metrics (SQX Build 144) ---
+  // --- Advanced Ratios & Quality Metrics (retained target fixture) ---
   {
     id: 'sortinoRatio',
     name: 'Sortino ratio',
@@ -1353,7 +1353,7 @@ export const DEFAULT_VIEW_PRESETS: DatabankView[] = [
     id: 'default-main',
     name: 'Default - Main data',
     isDefault: true,
-    // Donor "Default - Main data" view column order (SQX144-EV-000031):
+    // Donor "Default - Main data" view column order (retained target UI; current donor equivalence unverified):
     // pinned Strategy Name first, then the saved view's metric columns.
     columns: [
       { columnId: 'name', width: 175 },

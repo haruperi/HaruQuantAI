@@ -2,10 +2,7 @@
 
 Status: reset-aware target charter; P00 evidence infrastructure is the only current
 Python delivery cohort. Ratified by the owner-approved P00 plan, 2026-10-06.
-Historical source: Git commit `3ede688544b1c161984573cdc25e7a36b01d4a37`,
-`docs/PROJECT.md`, SHA-256
-`ba694cd20cb7ded6057e2beddc6a7cf534e8763f061995d1aaadf3ad418f49ff`.
-This adaptation preserves product boundaries, not deleted implementation status.
+Current reference authority is the sole SQX145 downloaded cohort; installed product activation remains unverified.
 
 ## Authority
 
@@ -55,13 +52,13 @@ No removed backend service or workflow is reinstated by restoring this charter.
 
 ## Cohort and release truth
 
-Reference cohort label: SQX 144.2953. Actual installed product build and activation
+Reference cohort label: SQX145 Dev 1 download (145-dev1). Actual installed product build and activation
 are unverified; runtime JAR version is not product-version evidence.
 
-P00 delivers inventories, historical/current evidence, proposed ownership and
+P00 delivers inventories, current-source evidence, proposed ownership and
 reference validation. Exact SHA/count/order comparisons use zero tolerance.
 Common-core algorithms, donor runtime output fixtures, product activation and
-P01-P18 execution remain blocked/unqualified. See the
+P01-P19 application execution remain blocked/unqualified. See the
 [release matrix](dev/evidence/p00-release-matrix.md).
 
 A future feature requires complete body-derived behavior, ratified owner/FEAT/FR/

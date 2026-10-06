@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SaverHTML/SaverHTML.jar",
+  "sha256": "1159ff22c6d8210a59b97b48ee0489c67b4647f5efe93b447d7a363a8c129675",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Saver/impl/HTML/HTMLReportPlugin.class": "5a32828c61c33ed947315086bad79549cf4a57e4848184c8124cb4fdb477616f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Saver/impl/HTML/HTMLReportPlugin.class",
+      "occurrence": 0,
+      "sha256": "5a32828c61c33ed947315086bad79549cf4a57e4848184c8124cb4fdb477616f",
+      "member_shard": "docs/dev/evidence/sqx145/members/223/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/223/001.json",
+      "sha256": "c12eef38b1655267e2e0f6182654e04ab9c3a449fda3d34b56415c29e37d14af"
+    }
+  ]
+}

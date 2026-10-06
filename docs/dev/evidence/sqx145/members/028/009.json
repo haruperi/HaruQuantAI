@@ -1,0 +1,4944 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/freemarker-2.3.28.jar",
+  "archive_sha256": "de92d103d3a86c2287307218ff50dc1c941de283f7b9e1fb23e93fc7220838bf",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "freemarker/ext/beans/BooleanModel.class",
+      "occurrence": 0,
+      "sha256": "7919500e73dda8a4359f3f10cc7f6b36f817e90aa94978366b119907f9028289",
+      "name": "freemarker/ext/beans/BooleanModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/BeanModel",
+      "interfaces": [
+        "freemarker/template/TemplateBooleanModel"
+      ],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Boolean;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "291ca2b608391be340e8e3b8cd1dd979344270c8098d8c03930a959780203b80",
+          "code_length": 16
+        },
+        {
+          "name": "getAsBoolean",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeanModel",
+        "freemarker/ext/beans/BooleanModel",
+        "freemarker/template/TemplateBooleanModel",
+        "java/lang/Boolean"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CallableMemberDescriptor.class",
+      "occurrence": 0,
+      "sha256": "de69bc145cae8ec1a57ea937a99f2f036e2e378c7178465751aaae7a128da143",
+      "name": "freemarker/ext/beans/CallableMemberDescriptor",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "invokeMethod",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper;Ljava/lang/Object;[Ljava/lang/Object;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "java/lang/reflect/InvocationTargetException",
+            "java/lang/IllegalAccessException"
+          ]
+        },
+        {
+          "name": "invokeConstructor",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1024,
+          "throws": [
+            "java/lang/IllegalArgumentException",
+            "java/lang/InstantiationException",
+            "java/lang/IllegalAccessException",
+            "java/lang/reflect/InvocationTargetException",
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getDeclaration",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1024
+        },
+        {
+          "name": "isConstructor",
+          "descriptor": "()Z",
+          "access": 1024
+        },
+        {
+          "name": "isStatic",
+          "descriptor": "()Z",
+          "access": 1024
+        },
+        {
+          "name": "isVarargs",
+          "descriptor": "()Z",
+          "access": 1024
+        },
+        {
+          "name": "getParamTypes",
+          "descriptor": "()[Ljava/lang/Class;",
+          "access": 1024
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1024
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/CallableMemberDescriptor",
+        "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+        "freemarker/template/TemplateModelException",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/reflect/InvocationTargetException"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CharacterOrString.class",
+      "occurrence": 0,
+      "sha256": "be9ab2428e92ba7fb2e82bfc0793c9dff10ef5ff84806e71f1ab22f116337abd",
+      "name": "freemarker/ext/beans/CharacterOrString",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "stringValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getAsChar",
+          "descriptor": "()C",
+          "access": 0,
+          "code_sha256": "c28226b868b29eb7b47bd2469eafda68229b8bb189ebdbdb45f0797ce8105b0c",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/CharacterOrString",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassBasedModelFactory.class",
+      "occurrence": 0,
+      "sha256": "623c35d0ca27383609e1cd60c6cdcb8852b5001107bcea273227763263c65e74",
+      "name": "freemarker/ext/beans/ClassBasedModelFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateHashModel"
+      ],
+      "fields": [
+        {
+          "name": "wrapper",
+          "descriptor": "Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 18
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "classIntrospectionsInProgress",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 4,
+          "code_sha256": "ec0a485f3e4e4eff2e05de42a24d9136f850db36850ff9dd849dd9f978bd5645",
+          "code_length": 32
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "0d5056af2c084dfdc5bba1be9e11b542101371d3e6652529dd0cfa58b3197932",
+          "code_length": 53,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getInternal",
+          "descriptor": "(Ljava/lang/String;)Lfreemarker/template/TemplateModel;",
+          "access": 2,
+          "code_sha256": "6e16d380f8d824d14fa7aaf1f48fe73ff6003d257d0078216f1929dbae787461",
+          "code_length": 343,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "clearCache",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "99955bc73a26f9f1842fb857898829ca42b9ea692a90bc4abb9e8161624ec6d1",
+          "code_length": 30
+        },
+        {
+          "name": "removeFromCache",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "3a26d65ad675e41f715621b2f53e33afb106fdee067cb52f62973addf22d96dc",
+          "code_length": 35
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "createModel",
+          "descriptor": "(Ljava/lang/Class;)Lfreemarker/template/TemplateModel;",
+          "access": 1028,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getWrapper",
+          "descriptor": "()Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 4,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/_DelayedJQuote",
+        "freemarker/core/_TemplateModelException",
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/ClassBasedModelFactory",
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/template/TemplateHashModel",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/ClassUtil",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/util/HashSet",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassChangeNotifier.class",
+      "occurrence": 0,
+      "sha256": "83667e65f550a07306ba8ae7aa5053857493e5fde4dc93a5373da7f982c2d5d4",
+      "name": "freemarker/ext/beans/ClassChangeNotifier",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "subscribe",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/ClassChangeNotifier",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassIntrospector$MethodSignature.class",
+      "occurrence": 0,
+      "sha256": "492d42811a1366f8b4624439786f70b6fcf26cda71506fc8dbf3da6c5e9cbcd8",
+      "name": "freemarker/ext/beans/ClassIntrospector$MethodSignature",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "GET_STRING_SIGNATURE",
+          "descriptor": "Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;",
+          "access": 26
+        },
+        {
+          "name": "GET_OBJECT_SIGNATURE",
+          "descriptor": "Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;",
+          "access": 26
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "args",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "[Ljava/lang/Class<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "5a8573e2548f843d8102241153075e89f63001bfa78578a164cba6a9b5cba518",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/String;[Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/reflect/Method;)V",
+          "access": 0,
+          "code_sha256": "da1852b544dd3bf3d9f804ac8994395eaf1a9c6519d8db7bd9c147af4ead22a0",
+          "code_length": 13
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "dccb52c4c34ea84cbbe6d0b0bd3ff1d6e84e3afb3cab42c5914e1fca4956b17e",
+          "code_length": 48
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "94abca418bd6ba57ac0095931a79cf6c8db45933e018f5670419d05b0ab5c02d",
+          "code_length": 14
+        },
+        {
+          "name": "access$200",
+          "descriptor": "()Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;",
+          "access": 4104,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "access$300",
+          "descriptor": "()Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7c24c1a0f194a366993277e0f2e9894dac28965ee608acc8d9a1c7a83daa383b",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/ext/beans/ClassIntrospector$MethodSignature",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/Method",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair.class",
+      "occurrence": 0,
+      "sha256": "eef86cd5b6a7cead42341b3aba86e7b6502d423679f5fb83bb3d83168659aabf",
+      "name": "freemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "readMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        },
+        {
+          "name": "indexedReadMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)V",
+          "access": 0,
+          "code_sha256": "f3e16584c7ac4e1cd180606ced39b4526e89d48447df4d635b981dc75f384c8b",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/beans/PropertyDescriptor;)V",
+          "access": 0,
+          "code_sha256": "f3ce426fac4ca22846806ff26cd7d052b4a5e1afe632a7bd77ea25bea83c9677",
+          "code_length": 27
+        },
+        {
+          "name": "from",
+          "descriptor": "(Ljava/lang/Object;)Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;",
+          "access": 8,
+          "code_sha256": "c466d864cc8da013c99f107fa00cae2a59e28f830670775b6c8c1c87e113771a",
+          "code_length": 84
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;",
+          "access": 8,
+          "code_sha256": "d3aae8f1c134eb78fdc1a1b548c3516aa93bd01a88cb63b8b80c7d4e0b8f7591",
+          "code_length": 44
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bda1b91361a07b71ded5f404b0456264cd3fc2133c980577242e2057c9a0d796",
+          "code_length": 55
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f346019c3aee1b2feb850b9fe1795d1f50787d98d6dd852cdb88273b3d4d8ce7",
+          "code_length": 59
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)Ljava/lang/reflect/Method;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)Ljava/lang/reflect/Method;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BugException",
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair",
+        "java/beans/IndexedPropertyDescriptor",
+        "java/beans/PropertyDescriptor",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Method"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassIntrospector.class",
+      "occurrence": 0,
+      "sha256": "897ac7c400d9c2716f8aa88e0c759241b392531e0fdf2644565aef260cd70a8a",
+      "name": "freemarker/ext/beans/ClassIntrospector",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOG",
+          "descriptor": "Lfreemarker/log/Logger;",
+          "access": 26
+        },
+        {
+          "name": "JREBEL_SDK_CLASS_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "JREBEL_INTEGRATION_ERROR_MSG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DEVELOPMENT_MODE",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "CLASS_CHANGE_NOTIFIER",
+          "descriptor": "Lfreemarker/ext/beans/ClassChangeNotifier;",
+          "access": 26
+        },
+        {
+          "name": "ARG_TYPES_BY_METHOD_KEY",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTORS_KEY",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 24
+        },
+        {
+          "name": "GENERIC_GET_KEY",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 24
+        },
+        {
+          "name": "exposureLevel",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "exposeFields",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "methodAppearanceFineTuner",
+          "descriptor": "Lfreemarker/ext/beans/MethodAppearanceFineTuner;",
+          "access": 16
+        },
+        {
+          "name": "methodSorter",
+          "descriptor": "Lfreemarker/ext/beans/MethodSorter;",
+          "access": 16
+        },
+        {
+          "name": "treatDefaultMethodsAsBeanMembers",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "bugfixed",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "hasSharedInstanceRestrictons",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "shared",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "sharedLock",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "cacheClassNames",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "classIntrospectionsInProgress",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/Class<*>;>;"
+        },
+        {
+          "name": "modelFactories",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/ref/WeakReference<Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "modelFactoriesRefQueue",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ref/ReferenceQueue<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "clearingCounter",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospectorBuilder;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "25bf6d461684f39dc56dae8d79ebb3bb0caa52c865ce5b7c99528f24a9b4ee89",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospectorBuilder;Ljava/lang/Object;ZZ)V",
+          "access": 0,
+          "code_sha256": "2782634e336b316e463f9695020326080a8611cc1d2864846683eca64831e10a",
+          "code_length": 152
+        },
+        {
+          "name": "createBuilder",
+          "descriptor": "()Lfreemarker/ext/beans/ClassIntrospectorBuilder;",
+          "access": 0,
+          "code_sha256": "2b1ff9a4035d0e3037ecc15cb86e754804e085cab3f27bb2954e38450411fea5",
+          "code_length": 9
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 0,
+          "code_sha256": "12ca95d8ac67cd46ab4a1166bfa684ee0282187a603cc173b11d4348f6ee2c8a",
+          "code_length": 323,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "createClassIntrospectionData",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "527bd7258fcb2fac085c72e25daea5259a75cbac2fa81adf0883e751dcaf1ae4",
+          "code_length": 155,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "addFieldsToClassIntrospectionData",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "99f954b66ce4b589c98334f78cdf96519395e224f0c9053608da0ac791862741",
+          "code_length": 53,
+          "throws": [
+            "java/lang/SecurityException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "addBeanInfoToClassIntrospectionData",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Class;Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "4fb701ea819c97648ea8fb99b3879c13157c9a800761ef1bb4ddca04fe673f45",
+          "code_length": 458,
+          "throws": [
+            "java/beans/IntrospectionException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/lang/Class<*>;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)V"
+        },
+        {
+          "name": "getPropertyDescriptors",
+          "descriptor": "(Ljava/beans/BeanInfo;Ljava/lang/Class;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "a6f806cff28bfbc95401470819000af7e2a3740332e5e691229edae3408b8649",
+          "code_length": 545,
+          "generic_signature": "(Ljava/beans/BeanInfo;Ljava/lang/Class<*>;)Ljava/util/List<Ljava/beans/PropertyDescriptor;>;"
+        },
+        {
+          "name": "mergeInPropertyDescriptor",
+          "descriptor": "(Ljava/util/LinkedHashMap;Ljava/beans/PropertyDescriptor;)V",
+          "access": 2,
+          "code_sha256": "a1b4fb4bb20204b64515d164758fdbf27919b3e4fb2a552c4a41ade48617bcc0",
+          "code_length": 39,
+          "generic_signature": "(Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/Object;>;Ljava/beans/PropertyDescriptor;)V"
+        },
+        {
+          "name": "mergeInPropertyReaderMethodPair",
+          "descriptor": "(Ljava/util/LinkedHashMap;Ljava/lang/String;Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)V",
+          "access": 2,
+          "code_sha256": "81cb00f2dcb5967291d18689c6cf41e71e4233b6cf97f3b99baadfd8adeadfce",
+          "code_length": 23,
+          "generic_signature": "(Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)V"
+        },
+        {
+          "name": "mergeInPropertyReaderMethod",
+          "descriptor": "(Ljava/util/LinkedHashMap;Ljava/lang/String;Ljava/lang/reflect/Method;)V",
+          "access": 2,
+          "code_sha256": "fcd3c8ce210bd4d199eaf2de4f4a2c15d3ab380e3fe446db8570239a2237a691",
+          "code_length": 31,
+          "generic_signature": "(Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;Ljava/lang/reflect/Method;)V"
+        },
+        {
+          "name": "putIfMergedPropertyReaderMethodPairDiffers",
+          "descriptor": "(Ljava/util/LinkedHashMap;Ljava/lang/String;Ljava/lang/Object;Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)V",
+          "access": 2,
+          "code_sha256": "0b5e58c2a57acf9b50cca9dc12775cd390866b6d65aeef83e7f8d5c4c3492296",
+          "code_length": 34,
+          "generic_signature": "(Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/String;Ljava/lang/Object;Lfreemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair;)V"
+        },
+        {
+          "name": "getMethodDescriptors",
+          "descriptor": "(Ljava/beans/BeanInfo;Ljava/lang/Class;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "6e3b0fa49784915dd21b6f4225e5f53faa90c96df2d3bd969dc30e7f9483baf2",
+          "code_length": 378,
+          "generic_signature": "(Ljava/beans/BeanInfo;Ljava/lang/Class<*>;)Ljava/util/List<Ljava/beans/MethodDescriptor;>;"
+        },
+        {
+          "name": "containsMethodWithSameParameterTypes",
+          "descriptor": "(Ljava/util/List;Ljava/lang/reflect/Method;)Z",
+          "access": 2,
+          "code_sha256": "6ab66b6e6c187697c4f96f279a694b702844888d887728ffa562c0c30eebeee0",
+          "code_length": 60,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/reflect/Method;>;Ljava/lang/reflect/Method;)Z"
+        },
+        {
+          "name": "addPropertyDescriptorToClassIntrospectionData",
+          "descriptor": "(Ljava/util/Map;Ljava/beans/PropertyDescriptor;Ljava/lang/Class;Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "e2d71c94fac4b337b1c07de0e4585ca121acced6af69a73530437d8fce62c22d",
+          "code_length": 127,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/beans/PropertyDescriptor;Ljava/lang/Class<*>;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)V"
+        },
+        {
+          "name": "addGenericGetToClassIntrospectionData",
+          "descriptor": "(Ljava/util/Map;Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "447936fe4ce4a8a250eb22407d0be837686135e227a790d4623585713aee97e0",
+          "code_length": 36,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)V"
+        },
+        {
+          "name": "addConstructorsToClassIntrospectionData",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "daa6fd196245326854b87dabaf910bc45e3dfe684937bfbf866e681cbd3af6ea",
+          "code_length": 133,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "discoverAccessibleMethods",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "14dc09d7709f17cc550c8c8d63f7d9cedc1249588f41bf31579917c5e2181dfa",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;"
+        },
+        {
+          "name": "discoverAccessibleMethods",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/Map;)V",
+          "access": 10,
+          "code_sha256": "831b28c5b809ce22b3d86a39d50e882f4996340da2d3ef9b7267dc682177e0ee",
+          "code_length": 170,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)V"
+        },
+        {
+          "name": "getMatchingAccessibleMethod",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/util/Map;)Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "7f914a392337b4ac1f72a43bf5c06fb6bd985035986f2e0fd2ad0413da1eb4ef",
+          "code_length": 82,
+          "generic_signature": "(Ljava/lang/reflect/Method;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)Ljava/lang/reflect/Method;"
+        },
+        {
+          "name": "getFirstAccessibleMethod",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/Map;)Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "d868ccda35e9d60cb06338ad2b2ae8551d23fb06aefc738a6ffeee15d4393514",
+          "code_length": 37,
+          "generic_signature": "(Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/Map<Lfreemarker/ext/beans/ClassIntrospector$MethodSignature;Ljava/util/List<Ljava/lang/reflect/Method;>;>;)Ljava/lang/reflect/Method;"
+        },
+        {
+          "name": "sortMethodDescriptors",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "b7a99f8cbdefda1bcc5cb059efb48cb175fd046186f8dc4e8b5ae98b308b378d",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/List<Ljava/beans/MethodDescriptor;>;)V"
+        },
+        {
+          "name": "isAllowedToExpose",
+          "descriptor": "(Ljava/lang/reflect/Method;)Z",
+          "access": 0,
+          "code_sha256": "c2b34e482987be39450ce6064efa012c7d8b38a6b90d0ed72238fd19255af13c",
+          "code_length": 21
+        },
+        {
+          "name": "getArgTypesByMethod",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "0f6be5d5f1466526a05e2eec8cf3635eaa3838a187844b0bcf7874c5f026ad88",
+          "code_length": 38,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;)Ljava/util/Map<Ljava/lang/reflect/Method;[Ljava/lang/Class<*>;>;"
+        },
+        {
+          "name": "clearCache",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "bc860dadc0cd24d150305314df761afdf7d91fd33acd2833262fda012e6e1d37",
+          "code_length": 50
+        },
+        {
+          "name": "forcedClearCache",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c1965ded188431b5142947b67dcec1caef4aa940fa9542618cebf75754dcaab5",
+          "code_length": 141
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "8114479d2a1dc2d41ff1d1fe41261dede3e422e8828b7c99a5de13dc98c6cc92",
+          "code_length": 151,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "getClearingCounter",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "ca920f97ae90d0fbf30b4024974cd4939fd10f19337a4b0fbf84d58d01ded1eb",
+          "code_length": 19
+        },
+        {
+          "name": "onSameNameClassesDetected",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "7fd4ac0c0bd5d136a0397f1d1b7f81ae9bef9a3f94043ca474ffad2634f125f1",
+          "code_length": 44
+        },
+        {
+          "name": "registerModelFactory",
+          "descriptor": "(Lfreemarker/ext/beans/ClassBasedModelFactory;)V",
+          "access": 0,
+          "code_sha256": "f39ca9920c29fc4633be369eb6bc1094a960b3ef93e9928a8cbb0e028e276845",
+          "code_length": 6
+        },
+        {
+          "name": "registerModelFactory",
+          "descriptor": "(Lfreemarker/ext/util/ModelCache;)V",
+          "access": 0,
+          "code_sha256": "f39ca9920c29fc4633be369eb6bc1094a960b3ef93e9928a8cbb0e028e276845",
+          "code_length": 6
+        },
+        {
+          "name": "registerModelFactory",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "1014ddd166bf79f3954cd8fbf3bcd725b7fdd8af441462727f6bbbd4757a0919",
+          "code_length": 44
+        },
+        {
+          "name": "unregisterModelFactory",
+          "descriptor": "(Lfreemarker/ext/beans/ClassBasedModelFactory;)V",
+          "access": 0,
+          "code_sha256": "7dfd7d1ef5076560d9cd447cb6c8afb98bdb3601b264fecfecee7b8cbc4340f3",
+          "code_length": 6
+        },
+        {
+          "name": "unregisterModelFactory",
+          "descriptor": "(Lfreemarker/ext/util/ModelCache;)V",
+          "access": 0,
+          "code_sha256": "7dfd7d1ef5076560d9cd447cb6c8afb98bdb3601b264fecfecee7b8cbc4340f3",
+          "code_length": 6
+        },
+        {
+          "name": "unregisterModelFactory",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "8bf6598dbe49791af2e7db4b930cb6a101c37597361daf026d385bebdfdd6b95",
+          "code_length": 68
+        },
+        {
+          "name": "removeClearedModelFactoryReferences",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "7fc755f2479f7c3eb514690816a3471faf1fc5ac6730fe53c5b433681e21e8c0",
+          "code_length": 73
+        },
+        {
+          "name": "getArgTypes",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/reflect/Method;)[Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "f9498061e6fee37ff59990b6ee5c17ba3f5f2fe1e852d18fafff43782ed1001a",
+          "code_length": 24,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/Object;Ljava/lang/Object;>;Ljava/lang/reflect/Method;)[Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "keyCount",
+          "descriptor": "(Ljava/lang/Class;)I",
+          "access": 0,
+          "code_sha256": "e862652feee1bf89e41e073f2a3151b15d9bad66780e8215e141e5197504a179",
+          "code_length": 60,
+          "generic_signature": "(Ljava/lang/Class<*>;)I"
+        },
+        {
+          "name": "keySet",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Set;",
+          "access": 0,
+          "code_sha256": "d4dca7081d342ed2b3fe846b0bcd084d53637bb78c4ee9ae67974b45614be64a",
+          "code_length": 50,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Set<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getExposureLevel",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "c82aed037c5afb54cd1235f0acbd9e50ea5462301ecc01f1e215873f28b1fa33",
+          "code_length": 5
+        },
+        {
+          "name": "getExposeFields",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "85d26770fd4a48de59f70964ff3f08e2243f6d9c897910136273f9d9fa1dbbc0",
+          "code_length": 5
+        },
+        {
+          "name": "getTreatDefaultMethodsAsBeanMembers",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "1010793b1c478cd9dba76622de9b5fa2602360d8c920264824d19123a73a9a0b",
+          "code_length": 5
+        },
+        {
+          "name": "getMethodAppearanceFineTuner",
+          "descriptor": "()Lfreemarker/ext/beans/MethodAppearanceFineTuner;",
+          "access": 0,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "getMethodSorter",
+          "descriptor": "()Lfreemarker/ext/beans/MethodSorter;",
+          "access": 0,
+          "code_sha256": "1ac2df7ba3a2c6e5813993ef99152a042e99a0448328ecb2bc980ff489723a92",
+          "code_length": 5
+        },
+        {
+          "name": "getHasSharedInstanceRestrictons",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "9bcb244defc50bbabfd2dd1d7b5d2d56007edc817c09fae83f8cc4ce6c06a85d",
+          "code_length": 5
+        },
+        {
+          "name": "isShared",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "588c3e4df5be1df26a6652d68d3732f7095939454e6d394423a4b7adc31e1344",
+          "code_length": 5
+        },
+        {
+          "name": "getSharedLock",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "b805b19adbf9630ba86303593ac47fadafc3c658e98ceda51257cda42504f784",
+          "code_length": 5
+        },
+        {
+          "name": "getRegisteredModelFactoriesSnapshot",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "7ef85e41bdd8f0be425971b1b0f639010a33a7d093031102086482c606621161",
+          "code_length": 24
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "16c2df53bfffca0280aa03178742f635f73dcc4976e0dce97983a61175046c37",
+          "code_length": 132
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "freemarker/core/BugException",
+        "freemarker/core/_Java8",
+        "freemarker/core/_JavaVersions",
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/BeansWrapper$MethodAppearanceDecision",
+        "freemarker/ext/beans/BeansWrapper$MethodAppearanceDecisionInput",
+        "freemarker/ext/beans/ClassBasedModelFactory",
+        "freemarker/ext/beans/ClassChangeNotifier",
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/ext/beans/ClassIntrospector$MethodSignature",
+        "freemarker/ext/beans/ClassIntrospector$PropertyReaderMethodPair",
+        "freemarker/ext/beans/ClassIntrospectorBuilder",
+        "freemarker/ext/beans/FastPropertyDescriptor",
+        "freemarker/ext/beans/MethodAppearanceFineTuner",
+        "freemarker/ext/beans/MethodSorter",
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/SimpleMethod",
+        "freemarker/ext/beans/UnsafeMethods",
+        "freemarker/ext/beans/_MethodUtil",
+        "freemarker/ext/util/ModelCache",
+        "freemarker/log/Logger",
+        "freemarker/template/utility/NullArgumentException",
+        "freemarker/template/utility/SecurityUtilities",
+        "java/beans/BeanInfo",
+        "java/beans/IndexedPropertyDescriptor",
+        "java/beans/IntrospectionException",
+        "java/beans/Introspector",
+        "java/beans/MethodDescriptor",
+        "java/beans/PropertyDescriptor",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/Void",
+        "java/lang/ref/ReferenceQueue",
+        "java/lang/ref/WeakReference",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/IdentityHashMap",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/ClassIntrospectorBuilder.class",
+      "occurrence": 0,
+      "sha256": "c7ccc866042a65a95140b484f484adf083fd36b3d9c58d7ae6c29dfad90318f1",
+      "name": "freemarker/ext/beans/ClassIntrospectorBuilder",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "bugfixed",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "INSTANCE_CACHE",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26
+        },
+        {
+          "name": "INSTANCE_CACHE_REF_QUEUE",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 26
+        },
+        {
+          "name": "exposureLevel",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "exposeFields",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "treatDefaultMethodsAsBeanMembers",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "methodAppearanceFineTuner",
+          "descriptor": "Lfreemarker/ext/beans/MethodAppearanceFineTuner;",
+          "access": 2
+        },
+        {
+          "name": "methodSorter",
+          "descriptor": "Lfreemarker/ext/beans/MethodSorter;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector;)V",
+          "access": 0,
+          "code_sha256": "d7d543a8a77fcbe29c276e827f2eaff446709801bd11277d39d26781135100a0",
+          "code_length": 58
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/template/Version;)V",
+          "access": 0,
+          "code_sha256": "653f0e87632c650ef09917ab777eeaea1aff54dc812c386238a70f0ee128d4e3",
+          "code_length": 37
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "11869a9cf2d3b4c394b87002968457237da4f0bc311dc3f9a4322f4ff534fb31",
+          "code_length": 17
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d6d84f6542daa8c1b926b3566e38a5f535e9deda41761e4267c13e5e56ebecb3",
+          "code_length": 109
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "377d9cf9dc0cc929cf8d68af3dca8321d4167e358991c5ffbf14ee3424b2d286",
+          "code_length": 111
+        },
+        {
+          "name": "getExposureLevel",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setExposureLevel",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "8fd014ff5e1b4bccd485a69c169dbb00270e4aeecc3b486342b29176d7404d42",
+          "code_length": 42
+        },
+        {
+          "name": "getExposeFields",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "setExposeFields",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c8c4752ca68104796797c33b65753bc9f43eed000b98189a2bfcc9110a8c39a9",
+          "code_length": 6
+        },
+        {
+          "name": "getTreatDefaultMethodsAsBeanMembers",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "setTreatDefaultMethodsAsBeanMembers",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "e07b26bc84cb04399f939d9b1dcecf2d6e991d8f9d2200e8f6be20389f064821",
+          "code_length": 6
+        },
+        {
+          "name": "getMethodAppearanceFineTuner",
+          "descriptor": "()Lfreemarker/ext/beans/MethodAppearanceFineTuner;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "setMethodAppearanceFineTuner",
+          "descriptor": "(Lfreemarker/ext/beans/MethodAppearanceFineTuner;)V",
+          "access": 1,
+          "code_sha256": "351e4151526ca3f9a50a82cb2419ff6265804f4471b94c2b05ef40c1aeda7b22",
+          "code_length": 6
+        },
+        {
+          "name": "getMethodSorter",
+          "descriptor": "()Lfreemarker/ext/beans/MethodSorter;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "setMethodSorter",
+          "descriptor": "(Lfreemarker/ext/beans/MethodSorter;)V",
+          "access": 1,
+          "code_sha256": "357112b46d606be3030f83e27bd517dbb0e2e88b28fb5eb166beeb8eeaf6e331",
+          "code_length": 6
+        },
+        {
+          "name": "removeClearedReferencesFromInstanceCache",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "27f0284fee55ec0745cfbe799acfaf855978105279c55292a12c544e03dfd377",
+          "code_length": 73
+        },
+        {
+          "name": "clearInstanceCache",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "553e050d60b62cf9e4238c451b2ce7066f149d7358272520c0c5d3ec30310e43",
+          "code_length": 25
+        },
+        {
+          "name": "getInstanceCache",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 8,
+          "code_sha256": "6b3a7278fa3dee33bd273f8991aeb2ea0519ed2cca03b9bd4ce4505b1d6ff51f",
+          "code_length": 4
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lfreemarker/ext/beans/ClassIntrospector;",
+          "access": 0,
+          "code_sha256": "8fad57c434f1681d4f66d94f3220391279ca55e027b097208a25362e77e63ca0",
+          "code_length": 158
+        },
+        {
+          "name": "isBugfixed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d540923e0aedb252a24c9a75295325a5dffb80d425bd5e3473ef7995ca767387",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/ext/beans/ClassIntrospectorBuilder",
+        "freemarker/ext/beans/SingletonCustomizer",
+        "freemarker/template/Version",
+        "freemarker/template/_TemplateAPI",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/ref/Reference",
+        "java/lang/ref/ReferenceQueue",
+        "java/lang/ref/WeakReference",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CollectionAdapter$1.class",
+      "occurrence": 0,
+      "sha256": "aa275db3ccf2cedab4815ae98ce3e87bdc527ed8664dfdd1cda37c8ed1208fa8",
+      "name": "freemarker/ext/beans/CollectionAdapter$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "i",
+          "descriptor": "Lfreemarker/template/TemplateModelIterator;",
+          "access": 16
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/CollectionAdapter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/CollectionAdapter;)V",
+          "access": 0,
+          "code_sha256": "ba4a1817df1f63ded4052093bcb3b75b78ef6f79b0ee923b33c1fe271f6faaf1",
+          "code_length": 26,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ad66dcf8e6551ae3d4c36738cdfd0ae09ff6d15cb0ec3a70f998c3deb246faa9",
+          "code_length": 20
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e66334d0af1ea45d9e03a8311c9a844e90d74f1e2f4580f474476e0f5379bd30",
+          "code_length": 30
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "19a34528af5c7cc21b1ffca7e38960e569224b742d08a6f5f208ff15bfe15e03",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/CollectionAdapter",
+        "freemarker/ext/beans/CollectionAdapter$1",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateModelIterator",
+        "freemarker/template/utility/UndeclaredThrowableException",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CollectionAdapter.class",
+      "occurrence": 0,
+      "sha256": "4aeeb47f5a1232acccc9c6c5b3d31d0b37761039eed2b08d9d34c43a6e766d27",
+      "name": "freemarker/ext/beans/CollectionAdapter",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [
+        "freemarker/template/TemplateModelAdapter"
+      ],
+      "fields": [
+        {
+          "name": "wrapper",
+          "descriptor": "Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 18
+        },
+        {
+          "name": "model",
+          "descriptor": "Lfreemarker/template/TemplateCollectionModel;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/template/TemplateCollectionModel;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 0,
+          "code_sha256": "f3e16584c7ac4e1cd180606ced39b4526e89d48447df4d635b981dc75f384c8b",
+          "code_length": 15
+        },
+        {
+          "name": "getTemplateModel",
+          "descriptor": "()Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "798ef5aa08976f4fe3c72beabf07ca715f964e47ba269d6c88cea17daa4ed927",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "3cb3165bf8d72851a436eaffea38da658faa77e9c0c936f313e1d07712f59c35",
+          "code_length": 19
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/ext/beans/CollectionAdapter;)Lfreemarker/template/TemplateCollectionModel;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lfreemarker/ext/beans/CollectionAdapter;)Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/CollectionAdapter",
+        "freemarker/ext/beans/CollectionAdapter$1",
+        "freemarker/template/TemplateModelAdapter",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/UndeclaredThrowableException",
+        "java/lang/UnsupportedOperationException",
+        "java/util/AbstractCollection"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CollectionModel$1.class",
+      "occurrence": 0,
+      "sha256": "d3e51ebdd2e5b2d2839a52793a0aa5d276a4ca945dcfdc4ba77896e242984906",
+      "name": "freemarker/ext/beans/CollectionModel$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/ext/util/ModelFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Object;Lfreemarker/template/ObjectWrapper;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "c1484dcecc39f5cc5a289843cfb7f3ea082417830ade3001b815c1892b93d226",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/CollectionModel",
+        "freemarker/ext/beans/CollectionModel$1",
+        "freemarker/ext/util/ModelFactory",
+        "java/lang/Object",
+        "java/util/Collection"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/CollectionModel.class",
+      "occurrence": 0,
+      "sha256": "82fb2964d21b75cf6e5184924e3ccd372aab9c57d216e8370d33b750e9c2dbd0",
+      "name": "freemarker/ext/beans/CollectionModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/StringModel",
+      "interfaces": [
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateSequenceModel"
+      ],
+      "fields": [
+        {
+          "name": "FACTORY",
+          "descriptor": "Lfreemarker/ext/util/ModelFactory;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "762f0d44b7d0370961bd959684d0c6bd66d473a2da0b8885976f2db1b12f7280",
+          "code_length": 67,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getSupportsIndexedAccess",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b6c828e8491540cad9aa8caeff073515cd3afc98bd517385e931c43705ddc6bd",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lfreemarker/template/TemplateModelIterator;",
+          "access": 1,
+          "code_sha256": "e1cbf7f7f323ce7a06bb7e56bbbe060947686dda69e3e233d72db807e0f60f61",
+          "code_length": 24
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "19af3e3aa89660c2835728993bd617b2450d6f5c4de0e3e2106c8e57cb3c112b",
+          "code_length": 13
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2628feeebf912c03cf9ca81c60d575bb46b1958f87087deec95332a43e62d1e8",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/CollectionModel",
+        "freemarker/ext/beans/CollectionModel$1",
+        "freemarker/ext/beans/IteratorModel",
+        "freemarker/ext/beans/StringModel",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateSequenceModel",
+        "java/lang/Class",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Collection",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/DateModel$1.class",
+      "occurrence": 0,
+      "sha256": "ad0ef77d363409d2f9a5ca3496ac8664ccac73a610874a39234a8ad8a58094b1",
+      "name": "freemarker/ext/beans/DateModel$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/ext/util/ModelFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Object;Lfreemarker/template/ObjectWrapper;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "c1484dcecc39f5cc5a289843cfb7f3ea082417830ade3001b815c1892b93d226",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/DateModel",
+        "freemarker/ext/beans/DateModel$1",
+        "freemarker/ext/util/ModelFactory",
+        "java/lang/Object",
+        "java/util/Date"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/DateModel.class",
+      "occurrence": 0,
+      "sha256": "00736fee04319052fd20edf49baa1ff19f799e8a57122bd8549da679a23d5c07",
+      "name": "freemarker/ext/beans/DateModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/BeanModel",
+      "interfaces": [
+        "freemarker/template/TemplateDateModel"
+      ],
+      "fields": [
+        {
+          "name": "FACTORY",
+          "descriptor": "Lfreemarker/ext/util/ModelFactory;",
+          "access": 24
+        },
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Date;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "97d7d71f9e23283d9770c0cc2f35299487dc8e948fd03a2bdf3edb909296b27c",
+          "code_length": 60
+        },
+        {
+          "name": "getAsDate",
+          "descriptor": "()Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "04ad9659d5b51c44d75a20c927fe36f00478e38d04c462ea98f32d8fed6d3a39",
+          "code_length": 8
+        },
+        {
+          "name": "getDateType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f99a2dfe9b7091ae3e28a8a3131f675b0babca0c42fd01daca87f099c5105c03",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeanModel",
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/DateModel",
+        "freemarker/ext/beans/DateModel$1",
+        "freemarker/template/TemplateDateModel",
+        "java/sql/Date",
+        "java/sql/Time",
+        "java/sql/Timestamp",
+        "java/util/Date"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/EmptyCallableMemberDescriptor.class",
+      "occurrence": 0,
+      "sha256": "38f501788454576d8f7dde5cbdf6c3b7ca907844982e7c63eec40534a9ba38e7",
+      "name": "freemarker/ext/beans/EmptyCallableMemberDescriptor",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NO_SUCH_METHOD",
+          "descriptor": "Lfreemarker/ext/beans/EmptyCallableMemberDescriptor;",
+          "access": 24
+        },
+        {
+          "name": "AMBIGUOUS_METHOD",
+          "descriptor": "Lfreemarker/ext/beans/EmptyCallableMemberDescriptor;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fdb53ce5c2c14c7d04da1accef31141a72b701ec5ec1d6781516c9c2f4a073e5",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/EmptyCallableMemberDescriptor",
+        "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/EmptyMemberAndArguments.class",
+      "occurrence": 0,
+      "sha256": "5ba45574b9b3ef44029da38db8337e1e165ea4610483fb23e75b8561834cb31c",
+      "name": "freemarker/ext/beans/EmptyMemberAndArguments",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WRONG_NUMBER_OF_ARGUMENTS",
+          "descriptor": "Lfreemarker/ext/beans/EmptyMemberAndArguments;",
+          "access": 24
+        },
+        {
+          "name": "errorDescription",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "numberOfArgumentsWrong",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "unwrappedArguments",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Z[Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "e8eec4a2dea2a43c2855af9d8dbd29d07a675ffd95bc2408a5c75ec27fafcd66",
+          "code_length": 20
+        },
+        {
+          "name": "noCompatibleOverload",
+          "descriptor": "(I)Lfreemarker/ext/beans/EmptyMemberAndArguments;",
+          "access": 8,
+          "code_sha256": "f011968ffb01b75476667c92fbf214c463b59a4d0ea82fef594277bb70966e55",
+          "code_length": 38
+        },
+        {
+          "name": "noCompatibleOverload",
+          "descriptor": "([Ljava/lang/Object;)Lfreemarker/ext/beans/EmptyMemberAndArguments;",
+          "access": 8,
+          "code_sha256": "187807ce132c874ea57dd22580fda632b7503b0be5ac7b4dfb03b7fe1372ed7d",
+          "code_length": 12
+        },
+        {
+          "name": "ambiguous",
+          "descriptor": "([Ljava/lang/Object;)Lfreemarker/ext/beans/EmptyMemberAndArguments;",
+          "access": 8,
+          "code_sha256": "08f27a8dd558c692f4e63268b80a425a2ac9369f34361af8908ed1cb67a0dab3",
+          "code_length": 12
+        },
+        {
+          "name": "from",
+          "descriptor": "(Lfreemarker/ext/beans/EmptyCallableMemberDescriptor;[Ljava/lang/Object;)Lfreemarker/ext/beans/MaybeEmptyMemberAndArguments;",
+          "access": 8,
+          "code_sha256": "5a5a39450a9afa4a864df9bb2d4e14bd422e562b854eed655c693200c1e2571b",
+          "code_length": 51
+        },
+        {
+          "name": "getErrorDescription",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getUnwrappedArguments",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "isNumberOfArgumentsWrong",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cdbf94ef31a9e3a1da98e13ced0c58e14be28a84ab7d9050fe7e0bd36b39005c",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "freemarker/core/_DelayedOrdinal",
+        "freemarker/ext/beans/EmptyCallableMemberDescriptor",
+        "freemarker/ext/beans/EmptyMemberAndArguments",
+        "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/EnumerationModel.class",
+      "occurrence": 0,
+      "sha256": "8e432ee07ba55a56cd64d37de53427995b84b286c441b3c9d7532644a3a38ac7",
+      "name": "freemarker/ext/beans/EnumerationModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/BeanModel",
+      "interfaces": [
+        "freemarker/template/TemplateModelIterator",
+        "freemarker/template/TemplateCollectionModel"
+      ],
+      "fields": [
+        {
+          "name": "accessed",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Enumeration;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "2a349f3878fc45a7b295a9a5dbcf7ced7d93966fd2473396edd48e7e9850a64e",
+          "code_length": 12
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lfreemarker/template/TemplateModelIterator;",
+          "access": 1,
+          "code_sha256": "940150d3ee32c0169915dcd36cf64054f7953866d3097995629808ad0abacf5e",
+          "code_length": 38,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "981a0a43a57e93df63f69d7c8c8a71a8cabca5c913497407281e5c791024e56f",
+          "code_length": 13
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "a1c71735e7331debcc569c734939b0701037749d959cece10c4bc95c14da32b5",
+          "code_length": 28,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getAsBoolean",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9981f09331591232a900a6f5cdc68ea88db0e6744de7b758b554f13d40c48884",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeanModel",
+        "freemarker/ext/beans/EnumerationModel",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateModelIterator",
+        "java/util/Enumeration",
+        "java/util/NoSuchElementException"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/FastPropertyDescriptor.class",
+      "occurrence": 0,
+      "sha256": "0e2fbdb7c78abfc849bf06dbceee5bd266462a5d436e4a9157ad2679bc163f9e",
+      "name": "freemarker/ext/beans/FastPropertyDescriptor",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "readMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        },
+        {
+          "name": "indexedReadMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getReadMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getIndexedReadMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/FastPropertyDescriptor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/HashAdapter$1$1$1.class",
+      "occurrence": 0,
+      "sha256": "86e1487469a77f84c644c82c395129b656c229d5c8b20144396e84261eb0ee4a",
+      "name": "freemarker/ext/beans/HashAdapter$1$1$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry"
+      ],
+      "fields": [
+        {
+          "name": "val$key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4112
+        },
+        {
+          "name": "this$2",
+          "descriptor": "Lfreemarker/ext/beans/HashAdapter$1$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/HashAdapter$1$1;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c32c8a9b240b52da59846491a08b6033acc24a273ebf8153ba47f81620195aa",
+          "code_length": 18
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "091beca767b5187c4ad1478e61906dfc58a81011b63d88ef31a2a05145c6c67a",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2f4ff8d8f99a022b5e0556c5036128108bcbb9603dc08055f8fe3c3a93a756d4",
+          "code_length": 86
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8e543bb489a00d6bbced3dd05e3b3a8812530f2c608a1cb29824edb3044c77e2",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/HashAdapter",
+        "freemarker/ext/beans/HashAdapter$1",
+        "freemarker/ext/beans/HashAdapter$1$1",
+        "freemarker/ext/beans/HashAdapter$1$1$1",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/HashAdapter$1$1.class",
+      "occurrence": 0,
+      "sha256": "1791ec6e7c555b0922f06814541b0bbcb9acb998d4a7f99f4d0f6f619a28f90a",
+      "name": "freemarker/ext/beans/HashAdapter$1$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "val$i",
+          "descriptor": "Lfreemarker/template/TemplateModelIterator;",
+          "access": 4112
+        },
+        {
+          "name": "this$1",
+          "descriptor": "Lfreemarker/ext/beans/HashAdapter$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/HashAdapter$1;Lfreemarker/template/TemplateModelIterator;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "eed853d0ffc1f8e5a9802ed7db8699d8951ac5069f418b9b118232e9e0f83df6",
+          "code_length": 20
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "86c4a691c44837b6ea2a1c742b8c0ea6898576226599bbbfcad8cab4bf74e598",
+          "code_length": 46
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/HashAdapter",
+        "freemarker/ext/beans/HashAdapter$1",
+        "freemarker/ext/beans/HashAdapter$1$1",
+        "freemarker/ext/beans/HashAdapter$1$1$1",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateModelIterator",
+        "freemarker/template/utility/UndeclaredThrowableException",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/HashAdapter$1.class",
+      "occurrence": 0,
+      "sha256": "a555c57d00621d98bc32a43a99b2f276860a389958cf4053c87dc840d871ba12",
+      "name": "freemarker/ext/beans/HashAdapter$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/HashAdapter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/HashAdapter;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "04777c681061790db8f311e2ae8e97bd5d47cbb9cfea77865834c07e6d8a454a",
+          "code_length": 41
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8acbfecd8094b5391008b66d7d5ab65415dc661da100606603310b296f31ecab",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/HashAdapter",
+        "freemarker/ext/beans/HashAdapter$1",
+        "freemarker/ext/beans/HashAdapter$1$1",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateHashModelEx",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/UndeclaredThrowableException",
+        "java/util/AbstractSet"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/HashAdapter.class",
+      "occurrence": 0,
+      "sha256": "5067d4e7f531ea3d1ee8f2ab84773cb349a936455060ceac33bb80db67e75f63",
+      "name": "freemarker/ext/beans/HashAdapter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/AbstractMap",
+      "interfaces": [
+        "freemarker/template/TemplateModelAdapter"
+      ],
+      "fields": [
+        {
+          "name": "wrapper",
+          "descriptor": "Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 18
+        },
+        {
+          "name": "model",
+          "descriptor": "Lfreemarker/template/TemplateHashModel;",
+          "access": 18
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/template/TemplateHashModel;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 0,
+          "code_sha256": "89edbd7a039944e9ad49171142841fae8d6cdf23e51b5dabb61a70edc20ec76c",
+          "code_length": 15
+        },
+        {
+          "name": "getTemplateModel",
+          "descriptor": "()Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "68e1efe31f9de7dcff6bd987774a20b83e2bf621894ee24bc04d5f833ec027e8",
+          "code_length": 20
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "281f7b495b4d6d184273a02c364c2879fe440ca50c8fd553f37f4b1c81942539",
+          "code_length": 20
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3aaa91e0d8ee38c86e4a06da2cbd36010342bd962ef4ef55ec49837dd3c7422e",
+          "code_length": 31
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "17bac58f5ec2568b0c9651dbff8df91c97837b77e9bed67db3896b3fd768e195",
+          "code_length": 16
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "04e21db5632c78f2af16ca2981176a365427359f41d8d223a154d0c10454a2d7",
+          "code_length": 26
+        },
+        {
+          "name": "getModelEx",
+          "descriptor": "()Lfreemarker/template/TemplateHashModelEx;",
+          "access": 2,
+          "code_sha256": "3d93ff29b466723b7e564d3f07e3811e8488f315180418b97547e59a62e986b3",
+          "code_length": 59
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/ext/beans/HashAdapter;)Lfreemarker/template/TemplateHashModelEx;",
+          "access": 4104,
+          "code_sha256": "ed2b8254e0ba5a4243ea4b6f3d71ddfe0edc73225edd6f928618cb103449edb9",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lfreemarker/ext/beans/HashAdapter;)Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/HashAdapter",
+        "freemarker/ext/beans/HashAdapter$1",
+        "freemarker/template/TemplateHashModel",
+        "freemarker/template/TemplateHashModelEx",
+        "freemarker/template/TemplateModelAdapter",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/UndeclaredThrowableException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/util/AbstractMap"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/InvalidPropertyException.class",
+      "occurrence": 0,
+      "sha256": "37ce6c38289bc0281a30764f245f5261c410dc85869b27635afd1012e871d5e5",
+      "name": "freemarker/ext/beans/InvalidPropertyException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/template/TemplateModelException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/InvalidPropertyException",
+        "freemarker/template/TemplateModelException"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/IteratorModel.class",
+      "occurrence": 0,
+      "sha256": "7cfc12e8ca334bf9690f95adff085673b19c758d4e45462aaeaa69d60d2b2f34",
+      "name": "freemarker/ext/beans/IteratorModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/BeanModel",
+      "interfaces": [
+        "freemarker/template/TemplateModelIterator",
+        "freemarker/template/TemplateCollectionModel"
+      ],
+      "fields": [
+        {
+          "name": "accessed",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "2a349f3878fc45a7b295a9a5dbcf7ced7d93966fd2473396edd48e7e9850a64e",
+          "code_length": 12
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lfreemarker/template/TemplateModelIterator;",
+          "access": 1,
+          "code_sha256": "940150d3ee32c0169915dcd36cf64054f7953866d3097995629808ad0abacf5e",
+          "code_length": 38,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "981a0a43a57e93df63f69d7c8c8a71a8cabca5c913497407281e5c791024e56f",
+          "code_length": 13
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "0f9749bb8616b85db58dd6d4d73210fea0d2d1c99fa90c4ea45a6c7ad26a564f",
+          "code_length": 29,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getAsBoolean",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "349eb302fed3fc24db74625e66b25e8adc8d9f8731d379860524a11759961af2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeanModel",
+        "freemarker/ext/beans/IteratorModel",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateModelIterator",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/JRebelClassChangeNotifier$ClassIntrospectorCacheInvalidator.class",
+      "occurrence": 0,
+      "sha256": "21288a7d0082d530bbc3c40e3b65b5eca685ad8727ca96b846867815eb2e3591",
+      "name": "freemarker/ext/beans/JRebelClassChangeNotifier$ClassIntrospectorCacheInvalidator",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/zeroturnaround/javarebel/ClassEventListener"
+      ],
+      "fields": [
+        {
+          "name": "ref",
+          "descriptor": "Ljava/lang/ref/WeakReference;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector;)V",
+          "access": 0,
+          "code_sha256": "12df46791ab4a146bfc0cbdaa86ff8b63dffb4039e68c1bca58cbf2305eadb01",
+          "code_length": 17
+        },
+        {
+          "name": "onClassEvent",
+          "descriptor": "(ILjava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "0f386bedc105a26e06af682143bbf65d3f0d8dd471afee11542560c591f2267d",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/ClassIntrospector",
+        "freemarker/ext/beans/JRebelClassChangeNotifier",
+        "freemarker/ext/beans/JRebelClassChangeNotifier$ClassIntrospectorCacheInvalidator",
+        "java/lang/Object",
+        "java/lang/ref/WeakReference",
+        "org/zeroturnaround/javarebel/ClassEventListener",
+        "org/zeroturnaround/javarebel/Reloader",
+        "org/zeroturnaround/javarebel/ReloaderFactory"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/JRebelClassChangeNotifier.class",
+      "occurrence": 0,
+      "sha256": "1a3a4de914bb582615c0e2cae2bca6462e4202ba40b4f84d47426d8f970b858d",
+      "name": "freemarker/ext/beans/JRebelClassChangeNotifier",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/ext/beans/ClassChangeNotifier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "testAvailability",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d070d2657fc899e52234d92946bd59836413d87c5cf48ed75b1b51bc09762ed6",
+          "code_length": 5
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Lfreemarker/ext/beans/ClassIntrospector;)V",
+          "access": 1,
+          "code_sha256": "3c96bca0954e8bc34802e683bedf2b032b1af89f8d72b01925b7e6f4d946d152",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/ClassChangeNotifier",
+        "freemarker/ext/beans/JRebelClassChangeNotifier",
+        "freemarker/ext/beans/JRebelClassChangeNotifier$ClassIntrospectorCacheInvalidator",
+        "java/lang/Object",
+        "org/zeroturnaround/javarebel/Reloader",
+        "org/zeroturnaround/javarebel/ReloaderFactory"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MapModel$1.class",
+      "occurrence": 0,
+      "sha256": "d3ca63dc82abede57cf727acadef29aaa2c4a46bfb7d28930560395a187b6edd",
+      "name": "freemarker/ext/beans/MapModel$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/ext/util/ModelFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Object;Lfreemarker/template/ObjectWrapper;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "c1484dcecc39f5cc5a289843cfb7f3ea082417830ade3001b815c1892b93d226",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/MapModel",
+        "freemarker/ext/beans/MapModel$1",
+        "freemarker/ext/util/ModelFactory",
+        "java/lang/Object",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MapModel.class",
+      "occurrence": 0,
+      "sha256": "aa366909a665ce01d39cbef5cbc8a0f702a6a5fc2b81963ddfb510d9eadb36f0",
+      "name": "freemarker/ext/beans/MapModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/StringModel",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx"
+      ],
+      "fields": [
+        {
+          "name": "FACTORY",
+          "descriptor": "Lfreemarker/ext/util/ModelFactory;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "734073ea7cdf0bb56b7073dd50c2ffca97a6fe4fea5cfdea2b0825138e07240c",
+          "code_length": 33,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "invokeGenericGet",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Class;Ljava/lang/String;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "f29d1aa57ed6b496c13900396dd4353a75778f1efa517374721519b587b65485",
+          "code_length": 110,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "86483d4cea4ead1874228bcec63915ec84b08edbc001b80c6e5c3c271de3b1c2",
+          "code_length": 28
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d5196825b4e90eee0f51aa80e6fb3da2415edf152ba681595f8799bcbf6ae3fe",
+          "code_length": 10
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 4,
+          "code_sha256": "c2df9e78e36596978023aed9b130448ab013bc73c88006a234046c8aba8d4f97",
+          "code_length": 26
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "668139d333d783b6e1a3a20404b8c57f7abc18f73cd66e1977c4e4ce0c9769be",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/MapModel",
+        "freemarker/ext/beans/MapModel$1",
+        "freemarker/ext/beans/StringModel",
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Character",
+        "java/lang/String",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor.class",
+      "occurrence": 0,
+      "sha256": "155eab9c055513bfcd2da9493c40318abf43f5a5cb371ee89f1e2eafc0b17ce2",
+      "name": "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MaybeEmptyMemberAndArguments.class",
+      "occurrence": 0,
+      "sha256": "b81534b65d60e0ee77b8d25480cc85c23aef6fb7642379884e0dd443c48e669c",
+      "name": "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MemberAndArguments.class",
+      "occurrence": 0,
+      "sha256": "0e697253c3b47a3d5e69af515920e273047a82e9be5c7853fb5f0086b22a5f20",
+      "name": "freemarker/ext/beans/MemberAndArguments",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "callableMemberDesc",
+          "descriptor": "Lfreemarker/ext/beans/CallableMemberDescriptor;",
+          "access": 18
+        },
+        {
+          "name": "args",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/CallableMemberDescriptor;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getArgs",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "invokeMethod",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper;Ljava/lang/Object;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "407f11cd78063ebfb8579223bf3181fba0fc669d1f8055fa69e48279f9772f47",
+          "code_length": 14,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "java/lang/reflect/InvocationTargetException",
+            "java/lang/IllegalAccessException"
+          ]
+        },
+        {
+          "name": "invokeConstructor",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper;)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "ae0a6bbb98575c5521e8dd017789c7631b0529fae1aa44f5f6e01f4a321fb499",
+          "code_length": 13,
+          "throws": [
+            "java/lang/IllegalArgumentException",
+            "java/lang/InstantiationException",
+            "java/lang/IllegalAccessException",
+            "java/lang/reflect/InvocationTargetException",
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getCallableMemberDescriptor",
+          "descriptor": "()Lfreemarker/ext/beans/CallableMemberDescriptor;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/CallableMemberDescriptor",
+        "freemarker/ext/beans/MaybeEmptyMemberAndArguments",
+        "freemarker/ext/beans/MemberAndArguments",
+        "freemarker/template/TemplateModelException",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/reflect/InvocationTargetException"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MethodAppearanceFineTuner.class",
+      "occurrence": 0,
+      "sha256": "7e0e32a7ba216d6bc37c200649e634d55c771ea3e92deb916a7caf9741c7a5a6",
+      "name": "freemarker/ext/beans/MethodAppearanceFineTuner",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "process",
+          "descriptor": "(Lfreemarker/ext/beans/BeansWrapper$MethodAppearanceDecisionInput;Lfreemarker/ext/beans/BeansWrapper$MethodAppearanceDecision;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/BeansWrapper$MethodAppearanceDecision",
+        "freemarker/ext/beans/BeansWrapper$MethodAppearanceDecisionInput",
+        "freemarker/ext/beans/MethodAppearanceFineTuner",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/MethodSorter.class",
+      "occurrence": 0,
+      "sha256": "b0d918b82033760d69e76aee242c817d85376825eb3e8817d0c6784fed3f6d7d",
+      "name": "freemarker/ext/beans/MethodSorter",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "sortMethodDescriptors",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/List<Ljava/beans/MethodDescriptor;>;)V"
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/MethodSorter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/NonPrimitiveArrayBackedReadOnlyList.class",
+      "occurrence": 0,
+      "sha256": "829c6172dc8decf65cd98f293b857c00aee8ca3bef217c6a786b8b9fee252638",
+      "name": "freemarker/ext/beans/NonPrimitiveArrayBackedReadOnlyList",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "array",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b630d9952f16327b56f29bd6c80981fca5239bc45a5ef7c9a91b36634e3bb58c",
+          "code_length": 7
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "860a6294a8cf542dcf8e8f610662efb846f637275fe0d5ed5b6368669c7330a0",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/NonPrimitiveArrayBackedReadOnlyList",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/NumberModel$1.class",
+      "occurrence": 0,
+      "sha256": "1ac32f95220f7bae0f784da1c004d8e55e7e83fe793a9348d38983b3fd86a458",
+      "name": "freemarker/ext/beans/NumberModel$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/ext/util/ModelFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Object;Lfreemarker/template/ObjectWrapper;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "c1484dcecc39f5cc5a289843cfb7f3ea082417830ade3001b815c1892b93d226",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/NumberModel",
+        "freemarker/ext/beans/NumberModel$1",
+        "freemarker/ext/util/ModelFactory",
+        "java/lang/Number",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/NumberModel.class",
+      "occurrence": 0,
+      "sha256": "b1be699baf699bcdbd1d1d610f5d857677e7a69ac1e05069e3b97300fa278dc6",
+      "name": "freemarker/ext/beans/NumberModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "freemarker/ext/beans/BeanModel",
+      "interfaces": [
+        "freemarker/template/TemplateNumberModel"
+      ],
+      "fields": [
+        {
+          "name": "FACTORY",
+          "descriptor": "Lfreemarker/ext/util/ModelFactory;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Number;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "getAsNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "596fd69073e949dc69c5bc305f2ce37803e1733834c3229bd215453b8a7dbab5",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ae306cf026389d4d33b1de029f81e4b997091849f231825a8ac312ca2653fb00",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeanModel",
+        "freemarker/ext/beans/NumberModel",
+        "freemarker/ext/beans/NumberModel$1",
+        "freemarker/template/TemplateNumberModel",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedFixArgsMethods.class",
+      "occurrence": 0,
+      "sha256": "20caceb33593360d430353355ccadadcf6cbaa8b87597dc5c48343e70ffb8697",
+      "name": "freemarker/ext/beans/OverloadedFixArgsMethods",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedMethodsSubset",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "30bb1e04d4a1d03a8a6137208d139809d8f19d6b14a4645862901554a440e8d0",
+          "code_length": 6
+        },
+        {
+          "name": "preprocessParameterTypes",
+          "descriptor": "(Lfreemarker/ext/beans/CallableMemberDescriptor;)[Ljava/lang/Class;",
+          "access": 0,
+          "code_sha256": "8ae76e442ce68e2d26a08ceb8057e2a0b20522cc50892bb6e8a49d7ef56e332b",
+          "code_length": 5
+        },
+        {
+          "name": "afterWideningUnwrappingHints",
+          "descriptor": "([Ljava/lang/Class;[I)V",
+          "access": 0,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getMemberAndArguments",
+          "descriptor": "(Ljava/util/List;Lfreemarker/ext/beans/BeansWrapper;)Lfreemarker/ext/beans/MaybeEmptyMemberAndArguments;",
+          "access": 0,
+          "code_sha256": "2afc100cbd6178385f9dbf05a98f3530c86df82990c7cab83d7b1d9f7399bc94",
+          "code_length": 237,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/CallableMemberDescriptor",
+        "freemarker/ext/beans/EmptyCallableMemberDescriptor",
+        "freemarker/ext/beans/EmptyMemberAndArguments",
+        "freemarker/ext/beans/MemberAndArguments",
+        "freemarker/ext/beans/OverloadedFixArgsMethods",
+        "freemarker/ext/beans/OverloadedMethodsSubset",
+        "freemarker/template/ObjectWrapperAndUnwrapper",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Object",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethods$1.class",
+      "occurrence": 0,
+      "sha256": "efb3287647f3145a807ada462bc371e4871ed9d2cf5974f4a8affbd441814075",
+      "name": "freemarker/ext/beans/OverloadedMethods$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/_DelayedConversionToString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethods;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "cb5e9b3c3e1a549a760167c56b86873ab319d59a0195275a3d7c6c29511a8d2a",
+          "code_length": 11
+        },
+        {
+          "name": "doConversion",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "0e8dec7a16bd325c9b951971e2e3a7d6a5a32e9b327aa3d4cebc5870886ac478",
+          "code_length": 235
+        }
+      ],
+      "class_references": [
+        "freemarker/core/_DelayedConversionToString",
+        "freemarker/ext/beans/CallableMemberDescriptor",
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethods$1",
+        "freemarker/ext/beans/OverloadedMethodsSubset",
+        "java/lang/StringBuilder",
+        "java/util/HashSet",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethods$2.class",
+      "occurrence": 0,
+      "sha256": "9d11c7a7aac89b8013f8828a202eeaa718ba84e27c25ea4ca95d47de21bf2907",
+      "name": "freemarker/ext/beans/OverloadedMethods$2",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethods;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "1ae9c24e34a64a71333c11883aade8dc7387fbb7d7e1b873cbce4379e28a062c",
+          "code_length": 12
+        },
+        {
+          "name": "argumentToString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "19acb1469c2823d2a52d960d21b99df05b3e1d9f46dc9efa711499e178191d9a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethods$2",
+        "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethods$3.class",
+      "occurrence": 0,
+      "sha256": "e2e04fdda9c0f774893e5f218481ddbafaba2daa237c72e9ddbc0313a6035ad3",
+      "name": "freemarker/ext/beans/OverloadedMethods$3",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethods;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;[Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "1ae9c24e34a64a71333c11883aade8dc7387fbb7d7e1b873cbce4379e28a062c",
+          "code_length": 12
+        },
+        {
+          "name": "argumentToString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "17bed0ff8b3f64c89eff82ea5ae0855d1fa73940bc994cbced25f071f69dbec4",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethods$3",
+        "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+        "freemarker/template/utility/ClassUtil",
+        "java/lang/Class"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString.class",
+      "occurrence": 0,
+      "sha256": "9add5d5a3783f976021195ef26b27604a84f3be55e3ca63925ea26282dfabdf3",
+      "name": "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/_DelayedConversionToString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethods;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;[Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cb5e9b3c3e1a549a760167c56b86873ab319d59a0195275a3d7c6c29511a8d2a",
+          "code_length": 11
+        },
+        {
+          "name": "doConversion",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "5fc2f1a4b73dfc4969476a841f90d6c061fa702e8af185127c80f9c2cb2315e4",
+          "code_length": 62
+        },
+        {
+          "name": "argumentToString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1024
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "freemarker/core/_DelayedConversionToString",
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethods.class",
+      "occurrence": 0,
+      "sha256": "0889b426b99d7d48423fb697ca700cbe9083250afd878e0ddca13542c9e35105",
+      "name": "freemarker/ext/beans/OverloadedMethods",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fixArgMethods",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethodsSubset;",
+          "access": 18
+        },
+        {
+          "name": "varargMethods",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethodsSubset;",
+          "access": 2
+        },
+        {
+          "name": "bugfixed",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "60788cecf1cab25328c7b5b83729b3023ac1e0022c1ad063eb65814a0111c256",
+          "code_length": 22
+        },
+        {
+          "name": "addMethod",
+          "descriptor": "(Ljava/lang/reflect/Method;)V",
+          "access": 0,
+          "code_sha256": "03b0db823958722df8019d25cddf78f27e1dd7ea62d1d9459f73997d644d306a",
+          "code_length": 19
+        },
+        {
+          "name": "addConstructor",
+          "descriptor": "(Ljava/lang/reflect/Constructor;)V",
+          "access": 0,
+          "code_sha256": "4cc7e193a01b4715d69b2d4a5e221b4a02d5c000099c4abf06b2c3935a406670",
+          "code_length": 19
+        },
+        {
+          "name": "addCallableMemberDescriptor",
+          "descriptor": "(Lfreemarker/ext/beans/ReflectionCallableMemberDescriptor;)V",
+          "access": 2,
+          "code_sha256": "619c49932dea669befc8095278b94f4a46d991b9ff2fd12f1f319260bd76b7e4",
+          "code_length": 46
+        },
+        {
+          "name": "getMemberAndArguments",
+          "descriptor": "(Ljava/util/List;Lfreemarker/ext/beans/BeansWrapper;)Lfreemarker/ext/beans/MemberAndArguments;",
+          "access": 0,
+          "code_sha256": "168c9c9107b9bde2cd7ed0698ea90b94438e82402620ef29ae33a53d6addc8c8",
+          "code_length": 131,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "toCompositeErrorMessage",
+          "descriptor": "(Lfreemarker/ext/beans/EmptyMemberAndArguments;Lfreemarker/ext/beans/EmptyMemberAndArguments;Ljava/util/List;)[Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "c31378f3bdd578c0066d1f1e6c41ef950a9450573ba8ae44d87b9f9582c7dbfa",
+          "code_length": 74
+        },
+        {
+          "name": "toErrorMessage",
+          "descriptor": "(Lfreemarker/ext/beans/EmptyMemberAndArguments;Ljava/util/List;)[Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "de9d80c11e563a1468c62d16582067cc759dada14c8d31e8b1c93b22f19fb019",
+          "code_length": 98
+        },
+        {
+          "name": "memberListToString",
+          "descriptor": "()Lfreemarker/core/_DelayedConversionToString;",
+          "access": 2,
+          "code_sha256": "181ec2bda9b20bb36a5c08a6b03eccc5edb896211bc717506a443f075aec6cb0",
+          "code_length": 10
+        },
+        {
+          "name": "addMarkupBITipAfterNoNoMarchIfApplicable",
+          "descriptor": "(Lfreemarker/core/_ErrorDescriptionBuilder;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "1395140210d94f3bd5a85f4111ca9bf7973b6669fdf77c6a191b8eeea353b2ee",
+          "code_length": 176
+        },
+        {
+          "name": "getTMActualParameterTypes",
+          "descriptor": "(Ljava/util/List;)Lfreemarker/core/_DelayedConversionToString;",
+          "access": 2,
+          "code_sha256": "97147da6fd9df20163726bbf90f0688b6ddd13244cda185ef8da464ce4cdbb41",
+          "code_length": 54
+        },
+        {
+          "name": "getUnwrappedActualParameterTypes",
+          "descriptor": "([Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "b4fd14d949dbf6b995335bab13559fcc01191e352c02d689b1b95b5050e380a6",
+          "code_length": 52
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;)Lfreemarker/ext/beans/OverloadedMethodsSubset;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lfreemarker/ext/beans/OverloadedMethods;)Lfreemarker/ext/beans/OverloadedMethodsSubset;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/TemplateMarkupOutputModel",
+        "freemarker/core/_ErrorDescriptionBuilder",
+        "freemarker/core/_TemplateModelException",
+        "freemarker/ext/beans/CallableMemberDescriptor",
+        "freemarker/ext/beans/EmptyMemberAndArguments",
+        "freemarker/ext/beans/MemberAndArguments",
+        "freemarker/ext/beans/OverloadedFixArgsMethods",
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethods$1",
+        "freemarker/ext/beans/OverloadedMethods$2",
+        "freemarker/ext/beans/OverloadedMethods$3",
+        "freemarker/ext/beans/OverloadedMethods$DelayedCallSignatureToString",
+        "freemarker/ext/beans/OverloadedMethodsSubset",
+        "freemarker/ext/beans/OverloadedVarArgsMethods",
+        "freemarker/ext/beans/ReflectionCallableMemberDescriptor",
+        "freemarker/ext/beans/SimpleMethodModel",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/ClassUtil",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Method",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethodsModel.class",
+      "occurrence": 0,
+      "sha256": "a21e1f6211f267e3488ed327cad0adfea9d0a8762f99a98dacfee0ba41866fc7",
+      "name": "freemarker/ext/beans/OverloadedMethodsModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateSequenceModel"
+      ],
+      "fields": [
+        {
+          "name": "object",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "overloadedMethods",
+          "descriptor": "Lfreemarker/ext/beans/OverloadedMethods;",
+          "access": 18
+        },
+        {
+          "name": "wrapper",
+          "descriptor": "Lfreemarker/ext/beans/BeansWrapper;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Lfreemarker/ext/beans/OverloadedMethods;Lfreemarker/ext/beans/BeansWrapper;)V",
+          "access": 0,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0eaad845138462d947b401ec4543bdedb58cb84692e29a2619205ef504f677ff",
+          "code_length": 52,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "e861df59213e781788912e58ea093700b3725f0381af09158ef7a989b06a072d",
+          "code_length": 22,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9309dea3a9a8509fe476b1884156d408c4259b6173ad80bafad089a8f58f43b2",
+          "code_length": 33,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/MemberAndArguments",
+        "freemarker/ext/beans/OverloadedMethods",
+        "freemarker/ext/beans/OverloadedMethodsModel",
+        "freemarker/ext/beans/_MethodUtil",
+        "freemarker/template/SimpleNumber",
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateSequenceModel",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedMethodsSubset.class",
+      "occurrence": 0,
+      "sha256": "e069f0e9763a49e6c4ea4cbb6318a98f70ca2cf5a52638d01c23156e04cd2d73",
+      "name": "freemarker/ext/beans/OverloadedMethodsSubset",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ALL_ZEROS_ARRAY",
+          "descriptor": "[I",
+          "access": 24
+        },
+        {
+          "name": "ZERO_PARAM_COUNT_TYPE_FLAGS_ARRAY",
+          "descriptor": "[[I",
+          "access": 26
+        },
+        {
+          "name": "unwrappingHintsByParamCount",
+          "descriptor": "[[Ljava/lang/Class;",
+          "access": 2
+        },
+        {
+          "name": "typeFlagsByParamCount",
+          "descriptor": "[[I",
+          "access": 2
+        },
+        {
+          "name": "argTypesToMemberDescCache",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18
+        },
+        {
+          "name": "memberDescs",
+          "descriptor": "Ljava/util/List;",
+          "access": 18
+        },
+        {
+          "name": "bugfixed",
+          "descriptor": "Z",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "13ed96122decadebb7eccb55e095dcc21fbdc9f511e06f07233c0d560796d22b",
+          "code_length": 37
+        },
+        {
+          "name": "addCallableMemberDescriptor",
+          "descriptor": "(Lfreemarker/ext/beans/ReflectionCallableMemberDescriptor;)V",
+          "access": 0,
+          "code_sha256": "16fd01fd4ec627c50e072d142fd8836d6d33d1a148cbb9f6523ddea0167833c5",
+          "code_length": 263
+        },
+        {
+          "name": "getUnwrappingHintsByParamCount",
+          "descriptor": "()[[Ljava/lang/Class;",
+          "access": 0,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "getMemberDescriptorForArgs",
+          "descriptor": "([Ljava/lang/Object;Z)Lfreemarker/ext/beans/MaybeEmptyCallableMemberDescriptor;",
+          "access": 16,
+          "code_sha256": "78114cecbaef8499b355e0e6a93384535a54e21e0ba7f4a17f9e89a08732bec5",
+          "code_length": 102
+        },
+        {
+          "name": "getMemberDescriptors",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 0,
+          "code_sha256": "5cb86f15672531843f1c4ecf241982b131344408bd9e13b063608c5bcc95341f",
+          "code_length": 10
+        },
+        {
+          "name": "preprocessParameterTypes",
+          "descriptor": "(Lfreemarker/ext/beans/CallableMemberDescriptor;)[Ljava/lang/Class;",
+          "access": 1024
+        },
+        {
+          "name": "afterWideningUnwrappingHints",
+          "descriptor": "([Ljava/lang/Class;[I)V",
+          "access": 1024
+        },
+        {
+          "name": "getMemberAndArguments",
+          "descriptor": "(Ljava/util/List;Lfreemarker/ext/beans/BeansWrapper;)Lfreemarker/ext/beans/MaybeEmptyMemberAndArguments;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getCommonSupertypeForUnwrappingHint",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 4,
+          "code_sha256": "38c968bd945de4281e0c418ed63ab4db047955ff10b80c65534ff9718d7db3b3",
+          "code_length": 500
+        },
+        {
+          "name": "getTypeFlags",
+          "descriptor": "(I)[I",
+          "access": 20,
+          "code_sha256": "1ff132a64f023f036a57923eac09fe0456ffbc9c0de1293cc5766b268627136b",
+          "code_length": 27
+        },
+        {
+          "name": "mergeInTypesFlags",
+          "descriptor": "(I[I)V",
+          "access": 20,
+          "code_sha256": "621e45ee5cfa6896422f1b6944a96210e856e93ed69a55cdfa0c3f479f9ab4c5",
+          "code_length": 305
+        },
+        {
+          "name": "forceNumberArgumentsToParameterTypes",
+          "descriptor": "([Ljava/lang/Object;[Ljava/lang/Class;[I)V",
+          "access": 4,
+          "code_sha256": "ceda2d3a49041395254cee893df56948f5c452bdd86fe3b344c20bb021d3cabe",
+          "code_length": 103
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "88d116b72197f35da9de96256be2e79164804371f32ccc02c97899a43f7c1b8e",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Class;",
+        "freemarker/ext/beans/ArgumentTypes",
+        "freemarker/ext/beans/BeansWrapper",
+        "freemarker/ext/beans/MaybeEmptyCallableMemberDescriptor",
+        "freemarker/ext/beans/OverloadedMethodsSubset",
+        "freemarker/ext/beans/TypeFlags",
+        "freemarker/ext/beans/_MethodUtil",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/utility/ClassUtil",
+        "freemarker/template/utility/NullArgumentException",
+        "java/io/Serializable",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Cloneable",
+        "java/lang/Comparable",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/Short",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigDecimalSource.class",
+      "occurrence": 0,
+      "sha256": "0a4e860ad7b11d135f657d067a2f5703893d71883b7f49413312c88f8f1f1b87",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigDecimalSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "bigDecimalValue",
+          "descriptor": "()Ljava/math/BigDecimal;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigDecimalSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrByte.class",
+      "occurrence": 0,
+      "sha256": "91bdcdb63548348d7a35abe2861f47a43697ca0265ae87113fe1e046db1526b0",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrByte",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrByte",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrDouble.class",
+      "occurrence": 0,
+      "sha256": "c2d40ceff09b73a207a3c2e5125b392de93bacf32bc5a3b1cd59c6958f28298e",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrDouble",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrDouble",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive.class",
+      "occurrence": 0,
+      "sha256": "bc48647c9020b499e66c67c499357c9cf9747bd27720678742ab1d16a944d9d8",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "4a6d3f6e08689c1b35172002a269f0e47d0c97d44643ac354d98f75b0dbadeae",
+          "code_length": 9
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "dca89b447d4f0dec8db4b4fc9a2a88b95064e4a9b4a37d5ca606eea357ffc118",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+        "java/math/BigInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFloat.class",
+      "occurrence": 0,
+      "sha256": "54b424ab2d5c9a9528b67863636e172f57895b0d16637b4ad398ac1c9aba7c7c",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFloat",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFPPrimitive",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrFloat"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrInteger.class",
+      "occurrence": 0,
+      "sha256": "d7e44a6f113fc216741a452e5c5408f9501eb3ed3e8537f97efd8fac82e671dd",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrLong.class",
+      "occurrence": 0,
+      "sha256": "c72e76912237840846d5313faf367326bfc99ec033385a86a75db4295fde91f0",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrLong",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrLong",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive.class",
+      "occurrence": 0,
+      "sha256": "c9f9d9ce9c37ffb845b2fd5a7fa015795f381a6a75b02bf67c80fd1df8069255",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/math/BigInteger;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrShort.class",
+      "occurrence": 0,
+      "sha256": "ef3a670818fc6744edd61447b9f9aefb681236185486b2bb9229d5269fb3a550",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrShort",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrPrimitive",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerOrShort"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerSource.class",
+      "occurrence": 0,
+      "sha256": "517348efabc2613d3cae5ca75902e3d55f0a0a2ade700e9e306d6cbe13c55765",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "bigIntegerValue",
+          "descriptor": "()Ljava/math/BigInteger;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$BigIntegerSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$ByteSource.class",
+      "occurrence": 0,
+      "sha256": "32e6c98388a40077ff220776e5556aeead87e0b9317c23627c5ed0560f4a094a",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$ByteSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "byteValue",
+          "descriptor": "()Ljava/lang/Byte;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$ByteSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrByte.class",
+      "occurrence": 0,
+      "sha256": "b0ea9231dbf5acf306ee49a7f922216de43e192550c330cfad86a0286a4ddb7a",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrByte",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;B)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "0367d2744e6ccbe06692cfc605f9b7a98e92cc3f64d37df2e04bd7e6e30a7012",
+          "code_length": 6
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrByte",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrFloat.class",
+      "occurrence": 0,
+      "sha256": "249d3f6eaf053ded75415b0fa3eabcb45b258049b960bb69c0821a0fa1777dd5",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrFloat",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/lang/Double;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5cf4b864a2318cf050a25d2055c66ebbb1646fee6ed54ed36ef844f92ca21242",
+          "code_length": 8
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "b60053da2d0150d2087111bcd67d05e3a816e3e2f17bee2a01b9489010cf923e",
+          "code_length": 8
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrFloat",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Double"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrInteger.class",
+      "occurrence": 0,
+      "sha256": "799a99bb22ebba2323be9c73d830dd118570fc0c48b28b13ef490823a538bc82",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;I)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrIntegerOrFloat.class",
+      "occurrence": 0,
+      "sha256": "e55e6dcbb8876b4a2d9a8f2e2510f878142ce4b82e550dcdda726ff8da8461da",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrIntegerOrFloat",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;I)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrIntegerOrFloat",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrLong.class",
+      "occurrence": 0,
+      "sha256": "7a2e89dc3f3967d3eaf32b5122fdf027f27f5f052f4624ac5aaa0e06ea1cc891",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrLong",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;J)V",
+          "access": 0,
+          "code_sha256": "fe05bd9f31a8b46073801b1c24f78c0ba3eeffda729e39c8d47318aa88dc59be",
+          "code_length": 11
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrLong",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrShort.class",
+      "occurrence": 0,
+      "sha256": "0b696904e65225a724d40e484e6038599e022fa8bf750bff6f74464b6f1d5ea8",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrShort",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "S",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;S)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrShort",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber.class",
+      "occurrence": 0,
+      "sha256": "9b55cc50f44629c9d1397be60171cf4a603fc05f2a53a0fe45d27b7e005fe0ec",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/lang/Double;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Double;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "04beba0f779d8c93c24df34ba195ae32d5bc73f217c2d3d6fbd5ae68d135073a",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleOrWholeNumber",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Double"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$DoubleSource.class",
+      "occurrence": 0,
+      "sha256": "b3d1bcbb56ab72680750265bee4742e909d45f50954461a2db259a1cfc4c9bc4",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$DoubleSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "doubleValue",
+          "descriptor": "()Ljava/lang/Double;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$DoubleSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrByte.class",
+      "occurrence": 0,
+      "sha256": "6024f4bb51fd3e2f473a28a0f54d6b5ae9552e5fd71ca9f76ab3ac36b7b60e6d",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrByte",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Float;B)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "0367d2744e6ccbe06692cfc605f9b7a98e92cc3f64d37df2e04bd7e6e30a7012",
+          "code_length": 6
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrByte",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrInteger.class",
+      "occurrence": 0,
+      "sha256": "6c6a731eaaa74bf6aab9b91d67187f0222a65c1051e2a268ebebcbf066ba2137",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Float;I)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrShort.class",
+      "occurrence": 0,
+      "sha256": "19156789ed9c453bc919a5b42b89545edab00d71c37147a11692f6ac619f1ef4",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrShort",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "S",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Float;S)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrShort",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber.class",
+      "occurrence": 0,
+      "sha256": "8284e058fd5d9bd8e21ebc4924a7a6e9c238c193789eb0fc424275b3adbe6497",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/lang/Float;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Float;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "5cf4b864a2318cf050a25d2055c66ebbb1646fee6ed54ed36ef844f92ca21242",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatOrWholeNumber",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$FloatSource.class",
+      "occurrence": 0,
+      "sha256": "f993a51ce3e3db7d5ebbb7981bea0d70d980850618d50e70ee1c22e751186d77",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$FloatSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "floatValue",
+          "descriptor": "()Ljava/lang/Float;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$FloatSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$IntegerBigDecimal.class",
+      "occurrence": 0,
+      "sha256": "dc5b0ee99aa787e170fb490612f4ce8b904752d5969c51fd955ac98812306bb4",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$IntegerBigDecimal",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/math/BigDecimal;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigDecimal;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "bigIntegerValue",
+          "descriptor": "()Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "76ac1e4adf5662f17c6ebd42f6461b24bbaafe428c15d462787286de78ea82a1",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerBigDecimal",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/math/BigDecimal"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrByte.class",
+      "occurrence": 0,
+      "sha256": "7d7e46ab73e1c592ec461aaee878d20787e9b431a9ceabcce8bdd703921d5047",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrByte",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Integer;B)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrByte",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrShort.class",
+      "occurrence": 0,
+      "sha256": "df1dd5ca56a8b2bccdcd1131a1652025d844c917e48d8cb8adccb7e0b7f38b1f",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrShort",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "S",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Integer;S)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrShort",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger.class",
+      "occurrence": 0,
+      "sha256": "34491ca40809beed6be3b81ae0d9fe7281f44411cbc7842feaac1e5be0130d96",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Integer;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerOrSmallerInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$IntegerSource.class",
+      "occurrence": 0,
+      "sha256": "d2cb4ffb9c44e0cdc941d5394e9e7c691af7f55523d6ee601c6e82b2182fc197",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$IntegerSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "integerValue",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$IntegerSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$LongOrByte.class",
+      "occurrence": 0,
+      "sha256": "1413ad235ba104a453985b43f34aedf5c226d326157b31c3e17255eabbd775bc",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$LongOrByte",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Long;B)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrByte",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$LongOrInteger.class",
+      "occurrence": 0,
+      "sha256": "2cbae3c7febc5a9a906e81462ab374a6088ea4efb4d0b05ba566502fcd4de0b1",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$LongOrInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Long;I)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$LongOrShort.class",
+      "occurrence": 0,
+      "sha256": "15e32f5d9ecbfabff060bbcdeadf1f0f968dde2e9b7a61c110562e15755e006b",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$LongOrShort",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "w",
+          "descriptor": "S",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Long;S)V",
+          "access": 0,
+          "code_sha256": "7f18e93a526bc7d3fc6edd46d05635fcdda95ccd70fac7bfb2d3bae5ac345fa8",
+          "code_length": 11
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrShort",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger.class",
+      "occurrence": 0,
+      "sha256": "067625eeaba22800944d864dc15397ce085baefc201a3fb19dcd46e08aad9937",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "n",
+          "descriptor": "Ljava/lang/Long;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Long;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "e17ac317866c48ffc1d9bf1e1d288e2304728416abeb9e0bb2306d1787f1a1d7",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongOrSmallerInteger",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Long"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$LongSource.class",
+      "occurrence": 0,
+      "sha256": "76547da8580f61d4bf19697c509905064dcd50bce468a27c030236124a3f796f",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$LongSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "longValue",
+          "descriptor": "()Ljava/lang/Long;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$LongSource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType.class",
+      "occurrence": 0,
+      "sha256": "aaca72d7d618cd3d27fb93eee8b655dff4f45c6744a3ae6280444f003a1dd30c",
+      "name": "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Number",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSourceNumber",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 1028
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2a85dc77086b2d523b0b3d5bd11f4f637623f46d2a6badd024fe0d14bb45b60a",
+          "code_length": 8
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ae05559693e955bcde5f42d6bd2fec152a98426a833cc785ea058dce46147108",
+          "code_length": 8
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "f092fd0ace6f62f8d37eb55334730dad0e6667b527cbd1d189ded8da532ad72a",
+          "code_length": 8
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8234a79bdcc2cd274a315abfb6a99b1b5c7d76f408c65e78528ffe4fa00663a0",
+          "code_length": 8
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "aa3972cbe9dd8c9abe7652866b2b189451488054d8554dbe1cc7c5c036fc7cb9",
+          "code_length": 8
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "8cada7ae6aebccfcdb945622d492bddd19a87efdd89e684ad2d0ac7059918cb2",
+          "code_length": 8
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "80da3e263e4e0cd4ae46662dba20e05c3a5b35fa25489fe60bd796f844fd218f",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "090518f7215aea22aa8df5c8b4723366850b30722f030481a73af47a2c47c776",
+          "code_length": 32
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6d802f1ef37723d1845bad8181566da7b825533b42750c4e9a15be4abb091c8c",
+          "code_length": 8
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "95885174b63252b3ddf07926a64395c0c6f1a44853ce33067cca69fad0e78080",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "freemarker/ext/beans/OverloadedNumberUtil",
+        "freemarker/ext/beans/OverloadedNumberUtil$NumberWithFallbackType",
+        "java/lang/Class",
+        "java/lang/ClassCastException",
+        "java/lang/Comparable",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    }
+  ]
+}

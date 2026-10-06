@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimization.jar",
+  "sha256": "7d5039a1c9d0868b8ed2e64913b46a0329bd79f8bc01d4546e899a7a26c6ee7e",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationPlugin.class": "35a3a053f93b6f04120ec795f701f98ffd3c86c0f03e3d6bfe72f6c3da4dfd6a",
+    "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet.class": "e845c418debb6cadaa8a86b951844f73823f089e029fffdce47c1e0bf8afea24"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationPlugin.class",
+      "occurrence": 0,
+      "sha256": "35a3a053f93b6f04120ec795f701f98ffd3c86c0f03e3d6bfe72f6c3da4dfd6a",
+      "member_shard": "docs/dev/evidence/sqx145/members/213/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SequentialOptimization/SequentialOptimizationServlet.class",
+      "occurrence": 0,
+      "sha256": "e845c418debb6cadaa8a86b951844f73823f089e029fffdce47c1e0bf8afea24",
+      "member_shard": "docs/dev/evidence/sqx145/members/213/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/213/001.json",
+      "sha256": "529e01890b8e458af5c676ba5e66cacce3d6d57f8e48f6dbb8644f234c845242"
+    }
+  ]
+}

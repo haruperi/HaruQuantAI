@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+  "sha256": "b14b83a58c5191fb5a4b7d9b79ec0c81ae70b31263f07d12a19ea559aec8181f",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsPlugin.class": "a2a6b612b727101da904c713743d9f95cc0240d38d9041f5928a74078a969e98",
+    "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet$1.class": "304644fee6605fc2d0a2bf9c44ca74bc9ba7127155b5ba6bd86f2740e4fffa8b",
+    "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet.class": "7ea8df108c7bb5fb33fe74f8166b4d5c0bbc7044b89df770f788e93924908363"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsPlugin.class",
+      "occurrence": 0,
+      "sha256": "a2a6b612b727101da904c713743d9f95cc0240d38d9041f5928a74078a969e98",
+      "member_shard": "docs/dev/evidence/sqx145/members/201/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet$1.class",
+      "occurrence": 0,
+      "sha256": "304644fee6605fc2d0a2bf9c44ca74bc9ba7127155b5ba6bd86f2740e4fffa8b",
+      "member_shard": "docs/dev/evidence/sqx145/members/201/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet.class",
+      "occurrence": 0,
+      "sha256": "7ea8df108c7bb5fb33fe74f8166b4d5c0bbc7044b89df770f788e93924908363",
+      "member_shard": "docs/dev/evidence/sqx145/members/201/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/201/001.json",
+      "sha256": "c32db6e61ee6b1d67a5e9a5367d244c5c394c9e44019d3a7f83928f208961850"
+    }
+  ]
+}

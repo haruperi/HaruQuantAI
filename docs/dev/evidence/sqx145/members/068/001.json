@@ -1,0 +1,1286 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jsonschema-module-jackson-4.38.0.jar",
+  "archive_sha256": "36fbd3f1c27379c3ba8420ac2cb0b42411f7bc3b3df8bdd11d8d7e024a1c28ca",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JacksonOption.class",
+      "occurrence": 0,
+      "sha256": "5e59fdd7a2622c830b1f82aaeeb0caead28b39f9a4044f8e93d96dbc8b0996ef",
+      "name": "com/github/victools/jsonschema/module/jackson/JacksonOption",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FLATTENED_ENUMS_FROM_JSONVALUE",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "FLATTENED_ENUMS_FROM_JSONPROPERTY",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "RESPECT_JSONPROPERTY_ORDER",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "IGNORE_PROPERTY_NAMING_STRATEGY",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "ALWAYS_REF_SUBTYPES",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "INLINE_TRANSFORMED_SUBTYPES",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "SKIP_SUBTYPE_LOOKUP",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "IGNORE_TYPE_INFO_TRANSFORM",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "RESPECT_JSONPROPERTY_REQUIRED",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "JSONIDENTITY_REFERENCE_ALWAYS_AS_ID",
+          "descriptor": "Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4e05e4091b5669a7c04d8a12c867cb5d28c590524922f1f2567852b233e4eeae",
+          "code_length": 228
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/github/victools/jsonschema/module/jackson/JacksonOption;>;",
+      "class_references": [
+        "[Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+        "com/github/victools/jsonschema/module/jackson/JacksonOption",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver.class",
+      "occurrence": 0,
+      "sha256": "717b84ba2d9f565c4a63376ea8c9a40c0e9acd37cb4287e007b4bccd11183eb4",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/victools/jsonschema/generator/SubtypeResolver",
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2"
+      ],
+      "fields": [
+        {
+          "name": "wrappingSubtypeDefinitionType",
+          "descriptor": "Lcom/github/victools/jsonschema/generator/CustomDefinition$DefinitionType;",
+          "access": 18
+        },
+        {
+          "name": "shouldInlineNestedSubtypes",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "identityReferenceProvider",
+          "descriptor": "Ljava/util/Optional;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Optional<Lcom/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a1cb2dd63d76ca82ba520c78f40439c6adb2fb8ffcab23060f564c1992bc669e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;)V",
+          "access": 1,
+          "code_sha256": "f1454281f55ed833186837d753c5aee0b74016ec5677b973f565e0169116ca15",
+          "code_length": 79,
+          "generic_signature": "(Ljava/util/Collection<Lcom/github/victools/jsonschema/module/jackson/JacksonOption;>;)V"
+        },
+        {
+          "name": "skipSubtypeResolution",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Z",
+          "access": 2,
+          "code_sha256": "350e6f6473023169d870a56ef98106cd76def170f834c7aca5d6cd7a1b5041ce",
+          "code_length": 32,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Z"
+        },
+        {
+          "name": "skipSubtypeResolution",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;)Z",
+          "access": 2,
+          "code_sha256": "a80818975228c5c1f654e7e33d6e47a9782ba0511f114ad766db233c59be0a8f",
+          "code_length": 18
+        },
+        {
+          "name": "findSubtypes",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "bb0a022888c9f74d19d5c317a6541c5ab1c587b8bcfde808e698e3f17c73acfe",
+          "code_length": 49,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "findTargetTypeOverrides",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "26a2096775a9a1bb5f4e91c3820c6bbefb7f26d71da1cdfd6a39497caf4d2b20",
+          "code_length": 37,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "lookUpSubtypesFromAnnotation",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/jackson/annotation/JsonSubTypes;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "af33faad3b83f9e4a2623cbd194b6284e592056344cdf9b6e6a77b5551ab1de4",
+          "code_length": 40,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/jackson/annotation/JsonSubTypes;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "resolveSubtype",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/jackson/annotation/JsonSubTypes$Type;Lcom/github/victools/jsonschema/generator/TypeContext;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "01c3b5f89ad929c19bb1d0c8403f2d59d2a5b80b480746a4fa71129649144da2",
+          "code_length": 29
+        },
+        {
+          "name": "provideCustomSchemaDefinition",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomDefinition;",
+          "access": 1,
+          "code_sha256": "b6c22810bf49028a2ef9ef358f17dcf215552b5c2896fc6b41884a353cf07e4e",
+          "code_length": 152
+        },
+        {
+          "name": "provideCustomPropertySchemaDefinition",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomPropertyDefinition;",
+          "access": 1,
+          "code_sha256": "c46a9cb27a916df44e261d29580ffbf97cd3c019c324c780a3931d4051f2a74b",
+          "code_length": 162,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomPropertyDefinition;"
+        },
+        {
+          "name": "getTypeIdentifier",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/jackson/annotation/JsonTypeInfo;Lcom/fasterxml/jackson/annotation/JsonSubTypes;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "14c01ec81ad515a0492f273fd325f1fc791e8677ef9edc7fb6461ee75d557830",
+          "code_length": 84
+        },
+        {
+          "name": "getNameFromSubTypeAnnotation",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/jackson/annotation/JsonSubTypes;)Ljava/util/Optional;",
+          "access": 10,
+          "code_sha256": "24642b52e3e2be9fe579d4259594dfe658ec6aff0a8796e609919334591e7230",
+          "code_length": 50,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/jackson/annotation/JsonSubTypes;)Ljava/util/Optional<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getNameFromTypeNameAnnotation",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Optional;",
+          "access": 10,
+          "code_sha256": "27bc213c8e2ff581059327a115d6d8464bda28c1b1399c60e41f089041644ecb",
+          "code_length": 26,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Optional<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getUnqualifiedClassName",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "eb7bd3a1cc9aeabc51b4062c99900f44ce0169c4bcacd362eabec9e60ac63078",
+          "code_length": 44,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/String;"
+        },
+        {
+          "name": "createSubtypeDefinition",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/TypeScope;Lcom/fasterxml/jackson/annotation/JsonTypeInfo;Lcom/fasterxml/jackson/annotation/JsonSubTypes;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 2,
+          "code_sha256": "979d2f97a09b5a6fb96b7d2e7092ddedc93104508f8d36d2772a3c3e719b5faa",
+          "code_length": 141
+        },
+        {
+          "name": "createSubtypeDefinitionForWrapperArrayTypeInfo",
+          "descriptor": "(Lcom/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails;)V",
+          "access": 2,
+          "code_sha256": "4cf39d86a2aeea3fb250b11da22a8dcfe601542ee88c737ffaeb1f6fd2b048e4",
+          "code_length": 148
+        },
+        {
+          "name": "createSubtypeDefinitionForWrapperObjectTypeInfo",
+          "descriptor": "(Lcom/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails;)V",
+          "access": 2,
+          "code_sha256": "06037dfa06d91ed652aa91121ca0ed9a09efef97c88555c3559f3539abe890d1",
+          "code_length": 133
+        },
+        {
+          "name": "createSubtypeDefinitionForPropertyTypeInfo",
+          "descriptor": "(Lcom/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails;Lcom/fasterxml/jackson/annotation/JsonTypeInfo;)V",
+          "access": 2,
+          "code_sha256": "fe9981ab18d6a26792596fec1cf77accae100a1264fc8e60f6632a12e69f471e",
+          "code_length": 176
+        },
+        {
+          "name": "createNestedSubtypeSchema",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 2,
+          "code_sha256": "5ce35900c76ad85e121f4dc36e112271a5f4b205f73f6230c2420f4596ff5839",
+          "code_length": 25
+        },
+        {
+          "name": "getAttributesToInclude",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/TypeScope;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 2,
+          "code_sha256": "93049c734a18a718b5f5f1ece20d677add9c7b467cc982f0f4d34c88921c4121",
+          "code_length": 42
+        },
+        {
+          "name": "lambda$createSubtypeDefinitionForPropertyTypeInfo$9",
+          "descriptor": "(Lcom/fasterxml/jackson/annotation/JsonTypeInfo;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "98b95d0b3b66dbf0cd27fc6cbfd02f685e0c03450e962cabf59b5df58db313e3",
+          "code_length": 10
+        },
+        {
+          "name": "lambda$createSubtypeDefinitionForPropertyTypeInfo$8",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "5fc09e5d1f7e5cf3b8ee53aea4a3268027e43bd19d8226c0d3cf30c4d27f9399",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$getNameFromTypeNameAnnotation$7",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "5fc09e5d1f7e5cf3b8ee53aea4a3268027e43bd19d8226c0d3cf30c4d27f9399",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$getNameFromSubTypeAnnotation$6",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "5fc09e5d1f7e5cf3b8ee53aea4a3268027e43bd19d8226c0d3cf30c4d27f9399",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$getNameFromSubTypeAnnotation$5",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/jackson/annotation/JsonSubTypes$Type;)Z",
+          "access": 4106,
+          "code_sha256": "2bc3870b558e6c4c19b4ba67d24e558e42790c2ecf973a626b4679c31d8e13fd",
+          "code_length": 11
+        },
+        {
+          "name": "lambda$getTypeIdentifier$4",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "4e58770f9d0296d8db950295fe707c2b27a9091a891ef7f90f7903ee76e0f1eb",
+          "code_length": 17
+        },
+        {
+          "name": "lambda$getTypeIdentifier$3",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "ef816367d967fe7cf7348b26631b93956f9aa441250ff63afd7d9252e1a1a974",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$lookUpSubtypesFromAnnotation$2",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;Lcom/fasterxml/jackson/annotation/JsonSubTypes$Type;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 4098,
+          "code_sha256": "450ef956da1e8c236fba98eae92daa3b19404936843085b06b24f1ce74eb6a6b",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$skipSubtypeResolution$1",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;Lcom/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider;)Ljava/util/Optional;",
+          "access": 4106,
+          "code_sha256": "c1cba75aefc31dec7a0f37f104a58a4a957f2023105a41dee9cc4585b6d0ccdf",
+          "code_length": 7
+        },
+        {
+          "name": "lambda$skipSubtypeResolution$0",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;Lcom/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider;)Ljava/util/Optional;",
+          "access": 4106,
+          "code_sha256": "f66e28ba38cf3538df5310b76768ed44b1735527f13a60a13b0b7430f57ed8a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/jackson/annotation/JsonSubTypes",
+        "com/fasterxml/jackson/annotation/JsonSubTypes$Type",
+        "com/fasterxml/jackson/annotation/JsonTypeInfo",
+        "com/fasterxml/jackson/annotation/JsonTypeInfo$As",
+        "com/fasterxml/jackson/annotation/JsonTypeInfo$Id",
+        "com/fasterxml/jackson/annotation/JsonTypeName",
+        "com/fasterxml/jackson/databind/node/ArrayNode",
+        "com/fasterxml/jackson/databind/node/ObjectNode",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/CustomDefinition",
+        "com/github/victools/jsonschema/generator/CustomDefinition$AttributeInclusion",
+        "com/github/victools/jsonschema/generator/CustomDefinition$DefinitionType",
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2",
+        "com/github/victools/jsonschema/generator/CustomPropertyDefinition",
+        "com/github/victools/jsonschema/generator/FieldScope",
+        "com/github/victools/jsonschema/generator/MemberScope",
+        "com/github/victools/jsonschema/generator/MethodScope",
+        "com/github/victools/jsonschema/generator/SchemaGenerationContext",
+        "com/github/victools/jsonschema/generator/SchemaGeneratorConfig",
+        "com/github/victools/jsonschema/generator/SchemaKeyword",
+        "com/github/victools/jsonschema/generator/SubtypeResolver",
+        "com/github/victools/jsonschema/generator/TypeContext",
+        "com/github/victools/jsonschema/generator/TypeScope",
+        "com/github/victools/jsonschema/generator/impl/AttributeCollector",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "com/github/victools/jsonschema/module/jackson/JacksonOption",
+        "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Type",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/List",
+        "java/util/Optional",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "89e3f5e69ee0de45759e55ad78b173980fc1ecb98919cdf675611341e33948e7",
+      "name": "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2"
+      ],
+      "fields": [
+        {
+          "name": "checkForJsonValueAnnotatedMethod",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "checkForJsonPropertyAnnotations",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZZ)V",
+          "access": 1,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "provideCustomSchemaDefinition",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomDefinition;",
+          "access": 1,
+          "code_sha256": "96e2594ec8fbf94bfb0c85d7b077a1695cde0f057f3911620fd757f0169f482d",
+          "code_length": 146
+        },
+        {
+          "name": "getSerializedValuesFromJsonValue",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;[Ljava/lang/Object;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "0315cf936b41f6343e887d14a1464b5b888172793d5ed11994580b286f210aa8",
+          "code_length": 89,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;[Ljava/lang/Object;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getJsonValueAnnotatedMethod",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4,
+          "code_sha256": "c7e1d4565b9596654a72f28aa4428b32eccc784b94803fb78e05601ce371f9a6",
+          "code_length": 80
+        },
+        {
+          "name": "getSerializedValuesFromJsonProperty",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;[Ljava/lang/Object;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "6af7ff890bbe055de01d55128730ecf896057b957021843033abb5f1667891be",
+          "code_length": 124,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;[Ljava/lang/Object;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "lambda$getJsonValueAnnotatedMethod$1",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedMethod;)Z",
+          "access": 4106,
+          "code_sha256": "7c3ce3f5483ff884ae15577307b0de9fdc225dbf6a4c9e69ccb68b78e60b7958",
+          "code_length": 31
+        },
+        {
+          "name": "lambda$getJsonValueAnnotatedMethod$0",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedMethod;)Z",
+          "access": 4106,
+          "code_sha256": "d59c48b91d3bc339b3af6f4d69ea4149aaef7ec86ad99e7978446dcdc8a7f9f2",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+        "[Ljava/lang/Object;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/members/ResolvedMethod",
+        "com/fasterxml/jackson/annotation/JsonProperty",
+        "com/fasterxml/jackson/annotation/JsonValue",
+        "com/fasterxml/jackson/databind/node/ObjectNode",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/CustomDefinition",
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2",
+        "com/github/victools/jsonschema/generator/SchemaGenerationContext",
+        "com/github/victools/jsonschema/generator/SchemaGeneratorConfig",
+        "com/github/victools/jsonschema/generator/SchemaKeyword",
+        "com/github/victools/jsonschema/generator/TypeContext",
+        "com/github/victools/jsonschema/generator/impl/AttributeCollector",
+        "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoSuchFieldException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Optional",
+        "java/util/Set",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "1a509344ce7036259df0c88cbb728f962207ecd9f3fca17e28eadb355bf5bf35",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "provideCustomSchemaDefinition",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomDefinition;",
+          "access": 1,
+          "code_sha256": "6d4d9a0fef985936af37af5b649903f18c00697d0a8ab18793bdd4e260e90d86",
+          "code_length": 163
+        },
+        {
+          "name": "hasJsonUnwrappedAnnotation",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedMember;)Z",
+          "access": 2,
+          "code_sha256": "26f858a3d80d4897a701cba732671b6dffcf4a06f66c55264f8613c97aac5259",
+          "code_length": 21,
+          "generic_signature": "(Lcom/fasterxml/classmate/members/ResolvedMember<*>;)Z"
+        },
+        {
+          "name": "createUnwrappedMemberSchema",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedMember;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/Optional;",
+          "access": 2,
+          "code_sha256": "52244521e67c8ddc379b47c9796120d1328384cbd7a9fca7bef2375d4e598460",
+          "code_length": 29,
+          "generic_signature": "(Lcom/fasterxml/classmate/members/ResolvedMember<*>;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Ljava/util/Optional<Lcom/fasterxml/jackson/databind/node/ObjectNode;>;"
+        },
+        {
+          "name": "applyPrefixAndSuffixToPropertyNames",
+          "descriptor": "(Lcom/fasterxml/jackson/databind/JsonNode;Ljava/lang/String;Ljava/lang/String;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)V",
+          "access": 2,
+          "code_sha256": "3d8b10bdcd9b4954be8366affbd4e4bb8c61f40bfcbf8d811d36d1a433a80bdd",
+          "code_length": 183
+        },
+        {
+          "name": "lambda$applyPrefixAndSuffixToPropertyNames$2",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;Lcom/fasterxml/jackson/databind/JsonNode;)V",
+          "access": 4098,
+          "code_sha256": "1370742e6d84a251bde236523fc2e66c7384561554145fce4ed7aded929a9195",
+          "code_length": 10
+        },
+        {
+          "name": "lambda$createUnwrappedMemberSchema$1",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;Lcom/fasterxml/classmate/members/ResolvedMember;Lcom/fasterxml/jackson/annotation/JsonUnwrapped;)Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 4098,
+          "code_sha256": "f222d71d760bbe281e63bd0885e0dc5ebfc0acd818053b61ed458c885d390cdd",
+          "code_length": 59
+        },
+        {
+          "name": "lambda$provideCustomSchemaDefinition$0",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;Lcom/fasterxml/classmate/members/ResolvedMember;)Ljava/util/Optional;",
+          "access": 4098,
+          "code_sha256": "4ee42b5f77e6e5342c386c3af07be21182de2a789a81397db37992226ca147d3",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/members/ResolvedMember",
+        "com/fasterxml/jackson/annotation/JsonUnwrapped",
+        "com/fasterxml/jackson/databind/JsonNode",
+        "com/fasterxml/jackson/databind/node/ArrayNode",
+        "com/fasterxml/jackson/databind/node/ObjectNode",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/CustomDefinition",
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2",
+        "com/github/victools/jsonschema/generator/SchemaGenerationContext",
+        "com/github/victools/jsonschema/generator/SchemaKeyword",
+        "com/github/victools/jsonschema/generator/TypeContext",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Objects",
+        "java/util/Optional",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "7608e3b6a2a00051d81244a0f914b19811cca6ab715f4ab7843a73fc3f7d627c",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "provideCustomSchemaDefinition",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomDefinition;",
+          "access": 1,
+          "code_sha256": "81bc391a4cb68d08c97e7c35fa1cf67f1b8148967c96d504d0d2915e743042c4",
+          "code_length": 47
+        },
+        {
+          "name": "provideCustomPropertySchemaDefinition",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomPropertyDefinition;",
+          "access": 1,
+          "code_sha256": "c68ec2b59ea6a975c54404bbd8e3196e248d8e1ea61b270d306e62f0b67d7f4c",
+          "code_length": 35,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;)Lcom/github/victools/jsonschema/generator/CustomPropertyDefinition;"
+        },
+        {
+          "name": "getIdentityReferenceType",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/Optional;",
+          "access": 1,
+          "code_sha256": "19a79183a71e554855597fedd4770c654a9baa0ea4e5c8e35aebf879a1592349",
+          "code_length": 28,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/Optional<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getIdentityReferenceType",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Ljava/util/Optional;",
+          "access": 1,
+          "code_sha256": "e3d385cc57648d0b691b836ca6937309f99b8708a9977381ad0236380faddbef",
+          "code_length": 44,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Ljava/util/Optional<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getIdentityReferenceType",
+          "descriptor": "(Lcom/fasterxml/jackson/annotation/JsonIdentityReference;Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/Optional;",
+          "access": 2,
+          "code_sha256": "311dbc55e6e96cb6d0f5c46628b36faae8087d9ea3f597aca6c6936d694334eb",
+          "code_length": 173,
+          "generic_signature": "(Lcom/fasterxml/jackson/annotation/JsonIdentityReference;Lcom/fasterxml/classmate/ResolvedType;Lcom/github/victools/jsonschema/generator/TypeContext;)Ljava/util/Optional<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "lambda$getIdentityReferenceType$0",
+          "descriptor": "(Ljava/lang/String;Lcom/fasterxml/classmate/members/ResolvedField;)Z",
+          "access": 4106,
+          "code_sha256": "95e3e225e49698adae23bb75cf2aa539fd2b928bff94b6a2c12043502ed5e2e5",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/members/ResolvedField",
+        "com/fasterxml/classmate/members/ResolvedMember",
+        "com/fasterxml/jackson/annotation/JsonIdentityInfo",
+        "com/fasterxml/jackson/annotation/JsonIdentityReference",
+        "com/fasterxml/jackson/annotation/ObjectIdGenerator",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/CustomDefinition",
+        "com/github/victools/jsonschema/generator/CustomDefinitionProviderV2",
+        "com/github/victools/jsonschema/generator/CustomPropertyDefinition",
+        "com/github/victools/jsonschema/generator/MemberScope",
+        "com/github/victools/jsonschema/generator/SchemaGenerationContext",
+        "com/github/victools/jsonschema/generator/TypeContext",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Type",
+        "java/util/Arrays",
+        "java/util/Objects",
+        "java/util/Optional",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonPropertySorter.class",
+      "occurrence": 0,
+      "sha256": "2e94e46db189845ea0fa277d8b07f3f654800b377c6c8f09464f7ccb3fd27f16",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonPropertySorter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "sortAlphabeticallyIfNotAnnotated",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "propertyOrderPerDeclaringType",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Ljava/util/List<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "enabledAlphabeticSorting",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Ljava/lang/Boolean;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "86e7e22c8888001fbeef7b41ecdf22870034f5d80e9fd957bf26c0ea2b3e514c",
+          "code_length": 32
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;Lcom/github/victools/jsonschema/generator/MemberScope;)I",
+          "access": 1,
+          "code_sha256": "755f3b285fc93668ebea2424054b9fda16f98ede0367ecb1f363418a7f5c612a",
+          "code_length": 83,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;Lcom/github/victools/jsonschema/generator/MemberScope<**>;)I"
+        },
+        {
+          "name": "getPropertyIndex",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)I",
+          "access": 4,
+          "code_sha256": "01b626ce5161bc84de8e2658ba5cb36a495223c84db806492d507f82bfccfc86",
+          "code_length": 101,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)I"
+        },
+        {
+          "name": "shouldSortPropertiesAlphabetically",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 4,
+          "code_sha256": "4faec6fbd6d08fdfff0f1cf77a0ebd403407e3a24da047175d5344abf1096037",
+          "code_length": 34,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "getAnnotatedPropertyOrder",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "39258155829e81fc238af2e2d18336c3478747f6f884e23d230f2990a2d436a5",
+          "code_length": 45,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "b4cdb67a14a9859d3b48eb422beaa85e5113b6fd0d51310b23dd7a4d11560f37",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$getAnnotatedPropertyOrder$2",
+          "descriptor": "([Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "547c846f307c587cf9b1b75f63897d65ce6765492cb5583dc16e2a736cc9e417",
+          "code_length": 11
+        },
+        {
+          "name": "lambda$compare$1",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 4098,
+          "code_sha256": "b652102ad13396a6a61b9040c362d33a95124402c0c71899ddcc3b747732be96",
+          "code_length": 23
+        },
+        {
+          "name": "lambda$compare$0",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Ljava/lang/Class;",
+          "access": 4106,
+          "code_sha256": "b32742dabe3360db099830df5028a3707784e4dba3fae2cbf84d6962830fdf79",
+          "code_length": 8
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lcom/github/victools/jsonschema/generator/MemberScope<**>;>;",
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/members/HierarchicType",
+        "com/fasterxml/jackson/annotation/JsonPropertyOrder",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/MemberScope",
+        "com/github/victools/jsonschema/generator/MethodScope",
+        "com/github/victools/jsonschema/generator/impl/PropertySortUtils",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "com/github/victools/jsonschema/module/jackson/JsonPropertySorter",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/Comparator",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Optional",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1.class",
+      "occurrence": 0,
+      "sha256": "762560f1d174541d89d04288ed2ee4f6f7ab44cb5fb864efa8f63c5f93f212c3",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$com$fasterxml$jackson$annotation$JsonTypeInfo$Id",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$com$fasterxml$jackson$annotation$JsonTypeInfo$As",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "167d464bbebaee8196c9d0a86c80f3a9ef8a97d74bdc2bf525c3a2eadb3f83a2",
+          "code_length": 109
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/annotation/JsonTypeInfo",
+        "com/fasterxml/jackson/annotation/JsonTypeInfo$As",
+        "com/fasterxml/jackson/annotation/JsonTypeInfo$Id",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails.class",
+      "occurrence": 0,
+      "sha256": "4dcad0d1b3732ee458402ed052fc41adda8d956fedd317bb086f40511e6e14dd",
+      "name": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "javaType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 18
+        },
+        {
+          "name": "attributesToInclude",
+          "descriptor": "Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 18
+        },
+        {
+          "name": "context",
+          "descriptor": "Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;",
+          "access": 18
+        },
+        {
+          "name": "typeIdentifier",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "definition",
+          "descriptor": "Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/jackson/databind/node/ObjectNode;Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;Ljava/lang/String;Lcom/fasterxml/jackson/databind/node/ObjectNode;)V",
+          "access": 0,
+          "code_sha256": "7cd57371b84b7f03d35cf48b6b967c034a5a944627f72ed97fed45d13b81694d",
+          "code_length": 32
+        },
+        {
+          "name": "getJavaType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 0,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getAttributesToInclude",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 0,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getContext",
+          "descriptor": "()Lcom/github/victools/jsonschema/generator/SchemaGenerationContext;",
+          "access": 0,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getTypeIdentifier",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getDefinition",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/node/ObjectNode;",
+          "access": 0,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getKeyword",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaKeyword;)Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "3da27d8685b6f503a8582ee9644b1b4d6c00182557719f7eab6f6af235131e4e",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/github/victools/jsonschema/generator/SchemaGenerationContext",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JacksonModule.class",
+      "occurrence": 0,
+      "sha256": "f3e7a0615eb8d9f701f9d136d3578e2b20416725ece2d19e0b2e25b2394dffd8",
+      "name": "com/github/victools/jsonschema/module/jackson/JacksonModule",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/victools/jsonschema/generator/Module"
+      ],
+      "fields": [
+        {
+          "name": "NESTED_ANNOTATION_CHECK",
+          "descriptor": "Ljava/util/function/Predicate;",
+          "access": 24,
+          "generic_signature": "Ljava/util/function/Predicate<Ljava/lang/annotation/Annotation;>;"
+        },
+        {
+          "name": "options",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lcom/github/victools/jsonschema/module/jackson/JacksonOption;>;"
+        },
+        {
+          "name": "objectMapper",
+          "descriptor": "Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 2
+        },
+        {
+          "name": "beanDescriptions",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Lcom/fasterxml/jackson/databind/BeanDescription;>;"
+        },
+        {
+          "name": "namingStrategies",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<*>;Lcom/fasterxml/jackson/databind/PropertyNamingStrategy;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "11324a7b2006b17e208986ede11881f5bf48a487fa94c3fe6c9dac413bb87f57",
+          "code_length": 40
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Lcom/github/victools/jsonschema/module/jackson/JacksonOption;)V",
+          "access": 129,
+          "code_sha256": "e392c28c20dac5c4baba9866204611d53b075860a8ac331964fb337c132c5ba4",
+          "code_length": 58
+        },
+        {
+          "name": "applyToConfigBuilder",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigBuilder;)V",
+          "access": 1,
+          "code_sha256": "8c1a2579e5d546ffa976a3b68b7909b5324d0abc703eae4bdfc031074d01495b",
+          "code_length": 266
+        },
+        {
+          "name": "applySubtypeResolverToConfigBuilder",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaGeneratorGeneralConfigPart;Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart;Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart;)V",
+          "access": 2,
+          "code_sha256": "b49bac9c8c3f712f4b4a39b888ff9f24cc35ac49b6a55ed29905b3c4c843db89",
+          "code_length": 145,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/SchemaGeneratorGeneralConfigPart;Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart<Lcom/github/victools/jsonschema/generator/FieldScope;>;Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart<Lcom/github/victools/jsonschema/generator/MethodScope;>;)V"
+        },
+        {
+          "name": "applyToConfigBuilderPart",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart;)V",
+          "access": 2,
+          "code_sha256": "5c270c0119778a6bb113689a0520e53fd29f7cdd609ffb19033190b92a86f961",
+          "code_length": 71,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/SchemaGeneratorConfigPart<*>;)V"
+        },
+        {
+          "name": "resolveDescription",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "d3026cee9c1ad742b53d373290044ac105355626897c5f544ca2a9853dc225e7",
+          "code_length": 23,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Ljava/lang/String;"
+        },
+        {
+          "name": "resolveDescriptionForType",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/TypeScope;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "07561328cd7815dd01ec43e12f0c75014e80deae6130282870e8b4ecd9f1351f",
+          "code_length": 33
+        },
+        {
+          "name": "getPropertyNameOverrideBasedOnJsonPropertyAnnotation",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "07618560e41cf2cbce166865d302404fab22f62026389d4f1c353896fcb24acb",
+          "code_length": 50,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getPropertyNameOverrideBasedOnJsonNamingAnnotation",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/FieldScope;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "d8cce3f8f2d8191efe2c7e7d9e099e2e96f023ef73a5846ed8586596c6303bab",
+          "code_length": 62
+        },
+        {
+          "name": "getAnnotatedNamingStrategy",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/jackson/databind/PropertyNamingStrategy;",
+          "access": 2,
+          "code_sha256": "86ac673bd1efcf89bdaf5a87387be55eb8011116d9443dae17c4c32145ddd7a6",
+          "code_length": 33,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lcom/fasterxml/jackson/databind/PropertyNamingStrategy;"
+        },
+        {
+          "name": "getBeanDescriptionForClass",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)Lcom/fasterxml/jackson/databind/BeanDescription;",
+          "access": 20,
+          "code_sha256": "ba71d8fd0fccd8d459efc9fed127a93f44dbc67b6c8766361cf4362b6e59feb6",
+          "code_length": 37
+        },
+        {
+          "name": "shouldIgnoreField",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/FieldScope;)Z",
+          "access": 4,
+          "code_sha256": "23ca18e2f9ebabd1ad5e28cc855ceda83179abb557a1aabc3bbb9c3ac43d61cf",
+          "code_length": 144
+        },
+        {
+          "name": "shouldIgnoreMethod",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MethodScope;)Z",
+          "access": 4,
+          "code_sha256": "1502008fd8c0b39dd223c26283a187e14f7b5a82dc4dbae71fa4905513a826f2",
+          "code_length": 97
+        },
+        {
+          "name": "getRequiredCheckBasedOnJsonPropertyAnnotation",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Z",
+          "access": 4,
+          "code_sha256": "ebb406b2482ad6a01f99494aed6b452ed66aebe21ff052ff68f00ecbf6372875",
+          "code_length": 32,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Z"
+        },
+        {
+          "name": "getReadOnlyCheck",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Z",
+          "access": 4,
+          "code_sha256": "c1540410deea921b0e7855d882050b1dd8c90b01fbb57f05d5877e3a63b78ff2",
+          "code_length": 35,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Z"
+        },
+        {
+          "name": "getWriteOnlyCheck",
+          "descriptor": "(Lcom/github/victools/jsonschema/generator/MemberScope;)Z",
+          "access": 4,
+          "code_sha256": "edc37b6aae03df29753f485b505709e072f93817b8459c63af2f1cc2c1a8bfdd",
+          "code_length": 35,
+          "generic_signature": "(Lcom/github/victools/jsonschema/generator/MemberScope<**>;)Z"
+        },
+        {
+          "name": "lambda$shouldIgnoreField$3",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/fasterxml/jackson/databind/introspect/BeanPropertyDefinition;)Z",
+          "access": 4106,
+          "code_sha256": "ffe57c94874fb60f6a671d6f2032efdc502da689b5473ffcf7860522ff9b122b",
+          "code_length": 28
+        },
+        {
+          "name": "lambda$getBeanDescriptionForClass$2",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/jackson/databind/BeanDescription;",
+          "access": 4098,
+          "code_sha256": "3d53cf64a43c67afbb9f457957abc18586be9e847cf4bf5d9d5d1a3fb9c177f1",
+          "code_length": 22
+        },
+        {
+          "name": "lambda$getAnnotatedNamingStrategy$1",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/jackson/databind/PropertyNamingStrategy;",
+          "access": 4106,
+          "code_sha256": "26d62639536ee05fe4bdf028057ba25fe7127aab4e0be2f9a5399274be3d98bc",
+          "code_length": 22
+        },
+        {
+          "name": "lambda$static$0",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 4106,
+          "code_sha256": "203b167c148297c8134d8f0c121c9dbba494e230b872334fdd8d51272da009f9",
+          "code_length": 12
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "de8429efbe6e45792e9e0e5db23b8f54c459f8c8a101a2d684c15132c206ef20",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Lcom/github/victools/jsonschema/module/jackson/JacksonOption;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/members/HierarchicType",
+        "com/fasterxml/jackson/annotation/JacksonAnnotationsInside",
+        "com/fasterxml/jackson/annotation/JsonBackReference",
+        "com/fasterxml/jackson/annotation/JsonClassDescription",
+        "com/fasterxml/jackson/annotation/JsonIgnoreProperties",
+        "com/fasterxml/jackson/annotation/JsonIgnoreProperties$Value",
+        "com/fasterxml/jackson/annotation/JsonProperty",
+        "com/fasterxml/jackson/annotation/JsonProperty$Access",
+        "com/fasterxml/jackson/annotation/JsonPropertyDescription",
+        "com/fasterxml/jackson/annotation/JsonUnwrapped",
+        "com/fasterxml/jackson/databind/AnnotationIntrospector",
+        "com/fasterxml/jackson/databind/BeanDescription",
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "com/fasterxml/jackson/databind/PropertyNamingStrategy",
+        "com/fasterxml/jackson/databind/SerializationConfig",
+        "com/fasterxml/jackson/databind/annotation/JsonNaming",
+        "com/fasterxml/jackson/databind/introspect/BeanPropertyDefinition",
+        "com/fasterxml/jackson/databind/type/TypeFactory",
+        "com/github/victools/jsonschema/generator/AnnotationHelper",
+        "com/github/victools/jsonschema/generator/FieldScope",
+        "com/github/victools/jsonschema/generator/MemberScope",
+        "com/github/victools/jsonschema/generator/MethodScope",
+        "com/github/victools/jsonschema/generator/Module",
+        "com/github/victools/jsonschema/generator/SchemaGeneratorConfigBuilder",
+        "com/github/victools/jsonschema/generator/SchemaGeneratorConfigPart",
+        "com/github/victools/jsonschema/generator/SchemaGeneratorGeneralConfigPart",
+        "com/github/victools/jsonschema/generator/TypeScope",
+        "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider",
+        "com/github/victools/jsonschema/module/jackson/JacksonModule",
+        "com/github/victools/jsonschema/module/jackson/JacksonOption",
+        "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider",
+        "com/github/victools/jsonschema/module/jackson/JsonPropertySorter",
+        "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver",
+        "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/ReflectiveOperationException",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/annotation/Annotation",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Constructor",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Objects",
+        "java/util/Optional",
+        "java/util/Set",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "995314dc59dd8cbb29ff8c1a0f9820404c651260249f3fb2d24066887e422e6d",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

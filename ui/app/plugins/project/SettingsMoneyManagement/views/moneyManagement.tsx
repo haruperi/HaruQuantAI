@@ -1,7 +1,7 @@
 import { useMoneyManagementController } from '../MoneyManagementCtrl';
 import { SqdFieldset, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
 
-/** "Money management" tab (donor evidence SQX144-EV-000041). */
+/** "Money management" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function MoneyManagementTab() {
   const { initialCapital, setInitialCapital, methods, setMethods, patch } = useMoneyManagementController();
 

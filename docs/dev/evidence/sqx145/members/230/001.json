@@ -1,0 +1,1892 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+  "archive_sha256": "ad9b7062db2f6bc617a5e865b01b049f03f21d28f2db61b35976c122c0edbef7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager.class",
+      "occurrence": 0,
+      "sha256": "d8bc29255472ab67ce96bb4e8c8de47bc2a4fab91c250b83086504cf988f8b83",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b8e7634c761fd6943e6d1518d4a3c84e3e6947acb00b7acd8258f54b9475e125",
+          "code_length": 104,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "getCustomJarFiles",
+          "descriptor": "()[Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "1bc89a3c8dbb0eccdcc9653284b6877e1fcc90d0df30a15a9d7fe03b31643973",
+          "code_length": 47
+        },
+        {
+          "name": "getCustomJarCacheFile",
+          "descriptor": "(Ljava/io/File;)Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "cbf891738e9eb4fdce0fdaf23b33bf0b4daa6367e16713251abc49bc5aa3dcf9",
+          "code_length": 60
+        },
+        {
+          "name": "getCachedCustomJarData",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "be367f21780dda41a1f692c76f8818e343fd8ee8c9ca7afbaba5c99d26701dcc",
+          "code_length": 46
+        },
+        {
+          "name": "performLoadCustomJarInfo",
+          "descriptor": "(Ljava/io/File;)Lcom/strategyquant/lib/classInfo/CodeInfo;",
+          "access": 2,
+          "code_sha256": "a6408d7559707cfc5f1503b76685c22cf65d0bb43db9192fb33e9e6f15d42d3e",
+          "code_length": 276,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getCustomJarsCompleteData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "952c9233274990f6eea24f7405e18bda7e0c023c9b6e8eed8c69a3d9dc1ba02b",
+          "code_length": 150,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getSqAutoCompleteData",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b18d98aa9e06e956a8f557a3f8305c356610b29eb67861b5d3e3cc529e6f3654",
+          "code_length": 234,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getJavaDocs",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4e00531923efc92cef4c195d040fa1b045ad84c50580be8649ef1fd9a85d16c6",
+          "code_length": 114
+        },
+        {
+          "name": "lambda$getSqAutoCompleteData$0",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "63193a733ad684ea198d1c47ce4cdb5b6338c67d891788a469f16d4dafe57e55",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$getCustomJarFiles$0",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "2418a743ea75c18d1a6732edc1e195d7317bdbdd68c5f565975e846553f2208b",
+          "code_length": 32
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6f9087d31712913a7eada9c36027416984532fcae64b55a48ab9d411aaa60562",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "[Ljava/net/URL;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/classInfo/ClassHelper",
+        "com/strategyquant/lib/classInfo/CodeInfo",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Package",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/net/URL",
+        "java/net/URLClassLoader",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Files",
+        "java/nio/file/OpenOption",
+        "java/util/ArrayList",
+        "java/util/Enumeration",
+        "java/util/HashSet",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender.class",
+      "occurrence": 0,
+      "sha256": "088b22e09911623cf34be0522bf61b7c1462088116bf2b4783dd4926daad2aef",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "toSend",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 18
+        },
+        {
+          "name": "data",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dd1797467bb95261284aac3dbb924b1179425b786546fa05760acddd5f2e7c94",
+          "code_length": 39
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "d6d3002e7e37932e6a7286f08296994513f9acbc7d2f1d36b053d2d551554d14",
+          "code_length": 40
+        },
+        {
+          "name": "sendData",
+          "descriptor": "(Lorg/json/JSONObject;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorPlugin.class",
+      "occurrence": 0,
+      "sha256": "f7ea7c9cf15b8f5a9053b6f845d92d2c58a8713af3b3466efe35eecd545c48d0",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "3724c2a759c8f4f8b4add0ceb15240eb2a3150da63b230eabbf8a33407d07a61",
+          "code_length": 71
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "d60a5029a11c45aa3926663eb6b9f092e9f73bf1cb4d9a8b436563658ab40fe1",
+          "code_length": 53,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorPlugin",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet.class",
+      "occurrence": 0,
+      "sha256": "58915c4d81006824c1a7b69a99cd0a2dd2ecda8c5fc24ecc5758ab41a8da8f11",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "infoSender",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender;",
+          "access": 10
+        },
+        {
+          "name": "fileMap",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap;",
+          "access": 10
+        },
+        {
+          "name": "templates",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates;",
+          "access": 10
+        },
+        {
+          "name": "pc",
+          "descriptor": "Lcom/strategyquant/lib/plugins/compile/PluginCompiler;",
+          "access": 2
+        },
+        {
+          "name": "KEY_SUCCESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_COMPILATION_RESULT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_INDICATORS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEMPLATE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEMPLATES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_MATCHES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEMS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_PROTECTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_DESCRIPTION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_DATA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_PLUGIN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "LAST_OPENED_SNIPPETS_FILE_PATH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "getInfoSenderInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender;",
+          "access": 42,
+          "code_sha256": "261e5bf8e02d01e47680c7d687c64fc7dadf899ca09d853a91c92f0be22e9362",
+          "code_length": 20
+        },
+        {
+          "name": "getFileMapInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap;",
+          "access": 42,
+          "code_sha256": "84a98f8dbacf054ac47aaf3b460216266496558146743c6b3826fe09cceec594",
+          "code_length": 20
+        },
+        {
+          "name": "getTemplatesInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates;",
+          "access": 42,
+          "code_sha256": "d1dcebff72975c2e698e0ea5f7a40a882faa41fc8dfa0d08882e03c77cb5dedd",
+          "code_length": 20
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "72f1e87bd7c94f14f07765bdf2a88c8c86ba450e24908c37657e4d6c629c8a57",
+          "code_length": 949,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "validateFileName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "24d36ff17baae381a86492c8b49711f5160034aa56776b8660f774e6bf04ad68",
+          "code_length": 26,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "prvCheckParamExists",
+          "descriptor": "(Ljava/util/Map;[Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "92427229aaa976472d6934595764f17a395bb13787dc5b71f63706dc78cbf24a",
+          "code_length": 23,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;[Ljava/lang/String;)V"
+        },
+        {
+          "name": "prvStringToFile",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "a03dd399ee63f9fa09708793dc4c2e26d91e1c92a58f8ccd1ae2a2f03c7f25db",
+          "code_length": 29,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "prvStringToFile",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "7280b9d1642807a9c3fdafe4aea5b8aa0a958e7d883edde115854a13ff4adf0c",
+          "code_length": 22,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "prvFileToString",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "0d5528f88020235a3a2c88919ba3e2dd62d50adf38aa200d084d4a8f4c546de3",
+          "code_length": 18,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "onFindInFiles",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8b80071e09dd1831438cfcc762ef05e3bf2394dc9365572fd72ed9040de6ae71",
+          "code_length": 166,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onReload",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7aa29c047daadaa17370e4371754e03be59e11beeb42249fc26f7dbd03a37d67",
+          "code_length": 49,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onDelete",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9e6059b6f137f17b00f413eb7fa13ada66b5663d6c3b1b9ddd5a4d3562b3bc1a",
+          "code_length": 194,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "deleteRecursive",
+          "descriptor": "(Ljava/io/File;Ljava/util/List;)Z",
+          "access": 1,
+          "code_sha256": "178afc938b010ed15c6394db9857f87fec2860b6b0e4c5944c82df87cecd9b20",
+          "code_length": 156,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/io/File;Ljava/util/List<Ljava/lang/String;>;)Z"
+        },
+        {
+          "name": "onRename",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "372125febe53b7c10ffb8cd6945e677af062ff62f7e4ec7592f2ca91c3a263bc",
+          "code_length": 252,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onClone",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "63fe34d32628a1a1ac7abf3e5252d1d72389f40ae1502daa8f6d05006101bfd6",
+          "code_length": 564,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCreateNewDir",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "088be02b68d707fb8b864633a5658cdc34ea70015f9a92b8c70ac64791851232",
+          "code_length": 190,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCreateNew",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b6cb1d90d2bb96ca7b799f7819df594b0edf2f65a8d11c02a2637f2c3c1a4efe",
+          "code_length": 787,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCreateNewFile",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "489bc9b142cb471ccd197a71338d6ffa00d68be2a9d687bc5031775f919562fd",
+          "code_length": 523,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "createEmptyFileTemplate",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "adfac3108e566f8787f741e62cae0176621903d5f6a1c88812716d0af281f1a5",
+          "code_length": 92,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createCodeBlocksTemplate",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "96d2ba7fad7f56ea7c1164ab5781366fdb23c69f5f0d594c4039ed979927dee6",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onCreateNewTemplate",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1b9251d943b86bf7fdd3969f7b4744e10e0a07af0fd19962cbf0decd75289267",
+          "code_length": 219,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "isNameValid",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "1ab721bd83054db4f5069f37d24e8b41fd865caa17c9f320ef4bc9042000f7f0",
+          "code_length": 18
+        },
+        {
+          "name": "onListIndicators",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3676698e2dab42ab43cf6f0638d3060dbe56cffc88bd406beb725e6dd4b932fc",
+          "code_length": 57
+        },
+        {
+          "name": "listIndicators",
+          "descriptor": "(Ljava/lang/String;Lorg/json/JSONArray;)V",
+          "access": 2,
+          "code_sha256": "46dd19abc440511eba6657442b76a26c6b43f43e17d4a4e4bf4ac446ac0485a3",
+          "code_length": 90
+        },
+        {
+          "name": "onListTemplates",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6d507296c70d24367886702d7c9269c777184dbd16d750f21be2e0ffad4eed5d",
+          "code_length": 213,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onEditorAutocomplete",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fc5271f9d0574b6cd3b1be3748fb37ed8b987382db1dcf6220f6851e4ae6691c",
+          "code_length": 11,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "onListCodeTypes",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4dae06f25978971717b32bdb0a40e0846f607ab926bb39ee3f71355e8443e8b5",
+          "code_length": 87,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "onList",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f6a2a60377f19cb7aeef103797c7240dc206b14f9b164fb01aa2b664dc840f88",
+          "code_length": 113,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetContent",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "29224476caf35a045ed4c50416e8f8e3a05c787bfcdef6c824c0e69b199dd833",
+          "code_length": 76,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getFile",
+          "descriptor": "(Ljava/util/Map;)Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "1a4c385d898289e092a65e1af85b688f006d0059a25d75b75ad62c6de2b7b024",
+          "code_length": 70,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/io/File;"
+        },
+        {
+          "name": "onSave",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f02401185ec41928315e01f7001fee7988dad80cba6277820d14a24d294f6eb9",
+          "code_length": 60,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSaveAs",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "33382b72bbe0c3d90c7d04db7da7d4a4456167554de9bc60601509677ef75e04",
+          "code_length": 84,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCompile",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "38f262bc1932484842b911665f5c4543b050bfc4aa383fc76c03c2d860d9ab8e",
+          "code_length": 98,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCompileAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d6dae3c25006535737a5ffc6932eeadb3745d88257f120496da74e020893239b",
+          "code_length": 39
+        },
+        {
+          "name": "onStopCompilation",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a306cb9a0d2e592ffffd3173f55c23945e011a7fba6fcad4bffb19fb87a064e5",
+          "code_length": 24
+        },
+        {
+          "name": "onCompilePlugin",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b394a5e6170f5cde17a5f5e359c3d688dd3dae7f297e6a6a64614d720b9c369d",
+          "code_length": 72,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onFixImports",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "11a35899a167f086b96625c96a33be855b2b905fc3485869c761e757d0673e20",
+          "code_length": 130,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "fixImports",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "26daa479b9f00c45141f77a55a24a1f40ece622d29c951e1b900278449d7c99a",
+          "code_length": 66
+        },
+        {
+          "name": "onGetInfo",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "67beaeace578a40fbb04942d284edc266d73abe799b7ad79c4bf7a2a678610e7",
+          "code_length": 39
+        },
+        {
+          "name": "onSaveLastOpenedFiles",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "254fd43999b0cf0099b2b0231687d1f5541286d766ad14307ff8ca3b7b218f55",
+          "code_length": 230,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onReloadApp",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "10d641646012adde3c817946875cf8a6ba7b27e71e1876a38b805abe5df071e4",
+          "code_length": 45
+        },
+        {
+          "name": "onLoadLastOpenedFiles",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "645c3fa34d22cfd0d14d81ce9b35efc44cc7ef347e779fd6bc5d903bc90ff2c8",
+          "code_length": 338
+        },
+        {
+          "name": "lambda$onGetInfo$0",
+          "descriptor": "()V",
+          "access": 4106,
+          "code_sha256": "bd50ac1c95e650a58935969b17a70135e67e5a7871208fdd88440478ce183fd0",
+          "code_length": 78
+        },
+        {
+          "name": "lambda$onCompilePlugin$0",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 4098,
+          "code_sha256": "efc79279c3c3acd9f347ee791151f243ab2cc07320a49a0b4e37761e598d2921",
+          "code_length": 67
+        },
+        {
+          "name": "lambda$onCompileAll$0",
+          "descriptor": "()V",
+          "access": 4106,
+          "code_sha256": "43ed6c31f933e99f8f0fe362f3a32206038e87de6fcbc795b82e2aa119f5315b",
+          "code_length": 168
+        },
+        {
+          "name": "lambda$onCompile$0",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)V",
+          "access": 4106,
+          "code_sha256": "ece5d7a909cf04500e5d5df88db3885fcbe76f180d84c968d3cc8c58d566de67",
+          "code_length": 235
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b06f51df0e83ca1a0831b559b04c764766a5cdcafafb6f80d39ad53051b972fc",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/lib/plugins/compile/PluginCompiler",
+        "com/strategyquant/lib/snippets/CustomClassesReg",
+        "com/strategyquant/lib/snippets/ProtectedSnippets",
+        "com/strategyquant/lib/snippets/SnippetsCompiler",
+        "com/strategyquant/lib/snippets/SnippetsCompilerUtils",
+        "com/strategyquant/lib/snippets/compile/AutoImport",
+        "com/strategyquant/lib/snippets/compile/CompilationMessage",
+        "com/strategyquant/lib/snippets/compile/CompilationResult",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/lib/snippets/compile/inMemory/InMemoryJavaCompiler",
+        "com/strategyquant/lib/snippets/compile/indicators/IndicatorsBuilder",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/BufferedReader",
+        "java/io/BufferedWriter",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/OutputStreamWriter",
+        "java/io/Writer",
+        "java/lang/Boolean",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Files",
+        "java/nio/file/Paths",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException.class",
+      "occurrence": 0,
+      "sha256": "c0418ea5b3807ac051d3926b4d30af85f076a9ca7ccfb28e59df436d20d4694e",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap.class",
+      "occurrence": 0,
+      "sha256": "688d4624d2824b14f7dc0976e38979312d875ad60d878658ba8922afabec0ed6",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "KEY_MISSING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_CONTENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_INFO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_USERDATA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "fileInternalDir",
+          "descriptor": "Ljava/io/File;",
+          "access": 18
+        },
+        {
+          "name": "missingTemplateFiles",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/io/File;>;"
+        },
+        {
+          "name": "fileCodeBlockDirs",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/io/File;>;"
+        },
+        {
+          "name": "fileSnippetsBlocksDirs",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/io/File;>;"
+        },
+        {
+          "name": "patternForEngine",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "73e7272f31ce2c859536c4a9b61f92ce721778391c7e86fb18d67300b9611415",
+          "code_length": 109
+        },
+        {
+          "name": "getCodeBlocksTypes",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e92f64f1b1af5e509a00c0240754bead8631d2e9f55457f7a4e42c46462d6932",
+          "code_length": 125
+        },
+        {
+          "name": "searchForMissingTemplateFiles",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c09255608b7f5674c2fa15aac0258f9fd4eb2c881947bd2536079f5f5955dc94",
+          "code_length": 268
+        },
+        {
+          "name": "searchForMissingTemplateFilesRecursively",
+          "descriptor": "(Ljava/io/File;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "53c3f445b604be89ae0074f5422da85b5be2aba8f29796a2d4969e05b177ea6f",
+          "code_length": 228,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/io/File;Ljava/util/List<Ljava/io/File;>;)V"
+        },
+        {
+          "name": "isIntentionallyUnsupported",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 8,
+          "code_sha256": "6b26fc57b33b559a13c958118cc4aa3de97c8a096d1b9fe257d1fbb6e2df41d3",
+          "code_length": 252
+        },
+        {
+          "name": "dirContains",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "8d40df26d00fceaff66029518ec8a88a12ccf336df2227de6d4d69421003cfd2",
+          "code_length": 13
+        },
+        {
+          "name": "generateTree",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "3bb2306690e77bb1d77ffcabdde2e515877611e451a0f27a66644f4fe6d0ac0d",
+          "code_length": 118,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;I)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "parseFolder",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONArray;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "d2eabbbb513bcdaa306c67b6e06c7389da9db30e58e8f7295af74bea031a7ed5",
+          "code_length": 38
+        },
+        {
+          "name": "prvParse",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;Lorg/json/JSONArray;ZLjava/lang/String;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "7861dffeaa29893f2de0ffbb0586840f8b3cc041fe89cf950afecf2572c72faa",
+          "code_length": 689
+        },
+        {
+          "name": "isProtectedFile",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "8cec3326aaf11efc6fbab30a1a4ab958e86f22902efae568ea6d8deaf497668f",
+          "code_length": 8
+        },
+        {
+          "name": "isJavaFile",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "e23628ec6a3576da1f8077279d29ae52c4a3436325a534d19c186cb3a32e1ed7",
+          "code_length": 14
+        },
+        {
+          "name": "checkFile",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "b20fbf2bf583bf660814f9842f2e6a55da5d8af537cef5f58f0518450508a0e6",
+          "code_length": 43
+        },
+        {
+          "name": "containsFileByFilter",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "ad89bf2037c500eb093179a7105f6423fbbd351e9a91c135a567804216abe1cf",
+          "code_length": 88
+        },
+        {
+          "name": "checkTemplates",
+          "descriptor": "(Ljava/io/File;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "e7056afeb8eb63980ec2c292f9335499b70758b01b1a5b4a004d9c0379e874a7",
+          "code_length": 550
+        },
+        {
+          "name": "isMissingTemplate",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "55cefd61d33e7bc39a7efefa79f7cba1f8da5de15023b8dc99ed0d25943e8478",
+          "code_length": 50
+        },
+        {
+          "name": "isSnippetsBlockSourceFile",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "506e8716a1b7a0451afd6f386c874729b7b2fe2db64c4f76eba515ddfc701f90",
+          "code_length": 50
+        },
+        {
+          "name": "lambda$getCodeBlocksTypes$0",
+          "descriptor": "(I)[Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "0361b7cb49b1487fb2b3561c9f37e2e04c5c9bac1b20907be1b13a9e296d6f5a",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "90b8c1d086f0b444b3e2b6e747959b36a5f9995e76eb32799782fbbd1ae785d5",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/snippets/ProtectedSnippets",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Comparator",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "java/util/stream/Stream",
+        "org/apache/commons/io/comparator/NameFileComparator",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles.class",
+      "occurrence": 0,
+      "sha256": "d0d8b3538465af8b3dd500020bbf165f8cbf8e8b099dfa6006824ee15b7be360",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "matchCase",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "wholeWord",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "useRegex",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "searchString",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "matches",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches;>;"
+        },
+        {
+          "name": "totalMatches",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "IMG_PAGING_PAGE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "IMG_MATCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "RESP_TAG_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "RESP_TAG_CONTENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "search",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;ZZZ)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult;",
+          "access": 33,
+          "code_sha256": "c5882875f4c5f7ddeaf8475c11059fbc98302d7f4f50f244695fb86ba8950155",
+          "code_length": 181,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;ZZZ)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult;"
+        },
+        {
+          "name": "generateTree",
+          "descriptor": "(Ljava/io/File;Lorg/json/JSONArray;ZLjava/lang/String;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "400e26d4f4830ba3333bbf707d48b4e3e6c9b485ebeb55130a77c3772a4f1c2f",
+          "code_length": 709
+        },
+        {
+          "name": "matchFiles",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "80271ea68a93547ac1f646a880e31668ea9ed8be551aa6bdf93ab6ad00115d12",
+          "code_length": 62
+        },
+        {
+          "name": "searchInFile",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "48ea91f49bb5926a21b28e90fb2a0bed2d29da8a2b14bab48fe7a1ea62224150",
+          "code_length": 84
+        },
+        {
+          "name": "doSearchNoRegex",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches;",
+          "access": 2,
+          "code_sha256": "82d40f39ba68b8243b768afd05c355fac99545fb32de571f121955637135e20d",
+          "code_length": 83,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "doSearchRegex",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches;",
+          "access": 2,
+          "code_sha256": "c3540d450f9ac97a313498e7cc0987a732d887c755d8cab9634c680c4fa33de5",
+          "code_length": 107,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "getMatch",
+          "descriptor": "(Ljava/lang/String;I)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch;",
+          "access": 2,
+          "code_sha256": "0af21fd31174db14b4b766834a55ffff06015d56f233ccd841599834e79661d1",
+          "code_length": 87,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "isWholeWord",
+          "descriptor": "(Ljava/lang/CharSequence;II)Z",
+          "access": 2,
+          "code_sha256": "83a91066253db2634979bea3a4943a481d22b45460745f9d54cd7368fc1c9f8f",
+          "code_length": 60
+        },
+        {
+          "name": "checkFile",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "d84689441053b19bf7eda0ac7fca447192a06cab571bda3c6a4c617581461718",
+          "code_length": 25
+        },
+        {
+          "name": "checkFiles",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 2,
+          "code_sha256": "9c000c19e429f13d40845e1e49d466c9197c49452f4e6cad73d6c5ec56df5206",
+          "code_length": 73
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "28be2b88f1e48e7fec5840d0db93145df96765e46a26b464e684a3c5479cc838",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches",
+        "java/io/File",
+        "java/lang/CharSequence",
+        "java/lang/Character",
+        "java/lang/Exception",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult.class",
+      "occurrence": 0,
+      "sha256": "e606b33a896ce40067bb6387d8368cd7d4fe35841691cbd684de5e4823f214a2",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "items",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 18
+        },
+        {
+          "name": "totalMatches",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/json/JSONArray;I)V",
+          "access": 0,
+          "code_sha256": "e7fd20388c12ef0705ea2852a57abd1f755c705eab8d5e5f5363296885237777",
+          "code_length": 15
+        },
+        {
+          "name": "getItems",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getTotalMatchesCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch.class",
+      "occurrence": 0,
+      "sha256": "792fe7aaccc47b0586f7069e25f78ce4f9d749a74da22d0b28e2c164d026a477",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "line",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "text",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9b91aa84b8957b876238d7f0518543ab39d68f12e1ae07c8ad965a3c7bd1ad6a",
+          "code_length": 15
+        },
+        {
+          "name": "getLine",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches.class",
+      "occurrence": 0,
+      "sha256": "d68a7a7c3c7b4e59015c44011975042ddfdde09a547acbb97e40b45e512c3972",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/ArrayList",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template.class",
+      "occurrence": 0,
+      "sha256": "4e9a62a7d6a6d7230371e0909ed9e5eb3c3a08d5a39b8928132b557ce3f19e06",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fileTemplate",
+          "descriptor": "Ljava/io/File;",
+          "access": 18
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "fileExt",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "eee20a2a677cf6d808f5c00fc0e04b39293e6bee46f0348b6b0bd174eb3e64ee",
+          "code_length": 20,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException"
+          ]
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5
+        },
+        {
+          "name": "getExtension",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getTemplateFileAbsolutePath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8f18239ecc6dab66c5d483865cd4ad74cff59cc49ac766c75f6e19042ff31595",
+          "code_length": 8
+        },
+        {
+          "name": "getTemplateFileDirectoryPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a9f55c164ece284468bda06dae4511f1c7eea7ca774830acdd6d74f596d96a5c",
+          "code_length": 11
+        },
+        {
+          "name": "getTemplateFileName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0b67699a41b1e2f4decadda92df93eb250163044e8f0c6ceab6454577f3df579",
+          "code_length": 8
+        },
+        {
+          "name": "parse",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9cd7a1c2ae52f441b5768db8f13e5c0e4eaf5dd622b119f9b5a30accd9392dc4",
+          "code_length": 85,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException"
+          ]
+        },
+        {
+          "name": "parseTextBetweenTags",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "506dfce5bab495fb151041f8f139bf1e97c7c3ed655404981a27ada202ee1351",
+          "code_length": 172,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException"
+          ]
+        },
+        {
+          "name": "createNewFile",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "471f25fdeca99a2501a9db3be84c8bae3a07a49b8aca4f48311719df8dbb2c46",
+          "code_length": 224,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException"
+          ]
+        },
+        {
+          "name": "generateContent",
+          "descriptor": "(Ljava/lang/String;Ljava/io/File;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2b90b2351538fcdf7c7526532fb8d812d1952502109ac00412e83e09ef2c0055",
+          "code_length": 126,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException"
+          ]
+        },
+        {
+          "name": "removeDefinition",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "4506467ecc52602de13de12ae6458a6b2c144b7e05fa625f35ef6a0ad63ba1f7",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException.class",
+      "occurrence": 0,
+      "sha256": "537436dad7026099903794d13872829d100452897bfc3a13828bdbba159c0019",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 0,
+          "code_sha256": "2a162062f986c07bde42d217a5df41d4f4b0b724f3d8c1affb6d98522017ac0b",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates.class",
+      "occurrence": 0,
+      "sha256": "6aa73afbea5e0bdb75f038415a69a5e9cdba80fc4d4d6998b87ae24cc8c19fdd",
+      "name": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "availableTemplates",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template;>;"
+        },
+        {
+          "name": "TEMPLATES_PATH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CODE_BLOCKS_TPL_PATH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PSEUDO_CODE_BLOCKS_TPL_PATH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EMPTY_FILE_PATH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "51935d25d27922683343cab529ac20ae6efe78177ebcfb598c926bfe275b6f24",
+          "code_length": 20
+        },
+        {
+          "name": "getAvailableTemplates",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template;>;"
+        },
+        {
+          "name": "loadAvailableTemplates",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9dace325ecb77ada1b2b89d8cdc2209d1768d92e2bf2ee8e9ef40ddd1f831337",
+          "code_length": 55
+        },
+        {
+          "name": "loadTemplates",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "d85b43dac03d728cdbe804e5562178eb6129ae126c1a95311f04de57c689cf52",
+          "code_length": 141
+        },
+        {
+          "name": "findTemplateByPath",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template;",
+          "access": 1,
+          "code_sha256": "ddb942f587f32829522d54e5c5a5c0781832d56a9306a9fbc4807ded2be4d1a5",
+          "code_length": 64,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "findTemplateByFileName",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template;",
+          "access": 1,
+          "code_sha256": "dc7759b819e1403a06810ada15d4e63ea8bc1c9c4a9d528365d16f6bbe768264",
+          "code_length": 60,
+          "throws": [
+            "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0a3a831dc1496a885a96273f6fc5d8ea8fd8be75a5fd39bc122d6aa5ea5e1bcc",
+          "code_length": 115
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template",
+        "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

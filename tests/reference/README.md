@@ -1,31 +1,18 @@
-# P00 reference tooling
+# Current reference qualification tooling
 
-Owner: FEAT-HOST-EVIDENCE, app/host/README.md. This package is verification tooling,
-not a host runtime or donor common-core replacement. Imports perform no I/O.
+Owner: `FEAT-HOST-EVIDENCE`, `app/host/README.md`. No host runtime, donor execution or database access is implied.
 
-manifest.py owns explicit root resolution, safe bounded JSON, typed manifests and
-read-only inventory reconciliation. fixtures.py owns independently constructed
-cases with expected/actual observations and static/runtime provenance. validate.py
-owns schema/lineage/registry gates and the offline/explicit-donor CLI.
-
-All concrete classes/functions/private helpers map to their documented module FR;
-registered decisions govern schema history, logging adapter, size/path bounds,
-validator dependencies, ownership and the P00 release cohort. Log handlers are
-configured explicitly by API consumers or CLI; success/error/gap/lifecycle events
-carry fr_id and stable codes/counts without values, physical paths or exception text.
+- `manifest.py`: explicit `SQX_145_REFERENCE_ROOT`, bounded JSON, strict typed current manifest/index/member models, exact source hashing and exhaustive current metadata reconciliation.
+- `fixtures.py`: independent exact current static observations, source provenance and unavailable runtime fixtures.
+- `validate.py`: schema v4, source/relationship/registry/proposal gates, allocation floor/high-water mark, ownership and CLI outcomes.
+- Constructors/private helpers map to their module FRs and emit structured logs. API callers/CLI configure logging explicitly; no import-time I/O/handlers.
+- Current source fingerprint drift, malformed input, escaped paths, missing members, unsupported cohort or runtime claims without authority fail closed. No source substitution is available.
 
 ```powershell
 uv run pytest tests/unit/test_reference_manifest.py tests/unit/test_reference_fixtures.py tests/unit/test_reference_validation.py --no-cov
 uv run python -m tests.reference.validate
 uv run python -m tests.reference.validate --check-donor
+uv run python scripts/ci_check.py
 ```
 
-The donor command requires explicit SQX_REFERENCE_ROOT. No fallback scans the
-machine. Temporary synthetic test archives are separate from donor files and stores.
-The coverage.toml config qualifies reference-tool branches and preserves the root
-.coverage file. >=80% tooling coverage is not application coverage or donor parity.
-
-Fixtures contain independently authored input and recorded static observations
-only. Runtime fixtures remain unavailable. Zero tolerance applies to counts,
-fingerprints and discrete order; no financial formula or numerical default is
-invented. See docs/dev/evidence/README.md for atomic claim allocation and freshness.
+Explicit donor checks use only the configured current root; offline checks need no installation. Tests use synthetic temporary archives/stores. Dedicated branch-aware tooling coverage >=80% is not application coverage or numerical parity. Missing core/runtime evidence remains an application release blocker.

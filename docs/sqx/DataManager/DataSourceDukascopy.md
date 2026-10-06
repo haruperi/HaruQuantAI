@@ -1,257 +1,51 @@
 # DataSourceDukascopy.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar`.
-- SHA-256: `df1d953afd25874724953ac4793cc856698960f41a30e29db60ec02fc1502cf4`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **6**; non-nested: **4**; nested/anonymous: **2**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar`.
+- **SHA-256:** `40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 6 raw entries; 6 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY`, P04; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [175.json](../../dev/evidence/sqx145/archives/145/175.json).
 
-The `DataManager` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/175/001.json) — SHA-256 `e9d553c9fb7c23dc54f774dfd939019243bd04fee9f1fbe39dbaa054a8abf5f6`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.DataSource.impl.Dukascopy`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C0d87b1750ea6["DukasExport"] {
-        -dateFrom
-        -dateTo
-        -targetFolder
-        +getDateFrom()
-        +setDateFrom()
-        +getDateTo()
-        +setDateTo()
-    }
-    class Cfa7f43d9ba41["DukasServlet"] {
-        -formaterDate
-        -Log
-        -canceled
-        #execute()
-    }
-    class Cd0eb906fffa0["DukasServletPlugin"] {
-        -dukasServlet
-        -dataContext
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getHandler()
-        +call()
-    }
-    class C98149440b9fc["LastSymbolDates"] {
-        -symbol
-        -dateFrom
-        -dateTo
-    }
-    class C1b6b4448b67b["IProgram"]
-    class C249b5c671b1a["IServletPlugin"]
-    class C8900f90ae594["HttpJSONServlet"]
-    class C210d9b760f82["Serializable"]
-    C8900f90ae594 <|-- Cfa7f43d9ba41 : declared extends
-    C249b5c671b1a <|.. Cd0eb906fffa0 : declared interface
-    C1b6b4448b67b <|.. Cd0eb906fffa0 : declared interface
-    Cd0eb906fffa0 ..> Cfa7f43d9ba41 : field type
-    C210d9b760f82 <|.. C98149440b9fc : declared interface
+    class C0["DukasExport"]
+    class C1["DukasServlet"]
+    class C2["DukasServletPlugin"]
+    class C3["LastSymbolDates"]
+    class E0["HttpJSONServlet"]
+    E0 <|-- C1
+    class E1["IServletPlugin"]
+    E1 <|.. C2
+    class E2["IProgram"]
+    E2 <|.. C2
+    class E3["Serializable"]
+    E3 <|.. C3
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C0d87b1750ea6` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` (this JAR) | this diagram |
-| `Cfa7f43d9ba41` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | this diagram |
-| `Cd0eb906fffa0` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` (this JAR) | this diagram |
-| `C98149440b9fc` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` (this JAR) | this diagram |
-| `C1b6b4448b67b` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | referenced external type |
-| `C249b5c671b1a` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | referenced external type |
-| `C8900f90ae594` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | referenced external type |
-| `C210d9b760f82` | `java.io.Serializable` (not resolved in scoped archives) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` | class | non-nested |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | class | non-nested |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` | class | nested/anonymous |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | class | nested/anonymous |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | class | non-nested |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` / field declaration: `private java.lang.String targetFolder;`<br>`private java.lang.String symbol;`<br>`private java.lang.String filenamePrefix;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport` / method signature: `public java.lang.String getTargetFolder();`<br>`public void setTargetFolder(java.lang.String);`<br>`public java.lang.String getSymbol();`<br>`public void setSymbol(java.lang.String);`<br>`public java.lang.String getFilenamePrefix();`<br>`public void setFilenamePrefix(java.lang.String);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | extends | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `org.joda.time.format.DateTimeFormatter` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / field declaration: `org.joda.time.format.DateTimeFormatter formaterDate;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `static org.slf4j.Logger access$200();` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / field declaration: `private java.lang.String availableDataResponse;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onGetParallelDownload();`<br>`private java.lang.String onSetParallelDownload(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onGetDataList();`<br>`private java.lang.String onAddData(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onAddCancel() throws java.lang.Exception;`<br>`private java.lang.String onUpdateAll();`<br>`private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onImportData(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;`<br>`private java.lang.String onImportDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`static java.lang.String access$002(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.lang.String);`<br>`static java.lang.String access$100(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onSetParallelDownload(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onAddData(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onImportData(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onImportDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`static void access$300(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onSetParallelDownload(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onAddData(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onAddCancel() throws java.lang.Exception;`<br>`private java.lang.String onImportDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | [`com.strategyquant.tradinglib.dukascopy.ImportInfo`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void sanitizeDates(com.strategyquant.tradinglib.dukascopy.ImportInfo, boolean, com.strategyquant.datalib.SymbolData);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | [`com.strategyquant.datalib.SymbolData`](../Shared/SQDataLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void sanitizeDates(com.strategyquant.tradinglib.dukascopy.ImportInfo, boolean, com.strategyquant.datalib.SymbolData);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | [`com.strategyquant.tradinglib.dukascopy.CdnInfo`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `org.apache.http.client.ClientProtocolException` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.io.IOException` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `java.lang.IllegalStateException` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` | `org.jdom2.JDOMException` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` / method signature: `private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` | `java.lang.Thread` (not resolved in scoped archives) | extends | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` / class declaration: `class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1 extends java.lang.Thread` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` / field declaration: `final com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet this$0;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1` / method signature: `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | `java.lang.Thread` (not resolved in scoped archives) | extends | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` / class declaration: `class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2 extends java.lang.Thread` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` / field declaration: `final java.util.Map val$args;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` / method signature: `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` / field declaration: `final com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet this$0;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2` / method signature: `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / field declaration: `private com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet dukasServlet;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `org.eclipse.jetty.servlet.ServletContextHandler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / field declaration: `private org.eclipse.jetty.servlet.ServletContextHandler dataContext;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / method signature: `public java.lang.String getProduct();`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `org.eclipse.jetty.server.Handler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / method signature: `public org.eclipse.jetty.server.Handler getHandler();` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` | `java.lang.Object` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin` / method signature: `public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` | `java.io.Serializable` (not resolved in scoped archives) | implements | `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates implements java.io.Serializable` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` / field declaration: `java.lang.String symbol;` |
-| `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates` / method signature: `public com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates(java.lang.String, long, long);` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport
-    private long dateFrom;
-    private long dateTo;
-    private java.lang.String targetFolder;
-    private java.lang.String symbol;
-    private java.lang.String filenamePrefix;
-    public com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasExport();
-    public long getDateFrom();
-    public void setDateFrom(long);
-    public long getDateTo();
-    public void setDateTo(long);
-    public java.lang.String getTargetFolder();
-    public void setTargetFolder(java.lang.String);
-    public java.lang.String getSymbol();
-    public void setSymbol(java.lang.String);
-    public java.lang.String getFilenamePrefix();
-    public void setFilenamePrefix(java.lang.String);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet
-    org.joda.time.format.DateTimeFormatter formaterDate;
-    private static final org.slf4j.Logger Log;
-    private boolean canceled;
-    private java.lang.String availableDataResponse;
-    public com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet();
-    private void preloadAvailableDataResponse();
-    protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;
-    private java.lang.String onGetParallelDownload();
-    private java.lang.String onSetParallelDownload(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private java.lang.String onGetDataList();
-    private java.lang.String onAddData(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onAddCancel() throws java.lang.Exception;
-    private java.lang.String onUpdateAll();
-    private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onImportData(java.util.Map<java.lang.String, java.lang.String[]>);
-    private void sanitizeDates(com.strategyquant.tradinglib.dukascopy.ImportInfo, boolean, com.strategyquant.datalib.SymbolData);
-    private void fillCdnInfos(com.strategyquant.tradinglib.dukascopy.CdnInfo, java.lang.String) throws org.apache.http.client.ClientProtocolException, java.io.IOException, java.lang.IllegalStateException, org.jdom2.JDOMException;
-    private java.lang.String onImportDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    static java.lang.String access$002(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.lang.String);
-    static java.lang.String access$100(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet);
-    static org.slf4j.Logger access$200();
-    static void access$300(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.util.Map);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1</summary>
-
-```text
-class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1 extends java.lang.Thread
-    final com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet this$0;
-    com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$1(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet);
-    public void run();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2</summary>
-
-```text
-class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2 extends java.lang.Thread
-    final java.util.Map val$args;
-    final com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet this$0;
-    com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet$2(com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet, java.util.Map);
-    public void run();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram
-    private com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServlet dukasServlet;
-    private org.eclipse.jetty.servlet.ServletContextHandler dataContext;
-    public com.strategyquant.plugin.DataSource.impl.Dukascopy.DukasServletPlugin();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public org.eclipse.jetty.server.Handler getHandler();
-    public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates implements java.io.Serializable
-    java.lang.String symbol;
-    long dateFrom;
-    long dateTo;
-    public com.strategyquant.plugin.DataSource.impl.Dukascopy.LastSymbolDates(java.lang.String, long, long);
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasExport.class` | 0 | `d4b1e76279e8221d556621dc68a4c2bf609c627d2bff50e38826ed80ca34e696` | 5 | 11 |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$1.class` | 0 | `6c1ddffc04ad1100bce2bdb7f5ec3d00c96324770bd5ee28359b138a5057d041` | 1 | 2 |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet$2.class` | 0 | `428219651a4184b12aaa4ff7d59d3290c72185557af9fdb61468199f9b95a02b` | 2 | 2 |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class` | 0 | `0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3` | 4 | 20 |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServletPlugin.class` | 0 | `afa0ac47340cca2c01534ce9d702203f11c677065fc5edcb47834ac71167e363` | 2 | 6 |
+| `com/strategyquant/plugin/DataSource/impl/Dukascopy/LastSymbolDates.class` | 0 | `8538e185f97b7c6951f4135267bf69fce247ed3d8d5de4eb2c2a4ea4b25482e4` | 3 | 1 |

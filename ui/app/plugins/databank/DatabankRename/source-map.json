@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only DatabankRename structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankRename",
-  "source_head": "a15014d17cf37f26ac538f75712a0b527e886274",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145052_databank-rename-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,140 +28,136 @@
   "source_catalog": [
     {
       "id": "sqx-databankrename-plugin",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename",
       "family": "installed plugin frontend and excluded backend/project inventory"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.classpath",
-      "relative_path": ".classpath",
-      "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
-      "relation": "backend/build/project artifact excluded from frontend scope",
-      "access_date": "2026-10-06",
-      "sha256": "1e44ef762bff236b874f02bb57e79c487b58fc9ce69c9a85016e1bf25147b845",
-      "target": null,
-      "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
-    },
-    {
-      "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.gitignore",
-      "relative_path": ".gitignore",
-      "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
-      "relation": "backend/build/project artifact excluded from frontend scope",
-      "access_date": "2026-10-06",
-      "sha256": "ad45b21204ee76ec1f14ac437ba3291614e677e500f9efb969463376ae333d33",
-      "target": null,
-      "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
-    },
-    {
-      "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.project",
-      "relative_path": ".project",
-      "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
-      "relation": "backend/build/project artifact excluded from frontend scope",
-      "access_date": "2026-10-06",
-      "sha256": "c9146206a9966f61ea102307e1cb23404857fb853a8697a10c698683f0c496e0",
-      "target": null,
-      "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
-    },
-    {
-      "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/DatabankRename.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/DatabankRename.jar",
       "relative_path": "DatabankRename.jar",
       "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend/build/project artifact excluded from frontend scope",
       "access_date": "2026-10-06",
-      "sha256": "f3fa6e90b8a222f61a608081bec6d71ba3d6b234099cb37064299441b8a08b84",
+      "sha256": "599ccf09cfdbdd4eb4e56c8aef81b2a6dfebe73743a0106e92abde7c77a1dffa",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
       "relative_path": "src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
       "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend/build/project artifact excluded from frontend scope",
       "access_date": "2026-10-06",
-      "sha256": "a1ecb1387345029c149be0b3543a4aa0efcc265e94568d4713c39f9e6c93fe9b",
+      "sha256": "d42c498a9d97ee354665217c6e4af8c7ac4627e2aed1ade253d0410fbf69947d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
       "relative_path": "src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
       "location": "whole artifact; inventory only",
-      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend/build/project artifact excluded from frontend scope",
       "access_date": "2026-10-06",
-      "sha256": "d30276b7940fc85fdefe7c9d395983957008b23e5e83a523775cc206cc51239f",
+      "sha256": "ef45edc82083a3231e53b807356b224b4a33d7e72cab9c0357381c70d7381471",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/databankRenamePopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/databankRenamePopup.html",
       "relative_path": "ui/databankRenamePopup.html",
       "location": "lines 1-41; frontend responsibility boundary",
-      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "70ae8b256ba2a4c17a6706266723eba314f04dd505ab56cb3037aeff04b8b541",
+      "sha256": "8b16064b51c4992ea817d5a3cd13ccbaa8fb34dd08cf3080f161bec7a45c60e0",
       "target": "ui/databankRenamePopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/DatabankRenamePopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/DatabankRenamePopupCtrl.js",
       "relative_path": "ui/DatabankRenamePopupCtrl.js",
       "location": "lines 1-55; frontend responsibility boundary",
-      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a2ca3e71fb99f9075d9aeba51aa3ca3a2d683cdd4dc52fb539e26c99260758a2",
+      "sha256": "019fe0e227b798c01cf80e5e3bb3250eca0d3cc94aaac77fc1ea02ec9f702c46",
       "target": "ui/DatabankRenamePopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js",
       "relative_path": "ui/module.js",
       "location": "lines 1-39; frontend responsibility boundary",
-      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "6b28e6a3634bf8de18e8fb56c70042e9f5ed53f97fa14ea129ea858463085a4f",
+      "sha256": "273b6be8162c15bdff860a4d7be7c37f56a7dd62d9220bd0f4cfb259fdccfee1",
       "target": "ui/module.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-databankrename-plugin",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/styles.css",
       "relative_path": "ui/styles.css",
       "location": "lines 1-11; frontend responsibility boundary",
-      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "6b2b11bf618067eb8613241ab78fd94be89ff967c5785c958dc2c902238578ae",
+      "sha256": "0514964dfd427c0454acf81ee28a826a32fa100de92066adf9d9c1db5647b851",
       "target": "ui/styles.css",
       "classification": "counterpart",
-      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -169,5 +165,10 @@
       "path": "source-map.json",
       "reason": "Structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

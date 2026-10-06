@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+  "sha256": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin.class": "da22bcb2d70490f30d2b70dd8661df033fb37100fb7dfd3048d86e8c3946cec9",
+    "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet.class": "7821216b00cb3d457ff9c5e08cee05eae7db5b6eed103142a1a5b76ae5dbabd2"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin.class",
+      "occurrence": 0,
+      "sha256": "da22bcb2d70490f30d2b70dd8661df033fb37100fb7dfd3048d86e8c3946cec9",
+      "member_shard": "docs/dev/evidence/sqx145/members/221/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet.class",
+      "occurrence": 0,
+      "sha256": "7821216b00cb3d457ff9c5e08cee05eae7db5b6eed103142a1a5b76ae5dbabd2",
+      "member_shard": "docs/dev/evidence/sqx145/members/221/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/221/001.json",
+      "sha256": "3d995f56cda5291de53535661a5246b765c8dfda4254e5aa504c2e745369cc87"
+    }
+  ]
+}

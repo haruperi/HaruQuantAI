@@ -1,0 +1,2010 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-imaging-1.0-alpha1.jar",
+  "archive_sha256": "afadc2965ce10d1881861969e3b24648faea5e602cf202baa21afcc4c35541b7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/JpegImageParser$2.class",
+      "occurrence": 0,
+      "sha256": "0ee5f441dd9031321f423732334ac3420d518b139bd9bfe6e08a07b0c3180849",
+      "name": "org/apache/commons/imaging/formats/jpeg/JpegImageParser$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor"
+      ],
+      "fields": [
+        {
+          "name": "val$result",
+          "descriptor": "[Z",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/imaging/formats/jpeg/JpegImageParser;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/jpeg/JpegImageParser;[Z)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "beginSOS",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "visitSOS",
+          "descriptor": "(I[B[B)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "visitSegment",
+          "descriptor": "(I[BI[B[B)Z",
+          "access": 1,
+          "code_sha256": "ca9153a8d7d526cd842b540a689b0b2c2529e4ad99898e219bf6db7d7f962874",
+          "code_length": 36,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/common/BinaryFunctions",
+        "org/apache/commons/imaging/formats/jpeg/JpegConstants",
+        "org/apache/commons/imaging/formats/jpeg/JpegImageParser",
+        "org/apache/commons/imaging/formats/jpeg/JpegImageParser$2",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JpegSegmentOverflowException.class",
+      "occurrence": 0,
+      "sha256": "df0489cf2023e029185db1310e7d6b568ed314d0a21363bc80567efb78d9e1fa",
+      "name": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JpegSegmentOverflowException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/imaging/ImageWriteException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/imaging/ImageWriteException",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JpegSegmentOverflowException"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$3.class",
+      "occurrence": 0,
+      "sha256": "c8f7482f94d16d1f819b677ca375c7b7d576c96852f9db5abe4255ef19a51557",
+      "name": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$3",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$SegmentFilter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JFIFPieceSegment;)Z",
+          "access": 1,
+          "code_sha256": "8c4d0b43fa1926ed1f8bd1907cae725a1e634982bb06b307ff78bfcbaa083e7a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$3",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JFIFPieceSegment",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$SegmentFilter"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JFIFPiece.class",
+      "occurrence": 0,
+      "sha256": "7666eeb1b71098d4b3cfe21af61860831fbabc5c07a44b00706977f0113ed6a5",
+      "name": "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JFIFPiece",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1028,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9c164b6f3992d601d3fa19a388b5b639fde7cc3f60dd778a34dbffec4f640427",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter",
+        "org/apache/commons/imaging/formats/jpeg/xmp/JpegRewriter$JFIFPiece"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/JpegImageMetadata.class",
+      "occurrence": 0,
+      "sha256": "a7f0b11c92b6a9d0ade1dc449313913dc62226f3009d0e2aa1b7f89a6d10ca26",
+      "name": "org/apache/commons/imaging/formats/jpeg/JpegImageMetadata",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/imaging/common/ImageMetadata"
+      ],
+      "fields": [
+        {
+          "name": "photoshop",
+          "descriptor": "Lorg/apache/commons/imaging/formats/jpeg/JpegPhotoshopMetadata;",
+          "access": 18
+        },
+        {
+          "name": "exif",
+          "descriptor": "Lorg/apache/commons/imaging/formats/tiff/TiffImageMetadata;",
+          "access": 18
+        },
+        {
+          "name": "NEWLINE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/jpeg/JpegPhotoshopMetadata;Lorg/apache/commons/imaging/formats/tiff/TiffImageMetadata;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getExif",
+          "descriptor": "()Lorg/apache/commons/imaging/formats/tiff/TiffImageMetadata;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getPhotoshop",
+          "descriptor": "()Lorg/apache/commons/imaging/formats/jpeg/JpegPhotoshopMetadata;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "findEXIFValue",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/tiff/taginfos/TagInfo;)Lorg/apache/commons/imaging/formats/tiff/TiffField;",
+          "access": 1,
+          "code_sha256": "1fc510794fc40c7b026a782f2df4055ac7a07c0449c2ae5b1fce53e8a5120144",
+          "code_length": 23
+        },
+        {
+          "name": "findEXIFValueWithExactMatch",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/tiff/taginfos/TagInfo;)Lorg/apache/commons/imaging/formats/tiff/TiffField;",
+          "access": 1,
+          "code_sha256": "a1eed29f82f77797325284f6953feed8a39e8af58ec1ad8c2b60c0f423d8f313",
+          "code_length": 24
+        },
+        {
+          "name": "getEXIFThumbnailSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "180ea1e0a21fa9843107ca344fb7e0ce43ed1d9dd0a702c5cc1a16c1632e5d81",
+          "code_length": 16,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getEXIFThumbnailData",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "786a62aad15f1ef5dc6f62ead3d4ecb542783896fc86e5d218ec81ef4b6d5447",
+          "code_length": 83,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getEXIFThumbnail",
+          "descriptor": "()Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "3fe18b78b3b162c7d6dbd90906256149c60926796c3aed80959c564ef3ec3d34",
+          "code_length": 228,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getRawImageData",
+          "descriptor": "()Lorg/apache/commons/imaging/formats/tiff/TiffImageData;",
+          "access": 1,
+          "code_sha256": "1b96c273eca30febca1313fe1fc9f68eaacdd6bf093cda08d22f4821bf86d718",
+          "code_length": 70
+        },
+        {
+          "name": "getItems",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "045e72eb7fa0ae3e8fd1fdc50f57ba23712e9102dbb9fbcb38ea75d8b5003776",
+          "code_length": 54,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/imaging/common/ImageMetadata$ImageMetadataItem;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "317d6b413db5f028d9a8e5b809f3d62629a2872209bca4b66f2251302ad33a4e",
+          "code_length": 6
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "809bee83d0a9a8cdc2ff365058eb02e0862e086d0be6a406eeda61172fe6b243",
+          "code_length": 134
+        },
+        {
+          "name": "dump",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9a6f9bf3422a98899c316034eb5b9fd2d498805f8431bd8e02ce0f48bb409bbe",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "990403f2d84fd55922fead527f0a2c8f648d6ed2eb61299dc5134f0c27ebebc3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/awt/image/BufferedImage",
+        "java/io/ByteArrayInputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "javax/imageio/ImageIO",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/Imaging",
+        "org/apache/commons/imaging/ImagingException",
+        "org/apache/commons/imaging/common/ImageMetadata",
+        "org/apache/commons/imaging/common/ImageMetadata$ImageMetadataItem",
+        "org/apache/commons/imaging/formats/jpeg/JpegImageMetadata",
+        "org/apache/commons/imaging/formats/jpeg/JpegPhotoshopMetadata",
+        "org/apache/commons/imaging/formats/tiff/JpegImageData",
+        "org/apache/commons/imaging/formats/tiff/TiffField",
+        "org/apache/commons/imaging/formats/tiff/TiffImageMetadata",
+        "org/apache/commons/imaging/formats/tiff/TiffImageMetadata$Directory",
+        "org/apache/commons/imaging/internal/Debug"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/iptc/PhotoshopApp13Data.class",
+      "occurrence": 0,
+      "sha256": "ad03979f90890d68702e759532a2629a07ff17eb26d8318fbc613a1e547a754f",
+      "name": "org/apache/commons/imaging/formats/jpeg/iptc/PhotoshopApp13Data",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "records",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcRecord;>;"
+        },
+        {
+          "name": "rawBlocks",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcBlock;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "9f9cb4862266a0ed42097b778e0211f1caf042f3e571a4e12f71343750b4fac7",
+          "code_length": 15,
+          "generic_signature": "(Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcRecord;>;Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcBlock;>;)V"
+        },
+        {
+          "name": "getRecords",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "a3ce8a91c88e7007715a015fc83808dfd5ac2d8c79e3b6aec6f47f96efa415a9",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcRecord;>;"
+        },
+        {
+          "name": "getRawBlocks",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "e16e63fd349ff752ecd96df537f778230d52292bd5036c1dd05732c62e0d7d8a",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcBlock;>;"
+        },
+        {
+          "name": "getNonIptcBlocks",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "f2a01fc31c6496a7f6dfea56f20a01a3c350d6a3b2d19d36ab716c41f1d0bb73",
+          "code_length": 57,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/imaging/formats/jpeg/iptc/IptcBlock;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/imaging/formats/jpeg/iptc/IptcBlock",
+        "org/apache/commons/imaging/formats/jpeg/iptc/PhotoshopApp13Data"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/JpegUtils.class",
+      "occurrence": 0,
+      "sha256": "ec32b2cf326bb6184e9f2b8178d92a8988c24e75bee130214b2703e1c1febab3",
+      "name": "org/apache/commons/imaging/formats/jpeg/JpegUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/imaging/common/BinaryFileParser",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "baeac2876aeed69e93ecb79d3c4ddaa6cb03ea6e3a07fff91029db49a9794d15",
+          "code_length": 12
+        },
+        {
+          "name": "traverseJFIF",
+          "descriptor": "(Lorg/apache/commons/imaging/common/bytesource/ByteSource;Lorg/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor;)V",
+          "access": 1,
+          "code_sha256": "0e882193249697c22988db31c88e34d80a9056cbd78b90e255de2ba5bbbc1122",
+          "code_length": 390,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getMarkerName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b2d72b6c57593c12452473bab0ebd127df687d8a5c64d95c27e68cd3eec55702",
+          "code_length": 283
+        },
+        {
+          "name": "dumpJFIF",
+          "descriptor": "(Lorg/apache/commons/imaging/common/bytesource/ByteSource;)V",
+          "access": 1,
+          "code_sha256": "a8ab108822ca31e40d70e08f50cf82e7ca670f6a89448a13e23eff7a29fb36df",
+          "code_length": 16,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/nio/ByteOrder",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/common/BinaryFileParser",
+        "org/apache/commons/imaging/common/BinaryFunctions",
+        "org/apache/commons/imaging/common/ByteConversions",
+        "org/apache/commons/imaging/common/bytesource/ByteSource",
+        "org/apache/commons/imaging/formats/jpeg/JpegConstants",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils$1",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor",
+        "org/apache/commons/imaging/internal/Debug"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/segments/App14Segment.class",
+      "occurrence": 0,
+      "sha256": "fd52f697a24e9dc90c9ea94de2ea19e29e09bf210a1f794413b68c54a1b1eebc",
+      "name": "org/apache/commons/imaging/formats/jpeg/segments/App14Segment",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/imaging/formats/jpeg/segments/AppnSegment",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ADOBE_PREFIX",
+          "descriptor": "[B",
+          "access": 26
+        },
+        {
+          "name": "ADOBE_COLOR_TRANSFORM_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ADOBE_COLOR_TRANSFORM_YCbCr",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ADOBE_COLOR_TRANSFORM_YCCK",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "93bb79f7409d18742f370bebe3815d48d1ebcf2c8177e2510c329683a289447c",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IILjava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "a336f91f401d3a24e9a901de56629be7c5c575314bcc8955abc6aa9bfeb655b1",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isAdobeJpegSegment",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7eb1cb803e7f4552d89a691a771efaeb1bc491aa1ac9a263cf01de5d576fe1ac",
+          "code_length": 11
+        },
+        {
+          "name": "getAdobeColorTransform",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "35660560c11bc14b9256c34712053add9f6ad07cf13c2b12fbba56ddcdd1d097",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d4d406da7ba70047db6a9cf1cc44b8452b3e359f5b7fc8e0b874d7feb54b4e62",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayInputStream",
+        "java/io/IOException",
+        "java/lang/String",
+        "java/nio/charset/StandardCharsets",
+        "org/apache/commons/imaging/common/BinaryFunctions",
+        "org/apache/commons/imaging/formats/jpeg/segments/App14Segment",
+        "org/apache/commons/imaging/formats/jpeg/segments/AppnSegment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/segments/App13Segment.class",
+      "occurrence": 0,
+      "sha256": "0fbbc17dfa4f60eee76ccd753fe7005bfe724cc5a025766369200762cc2b9030",
+      "name": "org/apache/commons/imaging/formats/jpeg/segments/App13Segment",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/imaging/formats/jpeg/segments/AppnSegment",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/imaging/formats/jpeg/JpegImageParser;I[B)V",
+          "access": 1,
+          "code_sha256": "f610a9a1315a674977cdec2d1b972b031bccc5c1b4888888fd8f06a4a9348d60",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IILjava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "a336f91f401d3a24e9a901de56629be7c5c575314bcc8955abc6aa9bfeb655b1",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isPhotoshopJpegSegment",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a4d19448fb6258427d852b1d13ad62a1d640dcc06d29b748ec5da8d50b957720",
+          "code_length": 15
+        },
+        {
+          "name": "parsePhotoshopSegment",
+          "descriptor": "(Ljava/util/Map;)Lorg/apache/commons/imaging/formats/jpeg/iptc/PhotoshopApp13Data;",
+          "access": 1,
+          "code_sha256": "7eb805a84e0a21eef33987e0f2dc3a05346f87a44439dd4c12b909c6166570ed",
+          "code_length": 25,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lorg/apache/commons/imaging/formats/jpeg/iptc/PhotoshopApp13Data;"
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayInputStream",
+        "java/io/IOException",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/formats/jpeg/iptc/IptcParser",
+        "org/apache/commons/imaging/formats/jpeg/segments/App13Segment",
+        "org/apache/commons/imaging/formats/jpeg/segments/AppnSegment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/segments/UnknownSegment.class",
+      "occurrence": 0,
+      "sha256": "1fb507643e940ed93ce41c7c7b28e9e2512c6870892b9492df1d524499ec4cce",
+      "name": "org/apache/commons/imaging/formats/jpeg/segments/UnknownSegment",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/imaging/formats/jpeg/segments/GenericSegment",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IILjava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "cf4980985b76e7ac8b878de0fa8a28c729c325f07cbcec88e626d4aa7a40e270",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "853a394331ca829f7dbb86b9660f1ce6b4b4b9b37195d87738e4a34d531881d8",
+          "code_length": 7
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "53818469f8537929e5b58b8bd03331aec5f5dd9b6587d0778e4b5c011df6aa70",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "org/apache/commons/imaging/formats/jpeg/segments/GenericSegment",
+        "org/apache/commons/imaging/formats/jpeg/segments/UnknownSegment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$JFIFPieceSegment.class",
+      "occurrence": 0,
+      "sha256": "42246245842f49c25a0ce84d8ecd68b2d4977a286cb013e47dc8121f70bfa9bf",
+      "name": "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$JFIFPieceSegment",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$JFIFPiece",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "marker",
+          "descriptor": "I",
+          "access": 17
+        },
+        {
+          "name": "markerBytes",
+          "descriptor": "[B",
+          "access": 17
+        },
+        {
+          "name": "markerLengthBytes",
+          "descriptor": "[B",
+          "access": 17
+        },
+        {
+          "name": "segmentData",
+          "descriptor": "[B",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[B[B[B)V",
+          "access": 0,
+          "code_sha256": "b28b862aaad8c296e079cd6e779e21e9751b858901d13b2fa9435c20c8d3f26c",
+          "code_length": 27
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 4,
+          "code_sha256": "0f52ee2279e1f317710032276abd985c176a1a611111451eac32a1f714c52055",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter",
+        "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$1",
+        "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$JFIFPiece",
+        "org/apache/commons/imaging/formats/jpeg/exif/ExifRewriter$JFIFPieceSegment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor.class",
+      "occurrence": 0,
+      "sha256": "6e9028a7c55694a9f847d644ae5b24407a46bc31da795b66952f6e4a4c6d0c50",
+      "name": "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "beginSOS",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "visitSOS",
+          "descriptor": "(I[B[B)V",
+          "access": 1025
+        },
+        {
+          "name": "visitSegment",
+          "descriptor": "(I[BI[B[B)Z",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils",
+        "org/apache/commons/imaging/formats/jpeg/JpegUtils$Visitor"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/jpeg/decoder/ZigZag.class",
+      "occurrence": 0,
+      "sha256": "09e4ca6a355e25c29f22e70d34da0a62f70f4ce4ec3909d9330bef4b4a56e7db",
+      "name": "org/apache/commons/imaging/formats/jpeg/decoder/ZigZag",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZIG_ZAG",
+          "descriptor": "[I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "zigZagToBlock",
+          "descriptor": "([I[I)V",
+          "access": 9,
+          "code_sha256": "43cee244a0358a02b12e9b3e249a36912d7ae73348f1af9f349609964a34a480",
+          "code_length": 27
+        },
+        {
+          "name": "blockToZigZag",
+          "descriptor": "([I[I)V",
+          "access": 9,
+          "code_sha256": "abdfdddd75cba1f2e0766df791e0fc319a8e8ab995ee770037f8a02087d3fa4b",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a8af2d2b7952d48107de8b9a5b5675092d54ae6db1e88b0ba541a463475d9920",
+          "code_length": 380
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/formats/jpeg/decoder/ZigZag"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/formats/dcx/DcxImageParser$DcxHeader.class",
+      "occurrence": 0,
+      "sha256": "8538a759140a275be0a133b4cfaf119e15656d9ebb5e1424cd4b962345f7d3f0",
+      "name": "org/apache/commons/imaging/formats/dcx/DcxImageParser$DcxHeader",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DCX_ID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "id",
+          "descriptor": "I",
+          "access": 17
+        },
+        {
+          "name": "pageTable",
+          "descriptor": "[J",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[J)V",
+          "access": 0,
+          "code_sha256": "0dda5eb844f56c071e706fb96092e4deebb3127911b6eb5ec45c739f3d9a1f89",
+          "code_length": 15
+        },
+        {
+          "name": "dump",
+          "descriptor": "(Ljava/io/PrintWriter;)V",
+          "access": 1,
+          "code_sha256": "a303f6994692a68b0237c04cc8f7fd3a9fdb90e0d3db8e56eed016bcbb95bb9c",
+          "code_length": 67
+        }
+      ],
+      "class_references": [
+        "java/io/PrintWriter",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/imaging/formats/dcx/DcxImageParser",
+        "org/apache/commons/imaging/formats/dcx/DcxImageParser$DcxHeader"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/icc/CachingInputStream.class",
+      "occurrence": 0,
+      "sha256": "322a923ee9d56a01047d57bfd6b118de6858e7dbfff7cddd3f81362944f9214c",
+      "name": "org/apache/commons/imaging/icc/CachingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "is",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        },
+        {
+          "name": "baos",
+          "descriptor": "Ljava/io/ByteArrayOutputStream;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 0,
+          "code_sha256": "75f282fdde081fc0538543675859c779e118c4ace01e2715e52206468e24edc4",
+          "code_length": 21
+        },
+        {
+          "name": "getCache",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "1e23fd7dac57dbf6a2f116495c3a4b6be513f7610670bc87f3d77cfd15c41766",
+          "code_length": 8
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "600ead9115bbe8631b619fecd0e036ecd4bf0083e80ba3e06d7fe30376991931",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "available",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bedaac21c32513d218af7bf202edff50ca2ddb32aabd23d3c595665065d7097f",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aadddf2ab3a950a51e4b8e86083b32e2a0e6332a0ccc878f57bf7af66ad286d2",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "org/apache/commons/imaging/icc/CachingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/icc/IccTagType.class",
+      "occurrence": 0,
+      "sha256": "3b3aae4ec03b23a9fb8cc4fee428ea12259079e33c653559562c24927c07bf14",
+      "name": "org/apache/commons/imaging/icc/IccTagType",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getTypeDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getSignature",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/icc/IccTagType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/icc/IccTagDataTypes$4.class",
+      "occurrence": 0,
+      "sha256": "41e3ff6393bccb7801264eba880e003aa6f2afc7a6ffdff3b3a8aede9fee5f29",
+      "name": "org/apache/commons/imaging/icc/IccTagDataTypes$4",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/commons/imaging/icc/IccTagDataTypes",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "cc7c593dfc16808aae52e4d10e33b78e2b914ca6e0a846ef9d0429dd9f16dece",
+          "code_length": 11
+        },
+        {
+          "name": "dump",
+          "descriptor": "(Ljava/lang/String;[B)V",
+          "access": 1,
+          "code_sha256": "472048d75da350c7489b08b3df8f7eb9158585a9a9100f3e3d215c9b17f063fa",
+          "code_length": 241,
+          "throws": [
+            "org/apache/commons/imaging/ImageReadException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/nio/ByteOrder",
+        "java/nio/charset/StandardCharsets",
+        "java/util/logging/Logger",
+        "org/apache/commons/imaging/ImageReadException",
+        "org/apache/commons/imaging/common/BinaryFunctions",
+        "org/apache/commons/imaging/icc/IccTagDataTypes",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$1",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$4"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/icc/IccConstants.class",
+      "occurrence": 0,
+      "sha256": "ec1324434005af34bc134cb74d4533be94792c89cbcb63460a8b488919f1c43d",
+      "name": "org/apache/commons/imaging/icc/IccConstants",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IEC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "sRGB",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/icc/IccConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/icc/IccTagDataTypes.class",
+      "occurrence": 0,
+      "sha256": "685fa53586d9ab401e033db1d9c04dbde41c69e67534bd3bc98b3b89e5e13dda",
+      "name": "org/apache/commons/imaging/icc/IccTagDataTypes",
+      "major": 52,
+      "minor": 0,
+      "access": 17441,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "org/apache/commons/imaging/icc/IccTagDataType"
+      ],
+      "fields": [
+        {
+          "name": "DESC_TYPE",
+          "descriptor": "Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 16409
+        },
+        {
+          "name": "DATA_TYPE",
+          "descriptor": "Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 16409
+        },
+        {
+          "name": "MULTI_LOCALIZED_UNICODE_TYPE",
+          "descriptor": "Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 16409
+        },
+        {
+          "name": "SIGNATURE_TYPE",
+          "descriptor": "Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 16409
+        },
+        {
+          "name": "TEXT_TYPE",
+          "descriptor": "Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 16409
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 17
+        },
+        {
+          "name": "signature",
+          "descriptor": "I",
+          "access": 17
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 9,
+          "code_sha256": "b405c76217b5057e5fa482e7a73153ff356fd139297d8ecbbbbfdad3fadef0c1",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+          "access": 9,
+          "code_sha256": "f4b594e7acdbd71ab3b0ee5fcbbb4987df4d39563cce29c1d00ff526e90de503",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "5b766287b1711b0e1e6f9ff15ec48eb210c6701cd12f9bf56e2340e7c388372e",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/String;I)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getSignature",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;ILorg/apache/commons/imaging/icc/IccTagDataTypes$1;)V",
+          "access": 4096,
+          "code_sha256": "82de371e9e9ddee38abd779f18cdc8fc762c32efece32b6d5d0b39bfa2756ef7",
+          "code_length": 10
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Ljava/util/logging/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "253e0a26d8f0b3268f5c5fe6aad98012c7e9017e081fac065a36afe927978229",
+          "code_length": 134
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/imaging/icc/IccTagDataTypes;>;Lorg/apache/commons/imaging/icc/IccTagDataType;",
+      "class_references": [
+        "[Lorg/apache/commons/imaging/icc/IccTagDataTypes;",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/util/logging/Logger",
+        "org/apache/commons/imaging/icc/IccTagDataType",
+        "org/apache/commons/imaging/icc/IccTagDataTypes",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$1",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$2",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$3",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$4",
+        "org/apache/commons/imaging/icc/IccTagDataTypes$5"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/color/ColorCieLuv.class",
+      "occurrence": 0,
+      "sha256": "5eedd419206770cb334c31fe24e3b0bb3c3ab1137b0c428d89a97ff4727f9329",
+      "name": "org/apache/commons/imaging/color/ColorCieLuv",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BLACK",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCieLuv;",
+          "access": 25
+        },
+        {
+          "name": "WHITE",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCieLuv;",
+          "access": 25
+        },
+        {
+          "name": "RED",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCieLuv;",
+          "access": 25
+        },
+        {
+          "name": "GREEN",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCieLuv;",
+          "access": 25
+        },
+        {
+          "name": "BLUE",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCieLuv;",
+          "access": 25
+        },
+        {
+          "name": "L",
+          "descriptor": "D",
+          "access": 17
+        },
+        {
+          "name": "u",
+          "descriptor": "D",
+          "access": 17
+        },
+        {
+          "name": "v",
+          "descriptor": "D",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDD)V",
+          "access": 1,
+          "code_sha256": "1d298fd94e6b53879ad892ac2c4fd07c5af5f2b30eb17433d8dfb6d024bd72c6",
+          "code_length": 21
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f250ba98bdd5a14ba4655558f8c43371a67d73f9a0f550aa0cfc4f4627171420",
+          "code_length": 52
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "46d5036ea61328e1df6f80682288b1ec081a82c587be8c1db1d91aeee2e98c19",
+          "code_length": 79
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a94d7c7a44bc41302c87a8d27676f3f3d4554f3aa1f2e4c8b15061317f0018ee",
+          "code_length": 60
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "86d1b5db5f71c340dd7786766a18572561251c723d5db199d6c5f1750b387405",
+          "code_length": 88
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/imaging/color/ColorCieLuv"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/color/ColorCmyk.class",
+      "occurrence": 0,
+      "sha256": "965ba2c24790e8b899c8088ba54da6831c718a060d79aa30a07e1a8dcaead4c5",
+      "name": "org/apache/commons/imaging/color/ColorCmyk",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CYAN",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "MAGENTA",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "YELLOW",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "BLACK",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "WHITE",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "RED",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "GREEN",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "BLUE",
+          "descriptor": "Lorg/apache/commons/imaging/color/ColorCmyk;",
+          "access": 25
+        },
+        {
+          "name": "C",
+          "descriptor": "D",
+          "access": 17
+        },
+        {
+          "name": "M",
+          "descriptor": "D",
+          "access": 17
+        },
+        {
+          "name": "Y",
+          "descriptor": "D",
+          "access": 17
+        },
+        {
+          "name": "K",
+          "descriptor": "D",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDDD)V",
+          "access": 1,
+          "code_sha256": "d0c42c0defd98f6e19d27a19fc79ddd195111986e46b712820f14d8ee3fb1f18",
+          "code_length": 27
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ffe3c634040d34da35d565ae075db6020b54bcdd76f668bdad9f31e66c3bb636",
+          "code_length": 64
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "6021f980725b600ece15b971a60c1461cfcfe235991ab9b849bbd8e3b86dc8ab",
+          "code_length": 95
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "535fc253204fb8a427d28864b238ff0ea02a22c4b3e3f29b64994711df9f694e",
+          "code_length": 81
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "70be1d89c95560145f759ad5f3ec8808b37f60271ca6e36fb12ac45bb1807bfc",
+          "code_length": 133
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/imaging/color/ColorCmyk"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/palette/LongestAxisMedianCut$3.class",
+      "occurrence": 0,
+      "sha256": "f023f544779aa2fcdd136a5728fd0205b8db332f2abe097845b5f57ed51c9986",
+      "name": "org/apache/commons/imaging/palette/LongestAxisMedianCut$3",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$commons$imaging$palette$ColorComponent",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "30d04f9da2a65e0dea9f300f16bddb766bc0c175b0cdf003d97691879fda3b51",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/commons/imaging/palette/ColorComponent",
+        "org/apache/commons/imaging/palette/LongestAxisMedianCut",
+        "org/apache/commons/imaging/palette/LongestAxisMedianCut$3"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/palette/SimplePalette.class",
+      "occurrence": 0,
+      "sha256": "ea0ac7e5d048730f37ff12db89f8ad7e8f6e4350eac9fa8c004ac3950432809e",
+      "name": "org/apache/commons/imaging/palette/SimplePalette",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/imaging/palette/Palette"
+      ],
+      "fields": [
+        {
+          "name": "palette",
+          "descriptor": "[I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getPaletteIndex",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "18c0690e37011320746929b2dd584b9e8c46b0655cde7aa7695294e01370c522",
+          "code_length": 31
+        },
+        {
+          "name": "getEntry",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "712c47ca7ed458b691456516815f1d5f86a8c176300f756a8276545b32c5187c",
+          "code_length": 7
+        },
+        {
+          "name": "length",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "860a6294a8cf542dcf8e8f610662efb846f637275fe0d5ed5b6368669c7330a0",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/palette/Palette",
+        "org/apache/commons/imaging/palette/SimplePalette"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/palette/Palette.class",
+      "occurrence": 0,
+      "sha256": "434cbc74dfb0344ea363f9cb8a4fe11f77f269fc3d9d653543632648275c5e1c",
+      "name": "org/apache/commons/imaging/palette/Palette",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPaletteIndex",
+          "descriptor": "(I)I",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/imaging/ImageWriteException"
+          ]
+        },
+        {
+          "name": "getEntry",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "length",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/ImageWriteException",
+        "org/apache/commons/imaging/palette/Palette"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/common/RationalNumber.class",
+      "occurrence": 0,
+      "sha256": "cfe37993eb51bc11168a6bbc4c3bc15bbec8982f35f62254bd9a00687a902caf",
+      "name": "org/apache/commons/imaging/common/RationalNumber",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Number",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "TOLERANCE",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "numerator",
+          "descriptor": "I",
+          "access": 17
+        },
+        {
+          "name": "divisor",
+          "descriptor": "I",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "a6ea27b7ce34b1aaec684f1557bc6eb47bbc2b2b415358f587e96697314e98e4",
+          "code_length": 15
+        },
+        {
+          "name": "factoryMethod",
+          "descriptor": "(JJ)Lorg/apache/commons/imaging/common/RationalNumber;",
+          "access": 8,
+          "code_sha256": "d296067f54cfd52e4605eeb187049f51b4307b6af3e708e2003c6415311a42c8",
+          "code_length": 164
+        },
+        {
+          "name": "gcd",
+          "descriptor": "(JJ)J",
+          "access": 10,
+          "code_sha256": "1b743cfdbc8c5df5f1817fe96aaac37a6c3b10abae4eca007c5b6b166df7b72e",
+          "code_length": 16
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/apache/commons/imaging/common/RationalNumber;",
+          "access": 1,
+          "code_sha256": "d71fd3c76e61dcff0ae6350d03be76c4b635c6f713be88c8617f92286b38b63f",
+          "code_length": 17
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "5475b9df35688fa24a9d21a5908e386db902403f1e7c0ddcfe609764b923ad16",
+          "code_length": 12
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "b9f74b0f1f2214ab932d5ed54c92cfaa026f681370bd5c0afbac83eb55bcc34c",
+          "code_length": 12
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "718a5556e7fcdb5d0d7d740fe1f00956e59635fbe961e5f44447b6e073a7d6ac",
+          "code_length": 10
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "aba0ea598fc0f51a9a29c0177879f457ef133eb30384acd924c45f2e751aedd6",
+          "code_length": 12
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a77d0f6313c31c94c3d876b8dd6530bc33e3a1c7546ca8bd6158514fcc2173b0",
+          "code_length": 136
+        },
+        {
+          "name": "toDisplayString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "df44762e14d0158b54545b32f1dec6016112577261dece1531dd7ac395bceee9",
+          "code_length": 50
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(D)Lorg/apache/commons/imaging/common/RationalNumber;",
+          "access": 9,
+          "code_sha256": "34392e906d6b6b34a1dbf2ce8bcc70e62b4e00e4d96ba41a2c9332150d6a7a89",
+          "code_length": 427
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Number",
+        "java/lang/NumberFormatException",
+        "java/lang/StringBuilder",
+        "java/text/NumberFormat",
+        "org/apache/commons/imaging/common/RationalNumber",
+        "org/apache/commons/imaging/common/RationalNumber$Option"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/common/itu_t4/HuffmanTree$1.class",
+      "occurrence": 0,
+      "sha256": "04b8890951e85049a19cfd1ce04e81e694e764baae9b80faa6ea327ffa879a32",
+      "name": "org/apache/commons/imaging/common/itu_t4/HuffmanTree$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/imaging/common/itu_t4/HuffmanTree",
+        "org/apache/commons/imaging/common/itu_t4/HuffmanTree$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/common/itu_t4/T4_T6_Tables$Entry.class",
+      "occurrence": 0,
+      "sha256": "a99984d4ad410b518dccba7b8688727aa248b69ed072649be72753104fe53591",
+      "name": "org/apache/commons/imaging/common/itu_t4/T4_T6_Tables$Entry",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bitString",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "33d1434634659fcbe89c6ab81d29c940413b375b6ef8087457cfaf549792eb92",
+          "code_length": 18
+        },
+        {
+          "name": "writeBits",
+          "descriptor": "(Lorg/apache/commons/imaging/common/itu_t4/BitArrayOutputStream;)V",
+          "access": 1,
+          "code_sha256": "5b88a7a0291ad8892c2c137c85f42b93ae2d4bf1965b9626be1c475c73553bf0",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/imaging/common/itu_t4/BitArrayOutputStream",
+        "org/apache/commons/imaging/common/itu_t4/T4_T6_Tables",
+        "org/apache/commons/imaging/common/itu_t4/T4_T6_Tables$Entry"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/common/mylzw/MyLzwCompressor$ByteArray.class",
+      "occurrence": 0,
+      "sha256": "04605fcf0d75593471c974b77524704c2fb86fd5a4957c94a7cf9ea0a6b72a0c",
+      "name": "org/apache/commons/imaging/common/mylzw/MyLzwCompressor$ByteArray",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bytes",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "start",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([BII)V",
+          "access": 0,
+          "code_sha256": "4c7c7325cfafa2be509c3d404f76b6f9701fab7083409b52bedde949a07b79fd",
+          "code_length": 72
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f0b15fbde02ff08d5a1bc7e5cba83a4dcb2a5f24be1b60e8c1d0a7eddb832d35",
+          "code_length": 85
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/Object",
+        "org/apache/commons/imaging/common/mylzw/MyLzwCompressor",
+        "org/apache/commons/imaging/common/mylzw/MyLzwCompressor$ByteArray"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/imaging/common/mylzw/MyLzwDecompressor.class",
+      "occurrence": 0,
+      "sha256": "5e1b9d970b9623383b7463782f2f98d19b071cd12c16957c2f52bdf951988e90",
+      "name": "org/apache/commons/imaging/common/mylzw/MyLzwDecompressor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_TABLE_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "table",
+          "descriptor": "[[B",
+          "access": 18
+        },
+        {
+          "name": "codeSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "initialCodeSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "codes",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "byteOrder",
+          "descriptor": "Ljava/nio/ByteOrder;",
+          "access": 18
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lorg/apache/commons/imaging/common/mylzw/MyLzwDecompressor$Listener;",
+          "access": 18
+        },
+        {
+          "name": "clearCode",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "eoiCode",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "written",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "tiffLZWMode",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/nio/ByteOrder;)V",
+          "access": 1,
+          "code_sha256": "3690b1d42d7f538d4eb78ebd061f3c7c0cea4d61650878f252e4a9cb5ed21302",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/nio/ByteOrder;Lorg/apache/commons/imaging/common/mylzw/MyLzwDecompressor$Listener;)V",
+          "access": 1,
+          "code_sha256": "8314bee05baac6cda6c3d074f096c5f8c55facc2f22fda670209e34334be0b44",
+          "code_length": 75
+        },
+        {
+          "name": "initializeTable",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0ba7fd720c5d9cd2995d0abea618309e8d1043fced3b5f0531041d8c1908bc1e",
+          "code_length": 45
+        },
+        {
+          "name": "clearTable",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "346c8896012b0e7f52903ab7eb616c4f2b2ff9c1b5b22c69c0bdb00da4f102ee",
+          "code_length": 25
+        },
+        {
+          "name": "getNextCode",
+          "descriptor": "(Lorg/apache/commons/imaging/common/mylzw/MyBitInputStream;)I",
+          "access": 2,
+          "code_sha256": "93f7ea52506c09e447780ddfda42b9d7e7a334779190f26153cae478696db260",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "stringFromCode",
+          "descriptor": "(I)[B",
+          "access": 2,
+          "code_sha256": "fee757d7bb374c39499c7186cdfd024ffa99aa86d20c5dfb6527b1334ef69222",
+          "code_length": 83,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isInTable",
+          "descriptor": "(I)Z",
+          "access": 2,
+          "code_sha256": "67bad79cbee1a75c40e4bad62790e24909d462468d1918e048d11835cc4ee867",
+          "code_length": 14
+        },
+        {
+          "name": "firstChar",
+          "descriptor": "([B)B",
+          "access": 2,
+          "code_sha256": "04cb867d2e99a0898f36978f5546c05be9c5cbe63fcb0750e1f95bb6ab57165d",
+          "code_length": 4
+        },
+        {
+          "name": "addStringToTable",
+          "descriptor": "([B)V",
+          "access": 2,
+          "code_sha256": "fff3dab6f84530dd68501d1d5735034b1e2fdf1f74f2735d1e2591701747bd94",
+          "code_length": 83,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "appendBytes",
+          "descriptor": "([BB)[B",
+          "access": 2,
+          "code_sha256": "ab4fdc7b5a37d92e4f3896123fe4fb1efcba3fa4b386c2135732caef79fd57db",
+          "code_length": 25
+        },
+        {
+          "name": "writeToResult",
+          "descriptor": "(Ljava/io/OutputStream;[B)V",
+          "access": 2,
+          "code_sha256": "d7053b03d75210a36f83953eae3e25fa9a86bf1f5d6772427fd8e662ca243240",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setTiffLZWMode",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc486a3a832d6ab89f92cc9e398799424e096312116591982093f93de19da1e5",
+          "code_length": 6
+        },
+        {
+          "name": "decompress",
+          "descriptor": "(Ljava/io/InputStream;I)[B",
+          "access": 1,
+          "code_sha256": "7f0a628f5148d8388b8d84ea5c52ea66d0cb3225b754fd8fdfa738bd66fa9b1a",
+          "code_length": 220,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "checkCodeSize",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ef60006f5754572d5c6b6536c89dcec494fcf3a525260984aed2cff439503dda",
+          "code_length": 30
+        },
+        {
+          "name": "incrementCodeSize",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9c9192530976cd99f28d59ed8b00fd81716829b0b9666d22de00bdcaeb697ab2",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/nio/ByteOrder",
+        "org/apache/commons/imaging/common/mylzw/MyBitInputStream",
+        "org/apache/commons/imaging/common/mylzw/MyLzwDecompressor",
+        "org/apache/commons/imaging/common/mylzw/MyLzwDecompressor$Listener"
+      ]
+    }
+  ]
+}

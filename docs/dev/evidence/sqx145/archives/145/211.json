@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
+  "sha256": "e68533b22cc2d8d670723f4ffd023cfe2099a44e75abb81ae8e209350ddd9b0f",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartPlugin.class": "29bab6ade279b75a158d5d9743bc4fd2161f1c3480945c99ffb6e182daa3d7b8",
+    "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet.class": "30aee32fadf133bd305bfdc770705e866ceebfa826f73a83b93794206247c31b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartPlugin.class",
+      "occurrence": 0,
+      "sha256": "29bab6ade279b75a158d5d9743bc4fd2161f1c3480945c99ffb6e182daa3d7b8",
+      "member_shard": "docs/dev/evidence/sqx145/members/211/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/ProfileChart/ProfileChartServlet.class",
+      "occurrence": 0,
+      "sha256": "30aee32fadf133bd305bfdc770705e866ceebfa826f73a83b93794206247c31b",
+      "member_shard": "docs/dev/evidence/sqx145/members/211/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/211/001.json",
+      "sha256": "dce0f77e8f1f5dda0c478526aa4f28cf9a8fa08b218b4b7dd4bbb91b9bec3514"
+    }
+  ]
+}

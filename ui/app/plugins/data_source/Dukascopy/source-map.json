@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "UI-only Dukascopy structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Dukascopy",
-  "source_head": "73c92a8ba76af6a62644e0307b8f6dd6237cc4a2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_101814_dukascopy-ui-traceability-pilot/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy",
       "id": "sqx-dukascopy-ui",
       "family": "installed plugin UI artifacts"
     }
@@ -35,250 +35,345 @@
   "sources": [
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/addPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/addPopup.html",
       "relative_path": "add/addPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "3eb6ef5a59fe3c616b499047c85cec528a4bc43cbd21339f3261718f7b1a8691",
+      "sha256": "d1e3dd9da2f35f25ec97db669504214189499d2acb9be7741a532b79135b1f96",
       "target": "add/addPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/addPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/addPopupCtrl.js",
       "relative_path": "add/addPopupCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "ac5f6b45e3b929820884cfcc1814a3342673138508eee5d1510b23b05a3a4077",
+      "sha256": "12d54b2f377ffda66a658b5838e64dbfb396164ec4ee88fdac3a364d7a366539",
       "target": "add/addPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/module.js",
       "relative_path": "add/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "809b89b0ee62fd4e419571f46d33c9c3ba497e60ba56fbe3f07f53fab1e8fdb8",
+      "sha256": "c8922ddf1e18a07fa6940c524fe218e74676b017d7ef6bc28a5fa5074aee1f95",
       "target": "add/module.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/selectInstrumentsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/selectInstrumentsPopup.html",
       "relative_path": "add/selectInstrumentsPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "f37efd842b29a041e7bf7cef9e94396f2e101f0d42f590ad1bddef2985bd4e6c",
+      "sha256": "85792926db77b20b8e0ce3f8c214bbe0224024f16610d4a806e5294747e11316",
       "target": "add/selectInstrumentsPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/styles.css",
       "relative_path": "add/styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "f355aba0c85d9e1c2cf2e04560cd0810264f7feba9e46fc15609725760f2d13f",
+      "sha256": "601af657bfaf64712b71b5b4448ca00d126b60aff9fb10f167416d611a6dbd02",
       "target": "add/styles.css",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
       "relative_path": "DataSourceDukascopy.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "non-UI artifact excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "df1d953afd25874724953ac4793cc856698960f41a30e29db60ec02fc1502cf4",
+      "sha256": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c",
       "target": null,
       "classification": "excluded",
-      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping."
+      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/cdnDisclaimerPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/cdnDisclaimerPopup.html",
       "relative_path": "disclaimer/cdnDisclaimerPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "672e627c2f7726578db91f9ba5a7a76d91ba5075e5311c62832937f351e32ee2",
+      "sha256": "5e1f091fd73c15a24ed99c46567a6213f0534279273edc83a11c6959982a9a2d",
       "target": "disclaimer/cdnDisclaimerPopup.tsx",
       "classification": "counterpart",
-      "limitation": "External reachability unverified; exported variant retained without adding an application route."
+      "limitation": "External reachability unverified; exported variant retained without adding an application route. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/disclaimerPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/disclaimerPopup.html",
       "relative_path": "disclaimer/disclaimerPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "559524030f2bf301981d37e603c036f168783aab110d002acd6c9b8346b16115",
+      "sha256": "3b08efc1e2040e5d4cbda4bac835c4dc7e36b6ada1582b8510b5edf0edfd389f",
       "target": "disclaimer/disclaimerPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/dukascopyDataDisclaimerCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/dukascopyDataDisclaimerCtrl.js",
       "relative_path": "disclaimer/dukascopyDataDisclaimerCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "5ca34897892611b2b9feea74205e24ea9247efeea1f8ca858beeb61559d1d62b",
+      "sha256": "4f85e66ad8d788c6128c1053a03394c3ff5efa71e626d06e9d042f6568ac5446",
       "target": "disclaimer/dukascopyDataDisclaimerCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/disclaimer/module.js",
       "relative_path": "disclaimer/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "1119fd65ea2703e01cd47f97b9ff4c6d1a07d9625ded6978c554a218eec4b0c7",
+      "sha256": "367e578ffe51926d195e234c7555ba96d43d335cbbdfd5f1f13fde28a66dc33e",
       "target": "disclaimer/module.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/dukascopy.csv",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/dukascopy.csv",
       "relative_path": "dukascopy.csv",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "non-UI artifact excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "b14be89b5c016b1b2c6de0f3c1c00bdcc90661858bf6c8137a65c1c1e71536b0",
+      "sha256": "461c3fe3dfceca2b6f25639b8e351efe5593864b715f95493ac5cd3f0aa7c553",
       "target": null,
       "classification": "excluded",
-      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping."
+      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/dukascopy.ico",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/dukascopy.ico",
       "relative_path": "dukascopy.ico",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "non-UI artifact excluded from counterpart count",
       "access_date": "2026-10-06",
       "sha256": "e1383dac63867d7ee9072ebe36272bbd8608b5d981a20792af4eb2d40c2da4f0",
       "target": null,
       "classification": "excluded",
-      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping."
+      "limitation": "JAR, catalogue and icon are outside the scoped HTML/JS/CSS mapping. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DukascopyService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DukascopyService.js",
       "relative_path": "DukascopyService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "4f26d44369e8c65fed010db39df8c5e6adf66b349e472a0a29fe922ac3618415",
+      "sha256": "3372da5e88ae790cbc9a69e0dc3e767351f9786c6280dd860606450b66cf29e3",
       "target": "DukascopyService.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/cdnDisclaimerPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/cdnDisclaimerPopup.html",
       "relative_path": "import/cdnDisclaimerPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "d8a58bca9df80b49c78c615b86b3de85fc44cab37cf964f4eefbfa5e897d1f61",
+      "sha256": "d941e35379df7c179ee14f7b1e59d7e1739bdc91e14e9020b1c9c0645cf152d6",
       "target": "import/cdnDisclaimerPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/importPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/importPopup.html",
       "relative_path": "import/importPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "e1f266122bbea0083309f1f178acfc5a8924a71a5c6a78dec30a920c14a3a23e",
+      "sha256": "551bc9d52840650f84055cb8db62db5a2fbbc6dc01134a1f727c30e904e2293a",
       "target": "import/importPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/importPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/importPopupCtrl.js",
       "relative_path": "import/importPopupCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "2a740204ce4ae15d76778b8dd7f19045d14adbdbf49fa88de39b5b45a897ded3",
+      "sha256": "77836f1c295b414a5b151f0d12c92e4c467f61dc24caf1620c5f08ea30115dbc",
       "target": "import/importPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/module.js",
       "relative_path": "import/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "0c868c358363ccce254d6fd7c7cbad0c1844632422fb5a8ce15a0799a98152fc",
+      "sha256": "12c53aee3adef15c9f58143b6ae0c3e4376d4f682b1c414a10806945eb61416e",
       "target": "import/module.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "071c5e9e9d7d0bdf8e360a7e51fc85912e0fb72e8e72dbac40b5eba6f1966513",
+      "sha256": "f1a424cfe5dd97189497b35e2ce4ab4b5b27a990e24fce997681dca665aeeb04",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-dukascopy-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/style.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/style.css",
       "relative_path": "style.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local file inventory, SHA-256 and scoped source inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
-      "sha256": "acfa768c9d76280e22d9ebd030229c5cb230618b61b1760c06c5e987eed329d1",
+      "sha256": "f281eb16bb1e9b094d847ab6e1b2acbc81ddec30f6ee76517daa6920891037e3",
       "target": "style.css",
       "classification": "counterpart",
-      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity."
+      "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -298,5 +393,10 @@
       "reason": "Structural mapping manifest, not a behavioral evidence ledger.",
       "path": "source-map.json"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

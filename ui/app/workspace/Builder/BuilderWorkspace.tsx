@@ -8,10 +8,10 @@ import { FullSettingsView } from './FullSettingsView';
 import type { EngineRunStatus } from './fixtures';
 /**
  * Builder workspace shell in SQX Progress-tab parity (donor evidence
- * SQX144-EV-000033): the 51px dashboard header with the clickable project
+ * retained target UI; current donor equivalence unverified): the 51px dashboard header with the clickable project
  * name and the Progress / Full settings / Results large tabs. Progress is
  * the initial panel; Full settings mounts the donor-parity Advanced
- * settings surface (SQX144-EV-000038..043).
+ * settings surface (retained target UI; current donor equivalence unverified).
  */
 export type BuilderPanel = 'progress' | 'settings' | 'results';
 export function BuilderWorkspace() {

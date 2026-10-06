@@ -57,7 +57,7 @@ def main() -> int:
         logger.error("FR-DEV-RESOLVE-NPM: npm launcher not found")
         return 1
     logger.info("FR-DEV-RESOLVE-NPM: npm launcher resolved")
-    audit = root / ".agents/logs/20261006_175657_p00-prerequisites"
+    audit = root / ".agents/logs/reference-qualification"
     try:
         audit.mkdir(parents=True, exist_ok=True)
     except OSError as error:
@@ -103,7 +103,7 @@ def main() -> int:
             "--cov-branch",
             "--cov-fail-under=80",
             "--cov-report=term-missing",
-            "--cov-report=json:.agents/logs/20261006_175657_p00-prerequisites/coverage.json",
+            "--cov-report=json:.agents/logs/reference-qualification/coverage.json",
         ),
         (npm, "--prefix", "ui", "run", "typecheck"),
         (npm, "--prefix", "ui", "run", "test"),

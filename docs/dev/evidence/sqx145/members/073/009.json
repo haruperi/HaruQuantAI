@@ -1,0 +1,4957 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/kotlin-stdlib-2.2.21.jar",
+  "archive_sha256": "6558a3d233da56a20934b32159f9db5f86ed5816ef098f78a2c223dc6abb79dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "kotlin/reflect/KAnnotatedElement.class",
+      "occurrence": 0,
+      "sha256": "d1ff050bc46a8f1df0316f0ef0af75f00f5238246a924004c4e4073e992b820f",
+      "name": "kotlin/reflect/KAnnotatedElement",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getAnnotations",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/annotation/Annotation;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KAnnotatedElement"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KCallable$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "954e8b49a39ca94e8c3476183717d568bd4d81907caa10fc9e52d08756ed0f9f",
+      "name": "kotlin/reflect/KCallable$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getTypeParameters$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getVisibility$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isFinal$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isOpen$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isAbstract$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isSuspend$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KCallable",
+        "kotlin/reflect/KCallable$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KCallable.class",
+      "occurrence": 0,
+      "sha256": "bb147883fd17525e4a2c85fd37d8c70abb261b394794472f0821fdf1723abf40",
+      "name": "kotlin/reflect/KCallable",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KAnnotatedElement"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KParameter;>;"
+        },
+        {
+          "name": "getReturnType",
+          "descriptor": "()Lkotlin/reflect/KType;",
+          "access": 1025
+        },
+        {
+          "name": "getTypeParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KTypeParameter;>;"
+        },
+        {
+          "name": "call",
+          "descriptor": "([Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1153,
+          "generic_signature": "([Ljava/lang/Object;)TR;"
+        },
+        {
+          "name": "callBy",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Lkotlin/reflect/KParameter;+Ljava/lang/Object;>;)TR;"
+        },
+        {
+          "name": "getVisibility",
+          "descriptor": "()Lkotlin/reflect/KVisibility;",
+          "access": 1025
+        },
+        {
+          "name": "isFinal",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isSuspend",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<R:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KAnnotatedElement;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KAnnotatedElement",
+        "kotlin/reflect/KCallable",
+        "kotlin/reflect/KCallable$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KClass$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "d01e37db3bc55e3dc910ec5464b03fcca7d4ee0aea493ffc1c725369d28202cf",
+      "name": "kotlin/reflect/KClass$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTypeParameters$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getSupertypes$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getSealedSubclasses$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getVisibility$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isFinal$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isOpen$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isAbstract$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isSealed$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isData$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isInner$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isCompanion$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isFun$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isValue$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KClass",
+        "kotlin/reflect/KClass$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KClass.class",
+      "occurrence": 0,
+      "sha256": "1239e11c68ed81cd78cdf1ba924915d0318a5d1e0c7ba1ad7ed81d9e13f0bc4b",
+      "name": "kotlin/reflect/KClass",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KDeclarationContainer",
+        "kotlin/reflect/KAnnotatedElement",
+        "kotlin/reflect/KClassifier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSimpleName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getQualifiedName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getMembers",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Lkotlin/reflect/KCallable<*>;>;"
+        },
+        {
+          "name": "getConstructors",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Lkotlin/reflect/KFunction<TT;>;>;"
+        },
+        {
+          "name": "getNestedClasses",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Lkotlin/reflect/KClass<*>;>;"
+        },
+        {
+          "name": "getObjectInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "isInstance",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getTypeParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KTypeParameter;>;"
+        },
+        {
+          "name": "getSupertypes",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KType;>;"
+        },
+        {
+          "name": "getSealedSubclasses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KClass<+TT;>;>;"
+        },
+        {
+          "name": "getVisibility",
+          "descriptor": "()Lkotlin/reflect/KVisibility;",
+          "access": 1025
+        },
+        {
+          "name": "isFinal",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isSealed",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isData",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isInner",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isCompanion",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isFun",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isValue",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KDeclarationContainer;Lkotlin/reflect/KAnnotatedElement;Lkotlin/reflect/KClassifier;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KAnnotatedElement",
+        "kotlin/reflect/KClass",
+        "kotlin/reflect/KClass$DefaultImpls",
+        "kotlin/reflect/KClassifier",
+        "kotlin/reflect/KDeclarationContainer"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KClasses.class",
+      "occurrence": 0,
+      "sha256": "1427cad7d26e34069ac1902c806f5f4e5703af24901cad98449635106e9b29c8",
+      "name": "kotlin/reflect/KClasses",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "cast",
+          "descriptor": "(Lkotlin/reflect/KClass;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 25,
+          "code_sha256": "0c98069cf827b56e158f3052006057fecc19f49a403f583f987c6b526b4559fc",
+          "code_length": 60,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lkotlin/reflect/KClass<TT;>;Ljava/lang/Object;)TT;"
+        },
+        {
+          "name": "safeCast",
+          "descriptor": "(Lkotlin/reflect/KClass;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 25,
+          "code_sha256": "e926c031d3c68f30a21e18e47465c02c2c9ba8122f21da86081ab871d5514638",
+          "code_length": 28,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lkotlin/reflect/KClass<TT;>;Ljava/lang/Object;)TT;"
+        }
+      ],
+      "class_references": [
+        "java/lang/ClassCastException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/KClass",
+        "kotlin/reflect/KClasses"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KClassesImplKt.class",
+      "occurrence": 0,
+      "sha256": "ad491b452c5cae855153828f31fec73ff7e3dfe648ac44f584071d5af6a0ce3a",
+      "name": "kotlin/reflect/KClassesImplKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQualifiedOrSimpleName",
+          "descriptor": "(Lkotlin/reflect/KClass;)Ljava/lang/String;",
+          "access": 25,
+          "code_sha256": "6f4714c6b87843401a2d1a767544cb4b1579ba2fcc68acf9c1cf50c349193a89",
+          "code_length": 15,
+          "generic_signature": "(Lkotlin/reflect/KClass<*>;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/KClass",
+        "kotlin/reflect/KClassesImplKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KClassifier.class",
+      "occurrence": 0,
+      "sha256": "5230b949d0fda1911e865eddc046a1cc80299adee753c74dd485ec9883afea3a",
+      "name": "kotlin/reflect/KClassifier",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KClassifier"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KDeclarationContainer.class",
+      "occurrence": 0,
+      "sha256": "b5a9169de2b84bbbe961cf43b43a5ff9d6542bf4bd82d5f6c504f5855874d270",
+      "name": "kotlin/reflect/KDeclarationContainer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getMembers",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Lkotlin/reflect/KCallable<*>;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KDeclarationContainer"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KFunction$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "d3a3cd5af1ebf8ba4716447b4aaa3381589883b31133ad0bb6d69431cd837b0f",
+      "name": "kotlin/reflect/KFunction$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isInline$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isExternal$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isOperator$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isInfix$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isSuspend$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KFunction",
+        "kotlin/reflect/KFunction$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KFunction.class",
+      "occurrence": 0,
+      "sha256": "d049004b89a5e2681f634d4f1ba7c3f6099e7c105a99ac03b4d5bbeaf41f770b",
+      "name": "kotlin/reflect/KFunction",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KCallable",
+        "kotlin/Function"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isInline",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isExternal",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isOperator",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isInfix",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isSuspend",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<R:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KCallable<TR;>;Lkotlin/Function<TR;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/Function",
+        "kotlin/reflect/KCallable",
+        "kotlin/reflect/KFunction",
+        "kotlin/reflect/KFunction$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty$Setter.class",
+      "occurrence": 0,
+      "sha256": "73106867284682c5ad28306077ac0888343337734352fee609d91fa7ccb14b36",
+      "name": "kotlin/reflect/KMutableProperty$Setter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty$Accessor",
+        "kotlin/reflect/KFunction"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty$Accessor<TV;>;Lkotlin/reflect/KFunction<Lkotlin/Unit;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KFunction",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Accessor"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty.class",
+      "occurrence": 0,
+      "sha256": "b8bb3a63ff8d603340b234813d0e5107244fcea5506c651a0c6723729f5196b3",
+      "name": "kotlin/reflect/KMutableProperty",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSetter",
+          "descriptor": "()Lkotlin/reflect/KMutableProperty$Setter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KMutableProperty$Setter<TV;>;"
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/reflect/KProperty"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty0$Setter.class",
+      "occurrence": 0,
+      "sha256": "46adffe203563421e2ceda9cf11426174d288c242c50b94a9d5a8feeede7ba6f",
+      "name": "kotlin/reflect/KMutableProperty0$Setter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/jvm/functions/Function1"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KMutableProperty$Setter<TV;>;Lkotlin/jvm/functions/Function1<TV;Lkotlin/Unit;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/reflect/KMutableProperty0",
+        "kotlin/reflect/KMutableProperty0$Setter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty0.class",
+      "occurrence": 0,
+      "sha256": "144c10f11e44e94ace5aa42504d4abdf3413bb5dd7ba212a36bbb4835ee6881c",
+      "name": "kotlin/reflect/KMutableProperty0",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty0",
+        "kotlin/reflect/KMutableProperty"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TV;)V"
+        },
+        {
+          "name": "getSetter",
+          "descriptor": "()Lkotlin/reflect/KMutableProperty0$Setter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KMutableProperty0$Setter<TV;>;"
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty0<TV;>;Lkotlin/reflect/KMutableProperty<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty0",
+        "kotlin/reflect/KMutableProperty0$Setter",
+        "kotlin/reflect/KProperty0"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty1$Setter.class",
+      "occurrence": 0,
+      "sha256": "9b4768320954918acfc53626db908206be3ffc2a92d27e27cd1fbb2f0bb82d41",
+      "name": "kotlin/reflect/KMutableProperty1$Setter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/jvm/functions/Function2"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KMutableProperty$Setter<TV;>;Lkotlin/jvm/functions/Function2<TT;TV;Lkotlin/Unit;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function2",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/reflect/KMutableProperty1",
+        "kotlin/reflect/KMutableProperty1$Setter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty1.class",
+      "occurrence": 0,
+      "sha256": "fb1085ffefaa7f3371113b53edf2640b67cb530666e5739b8e491fc891f1278b",
+      "name": "kotlin/reflect/KMutableProperty1",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty1",
+        "kotlin/reflect/KMutableProperty"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TT;TV;)V"
+        },
+        {
+          "name": "getSetter",
+          "descriptor": "()Lkotlin/reflect/KMutableProperty1$Setter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KMutableProperty1$Setter<TT;TV;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty1<TT;TV;>;Lkotlin/reflect/KMutableProperty<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty1",
+        "kotlin/reflect/KMutableProperty1$Setter",
+        "kotlin/reflect/KProperty1"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty2$Setter.class",
+      "occurrence": 0,
+      "sha256": "083e68956aa737e7ac4fe7bf656b00dbe70887847559c14f299d551d4fc89c85",
+      "name": "kotlin/reflect/KMutableProperty2$Setter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/jvm/functions/Function3"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<D:Ljava/lang/Object;E:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KMutableProperty$Setter<TV;>;Lkotlin/jvm/functions/Function3<TD;TE;TV;Lkotlin/Unit;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function3",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty$Setter",
+        "kotlin/reflect/KMutableProperty2",
+        "kotlin/reflect/KMutableProperty2$Setter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KMutableProperty2.class",
+      "occurrence": 0,
+      "sha256": "61a290a4069c383d9b621329c041497bff90362f28fcbb8f5f55c448ba0a1fb3",
+      "name": "kotlin/reflect/KMutableProperty2",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty2",
+        "kotlin/reflect/KMutableProperty"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TD;TE;TV;)V"
+        },
+        {
+          "name": "getSetter",
+          "descriptor": "()Lkotlin/reflect/KMutableProperty2$Setter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KMutableProperty2$Setter<TD;TE;TV;>;"
+        }
+      ],
+      "generic_signature": "<D:Ljava/lang/Object;E:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty2<TD;TE;TV;>;Lkotlin/reflect/KMutableProperty<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KMutableProperty",
+        "kotlin/reflect/KMutableProperty2",
+        "kotlin/reflect/KMutableProperty2$Setter",
+        "kotlin/reflect/KProperty2"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KParameter$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "1911012dd391fe98fab31d6ed350ea6373842dd8b3f6f2b01423ee68c219129c",
+      "name": "kotlin/reflect/KParameter$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isVararg$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KParameter",
+        "kotlin/reflect/KParameter$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KParameter$Kind.class",
+      "occurrence": 0,
+      "sha256": "c627ec7a7b547c562606b65b636150ed1e654a436ac4313c5bf574e0e2360b51",
+      "name": "kotlin/reflect/KParameter$Kind",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lkotlin/reflect/KParameter$Kind;",
+          "access": 16409
+        },
+        {
+          "name": "CONTEXT",
+          "descriptor": "Lkotlin/reflect/KParameter$Kind;",
+          "access": 16409
+        },
+        {
+          "name": "EXTENSION_RECEIVER",
+          "descriptor": "Lkotlin/reflect/KParameter$Kind;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "Lkotlin/reflect/KParameter$Kind;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lkotlin/reflect/KParameter$Kind;",
+          "access": 4122
+        },
+        {
+          "name": "$ENTRIES",
+          "descriptor": "Lkotlin/enums/EnumEntries;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "0a1c11dc75b1d23b90f618267fde498947c4da0f91e226f1ff82cd53abe9e93e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "values",
+          "descriptor": "()[Lkotlin/reflect/KParameter$Kind;",
+          "access": 9,
+          "code_sha256": "13865d967be64a4babc038786e9e453d68653d24d2f07808866fab71b26db419",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lkotlin/reflect/KParameter$Kind;",
+          "access": 9,
+          "code_sha256": "6d344fd7fecb0768c3596ecfb764b2679e91f4ce2a9b8f9f766f67ba1762025c",
+          "code_length": 10
+        },
+        {
+          "name": "getEntries",
+          "descriptor": "()Lkotlin/enums/EnumEntries;",
+          "access": 9,
+          "code_sha256": "f88929d43769a369e4a9db3b4926b5fd97048f5c1ba458a1bc8d1ff1fa23a338",
+          "code_length": 4,
+          "generic_signature": "()Lkotlin/enums/EnumEntries<Lkotlin/reflect/KParameter$Kind;>;"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lkotlin/reflect/KParameter$Kind;",
+          "access": 4122,
+          "code_sha256": "18837790be81e8bdcb54ada97dc8f667df954a7682945101e18ccbf2cd4d8948",
+          "code_length": 31
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0ff15d7b7a4d1fac38b212a22586efbbc535958feff72eb08ea5ff970aca801d",
+          "code_length": 71
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lkotlin/reflect/KParameter$Kind;>;",
+      "class_references": [
+        "[Ljava/lang/Enum;",
+        "[Lkotlin/reflect/KParameter$Kind;",
+        "java/lang/Enum",
+        "java/lang/Object",
+        "kotlin/enums/EnumEntriesKt",
+        "kotlin/reflect/KParameter",
+        "kotlin/reflect/KParameter$Kind"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KParameter.class",
+      "occurrence": 0,
+      "sha256": "2b56112af8959ec0383c3cf472f47e98cbe610228b77f2188b51d68b4b5df252",
+      "name": "kotlin/reflect/KParameter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KAnnotatedElement"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getIndex",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lkotlin/reflect/KType;",
+          "access": 1025
+        },
+        {
+          "name": "getKind",
+          "descriptor": "()Lkotlin/reflect/KParameter$Kind;",
+          "access": 1025
+        },
+        {
+          "name": "isOptional",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isVararg",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KAnnotatedElement",
+        "kotlin/reflect/KParameter",
+        "kotlin/reflect/KParameter$DefaultImpls",
+        "kotlin/reflect/KParameter$Kind"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty$Accessor.class",
+      "occurrence": 0,
+      "sha256": "fe661e0cedb07417c0c2a1720d7631ba9eecb164208d7e4243b709dcf9f5c804",
+      "name": "kotlin/reflect/KProperty$Accessor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getProperty",
+          "descriptor": "()Lkotlin/reflect/KProperty;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KProperty<TV;>;"
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Accessor"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "3a59099fdb32a5d7c8e4645aa7d19ad223de1208c62853137d1a1d1f1ce555ed",
+      "name": "kotlin/reflect/KProperty$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isLateinit$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "isConst$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty$Getter.class",
+      "occurrence": 0,
+      "sha256": "45f4adf85343ef45c67ab0a893034a71e9ae5abf26445220f8152f2f2dde00a1",
+      "name": "kotlin/reflect/KProperty$Getter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty$Accessor",
+        "kotlin/reflect/KFunction"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty$Accessor<TV;>;Lkotlin/reflect/KFunction<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KFunction",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Accessor",
+        "kotlin/reflect/KProperty$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty.class",
+      "occurrence": 0,
+      "sha256": "b751fe3bdabb2c2478b60541aa5dbf688f0fbe7974e1dff4b2253e6bf6f4a20b",
+      "name": "kotlin/reflect/KProperty",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KCallable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isLateinit",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isConst",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getGetter",
+          "descriptor": "()Lkotlin/reflect/KProperty$Getter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KProperty$Getter<TV;>;"
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KCallable<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KCallable",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Accessor",
+        "kotlin/reflect/KProperty$DefaultImpls",
+        "kotlin/reflect/KProperty$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty0$Getter.class",
+      "occurrence": 0,
+      "sha256": "db040ea6722d358ed2bad99dc3762dbb3c36c16aeb5b074486a5ae2aad10918e",
+      "name": "kotlin/reflect/KProperty0$Getter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/jvm/functions/Function0"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty$Getter<TV;>;Lkotlin/jvm/functions/Function0<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function0",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/reflect/KProperty0",
+        "kotlin/reflect/KProperty0$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty0.class",
+      "occurrence": 0,
+      "sha256": "e33ea6f3f8271171939fa2d7cd34e4d0d79a8dd2dcfb20f61f01e985f5d7fb1f",
+      "name": "kotlin/reflect/KProperty0",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty",
+        "kotlin/jvm/functions/Function0"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "getDelegate",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getGetter",
+          "descriptor": "()Lkotlin/reflect/KProperty0$Getter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KProperty0$Getter<TV;>;"
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty<TV;>;Lkotlin/jvm/functions/Function0<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function0",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty0",
+        "kotlin/reflect/KProperty0$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty1$Getter.class",
+      "occurrence": 0,
+      "sha256": "e9a92f03837344ebac95e5a1368903812b272ca55e4ad623c0b41b09d066c34a",
+      "name": "kotlin/reflect/KProperty1$Getter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/jvm/functions/Function1"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty$Getter<TV;>;Lkotlin/jvm/functions/Function1<TT;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/reflect/KProperty1",
+        "kotlin/reflect/KProperty1$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty1.class",
+      "occurrence": 0,
+      "sha256": "36cc70b7188e9ae82d65a11df76cb1c33473c12ad7481e07ec7d4bfd663e4878",
+      "name": "kotlin/reflect/KProperty1",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty",
+        "kotlin/jvm/functions/Function1"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TT;)TV;"
+        },
+        {
+          "name": "getDelegate",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TT;)Ljava/lang/Object;"
+        },
+        {
+          "name": "getGetter",
+          "descriptor": "()Lkotlin/reflect/KProperty1$Getter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KProperty1$Getter<TT;TV;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty<TV;>;Lkotlin/jvm/functions/Function1<TT;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty1",
+        "kotlin/reflect/KProperty1$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty2$Getter.class",
+      "occurrence": 0,
+      "sha256": "f401233f27a08cd292e3403dd75357e49727e91bd1ebe7418fe2ee29eef176b6",
+      "name": "kotlin/reflect/KProperty2$Getter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/jvm/functions/Function2"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<D:Ljava/lang/Object;E:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty$Getter<TV;>;Lkotlin/jvm/functions/Function2<TD;TE;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function2",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty$Getter",
+        "kotlin/reflect/KProperty2",
+        "kotlin/reflect/KProperty2$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KProperty2.class",
+      "occurrence": 0,
+      "sha256": "e9e236d461387e38f99454a7b40dfd3a4204a5de51aa88f9175a9c45e2b3eba0",
+      "name": "kotlin/reflect/KProperty2",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KProperty",
+        "kotlin/jvm/functions/Function2"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TD;TE;)TV;"
+        },
+        {
+          "name": "getDelegate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TD;TE;)Ljava/lang/Object;"
+        },
+        {
+          "name": "getGetter",
+          "descriptor": "()Lkotlin/reflect/KProperty2$Getter;",
+          "access": 1025,
+          "generic_signature": "()Lkotlin/reflect/KProperty2$Getter<TD;TE;TV;>;"
+        }
+      ],
+      "generic_signature": "<D:Ljava/lang/Object;E:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/reflect/KProperty<TV;>;Lkotlin/jvm/functions/Function2<TD;TE;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/functions/Function2",
+        "kotlin/reflect/KProperty",
+        "kotlin/reflect/KProperty2",
+        "kotlin/reflect/KProperty2$Getter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KType$DefaultImpls.class",
+      "occurrence": 0,
+      "sha256": "d149074d377b5a8fa76bfe95f67eb58301f4dc35e95e1ae4104c4c84c5769109",
+      "name": "kotlin/reflect/KType$DefaultImpls",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getClassifier$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getArguments$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KType",
+        "kotlin/reflect/KType$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KType.class",
+      "occurrence": 0,
+      "sha256": "13d77982109f7ebc31b61b159125e0b9ea2bcec2c1f102bc59337dac5979744c",
+      "name": "kotlin/reflect/KType",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KAnnotatedElement"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getClassifier",
+          "descriptor": "()Lkotlin/reflect/KClassifier;",
+          "access": 1025
+        },
+        {
+          "name": "getArguments",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KTypeProjection;>;"
+        },
+        {
+          "name": "isMarkedNullable",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KAnnotatedElement",
+        "kotlin/reflect/KType",
+        "kotlin/reflect/KType$DefaultImpls"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KTypeParameter.class",
+      "occurrence": 0,
+      "sha256": "3f6b02d45a40a3163f188fb784345d57b26fee5e961bc4b9acf449d9907ff922",
+      "name": "kotlin/reflect/KTypeParameter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/reflect/KClassifier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getUpperBounds",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lkotlin/reflect/KType;>;"
+        },
+        {
+          "name": "getVariance",
+          "descriptor": "()Lkotlin/reflect/KVariance;",
+          "access": 1025
+        },
+        {
+          "name": "isReified",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/KClassifier",
+        "kotlin/reflect/KTypeParameter"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KTypeProjection$Companion.class",
+      "occurrence": 0,
+      "sha256": "f73f40af62550a472b5af28ba0992d5565e1792f55fd9c873c1b77763a3c82b1",
+      "name": "kotlin/reflect/KTypeProjection$Companion",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "getStar$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getSTAR",
+          "descriptor": "()Lkotlin/reflect/KTypeProjection;",
+          "access": 17,
+          "code_sha256": "1735ce186ec0fdb8bc5e32aa675736f8f329ac506a612e4ccf49a26163c27793",
+          "code_length": 4
+        },
+        {
+          "name": "invariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 17,
+          "code_sha256": "12cb656660b45a0a0ec530e4bf615c7c88a6f86b906d2a775b26b0c30a38d2a4",
+          "code_length": 18
+        },
+        {
+          "name": "contravariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 17,
+          "code_sha256": "b3d1fffbbca9f195acb241d294f5f0a848c8bdb8deef2a4eca366515a889c18c",
+          "code_length": 18
+        },
+        {
+          "name": "covariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 17,
+          "code_sha256": "bcf6d395c5ec2b3fc437e38b4500b835ae7981958975f6ad5350f623014fcd92",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "810b1a9d8403434379bd11f0c35dca4fc60749a82d9c1c98716bc0979e7167f3",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/KTypeProjection",
+        "kotlin/reflect/KTypeProjection$Companion",
+        "kotlin/reflect/KVariance"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KTypeProjection$WhenMappings.class",
+      "occurrence": 0,
+      "sha256": "fd712dd0901caae27fb8f9870d83f9411b32399aba56f215ad14997d3ca0a373",
+      "name": "kotlin/reflect/KTypeProjection$WhenMappings",
+      "major": 52,
+      "minor": 0,
+      "access": 4145,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$EnumSwitchMapping$0",
+          "descriptor": "[I",
+          "access": 4121
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0b3a562a3ec751b4192649d388efdb0be7e1974dec5ea9fc77241ac220b21ca5",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "kotlin/reflect/KTypeProjection",
+        "kotlin/reflect/KTypeProjection$WhenMappings",
+        "kotlin/reflect/KVariance"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KTypeProjection.class",
+      "occurrence": 0,
+      "sha256": "1ee399c81d43d2297eee102441a24a8664e6f6af296700fdd436fbcc4b47bae5",
+      "name": "kotlin/reflect/KTypeProjection",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Companion",
+          "descriptor": "Lkotlin/reflect/KTypeProjection$Companion;",
+          "access": 25
+        },
+        {
+          "name": "variance",
+          "descriptor": "Lkotlin/reflect/KVariance;",
+          "access": 18
+        },
+        {
+          "name": "type",
+          "descriptor": "Lkotlin/reflect/KType;",
+          "access": 18
+        },
+        {
+          "name": "star",
+          "descriptor": "Lkotlin/reflect/KTypeProjection;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/reflect/KVariance;Lkotlin/reflect/KType;)V",
+          "access": 1,
+          "code_sha256": "8dfa1e98cc3f17d6576ad5ed7b1e47fdac4d78a348cda3d71bf91d4f8bd31710",
+          "code_length": 106
+        },
+        {
+          "name": "getVariance",
+          "descriptor": "()Lkotlin/reflect/KVariance;",
+          "access": 17,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lkotlin/reflect/KType;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ca3fb14f75f0a35d8e038caea063ae04a3adba42fd8e1e35e0410f98423002b3",
+          "code_length": 130
+        },
+        {
+          "name": "component1",
+          "descriptor": "()Lkotlin/reflect/KVariance;",
+          "access": 17,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "component2",
+          "descriptor": "()Lkotlin/reflect/KType;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Lkotlin/reflect/KVariance;Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 17,
+          "code_sha256": "bbc14a3b9a0697308a952b3f6ee29068d5067741879827773baddfb4947cb9f3",
+          "code_length": 10
+        },
+        {
+          "name": "copy$default",
+          "descriptor": "(Lkotlin/reflect/KTypeProjection;Lkotlin/reflect/KVariance;Lkotlin/reflect/KType;ILjava/lang/Object;)Lkotlin/reflect/KTypeProjection;",
+          "access": 4105,
+          "code_sha256": "36530dc76ce4665557728416ecf6d6f72ff1a9dfa5fc7018928db0104902403b",
+          "code_length": 29
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "62832bd782d4cce7c549277eeb48749f3a66257927785629f742808110a7ddde",
+          "code_length": 45
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "fce96e7ef7e2a9f06c3d281576d82780fc14f8b8a7e6fd0280b710a2b6786b36",
+          "code_length": 52
+        },
+        {
+          "name": "invariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 25,
+          "code_sha256": "5050d0b5668dfe4f56b9c99f5b637937c081e72d3e96fd895f6eaf8457ae7794",
+          "code_length": 8
+        },
+        {
+          "name": "contravariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 25,
+          "code_sha256": "2af58cd46bd98edb04e7060141051c71e0fe5cfde35d232c31c3c1eedfbd18bc",
+          "code_length": 8
+        },
+        {
+          "name": "covariant",
+          "descriptor": "(Lkotlin/reflect/KType;)Lkotlin/reflect/KTypeProjection;",
+          "access": 25,
+          "code_sha256": "af6845cf80bea73b86b4c4d088a3de82f390307444aca3270add7608a7ba2f28",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ce8447a68195d308e9fcdaa1851bc1ca0e258deb33113865c6d7f2169ceeb2c2",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "kotlin/NoWhenBranchMatchedException",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/KType",
+        "kotlin/reflect/KTypeProjection",
+        "kotlin/reflect/KTypeProjection$Companion",
+        "kotlin/reflect/KTypeProjection$WhenMappings",
+        "kotlin/reflect/KVariance"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KVariance.class",
+      "occurrence": 0,
+      "sha256": "095df7d718d58d3374d705d7aa6c1c9575f3f00df979814dd0fbb70ec7803976",
+      "name": "kotlin/reflect/KVariance",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INVARIANT",
+          "descriptor": "Lkotlin/reflect/KVariance;",
+          "access": 16409
+        },
+        {
+          "name": "IN",
+          "descriptor": "Lkotlin/reflect/KVariance;",
+          "access": 16409
+        },
+        {
+          "name": "OUT",
+          "descriptor": "Lkotlin/reflect/KVariance;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lkotlin/reflect/KVariance;",
+          "access": 4122
+        },
+        {
+          "name": "$ENTRIES",
+          "descriptor": "Lkotlin/enums/EnumEntries;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "0a1c11dc75b1d23b90f618267fde498947c4da0f91e226f1ff82cd53abe9e93e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "values",
+          "descriptor": "()[Lkotlin/reflect/KVariance;",
+          "access": 9,
+          "code_sha256": "13865d967be64a4babc038786e9e453d68653d24d2f07808866fab71b26db419",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lkotlin/reflect/KVariance;",
+          "access": 9,
+          "code_sha256": "6d344fd7fecb0768c3596ecfb764b2679e91f4ce2a9b8f9f766f67ba1762025c",
+          "code_length": 10
+        },
+        {
+          "name": "getEntries",
+          "descriptor": "()Lkotlin/enums/EnumEntries;",
+          "access": 9,
+          "code_sha256": "f88929d43769a369e4a9db3b4926b5fd97048f5c1ba458a1bc8d1ff1fa23a338",
+          "code_length": 4,
+          "generic_signature": "()Lkotlin/enums/EnumEntries<Lkotlin/reflect/KVariance;>;"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lkotlin/reflect/KVariance;",
+          "access": 4122,
+          "code_sha256": "230baf17c3533f7a045001b16dfb772c5df7e3a2fb4b3ad59a88c6d86567300b",
+          "code_length": 25
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0323b97b2327dc48460935c179dfe3c1610dba920152222cbbbfc50f66437003",
+          "code_length": 58
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lkotlin/reflect/KVariance;>;",
+      "class_references": [
+        "[Ljava/lang/Enum;",
+        "[Lkotlin/reflect/KVariance;",
+        "java/lang/Enum",
+        "java/lang/Object",
+        "kotlin/enums/EnumEntriesKt",
+        "kotlin/reflect/KVariance"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/KVisibility.class",
+      "occurrence": 0,
+      "sha256": "0837bd5e53a3856fe2eddd6df5b588cec1a8ab5046b739cda6d5a8675bad78c2",
+      "name": "kotlin/reflect/KVisibility",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PUBLIC",
+          "descriptor": "Lkotlin/reflect/KVisibility;",
+          "access": 16409
+        },
+        {
+          "name": "PROTECTED",
+          "descriptor": "Lkotlin/reflect/KVisibility;",
+          "access": 16409
+        },
+        {
+          "name": "INTERNAL",
+          "descriptor": "Lkotlin/reflect/KVisibility;",
+          "access": 16409
+        },
+        {
+          "name": "PRIVATE",
+          "descriptor": "Lkotlin/reflect/KVisibility;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lkotlin/reflect/KVisibility;",
+          "access": 4122
+        },
+        {
+          "name": "$ENTRIES",
+          "descriptor": "Lkotlin/enums/EnumEntries;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "0a1c11dc75b1d23b90f618267fde498947c4da0f91e226f1ff82cd53abe9e93e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "values",
+          "descriptor": "()[Lkotlin/reflect/KVisibility;",
+          "access": 9,
+          "code_sha256": "13865d967be64a4babc038786e9e453d68653d24d2f07808866fab71b26db419",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lkotlin/reflect/KVisibility;",
+          "access": 9,
+          "code_sha256": "6d344fd7fecb0768c3596ecfb764b2679e91f4ce2a9b8f9f766f67ba1762025c",
+          "code_length": 10
+        },
+        {
+          "name": "getEntries",
+          "descriptor": "()Lkotlin/enums/EnumEntries;",
+          "access": 9,
+          "code_sha256": "f88929d43769a369e4a9db3b4926b5fd97048f5c1ba458a1bc8d1ff1fa23a338",
+          "code_length": 4,
+          "generic_signature": "()Lkotlin/enums/EnumEntries<Lkotlin/reflect/KVisibility;>;"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lkotlin/reflect/KVisibility;",
+          "access": 4122,
+          "code_sha256": "18837790be81e8bdcb54ada97dc8f667df954a7682945101e18ccbf2cd4d8948",
+          "code_length": 31
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0ff15d7b7a4d1fac38b212a22586efbbc535958feff72eb08ea5ff970aca801d",
+          "code_length": 71
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lkotlin/reflect/KVisibility;>;",
+      "class_references": [
+        "[Ljava/lang/Enum;",
+        "[Lkotlin/reflect/KVisibility;",
+        "java/lang/Enum",
+        "java/lang/Object",
+        "kotlin/enums/EnumEntriesKt",
+        "kotlin/reflect/KVisibility"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/ParameterizedTypeImpl$getTypeName$1$1.class",
+      "occurrence": 0,
+      "sha256": "cdbce0a0dcd04ad46966af308425ee657ca492bf46c871050e5b2fcdbb62c0b5",
+      "name": "kotlin/reflect/ParameterizedTypeImpl$getTypeName$1$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4144,
+      "superclass": "kotlin/jvm/internal/FunctionReferenceImpl",
+      "interfaces": [
+        "kotlin/jvm/functions/Function1"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lkotlin/reflect/ParameterizedTypeImpl$getTypeName$1$1;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "6eac0a9c6f2718843ff777a0a220bec8ef35451f0fda0f9203ac973b438204ed",
+          "code_length": 13
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/reflect/Type;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "73f0231d0d8c1fee0c17c1978dc34eac82de8262bb095d7a55c5d40e7c4b4f4c",
+          "code_length": 11
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "be1dc68b32e63da36266731b59d1c1d9cdb2630651eaa57ca9a2db4cb946953f",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "82a1f187f6573c8a7b9de3217a699f5850258da4b59e247c672b475c2f5ba909",
+          "code_length": 11
+        }
+      ],
+      "generic_signature": "Lkotlin/jvm/internal/FunctionReferenceImpl;Lkotlin/jvm/functions/Function1<Ljava/lang/reflect/Type;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/reflect/Type",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/FunctionReferenceImpl",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/ParameterizedTypeImpl",
+        "kotlin/reflect/ParameterizedTypeImpl$getTypeName$1$1",
+        "kotlin/reflect/TypesJVMKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/ParameterizedTypeImpl.class",
+      "occurrence": 0,
+      "sha256": "0f77f3b6d71a23b560769e2c4ad31f92008b6231a54a0c8fc09865e7b565fedc",
+      "name": "kotlin/reflect/ParameterizedTypeImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/ParameterizedType",
+        "kotlin/reflect/TypeImpl"
+      ],
+      "fields": [
+        {
+          "name": "rawType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "ownerType",
+          "descriptor": "Ljava/lang/reflect/Type;",
+          "access": 18
+        },
+        {
+          "name": "typeArguments",
+          "descriptor": "[Ljava/lang/reflect/Type;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/reflect/Type;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "68ab8a303dffc4b87ac4deb46d96e70d095ae9fa51c404cb88e316b64e9e8285",
+          "code_length": 58,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/reflect/Type;Ljava/util/List<+Ljava/lang/reflect/Type;>;)V"
+        },
+        {
+          "name": "getRawType",
+          "descriptor": "()Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "338c3538ccf86f42afdead4bfad4c400de3a4584b3664279eec1eb0c6e4fe228",
+          "code_length": 8
+        },
+        {
+          "name": "getOwnerType",
+          "descriptor": "()Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "7e0bb919657973bf0959e14569eb267b15bb4e98602248480db68213179c69da",
+          "code_length": 5
+        },
+        {
+          "name": "getActualTypeArguments",
+          "descriptor": "()[Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "74d3b3eaa2e3751f214b4ad6026daaaff754ddb4139283403f8d492b37ee8de9",
+          "code_length": 5
+        },
+        {
+          "name": "getTypeName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c33f1ae775be95c16476fb37ac13b053e75ef8f8e0fb04d7826898914be13015",
+          "code_length": 131
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e14daf77a2119989a6ce8369f672a8de94054eb2c6f1ecff2be0518e12cea1c2",
+          "code_length": 70
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aabee36eb1a4374aafd6de057d6251d58038411f4f086271c87aa320cc24f463",
+          "code_length": 33
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b53fd620c82edc92ab7ce71aca8850ebbf50aa0e453e24758b91123b9944e40b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/reflect/Type;",
+        "java/lang/Appendable",
+        "java/lang/CharSequence",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/ParameterizedType",
+        "java/lang/reflect/Type",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "kotlin/collections/ArraysKt",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/ParameterizedTypeImpl",
+        "kotlin/reflect/ParameterizedTypeImpl$getTypeName$1$1",
+        "kotlin/reflect/TypeImpl",
+        "kotlin/reflect/TypesJVMKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypeImpl.class",
+      "occurrence": 0,
+      "sha256": "b7d585c280ab45b7a6d5c05ad1c7c7fd76cd804ab529e683b344121a569788e5",
+      "name": "kotlin/reflect/TypeImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/Type"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTypeName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/reflect/Type",
+        "kotlin/reflect/TypeImpl"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypeOfKt.class",
+      "occurrence": 0,
+      "sha256": "a86b5b9c70b3eafed9868123b4a83c6be639de8b29213409c3a6988efad34d5f",
+      "name": "kotlin/reflect/TypeOfKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "typeOf",
+          "descriptor": "()Lkotlin/reflect/KType;",
+          "access": 4121,
+          "code_sha256": "5875c949532467f6df3680c23a5c30768c4db39bc6fe08eb155de4bee3836a06",
+          "code_length": 12,
+          "generic_signature": "<T:Ljava/lang/Object;>()Lkotlin/reflect/KType;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "kotlin/reflect/TypeOfKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypeVariableImpl.class",
+      "occurrence": 0,
+      "sha256": "d3e835c0813cf388576514780a67c297c0ecb52fdc3a5c0189e0a2f4b77c6f1b",
+      "name": "kotlin/reflect/TypeVariableImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/TypeVariable",
+        "kotlin/reflect/TypeImpl"
+      ],
+      "fields": [
+        {
+          "name": "typeParameter",
+          "descriptor": "Lkotlin/reflect/KTypeParameter;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/reflect/KTypeParameter;)V",
+          "access": 1,
+          "code_sha256": "f361db109b5672ecc4598c32905c7336abf0114bf9c55c1c64605f70a35802f0",
+          "code_length": 16
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7da1916158bd8c78c55fbb485575a7e649448b3aba9199045bfd8b4b22dc0f63",
+          "code_length": 10
+        },
+        {
+          "name": "getGenericDeclaration",
+          "descriptor": "()Ljava/lang/reflect/GenericDeclaration;",
+          "access": 1,
+          "code_sha256": "5bf6a5ba9eacba074c73a71ffc055d0689c1557463ce0c1897cc4d789ab50f1a",
+          "code_length": 50
+        },
+        {
+          "name": "getBounds",
+          "descriptor": "()[Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "eca57bd3985d46ae5528a32345011ca474b073b44d33d9a510feef8df2cc4687",
+          "code_length": 126
+        },
+        {
+          "name": "getTypeName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2fa3838c0f51e39619f9378ce8483f88b0b0d3ed1bee62c3fc5daf5886642855",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3acae041745e0dfa55e73a830803ee12992c905885bd6c22ad38e058419d2d4c",
+          "code_length": 51
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b1c6cd5fe48fa04d96e28d5b399f04d426fe274cd9413e459076c750800061c4",
+          "code_length": 16
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "10935eec20c4546bfccff8271d1598d41b631330d3fa2f627b9a901e54a834c8",
+          "code_length": 5
+        },
+        {
+          "name": "getAnnotation",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;",
+          "access": 17,
+          "code_sha256": "08db7d4aaefd6b1fbace76c42e42bc3755668f8c8a26a9537c62b009feee75aa",
+          "code_length": 8,
+          "generic_signature": "<T::Ljava/lang/annotation/Annotation;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "getAnnotations",
+          "descriptor": "()[Ljava/lang/annotation/Annotation;",
+          "access": 17,
+          "code_sha256": "c94b8b084e7cd58af5b0a72b99e736ac386519f1448358c5412efe78f6ef71f3",
+          "code_length": 5
+        },
+        {
+          "name": "getDeclaredAnnotations",
+          "descriptor": "()[Ljava/lang/annotation/Annotation;",
+          "access": 17,
+          "code_sha256": "c94b8b084e7cd58af5b0a72b99e736ac386519f1448358c5412efe78f6ef71f3",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/reflect/TypeVariable<Ljava/lang/reflect/GenericDeclaration;>;Lkotlin/reflect/TypeImpl;",
+      "class_references": [
+        "[Ljava/lang/reflect/Type;",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/annotation/Annotation",
+        "java/lang/reflect/Type",
+        "java/lang/reflect/TypeVariable",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "kotlin/NotImplementedError",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/KType",
+        "kotlin/reflect/KTypeParameter",
+        "kotlin/reflect/TypeImpl",
+        "kotlin/reflect/TypeVariableImpl",
+        "kotlin/reflect/TypesJVMKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypesJVMKt$WhenMappings.class",
+      "occurrence": 0,
+      "sha256": "72a62fff4b676338f4935122d2c9703cd3766353d0dab48a3adf57be1b270e41",
+      "name": "kotlin/reflect/TypesJVMKt$WhenMappings",
+      "major": 52,
+      "minor": 0,
+      "access": 4145,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$EnumSwitchMapping$0",
+          "descriptor": "[I",
+          "access": 4121
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0b3a562a3ec751b4192649d388efdb0be7e1974dec5ea9fc77241ac220b21ca5",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "kotlin/reflect/KVariance",
+        "kotlin/reflect/TypesJVMKt",
+        "kotlin/reflect/TypesJVMKt$WhenMappings"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypesJVMKt$typeToString$unwrap$1.class",
+      "occurrence": 0,
+      "sha256": "8efc7e26d9cbfc09aeae412ddbd8f9c1495dd4bcc6a038b704e3441f76e5324a",
+      "name": "kotlin/reflect/TypesJVMKt$typeToString$unwrap$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4144,
+      "superclass": "kotlin/jvm/internal/FunctionReferenceImpl",
+      "interfaces": [
+        "kotlin/jvm/functions/Function1"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lkotlin/reflect/TypesJVMKt$typeToString$unwrap$1;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "83fd6a31646db881abc818700b9a3b72fc12b507e13f502fbaeb5dfb72ea388e",
+          "code_length": 13
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 17,
+          "code_sha256": "dc8c364958fe0c04a35b74bc67096641e05c375eed1e96fbbc2a5c916a310c6c",
+          "code_length": 11,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "653b73928e9ccb4b3f460571b492219cf42c40e8af5a93291ecb3dbb2a7890f9",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6e432acd5ecb11202f38b59b996f362cbcd4de5e87e2794f25b6f0963680a5fc",
+          "code_length": 11
+        }
+      ],
+      "generic_signature": "Lkotlin/jvm/internal/FunctionReferenceImpl;Lkotlin/jvm/functions/Function1<Ljava/lang/Class<*>;Ljava/lang/Class<*>;>;",
+      "class_references": [
+        "java/lang/Class",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/FunctionReferenceImpl",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/TypesJVMKt",
+        "kotlin/reflect/TypesJVMKt$typeToString$unwrap$1"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/TypesJVMKt.class",
+      "occurrence": 0,
+      "sha256": "be109db37b93ab24ba97240f763cc4ddc6c38275c532d048f9ce7878845f9572",
+      "name": "kotlin/reflect/TypesJVMKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getJavaType",
+          "descriptor": "(Lkotlin/reflect/KType;)Ljava/lang/reflect/Type;",
+          "access": 25,
+          "code_sha256": "399a3fd89e1e92648d961d44ffd65a28cc9e35b34a5fd71d1b1e89a9df55e212",
+          "code_length": 41
+        },
+        {
+          "name": "getJavaType$annotations",
+          "descriptor": "(Lkotlin/reflect/KType;)V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "computeJavaType",
+          "descriptor": "(Lkotlin/reflect/KType;Z)Ljava/lang/reflect/Type;",
+          "access": 26,
+          "code_sha256": "a61257b2ec8a1441240ec521396e573d3ca185fd38cfcd65520fc131420a09cf",
+          "code_length": 306
+        },
+        {
+          "name": "computeJavaType$default",
+          "descriptor": "(Lkotlin/reflect/KType;ZILjava/lang/Object;)Ljava/lang/reflect/Type;",
+          "access": 4104,
+          "code_sha256": "cef0d64ca9488cd6187044ccac4bb57d15c21bdcd7afc319860a665ff0b10b40",
+          "code_length": 14
+        },
+        {
+          "name": "createPossiblyInnerType",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/List;)Ljava/lang/reflect/Type;",
+          "access": 26,
+          "code_sha256": "75b39f989884bfa1381ee7e9b2fd7e71aae38947f775c4adc0a38b0a36d4390a",
+          "code_length": 460,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/util/List<Lkotlin/reflect/KTypeProjection;>;)Ljava/lang/reflect/Type;"
+        },
+        {
+          "name": "getJavaType",
+          "descriptor": "(Lkotlin/reflect/KTypeProjection;)Ljava/lang/reflect/Type;",
+          "access": 26,
+          "code_sha256": "3e81325a13a496adc7ae60b8101170172be1a219af961dfc38b32552bab06b38",
+          "code_length": 119
+        },
+        {
+          "name": "getJavaType$annotations",
+          "descriptor": "(Lkotlin/reflect/KTypeProjection;)V",
+          "access": 4106,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "typeToString",
+          "descriptor": "(Ljava/lang/reflect/Type;)Ljava/lang/String;",
+          "access": 26,
+          "code_sha256": "816294bc0feb18d3c3b00ce104e9342f88063e97b69b3183ef8da603e35420ef",
+          "code_length": 92
+        },
+        {
+          "name": "access$computeJavaType",
+          "descriptor": "(Lkotlin/reflect/KType;Z)Ljava/lang/reflect/Type;",
+          "access": 4121,
+          "code_sha256": "07f74428dfc3736832facf75605cf351a7a36fb4cfe470395e5fdc8540c96a6b",
+          "code_length": 6
+        },
+        {
+          "name": "access$typeToString",
+          "descriptor": "(Ljava/lang/reflect/Type;)Ljava/lang/String;",
+          "access": 4121,
+          "code_sha256": "aa912529d9b0d1635c070198b1e76f1d5e488261bebe507463cf32d78ba2992f",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/CharSequence",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/reflect/Modifier",
+        "java/lang/reflect/Type",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "kotlin/NoWhenBranchMatchedException",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/jvm/JvmClassMappingKt",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/internal/KTypeBase",
+        "kotlin/reflect/GenericArrayTypeImpl",
+        "kotlin/reflect/KClass",
+        "kotlin/reflect/KClassifier",
+        "kotlin/reflect/KType",
+        "kotlin/reflect/KTypeParameter",
+        "kotlin/reflect/KTypeProjection",
+        "kotlin/reflect/KVariance",
+        "kotlin/reflect/ParameterizedTypeImpl",
+        "kotlin/reflect/TypeVariableImpl",
+        "kotlin/reflect/TypesJVMKt",
+        "kotlin/reflect/TypesJVMKt$WhenMappings",
+        "kotlin/reflect/TypesJVMKt$typeToString$unwrap$1",
+        "kotlin/reflect/WildcardTypeImpl",
+        "kotlin/reflect/WildcardTypeImpl$Companion",
+        "kotlin/sequences/SequencesKt",
+        "kotlin/text/StringsKt"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/WildcardTypeImpl$Companion.class",
+      "occurrence": 0,
+      "sha256": "5341088ce204d5939c61414fdd9581f172300835f616e9491c568fba42646eb9",
+      "name": "kotlin/reflect/WildcardTypeImpl$Companion",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "getSTAR",
+          "descriptor": "()Lkotlin/reflect/WildcardTypeImpl;",
+          "access": 17,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "a9c6229f8627d4e536a6c126a138e2868ac1fa13c1edeae6ee722883cebffa65",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/reflect/WildcardTypeImpl",
+        "kotlin/reflect/WildcardTypeImpl$Companion"
+      ]
+    },
+    {
+      "entry": "kotlin/reflect/WildcardTypeImpl.class",
+      "occurrence": 0,
+      "sha256": "b77273059130cf7daa5118a809986df67e70e6d88d63dc47e2e16ddd509c9102",
+      "name": "kotlin/reflect/WildcardTypeImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/WildcardType",
+        "kotlin/reflect/TypeImpl"
+      ],
+      "fields": [
+        {
+          "name": "Companion",
+          "descriptor": "Lkotlin/reflect/WildcardTypeImpl$Companion;",
+          "access": 25
+        },
+        {
+          "name": "upperBound",
+          "descriptor": "Ljava/lang/reflect/Type;",
+          "access": 18
+        },
+        {
+          "name": "lowerBound",
+          "descriptor": "Ljava/lang/reflect/Type;",
+          "access": 18
+        },
+        {
+          "name": "STAR",
+          "descriptor": "Lkotlin/reflect/WildcardTypeImpl;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)V",
+          "access": 1,
+          "code_sha256": "b2eb97c5415cb4468f7cb6be44a0fe6593cf2dd0782cffca98a809b0d59bb1cf",
+          "code_length": 15
+        },
+        {
+          "name": "getUpperBounds",
+          "descriptor": "()[Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "4393051a67688080b04600dde647102fdaa71e3bbc914cf36a2e3ae775a68183",
+          "code_length": 24
+        },
+        {
+          "name": "getLowerBounds",
+          "descriptor": "()[Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "f8940be1ad332a6160a72b124861ae666622a31bfbb23040943379dc69cdb602",
+          "code_length": 28
+        },
+        {
+          "name": "getTypeName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2cf7299c2b3de7085b0bf875223b1d26b7751bb17101ef26481aeab398b95fe",
+          "code_length": 86
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b894ffc8bc3cd3ba9bbb4444436225332194bf267ba424b44fad772f33bd71a1",
+          "code_length": 51
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "930eb231acdbcf789a182bb9b6fedabcbdea7df63fcd35d34f0e13f090897dc5",
+          "code_length": 16
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "daf1e4e77d05f9994320fb1b5c5678d9fe98d8d4242413c5f62fbd98f5d9cf65",
+          "code_length": 5
+        },
+        {
+          "name": "access$getSTAR$cp",
+          "descriptor": "()Lkotlin/reflect/WildcardTypeImpl;",
+          "access": 4121,
+          "code_sha256": "1a263589ea250da46fd35119c310f8c21d3249fb4b3160074c63eda03777d2fe",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3c5eeecd8d9d405ef58506f02c44d4f05f6ea2a0eaf202b19c63fa0513d4c6fc",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/reflect/Type;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Type",
+        "java/lang/reflect/WildcardType",
+        "java/util/Arrays",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/reflect/TypeImpl",
+        "kotlin/reflect/TypesJVMKt",
+        "kotlin/reflect/WildcardTypeImpl",
+        "kotlin/reflect/WildcardTypeImpl$Companion"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/ConstrainedOnceSequence.class",
+      "occurrence": 0,
+      "sha256": "aa9b536046dca7fa08b9ac20300d3b9558dce9ad14c10342aea9075ecb8a50ba",
+      "name": "kotlin/sequences/ConstrainedOnceSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequenceRef",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReference;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReference<Lkotlin/sequences/Sequence<TT;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;)V",
+          "access": 1,
+          "code_sha256": "302591bed73dfdcadfda763a96d9c84517cd64a519f4d5f5bc1e9db7ec627123",
+          "code_length": 23,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "a8891dedaabc9da733069c178ecb427aeb88a8ec640c36fd7b4f598d208b503a",
+          "code_length": 34,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/concurrent/atomic/AtomicReference",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/ConstrainedOnceSequence",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DistinctIterator.class",
+      "occurrence": 0,
+      "sha256": "b7ded1dc2968eb753bcfb5eb7ce49694fc3204f6639c94a273a3c27e385273a6",
+      "name": "kotlin/sequences/DistinctIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "kotlin/collections/AbstractIterator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "keySelector",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;TK;>;"
+        },
+        {
+          "name": "observed",
+          "descriptor": "Ljava/util/HashSet;",
+          "access": 18,
+          "generic_signature": "Ljava/util/HashSet<TK;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;Lkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "cd9ae06687ba43a31cbca7be6fe9d9ba81661302f279ce4ef73cdb97cb75e614",
+          "code_length": 38,
+          "generic_signature": "(Ljava/util/Iterator<+TT;>;Lkotlin/jvm/functions/Function1<-TT;+TK;>;)V"
+        },
+        {
+          "name": "computeNext",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0ad2451d720b801ce6c8d60658b77ed373b268d89ea5115126b14cc135e26a37",
+          "code_length": 55
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;K:Ljava/lang/Object;>Lkotlin/collections/AbstractIterator<TT;>;",
+      "class_references": [
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "kotlin/collections/AbstractIterator",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/DistinctIterator"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DistinctSequence.class",
+      "occurrence": 0,
+      "sha256": "2d5f54faaee7e5705033e15272c95c09b2fc64f933847dc754923690a0f57cb5",
+      "name": "kotlin/sequences/DistinctSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "keySelector",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;TK;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "6ae9a1a33c8cd7510060eeaef83043a5f2e9de1347ba061aa0ddc74b8cbb3d69",
+          "code_length": 27,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;Lkotlin/jvm/functions/Function1<-TT;+TK;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "060ac880a764ae3277d4de9cfd215e2e7c9575e16c9875b1f402e77dc111578d",
+          "code_length": 24,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;K:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/DistinctIterator",
+        "kotlin/sequences/DistinctSequence",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DropSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "27b63b1cca2bb67208c41abc7b5fc2ae6528dbf782a1e74dbc5d9b8d2f5508c3",
+      "name": "kotlin/sequences/DropSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "left",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/DropSequence;)V",
+          "access": 0,
+          "code_sha256": "5901374b8c47cc1d626ce677f43807f7a84fe0d726514b8940f5b83f29439115",
+          "code_length": 26,
+          "generic_signature": "(Lkotlin/sequences/DropSequence<TT;>;)V"
+        },
+        {
+          "name": "getIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "getLeft",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "1b413329f5bd676d1fe6027f75ef0c03553f45f54b35607ecc5d492f5c28d47b",
+          "code_length": 5
+        },
+        {
+          "name": "setLeft",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "f4c504ef35903eea2e37f111b33093f5bb7c31f3a38eeb4e6dd04c9a21b6bc29",
+          "code_length": 6
+        },
+        {
+          "name": "drop",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "27919e4a7e567cef77529819aeeac25f6b5d3d108d6e2e6ed2b0449a40c6bd2d",
+          "code_length": 45
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f09c973541ae0fc63bbda9797c654ef90201d33500b5aeb5ac93d682968f3755",
+          "code_length": 14,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9f7058e56f8aa3e1e42d389a69ba1d3fe7765c6ce0709e215cbb0d008f83df55",
+          "code_length": 14
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e41b7d19a3ccd6d9263c57b83b101f79702319f042f716022aa87a85afb99355",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TT;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/DropSequence",
+        "kotlin/sequences/DropSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DropSequence.class",
+      "occurrence": 0,
+      "sha256": "993521cd32d2f30655b61ae4a874741a91ba4644ac2eb31922f4a76cd6f81ea9",
+      "name": "kotlin/sequences/DropSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/DropTakeSequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;I)V",
+          "access": 1,
+          "code_sha256": "9b46e71c26c7f21dbc3aa0d93e85ff4244b2d2a6dab3c66e8db39dd696812296",
+          "code_length": 80,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;I)V"
+        },
+        {
+          "name": "drop",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 1,
+          "code_sha256": "fda4e7df186bc1bbb6f1a658ec06ffb9ec0e07ac8a5e6363bc6e5573281e4cfd",
+          "code_length": 44,
+          "generic_signature": "(I)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "take",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 1,
+          "code_sha256": "dd751670e7f8c3fbfd138fd95f63043cee1bde3b9b9841e44166a3011c6a29bb",
+          "code_length": 54,
+          "generic_signature": "(I)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "77d67a6aa983a0a58e71a0632fa2334a7c8ece5a842aa572b2956588399f7121",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "access$getSequence$p",
+          "descriptor": "(Lkotlin/sequences/DropSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "access$getCount$p",
+          "descriptor": "(Lkotlin/sequences/DropSequence;)I",
+          "access": 4121,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;Lkotlin/sequences/DropTakeSequence<TT;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/DropSequence",
+        "kotlin/sequences/DropSequence$iterator$1",
+        "kotlin/sequences/DropTakeSequence",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SubSequence",
+        "kotlin/sequences/TakeSequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DropTakeSequence.class",
+      "occurrence": 0,
+      "sha256": "e4179c2f2db2a3c0dcab761d98d3465685ad303c778249a1cf212e7b0a81c459",
+      "name": "kotlin/sequences/DropTakeSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "drop",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 1025,
+          "generic_signature": "(I)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "take",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 1025,
+          "generic_signature": "(I)Lkotlin/sequences/Sequence<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/sequences/DropTakeSequence",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DropWhileSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "16aa13c4c9c04d963610b4ef70ddeab551efc4301bbf668d6d0635b73ab84c04",
+      "name": "kotlin/sequences/DropWhileSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "dropState",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "nextItem",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lkotlin/sequences/DropWhileSequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/DropWhileSequence<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/DropWhileSequence;)V",
+          "access": 0,
+          "code_sha256": "07908f982271210220917743c71228ef16b8c286100b5cc6cbb6abde1cf69b4d",
+          "code_length": 28,
+          "generic_signature": "(Lkotlin/sequences/DropWhileSequence<TT;>;)V"
+        },
+        {
+          "name": "getIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "getDropState",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "1b413329f5bd676d1fe6027f75ef0c03553f45f54b35607ecc5d492f5c28d47b",
+          "code_length": 5
+        },
+        {
+          "name": "setDropState",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "f4c504ef35903eea2e37f111b33093f5bb7c31f3a38eeb4e6dd04c9a21b6bc29",
+          "code_length": 6
+        },
+        {
+          "name": "getNextItem",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "9ba09aa498b5f8d439d96dfda99194f2c67152c001129aa7acc73a121cabb876",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "setNextItem",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "a4856b3c50917a1471ab56155d2c922a1048906c5ae570224989a1021649670d",
+          "code_length": 6,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "drop",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "5456bc77cb27b6c5bfbe0e49caba2f34d298994bff06e39d214371e45a13405d",
+          "code_length": 61
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "57803317aab6ba92d72babe3cffa07a0e88539895d5853a673566e9e6d63e647",
+          "code_length": 47,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "33876f540d6f59ebef93768e6f5998f7b0d20cfcfa5335c906821efe4734c894",
+          "code_length": 38
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4c8d10d2617250475986435abef9c5ab39a69580be1081af63da9fab20d67508",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TT;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/DropWhileSequence",
+        "kotlin/sequences/DropWhileSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/DropWhileSequence.class",
+      "occurrence": 0,
+      "sha256": "f090781a6d70e88aa7289ef8b671d9b571f4ea3b595a6922c877aa625ce6ef68",
+      "name": "kotlin/sequences/DropWhileSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "predicate",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;Ljava/lang/Boolean;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "6ae9a1a33c8cd7510060eeaef83043a5f2e9de1347ba061aa0ddc74b8cbb3d69",
+          "code_length": 27,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;Lkotlin/jvm/functions/Function1<-TT;Ljava/lang/Boolean;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "d6043378c53c5b665060d2812a8868fbb13e99bf4d4aa41b2cc615a438fa5f48",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "access$getSequence$p",
+          "descriptor": "(Lkotlin/sequences/DropWhileSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "access$getPredicate$p",
+          "descriptor": "(Lkotlin/sequences/DropWhileSequence;)Lkotlin/jvm/functions/Function1;",
+          "access": 4121,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/DropWhileSequence",
+        "kotlin/sequences/DropWhileSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/EmptySequence.class",
+      "occurrence": 0,
+      "sha256": "e0c41d780f3cc89ce0286b743d11f20e619ce34bf12209d97da6662265a91065",
+      "name": "kotlin/sequences/EmptySequence",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/DropTakeSequence"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lkotlin/sequences/EmptySequence;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aab13953f9d3feb5b9581e937786ec4c2ebbf1a0ebf7650fa7d8cd37fd68f2ec",
+          "code_length": 5
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "81059c0bdabb0a2da11ab2dcd03c48242934ab7e99f08c8db6b50c4e166c103e",
+          "code_length": 7
+        },
+        {
+          "name": "drop",
+          "descriptor": "(I)Lkotlin/sequences/EmptySequence;",
+          "access": 1,
+          "code_sha256": "42ac08703dfcf2b97e6edfe1c36d44a9b77996a1171596063cf92f3a8e2aa722",
+          "code_length": 4
+        },
+        {
+          "name": "take",
+          "descriptor": "(I)Lkotlin/sequences/EmptySequence;",
+          "access": 1,
+          "code_sha256": "42ac08703dfcf2b97e6edfe1c36d44a9b77996a1171596063cf92f3a8e2aa722",
+          "code_length": 4
+        },
+        {
+          "name": "drop",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 4161,
+          "code_sha256": "103f4acbde4f3b5243c033625b47326901b849e9ef7c77b4a0e88d9bd4dceeba",
+          "code_length": 9
+        },
+        {
+          "name": "take",
+          "descriptor": "(I)Lkotlin/sequences/Sequence;",
+          "access": 4161,
+          "code_sha256": "e96b815888b09123d3f7f64f614f26848558b32bf4dabd9128a54a20804255d7",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1886bd598a9edaee96fa76aca83d4cbade8931629d684ece6295dd1681ba63d8",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/collections/EmptyIterator",
+        "kotlin/sequences/DropTakeSequence",
+        "kotlin/sequences/EmptySequence",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/FilteringSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "49fd10032e36f08a2ec23324bf1c018a770ea7c3fc0a1f49dfe1da759bd0d930",
+      "name": "kotlin/sequences/FilteringSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "nextState",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "nextItem",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lkotlin/sequences/FilteringSequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/FilteringSequence<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/FilteringSequence;)V",
+          "access": 0,
+          "code_sha256": "07908f982271210220917743c71228ef16b8c286100b5cc6cbb6abde1cf69b4d",
+          "code_length": 28,
+          "generic_signature": "(Lkotlin/sequences/FilteringSequence<TT;>;)V"
+        },
+        {
+          "name": "getIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "getNextState",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "1b413329f5bd676d1fe6027f75ef0c03553f45f54b35607ecc5d492f5c28d47b",
+          "code_length": 5
+        },
+        {
+          "name": "setNextState",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "f4c504ef35903eea2e37f111b33093f5bb7c31f3a38eeb4e6dd04c9a21b6bc29",
+          "code_length": 6
+        },
+        {
+          "name": "getNextItem",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "9ba09aa498b5f8d439d96dfda99194f2c67152c001129aa7acc73a121cabb876",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "setNextItem",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "a4856b3c50917a1471ab56155d2c922a1048906c5ae570224989a1021649670d",
+          "code_length": 6,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "calcNext",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "b1650793f03e3a4f576e1edbbdce5fe1e5fdcda8a824653054b1faeaa2410b93",
+          "code_length": 68
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "45787ef84cc077d5d7687254c06dff80f2207900816f34878e1ee5bd99beba71",
+          "code_length": 44,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8f477408f0bb078010f9c9a5e5152ed3edd7ccc1204c7ce57b65ca2f6b956f75",
+          "code_length": 26
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c0099e4f9adfb72c01d9590535a79e66377dcae4e6d5b3ab5ac92efb16d19a8f",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TT;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/FilteringSequence",
+        "kotlin/sequences/FilteringSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/FilteringSequence.class",
+      "occurrence": 0,
+      "sha256": "3ffa263e46bb32a69355b55035b369e985b2b962af67f42465a1c077119e6be4",
+      "name": "kotlin/sequences/FilteringSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "sendWhen",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "predicate",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;Ljava/lang/Boolean;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;ZLkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "9466819815831a6d0a8ba8b855fa58a99141ea8b472f6eb641cb99a887486b50",
+          "code_length": 32,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;ZLkotlin/jvm/functions/Function1<-TT;Ljava/lang/Boolean;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;ZLkotlin/jvm/functions/Function1;ILkotlin/jvm/internal/DefaultConstructorMarker;)V",
+          "access": 4097,
+          "code_sha256": "e41cae26d8506d1519c57a72cb3fa17958e07d32d51e7229e0e12803403c9f8f",
+          "code_length": 17
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "852057b7c3322c2f5457be82b75f1fca1654dedfbf2f35716e5d08bdd372be76",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "access$getSequence$p",
+          "descriptor": "(Lkotlin/sequences/FilteringSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "access$getPredicate$p",
+          "descriptor": "(Lkotlin/sequences/FilteringSequence;)Lkotlin/jvm/functions/Function1;",
+          "access": 4121,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5
+        },
+        {
+          "name": "access$getSendWhen$p",
+          "descriptor": "(Lkotlin/sequences/FilteringSequence;)Z",
+          "access": 4121,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/FilteringSequence",
+        "kotlin/sequences/FilteringSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/FlatteningSequence$State.class",
+      "occurrence": 0,
+      "sha256": "e48e7f361c05b1e1fd025f318862e6074477193b0266dec97ffae4d78a38181f",
+      "name": "kotlin/sequences/FlatteningSequence$State",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lkotlin/sequences/FlatteningSequence$State;",
+          "access": 25
+        },
+        {
+          "name": "UNDEFINED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "READY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DONE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "db384cfea98fa8701fbe1c544b683244e68396f632bcff31651627612726690a",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/sequences/FlatteningSequence",
+        "kotlin/sequences/FlatteningSequence$State"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/FlatteningSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "cbb894e6d2f2d3d1ecbf06fcfdfde548fc4074d976dd6f821a8400c776f4f626",
+      "name": "kotlin/sequences/FlatteningSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "itemIterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Iterator<+TE;>;"
+        },
+        {
+          "name": "state",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lkotlin/sequences/FlatteningSequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/FlatteningSequence<TT;TR;TE;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/FlatteningSequence;)V",
+          "access": 0,
+          "code_sha256": "c592b72607bbe8390155e5134b380cb1311661ffcad0e1279e17f88bac5f14cf",
+          "code_length": 23,
+          "generic_signature": "(Lkotlin/sequences/FlatteningSequence<TT;TR;TE;>;)V"
+        },
+        {
+          "name": "getIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "getItemIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "15838c8c2da38de3025f9e7f6fa3ebb2e5822d1f333d1a7c1400b5a247d6bf55",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TE;>;"
+        },
+        {
+          "name": "setItemIterator",
+          "descriptor": "(Ljava/util/Iterator;)V",
+          "access": 17,
+          "code_sha256": "3266b8a127fd808d57673bfc90e52364a993e787219986db35b67b07f9272efe",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/Iterator<+TE;>;)V"
+        },
+        {
+          "name": "getState",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "c592a215e9d4054b2dc01127ebcf310df0e6f79375bced094f6e913cbcf857c9",
+          "code_length": 5
+        },
+        {
+          "name": "setState",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "a5ed0aaa5dcebed7bffaac0f15493bceda03d5bede2aa8871119a3e597851f11",
+          "code_length": 6
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "aa7158a39633f7b5abb14cb6e7690559e37225b96940f19adbdfbf57dba8b090",
+          "code_length": 57,
+          "generic_signature": "()TE;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2b1bc1f20dfd1c865c0c243d8531f903937afdf4a9522278959cdc99e10eee63",
+          "code_length": 25
+        },
+        {
+          "name": "ensureItemIterator",
+          "descriptor": "()Z",
+          "access": 18,
+          "code_sha256": "67145590b5a85c7a2a58dd54fe82d9835a87a73c66efb4165edd094fbaaed4c5",
+          "code_length": 109
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2698b3ef49668a6b9a61a5f3588b660ebf80794229fcd79510a5af2f6311ac69",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TE;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/FlatteningSequence",
+        "kotlin/sequences/FlatteningSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/FlatteningSequence.class",
+      "occurrence": 0,
+      "sha256": "8df7c40be605de7004a653b770dbcb9327f692a441a2663e2708c3ca38f88552",
+      "name": "kotlin/sequences/FlatteningSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "transformer",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;TR;>;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TR;Ljava/util/Iterator<TE;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "f33081ad67958028b90e635e119c9ccb1f630a277c2ce56bdfca22b6010d6afd",
+          "code_length": 38,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;Lkotlin/jvm/functions/Function1<-TT;+TR;>;Lkotlin/jvm/functions/Function1<-TR;+Ljava/util/Iterator<+TE;>;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "12af7a9715c33e3ba3ae45688f015a72e00b9be58b3a263357d438b0281f5f1d",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TE;>;"
+        },
+        {
+          "name": "access$getSequence$p",
+          "descriptor": "(Lkotlin/sequences/FlatteningSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "access$getIterator$p",
+          "descriptor": "(Lkotlin/sequences/FlatteningSequence;)Lkotlin/jvm/functions/Function1;",
+          "access": 4121,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5
+        },
+        {
+          "name": "access$getTransformer$p",
+          "descriptor": "(Lkotlin/sequences/FlatteningSequence;)Lkotlin/jvm/functions/Function1;",
+          "access": 4121,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;R:Ljava/lang/Object;E:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TE;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/FlatteningSequence",
+        "kotlin/sequences/FlatteningSequence$State",
+        "kotlin/sequences/FlatteningSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/GeneratorSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "10f87dbcb007cb7897a316a1f17d1dc7cf6bdf5c05d41bf89664b12daf2250d0",
+      "name": "kotlin/sequences/GeneratorSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "nextItem",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "nextState",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lkotlin/sequences/GeneratorSequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/GeneratorSequence<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/GeneratorSequence;)V",
+          "access": 0,
+          "code_sha256": "f576e4ae1c9afbfd9682f0cad5829d97aaff608641a414447da9a571d52e6b55",
+          "code_length": 16,
+          "generic_signature": "(Lkotlin/sequences/GeneratorSequence<TT;>;)V"
+        },
+        {
+          "name": "getNextItem",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "7e0bb919657973bf0959e14569eb267b15bb4e98602248480db68213179c69da",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "setNextItem",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 17,
+          "code_sha256": "b92b8962c045e611d0ac00781b4f095d538cfb537191732a8852c07702fe407d",
+          "code_length": 6,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "getNextState",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "8217be20328da627bba017940d5ad267e4b75c5cfc8603457f0e6207b3a1b416",
+          "code_length": 5
+        },
+        {
+          "name": "setNextState",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "3e068c17850dedb5ac9662f63ab17056485d5ae1d10efdcb505f3a6bbb369bef",
+          "code_length": 6
+        },
+        {
+          "name": "calcNext",
+          "descriptor": "()V",
+          "access": 18,
+          "code_sha256": "90ebcd19ac0e1466bf0aa37449915125066b4a7a4764d5178d971da5fd59b653",
+          "code_length": 65
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "da3fc0d1e624d8e8918993d53a7c1e048fede0c8ba0e3063f6c0ded326b43104",
+          "code_length": 44,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3d07fdfae6301d417fa335817dc73ad72ca73d1034bce6deb0cb2ef54e71d2de",
+          "code_length": 25
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e44738cc908dcd5c988eee6f062f7367b3492213908f41e10c39be75293c3427",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TT;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "kotlin/jvm/functions/Function0",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/GeneratorSequence",
+        "kotlin/sequences/GeneratorSequence$iterator$1"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/GeneratorSequence.class",
+      "occurrence": 0,
+      "sha256": "4de22d42f29dc49a37f777ab550adcae0736f6a9c786cf734ae8aef81be1edba",
+      "name": "kotlin/sequences/GeneratorSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "getInitialValue",
+          "descriptor": "Lkotlin/jvm/functions/Function0;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function0<TT;>;"
+        },
+        {
+          "name": "getNextValue",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TT;TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function1;)V",
+          "access": 1,
+          "code_sha256": "6ae9a1a33c8cd7510060eeaef83043a5f2e9de1347ba061aa0ddc74b8cbb3d69",
+          "code_length": 27,
+          "generic_signature": "(Lkotlin/jvm/functions/Function0<+TT;>;Lkotlin/jvm/functions/Function1<-TT;+TT;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "d6043378c53c5b665060d2812a8868fbb13e99bf4d4aa41b2cc615a438fa5f48",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "access$getGetInitialValue$p",
+          "descriptor": "(Lkotlin/sequences/GeneratorSequence;)Lkotlin/jvm/functions/Function0;",
+          "access": 4121,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "access$getGetNextValue$p",
+          "descriptor": "(Lkotlin/sequences/GeneratorSequence;)Lkotlin/jvm/functions/Function1;",
+          "access": 4121,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/GeneratorSequence",
+        "kotlin/sequences/GeneratorSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/IndexingSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "434b9e084de0b7cb45015fa46d03eac35583021f946bc70cf996e88f3f3f7bca",
+      "name": "kotlin/sequences/IndexingSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/IndexingSequence;)V",
+          "access": 0,
+          "code_sha256": "363d5496aa182f276b9dfd981569c1e69f2cf3173ba75496b7b0e19631d805b2",
+          "code_length": 18,
+          "generic_signature": "(Lkotlin/sequences/IndexingSequence<TT;>;)V"
+        },
+        {
+          "name": "getIterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "getIndex",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "a6d962c6ddbc65f55b56f8cc6210b30f8921c9f5faf203febb0f7128e40e060d",
+          "code_length": 5
+        },
+        {
+          "name": "setIndex",
+          "descriptor": "(I)V",
+          "access": 17,
+          "code_sha256": "a93c2dac6245c32c218f61ae6aaf1c14fa794b375f914c31cff6d0140f047397",
+          "code_length": 6
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lkotlin/collections/IndexedValue;",
+          "access": 1,
+          "code_sha256": "fe4e33fbe9228033477df42fb3ea72a74d147d29a8b1eaa9a8e72a13a18c05c2",
+          "code_length": 39,
+          "generic_signature": "()Lkotlin/collections/IndexedValue<TT;>;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ed23bab984a95a1e1a24af84b31aa395231c8673dafd4eedad2f8f17c003b3",
+          "code_length": 10
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8ee7685563915d889754927408c5917faceafb6b1cc83bd7b8be2712babd7dd9",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "723e97f38c9363f4643c9d20926f830fae95513611b17bdd776092f6d7bef54b",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Lkotlin/collections/IndexedValue<+TT;>;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/collections/IndexedValue",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/IndexingSequence",
+        "kotlin/sequences/IndexingSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/IndexingSequence.class",
+      "occurrence": 0,
+      "sha256": "038c439f6711451cc2f69ff8676130ed30ecdc600d49ed85af441aa1b01b0432",
+      "name": "kotlin/sequences/IndexingSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;)V",
+          "access": 1,
+          "code_sha256": "b803c74351be9c9b57ddb9d7a311a1358a4a6b1cb8690e5c660ebe40292cb821",
+          "code_length": 16,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "495f1c39fed3cb220bf6d162e3ace0cde852afc74b075b818dcbbc75481f0f09",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<Lkotlin/collections/IndexedValue<TT;>;>;"
+        },
+        {
+          "name": "access$getSequence$p",
+          "descriptor": "(Lkotlin/sequences/IndexingSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<Lkotlin/collections/IndexedValue<+TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/IndexingSequence",
+        "kotlin/sequences/IndexingSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/MergingSequence$iterator$1.class",
+      "occurrence": 0,
+      "sha256": "a230a64b0c385e091ea0b9ee85fef1e6d35aeb92cd9181a668240bb3bc31f109",
+      "name": "kotlin/sequences/MergingSequence$iterator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "iterator1",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT1;>;"
+        },
+        {
+          "name": "iterator2",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<TT2;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lkotlin/sequences/MergingSequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/MergingSequence<TT1;TT2;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/MergingSequence;)V",
+          "access": 0,
+          "code_sha256": "33c737c7691ea09c2d8983c41f36ba5cda274ac251e1099fd1ff491b343ba386",
+          "code_length": 36,
+          "generic_signature": "(Lkotlin/sequences/MergingSequence<TT1;TT2;TV;>;)V"
+        },
+        {
+          "name": "getIterator1",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "0256bbf2ee9b049b72c52c383a0ffd7278c47d2cd9bc11d1a1fb60fe8bf4f524",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT1;>;"
+        },
+        {
+          "name": "getIterator2",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "edfd289239e98d935385427321a331b4a0af3d4fefb6812c5c783fc3e82b8792",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Iterator<TT2;>;"
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8f319fdb1c6d8f6f80544e15310b620a27632ed9f416d788a10cfda2434706e2",
+          "code_length": 31,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5cdd28e21dbf4c0f2e2b115145ea22da54d8dde20341f1c1e6205c24dfb75889",
+          "code_length": 30
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b7f65ba1854383132fa016061f8fdf378bb41bf9b3031190656416712fa3f45",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<TV;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "kotlin/jvm/functions/Function2",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/MergingSequence",
+        "kotlin/sequences/MergingSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/MergingSequence.class",
+      "occurrence": 0,
+      "sha256": "85d9439ad8c5a597391626d783d3a47df8e1d39bbdddcc9cae4a36506f19d959",
+      "name": "kotlin/sequences/MergingSequence",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "sequence1",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT1;>;"
+        },
+        {
+          "name": "sequence2",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 18,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT2;>;"
+        },
+        {
+          "name": "transform",
+          "descriptor": "Lkotlin/jvm/functions/Function2;",
+          "access": 18,
+          "generic_signature": "Lkotlin/jvm/functions/Function2<TT1;TT2;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;)V",
+          "access": 1,
+          "code_sha256": "3018c15c6a7c8325ed4ac741b006b530103b309c7dd2221e6de428ab17172181",
+          "code_length": 38,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT1;>;Lkotlin/sequences/Sequence<+TT2;>;Lkotlin/jvm/functions/Function2<-TT1;-TT2;+TV;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "a47b006e6673c6f5be4a7c3e6053c022b0cb3a4965e21c8b20f23bf5cb972876",
+          "code_length": 12,
+          "generic_signature": "()Ljava/util/Iterator<TV;>;"
+        },
+        {
+          "name": "access$getSequence1$p",
+          "descriptor": "(Lkotlin/sequences/MergingSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "access$getSequence2$p",
+          "descriptor": "(Lkotlin/sequences/MergingSequence;)Lkotlin/sequences/Sequence;",
+          "access": 4121,
+          "code_sha256": "b805b19adbf9630ba86303593ac47fadafc3c658e98ceda51257cda42504f784",
+          "code_length": 5
+        },
+        {
+          "name": "access$getTransform$p",
+          "descriptor": "(Lkotlin/sequences/MergingSequence;)Lkotlin/jvm/functions/Function2;",
+          "access": 4121,
+          "code_sha256": "e8601800eb43540de362cdc4aa29dbee7b5cd554372a13598386fdb5d27d73f3",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T1:Ljava/lang/Object;T2:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Lkotlin/sequences/Sequence<TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/MergingSequence",
+        "kotlin/sequences/MergingSequence$iterator$1",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/Sequence.class",
+      "occurrence": 0,
+      "sha256": "ded017b6bfbc4cacdd322378aeca0706e712460efb05ba1a026a3a17727050ed",
+      "name": "kotlin/sequences/Sequence",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/sequences/Sequence"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequenceBuilderIterator.class",
+      "occurrence": 0,
+      "sha256": "8f3c982435259d70060083e8ede9d968bd20f7179a06aab7adf8655ffff82659",
+      "name": "kotlin/sequences/SequenceBuilderIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "kotlin/sequences/SequenceScope",
+      "interfaces": [
+        "java/util/Iterator",
+        "kotlin/coroutines/Continuation",
+        "kotlin/jvm/internal/markers/KMappedMarker"
+      ],
+      "fields": [
+        {
+          "name": "state",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "nextIterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Iterator<+TT;>;"
+        },
+        {
+          "name": "nextStep",
+          "descriptor": "Lkotlin/coroutines/Continuation;",
+          "access": 2,
+          "generic_signature": "Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1abc67ae60c13e998b08d010b77e059e5ac350dc5ba75cabdbd73cc291e4e941",
+          "code_length": 5
+        },
+        {
+          "name": "getNextStep",
+          "descriptor": "()Lkotlin/coroutines/Continuation;",
+          "access": 17,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5,
+          "generic_signature": "()Lkotlin/coroutines/Continuation<Lkotlin/Unit;>;"
+        },
+        {
+          "name": "setNextStep",
+          "descriptor": "(Lkotlin/coroutines/Continuation;)V",
+          "access": 17,
+          "code_sha256": "dfb2510a46310a07b2b85cca8155c7f5f427b719b005efe7d9cc5a60007db820",
+          "code_length": 6,
+          "generic_signature": "(Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)V"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d8c2dc06d7124a4d379d27083b69de7a1bfa329a966a070081465c6ea9aed2e9",
+          "code_length": 125
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9ad4214a23b4bb949cd6271f8ddcbaa5bdcf1e97e29c9f5eb204032883d2ca4e",
+          "code_length": 82,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "nextNotReady",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 18,
+          "code_sha256": "8e76eda4588bd1f864ba403a0e3f50308a914f6fb2c6e1cca5a6d6eeab56d525",
+          "code_length": 20,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "exceptionalState",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 18,
+          "code_sha256": "dde9e083524c1a1b54c46fb1a880fcdabb8a260833f76163126a7bbeb180f22c",
+          "code_length": 89
+        },
+        {
+          "name": "yield",
+          "descriptor": "(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "45d92c78145219c1b35143ff63979a28e17f5a1cc71d14121d53356926896abe",
+          "code_length": 47,
+          "generic_signature": "(TT;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "yieldAll",
+          "descriptor": "(Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b03d41bd4adf95e2c83e39abfdc3a135519d19547b71b49f4c1cb0d3e02b6931",
+          "code_length": 60,
+          "generic_signature": "(Ljava/util/Iterator<+TT;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "resumeWith",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6356f32627dbf4e4af900fb92ddd0fddf09806f7c3fcf262f40cad4a4e3c350d",
+          "code_length": 12
+        },
+        {
+          "name": "getContext",
+          "descriptor": "()Lkotlin/coroutines/CoroutineContext;",
+          "access": 1,
+          "code_sha256": "28a5ba69531e82f7cf38d0ccf435776145584abee3d95b66e2e428ce91ef6e8d",
+          "code_length": 7
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f20830905203fa4bd76f874fe0a12948eb65e4f836a4c3b941fc417a2c566252",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lkotlin/sequences/SequenceScope<TT;>;Ljava/util/Iterator<TT;>;Lkotlin/coroutines/Continuation<Lkotlin/Unit;>;Lkotlin/jvm/internal/markers/KMappedMarker;",
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "kotlin/Result",
+        "kotlin/ResultKt",
+        "kotlin/Unit",
+        "kotlin/coroutines/Continuation",
+        "kotlin/coroutines/CoroutineContext",
+        "kotlin/coroutines/EmptyCoroutineContext",
+        "kotlin/coroutines/intrinsics/IntrinsicsKt",
+        "kotlin/coroutines/jvm/internal/DebugProbesKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/internal/markers/KMappedMarker",
+        "kotlin/sequences/SequenceBuilderIterator",
+        "kotlin/sequences/SequenceScope"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequenceScope.class",
+      "occurrence": 0,
+      "sha256": "6302cd4e12c5760b085fcdabfa8a6bb66058daf76e3b544abeaa5c7d43d5b768",
+      "name": "kotlin/sequences/SequenceScope",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "261a2f1797eec5614a8f259eab3031a953c9369dd1f9f0c4090576e45bf24cce",
+          "code_length": 5
+        },
+        {
+          "name": "yield",
+          "descriptor": "(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TT;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "yieldAll",
+          "descriptor": "(Ljava/util/Iterator;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Iterator<+TT;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "yieldAll",
+          "descriptor": "(Ljava/lang/Iterable;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "a9fe4076e28d8a04c745db05539882a89ce5b2282dd4dd2d61f904b766e1592c",
+          "code_length": 47,
+          "generic_signature": "(Ljava/lang/Iterable<+TT;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "yieldAll",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "a605599d89ca5f9b9fb87a80660035fd0a61ef20528645a3b498e27f71c5f022",
+          "code_length": 24,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Collection",
+        "kotlin/Unit",
+        "kotlin/coroutines/intrinsics/IntrinsicsKt",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequenceScope"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt.class",
+      "occurrence": 0,
+      "sha256": "5819a0febbb609b65bb11b52b3840d798a9890c122d9b6a7a1a44c1e7b428b58",
+      "name": "kotlin/sequences/SequencesKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "kotlin/sequences/SequencesKt___SequencesKt",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "kotlin/sequences/SequencesKt",
+        "kotlin/sequences/SequencesKt___SequencesKt"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequenceBuilderKt$sequence$$inlined$Sequence$1.class",
+      "occurrence": 0,
+      "sha256": "680e3af1b1f7190679d8e1535526eb918f5179d9318e0fd2dd479807226eba0b",
+      "name": "kotlin/sequences/SequencesKt__SequenceBuilderKt$sequence$$inlined$Sequence$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$block$inlined",
+          "descriptor": "Lkotlin/jvm/functions/Function2;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/functions/Function2;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "ba4cc42d986b43025d45e87b2fe4ac2852ec2fd4c538f7ba67c8fc87091e55d7",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt",
+        "kotlin/sequences/SequencesKt__SequenceBuilderKt",
+        "kotlin/sequences/SequencesKt__SequenceBuilderKt$sequence$$inlined$Sequence$1",
+        "kotlin/sequences/SequencesKt__SequencesKt"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequenceBuilderKt.class",
+      "occurrence": 0,
+      "sha256": "911530af972253f08a06cfaa3f024f9e020394690d12b681bca7244e673b5a45",
+      "name": "kotlin/sequences/SequencesKt__SequenceBuilderKt",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "State_NotReady",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State_ManyNotReady",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State_ManyReady",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State_Ready",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State_Done",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State_Failed",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "sequence",
+          "descriptor": "(Lkotlin/jvm/functions/Function2;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "d67b0e09574247393c2486f69ff1ea35854a20389c7419052d64f0f7969fbfed",
+          "code_length": 18,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lkotlin/jvm/functions/Function2<-Lkotlin/sequences/SequenceScope<-TT;>;-Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;+Ljava/lang/Object;>;)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "(Lkotlin/jvm/functions/Function2;)Ljava/util/Iterator;",
+          "access": 25,
+          "code_sha256": "563e9624eeec0a57a1c7ae90a42aae0d72db0ea25b56b4b779c429b6386b4f78",
+          "code_length": 32,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lkotlin/jvm/functions/Function2<-Lkotlin/sequences/SequenceScope<-TT;>;-Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;+Ljava/lang/Object;>;)Ljava/util/Iterator<TT;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "adf01cc6d2f66ca4914f79e6a2283a9d3092ab1e8aee21245b26a5d73568543c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/coroutines/Continuation",
+        "kotlin/coroutines/intrinsics/IntrinsicsKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequenceBuilderIterator",
+        "kotlin/sequences/SequencesKt__SequenceBuilderKt",
+        "kotlin/sequences/SequencesKt__SequenceBuilderKt$sequence$$inlined$Sequence$1"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequencesJVMKt.class",
+      "occurrence": 0,
+      "sha256": "bf7209802182281c1dbe644dda9caf93521d4f4c5e6d9d03b45473e3d33405f4",
+      "name": "kotlin/sequences/SequencesKt__SequencesJVMKt",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "kotlin/sequences/SequencesKt__SequenceBuilderKt",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/Enumeration;)Lkotlin/sequences/Sequence;",
+          "access": 26,
+          "code_sha256": "4ab840e64aa41648e9a0597c531ee61c75c10ec92c380b3dfd57333cfb03a9ee",
+          "code_length": 14,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Enumeration<TT;>;)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "33916b80d60652642de7b755b56363d094875ec08724021a822a6188c255b107",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "kotlin/collections/CollectionsKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/SequencesKt",
+        "kotlin/sequences/SequencesKt__SequenceBuilderKt",
+        "kotlin/sequences/SequencesKt__SequencesJVMKt"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequencesKt$Sequence$1.class",
+      "occurrence": 0,
+      "sha256": "74dc4312ccdb090c9e2a5a80797050cc4b2e27e5ae7fd0115b6b5eec1f806a11",
+      "name": "kotlin/sequences/SequencesKt__SequencesKt$Sequence$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$iterator",
+          "descriptor": "Lkotlin/jvm/functions/Function0;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/jvm/functions/Function0<Ljava/util/Iterator<TT;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/jvm/functions/Function0;)V",
+          "access": 1,
+          "code_sha256": "97f12a2344cc0d77c8f6dfcee53f39ac9a3d671e83ba899fdf28df653e8566fb",
+          "code_length": 10,
+          "generic_signature": "(Lkotlin/jvm/functions/Function0<+Ljava/util/Iterator<+TT;>;>;)V"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "8eeb1756a55c4129c0c1eaf10736a76f30db2be8fbcf6b341b64e155ec25b6d0",
+          "code_length": 13,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/jvm/functions/Function0",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/sequences/SequencesKt__SequencesKt$Sequence$1"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1.class",
+      "occurrence": 0,
+      "sha256": "fa68865dbccf465f794a8bf26a25334bd5fbf8efa7339c1f74ccd54174f8cf00",
+      "name": "kotlin/sequences/SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$this_asSequence$inlined",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "d0d49f327bb5b4108bd65a6b024795a7e4b946528ec91a76969293f6af3f54b7",
+          "code_length": 7,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/sequences/SequencesKt__SequencesKt$asSequence$$inlined$Sequence$1"
+      ]
+    },
+    {
+      "entry": "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1.class",
+      "occurrence": 0,
+      "sha256": "f40e44e12d495ad80ad4127636adf6178768995ec1ee80f96fcafc70376754cf",
+      "name": "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "kotlin/coroutines/jvm/internal/RestrictedSuspendLambda",
+      "interfaces": [
+        "kotlin/jvm/functions/Function2"
+      ],
+      "fields": [
+        {
+          "name": "L$1",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "L$2",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "L$3",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "I$0",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "label",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "L$0",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4098
+        },
+        {
+          "name": "$source",
+          "descriptor": "Lkotlin/sequences/Sequence;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "$transform",
+          "descriptor": "Lkotlin/jvm/functions/Function2;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/jvm/functions/Function2<Ljava/lang/Integer;TT;TC;>;"
+        },
+        {
+          "name": "$iterator",
+          "descriptor": "Lkotlin/jvm/functions/Function1;",
+          "access": 4112,
+          "generic_signature": "Lkotlin/jvm/functions/Function1<TC;Ljava/util/Iterator<TR;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lkotlin/sequences/Sequence;Lkotlin/jvm/functions/Function2;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)V",
+          "access": 0,
+          "code_sha256": "e139733022ee705d52403295ffa8b7523ebd526f5e4f1f03eddb16c89e2f6f54",
+          "code_length": 23,
+          "generic_signature": "(Lkotlin/sequences/Sequence<+TT;>;Lkotlin/jvm/functions/Function2<-Ljava/lang/Integer;-TT;+TC;>;Lkotlin/jvm/functions/Function1<-TC;+Ljava/util/Iterator<+TR;>;>;Lkotlin/coroutines/Continuation<-Lkotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1;>;)V"
+        },
+        {
+          "name": "invokeSuspend",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "f470b2dc2bcf4630feb959c5a5009a63662165685061e9ef6654ca8ed31db964",
+          "code_length": 227
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Lkotlin/coroutines/Continuation;",
+          "access": 17,
+          "code_sha256": "5835e38c1e7501cf752f9488799d4ad80753020c8aa492c0493d2645282d87cf",
+          "code_length": 31,
+          "generic_signature": "(Ljava/lang/Object;Lkotlin/coroutines/Continuation<*>;)Lkotlin/coroutines/Continuation<Lkotlin/Unit;>;"
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Lkotlin/sequences/SequenceScope;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "9b1450d3571ac7216f74be3de27f8322e9b8c7fdec9d2ae722d04f0ec3959396",
+          "code_length": 16,
+          "generic_signature": "(Lkotlin/sequences/SequenceScope<-TR;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "bbd9bc483d287e4024c5f290bbc47cbe185176d6a22143b391e5ea342e355084",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Lkotlin/coroutines/jvm/internal/RestrictedSuspendLambda;Lkotlin/jvm/functions/Function2<Lkotlin/sequences/SequenceScope<-TR;>;Lkotlin/coroutines/Continuation<-Lkotlin/Unit;>;Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "kotlin/ResultKt",
+        "kotlin/Unit",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/coroutines/Continuation",
+        "kotlin/coroutines/intrinsics/IntrinsicsKt",
+        "kotlin/coroutines/jvm/internal/Boxing",
+        "kotlin/coroutines/jvm/internal/RestrictedSuspendLambda",
+        "kotlin/coroutines/jvm/internal/SpillingKt",
+        "kotlin/jvm/functions/Function1",
+        "kotlin/jvm/functions/Function2",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequenceScope",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,532 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/error_prone_annotations-2.4.0.jar",
+  "archive_sha256": "5f2a0648230a662e8be049df308d583d7369f13af683e44ddf5829b6d741a228",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/google/errorprone/annotations/CanIgnoreReturnValue.class",
+      "occurrence": 0,
+      "sha256": "7b908ae05832c942f1cd82750e86710ae8551d7865aa6fda683868c2587a800b",
+      "name": "com/google/errorprone/annotations/CanIgnoreReturnValue",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/CanIgnoreReturnValue",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/IncompatibleModifiers.class",
+      "occurrence": 0,
+      "sha256": "9bf81b42c94a56d6d6f200ba52d7377fa0d833778eddfcea5e46b06d37e255bd",
+      "name": "com/google/errorprone/annotations/IncompatibleModifiers",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljavax/lang/model/element/Modifier;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/IncompatibleModifiers",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/RestrictedApi.class",
+      "occurrence": 0,
+      "sha256": "5c856f6302bb5dcffbe34da074f26164c5e8a871d0b8734d8e5a7012db87ff7b",
+      "name": "com/google/errorprone/annotations/RestrictedApi",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "explanation",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "link",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "allowedOnPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "whitelistAnnotations",
+          "descriptor": "()[Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()[Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;"
+        },
+        {
+          "name": "whitelistWithWarningAnnotations",
+          "descriptor": "()[Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()[Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;"
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/RestrictedApi",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/RequiredModifiers.class",
+      "occurrence": 0,
+      "sha256": "f90c4a945a289e30e5281fbccae92db1e28e0a1d247ab212eb6ba74e80c5c5df",
+      "name": "com/google/errorprone/annotations/RequiredModifiers",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljavax/lang/model/element/Modifier;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/RequiredModifiers",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/LockMethod.class",
+      "occurrence": 0,
+      "sha256": "c07e89a2ebb34dddbd4bf4746ac667033ccd070fad0c085550575b29bf298136",
+      "name": "com/google/errorprone/annotations/concurrent/LockMethod",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/concurrent/LockMethod",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/LazyInit.class",
+      "occurrence": 0,
+      "sha256": "ff14b997374484af78c5a0a7d563dd8de85a271e8f49ec5705e8db30c816b5ac",
+      "name": "com/google/errorprone/annotations/concurrent/LazyInit",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/concurrent/LazyInit",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/UnlockMethod.class",
+      "occurrence": 0,
+      "sha256": "39727227b4b249e15e72fd340594578238d93b368e423aaa2825a788f43d39bf",
+      "name": "com/google/errorprone/annotations/concurrent/UnlockMethod",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/concurrent/UnlockMethod",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/concurrent/GuardedBy.class",
+      "occurrence": 0,
+      "sha256": "35ae0dfde8938d68a695560607c81d0e8fd1ae05ac166342c4fc5eaaa0ed5602",
+      "name": "com/google/errorprone/annotations/concurrent/GuardedBy",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/concurrent/GuardedBy",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/NoAllocation.class",
+      "occurrence": 0,
+      "sha256": "35ae8d947f90b538c8ae6af10889a66e0e608041f59aa7a938f37b33175a55ce",
+      "name": "com/google/errorprone/annotations/NoAllocation",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/NoAllocation",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/Immutable.class",
+      "occurrence": 0,
+      "sha256": "c2f421da3f28d5e5d4bd82233490493f8d92b8d57d90a9ef797c4132d7cf557a",
+      "name": "com/google/errorprone/annotations/Immutable",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "containerOf",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/Immutable",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/OverridingMethodsMustInvokeSuper.class",
+      "occurrence": 0,
+      "sha256": "7e928c6f8023b8b48c9d1439da7da4f05df559f471fb39f0cc310b2a05c11e36",
+      "name": "com/google/errorprone/annotations/OverridingMethodsMustInvokeSuper",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/OverridingMethodsMustInvokeSuper",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CompatibleWith.class",
+      "occurrence": 0,
+      "sha256": "f87396f38f850ff9280f99497c9e389a8245b4b8c78c2923cf506aafa901787b",
+      "name": "com/google/errorprone/annotations/CompatibleWith",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/CompatibleWith",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CheckReturnValue.class",
+      "occurrence": 0,
+      "sha256": "63fe138c1bb0b585fe8ef8b5a4296b8575a11f3d25069d5b6fb4c41493c7ac87",
+      "name": "com/google/errorprone/annotations/CheckReturnValue",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/CheckReturnValue",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/FormatMethod.class",
+      "occurrence": 0,
+      "sha256": "2cb02fede6bef92da58d9818ded630cf793454551c77f57de54314588341ddd4",
+      "name": "com/google/errorprone/annotations/FormatMethod",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/FormatMethod",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/DoNotMock.class",
+      "occurrence": 0,
+      "sha256": "814a479f1f950a7998588882a3c7c91a7b4bb05703469c4a7ee2dc15c5c1b91f",
+      "name": "com/google/errorprone/annotations/DoNotMock",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/DoNotMock",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/FormatString.class",
+      "occurrence": 0,
+      "sha256": "1327d830c766c6e91e43d5bb6899a63da9ca20250a841727251fd7831af898be",
+      "name": "com/google/errorprone/annotations/FormatString",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/FormatString",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/Var.class",
+      "occurrence": 0,
+      "sha256": "4f68444ada32ddb4b6f5f992e9b51b8e79a6cb8918c6904bc0795674cb04d79a",
+      "name": "com/google/errorprone/annotations/Var",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/Var",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/MustBeClosed.class",
+      "occurrence": 0,
+      "sha256": "4244431cb5b331f5bc3561d861bf064b2b39a1a3dd31a1e2b5e238989c74e0ca",
+      "name": "com/google/errorprone/annotations/MustBeClosed",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/MustBeClosed",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/CompileTimeConstant.class",
+      "occurrence": 0,
+      "sha256": "e218c3a65586627ab5d8bf57aa9e3704c666d9e67f2b279fb029b057f992af2e",
+      "name": "com/google/errorprone/annotations/CompileTimeConstant",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/CompileTimeConstant",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/SuppressPackageLocation.class",
+      "occurrence": 0,
+      "sha256": "74f0e0edcacbf8526ae0ded4201bdfe67c8fc52ab4f335dbee6044adf0dfe6b4",
+      "name": "com/google/errorprone/annotations/SuppressPackageLocation",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/SuppressPackageLocation",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/ForOverride.class",
+      "occurrence": 0,
+      "sha256": "c32691981d4c7c11a62d09d7be4deccd81fc9cb1393f525489bd204fabfe12f9",
+      "name": "com/google/errorprone/annotations/ForOverride",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/errorprone/annotations/ForOverride",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/errorprone/annotations/DoNotCall.class",
+      "occurrence": 0,
+      "sha256": "e6fd1e9fce32aea250e642c527c3707aac77157b03df8ae0c3f07b44d22d4746",
+      "name": "com/google/errorprone/annotations/DoNotCall",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/errorprone/annotations/DoNotCall",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    }
+  ]
+}

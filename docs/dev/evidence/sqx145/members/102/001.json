@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/PSUtils.jar",
+  "archive_sha256": "03ebfabefe9cb716e29757e64bd020bb78cfa0cb5d6088d622c16a5dc3e35da5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/jfx/ts/io/PSUtils.class",
+      "occurrence": 0,
+      "sha256": "8726bb3a0e49e466268a2891dbabdfe486377cdf29f0df1a489c0b0083b5b146",
+      "name": "com/jfx/ts/io/PSUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "isWindows",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "isX64",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "isJreX64",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/jfx/ts/io/PSUtils;",
+          "access": 10
+        },
+        {
+          "name": "libFolderPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3c8e5652907ce714d57fe2e128a4fcc37e5c7acadbfc70e5bdd7fc4d321fc331",
+          "code_length": 100
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5a7af95ff5a77a572bb0685aa3be4dee06b311dee64700fcd8e2c4313998f893",
+          "code_length": 5
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/jfx/ts/io/PSUtils;",
+          "access": 9,
+          "code_sha256": "208ce8a8630fc9496d9ca73e1dc649783cabb71c62ef28b243ee4825e96cda75",
+          "code_length": 26
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e414a99e182172a0c3f566d1a6a8401d1bc190302e1a58d53d8a1ebc0f587e3",
+          "code_length": 295
+        },
+        {
+          "name": "deinit",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ce5564b562ec630cabd403344662eb34d6dc8e8a84bdf046eeb88e55088e3a57",
+          "code_length": 25
+        },
+        {
+          "name": "deleteDir",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "9004927b1a7ab72b5ba0dcd2e3357ec6655f762ee754a90f38247f6b43625192",
+          "code_length": 49
+        },
+        {
+          "name": "checkProcess",
+          "descriptor": "(Ljava/lang/String;ZZ)[Ljava/lang/String;",
+          "access": 257
+        },
+        {
+          "name": "startProcess2",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ZZZ)I",
+          "access": 257
+        },
+        {
+          "name": "startProcess",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ZZ)I",
+          "access": 257
+        },
+        {
+          "name": "postMsg",
+          "descriptor": "(ZIIIJ)Z",
+          "access": 257
+        },
+        {
+          "name": "postMsgByPID",
+          "descriptor": "(IIIJ)Z",
+          "access": 257
+        },
+        {
+          "name": "swShowHideByPID",
+          "descriptor": "(ZI)Z",
+          "access": 257
+        },
+        {
+          "name": "toggleWindowVisibilityByPID",
+          "descriptor": "(I)Z",
+          "access": 257
+        },
+        {
+          "name": "terminateApp",
+          "descriptor": "(II)Z",
+          "access": 257
+        },
+        {
+          "name": "getHwndByPID",
+          "descriptor": "(I)I",
+          "access": 257
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/io/File;",
+        "com/jfx/ts/io/PSUtils",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/InputStream",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/FitnessMethodWFResult/FitnessMethodWFResult.jar",
+  "sha256": "9d652f7e6ef5d6631969668b6d2c50efa4244504eca0ab3d452e341e7c33546f",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1.class": "ec057bd32c56448b112b0459568bc931bbece557401f834163484f17d6b0a235",
+    "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal.class": "1c43fef45c3476850bde894395ad8025661e36ce6bbac6d57278315b5435fd6a",
+    "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult.class": "e6bc23056c31fc9109d33df1c41b0fe84b7362a7540a1db43f8d5930c44c555a"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$1.class",
+      "occurrence": 0,
+      "sha256": "ec057bd32c56448b112b0459568bc931bbece557401f834163484f17d6b0a235",
+      "member_shard": "docs/dev/evidence/sqx145/members/190/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult$Goal.class",
+      "occurrence": 0,
+      "sha256": "1c43fef45c3476850bde894395ad8025661e36ce6bbac6d57278315b5435fd6a",
+      "member_shard": "docs/dev/evidence/sqx145/members/190/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/WFResult/FitnessMethodWFResult.class",
+      "occurrence": 0,
+      "sha256": "e6bc23056c31fc9109d33df1c41b0fe84b7362a7540a1db43f8d5930c44c555a",
+      "member_shard": "docs/dev/evidence/sqx145/members/190/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/190/001.json",
+      "sha256": "0cf6895d4e04c43583102a6b3a6bb4fc36581e775cb758ba64c92af010f63357"
+    }
+  ]
+}

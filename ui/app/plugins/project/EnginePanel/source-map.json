@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only EnginePanel bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/EnginePanel",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-    "version": 1,
-    "state": "owner-approved-plan"
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
   },
   "owner": {
     "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
@@ -28,270 +28,370 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel",
       "id": "sqx-enginepanel-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/acceptedStatsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/acceptedStatsPopup.html",
       "relative_path": "acceptedStatsPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "7c21581980dab600cc538df660d66aa8c2a62c75c593999d6bcad85906a97b5f",
+      "sha256": "4bccc809f34137db9aef6622c4a72729a125250663849fe4f1ff71dfd566fe92",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
       "relative_path": "directives/engineChartPanel/engineChartPanel.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9e13472b5b3fbf9745b7e1240933caca2a8e1a5190b8f415dc1640355e07a6a9",
+      "sha256": "aa649441f22ffb064ebc44ecb9177a960b781ec9bbaa7ccc4a965623d543ff2b",
       "target": "directives/engineChartPanel/engineChartPanel.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanel.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanel.js",
       "relative_path": "directives/engineChartPanel/EngineChartPanel.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "b48ee0231235bcc204fd5e028bde61918870a33fedf064ce6ac47d87678073d8",
+      "sha256": "5a04835ecdb765a3ff691c74abb99326b2662732644f1c22d03370f4fcb311fe",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanelCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanelCtrl.js",
       "relative_path": "directives/engineChartPanel/EngineChartPanelCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "3125dc300775449b887fbc67ad08054243ccff4b8d4fbe252d8656864694eb51",
+      "sha256": "0264271cda4a5c2153d810a3d2a13928b980a3ac28717c6679e918b7635b2589",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/fitnessEvolution.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/fitnessEvolution.html",
       "relative_path": "directives/fitnessEvolution/fitnessEvolution.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "c7f4b06cd05cb03f8e6a3bd32363ab444b4b38ce50478ca36fad7df0cb937f2a",
+      "sha256": "03bb930fb4cbe9d611498a5f06055468b352b1ed8acf3459d9798c1d541b95f5",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionCtrl.js",
       "relative_path": "directives/fitnessEvolution/FitnessEvolutionCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "be589143539021a3f1aa4baf0bb8a2abc74f9e9b5a6e53b5e9b56edb89ff4eb3",
+      "sha256": "ee4c540b419dd3bb29ace9795a85bc2ea4727cdf175d85af05bc552f1bde7401",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js",
       "relative_path": "directives/fitnessEvolution/FitnessEvolutionService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "b772bb24cd38c64f31a16b4f9680b931c03ef290d5635de8252b36a40d48af1f",
+      "sha256": "3769c9bb7d2e7bff865bf3009bf122e14998a92d0131b1183f648eb13dc23eb8",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/module.js",
       "relative_path": "directives/fitnessEvolution/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "f387f31b58558bee497fb23d9396e7da26bc6f709e73cfece0b73908ddcea9f3",
+      "sha256": "9232b12121e4f0e0d312baf6dc60950787a9afb2218f8bf298fe64cd496a2dd7",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/dismissalStatsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/dismissalStatsPopup.html",
       "relative_path": "dismissalStatsPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "f3b8c1a27f295160b24c2e2a08ed9161d0464a1aa4f55e0e132445c1f96fce68",
+      "sha256": "d140a851b12010fbb567977d61edcb28f1fee04936121ed5b9459f106d819a89",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/durationStatsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/durationStatsPopup.html",
       "relative_path": "durationStatsPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "05dc18c7cda9ed176ab562350901e0a7fc1e5fc6afb7974b4081521fc89a96e6",
+      "sha256": "67f36a5f1ed7c7a787496d6a8ec79bd86d69c77d4d17bc3e2ee68dfc57a7d4d7",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html",
       "relative_path": "engine.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "8fe8e966ae58b0ab0619792f2fe2bc96cfae5a7bde8d9cb35818ea17f211feeb",
+      "sha256": "6f506b69ebd3b04893871abba400b3beed4ce307fcc2b35975105a0e82d2f62b",
       "target": "engine.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js",
       "relative_path": "EngineCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "622538c488af5def8729a7030c5268415bd8da4f2b520cce672ccee18e40c268",
+      "sha256": "956d7344c57fe821b6dc82a5364c5fb227a88c777d356ed585769f5da11b3206",
       "target": "EngineCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.css",
       "relative_path": "EnginePanel.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
       "sha256": "b8610fd0c4a6b348236d554657cedfc406b59df5fbac5912bed08d23f04e03d2",
       "target": "EnginePanel.css",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.db",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.db",
       "relative_path": "EnginePanel.db",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "0285714c5f5761562746673fc3314123330985bc910d50fe583fbd7bb574d741",
+      "sha256": "2d8530811b8c20daabd98a4a70beafbd63d6ed7239f1eec9b7a5228152755ece",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary/database outside frontend scope; fingerprinted only."
+      "limitation": "Backend binary/database outside frontend scope; fingerprinted only. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar",
       "relative_path": "EnginePanel.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "e10c17face0f953e75b3e36bdbc23c81941592665b0c7329eb9494bb1f2f45e1",
+      "sha256": "41c3a4e9037ddde57eefcafb911db5d3fb9626d76c7adead17217bceaa7fdeeb",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary/database outside frontend scope; fingerprinted only."
+      "limitation": "Backend binary/database outside frontend scope; fingerprinted only. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js",
       "relative_path": "EngineService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "950f1cf46fa2be840f6571dd9603aad5d7f609bdaebb9d1135e9d025b0032fba",
+      "sha256": "a2fdd9974b394353def53450ef43c21594c44b6d574aa38b7ca55666887e2b69",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a8b0662c2c7438fb09eb72e6aaad1b706131e4467665b5e5f47d303b5c1379be",
+      "sha256": "ca0cc0e86f78d3da20da992684f591a187162b3f9581065fb264210fe67ac473",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/projectConfigHelpPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/projectConfigHelpPopup.html",
       "relative_path": "projectConfigHelpPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "fb31f323fa76ce47e90fcd261b29ce0815299dee8a57c2c0a542a163c14d6f44",
+      "sha256": "7ea0b28d1c52f9f35c9b0172d65b0731c22661befe60cc4cd0b8ef3bd958fc2d",
       "target": "projectConfigHelpPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/textLogPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/textLogPopup.html",
       "relative_path": "textLogPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "025839bdfd58ffcdbacf37e26d8fbd0ea91db0d1cee9fd2c61ae18daa75a2ba1",
+      "sha256": "15bbfeb274a1b29dc49a92bc271d954a152e7eb0fbd49e9e89244dce5d65c469",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-enginepanel-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/visualLogPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/visualLogPopup.html",
       "relative_path": "visualLogPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "58c8005c5577e1b327ea5763460b0b57071b0c5edcc90e44b79af3c9880c8635",
+      "sha256": "d3a0bf32dee083f7e04af60d7863f909e70576fca87f4da2853942ae0d30a96b",
       "target": null,
       "classification": "excluded",
-      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -332,6 +432,9 @@
   ],
   "limitations": [
     "No backend, database mutation, live engine capability, new route or SQX parity claim.",
-    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
-  ]
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

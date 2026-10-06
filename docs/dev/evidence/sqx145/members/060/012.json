@@ -1,0 +1,4817 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI.class",
+      "occurrence": 0,
+      "sha256": "8c4dfdfc4d63888f6a1e8b586a7f6d84cee94bbd04cfb4930b0c5d3b2ecce5c6",
+      "name": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "wProcessorArchitecture",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wReserved",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7a0247c7bc524576702e6359f7860668cbc17ccb84c2087aedc70f9ec2bf8b95",
+      "name": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION.class",
+      "occurrence": 0,
+      "sha256": "fbbc2cfc8c42a0365d8c2181683807d789f62f333b87f8dbf40dc7fc3dfb93b5",
+      "name": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwOemID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "pi",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "23169aaad69c16c2cece6e03154f165add176689f3a0a2fba13d791944240f6d",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO.class",
+      "occurrence": 0,
+      "sha256": "1082665bd6ad88dcc84820423d9447bba9b6bae7416a6085d03aa58f617ae9d9",
+      "name": "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "processorArchitecture",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION;",
+          "access": 1
+        },
+        {
+          "name": "dwPageSize",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "lpMinimumApplicationAddress",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "lpMaximumApplicationAddress",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "dwActiveProcessorMask",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$DWORD_PTR;",
+          "access": 1
+        },
+        {
+          "name": "dwNumberOfProcessors",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "dwProcessorType",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "dwAllocationGranularity",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "wProcessorLevel",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wProcessorRevision",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$DWORD_PTR",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$PI",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO$UNION",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$THREAD_START_ROUTINE.class",
+      "occurrence": 0,
+      "sha256": "2cda7c0b42ad916525b10dd1f5a6e32eaf6bd3ecb7decf8beac6fe8bd0bf1166",
+      "name": "com/sun/jna/platform/win32/WinBase$THREAD_START_ROUTINE",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "apply",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$LPVOID;)Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$THREAD_START_ROUTINE",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$LPVOID",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$TIME_ZONE_INFORMATION.class",
+      "occurrence": 0,
+      "sha256": "c0d685ad2bbec8775c38260170f4a7ea0c8026e991a832e8add928585dd88ac9",
+      "name": "com/sun/jna/platform/win32/WinBase$TIME_ZONE_INFORMATION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Bias",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        },
+        {
+          "name": "StandardName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "StandardDate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$SYSTEMTIME;",
+          "access": 1
+        },
+        {
+          "name": "StandardBias",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        },
+        {
+          "name": "DaylightName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "DaylightDate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$SYSTEMTIME;",
+          "access": 1
+        },
+        {
+          "name": "DaylightBias",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/platform/win32/WinBase$TIME_ZONE_INFORMATION",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONG",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e3607491262b4e9a1329110a5f8b6132548e3e455dc49c857a8b309feb914977",
+      "name": "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA",
+        "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA.class",
+      "occurrence": 0,
+      "sha256": "2d9b0715802a6763e67ffd6194263f52bdbc20d038707ecdd31d8799435d3493",
+      "name": "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwFileAttributes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ftCreationTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "ftLastAccessTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "ftLastWriteTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "nFileSizeHigh",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "nFileSizeLow",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwReserved0",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwReserved1",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cFileName",
+          "descriptor": "[C",
+          "access": 1
+        },
+        {
+          "name": "cAlternateFileName",
+          "descriptor": "[C",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "sizeOf",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "41a404a908138da4c6e6dc5efbd878aeb29b74ed1d64ca5eb1a6614dcffc1536",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f02765a842a24304bc69d5dd9f3cf285e6aab77b901b65f67a9264e2917e3ed0",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "5e32c012b92fa179c2ccd2ebc3f1092e35311a8800dbd499325d471cee7dd0a6",
+          "code_length": 31
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILcom/sun/jna/platform/win32/WinBase$FILETIME;Lcom/sun/jna/platform/win32/WinBase$FILETIME;Lcom/sun/jna/platform/win32/WinBase$FILETIME;IIII[C[C)V",
+          "access": 1,
+          "code_sha256": "28f2282379ae895f4aaaa078eaf64f408aa2615348eddd4587883c8ec1ebe542",
+          "code_length": 77
+        },
+        {
+          "name": "getFileName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2564f95c817dc2f6090b8ccfa2e094164281d4688baaf99e771b6ceb6e7003c4",
+          "code_length": 8
+        },
+        {
+          "name": "getAlternateFileName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d37e96e61606783415d521d3b8153c602c612b26fb5cf6289de961c4ce03ef3",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA",
+        "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinBase.class",
+      "occurrence": 0,
+      "sha256": "5112066b8b7e38560e6f847643e610993055960da223933291c8d0ec59337103",
+      "name": "com/sun/jna/platform/win32/WinBase",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/BaseTSD"
+      ],
+      "fields": [
+        {
+          "name": "INVALID_HANDLE_VALUE",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 25
+        },
+        {
+          "name": "WAIT_FAILED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WAIT_OBJECT_0",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WAIT_ABANDONED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WAIT_ABANDONED_0",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAX_COMPUTERNAME_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_INTERACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_NETWORK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_BATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_SERVICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_UNLOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_NETWORK_CLEARTEXT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_LOGON_NEW_CREDENTIALS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_PROVIDER_DEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_PROVIDER_WINNT35",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_PROVIDER_WINNT40",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LOGON32_PROVIDER_WINNT50",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HANDLE_FLAG_INHERIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HANDLE_FLAG_PROTECT_FROM_CLOSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USESHOWWINDOW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USESIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USEPOSITION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USECOUNTCHARS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USEFILLATTRIBUTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_RUNFULLSCREEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_FORCEONFEEDBACK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_FORCEOFFFEEDBACK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STARTF_USESTDHANDLES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEBUG_PROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEBUG_ONLY_THIS_PROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_SUSPENDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DETACHED_PROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_NEW_CONSOLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_NEW_PROCESS_GROUP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_UNICODE_ENVIRONMENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_SEPARATE_WOW_VDM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_SHARED_WOW_VDM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_FORCEDOS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INHERIT_PARENT_AFFINITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_PROTECTED_PROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EXTENDED_STARTUPINFO_PRESENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_BREAKAWAY_FROM_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_PRESERVE_CODE_AUTHZ_LEVEL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_DEFAULT_ERROR_MODE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_NO_WINDOW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_ENCRYPTABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_IS_ENCRYPTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_SYSTEM_ATTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_ROOT_DIR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_SYSTEM_DIR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_SYSTEM_NOT_SUPPORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_USER_DISALLOWED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_READ_ONLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DIR_DISALOWED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_FOR_IMPORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CREATE_FOR_DIR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "OVERWRITE_HIDDEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INVALID_FILE_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INVALID_SET_FILE_POINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INVALID_FILE_ATTRIBUTES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STILL_ACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileBasicInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileStandardInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileNameInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileRenameInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileDispositionInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileAllocationInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileEndOfFileInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileStreamInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileCompressionInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileAttributeTagInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIdBothDirectoryInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIdBothDirectoryRestartInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIoPriorityHintInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileRemoteProtocolInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileFullDirectoryInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileFullDirectoryRestartInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileStorageInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileAlignmentInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIdInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIdExtdDirectoryInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FileIdExtdDirectoryRestartInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_MAP_COPY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_MAP_WRITE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_MAP_READ",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_MAP_ALL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_MAP_EXECUTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExInfoStandard",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExInfoBasic",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExInfoMaxInfoLevel",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExSearchNameMatch",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExSearchLimitToDirectories",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FindExSearchLimitToDevices",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_FIXED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_MOVEABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_NOCOMPACT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_NODISCARD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_ZEROINIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_MODIFY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_DISCARDABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_VALID_FLAGS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_INVALID_HANDLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LHND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LPTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_DISCARDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LMEM_LOCKCOUNT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_ALLOCATE_BUFFER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_IGNORE_INSERTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_FROM_STRING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_FROM_HMODULE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_FROM_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FORMAT_MESSAGE_ARGUMENT_ARRAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_NO_ROOT_DIR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_REMOVABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_FIXED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_REMOTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_CDROM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DRIVE_RAMDISK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INFINITE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_COPY_ALLOWED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_CREATE_HARDLINK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_DELAY_UNTIL_REBOOT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_FAIL_IF_NOT_TRACKABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_REPLACE_EXISTING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MOVEFILE_WRITE_THROUGH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_CLIENT_END",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_SERVER_END",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_ACCESS_DUPLEX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_ACCESS_INBOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_ACCESS_OUTBOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_TYPE_BYTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_TYPE_MESSAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_READMODE_BYTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_READMODE_MESSAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_WAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_NOWAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_ACCEPT_REMOTE_CLIENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_REJECT_REMOTE_CLIENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PIPE_UNLIMITED_INSTANCES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NMPWAIT_USE_DEFAULT_WAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NMPWAIT_NOWAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NMPWAIT_WAIT_FOREVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NOPARITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ODDPARITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVENPARITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MARKPARITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPACEPARITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ONESTOPBIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ONE5STOPBITS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TWOSTOPBITS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_110",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_300",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_600",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_1200",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_2400",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_4800",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_9600",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_14400",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_19200",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_38400",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_56000",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_128000",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CBR_256000",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DTR_CONTROL_DISABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DTR_CONTROL_ENABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DTR_CONTROL_HANDSHAKE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RTS_CONTROL_DISABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RTS_CONTROL_ENABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RTS_CONTROL_HANDSHAKE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RTS_CONTROL_TOGGLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ES_AWAYMODE_REQUIRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ES_CONTINUOUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ES_DISPLAY_REQUIRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ES_SYSTEM_REQUIRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ES_USER_PRESENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MUTEX_MODIFY_STATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MUTEX_ALL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c8e5f6ccb01fbc2fb6702ef8790d43726099b5aeba5e19606f2b7fd13d22c7b3",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Platform",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/NTStatus",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$COMMTIMEOUTS",
+        "com/sun/jna/platform/win32/WinBase$COMPUTER_NAME_FORMAT",
+        "com/sun/jna/platform/win32/WinBase$DCB",
+        "com/sun/jna/platform/win32/WinBase$EnumResNameProc",
+        "com/sun/jna/platform/win32/WinBase$EnumResTypeProc",
+        "com/sun/jna/platform/win32/WinBase$FE_EXPORT_FUNC",
+        "com/sun/jna/platform/win32/WinBase$FE_IMPORT_FUNC",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinBase$FILE_ATTRIBUTE_TAG_INFO",
+        "com/sun/jna/platform/win32/WinBase$FILE_BASIC_INFO",
+        "com/sun/jna/platform/win32/WinBase$FILE_COMPRESSION_INFO",
+        "com/sun/jna/platform/win32/WinBase$FILE_DISPOSITION_INFO",
+        "com/sun/jna/platform/win32/WinBase$FILE_ID_INFO",
+        "com/sun/jna/platform/win32/WinBase$FILE_STANDARD_INFO",
+        "com/sun/jna/platform/win32/WinBase$FOREIGN_THREAD_START_ROUTINE",
+        "com/sun/jna/platform/win32/WinBase$MEMORYSTATUSEX",
+        "com/sun/jna/platform/win32/WinBase$OVERLAPPED",
+        "com/sun/jna/platform/win32/WinBase$PROCESS_INFORMATION",
+        "com/sun/jna/platform/win32/WinBase$SECURITY_ATTRIBUTES",
+        "com/sun/jna/platform/win32/WinBase$STARTUPINFO",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/platform/win32/WinBase$SYSTEM_INFO",
+        "com/sun/jna/platform/win32/WinBase$THREAD_START_ROUTINE",
+        "com/sun/jna/platform/win32/WinBase$TIME_ZONE_INFORMATION",
+        "com/sun/jna/platform/win32/WinBase$WIN32_FIND_DATA",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0f2600915999686f5b30528753f3754730eb26508e84b90e9ac3720fb386eaf7",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT.class",
+      "occurrence": 0,
+      "sha256": "210b97e05d4fd893e09f8d332f6e41dbf850a8c8da5fec0bab262caa1aee3cb6",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "TrustStatus",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS;",
+          "access": 1
+        },
+        {
+          "name": "cChain",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpChain",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cLowerQualityChainContext",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpLowerQualityChainContext",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "fHasRevocationFreshnessTime",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "dwRevocationFreshnessTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwCreateFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ChainId",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRgpChain",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN;",
+          "access": 1,
+          "code_sha256": "a46f59110041cc147f64ed9135f41f6950694d29ef213e3c4e482d7faa458c9f",
+          "code_length": 54
+        },
+        {
+          "name": "getRgpLowerQualityChainContext",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT;",
+          "access": 1,
+          "code_sha256": "4328be03962937c18326b2e74d4d254ef9e69877517eb21e340f72c6c979987b",
+          "code_length": 54
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7f38b3b6e0b6f49fcfaf019e3381c4860fcbe3f3855abfae873ac2c985c50d94",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT;",
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN;",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "f48ddb8abd718649a0ee544305b595c57622a7670c793b19a456b560e4b3aa4e",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT.class",
+      "occurrence": 0,
+      "sha256": "c0801f8c59cf61de20b73ff49f966dadfc30adf278e6364027d40f61626c0c5c",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCertContext",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "TrustStatus",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS;",
+          "access": 1
+        },
+        {
+          "name": "pRevocationInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pIssuanceUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pApplicationUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pwszExtendedErrorInfo",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "723468ab9e579813ebefa748a6747a47af9777a3d9fb5a4e727735a2963f1fcc",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7c2cc262a0dd299c3bff01fee27566dc320bf48492814eeed1794c107305d857",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA.class",
+      "occurrence": 0,
+      "sha256": "b375109fe3aa63895f6ee50bf02048cf6637d28c379d1b1780879004a67ccdfe",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "RequestedUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH;",
+          "access": 1
+        },
+        {
+          "name": "RequestedIssuancePolicy",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH;",
+          "access": 1
+        },
+        {
+          "name": "dwUrlRetrievalTimeout",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "fCheckRevocationFreshnessTime",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "dwRevocationFreshnessTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pftCacheResync",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pStrongSignPara",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "dwStrongSignFlags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinBase$FILETIME$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0c2eee36e69bbfb9d24f506ee19b845df473f629313a3c9c06d3a00722dc42b5",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA.class",
+      "occurrence": 0,
+      "sha256": "97f0f26035c8677bab65fb3e7b31300b9ff76f5035c0fc5a2bb664127d20cfd9",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pvExtraPolicyPara",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "8d0d0f94ac81823e57f0032de5d0925cb703f0f3890ea37f04587c125df15b3e",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS.class",
+      "occurrence": 0,
+      "sha256": "a75ead9f45c6bc629d2ca4470a8158f542f9d7bfa41dd478384ccd5f8144a2aa",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwError",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lChainIndex",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lElementIndex",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pvExtraPolicyStatus",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_POLICY_STATUS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "ed51af03df835e79f106aebc0690c129420e22d9885f6667616711221a4403bc",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT.class",
+      "occurrence": 0,
+      "sha256": "576d028c446494a5fd9492b4a5ab23018f3d54d61b8e3de692511de8f4d84247",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwCertEncodingType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbCertEncoded",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cbCertEncoded",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCertInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "hCertStore",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$HCERTSTORE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$HCERTSTORE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION$ByReference.class",
+      "occurrence": 0,
+      "sha256": "bc0f39c6f0c31133721225fe09eb3fcd04c69f195e4f4321b471172b17b2d06a",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION.class",
+      "occurrence": 0,
+      "sha256": "160713f8efc94e9f251748e1cc5ea16fa13ef83e22c5becdca5cac4882850fcd",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pszObjId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "fCritical",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "Value",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "86cb888827c451c872b42caf984514ec20b5675014376b2bc7bf10b35417e2e6",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS.class",
+      "occurrence": 0,
+      "sha256": "5359458ca75f5e8d8d4e6e93fa6903f881841cbdb8c33907b8cdfbae27bfcd30",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cExtension",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgExtension",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSIONS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "fb0a2bafa2a39ed909d88f7715712f1307c59affea354fb52cc0b731bcfdd900",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_INFO.class",
+      "occurrence": 0,
+      "sha256": "95c7c4173eb9b76aba5438c01714bd52f70aa531a8c633c9d043203b6e035b3a",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwVersion",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SerialNumber",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "SignatureAlgorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "Issuer",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "NotBefore",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "NotAfter",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "Subject",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "SubjectPublicKeyInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO;",
+          "access": 1
+        },
+        {
+          "name": "IssuerUniqueId",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "SubjectUniqueId",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "cExtension",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgExtension",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "8a9e545312fe8852351894c2c8dd7b3a3ac7a0541667c46ee444fc823611bc10",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO.class",
+      "occurrence": 0,
+      "sha256": "540c8678b4f7e8d2c55fd1b112943169ebff9214feb07921d4d70a7df1873913",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Algorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "PublicKey",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_PUBLIC_KEY_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "63ad90610c5a281c84c09ff5ffcf69c586938ff6c2a67ac12015281425ee78aa",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO.class",
+      "occurrence": 0,
+      "sha256": "e192e628e0bc72454607c0089e14c404a482e2521de47bc3213d0e9f89915241",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pBaseCRLContext",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pDeltaCRLContext",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pCrlEntry",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "fDeltaCrlEntry",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "4291d0df0ef471bbcb4921f699538b69fe36b8f9fbcc063b330b1200ae86eb71",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO.class",
+      "occurrence": 0,
+      "sha256": "a3e0031a88b2b4b69f4be3eae6b37f0e3f0042e741393fed45dbe0b35fecf13b",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwRevocationResult",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pszRevocationOid",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pvOidSpecificInfo",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "fHasFreshnessTime",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "dwFreshnessTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCrlInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_CRL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_REVOCATION_INFO$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN$ByReference.class",
+      "occurrence": 0,
+      "sha256": "10fab4f2f698537463429d7abb117d3bec63b521002d3b42d0295789943a4183",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN.class",
+      "occurrence": 0,
+      "sha256": "09f2d3ac4b200ede5cf8bd07c67dafd9547ec271259bf8ec1e1a97a81bf92b36",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "TrustStatus",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS;",
+          "access": 1
+        },
+        {
+          "name": "cElement",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpElement",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "pTrustListInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "fHasRevocationFreshnessTime",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "dwRevocationFreshnessTime",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getRgpElement",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT;",
+          "access": 1,
+          "code_sha256": "2bb71f08349a62108c2796ee280a9298bf93f156dc3bb36a19f5253c92af9b7b",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT;",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_ELEMENT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_SIMPLE_CHAIN$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "fbe8696f95fc717562115917e3dcb50c184c30cfe0ed0a8309c964087b3a11c1",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$DUMMYUNION.class",
+      "occurrence": 0,
+      "sha256": "e28eedb46f1a873a9db0d1d08821f8cf6b007c123168cfdf2c096fb825bf9fb4",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$DUMMYUNION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pvInfo",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 0
+        },
+        {
+          "name": "pSerializedInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference;",
+          "access": 0
+        },
+        {
+          "name": "pszOID",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$LPSTR;",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$LPSTR",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$DUMMYUNION",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA.class",
+      "occurrence": 0,
+      "sha256": "b34afcabf9a7ad94de5345242fc1444a3bce345b9636a95c0dab9efbd62f1f7c",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwInfoChoice",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "DUMMYUNIONNAME",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$DUMMYUNION;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$DUMMYUNION"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "d386e4d15b88f95c22120d7d03e0e29e6f648b59854617cab99acb31a36e4c7c",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CHAIN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO.class",
+      "occurrence": 0,
+      "sha256": "05f21a21947b0facfbb29bf26d108dcef1370d7b661dd71fe299377b0d6f7238",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pwszCNGSignHashAlgids",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pwszCNGPubKeyMinBitLengths",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_SERIALIZED_INFO$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7a7575360744487cad90fcaf9f97c8a1be6b6b6e72aed7843b7e5a399a024f37",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO.class",
+      "occurrence": 0,
+      "sha256": "7be04776ae84a19ba7f03c388a6eb6e3907178a56f141516d9cb801bbd046e01",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCtlEntry",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "pCtlContext",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_LIST_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "cd2152a56073a416105341757e6416bf8ee51e6f3c58c79047e2e4e4a4418491",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS.class",
+      "occurrence": 0,
+      "sha256": "e08780040b5127ecf7585da567179fe449cde9137bc963332c7cc4cca2cd72dd",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwErrorStatus",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwInfoStatus",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_TRUST_STATUS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH$ByReference.class",
+      "occurrence": 0,
+      "sha256": "9d0e09976fb2658e994b240b6587db670dfa3259a962098f9476fc72a21c3705",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH.class",
+      "occurrence": 0,
+      "sha256": "6e3340056242dd0c5fc603a2be1b4ae345c67f8cffa9d8d49884ddcd72643964",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Usage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_USAGE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_USAGE_MATCH$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "d725eda69a9e03b3a427c94f4d08247ca3cf77dd67f07bb9852da2e4a81b9f07",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT.class",
+      "occurrence": 0,
+      "sha256": "deff1b8d54e875cc214acb340da3082f17abf73d939f73fc929a24d111bc5264",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwCertEncodingType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbCrlEncoded",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cbCrlEncoded",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCrlInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "hCertStore",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$HCERTSTORE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$HCERTSTORE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0d38623538b4bbf49866200d23f507e5a6bdf3d6bcd37f4ec859a9e81e031384",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY.class",
+      "occurrence": 0,
+      "sha256": "de23fabe46eb815a3d36db572cc0d859d29637ffc236a3618f421dfed47f3a15",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SerialNumber",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "RevocationDate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "cExtension",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgExtension",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "6805dd6f9b9b0552c2f09fc65e68e74f623f525f213b001b0d0075f5ea00d558",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRL_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRL_INFO.class",
+      "occurrence": 0,
+      "sha256": "8a48392c2096cf1f4798be850c4f00b7bda75cd75629cc3ba2a6ee733d0f1c2f",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRL_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwVersion",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SignatureAlgorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "Issuer",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "ThisUpdate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "NextUpdate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "cCRLEntry",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgCRLEntry",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cExtension",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgCRLEntry",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRL_ENTRY;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        },
+        {
+          "name": "getRgExtension",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+          "access": 1,
+          "code_sha256": "e1a1fe2c452bc6602d0ce500d5da19f4b5fb1f3a91870c319b24c5ec293365e7",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CRL_ENTRY;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPTPROTECT_PROMPTSTRUCT.class",
+      "occurrence": 0,
+      "sha256": "5ee8254275dd7aad8b0cad79159faddc87232117ab037f8bc2850e89ff2b7b9a",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPTPROTECT_PROMPTSTRUCT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwPromptFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hwndApp",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$HWND;",
+          "access": 1
+        },
+        {
+          "name": "szPrompt",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPTPROTECT_PROMPTSTRUCT",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER$ByReference.class",
+      "occurrence": 0,
+      "sha256": "95a3f081a655868ae5c79b0f0492d06dc8eec3ee0357bfba27f3debccbf73329",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER.class",
+      "occurrence": 0,
+      "sha256": "ccaa9d1b51eb4be08732c5445b9fc0843ef6c5454d31954fe6cf230f3903412b",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pszObjId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Parameters",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE$ByReference.class",
+      "occurrence": 0,
+      "sha256": "269a3190cd8fea31a933c3ab1b5c021b8b5855a1357d827dd8108909ac0ed717",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE.class",
+      "occurrence": 0,
+      "sha256": "2cad5cac1b404383e02579ac9740c43df56adaae2df0cd6f20997fa422a9c358",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pszObjId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "cValue",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgValue",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRgValue",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1,
+          "code_sha256": "316df1e56398a0c4daa1b514539aca5c2fd7658dcfbcdc897aa50a25dc33dd52",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "489a67d22ce8d39e62ea1df17525158e3bc17ce62022e6996f07dee696f46b97",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0a968469bf5a689477b2255e8ba231097ebccdd4ba61ab5a51a3409f00be1d01",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB.class",
+      "occurrence": 0,
+      "sha256": "608689daa51d27b4adf3ed96ad5f720377499eae1b20ad2234dd9c45aec1b01c",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbData",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbData",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cUnusedBits",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_BIT_BLOB$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "1f35f713c8c01f94c8104ec7e7d4e14850e8e2d59f0b43045d13d1e8b952ae62",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO.class",
+      "occurrence": 0,
+      "sha256": "346b66ca1312d7540369a66c36cd99636d33f2983ca4a071345d72e7b3b649fd",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pwszContainerName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pwszProvName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "dwProvType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cProvParam",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgProvParam",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "dwKeySpec",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getRgProvParam",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM;",
+          "access": 1,
+          "code_sha256": "2bb71f08349a62108c2796ee280a9298bf93f156dc3bb36a19f5253c92af9b7b",
+          "code_length": 54
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM;",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM$ByReference.class",
+      "occurrence": 0,
+      "sha256": "3752e94ebfce6f0faf3bbd13837a6f3a31523e6915cbab6bac706252d7574c97",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM.class",
+      "occurrence": 0,
+      "sha256": "65d7e26069a9c57a0d245e8038637724fc6148b37646bb91d9a4dae31ef48582",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwParam",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbData",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cbData",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwFlags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_KEY_PROV_PARAM$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "3865feed5564368a3359ef0e810831c4137392028e9ba627ff36891e8cbce098",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA.class",
+      "occurrence": 0,
+      "sha256": "84a3ff187e890187911326eafc1b57596bb5bb688f904eab850f267b30d44e68",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwMsgEncodingType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pSigningCert",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "HashAlgorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "pvHashAuxInfo",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cMsgCert",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpMsgCert",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cMsgCrl",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpMsgCrl",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cAuthAttr",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgAuthAttr",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cUnauthAttr",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgUnauthAttr",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "dwFlags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwInnerContentType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "HashEncryptionAlgorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "pvHashEncryptionAuxInfo",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40a881ec75ac5047503488ca57da49f62590de03d08ebce7df101e700d1b6802",
+          "code_length": 25
+        },
+        {
+          "name": "getRgpMsgCert",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT;",
+          "access": 1,
+          "code_sha256": "273f896332506cb6db42a9569a221ee6ad2610f224de82baf92c96cef735f643",
+          "code_length": 54
+        },
+        {
+          "name": "getRgpMsgCrl",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT;",
+          "access": 1,
+          "code_sha256": "986d07cd1e58294d6f4e0461ebb89e0ff8f2494edd9f0b56fc1724ba6b26668a",
+          "code_length": 54
+        },
+        {
+          "name": "getRgAuthAttr",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE;",
+          "access": 1,
+          "code_sha256": "3eb26ce183ba44138362cb9d9ffbe51236716ca98e5b6e0a834ea90e4ef3837e",
+          "code_length": 38
+        },
+        {
+          "name": "getRgUnauthAttr",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE;",
+          "access": 1,
+          "code_sha256": "10ca4ac26abc7a9ff82537220626ae80d18565839dbb2bb718d661ca90a398f8",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT;",
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT;",
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE;",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7a716fb59dbfe1ee5cc7a603193cc5af4f6a17777df63fd5a01c927ee5f84c8e",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_SIGN_MESSAGE_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA.class",
+      "occurrence": 0,
+      "sha256": "69da818a1419a9e4df1c95ede4446dd02711975402c42ab8a95a38ff405a6845",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwMsgAndCertEncodingType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hCryptProv",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$HCRYPTPROV_LEGACY;",
+          "access": 1
+        },
+        {
+          "name": "pfnGetSignerCertificate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CryptGetSignerCertificateCallback;",
+          "access": 1
+        },
+        {
+          "name": "pvGetArg",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "pStrongSignPara",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e376ec1741a8830befcdef12815168e084772d02fa5cefd5c59f06cb6b711f51",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_STRONG_SIGN_PARA$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_VERIFY_MESSAGE_PARA$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CryptGetSignerCertificateCallback",
+        "com/sun/jna/platform/win32/WinCrypt$HCRYPTPROV_LEGACY"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "fd5ac373d8d0705316e36ebbbbea3aab89871f9e75c160d5f096d1cd83fc0d4a",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT.class",
+      "occurrence": 0,
+      "sha256": "082423310e7a137c53753cda1f7e3770b4979f948c21f933e472df53cdf191e7",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwMsgAndCertEncodingType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbCtlEncoded",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cbCtlEncoded",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pCtlInfo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "hCertStore",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$HCERTSTORE;",
+          "access": 1
+        },
+        {
+          "name": "hCryptMsg",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$HCRYPTMSG;",
+          "access": 1
+        },
+        {
+          "name": "pbCtlContent",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cbCtlContent",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$HCERTSTORE",
+        "com/sun/jna/platform/win32/WinCrypt$HCRYPTMSG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference.class",
+      "occurrence": 0,
+      "sha256": "2c72d44d519832cbde41aaa4612b97a4c758fb40c0c9f14772e9477d5b32be87",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY.class",
+      "occurrence": 0,
+      "sha256": "ac59191942b96cd6fc831cb4779336622994a573037abff1e16017fbebc32ef1",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SubjectIdentifier",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "cAttribute",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgAttribute",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgAttribute",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ATTRIBUTE",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "4e64403ea6a7c07d9ab856f388936300d042c3558144a0c4ade42326c524d21c",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CTL_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_INFO.class",
+      "occurrence": 0,
+      "sha256": "9a7cd554983d9097cd983d19854b2106b2d8cf661c45e48aac6c7e793ab7509f",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwVersion",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SubjectUsage",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CTL_USAGE;",
+          "access": 1
+        },
+        {
+          "name": "ListIdentifier",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "SequenceNumber",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$DATA_BLOB;",
+          "access": 1
+        },
+        {
+          "name": "ThisUpdate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "NextUpdate",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "SubjectAlgorithm",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER;",
+          "access": 1
+        },
+        {
+          "name": "cCTLEntry",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgCTLEntry",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cExtension",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgCTLEntry",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CTL_ENTRY;",
+          "access": 1,
+          "code_sha256": "be7ef0305a8f12ecf2f9e498855dd7cbb99f3648aabc7e738cb4cafe66d91665",
+          "code_length": 46
+        },
+        {
+          "name": "getRgExtension",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+          "access": 1,
+          "code_sha256": "e1a1fe2c452bc6602d0ce500d5da19f4b5fb1f3a91870c319b24c5ec293365e7",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION;",
+        "[Lcom/sun/jna/platform/win32/WinCrypt$CTL_ENTRY;",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_EXTENSION",
+        "com/sun/jna/platform/win32/WinCrypt$CRYPT_ALGORITHM_IDENTIFIER",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_ENTRY",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_INFO$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e4b2eb85196b4a23d4a0dcb88d3a8a33894512786268bceacd6bc7d15ece7752",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE.class",
+      "occurrence": 0,
+      "sha256": "e354a391dc1492aaa46244016a7d73d88dddc165cd226db1b5681935b8c96a2e",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cUsageIdentifier",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rgpszUsageIdentifier",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getRgpszUsageIdentier",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b11cb2b6cb8c07e0f7673483b406f82fa8525efbd7e962f2dea3b99d8dfb4aa1",
+          "code_length": 25
+        },
+        {
+          "name": "setRgpszUsageIdentier",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "88595f8048110ac3bb7bca08f091156e20aceb76c5c4daa1a765b9ef2cdd9796",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/StringArray",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE",
+        "com/sun/jna/platform/win32/WinCrypt$CTL_USAGE$ByReference",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CertStoreProviderName.class",
+      "occurrence": 0,
+      "sha256": "a3d8d639171bd51901d3548cef71f3e6dc1e74ef2350510a9b3b397b00f70cbc",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CertStoreProviderName",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/NativeMapped"
+      ],
+      "fields": [
+        {
+          "name": "pointer",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5111ca286d205ab5254e4bc54fa4d8b0a9092a5ae7a9eeeeccd74b247f7692d8",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "87c5c242ec969c85573d57c3bc57a890ce4f2120742693e783313d777d10061e",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "997d012155f40d30055c592c9e3d79464edabad34771a1b4e25ff8f448cbfcee",
+          "code_length": 36
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "93badf66c0845abb593ad78a38a2cdf8ac5d3aa8194dfb81023342b4335cee84",
+          "code_length": 18
+        },
+        {
+          "name": "toNative",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "nativeType",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "83e424e5d40b4d8d14d99d90e3986a9021a55f073b843c457573f68aa101ce74",
+          "code_length": 3,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Native",
+        "com/sun/jna/NativeMapped",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CertStoreProviderName",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$CryptGetSignerCertificateCallback.class",
+      "occurrence": 0,
+      "sha256": "1bdd065b409371abebbe754b248a9b559034c3b3fa29702245377dd2496af37e",
+      "name": "com/sun/jna/platform/win32/WinCrypt$CryptGetSignerCertificateCallback",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "callback",
+          "descriptor": "(Lcom/sun/jna/Pointer;ILcom/sun/jna/platform/win32/WinCrypt$CERT_INFO;Lcom/sun/jna/platform/win32/WinCrypt$HCERTSTORE;)Lcom/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_CONTEXT$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt$CERT_INFO",
+        "com/sun/jna/platform/win32/WinCrypt$CryptGetSignerCertificateCallback",
+        "com/sun/jna/platform/win32/WinCrypt$HCERTSTORE",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference.class",
+      "occurrence": 0,
+      "sha256": "1b4ffca9c265cbb92a9daed27bcc0da7896ebfa332f554be31406fef4d678aa4",
+      "name": "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB.class",
+      "occurrence": 0,
+      "sha256": "2529faffde61b2f86722ea494fcc9163879586ef97f9ce61043daacce9f04ef7",
+      "name": "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbData",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbData",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "f74ce0037b86ce36e1041df4431e0354bea62c7c19c5ea162079588573b6980e",
+          "code_length": 62
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9da23d7db94c8bce10fe6dcc8eb8951657140b521a43b285d6694a8712ecf77",
+          "code_length": 9
+        },
+        {
+          "name": "getData",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "6c463d8aa8a236873c2adc940e8902fc61a49ffefbf58c9e06cc5470a4f5babf",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB",
+        "com/sun/jna/platform/win32/WinCrypt$DATA_BLOB$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinCrypt$HCERTCHAINENGINE.class",
+      "occurrence": 0,
+      "sha256": "aaa1a838cd711d7b0834d593c83499b051ccdb27c937002c11d8e5fe2b8bcb47",
+      "name": "com/sun/jna/platform/win32/WinCrypt$HCERTCHAINENGINE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinNT$HANDLE",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinCrypt",
+        "com/sun/jna/platform/win32/WinCrypt$HCERTCHAINENGINE",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE"
+      ]
+    }
+  ]
+}

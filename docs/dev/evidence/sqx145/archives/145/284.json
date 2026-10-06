@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskRetest/TaskRetest.jar",
+  "sha256": "a7957f8d46aa6b01be420af5970a63fed5b8ac9600beac6af95a28eab5cb5437",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/Retest/RetestJob.class": "97466cc61e3c5cc12c9db14f4cdd9624f227fa44e497df74a64f4c7480a623cc",
+    "com/strategyquant/plugin/Task/impl/Retest/RetestTask$1.class": "23ef2d5a8bab0d69a172788536b8a43335b1a731b432521d7a5891c44746eced",
+    "com/strategyquant/plugin/Task/impl/Retest/RetestTask$2.class": "fd963351a0805ec46f354b8002b38040e5f1689abec1c8e4bbdf6c3e75c1f21d",
+    "com/strategyquant/plugin/Task/impl/Retest/RetestTask.class": "e2b5706690f2743b7d5a0d54efe3137d159c2d6dbca6b3176c7021228bcf307a"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Retest/RetestJob.class",
+      "occurrence": 0,
+      "sha256": "97466cc61e3c5cc12c9db14f4cdd9624f227fa44e497df74a64f4c7480a623cc",
+      "member_shard": "docs/dev/evidence/sqx145/members/284/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Retest/RetestTask$1.class",
+      "occurrence": 0,
+      "sha256": "23ef2d5a8bab0d69a172788536b8a43335b1a731b432521d7a5891c44746eced",
+      "member_shard": "docs/dev/evidence/sqx145/members/284/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Retest/RetestTask$2.class",
+      "occurrence": 0,
+      "sha256": "fd963351a0805ec46f354b8002b38040e5f1689abec1c8e4bbdf6c3e75c1f21d",
+      "member_shard": "docs/dev/evidence/sqx145/members/284/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Retest/RetestTask.class",
+      "occurrence": 0,
+      "sha256": "e2b5706690f2743b7d5a0d54efe3137d159c2d6dbca6b3176c7021228bcf307a",
+      "member_shard": "docs/dev/evidence/sqx145/members/284/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/284/001.json",
+      "sha256": "508046aefef1177b607fe6500017d53805b6acd9c1b8f881a1c5db7b8aeac65c"
+    }
+  ]
+}

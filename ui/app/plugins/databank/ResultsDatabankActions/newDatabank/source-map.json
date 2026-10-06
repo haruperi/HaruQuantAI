@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsDatabankActions/newDatabank bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/newDatabank",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
     "version": 1
   },
   "owner": {
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank",
       "id": "sqx-resultsdatabankactions-newdatabank-ui",
       "family": "bounded installed core action artifacts"
     }
@@ -35,42 +35,57 @@
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-newdatabank-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified unsupported-scope exclusion",
       "access_date": "2026-10-06",
       "sha256": "636a6f510331fe97d11a370e5d2b165cb6c26c30fe26a51ea51de1171e296247",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing target creation control, dialog or capability; preserve absence"
+      "limitation": "No existing target creation control, dialog or capability; preserve absence Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-newdatabank-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/newDatabankPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/newDatabankPopup.html",
       "relative_path": "newDatabankPopup.html",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified unsupported-scope exclusion",
       "access_date": "2026-10-06",
-      "sha256": "52f94aa9b228e6277fa1baf19b3b04311d98609a12d35e37b235488a70d55fe9",
+      "sha256": "4ecacc0be2a21952243c8cab95216a73756656326b62c19da328fd097b93466a",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing target creation control, dialog or capability; preserve absence"
+      "limitation": "No existing target creation control, dialog or capability; preserve absence Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsdatabankactions-newdatabank-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/NewDatabankPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/newDatabank/NewDatabankPopupCtrl.js",
       "relative_path": "NewDatabankPopupCtrl.js",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified unsupported-scope exclusion",
       "access_date": "2026-10-06",
-      "sha256": "1f9bed5a9e61938d0741f9828d05023b5a1e7c502153a081b572c97eae854e40",
+      "sha256": "bb84467ccfe6fe50bde2644c874b6df067b8b0c8ea25ddd148cb1e2483987cf5",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing target creation control, dialog or capability; preserve absence"
+      "limitation": "No existing target creation control, dialog or capability; preserve absence Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -78,5 +93,10 @@
       "path": "source-map.json",
       "reason": "Bounded structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

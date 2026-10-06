@@ -1,0 +1,3375 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/itu-1.14.0.jar",
+  "archive_sha256": "5cf40ab0cc77828ab2b875b1f3ecd71c8295d7721933476abc2e08fddcea164a",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/ethlo/time/DateTime.class",
+      "occurrence": 0,
+      "sha256": "0707d664bbdb8c516819222df24fedf955157313d019fb96362d2882e15294ce",
+      "name": "com/ethlo/time/DateTime",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/time/temporal/TemporalAccessor"
+      ],
+      "fields": [
+        {
+          "name": "leapSecondHandler",
+          "descriptor": "Lcom/ethlo/time/internal/util/LeapSecondHandler;",
+          "access": 26
+        },
+        {
+          "name": "field",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 18
+        },
+        {
+          "name": "year",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "month",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "day",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "hour",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "minute",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "second",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "nano",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "offset",
+          "descriptor": "Lcom/ethlo/time/TimezoneOffset;",
+          "access": 18
+        },
+        {
+          "name": "fractionDigits",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "charLength",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/ethlo/time/Field;IIIIIIILcom/ethlo/time/TimezoneOffset;I)V",
+          "access": 1,
+          "code_sha256": "a3d4013e9851e1be8f854f593fec7ef3645f89bf6e00c32e3d194db94a99c3f0",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/ethlo/time/Field;IIIIIIILcom/ethlo/time/TimezoneOffset;II)V",
+          "access": 1,
+          "code_sha256": "ac070b4b67dcb94d73560ed2076d1d02674009e523bd4c18800202f4f8fbf75e",
+          "code_length": 89
+        },
+        {
+          "name": "of",
+          "descriptor": "(IIIIIILcom/ethlo/time/TimezoneOffset;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "e7c26746e4b448906375f4d0c9de82c712c830bf1d5186f89a705edef0069cc2",
+          "code_length": 23
+        },
+        {
+          "name": "of",
+          "descriptor": "(IIIIIIILcom/ethlo/time/TimezoneOffset;I)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "4ef670ab7d807beef8ac214a526fad76f3f700e6f05009cdabf198df29f83ed9",
+          "code_length": 25
+        },
+        {
+          "name": "ofYear",
+          "descriptor": "(I)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "59bab075f178a5876d20c52913bfcb1f7fcd0e07f897f39eec941c623482d4c4",
+          "code_length": 20
+        },
+        {
+          "name": "ofYearMonth",
+          "descriptor": "(II)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "bb22664c68e2125210c1ed4c505ef69d77d41d6b0ed19efc42573cf65874d26e",
+          "code_length": 20
+        },
+        {
+          "name": "ofDate",
+          "descriptor": "(III)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "5c3d4b98226df5f243bc73398567812905ad063af6d5d0e84507f3b1daec00bc",
+          "code_length": 20
+        },
+        {
+          "name": "of",
+          "descriptor": "(IIIIILcom/ethlo/time/TimezoneOffset;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "cab802b5bc91314c09c7f50262fdffeef2f66f136372dbab94654f265fd6e49f",
+          "code_length": 22
+        },
+        {
+          "name": "of",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "741cdd27091da69188ce98b462ba2a5a71f76829910c5923be40d19ce7766641",
+          "code_length": 41
+        },
+        {
+          "name": "leapSecondCheck",
+          "descriptor": "(IIIIIIILcom/ethlo/time/TimezoneOffset;)V",
+          "access": 10,
+          "code_sha256": "a43753b8f1233e548d1a0edfe3c12beace334f0a1a4b7377ae0ee288a9964a33",
+          "code_length": 172
+        },
+        {
+          "name": "includesGranularity",
+          "descriptor": "(Lcom/ethlo/time/Field;)Z",
+          "access": 1,
+          "code_sha256": "c5d9a427d4379b81adc2cfabb430ec16fe2ca2050315546787baf0c8486f4ea2",
+          "code_length": 20
+        },
+        {
+          "name": "getYear",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c82aed037c5afb54cd1235f0acbd9e50ea5462301ecc01f1e215873f28b1fa33",
+          "code_length": 5
+        },
+        {
+          "name": "getMonth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f33eb3645199a92a72da61be7b282d9a17a50e0648b912834e99f6b271d78e9e",
+          "code_length": 5
+        },
+        {
+          "name": "getDayOfMonth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1303b7a23f14710775099bd675efa4bb2b3b27c255f762d4f4c83b928e86cc02",
+          "code_length": 5
+        },
+        {
+          "name": "getHour",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "getMinute",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "588c3e4df5be1df26a6652d68d3732f7095939454e6d394423a4b7adc31e1344",
+          "code_length": 5
+        },
+        {
+          "name": "getSecond",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7e99de3c85c595453b2b2f98f49c7ea90a030841500e6d37b987653cbc16e933",
+          "code_length": 5
+        },
+        {
+          "name": "getNano",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7bf6b5cc666f60bedfb13ccd693d36ee92ac8e956b5163748e135ddb3486b434",
+          "code_length": 5
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "()Ljava/util/Optional;",
+          "access": 1,
+          "code_sha256": "eddc8677c5ec26dd9f1179d63af451deabc7bc11766829ca3e5241b57dc4b2ac",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Optional<Lcom/ethlo/time/TimezoneOffset;>;"
+        },
+        {
+          "name": "toYear",
+          "descriptor": "()Ljava/time/Year;",
+          "access": 1,
+          "code_sha256": "3eb6138bba3e389263e9706b8261e9f3a477c4c958ca70b7a5898555a243f23e",
+          "code_length": 8
+        },
+        {
+          "name": "toYearMonth",
+          "descriptor": "()Ljava/time/YearMonth;",
+          "access": 1,
+          "code_sha256": "591ee406a0a0143c729e7f85ebf433db4b0e08cf8c923cf46ac7ab03124c421c",
+          "code_length": 19
+        },
+        {
+          "name": "toLocalDatetime",
+          "descriptor": "()Ljava/time/LocalDateTime;",
+          "access": 1,
+          "code_sha256": "7420a8dbdbd2f3542c2fc0b77cbb5aa9a8d5b6e70d9f10c7c797ce2d27f104a8",
+          "code_length": 39
+        },
+        {
+          "name": "toOffsetDatetime",
+          "descriptor": "()Ljava/time/OffsetDateTime;",
+          "access": 1,
+          "code_sha256": "65d6641d10cc1c33c1fd816143f4a0de1f5085ab2348f89e9c797692d7c0ef5f",
+          "code_length": 90
+        },
+        {
+          "name": "toLocalDate",
+          "descriptor": "()Ljava/time/LocalDate;",
+          "access": 1,
+          "code_sha256": "167f12d03bf42ffb0fa5d165cece06edc8fba22a6a120a6e0fa25220a00b5ef4",
+          "code_length": 23
+        },
+        {
+          "name": "getMostGranularField",
+          "descriptor": "()Lcom/ethlo/time/Field;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        },
+        {
+          "name": "assertMinGranularity",
+          "descriptor": "(Lcom/ethlo/time/Field;)V",
+          "access": 2,
+          "code_sha256": "49e86d3bed28293477f3892552771beb8e7120f17491349fb46b339740a27002",
+          "code_length": 44
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lcom/ethlo/time/Field;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0bc2d5701a0c5fd6742eceaa916573f4f33e1f9af8d611050c1e04e31c3231e4",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f0b57100e6252379ccc62ccf3261d27c771a61dcbe02aee56d5335448bba0b91",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lcom/ethlo/time/DateTime;Lcom/ethlo/time/Field;I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4a0d368c27bad0d06f013f130dbcbb704b9d1fdc5c041b2e46f4333adce9c08d",
+          "code_length": 417
+        },
+        {
+          "name": "getFractionDigits",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e8dc54e0c5c74dd73652e110a37cc68649a173291f5744210a3b58c9a6d5b621",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b98f01a4bab4e0b1432da34fcbb0fd3f51e5294d4cac8940388daca2c6d213e2",
+          "code_length": 27
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "214ad7e1e84779d6b19460b64259651543fdb264239ea4fab02cec5ab3589fd9",
+          "code_length": 148
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1e25c2c41c3427bcf0ae183f54ca0c68e0bd6e7e0717f1f6a76f0c7ebe18d4d0",
+          "code_length": 113
+        },
+        {
+          "name": "isSupported",
+          "descriptor": "(Ljava/time/temporal/TemporalField;)Z",
+          "access": 1,
+          "code_sha256": "17e885f0ff76d9cb757d70c225e333d07fb7f3f30eb294cf77a5e8f86eda7e9b",
+          "code_length": 34
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(Ljava/time/temporal/TemporalField;)J",
+          "access": 1,
+          "code_sha256": "0594311aec8ede31dafd5aa50304c435720fa777ec9a89e24ba15ee02c3d0486",
+          "code_length": 219
+        },
+        {
+          "name": "toInstant",
+          "descriptor": "()Ljava/time/Instant;",
+          "access": 1,
+          "code_sha256": "601b5c201d2ff847725ec04aafd7344617dac06f2e904125a037eb9d2fd01ee0",
+          "code_length": 13
+        },
+        {
+          "name": "toEpochSeconds",
+          "descriptor": "()J",
+          "access": 2,
+          "code_sha256": "906570c8ca4907ae24d012dd0e48550d7462cc75c6641008546f892743112203",
+          "code_length": 96
+        },
+        {
+          "name": "validated",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aab8ce510cd7f757e05ac0a723f434fb768064dedb03ffa5733428212ee3ffd2",
+          "code_length": 70
+        },
+        {
+          "name": "getParseLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "44fbdd3829535ad3b630737eb0be5aaee063d75d79b65dac9955843a2e0efa82",
+          "code_length": 5
+        },
+        {
+          "name": "toLocalTime",
+          "descriptor": "()Ljava/time/LocalTime;",
+          "access": 1,
+          "code_sha256": "3685891a51412b0603632f11c4db98f4fa51ebafb63d8c3afa1e47adbb4ef5de",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "026327aa726e750299dcab61443165d223b1a847350549c757e0994917e4a618",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/ethlo/time/DateTime",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/LeapSecondException",
+        "com/ethlo/time/TimezoneOffset",
+        "com/ethlo/time/internal/DateTimeFormatException",
+        "com/ethlo/time/internal/fixed/ITUFormatter",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/internal/util/DateTimeMath",
+        "com/ethlo/time/internal/util/DefaultLeapSecondHandler",
+        "com/ethlo/time/internal/util/LeapSecondHandler",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/time/DateTimeException",
+        "java/time/Instant",
+        "java/time/LocalDate",
+        "java/time/LocalDateTime",
+        "java/time/LocalTime",
+        "java/time/Month",
+        "java/time/OffsetDateTime",
+        "java/time/Year",
+        "java/time/YearMonth",
+        "java/time/format/DateTimeParseException",
+        "java/time/temporal/ChronoField",
+        "java/time/temporal/TemporalAccessor",
+        "java/time/temporal/TemporalField",
+        "java/time/temporal/UnsupportedTemporalTypeException",
+        "java/util/Objects",
+        "java/util/Optional"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeParser.class",
+      "occurrence": 0,
+      "sha256": "2049d5e0ee82717807495d68c030b56e1759dbb4559ec0955936faa7c54df9f8",
+      "name": "com/ethlo/time/DateTimeParser",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 1025,
+          "throws": [
+            "java/time/DateTimeException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/DateTime;",
+          "access": 1,
+          "code_sha256": "96c9db7a094c4fa2114b733066383c2689bca87f7befba69ee7554ef5d57d98e",
+          "code_length": 16,
+          "throws": [
+            "java/time/DateTimeException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/DateTimeParser",
+        "java/lang/Object",
+        "java/text/ParsePosition",
+        "java/time/DateTimeException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeParsers.class",
+      "occurrence": 0,
+      "sha256": "625ba3906491ca671f0f088b292abf9b41048717be7700e8026e84de31dd285e",
+      "name": "com/ethlo/time/DateTimeParsers",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DATE",
+          "descriptor": "Lcom/ethlo/time/token/ConfigurableDateTimeParser;",
+          "access": 26
+        },
+        {
+          "name": "LOCAL_TIME",
+          "descriptor": "Lcom/ethlo/time/DateTimeParser;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "of",
+          "descriptor": "([Lcom/ethlo/time/token/DateTimeToken;)Lcom/ethlo/time/DateTimeParser;",
+          "access": 137,
+          "code_sha256": "46244573c32d6a50702a0aaa354038b03d87d304cbedaa24bce7dba9dbb335f9",
+          "code_length": 5
+        },
+        {
+          "name": "rfc3339",
+          "descriptor": "()Lcom/ethlo/time/DateTimeParser;",
+          "access": 9,
+          "code_sha256": "0f838e3d483644a8593f02a4843758da850e22f35a0d1aa6ccf948db959dd267",
+          "code_length": 4
+        },
+        {
+          "name": "localDate",
+          "descriptor": "()Lcom/ethlo/time/DateTimeParser;",
+          "access": 9,
+          "code_sha256": "afc8b9abcd858ca2fc039be08ff5a581a15c5fd9f66677daf2e27856f79770b9",
+          "code_length": 4
+        },
+        {
+          "name": "localTime",
+          "descriptor": "()Lcom/ethlo/time/DateTimeParser;",
+          "access": 9,
+          "code_sha256": "d7014c91a95f8a442e041b583563d353813b9d64056d44e2bfa681a5db9a4314",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "82314e1228ac76abee411da56c98640d8bd3eb6a7623e06ab56b046285755a08",
+          "code_length": 162
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/DateTimeParsers",
+        "com/ethlo/time/DateTimeTokens",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/token/ConfigurableDateTimeParser",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeTokens.class",
+      "occurrence": 0,
+      "sha256": "b6e728d7c76196e1c55b59cefb837de390a62f1ce22604a49cde5bffb65abb1e",
+      "name": "com/ethlo/time/DateTimeTokens",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "separators",
+          "descriptor": "([C)Lcom/ethlo/time/token/DateTimeToken;",
+          "access": 137,
+          "code_sha256": "252ce64ba297634476d67f14e80d14959bf540f56cd94c0bff3c3ee72cd7497c",
+          "code_length": 45
+        },
+        {
+          "name": "digits",
+          "descriptor": "(Lcom/ethlo/time/Field;I)Lcom/ethlo/time/token/DateTimeToken;",
+          "access": 9,
+          "code_sha256": "6f767ba579ece20ecb11fc13cc8ffba90afb5ea206214ac7ff305d667b8e9fad",
+          "code_length": 10
+        },
+        {
+          "name": "fractions",
+          "descriptor": "()Lcom/ethlo/time/token/DateTimeToken;",
+          "access": 9,
+          "code_sha256": "dc7dc3cc20fed847d7cfa355ada8122f6853775ceff7b97e1c5ba3cdcc34c4ca",
+          "code_length": 8
+        },
+        {
+          "name": "zoneOffset",
+          "descriptor": "()Lcom/ethlo/time/token/DateTimeToken;",
+          "access": 9,
+          "code_sha256": "fa51865571f4f6d38134229bc08311501a46f0d110ac77d207e14071fc747d49",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/DateTimeTokens",
+        "com/ethlo/time/internal/token/DigitsToken",
+        "com/ethlo/time/internal/token/FractionsToken",
+        "com/ethlo/time/internal/token/SeparatorToken",
+        "com/ethlo/time/internal/token/SeparatorsToken",
+        "com/ethlo/time/internal/token/ZoneOffsetToken",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/Duration.class",
+      "occurrence": 0,
+      "sha256": "54f52b08258beb0b637ecdbe579c49a717814a9b4f2ab83f93b1cb0bc60ed768",
+      "name": "com/ethlo/time/Duration",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Lcom/ethlo/time/Duration;",
+          "access": 25
+        },
+        {
+          "name": "NANOS_PER_SECOND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SECONDS_PER_MINUTE",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "SECONDS_PER_HOUR",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "SECONDS_PER_DAY",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "SECONDS_PER_WEEK",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "NANOS_PER_MICROSECOND",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "NANOS_PER_MILLISECOND",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "seconds",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "nanos",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JI)V",
+          "access": 0,
+          "code_sha256": "76f6a5491a8fe667200c1c913ccba52d4a3f1521c58ed60faed573e3dad28576",
+          "code_length": 45
+        },
+        {
+          "name": "ofMillis",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "ad2475936b0c165a6025c3d54d5f94dbe2769bdcfeaa2ccc0e053ff48b6738b3",
+          "code_length": 11
+        },
+        {
+          "name": "ofMicros",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "3142427c8eede5a269d2c8ccac8bd3d7201942fd1b595926b36b13fc6203bf14",
+          "code_length": 11
+        },
+        {
+          "name": "ofNanos",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "4bf09fff433d93106340911e55e8fc148ee15e1bad6bf4e8da6474baf588e460",
+          "code_length": 51
+        },
+        {
+          "name": "ofWeeks",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "53500e454057793ca288a863ea5d5002ed44f72f730e8a248ff8ccc3b5582726",
+          "code_length": 16
+        },
+        {
+          "name": "ofDays",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "d75ce4df24f6ef2118ddad8e2e83ed0d044b08338a0a3c33492bd9412eb85d65",
+          "code_length": 16
+        },
+        {
+          "name": "ofHours",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "aba5c59fbdc93f57da91c0871ecd3cf9b0ed383d06958212abcebb391b90d10e",
+          "code_length": 16
+        },
+        {
+          "name": "ofMinutes",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "8a5b0a6101638da79497d09b7124dbebc2a4bc5f0be8fb38fdd5b3354d3d67fa",
+          "code_length": 16
+        },
+        {
+          "name": "ofSeconds",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "4bd838668948befc84d1ba5365960e5c57be0b9130e45ad40ca5bafd3bbf3d58",
+          "code_length": 10
+        },
+        {
+          "name": "of",
+          "descriptor": "(JI)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "743bd90a3990d1e942a3e2909634c45854cc0eae1c75a32b221ef7f4222a0dad",
+          "code_length": 10
+        },
+        {
+          "name": "getSeconds",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "297da201021403b620439dd24bf3368088499bd2b6307926a0d465041feaaa95",
+          "code_length": 5
+        },
+        {
+          "name": "getNanos",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8217be20328da627bba017940d5ad267e4b75c5cfc8603457f0e6207b3a1b416",
+          "code_length": 5
+        },
+        {
+          "name": "normalized",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2c3de04143419551d9001c4a0c471f92fb33febd27cd9a072d0bdc91d488ac13",
+          "code_length": 5
+        },
+        {
+          "name": "timeline",
+          "descriptor": "()Ljava/time/Instant;",
+          "access": 1,
+          "code_sha256": "2eb7306ae2bb0de05f113b0e4f836ff7d7bb7087ed6990d701a901ecef16f57d",
+          "code_length": 8
+        },
+        {
+          "name": "timeline",
+          "descriptor": "(Ljava/time/Instant;)Ljava/time/Instant;",
+          "access": 1,
+          "code_sha256": "7b345717fff3f1beddfeba3a5066ecb1525c3c34af6bfd8d3f2a4397c28d10a0",
+          "code_length": 17
+        },
+        {
+          "name": "toDuration",
+          "descriptor": "()Ljava/time/Duration;",
+          "access": 0,
+          "code_sha256": "8c95140619a5fd5274665caf92e8d9dfb8fd1920801bd790e3f848eaaedc8820",
+          "code_length": 13
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lcom/ethlo/time/Duration;)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "7df3bd4a273be67ed2d5b608662f6c55ee4e453ec87ce98cebbf8708d2625588",
+          "code_length": 62
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lcom/ethlo/time/Duration;)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "103fead40d9464c7db93201b83b4ab60932b27d8a9d1818a000f6f597d7b7905",
+          "code_length": 9
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "28e9a6af35c7dffd037d5f7f6369141b36b774eb66be2a209d0a5d6618d8b701",
+          "code_length": 37
+        },
+        {
+          "name": "abs",
+          "descriptor": "()Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "cb03983650b85f34671592850babdc15343b14e62a89b88d4e6d8dca371996ef",
+          "code_length": 14
+        },
+        {
+          "name": "isNegative",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "4e2eddfb1f5647a9b6752c4d78948e69aa564f4ca28c0de46ebfaaf079d62023",
+          "code_length": 15
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0e8dcfce08ce85a2413b64fdb2ba1fdcf041e52d7647365b846461ecacdd09db",
+          "code_length": 58
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "280ba6d3378ead897f1cc38c77a51269854de3d6bb8fe622f56ff818b024a7c8",
+          "code_length": 28
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "be345cd5db5f57bc9cf464dd101b827498e52023e0ac2433f5b1a3388e3c4d7e",
+          "code_length": 5
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lcom/ethlo/time/Duration;)I",
+          "access": 1,
+          "code_sha256": "fbac22de9a0b3e5b4e69f37ea3db6355c6f817a6dc97b04060f857719389c493",
+          "code_length": 26
+        },
+        {
+          "name": "plusHours",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "05557b552d771d839fafd85684e6eec2d0f7b37f35fefa731ccc19011ec492f1",
+          "code_length": 12
+        },
+        {
+          "name": "plusMinutes",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "aa4d19f641480495e8dc74db4587cdad05c81979f24748c1b515ca23c57cf6d8",
+          "code_length": 12
+        },
+        {
+          "name": "plusSeconds",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "976c536fad9c3c3d0e568656d8bc8b0c918b1fdd45a0dbc58a64ab13f7241163",
+          "code_length": 20
+        },
+        {
+          "name": "plusNanos",
+          "descriptor": "(J)Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "52e0f939bbca6c2b9e46910be2ec317656bce044628484408b6289d246c38962",
+          "code_length": 46
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "f4d70b342104b08a1015bb725b554a1302e4ac0172834c9e428ad452b9bf883f",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "32e0afb90750785241d3fd0307d82f8ef20d8b7df35399f6ca1094b42f864b82",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Comparable<Lcom/ethlo/time/Duration;>;",
+      "class_references": [
+        "com/ethlo/time/Duration",
+        "com/ethlo/time/internal/util/DurationFormatter",
+        "java/lang/Comparable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/time/Duration",
+        "java/time/Instant",
+        "java/util/Comparator",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/Field.class",
+      "occurrence": 0,
+      "sha256": "674747291d8775b78b0e10f128f69bbb00148956546a83b870af6dee5faa6ef1",
+      "name": "com/ethlo/time/Field",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "YEAR",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "MONTH",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "DAY",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "HOUR",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "MINUTE",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "SECOND",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "NANO",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "ZONE_OFFSET",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 16409
+        },
+        {
+          "name": "requiredLength",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/ethlo/time/Field;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/ethlo/time/Field;",
+          "access": 9,
+          "code_sha256": "f97859721bb9bd8605e5a894ef2b4719b265f8bdd0a616610223c587dd96a41d",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/Field;",
+          "access": 9,
+          "code_sha256": "f4fc52cc3f8de8f7be65639483ce98492d0ba74ef2640bdc8b084d1a84755fb1",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 2,
+          "code_sha256": "52b7ec21b8fbf8c3a0d0a6f4fddf533539ac4515af0859467bde4f4248aa528a",
+          "code_length": 12,
+          "generic_signature": "(I)V"
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/Class;)Lcom/ethlo/time/Field;",
+          "access": 9,
+          "code_sha256": "e68921178c5baf2c0ffa6c0da410b500719d0d1fc56a2b4dc68eb1f64f9d2128",
+          "code_length": 87,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/time/temporal/Temporal;>;)Lcom/ethlo/time/Field;"
+        },
+        {
+          "name": "of",
+          "descriptor": "(Ljava/time/temporal/TemporalField;)Lcom/ethlo/time/Field;",
+          "access": 9,
+          "code_sha256": "8950e48f5ed47326e6681bf733e3a794d4094c451ac15f98e2d9cd17613b5aaa",
+          "code_length": 139
+        },
+        {
+          "name": "getRequiredLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2e30ef1c3aae3b8c8eefea14efc5a78d998ec9158a497ca82d178565b0e86c66",
+          "code_length": 5
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lcom/ethlo/time/Field;",
+          "access": 4106,
+          "code_sha256": "f555c12b1ce5fa79806a8dc2e143e03ea00caff878242eca14300b184991ed2a",
+          "code_length": 56
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6fbc1c868230a095ccdc48addc160e61a94c160c6afabbc15e87b31acd092976",
+          "code_length": 128
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/ethlo/time/Field;>;",
+      "class_references": [
+        "[Lcom/ethlo/time/Field;",
+        "com/ethlo/time/Field",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/time/LocalDate",
+        "java/time/OffsetDateTime",
+        "java/time/Year",
+        "java/time/YearMonth",
+        "java/time/temporal/ChronoField",
+        "java/time/temporal/TemporalField",
+        "java/time/temporal/UnsupportedTemporalTypeException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/ITU$1.class",
+      "occurrence": 0,
+      "sha256": "4fb075ad14665fc828e5be5fa4e2465bd42e1f8204b09d42939d0b54764ee531",
+      "name": "com/ethlo/time/ITU$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/TemporalHandler"
+      ],
+      "fields": [
+        {
+          "name": "val$types",
+          "descriptor": "[Lcom/ethlo/time/TemporalType;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lcom/ethlo/time/TemporalType;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDate;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "2dfa96d58c5f11ee0e9bc88bbbcd5d756fbbe5cbdf97196721d8e88e9f0dd7c4",
+          "code_length": 14
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "360c9d7c9ca6346689f8684932f2b0c40f4dfdcdef4d6fc7c4db0eaaa72fd231",
+          "code_length": 14
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDateTime;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "00944f10b42fa477e535df5e6da61ceb1408c8232677de92acea553214d66500",
+          "code_length": 14
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/YearMonth;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "04cc64e223eae361a4d79a239598d9638b0fa08dcac107c4ac6a9a3362f4f16f",
+          "code_length": 14
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/Year;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "477b5ea303db58a261497e496aafaf29bbe4d388cd48eda9d18e269c093b69a5",
+          "code_length": 14
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "3db317c6d621157cd9d2194b24c5d6fda029d9a5dfa82bde1750436448b53975",
+          "code_length": 6
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/Year;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "0c412a9268c6320a263962d6ff2724f1504412ab7fbddb8705bf75bcc9016586",
+          "code_length": 6
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/YearMonth;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "978fc639484fd3bf70ffeadedb65944de06506ff91cfd6ab1fb47c8b196df495",
+          "code_length": 6
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDate;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "eef3690a895b4a8a37e99782277bb2fa3b71444593a6fe408ac812b2b2d5243d",
+          "code_length": 6
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDateTime;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "de450599769977303aea14430ce852242f7402353b542d80c24e949e809fa098",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/ethlo/time/TemporalHandler<Ljava/lang/Boolean;>;",
+      "class_references": [
+        "com/ethlo/time/ITU",
+        "com/ethlo/time/ITU$1",
+        "com/ethlo/time/TemporalHandler",
+        "com/ethlo/time/TemporalType",
+        "java/lang/Boolean",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/ITU.class",
+      "occurrence": 0,
+      "sha256": "a9a952674edb37ead384ae4e1b61251cfc915b64a48dcc8e6683cba2fefefbee",
+      "name": "com/ethlo/time/ITU",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "453e557c6548b35730a6cc77039ad677c34240c042947f27d4cde64a2c487b62",
+          "code_length": 5
+        },
+        {
+          "name": "parseDateTime",
+          "descriptor": "(Ljava/lang/String;)Ljava/time/OffsetDateTime;",
+          "access": 9,
+          "code_sha256": "e8415a09030975882e6ab0c1aaeb52a24528320c270464a2976854e391dd6039",
+          "code_length": 6
+        },
+        {
+          "name": "parseDuration",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "d6c3e358341b5edd6f83feac12c957bfd2aa26273f6c1ab7dc18c1cde56f52a5",
+          "code_length": 6
+        },
+        {
+          "name": "parseDuration",
+          "descriptor": "(Ljava/lang/String;I)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "d352d7d7c3f1c04da1278d73a2b2b8bc3e7874c6563d74dfc3633f653cf15046",
+          "code_length": 6
+        },
+        {
+          "name": "parseDateTime",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Ljava/time/OffsetDateTime;",
+          "access": 9,
+          "code_sha256": "8d1d7279394330d6a0bf5108a664bb7398212a1f84066570b8b1c94e29625a94",
+          "code_length": 12
+        },
+        {
+          "name": "parseLenient",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "8b83fe7f4e9daabf554503272e3c79001a54156bb5e8ddd21729fd162c04c687",
+          "code_length": 9
+        },
+        {
+          "name": "parseLenient",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/ParseConfig;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "a5a049fd5eb328f6b0c6f89b5de7da6f807cc0b6bb869b21794c45836ad78c65",
+          "code_length": 7
+        },
+        {
+          "name": "parseLenient",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/ParseConfig;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "e81b6114e6fb8e979d48bb212363bd90e9e4ed6d0e841ed011c97752e7001d14",
+          "code_length": 7
+        },
+        {
+          "name": "isValid",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "7c0dd4b06a5a7553897ba5c37b5b0cb2e467521d6798d20a31262967d5f8486a",
+          "code_length": 10
+        },
+        {
+          "name": "formatUtc",
+          "descriptor": "(Ljava/time/OffsetDateTime;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "9cfaef02e67c533be1d88072125c5afac92271754dba1b87789d8a2fa652b45b",
+          "code_length": 6
+        },
+        {
+          "name": "formatUtc",
+          "descriptor": "(Ljava/time/OffsetDateTime;Lcom/ethlo/time/Field;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f3f2d5309a86eb20074177623923dc7469a0720b0d6c5501ba7eb2e76fc1a03b",
+          "code_length": 6
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c8c832755d3cd5a612547b9b81ba2f93da01bce770fbb061e6bbdc2b8003f53e",
+          "code_length": 10
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/time/OffsetDateTime;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "375d49ea34ca1ccbb7b2af8b01bd35fc69f5d4abc25472df2a6d61bf1f0094fe",
+          "code_length": 10
+        },
+        {
+          "name": "formatUtc",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8696f45210fb0f95b08b52cf6131878c1eb065d4839d03fe913a3267369f8553",
+          "code_length": 6
+        },
+        {
+          "name": "formatUtcMilli",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "392d7189152dab78541faa0573bb5b8f5298cb2ea2cb193119e936c75c3f57f1",
+          "code_length": 6
+        },
+        {
+          "name": "formatUtcMicro",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "aa6fb1f66545e687409694c9b60d7c297d420616e5171f26d10125139d33caad",
+          "code_length": 7
+        },
+        {
+          "name": "formatUtcNano",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8f322a247693993bde7d3b825239af921b1bd3a877681b30ce3b52664baa07ba",
+          "code_length": 7
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/TemporalConsumer;)V",
+          "access": 9,
+          "code_sha256": "ba010131dda0da2814856e59c5948f5f2d1094a711e941d606598d60a32f06be",
+          "code_length": 115
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/TemporalHandler;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "6b1d5d419a18b505adb7494103778b743dc9895cec174be30bc37427acd5c41f",
+          "code_length": 107,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lcom/ethlo/time/TemporalHandler<TT;>;)TT;"
+        },
+        {
+          "name": "isValid",
+          "descriptor": "(Ljava/lang/String;[Lcom/ethlo/time/TemporalType;)Z",
+          "access": 137,
+          "code_sha256": "8b892dd6426cf9875ca4028c622d779b77f8dd060006a18cdc9a1e6bff3269db",
+          "code_length": 22
+        },
+        {
+          "name": "isAllowed",
+          "descriptor": "(Lcom/ethlo/time/TemporalType;[Lcom/ethlo/time/TemporalType;)Z",
+          "access": 138,
+          "code_sha256": "e53241d20f853ad8c9575ba4b255b32f20b56d5a743b8c1cc9760ae285345815",
+          "code_length": 39
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/ethlo/time/TemporalType;[Lcom/ethlo/time/TemporalType;)Z",
+          "access": 4104,
+          "code_sha256": "86c62cce214002e09a5365c4854223afc6b3db41c3fee243f5489f78e2971671",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[Lcom/ethlo/time/TemporalType;",
+        "com/ethlo/time/DateTime",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/ITU",
+        "com/ethlo/time/ITU$1",
+        "com/ethlo/time/ParseConfig",
+        "com/ethlo/time/TemporalConsumer",
+        "com/ethlo/time/TemporalHandler",
+        "com/ethlo/time/TemporalType",
+        "com/ethlo/time/internal/ItuDurationParser",
+        "com/ethlo/time/internal/fixed/ITUFormatter",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/time/DateTimeException",
+        "java/time/OffsetDateTime",
+        "java/time/Year",
+        "java/util/Optional"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/LeapSecondException.class",
+      "occurrence": 0,
+      "sha256": "f16804d49b054a6202eab9b06a102ec287fc25bda2f995e3c33b9012435c4187",
+      "name": "com/ethlo/time/LeapSecondException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/time/DateTimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "secondsInMinute",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "isVerifiedValidLeapYearMonth",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "nearestDateTime",
+          "descriptor": "Ljava/time/OffsetDateTime;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/time/OffsetDateTime;IZ)V",
+          "access": 1,
+          "code_sha256": "062140214b20019ce09f546b118d3ee2d48c7e65ff351385ed1a99c3866388dd",
+          "code_length": 22
+        },
+        {
+          "name": "getSecondsInMinute",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f71c0e37ea3da5d4fd1a485105c71cfe89cdd2a717078a1b00ea19e11626bf1b",
+          "code_length": 5
+        },
+        {
+          "name": "getNearestDateTime",
+          "descriptor": "()Ljava/time/OffsetDateTime;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "isVerifiedValidLeapYearMonth",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4cd7596f3f9ecdc28dab0ea226a415307717e5905327759aaf103abfcbb2c4cd",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/LeapSecondException",
+        "java/time/DateTimeException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/ParseConfig.class",
+      "occurrence": 0,
+      "sha256": "58c1fd2d14ed4a5dbde6753325f73085813e69e9723f1e91bd3b5f10ecd4b43d",
+      "name": "com/ethlo/time/ParseConfig",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_DATE_TIME_SEPARATORS",
+          "descriptor": "[C",
+          "access": 26
+        },
+        {
+          "name": "RFC_3339_FRACTION_SEPARATOR",
+          "descriptor": "[C",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT",
+          "descriptor": "Lcom/ethlo/time/ParseConfig;",
+          "access": 25
+        },
+        {
+          "name": "STRICT",
+          "descriptor": "Lcom/ethlo/time/ParseConfig;",
+          "access": 25
+        },
+        {
+          "name": "dateTimeSeparators",
+          "descriptor": "[C",
+          "access": 18
+        },
+        {
+          "name": "fractionSeparators",
+          "descriptor": "[C",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([C[C)V",
+          "access": 4,
+          "code_sha256": "bf37b4d01f0226dfa47f4af57a5bc2c780be221119cc7fc8be5b591e550d3beb",
+          "code_length": 39
+        },
+        {
+          "name": "getFractionSeparators",
+          "descriptor": "()[C",
+          "access": 1,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5
+        },
+        {
+          "name": "withDateTimeSeparators",
+          "descriptor": "([C)Lcom/ethlo/time/ParseConfig;",
+          "access": 129,
+          "code_sha256": "2520559b798cb4081a21a6fd4263be18bc99582e48ff765e769a46828834538d",
+          "code_length": 18
+        },
+        {
+          "name": "assertChars",
+          "descriptor": "([C)V",
+          "access": 2,
+          "code_sha256": "cfdf0b3430e79ef9c1418a81d457a0e7018fb434d415909c45cc06f9817ac815",
+          "code_length": 30
+        },
+        {
+          "name": "withFractionSeparators",
+          "descriptor": "([C)Lcom/ethlo/time/ParseConfig;",
+          "access": 129,
+          "code_sha256": "2a8a543c82bec04925d02be900e1db48ab6ea5d1005fb7b8c0212981bd481d32",
+          "code_length": 18
+        },
+        {
+          "name": "withFailOnTrailingJunk",
+          "descriptor": "(Z)Lcom/ethlo/time/ParseConfig;",
+          "access": 1,
+          "code_sha256": "5e197d67f7d9c2d59b58ca2cd255900dde33ad3175015af69f55cb96f033f1de",
+          "code_length": 16
+        },
+        {
+          "name": "isFailOnTrailingJunk",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getDateTimeSeparators",
+          "descriptor": "()[C",
+          "access": 1,
+          "code_sha256": "1ac2df7ba3a2c6e5813993ef99152a042e99a0448328ecb2bc980ff489723a92",
+          "code_length": 5
+        },
+        {
+          "name": "isDateTimeSeparator",
+          "descriptor": "(C)Z",
+          "access": 1,
+          "code_sha256": "2f3dab9b88c89ee7cc2ffc3739bd9707fedff83c9506919c1c7aac1de49d2d71",
+          "code_length": 39
+        },
+        {
+          "name": "isFractionSeparator",
+          "descriptor": "(C)Z",
+          "access": 1,
+          "code_sha256": "dadc3bcb761833d55a41d75c6aaf25a5ce7304dc7e9f753d1d7061e67234b7ec",
+          "code_length": 39
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "db3edc7adc97914443335838d1ffa590e7586e3c09e02975fcea24b4d211e355",
+          "code_length": 46
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6700c787f809ca3092e15df16fdc0c3c7e6014f74230cfccb59d65376b192a82",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/ethlo/time/ParseConfig",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/Optional"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/TemporalConsumer.class",
+      "occurrence": 0,
+      "sha256": "0873ebab9df712b27a1b2ff9479ffb8168a166d591ed640225625b6e2ec8f362",
+      "name": "com/ethlo/time/TemporalConsumer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDateTime;)V",
+          "access": 1,
+          "code_sha256": "46bde579acefde7314b0e8ec5ce33f2dbd5be34b1aaa70d78435cc7d7510a3ee",
+          "code_length": 8
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDate;)V",
+          "access": 1,
+          "code_sha256": "46bde579acefde7314b0e8ec5ce33f2dbd5be34b1aaa70d78435cc7d7510a3ee",
+          "code_length": 8
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/YearMonth;)V",
+          "access": 1,
+          "code_sha256": "46bde579acefde7314b0e8ec5ce33f2dbd5be34b1aaa70d78435cc7d7510a3ee",
+          "code_length": 8
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/Year;)V",
+          "access": 1,
+          "code_sha256": "46bde579acefde7314b0e8ec5ce33f2dbd5be34b1aaa70d78435cc7d7510a3ee",
+          "code_length": 8
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/OffsetDateTime;)V",
+          "access": 1,
+          "code_sha256": "46bde579acefde7314b0e8ec5ce33f2dbd5be34b1aaa70d78435cc7d7510a3ee",
+          "code_length": 8
+        },
+        {
+          "name": "fallback",
+          "descriptor": "(Ljava/time/temporal/Temporal;)V",
+          "access": 1,
+          "code_sha256": "cd14ef9e5465729a36884cca8352ca4f8151482df7e8c9a38f1f6f1f9690e59b",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/TemporalConsumer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/time/temporal/Temporal"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/TemporalHandler.class",
+      "occurrence": 0,
+      "sha256": "9587e406f1a70a4acaccc502557df67d4548838d45ea122b4a01540582feebc4",
+      "name": "com/ethlo/time/TemporalHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDateTime;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8,
+          "generic_signature": "(Ljava/time/LocalDateTime;)TT;"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/LocalDate;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8,
+          "generic_signature": "(Ljava/time/LocalDate;)TT;"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/YearMonth;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8,
+          "generic_signature": "(Ljava/time/YearMonth;)TT;"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/Year;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8,
+          "generic_signature": "(Ljava/time/Year;)TT;"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/time/OffsetDateTime;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8,
+          "generic_signature": "(Ljava/time/OffsetDateTime;)TT;"
+        },
+        {
+          "name": "fallback",
+          "descriptor": "(Ljava/time/temporal/Temporal;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "cd14ef9e5465729a36884cca8352ca4f8151482df7e8c9a38f1f6f1f9690e59b",
+          "code_length": 32,
+          "generic_signature": "(Ljava/time/temporal/Temporal;)TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "com/ethlo/time/TemporalHandler",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/time/temporal/Temporal"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/TemporalType.class",
+      "occurrence": 0,
+      "sha256": "4304130fa736edc0e624af1ab11e8849744fea3a76f34a79b696762039e31968",
+      "name": "com/ethlo/time/TemporalType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "YEAR",
+          "descriptor": "Lcom/ethlo/time/TemporalType;",
+          "access": 16409
+        },
+        {
+          "name": "YEAR_MONTH",
+          "descriptor": "Lcom/ethlo/time/TemporalType;",
+          "access": 16409
+        },
+        {
+          "name": "LOCAL_DATE",
+          "descriptor": "Lcom/ethlo/time/TemporalType;",
+          "access": 16409
+        },
+        {
+          "name": "LOCAL_DATE_TIME",
+          "descriptor": "Lcom/ethlo/time/TemporalType;",
+          "access": 16409
+        },
+        {
+          "name": "OFFSET_DATE_TIME",
+          "descriptor": "Lcom/ethlo/time/TemporalType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/ethlo/time/TemporalType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/ethlo/time/TemporalType;",
+          "access": 9,
+          "code_sha256": "0d720954b09b57638106a545a25c1d38001615525f5611abae3fe870f5a2e9be",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/TemporalType;",
+          "access": 9,
+          "code_sha256": "27cb3cd13e8ce707c5590a013cca66b4f0ebddb337143f3202d5025223e759f7",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "73df9ce8f241bb2d76a4a2f71f30913b5b267816ed7053a19b7a359455bcf262",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lcom/ethlo/time/TemporalType;",
+          "access": 4106,
+          "code_sha256": "2bcbeeff9905e23eabe93ec35cd3c80f390bc15df63e30eaeab5723524461fef",
+          "code_length": 35
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9eec7f311d4131ad95623691829be74db2ab388b44a9e8cac77e986a2c045b35",
+          "code_length": 72
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/ethlo/time/TemporalType;>;",
+      "class_references": [
+        "[Lcom/ethlo/time/TemporalType;",
+        "com/ethlo/time/TemporalType",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/TimezoneOffset.class",
+      "occurrence": 0,
+      "sha256": "2fd97d35910ca21d26b335d0fc073ce32b0126a62fce2257385e05eaa9393856",
+      "name": "com/ethlo/time/TimezoneOffset",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UTC",
+          "descriptor": "Lcom/ethlo/time/TimezoneOffset;",
+          "access": 25
+        },
+        {
+          "name": "SECONDS_PER_HOUR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SECONDS_PER_MINUTE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MINUTES_PER_HOUR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "hours",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "minutes",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 2,
+          "code_sha256": "b9355bb422edac9c728013581df28f67ad760f2b5de25b3ab9ab4c3cd89ff6f8",
+          "code_length": 15
+        },
+        {
+          "name": "ofHoursMinutes",
+          "descriptor": "(II)Lcom/ethlo/time/TimezoneOffset;",
+          "access": 9,
+          "code_sha256": "c0bce8f7ec893b432d61af66663d488242af398b5b4ae5e990095c3e8dfe77fd",
+          "code_length": 10
+        },
+        {
+          "name": "ofTotalSeconds",
+          "descriptor": "(I)Lcom/ethlo/time/TimezoneOffset;",
+          "access": 9,
+          "code_sha256": "bc6ea4dbb557a1119c9c5cbf2cfed00f8c719253a149f867d26f3ce8c97e3b6a",
+          "code_length": 20
+        },
+        {
+          "name": "of",
+          "descriptor": "(Ljava/time/ZoneOffset;)Lcom/ethlo/time/TimezoneOffset;",
+          "access": 9,
+          "code_sha256": "d1acabaac546725c79f7e939c98aac135811783432badb72f1b7d37bdaf6c1cd",
+          "code_length": 30
+        },
+        {
+          "name": "getHours",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getMinutes",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "getTotalSeconds",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "cca272b8db5e15fe476a764cc5be0f9e286e35601ca85630153e7eaae3d5e929",
+          "code_length": 19
+        },
+        {
+          "name": "toZoneOffset",
+          "descriptor": "()Ljava/time/ZoneOffset;",
+          "access": 1,
+          "code_sha256": "8b7823a0a70fd19af98c5ce4279c749f5e826db717d5914cda734fa19244d320",
+          "code_length": 26
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3f3af2d39cf4048c439d8c8e7a133679add3ff6a45f251d33095f4e449f8c65c",
+          "code_length": 57
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c3964334fb1497aeb52ad47c8ae26b9ea523d56f2d5b926f7935bd71844364ea",
+          "code_length": 28
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "56b83f47cb081f5cd489cc35b48e9e3ad28f8f7843b22405c1bbb275769f0d8e",
+          "code_length": 40
+        },
+        {
+          "name": "getRequiredLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1850a84e2fd38fbf9321932b5ba6b443b0efa10df7182c4cde788395114e7480",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bc54f05236786348d713b77c1c91d02d6de59b61c139af17c154d73a2adacc7e",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/TimezoneOffset",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/time/ZoneOffset",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/DateTimeFormatException.class",
+      "occurrence": 0,
+      "sha256": "17317ef0a7a469bb1ae174399f4bc1fd276a92018effb888b673760eb950f884",
+      "name": "com/ethlo/time/internal/DateTimeFormatException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/time/DateTimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/DateTimeFormatException",
+        "java/time/DateTimeException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/DurationPartsConsumer.class",
+      "occurrence": 0,
+      "sha256": "e604c818a819e2b364d3388e1f4fbb134a2666f9f0d5484fe99afc143098ffa1",
+      "name": "com/ethlo/time/internal/DurationPartsConsumer",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "POW10_TABLE",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "startOffset",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "negative",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "seconds",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "nano",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "readingFractionalPart",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "afterT",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "pFound",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "wFound",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "dFound",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "hFound",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "mFound",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "sFound",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "dotFound",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "fractionsFound",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IZ)V",
+          "access": 0,
+          "code_sha256": "61e376e92d52bcb85e04f9bdd7207646d5a22a4bdefd486eb93ca8bfabead328",
+          "code_length": 15
+        },
+        {
+          "name": "error",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;I)V",
+          "access": 12,
+          "code_sha256": "02196ace5cb1c9a825fa0697eb88eaa033164bd842565fa0a3ece44dcee431c4",
+          "code_length": 33
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/String;IICJ)V",
+          "access": 17,
+          "code_sha256": "cc218ea922dc399cd05c0317008900f0f50d0a3dcae96398c9cd63c0c51aa1fe",
+          "code_length": 789
+        },
+        {
+          "name": "assertNonFractional",
+          "descriptor": "(CLjava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "a24c70f45b084503a2155e5541030d7eb3d491d7dc3f1435aa58c6cd8d607a0d",
+          "code_length": 32
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "e6b9db4f0684cec69a4c39a71b175e05adf413e16562b97f13e9ead5111be8b4",
+          "code_length": 113
+        },
+        {
+          "name": "validateUnitOrder",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "73157e5688e21bfbfe889bbd9c2466ef1b608dcdc6a1f7cd5f688f02ad0d0c9c",
+          "code_length": 58
+        },
+        {
+          "name": "verifyUnitIndex",
+          "descriptor": "(IILjava/lang/String;)I",
+          "access": 2,
+          "code_sha256": "af0fa07712f5473f1f8ca02d78e9ad66eb15ed9efd37e42bfb64a2396e9146d2",
+          "code_length": 20
+        },
+        {
+          "name": "getResult",
+          "descriptor": "()Lcom/ethlo/time/Duration;",
+          "access": 1,
+          "code_sha256": "590674a08cdf66a03bd81c0b406dc24dda3f47f002cb07cef69a32ffe7cb1f89",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e48a0a00ecb3c91504015ca0ad860a23befebe101427b12b40cb40c6c599714b",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/Duration",
+        "com/ethlo/time/internal/DurationPartsConsumer",
+        "com/ethlo/time/internal/ItuDurationParser",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/time/format/DateTimeParseException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/ItuDurationParser.class",
+      "occurrence": 0,
+      "sha256": "de1f90e0770a2630ff817a15f94fe09720294946548babd0f89d2e5198d70597",
+      "name": "com/ethlo/time/internal/ItuDurationParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NANOS_IN_SECOND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEP_T",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_WEEK",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_DAY",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_HOUR",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_MINUTE",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_SECOND",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "DOT",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "DIGIT_ZERO",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "DIGIT_NINE",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "MINUS",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "UNIT_UNDEFINED",
+          "descriptor": "C",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "a3748fea4c2b43c6c78b932476230001c8e6725d73c76da9dac8348d8a27c5b5",
+          "code_length": 6
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;I)Lcom/ethlo/time/Duration;",
+          "access": 9,
+          "code_sha256": "381b9745eb06a10455ead39fbdc85600149734afad8b9a0e57acfa887f1c9ff7",
+          "code_length": 94
+        },
+        {
+          "name": "readUntilNonDigit",
+          "descriptor": "(Ljava/lang/String;ILcom/ethlo/time/internal/DurationPartsConsumer;)I",
+          "access": 10,
+          "code_sha256": "4b06bd8a186753732b6ab167c3a37502c9874965afcfa86ee15fbe261d67d56a",
+          "code_length": 130
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/DurationPartsConsumer",
+        "com/ethlo/time/internal/ItuDurationParser",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/fixed/ITUFormatter.class",
+      "occurrence": 0,
+      "sha256": "528ed15ad332408e45c1a7dea127637f109211e6270da81cfc47d26f98854221",
+      "name": "com/ethlo/time/internal/fixed/ITUFormatter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "widths",
+          "descriptor": "[I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "finish",
+          "descriptor": "([CILcom/ethlo/time/TimezoneOffset;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2c79afbee47d33059439fbadc9b9d077b2a3c2a4959baab072b563c36e3eb5e9",
+          "code_length": 26
+        },
+        {
+          "name": "writeTz",
+          "descriptor": "([CILcom/ethlo/time/TimezoneOffset;)I",
+          "access": 10,
+          "code_sha256": "ce26bc340ba147776e86814018b2eb5f65b69e531177b5744fb3b952b26c9baf",
+          "code_length": 74
+        },
+        {
+          "name": "formatUtc",
+          "descriptor": "(Ljava/time/OffsetDateTime;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7332381185b50750f522494bd0678601ebcb3de16c51044302f2b60ddd8705f7",
+          "code_length": 12
+        },
+        {
+          "name": "formatUtc",
+          "descriptor": "(Ljava/time/OffsetDateTime;Lcom/ethlo/time/Field;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "56cc760cdb88a6b282fe83879dbf2cf86a35409feb94c4dc5762bd747b8429b7",
+          "code_length": 10
+        },
+        {
+          "name": "format",
+          "descriptor": "(Ljava/time/OffsetDateTime;Ljava/time/ZoneOffset;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c0087f77cb7b28cdd8d9adba6a27ad49fcf0f594ed336fb037b84cb03bc2cc14",
+          "code_length": 10
+        },
+        {
+          "name": "doFormat",
+          "descriptor": "(Ljava/time/OffsetDateTime;Ljava/time/ZoneOffset;Lcom/ethlo/time/Field;I)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "1e1939581b3134dffc2f7c79ce4c047611fce6a63122dd36045d2eae542d2a35",
+          "code_length": 318
+        },
+        {
+          "name": "handleDatePart",
+          "descriptor": "(Lcom/ethlo/time/Field;[CIIILcom/ethlo/time/Field;)Z",
+          "access": 10,
+          "code_sha256": "47bb4738ce1f3d2f49430dbebefd449a2bd8cf25ac4c0825ce0160788948de9b",
+          "code_length": 20
+        },
+        {
+          "name": "addFractions",
+          "descriptor": "([CII)V",
+          "access": 10,
+          "code_sha256": "dcb6b94aabd376f25a0a81ee81d81d1ee6a3841f4084649162750b452afc80f6",
+          "code_length": 22
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3c761e4ffc737192ee43a3346be03f6ffef263df45cb022e492f03f4eecc3afd",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/TimezoneOffset",
+        "com/ethlo/time/internal/DateTimeFormatException",
+        "com/ethlo/time/internal/fixed/ITUFormatter",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/time/OffsetDateTime",
+        "java/time/ZoneOffset",
+        "java/time/ZonedDateTime"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/fixed/ITUParser.class",
+      "occurrence": 0,
+      "sha256": "7e20fc307a86ef076950db5fcd582ab4ae52ea80228c5b970223833e73cf8c79",
+      "name": "com/ethlo/time/internal/fixed/ITUParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/DateTimeParser"
+      ],
+      "fields": [
+        {
+          "name": "DATE_SEPARATOR",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "TIME_SEPARATOR",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "SEPARATOR_UPPER",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "SEPARATOR_LOWER",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "SEPARATOR_SPACE",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "PLUS",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "MINUS",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "FRACTION_SEPARATOR",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "ZULU_UPPER",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "ZULU_LOWER",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "MAX_FRACTION_DIGITS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RADIX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DIGITS_IN_NANO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/ethlo/time/DateTimeParser;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "handleTime",
+          "descriptor": "(ILcom/ethlo/time/ParseConfig;Ljava/lang/String;IIIII)Lcom/ethlo/time/DateTime;",
+          "access": 10,
+          "code_sha256": "8cba54338173fee539327acc1d1626567b22dcd1a98ee708558e5099e4491331",
+          "code_length": 175
+        },
+        {
+          "name": "assertAllowedDateTimeSeparator",
+          "descriptor": "(ILjava/lang/String;Lcom/ethlo/time/ParseConfig;)V",
+          "access": 10,
+          "code_sha256": "263f0578a508772449d3999a7cd295244991ca133351dba1deec16e5191503f9",
+          "code_length": 100
+        },
+        {
+          "name": "parseTimezone",
+          "descriptor": "(ILcom/ethlo/time/ParseConfig;Ljava/lang/String;I)Lcom/ethlo/time/TimezoneOffset;",
+          "access": 10,
+          "code_sha256": "763d176ae9b96c87fbd2c2633e3d15857598cc6a2ac1c543c7ed8fbe5d27eb8e",
+          "code_length": 216
+        },
+        {
+          "name": "assertNoMoreChars",
+          "descriptor": "(ILcom/ethlo/time/ParseConfig;Ljava/lang/String;I)V",
+          "access": 10,
+          "code_sha256": "e5da520cae0ba96e88e77e4530573cec39c1d616027c5de088106d774f5ac3d0",
+          "code_length": 56
+        },
+        {
+          "name": "parseLenient",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/ParseConfig;I)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "2c89a307456da26dd08a487ea748ad07a4af2d1dcc90d2e17c34dd5f11a47ca2",
+          "code_length": 221
+        },
+        {
+          "name": "sanityCheckInputParams",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 9,
+          "code_sha256": "41115cfe06b3d9853b9ef23ac300a11dc0bdbd20476b25c2f20952d6edda4ae8",
+          "code_length": 89
+        },
+        {
+          "name": "parseSeconds",
+          "descriptor": "(ILjava/lang/String;)I",
+          "access": 10,
+          "code_sha256": "1863c68f3d36e7c40b36a8f0df6771d818131ec6bc995ffd28d6437971e63afd",
+          "code_length": 13
+        },
+        {
+          "name": "parseMinutes",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "4566f83259fb59843659cc64814b8fa02c14d399fc330bb9d1881a0b4b9c0d5b",
+          "code_length": 13
+        },
+        {
+          "name": "parseHours",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "431fcce607c5f7c563c63d81661962c73da20ac40475a9bf963a1f557a1feda5",
+          "code_length": 13
+        },
+        {
+          "name": "parseDays",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "e9b791b2987eb672356dbaebcd4c21108ca42c768db0542b2af989e3f2dcd2ee",
+          "code_length": 13
+        },
+        {
+          "name": "parseMonth",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "4e8f9555152f1df5d2d2b494604955395252ff22236abbfd505daa20b5dda34c",
+          "code_length": 12
+        },
+        {
+          "name": "parseYears",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "fabb1b9e450035fa57ad01e42bc8d77e28024dd0e6f5daecdcb4e637c65f4822",
+          "code_length": 9
+        },
+        {
+          "name": "handleTimeResolution",
+          "descriptor": "(ILcom/ethlo/time/ParseConfig;IIIIILjava/lang/String;)Lcom/ethlo/time/DateTime;",
+          "access": 10,
+          "code_sha256": "6dfc34f1a3d4cb230e64c99f8a8e179481aa41f065d86417b27ad67dc9b73193",
+          "code_length": 223
+        },
+        {
+          "name": "handleSecondResolution",
+          "descriptor": "(IIIIIILjava/lang/String;Lcom/ethlo/time/TimezoneOffset;)Lcom/ethlo/time/DateTime;",
+          "access": 10,
+          "code_sha256": "d3ef9936a663442b439e46db3cd30746e89a2f4727b901709d79002cdd01c802",
+          "code_length": 57
+        },
+        {
+          "name": "handleFractionalSeconds",
+          "descriptor": "(ILcom/ethlo/time/ParseConfig;IIIIILjava/lang/String;)Lcom/ethlo/time/DateTime;",
+          "access": 10,
+          "code_sha256": "d27dc94199ae479f22b61d88fb54d4ec00821c532e09f49cbf2674f1e32d6255",
+          "code_length": 176
+        },
+        {
+          "name": "parseDateTime",
+          "descriptor": "(Ljava/lang/String;I)Ljava/time/OffsetDateTime;",
+          "access": 9,
+          "code_sha256": "5d0ad9e5034c6ba710afdb80970b68942faada292d492c11af4ce86752d9fca6",
+          "code_length": 72
+        },
+        {
+          "name": "parseLenient",
+          "descriptor": "(Ljava/lang/String;Lcom/ethlo/time/ParseConfig;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 9,
+          "code_sha256": "dd24d55471f9d628a71af58186b9dfffdca6de601a5dc9d4a84fe26b98f692eb",
+          "code_length": 49
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/ethlo/time/DateTimeParser;",
+          "access": 9,
+          "code_sha256": "0c60a99ad7d20784cd8c80555137948070b1dad3f5101fd16a0aac4cb70c93a0",
+          "code_length": 4
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 1,
+          "code_sha256": "02644e5b1e55b89afe668de69066c84ab0879a4fe9d125e1b30369eac2e31f1c",
+          "code_length": 9
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)Lcom/ethlo/time/DateTime;",
+          "access": 1,
+          "code_sha256": "4c88eeb6f7ec1036dc6d592b3da203220d97837ddc07484e5de12a7a3e11b7f9",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3e0a24e5ee7166c0cb936f79984cf40809e3ffb85d3e21d8a0b16e67f07a571e",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/DateTime",
+        "com/ethlo/time/DateTimeParser",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/ParseConfig",
+        "com/ethlo/time/TimezoneOffset",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/internal/util/ArrayUtils",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "java/lang/Character",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/ParsePosition",
+        "java/time/format/DateTimeParseException",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/DigitsToken.class",
+      "occurrence": 0,
+      "sha256": "5fb0dab2584709ac18cb777dea9819aed9ef85c8ad82f508b82ef3f5d5e72d37",
+      "name": "com/ethlo/time/internal/token/DigitsToken",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/token/DateTimeToken"
+      ],
+      "fields": [
+        {
+          "name": "field",
+          "descriptor": "Lcom/ethlo/time/Field;",
+          "access": 18
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/ethlo/time/Field;I)V",
+          "access": 1,
+          "code_sha256": "e7fd20388c12ef0705ea2852a57abd1f755c705eab8d5e5f5363296885237777",
+          "code_length": 15
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1,
+          "code_sha256": "29d0f6abb02698159d137e841a83d62098654f3170f2cfc4ff5392b27772b2b3",
+          "code_length": 31
+        },
+        {
+          "name": "getField",
+          "descriptor": "()Lcom/ethlo/time/Field;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "31089468c1e4cd83f8ee653d62e3419129066e321380ba5a60637e39a8d8f883",
+          "code_length": 40
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/token/DigitsToken",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/text/ParsePosition"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/FractionsToken.class",
+      "occurrence": 0,
+      "sha256": "e7ce88d71afca25e35d86ffb2bd7e78eb9ca6a3a8a7e9865e59b727daa4cb0b5",
+      "name": "com/ethlo/time/internal/token/FractionsToken",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/token/DateTimeToken"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1,
+          "code_sha256": "56add2b855d1273d572c6c8ae6058bcec86f73c45209cfb3c6a9d96e0ffbb61c",
+          "code_length": 71
+        },
+        {
+          "name": "getField",
+          "descriptor": "()Lcom/ethlo/time/Field;",
+          "access": 1,
+          "code_sha256": "1144ff04366b49ef2a01d37a606196bc9d5556ff7082c3ca6c9b6a8606e0d07a",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/Field",
+        "com/ethlo/time/internal/token/FractionsToken",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/ParsePosition"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/SeparatorToken.class",
+      "occurrence": 0,
+      "sha256": "dbefd27d04f1e40354a86d4fcc10d4d8027d7c177dc3c974819807942bb30e27",
+      "name": "com/ethlo/time/internal/token/SeparatorToken",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/token/DateTimeToken"
+      ],
+      "fields": [
+        {
+          "name": "separator",
+          "descriptor": "C",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(C)V",
+          "access": 1,
+          "code_sha256": "8a53628aa5c9c7a4b6f7ee6f7b836ff74cc6f999cd5531a3db4365f6d64f9ce0",
+          "code_length": 10
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1,
+          "code_sha256": "70a1c688a8a0d47d9f22c93d3db6904ca379fcd3a20ea627ce9c3861af62ab9f",
+          "code_length": 92
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "563f6eb06f22e96a34f28a4809380ae3808f1fa6ef4145bccf997b5e15011fbb",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/token/SeparatorToken",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/ParsePosition"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/SeparatorsToken.class",
+      "occurrence": 0,
+      "sha256": "6c14580cc1ef58b6c448398b98e103733dead0f2320c50e8d7d7f2127eae1ba5",
+      "name": "com/ethlo/time/internal/token/SeparatorsToken",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/token/DateTimeToken"
+      ],
+      "fields": [
+        {
+          "name": "separators",
+          "descriptor": "[C",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([C)V",
+          "access": 129,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1,
+          "code_sha256": "c68b0a70d61fa8c930557e46484c5e59c1d7da24f40b9aacb1edfca136c9c9c7",
+          "code_length": 132
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a9f4b6a48fed2573acc718093eb5bd0496f6e3069c001f612cbdf08674c646ce",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/ethlo/time/internal/token/SeparatorsToken",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Character",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/ParsePosition",
+        "java/time/format/DateTimeParseException",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/ZoneOffsetToken.class",
+      "occurrence": 0,
+      "sha256": "575cda0453ac86015366bf070877620d65a8e24f4f102c7a23286221486e5de5",
+      "name": "com/ethlo/time/internal/token/ZoneOffsetToken",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/token/DateTimeToken"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1,
+          "code_sha256": "a4819683e9e13f56abd6b3b1fe105d49346c034dcb903749536258b6b29ae1f0",
+          "code_length": 221
+        },
+        {
+          "name": "getField",
+          "descriptor": "()Lcom/ethlo/time/Field;",
+          "access": 1,
+          "code_sha256": "9cd5f5b791da3d42c0bc4002fcf7d68bdf0f5f3981c57d36ba0b46e52fd532e7",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/Field",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/internal/token/ZoneOffsetToken",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/ParsePosition",
+        "java/time/format/DateTimeParseException"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/ArrayUtils.class",
+      "occurrence": 0,
+      "sha256": "af408a1fb7afaafde5b37d700d9b6eb53430f3682ab0bedc5f1c31e9ff0dc863",
+      "name": "com/ethlo/time/internal/util/ArrayUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "merge",
+          "descriptor": "([C[C)[C",
+          "access": 9,
+          "code_sha256": "9a9593d043514af6f70d00b2a7c6b22999594bf895a55f49000a20277d428a67",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/util/ArrayUtils",
+        "java/lang/Object",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DateTimeMath.class",
+      "occurrence": 0,
+      "sha256": "7ebb39efa21ccc862e34cd34710787d1b20d0eee3b62392795df2da8b0e031c5",
+      "name": "com/ethlo/time/internal/util/DateTimeMath",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "daysFromCivil",
+          "descriptor": "(III)J",
+          "access": 9,
+          "code_sha256": "5cf18d1440b89038e697e4f252dc91effac3d60b675f4ace3c26995c7939e320",
+          "code_length": 115
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/util/DateTimeMath",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DefaultLeapSecondHandler.class",
+      "occurrence": 0,
+      "sha256": "323286b4670730da51cb512e4d148c61caf4bf63e63c637e23c074c48309b25a",
+      "name": "com/ethlo/time/internal/util/DefaultLeapSecondHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/internal/util/LeapSecondHandler"
+      ],
+      "fields": [
+        {
+          "name": "LEAP_SECOND_PATH_CSV",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "leapSecondMonths",
+          "descriptor": "Ljava/util/SortedSet;",
+          "access": 18,
+          "generic_signature": "Ljava/util/SortedSet<Ljava/time/YearMonth;>;"
+        },
+        {
+          "name": "lastLeapKnown",
+          "descriptor": "Ljava/time/YearMonth;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6b32d78bf3805515207605d8af968467fcbb4814161793098e975fba71ac6637",
+          "code_length": 172
+        },
+        {
+          "name": "isValidLeapSecondDate",
+          "descriptor": "(Ljava/time/YearMonth;)Z",
+          "access": 1,
+          "code_sha256": "a5cdc9763888fb8c0b020f0197cc3aeb7c086b4362daba3b3bc9df31b0aa25de",
+          "code_length": 11
+        },
+        {
+          "name": "getLastKnownLeapSecond",
+          "descriptor": "()Ljava/time/YearMonth;",
+          "access": 1,
+          "code_sha256": "45fa83d5fdf990668be4fe70f3adb120ecd07bbf85f9ea72976cb6c7408eb5f1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/util/DefaultLeapSecondHandler",
+        "com/ethlo/time/internal/util/LeapSecondHandler",
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/io/UncheckedIOException",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/nio/charset/StandardCharsets",
+        "java/time/YearMonth",
+        "java/util/Objects",
+        "java/util/SortedSet",
+        "java/util/TreeSet"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DurationFormatter.class",
+      "occurrence": 0,
+      "sha256": "f9fbd06863d21209009feb56e63d0d1b51d974dad3e2575dacde538a090e3e2b",
+      "name": "com/ethlo/time/internal/util/DurationFormatter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SECONDS_IN_MINUTE",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "SECONDS_IN_HOUR",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "SECONDS_IN_DAY",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "SECONDS_IN_WEEK",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "normalizeDuration",
+          "descriptor": "(Lcom/ethlo/time/Duration;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "0c16f1d2e4fbe26e40e6bc8bdda80de19cbd2deda6263be18b6176ae33308b3d",
+          "code_length": 354
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/ethlo/time/Duration",
+        "com/ethlo/time/internal/ItuDurationParser",
+        "com/ethlo/time/internal/util/DurationFormatter",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/ErrorUtil.class",
+      "occurrence": 0,
+      "sha256": "585a0a33b0c28d1d96ac5671849cd353ff213b5879c60f667a51bb4217e7a77b",
+      "name": "com/ethlo/time/internal/util/ErrorUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "raiseUnexpectedCharacter",
+          "descriptor": "(Ljava/lang/String;I[C)Ljava/time/format/DateTimeParseException;",
+          "access": 137,
+          "code_sha256": "def65bfc2e56f06b296808fd8d882590c72531e9100899f2ab21b944234d08a2",
+          "code_length": 50
+        },
+        {
+          "name": "raiseUnexpectedEndOfText",
+          "descriptor": "(Ljava/lang/String;I)Ljava/time/format/DateTimeParseException;",
+          "access": 9,
+          "code_sha256": "714bc1147d517e2a5b48084ddbd955b889bc8034af9f46e251c7280eccc42ee9",
+          "code_length": 23
+        },
+        {
+          "name": "raiseMissingGranularity",
+          "descriptor": "(Lcom/ethlo/time/Field;Ljava/lang/String;I)Ljava/time/format/DateTimeParseException;",
+          "access": 9,
+          "code_sha256": "f08243b9fc8bea16458797e9acc95cd656462fed3c41c5021e7ea94412b34e3c",
+          "code_length": 30
+        },
+        {
+          "name": "assertPositionContains",
+          "descriptor": "(Lcom/ethlo/time/Field;Ljava/lang/String;IC)V",
+          "access": 9,
+          "code_sha256": "98454e7edb48fa830e6664892e625521b2b91083e5d6fe67bac82fdda8f7973b",
+          "code_length": 75
+        },
+        {
+          "name": "assertFractionDigits",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 9,
+          "code_sha256": "a0d3d805f448856ae9dfdcacff9b07999ac05066d41cb3a1d39bbb60851ad5d0",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/Field",
+        "com/ethlo/time/internal/fixed/ITUParser",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "java/lang/Character",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/time/format/DateTimeParseException",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/LeapSecondHandler.class",
+      "occurrence": 0,
+      "sha256": "571d9de68f3ff6efcc4a93fdb5f965543e7148d9253f72d9caada8eaff1b08a9",
+      "name": "com/ethlo/time/internal/util/LeapSecondHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LEAP_SECOND_SECONDS",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "isValidLeapSecondDate",
+          "descriptor": "(Ljava/time/YearMonth;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getLastKnownLeapSecond",
+          "descriptor": "()Ljava/time/YearMonth;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/internal/util/LeapSecondHandler",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil.class",
+      "occurrence": 0,
+      "sha256": "a4f59e95eba849df61676d449fc2828e8d636e07d2d7c5f10f8c2374c037a49a",
+      "name": "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DIGIT_9",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "ZERO",
+          "descriptor": "C",
+          "access": 25
+        },
+        {
+          "name": "DIGITS",
+          "descriptor": "[C",
+          "access": 26
+        },
+        {
+          "name": "TABLE_WIDTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "RADIX",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MAX_INT_WIDTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "TABLE_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INT_CONVERSION_CACHE",
+          "descriptor": "[C",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "parsePositiveInt",
+          "descriptor": "(Ljava/lang/String;II)I",
+          "access": 9,
+          "code_sha256": "df5863da27ae8d48189e88e0a3161d6837bed935cbfc226402165f9550bc8f6c",
+          "code_length": 128
+        },
+        {
+          "name": "toString",
+          "descriptor": "(I[CII)V",
+          "access": 9,
+          "code_sha256": "46ce15bcf894a63b86e1377c28cac84e9501be5c80c02d93a99653831ccce536",
+          "code_length": 93
+        },
+        {
+          "name": "createBufferEntry",
+          "descriptor": "([CIII)V",
+          "access": 10,
+          "code_sha256": "4280226b753264a9584043d168ef6acf3a94530d7f434cbde8bf0faa6846ff00",
+          "code_length": 105
+        },
+        {
+          "name": "zeroFill",
+          "descriptor": "([CII)V",
+          "access": 10,
+          "code_sha256": "38310b7aa3cb7c4b150aa371f178bcf9fe0fd666103becc0c29f409c2e203e90",
+          "code_length": 11
+        },
+        {
+          "name": "copy",
+          "descriptor": "([CIII)V",
+          "access": 10,
+          "code_sha256": "9d6713cc8c242909ec19232ce1a17d39b00c98e58af8dc5e3eade4f3a21b2ac8",
+          "code_length": 9
+        },
+        {
+          "name": "copy",
+          "descriptor": "([CI[CII)V",
+          "access": 10,
+          "code_sha256": "5650dad0ac479ef9f13d0bc6a7428efb1c7ec759d748574dcf7b47719325e4b5",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a0f6d65ad1253e6a4e5793959ad5e090adeab02c5ae3863cf0eeef345579bc94",
+          "code_length": 117
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/ethlo/time/internal/util/ErrorUtil",
+        "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringIndexOutOfBoundsException",
+        "java/lang/System",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/token/ConfigurableDateTimeParser.class",
+      "occurrence": 0,
+      "sha256": "dfc4de6b9cee9b35855649192f720f9664e9e648d5b06bbd15d92ef7726943aa",
+      "name": "com/ethlo/time/token/ConfigurableDateTimeParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/ethlo/time/DateTimeParser"
+      ],
+      "fields": [
+        {
+          "name": "tokens",
+          "descriptor": "[Lcom/ethlo/time/token/DateTimeToken;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lcom/ethlo/time/token/DateTimeToken;)V",
+          "access": 130,
+          "code_sha256": "7e39d504628a14eb761a501372ed5add6e9eaf930a01877b2e84831ed9dc658b",
+          "code_length": 34
+        },
+        {
+          "name": "of",
+          "descriptor": "([Lcom/ethlo/time/token/DateTimeToken;)Lcom/ethlo/time/DateTimeParser;",
+          "access": 137,
+          "code_sha256": "a9d7fa79d77211ee964670935c67cfc0b88978e951dfed233a290ee0f733bf85",
+          "code_length": 9
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 1,
+          "code_sha256": "2675d889bb05c900477d4a58fbd5dba4218792112b96f2667d50c52eb4851a5a",
+          "code_length": 26
+        },
+        {
+          "name": "doParse",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)Lcom/ethlo/time/DateTime;",
+          "access": 2,
+          "code_sha256": "566975ea69d5ffdfe7d1f961acc8b4dc73e3936426d9fdbd46328ba7c33b00c5",
+          "code_length": 282
+        },
+        {
+          "name": "scale",
+          "descriptor": "(II)I",
+          "access": 2,
+          "code_sha256": "c2bd8f4ecc24fd2db9942adeee6528923366bf8cb6425e751d4f73cc98680674",
+          "code_length": 21
+        },
+        {
+          "name": "lambda$new$0",
+          "descriptor": "(Ljava/util/Set;[Lcom/ethlo/time/token/DateTimeToken;Lcom/ethlo/time/token/DateTimeToken;)V",
+          "access": 4106,
+          "code_sha256": "1498199099798528d54c26511bc6080389920459db50a631c8147550ef128056",
+          "code_length": 69
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Lcom/ethlo/time/token/DateTimeToken;",
+        "com/ethlo/time/DateTime",
+        "com/ethlo/time/DateTimeParser",
+        "com/ethlo/time/Field",
+        "com/ethlo/time/TimezoneOffset",
+        "com/ethlo/time/internal/token/FractionsToken",
+        "com/ethlo/time/token/ConfigurableDateTimeParser",
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/text/ParsePosition",
+        "java/time/format/DateTimeParseException",
+        "java/util/Arrays",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/ethlo/time/token/DateTimeToken.class",
+      "occurrence": 0,
+      "sha256": "a849f959ab6360a50d1e4ad6cf00fec85c8558cd38b255e2e56f34fd23c9740d",
+      "name": "com/ethlo/time/token/DateTimeToken",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "read",
+          "descriptor": "(Ljava/lang/String;Ljava/text/ParsePosition;)I",
+          "access": 1025
+        },
+        {
+          "name": "getField",
+          "descriptor": "()Lcom/ethlo/time/Field;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/ethlo/time/token/DateTimeToken",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "e78c7417ddd9d81aacf7874a2e335b50c15556c7195c111e8e46fe7fcffbd117",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

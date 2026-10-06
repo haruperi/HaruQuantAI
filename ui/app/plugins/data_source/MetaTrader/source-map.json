@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "UI-only MetaTrader structural traceability to DataSourceMt5Api",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/MetaTrader",
-  "source_head": "d61d12f39c5ee617894b0f227e12c5dcf63c345d",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_132729_data-source-mt5-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
       "id": "sqx-mt5api-ui",
       "family": "installed plugin UI artifacts"
     }
@@ -35,94 +35,129 @@
   "sources": [
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
       "relative_path": "DataSourceMt5Api.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend binary excluded",
       "access_date": "2026-10-06",
-      "sha256": "d9868bb340541b513341d0fdef81a76823bb6b8c022face241a4d2de7424d37d",
+      "sha256": "0e9a2fcba6c8457afbf3412a09c50572f207d04290e96469cefa9858f33aaf64",
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js",
       "relative_path": "DataSourceMt5Api.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a89027d3586443d105c45a65ba3b2b8f40889f269852551310c253a9fa2a656f",
+      "sha256": "622373e8864360f3fb3b78b4458bd70e4925ef80fe8aa6ae9c7b1ecdbc4027a6",
       "target": "DataSourceMt5Api.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js",
       "relative_path": "import/DataSourceMt5ApiImportCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "16948d13cea06914114b0ac8eb7e9f2a33f4b4a971b47f02f73607d51afd0ac3",
+      "sha256": "fa8e2a2b192d6bbb197e38bc6f877d5266ac756028ecac833af6336c02225e0c",
       "target": "import/DataSourceMt5ApiImportCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/importPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/importPopup.html",
       "relative_path": "import/importPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "ab509b08fba2eaf229fd730dcd3903d7f29e8771b46fcec622c14002f0fc534d",
+      "sha256": "68a3b4e1c8715711e8e217f71026464e0283fed09ada9e32792c24fc3d9857e1",
       "target": "import/importPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/module.js",
       "relative_path": "import/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "be83c1440c68759c7cdc15e56a4bca6b555abfebefbbc3f9b4ee3ee2eb120b2b",
+      "sha256": "87679901e632c6b29aeb60afe1a42a0df022fa91944e8df4d654afa3334e3555",
       "target": "import/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "dc4ae11253a5aa5ff958570fdd437c1fba754f86c12ea9ecdb095cdfe31c8312",
+      "sha256": "a3d82ded3f568ec62b46a78a335bb0afefac571900231a27317105c26ae00644",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-mt5api-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "de2b14fb90168a0f3ca4e8c5d11d48faf027fe8c61f115e9d0bce7441e7eee0b",
+      "sha256": "dd3e0fb5b20de72985be1316dfddc605632a01fb9b0d62bec85f74cfd6ded098",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -142,5 +177,10 @@
       "path": "source-map.json",
       "reason": "Structural manifest, not behavioral evidence ledger."
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

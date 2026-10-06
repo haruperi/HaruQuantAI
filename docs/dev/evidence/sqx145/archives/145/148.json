@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckMonteCarloRetest/CrossCheckMonteCarloRetest.jar",
+  "sha256": "e2f5937574171309bcfb4dc9ada19eff0195f767383e614187b06a71a941c43b",
+  "class_count": 7,
+  "unique_class_entries": 7,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult.class": "851c5007b29a91a93f7cd35ceec8b361f0491a8687604e68a1caeea15fb0ee74",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1.class": "9625da3fdb24f1b9b81dd3a7c65f7d127e3e6084bd915ae0bfbf8d285dcf28ad",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2.class": "aadd9f2254f3f0308f62118c4aae26c4c36b5532e67880542278315bddcec675",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob.class": "20ed06c55319a2481b3592ce19fae44e14dcdbbf80ba2eb1fe7de022eecc042d",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1.class": "2179241078a49bc3be495996df029a6f2b3351f2670d53ca6c376ebea6a1c52b",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin.class": "99a486f00fb9bc3ade973d63692a99cb942778ee1db1a2e70dc0ffa105e90a45",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet.class": "7ff5dd1d58b849a475c760a74d33f0a20c03d3d7a703d067039abbfbd1bc30f4"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult.class",
+      "occurrence": 0,
+      "sha256": "851c5007b29a91a93f7cd35ceec8b361f0491a8687604e68a1caeea15fb0ee74",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1.class",
+      "occurrence": 0,
+      "sha256": "9625da3fdb24f1b9b81dd3a7c65f7d127e3e6084bd915ae0bfbf8d285dcf28ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2.class",
+      "occurrence": 0,
+      "sha256": "aadd9f2254f3f0308f62118c4aae26c4c36b5532e67880542278315bddcec675",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob.class",
+      "occurrence": 0,
+      "sha256": "20ed06c55319a2481b3592ce19fae44e14dcdbbf80ba2eb1fe7de022eecc042d",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1.class",
+      "occurrence": 0,
+      "sha256": "2179241078a49bc3be495996df029a6f2b3351f2670d53ca6c376ebea6a1c52b",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin.class",
+      "occurrence": 0,
+      "sha256": "99a486f00fb9bc3ade973d63692a99cb942778ee1db1a2e70dc0ffa105e90a45",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet.class",
+      "occurrence": 0,
+      "sha256": "7ff5dd1d58b849a475c760a74d33f0a20c03d3d7a703d067039abbfbd1bc30f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/148/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/148/001.json",
+      "sha256": "b9bcc2e0ce3deb9b8077540ee0428692068ce190bb487f06f6d3f564bf6e4ba2"
+    }
+  ]
+}

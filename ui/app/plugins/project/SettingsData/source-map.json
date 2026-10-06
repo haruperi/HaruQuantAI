@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only SettingsData recursive bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsData",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,101 +28,136 @@
   "source_catalog": [
     {
       "id": "sqx-settingsdata-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData",
       "family": "bounded installed project data-settings frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/ComplexitiesService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/ComplexitiesService.js",
       "relative_path": "ComplexitiesService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "535c013adc719f256623be684513671e37f6c6552c03d2ff1edbd688a374d2a4",
+      "sha256": "e1977eb87121ed1047db8e929c84ec683b8a79666359d7d95d0f79bfefd2a884",
       "target": null,
       "classification": "excluded",
-      "limitation": "Native chart-complexity/schema management has no assigned current data-form counterpart."
+      "limitation": "Native chart-complexity/schema management has no assigned current data-form counterpart. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/DataCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/DataCtrl.js",
       "relative_path": "DataCtrl.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3ae3ae19f486f92f89f37cd2debe45facefab7a1124d0d280e029d6707eb0dd8",
+      "sha256": "f79eb17dc1f9d1ed37761b2b82eff1078ae002c8efc074e57c7a9630ee0fa596",
       "target": "DataCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity."
+      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/DataService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/DataService.js",
       "relative_path": "DataService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "1bc6fbc37d2049dd6e1330a85a122b0f5560eb0f1621a3d41e3c5ead9fd2a283",
+      "sha256": "a171dd2f380e07c8613de0bb0c9f5b006f628b9cb7182447f1363c8a3697122c",
       "target": null,
       "classification": "excluded",
-      "limitation": "Native XML project setup, commission loading, OOS recalculation and backend behavior are absent; retained independent shared fixtures are external target support."
+      "limitation": "Native XML project setup, commission loading, OOS recalculation and backend behavior are absent; retained independent shared fixtures are external target support. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "c1214467e76d75742b4a7cf18db098b57bd51e10aa03a93c4f2b28642baf2ac2",
+      "sha256": "82769ac81c049f692a0e58b561dc87ce7e3dbf5216cc92fbb9b0714aad8f823a",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity."
+      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/SettingsData.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/SettingsData.jar",
       "relative_path": "SettingsData.jar",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "69be16089a6f5ec0e6160e9f4980abf384b8ac57449de32a687fc8e0e8fdd3f1",
+      "sha256": "94a9bfd2150182df7abdce887f87121cc44ba4421c2725e247fd9588418f42da",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary is outside approved frontend-only scope."
+      "limitation": "Backend binary is outside approved frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "95161ffd8163e80953e47b9a22de2be8bc6b7af946b60075a72d047f09199762",
+      "sha256": "9215613d208a38278670f000a21d6d2c8d1400569e8ecff099366f7d485a2be5",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Coordinator-owned independently authored retained data-specific styles; creation/verification pending integration."
+      "limitation": "Coordinator-owned independently authored retained data-specific styles; creation/verification pending integration. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsdata-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsData/views/data.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsData/views/data.html",
       "relative_path": "views/data.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "ef6b959f474d574a939dafeaaa063243e74c38c3462d0f0efc35d34366654808",
+      "sha256": "95a2c3f5eb1c7290c98c333cb272341430f6a3a657b151675018fb0ca2b3df5f",
       "target": "views/data.tsx",
       "classification": "counterpart",
-      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity."
+      "limitation": "Existing local prototype responsibility only; no native runtime, quantitative or persistence parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -144,6 +179,9 @@
   "limitations": [
     "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity.",
     "Existing local drafts, preset date parsing, validation error, range rounding and all target task visibility preserved.",
-    "Coordinator-owned CSS, facade rewiring and owner-decision registry integration are pending."
-  ]
+    "Coordinator-owned CSS, facade rewiring and owner-decision registry integration are pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

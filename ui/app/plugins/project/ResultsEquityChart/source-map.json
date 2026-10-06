@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsEquityChart bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsEquityChart",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "version": 1,
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+    "version": 1
   },
   "owner": {
     "feature": "FEAT-UI-PROJECT_WORKBENCH",
@@ -28,127 +28,172 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
       "id": "sqx-resultsequitychart-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/benchmark.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/benchmark.html",
       "relative_path": "benchmark/benchmark.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "ca3bf0a2b4d0c88be50c0509e8dfabed481460305b0d308edcab779a3677ff00",
+      "sha256": "bd3770d9eec01918c74ec81f72fc68d6e106dc18f2df555ce503b5656cd28e3c",
       "target": "benchmark/benchmark.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/Benchmark.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/Benchmark.js",
       "relative_path": "benchmark/Benchmark.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a2475d9df11dbc90be5594ec6367bda3fdffb9be7b04bd7f393d8370ba61ffa1",
+      "sha256": "cb19019a9b15770f5693c0aee1d7f812d2ba89e1c9828a20769e234508b3c860",
       "target": "benchmark/Benchmark.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/BenchmarkCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/BenchmarkCtrl.js",
       "relative_path": "benchmark/BenchmarkCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "d702f4464e5266abbee0c2be4e143e321fa1353c3010c949e04cba494d704cac",
+      "sha256": "e92548b4227c6bf42c2c31808a69b48fb1126558c7588f690c2eec114aa4a21f",
       "target": "benchmark/BenchmarkCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/equityChart.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/equityChart.html",
       "relative_path": "equityChart.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "36a9ec3b239c61a492104d32a863427c69c82c3ab28af91723824d63f1023139",
+      "sha256": "77ea2179fa1dee4650e5eee9714f35cb7e0226c92f694fc1ba167fa7f582d55d",
       "target": "equityChart.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartCtrl.js",
       "relative_path": "EquityChartCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "7a5e380a6a463682290737181d065a66cce6277e9d84edf5307c1d8517f06285",
+      "sha256": "ea6b7afd24bc34debfbe50b3169f8ca8db1b5a31f6061d811dc907135744ef00",
       "target": "EquityChartCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js",
       "relative_path": "EquityChartService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "0f72cac89cb2a6dc28bdb5640da9d1551bed8582965cfdfc08ff9417cb19eb48",
+      "sha256": "609d84f4dfff0ef32c7f5e1d91efc6372a4eceba4207c6ba2aa68575e5479129",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services."
+      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9c0baca2f50be624d2f85ae0806a584673448170c16a4e4d8f3a7f8aba9340e4",
+      "sha256": "ffe97b108de8349cb31c62f27cde9c37f3299e0bf86e6199d7ee4b816920e166",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
       "relative_path": "ResultsEquityChart.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "d13f1ffdd75ec94f33d7c383b5a8239f3f1a28700b4aed2303041cbd936e4645",
+      "sha256": "070932946751314323159f9a5a84d499b1b66924907a093d582f0ce9a7812c54",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsequitychart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3cd3c3eed4ab6f1cad46aaa2ba6cb19b92d78aa5efa352c2c362923d73b62bb5",
+      "sha256": "bcc20159b57b5c49fb9fbdf274bccfda9885a491411d059a9b2977a5c5859dd4",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -190,6 +235,9 @@
   "limitations": [
     "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
     "Views/analyses remain session-only; reports/charts are precomputed approximations.",
-    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
-  ]
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

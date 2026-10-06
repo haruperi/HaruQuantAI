@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsTradelistViews bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsTradelistViews",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "version": 1,
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+    "version": 1
   },
   "owner": {
     "feature": "FEAT-UI-PROJECT_WORKBENCH",
@@ -28,88 +28,118 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews",
       "id": "sqx-resultstradelistviews-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "e123ed423852db22006619e9c24e467e6bb5756405f8d79f5fe655a0111eff76",
+      "sha256": "da34b45a9763b296b38bc6a8090068d5d8e1fbb983b3aa73ea46d5f5362c4891",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
       "relative_path": "ResultsTradelistViews.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "f0b240c1d0907dc879d423d426dff448569f01d2e7b6c67427f4b21fc4feddd7",
+      "sha256": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "f45ac87f37cc17df419896f64e7baf39b49635bf74239e98234cf5a54f61019e",
+      "sha256": "9a950c324de112ca59cbee39af5a030bf2b3a6cc8f1041f48996123b43494da1",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing view-manager styling uses shared modal/export selectors retained in coordinator-owned host stylesheet."
+      "limitation": "Existing view-manager styling uses shared modal/export selectors retained in coordinator-owned host stylesheet. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/tradelistViews.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/tradelistViews.html",
       "relative_path": "tradelistViews.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "36071615902f14efae01dc04b030e32a4adb5752b1f821c8a881c214a97b32c8",
+      "sha256": "73e3bfac95c3921cca371c3966850a8ec177ce0fbb2ebe60b2f1ccfb60b7ffe5",
       "target": "tradelistViews.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsCtrl.js",
       "relative_path": "TradelistViewsCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "6ce4559a4d257b6ef2ff131ed70077a462a95394893e52450993027750faef63",
+      "sha256": "9aafcb8403bc0f0f911f3039a21f376f34dcffec7668545d8e08e7b8838baf96",
       "target": "TradelistViewsCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradelistviews-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js",
       "relative_path": "TradelistViewsService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "992554c18962198aa124187be2b70ab84a073af1143509b77321a5f70351bd71",
+      "sha256": "8c3164cdccce3c46aaca4b0d3b952ecbb588b8a2d55169db1a51556f877653a3",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services."
+      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -151,6 +181,9 @@
   "limitations": [
     "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
     "Views/analyses remain session-only; reports/charts are precomputed approximations.",
-    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
-  ]
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

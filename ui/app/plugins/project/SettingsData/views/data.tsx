@@ -3,7 +3,7 @@ import { SqdFieldset, SqdHelpLink, SqdSelect, SqdTextInput } from '../../Project
 import { dataTabDefaults, oosPresets, type DataTabState, type OosRange } from '../../ProjectWorkbench/settings/sharedSettingsFixtures';
 
 /**
- * "Data" tab (donor evidence SQX144-EV-000041): the main chart setup editor
+ * "Data" tab (donor evidence retained target UI; current donor equivalence unverified): the main chart setup editor
  * plus the "Data range parts" fieldset with the five most-used presets and
  * the OOS range rows. Sub-editors (symbol picker cloud) are donor-style
  * fixture selects.

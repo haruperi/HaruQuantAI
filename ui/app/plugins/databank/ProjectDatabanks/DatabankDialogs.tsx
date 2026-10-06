@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 
 /**
- * SQX-parity databanks dialogs (donor evidence SQX144-EV-000030).
+ * SQX-style databanks dialogs (donor evidence retained target UI; current donor equivalence unverified).
  * Titles, fields, buttons, and message texts follow the installed donor
  * templates verbatim, including the donor misspelling in the Retest title.
  */

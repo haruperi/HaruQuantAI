@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+  "archive_sha256": "0e9a2fcba6c8457afbf3412a09c50572f207d04290e96469cefa9858f33aaf64",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiPlugin.class",
+      "occurrence": 0,
+      "sha256": "1b6c09b0bab1c74749e0b0334cfb82bb81b5894730b3b402dd270570344f2af9",
+      "name": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "dataSourceFilesServlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "4484b3c8e5de91fa3b9cfd00b59efb33c98e2c2281cfe6f1dc8d5949653bc087",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "d9bea42dd00f9a02fe88e351a0fc0cd715db3ef8e5d90eadd17715a436455c33",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiPlugin",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1.class",
+      "occurrence": 0,
+      "sha256": "38412b5c7bbdb9b7ed601b8673619014187cfe951a2884757e93e047465c3816",
+      "name": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/json/JSONObject;Lorg/json/JSONObject;)I",
+          "access": 1,
+          "code_sha256": "e5c662fae808ffc4aba0b2b20f6c260123befe1cf90da5884f8637d6810239ce",
+          "code_length": 38
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "4187f9342db55fe6b29932a6d974c3927f91320a1f60dd3be984caa8c5d04e78",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/json/JSONObject;>;",
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Comparator",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2.class",
+      "occurrence": 0,
+      "sha256": "6e8364d89b847dc0e26eab94c672673d386c874d1d0c61e67263e92eefdd1e02",
+      "name": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet.class",
+      "occurrence": 0,
+      "sha256": "c95f1a84d82f2685d6cf9c40ceb5d233be9ee3698cbfc5dfdc40b6687c82d80e",
+      "name": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "formaterDate",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 0
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e990d32b0ffa04dbabdfc7d5158812370c4849b73abf468b0f9f76a889f4cdd7",
+          "code_length": 14
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "9adcb209fe12698a0014283ff0cf0086db06bcf301abf42764b3dd99e790a9bc",
+          "code_length": 186,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "updateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bc1106b20eac3e95d3f03aff9243b3b5e331e41e904e2affa488736b3d0ec4fc",
+          "code_length": 159,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onLoadAvailableSymbols",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "eb38f70b7bda1437b1960c4bf01f5f519f005097782c03d0966ed912384bb3a6",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "117fcea805595d70fab41e9c66cf3067974da40f651ab44b4d6bf296f3f75a25",
+          "code_length": 80,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onImportData",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "978237fe0df81b02a69385e06d678e774f19b5cef62acb30e3356540ff65157a",
+          "code_length": 599,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "addData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/mt5api/Mt5ApiManager$Source;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "28531abd664e803737b6ab0ff4cbd1849a5b0b8852c4896e75814a9274a5cc27",
+          "code_length": 357,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a755a56d0c99dd0c9f261a7cdc914f297a22daa7720039aa4d6b90fb6786430d",
+          "code_length": 238,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b27cb63c93cbd6f6189622983cfada8dd2240ad9592a1d1fe7e378f81d3a2459",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/broker/BrokerDto",
+        "com/strategyquant/datalib/broker/BrokerManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$1",
+        "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet$2",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/mt5api/Mt5ApiImportInfo",
+        "com/strategyquant/tradinglib/mt5api/Mt5ApiManager",
+        "com/strategyquant/tradinglib/mt5api/Mt5ApiManager$Source",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "org/joda/time/format/DateTimeFormat",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

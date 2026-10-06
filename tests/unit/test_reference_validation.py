@@ -1,12 +1,12 @@
 """Exercise evidence lineage, registries and unavailable runtime gates.
 
 Description:
-    Temporary repository copies retain historical hashes while mutations test
+    Temporary current reference copies isolate ledger/source/registry mutations and test
     schema, IDs, source links, ownership and CLI failures. Shared stores are absent.
 Purpose:
-    FEAT-HOST-EVIDENCE; DEC-HOST-P00-HISTORICAL-EVIDENCE and SCHEMA-EVOLUTION.
+    FEAT-HOST-EVIDENCE; DEC-HOST-SQX145-REFERENCE and SCHEMA-EVOLUTION.
 Key Capabilities:
-    - FR-HOST-EVIDENCE-LEDGER-INTEGRITY: Assert history/current schema and lineage.
+    - FR-HOST-EVIDENCE-LEDGER-INTEGRITY: Assert current schema, sources and lineage.
       Associated: ledger tests; Logging: caplog verifies integrity events.
     - FR-HOST-EVIDENCE-OWNERSHIP-GATES: Assert proposals and runtime refusal.
       Associated: ownership tests; Logging: warning/error gap events are asserted.
@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import json
 import logging
-import shutil
 from pathlib import Path
 
 import pytest
@@ -31,27 +30,35 @@ from tests.reference import validate
 
 
 @pytest.fixture
-def repository(tmp_path: Path) -> Path:
+def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Copy bounded current evidence; member coverage has its own integration gate."""
     source = Path(__file__).resolve().parents[2]
     root = tmp_path / "repo"
-    shutil.copytree(source / "docs/dev/evidence", root / "docs/dev/evidence")
+    for path in (source / "docs/dev/evidence").rglob("*"):
+        if path.is_file() and not any(
+            part in {"archives", "members"} for part in path.parts
+        ):
+            target = root / path.relative_to(source)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(path.read_bytes())
     for locator in (
         "docs/dev/sqx-full-application-roadmap.md",
         "app/host/README.md",
         "tests/reference/p00-fixtures.json",
     ):
-        path = root / locator
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes((source / locator).read_bytes())
+        target = root / locator
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((source / locator).read_bytes())
     ownership = json.loads((root / "docs/dev/evidence/p00-ownership.json").read_text())
     for registry in ownership["existing_ui_registries"]:
-        path = root / registry["readme"]
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes((source / registry["readme"]).read_bytes())
+        target = root / registry["readme"]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((source / registry["readme"]).read_bytes())
+    monkeypatch.setattr(validate, "reconcile_metadata", lambda *_: {})
     return root
 
 
-def test_actual_baseline_and_logs(
+def test_current_ledger_ownership_and_logs(
     repository: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     caplog.set_level(logging.INFO)
@@ -72,7 +79,7 @@ def test_actual_baseline_and_logs(
     "mutation,code",
     [
         ("schema", "LEDGER_SCHEMA"),
-        ("duplicate_id", "RECORD_ID_COLLISION"),
+        ("duplicate_id", "RECORD_ID_ALLOCATION"),
         ("low_id", "RECORD_ID_ALLOCATION"),
         ("catalog", "SOURCE_CATALOG"),
         ("registry", "REGISTRY_ID"),
@@ -84,7 +91,11 @@ def test_actual_baseline_and_logs(
         ("clean_room", "LEDGER_SCHEMA"),
         ("location", "SOURCE_LOCATION"),
         ("source_path", "SOURCE_LOCATOR"),
-        ("history_hash", "HISTORY_HASH"),
+        ("source_hash", "SOURCE_HASH"),
+        ("allocation_high_water", "RECORD_ID_ALLOCATION"),
+        ("wrong_cohort", "LEDGER_SCHEMA"),
+        ("proposed_owner", "PROPOSED_MAPPING"),
+        ("donor_hash", "SOURCE_DONOR_BINDING"),
         ("schema_remote", "LEDGER_SCHEMA"),
         ("cycle", "SUPERSESSION_CYCLE"),
     ],
@@ -97,17 +108,17 @@ def test_ledger_failures(repository: Path, mutation: str, code: str) -> None:  #
     if mutation == "schema":
         data["extra"] = True
     elif mutation == "duplicate_id":
-        data["records"]["SQX144-EV-000001"] = data["records"].pop(key)
+        data["records"]["SQX145-EV-000001"] = data["records"].pop(key)
     elif mutation == "low_id":
-        data["records"]["SQX144-EV-000000"] = data["records"].pop(key)
+        data["records"]["SQX145-EV-000000"] = data["records"].pop(key)
     elif mutation == "catalog":
         record["sources"][0]["catalog_id"] = "E-R99"
     elif mutation == "registry":
         record["target_mapping"]["requirement_ids"] = ["FR-HOST-UNREGISTERED"]
     elif mutation == "link":
-        record["relationships"]["supports_records"] = ["SQX144-EV-999999"]
+        record["relationships"]["supports_records"] = ["SQX145-EV-999999"]
     elif mutation == "supersession":
-        record["relationships"]["superseded_by"] = "SQX144-EV-000090"
+        record["relationships"]["superseded_by"] = "SQX145-EV-000133"
     elif mutation == "passed_empty":
         record["validation"]["actual_observation"] = None
     elif mutation == "passed_artifact":
@@ -122,18 +133,35 @@ def test_ledger_failures(repository: Path, mutation: str, code: str) -> None:  #
         )
     elif mutation == "source_path":
         record["sources"][0]["artifact_locator"] = "../escape"
-    elif mutation == "history_hash":
-        historical = repository / data["historical_snapshot"]["ledger_locator"]
-        historical.write_bytes(historical.read_bytes() + b" ")
+    elif mutation == "source_hash":
+        record["sources"][0]["fingerprint"]["value"] = "f" * 64
+    elif mutation == "allocation_high_water":
+        data["allocation_high_water_mark"] = 132
+    elif mutation == "wrong_cohort":
+        record["reference_scope"]["build"] = "unsupported-build"
+    elif mutation == "proposed_owner":
+        proposed = next(
+            r
+            for r in data["records"].values()
+            if r["target_mapping"]["registration_status"] == "proposed"
+        )
+        proposed["target_mapping"]["feature_ids"] = ["FEAT-HOST-UNREGISTERED"]
+    elif mutation == "donor_hash":
+        donor = next(
+            r
+            for r in data["records"].values()
+            if r["sources"][0]["catalog_id"] == "E-L14"
+        )
+        donor["sources"][0]["fingerprint"]["value"] = "f" * 64
     elif mutation == "schema_remote":
         schema_path = repository / "docs/dev/evidence/reimplementation.schema.json"
         schema = json.loads(schema_path.read_text())
         schema["$ref"] = "https://example.invalid/schema"
         schema_path.write_text(json.dumps(schema))
     else:
-        other = data["records"]["SQX144-EV-000090"]
-        record["relationships"]["superseded_by"] = "SQX144-EV-000090"
-        record["relationships"]["supersedes_records"] = ["SQX144-EV-000090"]
+        other = data["records"]["SQX145-EV-000133"]
+        record["relationships"]["superseded_by"] = "SQX145-EV-000133"
+        record["relationships"]["supersedes_records"] = ["SQX145-EV-000133"]
         other["relationships"]["superseded_by"] = key
         other["relationships"]["supersedes_records"] = [key]
     path.write_text(json.dumps(data))
@@ -179,11 +207,11 @@ def test_cli_offline_and_failures(
     )
     assert validate.main([]) == 0
     assert any(r.__dict__.get("fr_id") == validate.CLI_FR for r in caplog.records)
-    monkeypatch.delenv("SQX_REFERENCE_ROOT", raising=False)
+    monkeypatch.delenv("SQX_145_REFERENCE_ROOT", raising=False)
     assert validate.main(["--check-donor"]) == 1
     path = repository / "tests/reference/p00-fixtures.json"
     data = json.loads(path.read_text())
-    data["cases"][0]["evidence_ids"] = ["SQX144-EV-999999"]
+    data["cases"][0]["evidence_ids"] = ["SQX145-EV-999999"]
     data["cases"][0]["capture_artifact"] = "missing.json"
     path.write_text(json.dumps(data))
     assert validate.main([]) == 1

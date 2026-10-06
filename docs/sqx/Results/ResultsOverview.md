@@ -1,139 +1,41 @@
 # ResultsOverview.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverview.jar`.
-- SHA-256: `9a97ec7cf2324e744f87a5e5039e7365cb162713ca4ff5b0cc324a6bf7dcfa23`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **2**; non-nested: **2**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverview.jar`.
+- **SHA-256:** `d728475561b669238963858dd91145cbc03ca0e4a4955445ce73f6a4c42c80aa`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 2 raw entries; 2 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-RESULTS-RESULTS-OVERVIEW`, P08; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [206.json](../../dev/evidence/sqx145/archives/145/206.json).
 
-The `Results` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/206/001.json) — SHA-256 `28a9c4d3245e0cda57f664e982399723288e977f489e4288ee85c48ff9077791`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Results.impl.Overview`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C547e64a92adf["OverviewServlet"] {
-        -Log
-        -LOCK_OVERVIEWSERVLET
-        -rgProvider
-        #execute()
-        +getTemplates()
-    }
-    class C8246e427501f["OverviewServletPlugin"] {
-        -dataContext
-        -servlet
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getHandler()
-        +containsResult()
-    }
-    class C180e0c3f58c3["AbstractResultsPlugin"]
-    class C9ceba9ba4bac["IResultsGroupProvider"]
-    class C8900f90ae594["HttpJSONServlet"]
-    C8900f90ae594 <|-- C547e64a92adf : declared extends
-    C547e64a92adf ..> C9ceba9ba4bac : field type
-    C180e0c3f58c3 <|-- C8246e427501f : declared extends
-    C8246e427501f ..> C547e64a92adf : field type
+    class C0["OverviewServlet"]
+    class C1["OverviewServletPlugin"]
+    class E0["HttpJSONServlet"]
+    E0 <|-- C0
+    class E1["AbstractResultsPlugin"]
+    E1 <|-- C1
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C547e64a92adf` | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` (this JAR) | this diagram |
-| `C8246e427501f` | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` (this JAR) | this diagram |
-| `C180e0c3f58c3` | [`com.strategyquant.tradinglib.results.AbstractResultsPlugin`](../Shared/SQTradingLib.md) | referenced external type |
-| `C9ceba9ba4bac` | [`com.strategyquant.tradinglib.results.IResultsGroupProvider`](../Shared/SQTradingLib.md) | referenced external type |
-| `C8900f90ae594` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | class | non-nested |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | extends | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / class declaration: `public class com.strategyquant.plugin.Results.impl.Overview.OverviewServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / field declaration: `private static final java.lang.String LOCK_OVERVIEWSERVLET;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onGetOverviewContent(java.util.Map<java.lang.String, java.lang.String[]>);` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | [`com.strategyquant.tradinglib.results.IResultsGroupProvider`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / field declaration: `private static com.strategyquant.tradinglib.results.IResultsGroupProvider rgProvider;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | [`com.strategyquant.tradinglib.results.IResultsGroupProvider`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / method signature: `public com.strategyquant.plugin.Results.impl.Overview.OverviewServlet(com.strategyquant.tradinglib.results.IResultsGroupProvider);` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onGetOverviewContent(java.util.Map<java.lang.String, java.lang.String[]>);` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`public org.json.JSONArray getTemplates() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` | `org.json.JSONArray` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` / method signature: `public org.json.JSONArray getTemplates() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | [`com.strategyquant.tradinglib.results.AbstractResultsPlugin`](../Shared/SQTradingLib.md) | extends | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / class declaration: `public class com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin extends com.strategyquant.tradinglib.results.AbstractResultsPlugin` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `org.eclipse.jetty.servlet.ServletContextHandler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / field declaration: `private org.eclipse.jetty.servlet.ServletContextHandler dataContext;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `com.strategyquant.plugin.Results.impl.Overview.OverviewServlet` (this JAR) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / field declaration: `private com.strategyquant.plugin.Results.impl.Overview.OverviewServlet servlet;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / method signature: `public java.lang.String getProduct();`<br>`public java.lang.String getKey();` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `org.eclipse.jetty.server.Handler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / method signature: `public org.eclipse.jetty.server.Handler getHandler();` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | [`com.strategyquant.tradinglib.ResultsGroup`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / method signature: `public boolean containsResult(com.strategyquant.tradinglib.ResultsGroup);` |
-| `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` | `org.json.JSONObject` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin` / method signature: `public org.json.JSONObject getInitializationData() throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Results.impl.Overview.OverviewServlet</summary>
-
-```text
-public class com.strategyquant.plugin.Results.impl.Overview.OverviewServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet
-    private static final org.slf4j.Logger Log;
-    private static final java.lang.String LOCK_OVERVIEWSERVLET;
-    private static com.strategyquant.tradinglib.results.IResultsGroupProvider rgProvider;
-    public com.strategyquant.plugin.Results.impl.Overview.OverviewServlet(com.strategyquant.tradinglib.results.IResultsGroupProvider);
-    protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;
-    private java.lang.String onGetOverviewContent(java.util.Map<java.lang.String, java.lang.String[]>);
-    public org.json.JSONArray getTemplates() throws java.lang.Exception;
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin extends com.strategyquant.tradinglib.results.AbstractResultsPlugin
-    private org.eclipse.jetty.servlet.ServletContextHandler dataContext;
-    private com.strategyquant.plugin.Results.impl.Overview.OverviewServlet servlet;
-    public com.strategyquant.plugin.Results.impl.Overview.OverviewServletPlugin();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public org.eclipse.jetty.server.Handler getHandler();
-    public boolean containsResult(com.strategyquant.tradinglib.ResultsGroup);
-    public java.lang.String getKey();
-    public org.json.JSONObject getInitializationData() throws java.lang.Exception;
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Results/impl/Overview/OverviewServlet.class` | 0 | `337feae255a60817c3784dd3f38e0276d98bbb335cb8cd7e8171b62fd7dfb2b3` | 3 | 6 |
+| `com/strategyquant/plugin/Results/impl/Overview/OverviewServletPlugin.class` | 0 | `fb0f096ea4bac6af89023b428cd12276940942bc07337d1416296b457f3dbe52` | 2 | 8 |

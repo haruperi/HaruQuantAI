@@ -1,0 +1,1118 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-reactor-3.1-2.27.0-alpha.jar",
+  "archive_sha256": "be1db19d7861a5a878c2329fb7b2c9ad35a15d898460b6a1e70a399b95af54a5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1.class",
+      "occurrence": 0,
+      "sha256": "a5b23147cd112bee5d760168233536fd40817356610b48b1dfa5b1186cad561a",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$Lifter.class",
+      "occurrence": 0,
+      "sha256": "c6cf65a3f1f929de6e2a94f6f6e31fb9bb2be687b1f083a3cf80a922219ac362",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$Lifter",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/function/BiFunction"
+      ],
+      "fields": [
+        {
+          "name": "asyncOperationEndStrategy",
+          "descriptor": "Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;)V",
+          "access": 0,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lreactor/core/Scannable;Lreactor/core/CoreSubscriber;)Lreactor/core/CoreSubscriber;",
+          "access": 1,
+          "code_sha256": "b05e3a58046a05439804a26c51a909df917ecfd8aa36b5ebbd85077e19555fa2",
+          "code_length": 15,
+          "generic_signature": "(Lreactor/core/Scannable;Lreactor/core/CoreSubscriber<-TT;>;)Lreactor/core/CoreSubscriber<-TT;>;"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b23fedc3692d0c87fd3566d54d8841ffe1a5ba388e9114f9c366ee6fb38b4a22",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/function/BiFunction<Lreactor/core/Scannable;Lreactor/core/CoreSubscriber<-TT;>;Lreactor/core/CoreSubscriber<-TT;>;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$Lifter",
+        "io/opentelemetry/instrumentation/reactor/v3_1/TracingSubscriber",
+        "java/lang/Object",
+        "java/util/function/BiFunction",
+        "reactor/core/CoreSubscriber",
+        "reactor/core/Scannable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$RunnableWrapper.class",
+      "occurrence": 0,
+      "sha256": "59c80e2faf616377aba1b06594879b2754547cc6663dd34f470139d2b2fb4d22",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$RunnableWrapper",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/lang/Runnable;",
+          "access": 18
+        },
+        {
+          "name": "context",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 0,
+          "code_sha256": "f8c7732efd2ed64791bb85b006a834f4df9067130497db8656118aac5901de20",
+          "code_length": 17
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f0591c7debd50745f572d111450ace0161cf0381032e60a9b619ec3d00cbb054",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$RunnableWrapper",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingFlux.class",
+      "occurrence": 0,
+      "sha256": "6b5b9161ffa0012741bf9dcca2ff36e564977734a561a01bdbd788bf6661230a",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingFlux",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "reactor/core/publisher/Flux",
+      "interfaces": [
+        "reactor/core/Scannable"
+      ],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Lreactor/core/publisher/Flux;",
+          "access": 18,
+          "generic_signature": "Lreactor/core/publisher/Flux<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lreactor/core/publisher/Flux;)Lreactor/core/publisher/Flux;",
+          "access": 8,
+          "code_sha256": "3a6ba0e61369fb65c3427da5a1a166f2f81147e4a765ee7f8764efa81bbf810a",
+          "code_length": 18,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lreactor/core/publisher/Flux<TT;>;)Lreactor/core/publisher/Flux<TT;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lreactor/core/publisher/Flux;)V",
+          "access": 2,
+          "code_sha256": "59031a27eed85745c63ae4e83cbef2e4285c2956e26d4965ec22afa3cb55cbbf",
+          "code_length": 10,
+          "generic_signature": "(Lreactor/core/publisher/Flux<*>;)V"
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Lreactor/core/CoreSubscriber;)V",
+          "access": 1,
+          "code_sha256": "ba5d14b028ba7936ab634437401bc4af4766a85285c203469f327a1552830bd5",
+          "code_length": 8,
+          "generic_signature": "(Lreactor/core/CoreSubscriber<-Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "scanUnsafe",
+          "descriptor": "(Lreactor/core/Scannable$Attr;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2c5e131d20f88deb5a82e9e969d6152c0b319435aa71420510c035ebe19c8fb7",
+          "code_length": 14
+        },
+        {
+          "name": "lambda$create$0",
+          "descriptor": "(Lreactor/core/publisher/Flux;Ljava/lang/Object;)Lorg/reactivestreams/Publisher;",
+          "access": 4106,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "Lreactor/core/publisher/Flux<Ljava/lang/Object;>;Lreactor/core/Scannable;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingFlux",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "reactor/core/Scannable",
+        "reactor/core/Scannable$Attr",
+        "reactor/core/publisher/Flux"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingMono.class",
+      "occurrence": 0,
+      "sha256": "89c54e084fca245616b8d916725142b9acaaabba17498fc12fe7b81622c8df6d",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingMono",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "reactor/core/publisher/Mono",
+      "interfaces": [
+        "reactor/core/Scannable"
+      ],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Lreactor/core/publisher/Mono;",
+          "access": 18,
+          "generic_signature": "Lreactor/core/publisher/Mono<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lreactor/core/publisher/Mono;)Lreactor/core/publisher/Mono;",
+          "access": 8,
+          "code_sha256": "3a6ba0e61369fb65c3427da5a1a166f2f81147e4a765ee7f8764efa81bbf810a",
+          "code_length": 18,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lreactor/core/publisher/Mono<TT;>;)Lreactor/core/publisher/Mono<TT;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lreactor/core/publisher/Mono;)V",
+          "access": 2,
+          "code_sha256": "59031a27eed85745c63ae4e83cbef2e4285c2956e26d4965ec22afa3cb55cbbf",
+          "code_length": 10,
+          "generic_signature": "(Lreactor/core/publisher/Mono<*>;)V"
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Lreactor/core/CoreSubscriber;)V",
+          "access": 1,
+          "code_sha256": "ba5d14b028ba7936ab634437401bc4af4766a85285c203469f327a1552830bd5",
+          "code_length": 8,
+          "generic_signature": "(Lreactor/core/CoreSubscriber<-Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "scanUnsafe",
+          "descriptor": "(Lreactor/core/Scannable$Attr;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2c5e131d20f88deb5a82e9e969d6152c0b319435aa71420510c035ebe19c8fb7",
+          "code_length": 14
+        },
+        {
+          "name": "lambda$create$0",
+          "descriptor": "(Lreactor/core/publisher/Mono;Ljava/lang/Object;)Lreactor/core/publisher/Mono;",
+          "access": 4106,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "Lreactor/core/publisher/Mono<Ljava/lang/Object;>;Lreactor/core/Scannable;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingMono",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "reactor/core/Scannable",
+        "reactor/core/Scannable$Attr",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$StoreOpenTelemetryContext.class",
+      "occurrence": 0,
+      "sha256": "df9d48f05b47ebc8c7995b99ecdf0ba1648f67d642c7f45c6fd8e484bf97dbba",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$StoreOpenTelemetryContext",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/function/Function"
+      ],
+      "fields": [
+        {
+          "name": "tracingContext",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/Context;)V",
+          "access": 2,
+          "code_sha256": "c409b7c2dbb249a5ba44328a46d977cf8cf881653f57fd1124a42139303578e2",
+          "code_length": 10
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lreactor/util/context/Context;)Lreactor/util/context/Context;",
+          "access": 1,
+          "code_sha256": "0840e12b772c2d3bdd7c97e9ca654b750ffc93dadd29197185646f178f867148",
+          "code_length": 9
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "cb4578d752ab069d290126725b213c74c21671739d1ca56f0f06bbafaf3936fe",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/Context;Lio/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/function/Function<Lreactor/util/context/Context;Lreactor/util/context/Context;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$StoreOpenTelemetryContext",
+        "java/lang/Object",
+        "java/util/function/Function",
+        "reactor/util/context/Context"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator.class",
+      "occurrence": 0,
+      "sha256": "711fe9cd7236d2648e5b870aea0c38e5fe01e852bc2e89b0bc8ad78756ec0255",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "MONO_CONTEXT_WRITE_METHOD",
+          "descriptor": "Ljava/lang/invoke/MethodHandle;",
+          "access": 26
+        },
+        {
+          "name": "FLUX_CONTEXT_WRITE_METHOD",
+          "descriptor": "Ljava/lang/invoke/MethodHandle;",
+          "access": 26
+        },
+        {
+          "name": "SCHEDULERS_HOOK_METHOD",
+          "descriptor": "Ljava/lang/invoke/MethodHandle;",
+          "access": 26
+        },
+        {
+          "name": "asyncOperationEndStrategy",
+          "descriptor": "Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 18
+        },
+        {
+          "name": "TRACE_CONTEXT_KEY",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "enabled",
+          "descriptor": "Z",
+          "access": 74
+        }
+      ],
+      "methods": [
+        {
+          "name": "getContextWriteMethod",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;",
+          "access": 10,
+          "code_sha256": "5c3a6fd3983453764fcf8d41b83ffe69c8ec6c86bc12a95f2bdbfb50450e62e0",
+          "code_length": 36,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/invoke/MethodHandle;"
+        },
+        {
+          "name": "getSchedulersHookMethod",
+          "descriptor": "()Ljava/lang/invoke/MethodHandle;",
+          "access": 10,
+          "code_sha256": "4d9ffd97e7445880c2e13c70bb9dbbefb1bc99d2d4e6565be9133dadb239bd30",
+          "code_length": 33
+        },
+        {
+          "name": "create",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator;",
+          "access": 9,
+          "code_sha256": "53c72db6147dd7ff3dae6797033012d065a31a5fdb12cb3febd1d206e1aace34",
+          "code_length": 7
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder;",
+          "access": 9,
+          "code_sha256": "458e0df8e176dd2e7bfe240033127a0c4dbbda06cb1eadbc5375ee6cc016ded9",
+          "code_length": 8
+        },
+        {
+          "name": "storeOpenTelemetryContext",
+          "descriptor": "(Lreactor/util/context/Context;Lio/opentelemetry/context/Context;)Lreactor/util/context/Context;",
+          "access": 9,
+          "code_sha256": "05770599359e833159f917d133dbb37aa780856aa21f6cd40431cdd9a29ddc89",
+          "code_length": 11
+        },
+        {
+          "name": "getOpenTelemetryContext",
+          "descriptor": "(Lreactor/util/context/Context;Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Context;",
+          "access": 9,
+          "code_sha256": "9cbcea92946883ca4ef5f0ce0ec42b7c24ebfe5463d0a3d891b660fc2936dddf",
+          "code_length": 14
+        },
+        {
+          "name": "getOpenTelemetryContextFromContextView",
+          "descriptor": "(Lreactor/util/context/ContextView;Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Context;",
+          "access": 9,
+          "code_sha256": "9755c7357da1a5ab31bf85f8f4178967fc4dd14a8228ab5c34ab62954fb239c6",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "6c7182a9f7092b924831259987d431fbb1239139ea045b74de7d6a094fafa21f",
+          "code_length": 19
+        },
+        {
+          "name": "registerOnEachOperator",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0939523edc3b328c95d1dc209d41170c081006fa432f16199c336f811a441b1a",
+          "code_length": 68
+        },
+        {
+          "name": "registerScheduleHook",
+          "descriptor": "(Ljava/lang/String;Ljava/util/function/Function;)V",
+          "access": 10,
+          "code_sha256": "bb85615a86873469ada2c3962034e6dbb9fb8b508e8286536e084d0533fbdd22",
+          "code_length": 32,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/function/Function<Ljava/lang/Runnable;Ljava/lang/Runnable;>;)V"
+        },
+        {
+          "name": "resetOnEachOperator",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e96b21fa8d482443695977fe49ada33cc671a95600c88c0786989ed9114111df",
+          "code_length": 48
+        },
+        {
+          "name": "tracingLift",
+          "descriptor": "(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;)Ljava/util/function/Function;",
+          "access": 10,
+          "code_sha256": "3b421a53d536afe4fbf5d7419b29ced00f2f734295503b8c47419a4c7af02927",
+          "code_length": 17,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;)Ljava/util/function/Function<-Lorg/reactivestreams/Publisher<TT;>;+Lorg/reactivestreams/Publisher<TT;>;>;"
+        },
+        {
+          "name": "runWithContext",
+          "descriptor": "(Lreactor/core/publisher/Mono;Lio/opentelemetry/context/Context;)Lreactor/core/publisher/Mono;",
+          "access": 9,
+          "code_sha256": "9fdf0446e410cf7ce28c39300f67043480ad79145a99c87b431d22720b845428",
+          "code_length": 43,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lreactor/core/publisher/Mono<TT;>;Lio/opentelemetry/context/Context;)Lreactor/core/publisher/Mono<TT;>;"
+        },
+        {
+          "name": "runWithContext",
+          "descriptor": "(Lreactor/core/publisher/Flux;Lio/opentelemetry/context/Context;)Lreactor/core/publisher/Flux;",
+          "access": 9,
+          "code_sha256": "9b8e645f50726ab7020403c25481a9e0efc0cef6e1dad7f92653a19cdbf98328",
+          "code_length": 43,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lreactor/core/publisher/Flux<TT;>;Lio/opentelemetry/context/Context;)Lreactor/core/publisher/Flux<TT;>;"
+        },
+        {
+          "name": "sneakyThrow",
+          "descriptor": "(Ljava/lang/Throwable;)Ljava/lang/Throwable;",
+          "access": 10,
+          "code_sha256": "83e863e416e1aee9f9330bb60e382e85eeb997b95d2bc7654c785d8e62c2ab42",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<T:Ljava/lang/Throwable;>(Ljava/lang/Throwable;)TT;^TT;"
+        },
+        {
+          "name": "shouldInstrument",
+          "descriptor": "(Lreactor/core/Scannable;)Z",
+          "access": 10,
+          "code_sha256": "437e7f0c75b2e40415abeb9798d177bb8d85adb52f9fff2cf2028f160ad7d42a",
+          "code_length": 13
+        },
+        {
+          "name": "subscribeInActiveSpan",
+          "descriptor": "(Lreactor/core/CoreSubscriber;Ljava/lang/Object;)V",
+          "access": 8,
+          "code_sha256": "bc22472e9f19ba9ad77667d2ed9f8fa1ad5fa1d6bacabee454fcd49836eb00cf",
+          "code_length": 95,
+          "generic_signature": "(Lreactor/core/CoreSubscriber<-Ljava/lang/Object;>;Ljava/lang/Object;)V"
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9e0979f57f25de8d6e1292a9cc497dedbd200bc18f45a23a5f9e582b54ef7685",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$1",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$Lifter",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$RunnableWrapper",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingFlux",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$ScalarPropagatingMono",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator$StoreOpenTelemetryContext",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder",
+        "io/opentelemetry/instrumentation/reactor/v3_1/TracingSubscriber",
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/ReflectiveOperationException",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/Void",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandle",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/MethodType",
+        "java/util/function/Function",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "reactor/core/CoreSubscriber",
+        "reactor/core/Fuseable",
+        "reactor/core/Fuseable$ScalarCallable",
+        "reactor/core/publisher/Flux",
+        "reactor/core/publisher/Hooks",
+        "reactor/core/publisher/Mono",
+        "reactor/core/publisher/Operators",
+        "reactor/core/scheduler/Schedulers",
+        "reactor/util/context/Context",
+        "reactor/util/context/ContextView"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder.class",
+      "occurrence": 0,
+      "sha256": "b7e0e1af58f568aa7a2a04002fc0b28cf231ee60c8ca253295dcad42b04fb404",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "captureExperimentalSpanAttributes",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setCaptureExperimentalSpanAttributes",
+          "descriptor": "(Z)Lio/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder;",
+          "access": 1,
+          "code_sha256": "350cf897d56f63a4e8e8d5036956074d674f60c75e163de0f4f3a1c9f170445b",
+          "code_length": 7
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator;",
+          "access": 1,
+          "code_sha256": "0f3bbd4c8ac73205da8b4750d1b643e6740bbb6b445f53310f2e110d1ae74883",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperatorBuilder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$1.class",
+      "occurrence": 0,
+      "sha256": "5d67d681d2e5230588098f817a3d8273a67fce100943d2f6dd35fc0a02db839d",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$instrumenter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;",
+          "access": 4112
+        },
+        {
+          "name": "val$context",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 4112
+        },
+        {
+          "name": "val$request",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4112
+        },
+        {
+          "name": "val$responseType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;Lio/opentelemetry/context/Context;Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "c11ed8d149329e81418cae563b357962d8af240b4ac65f6c5fcc988d55846940",
+          "code_length": 35
+        },
+        {
+          "name": "end",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 4,
+          "code_sha256": "f19c4d7670100c893a73fe5f639eb9d5d181c270b5339e12bf350e420e38d7eb",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport",
+        "io/opentelemetry/instrumentation/api/instrumenter/Instrumenter",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$1",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer.class",
+      "occurrence": 0,
+      "sha256": "4086ad89fb15caef3c4943c9c79b592b5929d126ab42251f3e3ba8d800ff8db8",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/util/concurrent/atomic/AtomicBoolean",
+      "interfaces": [
+        "java/lang/Runnable",
+        "java/util/function/Consumer"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "context",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;Lio/opentelemetry/context/Context;)V",
+          "access": 0,
+          "code_sha256": "bff085d324337a39c40872c628fe4bc4d2126b5ce26c3974a2a1dc6c109e4c4e",
+          "code_length": 16
+        },
+        {
+          "name": "onSuccess",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "1eab170b57bbc699cca50f7038c826f046eb345cb7a183ddb94261feff6175d7",
+          "code_length": 7,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;)V"
+        },
+        {
+          "name": "onCancel",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d11f4d3f0c8870ed40599b134a609e1e10d3c3dba939ad4a08996f1436129767",
+          "code_length": 46
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "49408e0198125b51a757233bf4dd5a35eda3d9b858eeb709186569e661c5fadc",
+          "code_length": 7
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "25042d67da72f1f50eb641b4f3ff954a6de7f68a5497840410d6cc6bc105ec98",
+          "code_length": 7
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 2,
+          "code_sha256": "fd42bd2d09e90fb94b690c0335daa20e15120c843d68a75e1b1b7dc78f14faff",
+          "code_length": 16
+        },
+        {
+          "name": "end",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1024
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "c15445fa03a8cf35a313b28695603f005b5ac27fdb14e4209422d25d6d9b8822",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/util/concurrent/atomic/AtomicBoolean;Ljava/lang/Runnable;Ljava/util/function/Consumer<Ljava/lang/Throwable;>;",
+      "class_references": [
+        "io/opentelemetry/api/trace/Span",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer",
+        "java/lang/Boolean",
+        "java/lang/Runnable",
+        "java/lang/Throwable",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "java/util/function/Consumer"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy.class",
+      "occurrence": 0,
+      "sha256": "f8e9d9dcfc9c83deab7008fd15e9f9e52f6f84890a64747c2dfe7f36a45954d6",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy"
+      ],
+      "fields": [
+        {
+          "name": "CANCELED_ATTRIBUTE_KEY",
+          "descriptor": "Lio/opentelemetry/api/common/AttributeKey;",
+          "access": 24,
+          "generic_signature": "Lio/opentelemetry/api/common/AttributeKey<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "captureExperimentalSpanAttributes",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 9,
+          "code_sha256": "04c8895fa46fdb51ea460d9c8cfda19e69df3b7c12789fd1b4ff99f8cb3a5fd0",
+          "code_length": 7
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder;",
+          "access": 9,
+          "code_sha256": "212f6324551ef40079ee306dfc53202b7174b492245f1dbdd09e27d4129ba8dc",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "37d1d22d72d0a3de3d4e91a2f58a4303248d258814b23af3cd33d187116971a3",
+          "code_length": 10
+        },
+        {
+          "name": "supports",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "18350a011caf44806acb7d58e03afe8c213c887abdb5204cb7bcb9fd82437034",
+          "code_length": 24,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "end",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3cc38875d79496ae2505352ba29aaeee65b1786d5fd88dcc296a3c36499c44c5",
+          "code_length": 115,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Lio/opentelemetry/context/Context;TREQUEST;Ljava/lang/Object;Ljava/lang/Class<TRESPONSE;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;)Z",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3eeec375478064f71f1762a04cb89dddfd5750b856507ead7d751c6cbbc8a8c0",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$1",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy$EndOnFirstNotificationConsumer",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Objects",
+        "org/reactivestreams/Publisher",
+        "reactor/core/publisher/Flux",
+        "reactor/core/publisher/Mono"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder.class",
+      "occurrence": 0,
+      "sha256": "d55987605ef79e0195754a3c8cfb07ad2b476781fa20e6870e4d715c5e75b675",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "captureExperimentalSpanAttributes",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setCaptureExperimentalSpanAttributes",
+          "descriptor": "(Z)Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder;",
+          "access": 1,
+          "code_sha256": "350cf897d56f63a4e8e8d5036956074d674f60c75e163de0f4f3a1c9f170445b",
+          "code_length": 7
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy;",
+          "access": 1,
+          "code_sha256": "0f3bbd4c8ac73205da8b4750d1b643e6740bbb6b445f53310f2e110d1ae74883",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ReactorAsyncOperationEndStrategyBuilder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/reactor/v3_1/TracingSubscriber.class",
+      "occurrence": 0,
+      "sha256": "1603f0d3d58dfab1e0dd0578d0dff76df37c5cb99051e778a39530ab74d2cc09",
+      "name": "io/opentelemetry/instrumentation/reactor/v3_1/TracingSubscriber",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "reactor/core/CoreSubscriber"
+      ],
+      "fields": [
+        {
+          "name": "fluxRetrySubscriberClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "fluxRetryWhenSubscriberClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "traceContext",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        },
+        {
+          "name": "subscriber",
+          "descriptor": "Lorg/reactivestreams/Subscriber;",
+          "access": 18,
+          "generic_signature": "Lorg/reactivestreams/Subscriber<-TT;>;"
+        },
+        {
+          "name": "context",
+          "descriptor": "Lreactor/util/context/Context;",
+          "access": 18
+        },
+        {
+          "name": "hasContextToPropagate",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;Lreactor/util/context/Context;)V",
+          "access": 1,
+          "code_sha256": "bb6329ac05104c82915433eacbf2ea43eecdd12dd3d49ce7edeb496539082e44",
+          "code_length": 10,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TT;>;Lreactor/util/context/Context;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;Lreactor/util/context/Context;Lio/opentelemetry/context/Context;)V",
+          "access": 1,
+          "code_sha256": "55bcdb26ccc0db595519dadb04145a76cfa92861efa36cfc743d3e785e258dc8",
+          "code_length": 60,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TT;>;Lreactor/util/context/Context;Lio/opentelemetry/context/Context;)V"
+        },
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscription;)V",
+          "access": 1,
+          "code_sha256": "88c9702b8dcdf0700ce84dfdfa6f8dfae63efe6af33983335e25a1762a982d00",
+          "code_length": 53
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "963b032eca14612661bceea6889d5d5820ce0f301413f0ca4c8e63142271d6c0",
+          "code_length": 53,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "1b3abee82079e58742aed7b78e6d1f28140b0d84b3c4f6e81c737c2fed7cc40d",
+          "code_length": 114
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "11b393e6679b4d34fb66dd543a9f8358bca2c4b77aa578acbe8495aea005f942",
+          "code_length": 50
+        },
+        {
+          "name": "currentContext",
+          "descriptor": "()Lreactor/util/context/Context;",
+          "access": 1,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "openScope",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 2,
+          "code_sha256": "5bb899d85f2939aec834c161c6c3bb7a9c4627fbf494ec6f91db1d66b3ab4154",
+          "code_length": 19
+        },
+        {
+          "name": "openScope",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Scope;",
+          "access": 10,
+          "code_sha256": "c56f36a1633b6832a130db5e4c9aa5c4ac302332aaa9a932069f61a5f1bcbba3",
+          "code_length": 15
+        },
+        {
+          "name": "getFluxRetrySubscriberClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 10,
+          "code_sha256": "296688cf3fb3ab371e7a989da59c103dd6334700da4787426c9a91a2a1ca8837",
+          "code_length": 9,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "getFluxRetryWhenSubscriberClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 10,
+          "code_sha256": "d7880d5ca39d2ca8b301c0e87f3fce06d49030f79cbfae5d1691338b0b906bde",
+          "code_length": 9,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "lambda$onError$1",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 4098,
+          "code_sha256": "c715f8769a611fdb5325f805fc13dec0e9fd2c248f21a442d5f23f139f2f4a68",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$onError$0",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 4106,
+          "code_sha256": "28eeed1e7f6585d8b5c9ecd586ae9cfb3b8b05567c3e7b59e4b87968cc3040a8",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "911449f34d8a908f3b16119d5937247eacf18b80a14420e0dc2cf34187e8e4f6",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lreactor/core/CoreSubscriber<TT;>;",
+      "class_references": [
+        "io/opentelemetry/api/trace/Span",
+        "io/opentelemetry/api/trace/SpanContext",
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/instrumentation/reactor/v3_1/ContextPropagationOperator",
+        "io/opentelemetry/instrumentation/reactor/v3_1/TracingSubscriber",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/function/Supplier",
+        "org/reactivestreams/Subscriber",
+        "org/reactivestreams/Subscription",
+        "reactor/core/CoreSubscriber",
+        "reactor/util/context/Context"
+      ]
+    }
+  ]
+}

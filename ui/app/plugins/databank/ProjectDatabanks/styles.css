@@ -1,4 +1,4 @@
-/* SQX-parity databanks splitter (donor evidence SQX144-EV-000025..027) */
+/* SQX-style databanks splitter (donor evidence retained target UI; current donor equivalence unverified) */
 .sq-splitter{flex:1;min-height:0;display:flex;flex-direction:column}
 .sq-splitter-top{position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;overflow:hidden}
 .sq-splitter-top>.module-area{flex:1;min-height:0}

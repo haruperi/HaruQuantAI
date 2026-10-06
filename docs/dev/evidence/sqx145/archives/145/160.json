@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar",
+  "sha256": "fcec4232af5eccc490262dae6ea853be6edbf8e02d341ac784d1bf222add7a05",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CryptoExchange/impl/CoinbasePro/CryptoExchangeCoinbaseProPlugin.class": "f63b7cf66e9272b9e4309501e0a2466caa949dc53f1eac038dbaf3831ee91da4"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/CoinbasePro/CryptoExchangeCoinbaseProPlugin.class",
+      "occurrence": 0,
+      "sha256": "f63b7cf66e9272b9e4309501e0a2466caa949dc53f1eac038dbaf3831ee91da4",
+      "member_shard": "docs/dev/evidence/sqx145/members/160/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/160/001.json",
+      "sha256": "be8cbe8d918f4754782968fc19241d153e9699127206bbd3cc3db3e68ee740fd"
+    }
+  ]
+}

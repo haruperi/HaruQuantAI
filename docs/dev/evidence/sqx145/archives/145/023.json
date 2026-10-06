@@ -1,0 +1,223 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-logging-1.2.jar",
+  "sha256": "daddea1ea0be0f56978ab3006b8ac92834afeefbd9b7e4e6316fca57df0fa636",
+  "class_count": 28,
+  "unique_class_entries": 28,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "org/apache/commons/logging/impl/AvalonLogger.class": "f9427e8fa378fb831fe7d054787a948ef99a677ba9817c194d8c68d986f1ad57",
+    "org/apache/commons/logging/impl/SimpleLog.class": "c506cac8cc49b52e68ac9a7733ec85000ced8e58eb7ae1e37fb7472777b46734",
+    "org/apache/commons/logging/impl/Log4JLogger.class": "06900a59cc23825afc7f4b553be4b0f86b3921cd1a77e5834543177b9c0bcd79",
+    "org/apache/commons/logging/impl/WeakHashtable.class": "f422e02a277445e8e06d4fc70a95537bf151fbc6bc89f5b9dd78099d6b44fe27",
+    "org/apache/commons/logging/impl/WeakHashtable$1.class": "f0b97758f88d7537c99733a86c178d9153f5e4210121e87cfa7bc520d7705adc",
+    "org/apache/commons/logging/impl/Jdk14Logger.class": "4a4110e2db0818ea7450eb6dd0d8a40471c0b35f3a6a2e6e4a302476a101ffa3",
+    "org/apache/commons/logging/impl/ServletContextCleaner.class": "76342437e114f9c93bb8b1f0e0cc2e657e167af99cd879dc3a893d33036813a6",
+    "org/apache/commons/logging/impl/WeakHashtable$WeakKey.class": "d05a1da35de6015a965c86e03be65cc16cadca2aa861fb8921ab23888ae0f49a",
+    "org/apache/commons/logging/impl/NoOpLog.class": "9227b39903c04bf379e7cd0fe9c353640feba172826431545c86bde4c28edb19",
+    "org/apache/commons/logging/impl/LogKitLogger.class": "8e2ee10e0665a76118b186cd092910a9d35760980e2d7b09a2c7f70c977596d3",
+    "org/apache/commons/logging/impl/LogFactoryImpl$3.class": "4999c0dbf350ed5d0ea40f5639eb84746fa4b1b440d0c68a22a96bf20718a3f8",
+    "org/apache/commons/logging/impl/LogFactoryImpl$1.class": "32a9df68b3d3eb474bc7407d8d7f4d675bbe7e8a993678f8e29ddc244e8350fa",
+    "org/apache/commons/logging/impl/WeakHashtable$Referenced.class": "40bae0ec2c8903f5dad4619b912997524774d487cff3c7844e69ee9bfae63ea6",
+    "org/apache/commons/logging/impl/SimpleLog$1.class": "87bfd399e8c651bfe5b8e20349de8777fe3febd5c419a06b631967b2708e8f36",
+    "org/apache/commons/logging/impl/Jdk13LumberjackLogger.class": "622c5a3e5064e04be7b239f2cc2111f9217f1a302c51ffe83eaceff613a773df",
+    "org/apache/commons/logging/impl/LogFactoryImpl.class": "e95346565a25b7547c8b08b9474a9473a6765c60584b5806b570b066e25d2de7",
+    "org/apache/commons/logging/impl/LogFactoryImpl$2.class": "c4c53510a440d61d96526b5ce17b18b3a397ab6730132eb4149326c20caf28d6",
+    "org/apache/commons/logging/impl/WeakHashtable$Entry.class": "092716c667b99f160ba3e68f0ae58d3bf0d091dfab5413ede208998f0f2854e3",
+    "org/apache/commons/logging/LogSource.class": "c315741f45ebe0b0a1438f8272bc7daacba268bc3c578eb92790b562845e9246",
+    "org/apache/commons/logging/LogFactory$4.class": "1efefab7835d51f495978d2a25eaba6b800c275be77454c987ad63bcdefedb1a",
+    "org/apache/commons/logging/LogFactory$3.class": "b943569622c0d48d6a2343e90f090bd10bdd0e1c9a119842cef354c66d1a2825",
+    "org/apache/commons/logging/LogFactory$6.class": "c6a6b22e7c3c6ecb9009e59892176e03468a998632555acdb607e5dd31ce21a3",
+    "org/apache/commons/logging/LogConfigurationException.class": "713bcf0e265adb22235d9ac7d7a954a70df45bb7d91187c4a21f421049a4e7b7",
+    "org/apache/commons/logging/LogFactory.class": "9ef05a717b80acfaa616e69e0cecf12c4f12f1ac16a588fac836ef0a92088bd9",
+    "org/apache/commons/logging/LogFactory$5.class": "8920912c7f16b39ff946cfac78da4c9927734c3063033eff153ce2a41354ca0a",
+    "org/apache/commons/logging/LogFactory$1.class": "fe66f560eb529b9df72763fb79ce77b2495a898f59909e5128f027a4cf1db393",
+    "org/apache/commons/logging/LogFactory$2.class": "dc836b785dff81f1062af4d0017ba295aa3f6c536284113e088cd3a646cbda7c",
+    "org/apache/commons/logging/Log.class": "015e092e7c1766216f573cce8097f4cb84f1a84568bea32ad92efdedaebecfdc"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "f330b87caf237afce2767bdac4d3dd9078fb7595696f22646e3b05336c625ba2",
+    "META-INF/NOTICE.txt": "785071a94ab6133000164bc6ed8543da88231503768dfeadcc83847af99cf8f8",
+    "META-INF/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "META-INF/maven/commons-logging/commons-logging/pom.xml": "c91ab5aa570d86f6fd07cc158ec6bc2c50080402972ee9179fe24100739fbb20",
+    "META-INF/maven/commons-logging/commons-logging/pom.properties": "be642bbccd99f68e5719cf264ddf5c6f8ee7597d85ebcb03a8697baaa3e6c262"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/apache/commons/logging/impl/AvalonLogger.class",
+      "occurrence": 0,
+      "sha256": "f9427e8fa378fb831fe7d054787a948ef99a677ba9817c194d8c68d986f1ad57",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/SimpleLog.class",
+      "occurrence": 0,
+      "sha256": "c506cac8cc49b52e68ac9a7733ec85000ced8e58eb7ae1e37fb7472777b46734",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Log4JLogger.class",
+      "occurrence": 0,
+      "sha256": "06900a59cc23825afc7f4b553be4b0f86b3921cd1a77e5834543177b9c0bcd79",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable.class",
+      "occurrence": 0,
+      "sha256": "f422e02a277445e8e06d4fc70a95537bf151fbc6bc89f5b9dd78099d6b44fe27",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$1.class",
+      "occurrence": 0,
+      "sha256": "f0b97758f88d7537c99733a86c178d9153f5e4210121e87cfa7bc520d7705adc",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Jdk14Logger.class",
+      "occurrence": 0,
+      "sha256": "4a4110e2db0818ea7450eb6dd0d8a40471c0b35f3a6a2e6e4a302476a101ffa3",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/ServletContextCleaner.class",
+      "occurrence": 0,
+      "sha256": "76342437e114f9c93bb8b1f0e0cc2e657e167af99cd879dc3a893d33036813a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$WeakKey.class",
+      "occurrence": 0,
+      "sha256": "d05a1da35de6015a965c86e03be65cc16cadca2aa861fb8921ab23888ae0f49a",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/NoOpLog.class",
+      "occurrence": 0,
+      "sha256": "9227b39903c04bf379e7cd0fe9c353640feba172826431545c86bde4c28edb19",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogKitLogger.class",
+      "occurrence": 0,
+      "sha256": "8e2ee10e0665a76118b186cd092910a9d35760980e2d7b09a2c7f70c977596d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$3.class",
+      "occurrence": 0,
+      "sha256": "4999c0dbf350ed5d0ea40f5639eb84746fa4b1b440d0c68a22a96bf20718a3f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$1.class",
+      "occurrence": 0,
+      "sha256": "32a9df68b3d3eb474bc7407d8d7f4d675bbe7e8a993678f8e29ddc244e8350fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$Referenced.class",
+      "occurrence": 0,
+      "sha256": "40bae0ec2c8903f5dad4619b912997524774d487cff3c7844e69ee9bfae63ea6",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/SimpleLog$1.class",
+      "occurrence": 0,
+      "sha256": "87bfd399e8c651bfe5b8e20349de8777fe3febd5c419a06b631967b2708e8f36",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/Jdk13LumberjackLogger.class",
+      "occurrence": 0,
+      "sha256": "622c5a3e5064e04be7b239f2cc2111f9217f1a302c51ffe83eaceff613a773df",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl.class",
+      "occurrence": 0,
+      "sha256": "e95346565a25b7547c8b08b9474a9473a6765c60584b5806b570b066e25d2de7",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/LogFactoryImpl$2.class",
+      "occurrence": 0,
+      "sha256": "c4c53510a440d61d96526b5ce17b18b3a397ab6730132eb4149326c20caf28d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/impl/WeakHashtable$Entry.class",
+      "occurrence": 0,
+      "sha256": "092716c667b99f160ba3e68f0ae58d3bf0d091dfab5413ede208998f0f2854e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogSource.class",
+      "occurrence": 0,
+      "sha256": "c315741f45ebe0b0a1438f8272bc7daacba268bc3c578eb92790b562845e9246",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$4.class",
+      "occurrence": 0,
+      "sha256": "1efefab7835d51f495978d2a25eaba6b800c275be77454c987ad63bcdefedb1a",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$3.class",
+      "occurrence": 0,
+      "sha256": "b943569622c0d48d6a2343e90f090bd10bdd0e1c9a119842cef354c66d1a2825",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$6.class",
+      "occurrence": 0,
+      "sha256": "c6a6b22e7c3c6ecb9009e59892176e03468a998632555acdb607e5dd31ce21a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogConfigurationException.class",
+      "occurrence": 0,
+      "sha256": "713bcf0e265adb22235d9ac7d7a954a70df45bb7d91187c4a21f421049a4e7b7",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory.class",
+      "occurrence": 0,
+      "sha256": "9ef05a717b80acfaa616e69e0cecf12c4f12f1ac16a588fac836ef0a92088bd9",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$5.class",
+      "occurrence": 0,
+      "sha256": "8920912c7f16b39ff946cfac78da4c9927734c3063033eff153ce2a41354ca0a",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$1.class",
+      "occurrence": 0,
+      "sha256": "fe66f560eb529b9df72763fb79ce77b2495a898f59909e5128f027a4cf1db393",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/LogFactory$2.class",
+      "occurrence": 0,
+      "sha256": "dc836b785dff81f1062af4d0017ba295aa3f6c536284113e088cd3a646cbda7c",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    },
+    {
+      "entry": "org/apache/commons/logging/Log.class",
+      "occurrence": 0,
+      "sha256": "015e092e7c1766216f573cce8097f4cb84f1a84568bea32ad92efdedaebecfdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/023/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/023/001.json",
+      "sha256": "8cb9dc8dc278b5bdc2f46554c9f5f7e10e368d1709300a43756f056eb3b99b5d"
+    }
+  ]
+}

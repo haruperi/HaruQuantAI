@@ -18,7 +18,7 @@ import {
 } from './settingsFixtures';
 
 /**
- * The "What to build" settings tab (donor evidence SQX144-EV-000039):
+ * The "What to build" settings tab (donor evidence retained target UI; current donor equivalence unverified):
  * the Strategy type radio set with its conditional sub-controls, and the
  * six "Additional build config" rows with gear popups and live description
  * strings. Fixture state only.

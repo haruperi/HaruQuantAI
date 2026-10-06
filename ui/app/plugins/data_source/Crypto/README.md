@@ -1,6 +1,6 @@
 # Crypto UI
 
-Donor: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`.
+Donor: `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`.
 Target: `HARUQUANTAI_ROOT/ui/app/plugins/data_source/Crypto`.
 Donor informs; specification owns. Independently written React code is retained.
 
@@ -46,3 +46,7 @@ Structural alignment does not establish SQX behavioral parity. Real exchange
 catalogue loading, market bars and backend lifecycle remain unsupported by this
 frontend cohort. Canonical reimplementation ledger/schema were not found;
 this manifest does not replace them and no new behavioral claim is recorded.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

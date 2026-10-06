@@ -1,0 +1,1402 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jProcesses-1.6.5.jar",
+  "archive_sha256": "57f61d01102f0e88e87c4a3cae6ccea3e5b390a38aeb3abd2ed20b06f25466ea",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/jutils/jprocesses/info/AbstractProcessesService.class",
+      "occurrence": 0,
+      "sha256": "b09503673a03a31cf975053aa35c9977d128565ebfc6069dead43460247f05a3",
+      "name": "org/jutils/jprocesses/info/AbstractProcessesService",
+      "major": 51,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jutils/jprocesses/info/ProcessesService"
+      ],
+      "fields": [
+        {
+          "name": "fastMode",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "getList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "21a50ead87f8dcd44e2f47d2d83d8495489f25f43ccb8488b2eafd4b86f47946",
+          "code_length": 6,
+          "generic_signature": "()Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Z)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8e2756e105b6838d0350665ff14eeadb68d6544d8898e57643c4ba842a9882ab",
+          "code_length": 7,
+          "generic_signature": "(Z)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d5363ca69dae49011f32e175f762cc1124958da1b3968a45f3fb66ca3b42475d",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Ljava/lang/String;Z)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "22085e54b8f4a841fd2bf52feb8f9463cad1b0f0969b2d8dbd5f24927aea4d8e",
+          "code_length": 25,
+          "generic_signature": "(Ljava/lang/String;Z)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "killProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1,
+          "code_sha256": "504cde8c2962c2f3942bb0b3260df4a564cecc9c35657f98c53ed6f1036832c3",
+          "code_length": 6
+        },
+        {
+          "name": "killProcessGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1,
+          "code_sha256": "020359a45938f4136a4fbaa0189743ff5a2a3c0bcb16b52f34d39384dc27e15a",
+          "code_length": 6
+        },
+        {
+          "name": "parseList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1028,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "getProcessesData",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1028
+        },
+        {
+          "name": "kill",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1028
+        },
+        {
+          "name": "killGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1028
+        },
+        {
+          "name": "buildInfoFromMap",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "974fdf66562f651d04c2469e27d8c6a9c89f35d292099b505d77933be5a2df91",
+          "code_length": 252,
+          "generic_signature": "(Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/jutils/jprocesses/info/AbstractProcessesService",
+        "org/jutils/jprocesses/info/ProcessesService",
+        "org/jutils/jprocesses/model/ProcessInfo"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/ProcessesFactory.class",
+      "occurrence": 0,
+      "sha256": "492d4e41ec7d717afda2a14a9d8fe0489e9d81920d13ca31ae13a7d7a4bd9ab7",
+      "name": "org/jutils/jprocesses/info/ProcessesFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getService",
+          "descriptor": "()Lorg/jutils/jprocesses/info/ProcessesService;",
+          "access": 9,
+          "code_sha256": "862916a867099a7c402362529dde751caf824f611312ff2e4307f807db1929e3",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "org/jutils/jprocesses/info/ProcessesFactory",
+        "org/jutils/jprocesses/info/UnixProcessesService",
+        "org/jutils/jprocesses/info/WindowsProcessesService",
+        "org/jutils/jprocesses/util/OSDetector"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/ProcessesService.class",
+      "occurrence": 0,
+      "sha256": "8a7c178a2b0b6ad70a6fb9ce94022343cad8fa4c6ef07d905debf14837d2bbd9",
+      "name": "org/jutils/jprocesses/info/ProcessesService",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Z)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Z)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getList",
+          "descriptor": "(Ljava/lang/String;Z)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/String;Z)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1025
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(IZ)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1025
+        },
+        {
+          "name": "killProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1025
+        },
+        {
+          "name": "killProcessGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1025
+        },
+        {
+          "name": "changePriority",
+          "descriptor": "(II)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jutils/jprocesses/info/ProcessesService"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/UnixProcessesService.class",
+      "occurrence": 0,
+      "sha256": "60f153107e9a2504795761713312746138d2dbfb318355d57910c1313df9bc82",
+      "name": "org/jutils/jprocesses/info/UnixProcessesService",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/jutils/jprocesses/info/AbstractProcessesService",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PS_COLUMNS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PS_FULL_COMMAND",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PS_COLUMNS_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "PS_FULL_COMMAND_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "nameFilter",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "5aa8b1d788997e7d70ad6fa3292d3ef3697f4be437a6f16c2bcd1c7707462aa6",
+          "code_length": 10
+        },
+        {
+          "name": "parseList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "a3cd1c4b5714460a8c78681c979f43bb7e0b12710a68e40a2462db0bd93c7c59",
+          "code_length": 434,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "getProcessesData",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "8e57ffda529bd851499d17776257946cd6d473b02eb0979c97962c4a21992d49",
+          "code_length": 75
+        },
+        {
+          "name": "kill",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 4,
+          "code_sha256": "21c939026406629494a74586ed4148d637c9910e2eee0065130eb80e8964fed2",
+          "code_length": 42
+        },
+        {
+          "name": "killGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 4,
+          "code_sha256": "76e36a8670927058eff2041b157cff42e02934bc18ed57562d2354b3a1b461ce",
+          "code_length": 42
+        },
+        {
+          "name": "changePriority",
+          "descriptor": "(II)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1,
+          "code_sha256": "62f3f08b569bfc312ff6cfb075d0d24b7fc0578e3fd1ce30858113186d717ac7",
+          "code_length": 49
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1,
+          "code_sha256": "f7c5de94cc3c126a187da2747cc55a8f4150484bc770f5fec87852f2f2b32bef",
+          "code_length": 7
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(IZ)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1,
+          "code_sha256": "746dc3904b454d391cfc2416d92a33e2dea29f2e6c233bd8cc45696d8f84a506",
+          "code_length": 253
+        },
+        {
+          "name": "loadFullCommandData",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 10,
+          "code_sha256": "19154a13bc30ec87c96aa49c54c7e61457fb26ea930f78714fd147498de21b2e",
+          "code_length": 203,
+          "generic_signature": "(Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;)V"
+        },
+        {
+          "name": "filterByName",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "ea5019832520b5e86b9f556b6392a7e39f565f6c83ff80525822f4ba8c14b80c",
+          "code_length": 75,
+          "generic_signature": "(Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bd7500423faffb7c1db2f7f5e12e81adcf0c422a31dbac2834d371e650461af3",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/PrintStream",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/text/ParseException",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map",
+        "org/jutils/jprocesses/info/AbstractProcessesService",
+        "org/jutils/jprocesses/info/UnixProcessesService",
+        "org/jutils/jprocesses/model/JProcessesResponse",
+        "org/jutils/jprocesses/model/ProcessInfo",
+        "org/jutils/jprocesses/util/OSDetector",
+        "org/jutils/jprocesses/util/ProcessesUtils"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/VBScriptHelper.class",
+      "occurrence": 0,
+      "sha256": "1d22384bfc5f7009d227ebc58e8418eb9ad7df01d139f0863efcaf6c580b951b",
+      "name": "org/jutils/jprocesses/info/VBScriptHelper",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CRLF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "e6f84021391cd39347eda2d3622e0057dc1e9414a8a504032debbddc4f240fdf",
+          "code_length": 498
+        },
+        {
+          "name": "getProcessesOwner",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "62b950f17642b27433000d458997cdd754c0505767e39e8f543e38a3e074001b",
+          "code_length": 130
+        },
+        {
+          "name": "changePriority",
+          "descriptor": "(II)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "5bd10037cc2a0f62d173c47b808e882db9ec949c485d4313e0274be24bf32480",
+          "code_length": 136
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedReader",
+        "java/io/File",
+        "java/io/FileWriter",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/Date",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "org/jutils/jprocesses/info/VBScriptHelper"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/info/WindowsProcessesService.class",
+      "occurrence": 0,
+      "sha256": "451668e6ab9be6305ea7781855448c9b9b31155f5a85fad391469635a8052264",
+      "name": "org/jutils/jprocesses/info/WindowsProcessesService",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/jutils/jprocesses/info/AbstractProcessesService",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "userData",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "cpuData",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "LINE_BREAK_REGEX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "keyMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "processMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "NAME_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PROCESSID_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "USERMODETIME_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PRIORITY_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "VIRTUALSIZE_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "WORKINGSETSIZE_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "COMMANDLINE_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CREATIONDATE_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CAPTION_PROPNAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "wmi4Java",
+          "descriptor": "Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/profesorfalken/wmi4java/WMI4Java;)V",
+          "access": 0,
+          "code_sha256": "4498680e642b06aa6737cc9d34cc73e1fae323331b5f4810548c389217b85613",
+          "code_length": 32
+        },
+        {
+          "name": "getWmi4Java",
+          "descriptor": "()Lcom/profesorfalken/wmi4java/WMI4Java;",
+          "access": 1,
+          "code_sha256": "c1a72809239b738454b48cd98a2254d3b03e6936b4ad2bf1d558771e3a40b701",
+          "code_length": 16
+        },
+        {
+          "name": "parseList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "567b659452e67bdfdd864037768f67ea6b2c9a4ea7cfda957e30f2ff1cbab208",
+          "code_length": 66,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "processLine",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "f282d405afe3d600a0680e39c11f4ca336ebf28144e11a52f0186ad613510190",
+          "code_length": 184,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;)V"
+        },
+        {
+          "name": "getProcessesData",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "14a18224b5fd78b63929152949e463bca4e912be9733dd3d60eaafd8420d07d0",
+          "code_length": 132
+        },
+        {
+          "name": "kill",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 4,
+          "code_sha256": "29938b2be30f7e014a4f083f567fa603abfae66b251e0ca81212390175acc346",
+          "code_length": 47
+        },
+        {
+          "name": "killGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 4,
+          "code_sha256": "6606d8afbdf07d1d20e7964277e95af4aca48e9ab9b5936101d9fa534fb9e593",
+          "code_length": 42
+        },
+        {
+          "name": "normalizeKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "8dc300d7f2414224bc4f4a2fd08c1172f4bd0412dff409dc6ec751ee01b1da87",
+          "code_length": 13
+        },
+        {
+          "name": "normalizeValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "31bcbfa7db974f97ba56121ac14c356d8716df0b30d3b0e2e4a501e603fe2d53",
+          "code_length": 84
+        },
+        {
+          "name": "nomalizeTime",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "b168b14f42b0f19ac2f9ab3d980b5681f4b163f137996e86ea46ee040677962b",
+          "code_length": 49
+        },
+        {
+          "name": "fillExtraProcessData",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "7dc90c6eef944704bd873d659e412cb99fa2040069a55bae83f40514e52c89a5",
+          "code_length": 225
+        },
+        {
+          "name": "checkAndGetDataInLine",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "aa04fd20a68531be5b8a60b82b2917f327d17300652f66517a67c5008cdfbd66",
+          "code_length": 30
+        },
+        {
+          "name": "changePriority",
+          "descriptor": "(II)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 1,
+          "code_sha256": "983cd58953f9566083ba062e2924ebc003affca4eff12d7605b3b9c104128330",
+          "code_length": 44
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1,
+          "code_sha256": "2d4a82aec294b347f5f1b2ca1f4dc0172ba3e1bc0ccbcd71bbb2068cb751ec4b",
+          "code_length": 7
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(IZ)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 1,
+          "code_sha256": "8f3f5f785518b72c6d809dcc5f1175e4bfc3b41c2aaae9697ccf8d1cf361286f",
+          "code_length": 251
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6946383235d111d54f41edd5bf1e91aefdce16c6d26da721c203980182df0090",
+          "code_length": 104
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/profesorfalken/wmi4java/WMI4Java",
+        "com/profesorfalken/wmi4java/WMIClass",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/jutils/jprocesses/info/AbstractProcessesService",
+        "org/jutils/jprocesses/info/VBScriptHelper",
+        "org/jutils/jprocesses/info/WindowsProcessesService",
+        "org/jutils/jprocesses/model/JProcessesResponse",
+        "org/jutils/jprocesses/model/ProcessInfo",
+        "org/jutils/jprocesses/util/ProcessesUtils"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/JProcesses.class",
+      "occurrence": 0,
+      "sha256": "eba81a71ac4c02f93b9e5a2707c57a486e1bb7673ea27f5f4633f41734d5deb5",
+      "name": "org/jutils/jprocesses/JProcesses",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fastMode",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lorg/jutils/jprocesses/JProcesses;",
+          "access": 9,
+          "code_sha256": "a74ea675dd0add17c00cfe757b8c0e1cfe86bf2e0f635f0652692ca67cd7882a",
+          "code_length": 8
+        },
+        {
+          "name": "fastMode",
+          "descriptor": "()Lorg/jutils/jprocesses/JProcesses;",
+          "access": 1,
+          "code_sha256": "dca36f7c7471791f650e080e6d448b4247255cbf2f94dbd56f0ab0c3a3f174f9",
+          "code_length": 7
+        },
+        {
+          "name": "fastMode",
+          "descriptor": "(Z)Lorg/jutils/jprocesses/JProcesses;",
+          "access": 1,
+          "code_sha256": "2f8d33bfd1c9d2faff66a9975a5dc5feb799d4989cfc6950c00a25dc374a0e8e",
+          "code_length": 7
+        },
+        {
+          "name": "listProcesses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "11750124310047afa6c51426e4e1dcf013e27a4bc45521433c825d181fbe6602",
+          "code_length": 13,
+          "generic_signature": "()Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "listProcesses",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "54c0fee35967f9fa0058493ea6cc57acee8f98e71f2fe09977e029ab1a4b3b13",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getProcessList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "8e2e373fe50df2b35d0a7d3e25ec8f237e9e8c67c4a4f687541ffcb69e36df82",
+          "code_length": 9,
+          "generic_signature": "()Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getProcessList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "0cae23135cd2cc48dfae2fd850b08240917e80a0607e102dabbda48979f8f3cc",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Lorg/jutils/jprocesses/model/ProcessInfo;>;"
+        },
+        {
+          "name": "getProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/ProcessInfo;",
+          "access": 9,
+          "code_sha256": "47342cb5495c9729f59afcc496c9ed9fec58907de412498ddbaa64e9767d488d",
+          "code_length": 10
+        },
+        {
+          "name": "killProcess",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 9,
+          "code_sha256": "a8e4cd10ea3075f8e46ba66ebf76f5d3a6b29aa1b5832cc59e248ac8ec4dfc81",
+          "code_length": 10
+        },
+        {
+          "name": "killProcessGracefully",
+          "descriptor": "(I)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 9,
+          "code_sha256": "bfc0b69dd8fb6434c643afcf55f2de0a42a90d1139abdf7652788a694ce10f81",
+          "code_length": 10
+        },
+        {
+          "name": "changePriority",
+          "descriptor": "(II)Lorg/jutils/jprocesses/model/JProcessesResponse;",
+          "access": 9,
+          "code_sha256": "a53806b51453d922a4941cab822a4632d9a85f66e2b36793e14dd3c8284c9493",
+          "code_length": 11
+        },
+        {
+          "name": "getService",
+          "descriptor": "()Lorg/jutils/jprocesses/info/ProcessesService;",
+          "access": 10,
+          "code_sha256": "dd138b992121bd58d9dc269f2d850eebaf890396ebe0058537b394888990382f",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jutils/jprocesses/JProcesses",
+        "org/jutils/jprocesses/info/ProcessesFactory",
+        "org/jutils/jprocesses/info/ProcessesService"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/JProcessesResponse.class",
+      "occurrence": 0,
+      "sha256": "2c2489fd52f476f70f7d4eda6111845ee25ac2815f4cb7f577294df4ad1fda9e",
+      "name": "org/jutils/jprocesses/model/JProcessesResponse",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "success",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "message",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isSuccess",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setSuccess",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jutils/jprocesses/model/JProcessesResponse"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/ProcessInfo.class",
+      "occurrence": 0,
+      "sha256": "e8a4b692366d3432ca498b0017e8f4d9a6217fbaa20558cc29b8372f6804915f",
+      "name": "org/jutils/jprocesses/model/ProcessInfo",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pid",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "time",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "user",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "virtualMemory",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "physicalMemory",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "cpuUsage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "startTime",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "priority",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "command",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "extraData",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "630ee2c2ba90fed1ed58e142010290d536984043d210b0138452ef4864f60870",
+          "code_length": 73
+        },
+        {
+          "name": "getPid",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "setPid",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "935836f6468fbbdce3aa550163b41db4acc66eaba962e885841470780dddd4d2",
+          "code_length": 6
+        },
+        {
+          "name": "getTime",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "setTime",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "48fb720aa2a9b68dfbb952c6e9e11d36348ceb48bf0fec91e3294ba5ac037a6d",
+          "code_length": 6
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "getUser",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "setUser",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3187f710dcb01652de862560cc7782b805f200c9af0d7b1df750b2924081e43c",
+          "code_length": 6
+        },
+        {
+          "name": "getVirtualMemory",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "setVirtualMemory",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4b4a95718f47d6e120ea908206ec14d71a5ef30340520d38301caa02852d54b7",
+          "code_length": 6
+        },
+        {
+          "name": "getPhysicalMemory",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "setPhysicalMemory",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cfbe938644294b083b0cc711c69496b4a235b8f0d50b61163d82f107bf8b36e8",
+          "code_length": 6
+        },
+        {
+          "name": "getCpuUsage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "setCpuUsage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "31aaee38ace5ee5e60a16dfda67e573c0bac2df9b69a2a5567cd9fdf37b96d9f",
+          "code_length": 6
+        },
+        {
+          "name": "getStartTime",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "setStartTime",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "351e4151526ca3f9a50a82cb2419ff6265804f4471b94c2b05ef40c1aeda7b22",
+          "code_length": 6
+        },
+        {
+          "name": "getCommand",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "setCommand",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "357112b46d606be3030f83e27bd517dbb0e2e88b28fb5eb166beeb8eeaf6e331",
+          "code_length": 6
+        },
+        {
+          "name": "getPriority",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "setPriority",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b5c6632fdead94e6cf5d078f9da49015f7742cbf1bf22678e79eecefc50ff91a",
+          "code_length": 6
+        },
+        {
+          "name": "getExtraData",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "setExtraData",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "addExtraData",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "569ac13637794509588a4d29f91dc32991fced36105b47da0d83f3c8abd61e73",
+          "code_length": 13
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "88c6429ccb68af3ca04d323ca73f533f89ed9cd3b09965aaf9e28817ab1081aa",
+          "code_length": 228
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6564ea7e34b93ee5dd7070c488e553e20ab99b2ccb2ef9a4875c3d913dc1006b",
+          "code_length": 141
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b976cfa235750220ffbbb580837181dac36eaf7ec8547765392eb8361fecd21d",
+          "code_length": 71
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/jutils/jprocesses/model/ProcessInfo"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/model/WindowsPriority.class",
+      "occurrence": 0,
+      "sha256": "9d2093fea5897e53196d69c72e1ce5b67fc9cc848cae1fca08f4bcd8c4ac5f31",
+      "name": "org/jutils/jprocesses/model/WindowsPriority",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IDLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BELOW_NORMAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NORMAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ABOVE_NORMAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HIGH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "REAL_TIME",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/jutils/jprocesses/model/WindowsPriority"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/util/OSDetector.class",
+      "occurrence": 0,
+      "sha256": "10beb167d48abdd1238c1cb1dd29199e7bd90a735da510ef626d049aca62edfa",
+      "name": "org/jutils/jprocesses/util/OSDetector",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isWindows",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "1459546edf6740133e397adc8ad3cd3af96f8469989def6629107f125c3af1f9",
+          "code_length": 9
+        },
+        {
+          "name": "isMac",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "2331e9c25674079dfdb78a6284a6c3a8ce77d894d2a22b25bd15c3d551d3198a",
+          "code_length": 9
+        },
+        {
+          "name": "isUnix",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "a769abd6401d981f4768a23b1e7668ab4f09c47463d8cca8247334a89d968e9c",
+          "code_length": 50
+        },
+        {
+          "name": "isLinux",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "b7bdc83e3b5da8d22ddd744461cecfcdd3e694a7e0f13aec68f20cba906dd818",
+          "code_length": 9
+        },
+        {
+          "name": "isSolaris",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "ba35d54ad4c25400bdd29b45de47f29e0d0f952a059b953ead4f6391c411de15",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0aa6645103a0c90ab540adbd4a8abbf9f8c8636bf1f6cfa52efdefc18d74e3a8",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "org/jutils/jprocesses/util/OSDetector"
+      ]
+    },
+    {
+      "entry": "org/jutils/jprocesses/util/ProcessesUtils.class",
+      "occurrence": 0,
+      "sha256": "6ca2d87d0f4d02d9d2b7163a2415f32a946a975144db603a179c378daa31d08f",
+      "name": "org/jutils/jprocesses/util/ProcessesUtils",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CRLF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "customDateFormat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "customLocale",
+          "descriptor": "Ljava/util/Locale;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "executeCommand",
+          "descriptor": "([Ljava/lang/String;)Ljava/lang/String;",
+          "access": 137,
+          "code_sha256": "d8b73e1db7eadfe4765d2277adfdf4352cea6089d9b2ce720fc36f0f00c7c161",
+          "code_length": 55
+        },
+        {
+          "name": "readData",
+          "descriptor": "(Ljava/lang/Process;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "6c8309cfae4b3de9ebbaefa831599a939189fe7b884b9d522d8bc0d52e98e8c0",
+          "code_length": 182
+        },
+        {
+          "name": "executeCommandAndGetCode",
+          "descriptor": "([Ljava/lang/String;)I",
+          "access": 137,
+          "code_sha256": "80c56f22ac4d4ba39b9e25186d3730ffe0c02d88b5bf9c7b2616131c9032648a",
+          "code_length": 59
+        },
+        {
+          "name": "parseWindowsDateTimeToSimpleTime",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "9b4d43c2373ae18584a7807348e9784ff677a9a0b0aaaa8125eab3ce78b182ed",
+          "code_length": 77
+        },
+        {
+          "name": "parseWindowsDateTimeToFullDate",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "edea20f41c6105c83f94ca6ec6172a46f37681df3c46a27861021db3108fef07",
+          "code_length": 134
+        },
+        {
+          "name": "parseUnixLongTimeToFullDate",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "ed6f614c407192a3525ca4de226b9f6c41c92ee53ab74b7e56a8fcc8d4dd8a6f",
+          "code_length": 219,
+          "throws": [
+            "java/text/ParseException"
+          ]
+        },
+        {
+          "name": "getCustomDateFormat",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2198524d50b3f6a4bfe6996efccacb61a2dad1527ab813c3708e8e20c8fe6040",
+          "code_length": 4
+        },
+        {
+          "name": "setCustomDateFormat",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "d767524ec595e1c8c2aa28fe519b3c97b9ea07a184e4240db082d4ceed1a0991",
+          "code_length": 5
+        },
+        {
+          "name": "getCustomLocale",
+          "descriptor": "()Ljava/util/Locale;",
+          "access": 9,
+          "code_sha256": "b461d9381149d14efdefed4efa69e77a5eac52b9fb77855496b452373a0bf2cd",
+          "code_length": 4
+        },
+        {
+          "name": "setCustomLocale",
+          "descriptor": "(Ljava/util/Locale;)V",
+          "access": 9,
+          "code_sha256": "fe98d1d06b0567e61be0c13aace963f948b7124af72939101f65b1d9a4121aa2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/ProcessBuilder",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/text/DateFormat",
+        "java/text/ParseException",
+        "java/text/SimpleDateFormat",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Locale$Category",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "org/jutils/jprocesses/util/ProcessesUtils"
+      ]
+    }
+  ]
+}

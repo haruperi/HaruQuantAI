@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppGridControl/AppGridControl.jar",
+  "sha256": "edc5f2cdac1835cdbe512ea3c19b25a1d660ad9a990a488c533db3b27bad9197",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/GridControl/GridControlAppPlugin.class": "d57d80fc1090350d50704a0c70668cd5ae703a0f9c39b876c0e22588686de31f"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/GridControl/GridControlAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "d57d80fc1090350d50704a0c70668cd5ae703a0f9c39b876c0e22588686de31f",
+      "member_shard": "docs/dev/evidence/sqx145/members/128/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/128/001.json",
+      "sha256": "2fad9d8f62bee3320a260521009f964ff9ed1d36b7bc8cc6841fe05edb65de56"
+    }
+  ]
+}

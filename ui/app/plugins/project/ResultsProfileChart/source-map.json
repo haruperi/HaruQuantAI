@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsProfileChart bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsProfileChart",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,75 +28,100 @@
   "source_catalog": [
     {
       "id": "sqx-resultsprofilechart-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart",
       "family": "bounded installed frontend plugin artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsprofilechart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "ac0d142105f21bb9b89f5fbc66af3294764f93de8b63a75421374863616f7663",
+      "sha256": "a1696b0017b514c2ff9aa86fb95b9c3c2735463532917dfc6650027e1aa89584",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsprofilechart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/profileChart.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/profileChart.html",
       "relative_path": "profileChart.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "34e6e0cb5d82c8cab5114b261af3925aa3a027517d746bfec698df89d154c8e9",
+      "sha256": "b577ce7cc0218b555528e79b73fc457ce03f46bb6911ebb3368faf9d57d059eb",
       "target": "profileChart.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsprofilechart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartCtrl.js",
       "relative_path": "ProfileChartCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
       "sha256": "c18aa712cdee8db7994e08f1088b7c5b357af7f58180959c5a4f4f389aa8396c",
       "target": "ProfileChartCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsprofilechart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js",
       "relative_path": "ProfileChartService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
       "sha256": "daedc263e3f5addb592754b1090766fe09de82404cc4a034e0657ed907b21bf2",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsprofilechart-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
       "relative_path": "ResultsProfileChart.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "1c0cbb510a72e0b4515803886440ce10c11a6173b9e1ee9b8de46fa7feec84cd",
+      "sha256": "e68533b22cc2d8d670723f4ffd023cfe2099a44e75abb81ae8e209350ddd9b0f",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -138,6 +163,9 @@
   "limitations": [
     "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
     "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
-    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
-  ]
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

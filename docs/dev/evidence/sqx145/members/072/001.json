@@ -1,0 +1,961 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jsr305-3.0.2.jar",
+  "archive_sha256": "766ad2a0783f2687962c8ad74ceecc38a28b9f72a2d085ee438b7813e928d0c7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "javax/annotation/CheckForNull.class",
+      "occurrence": 0,
+      "sha256": "5fa59b59f215cba12a540ca090fcb3f962e513c12cf01c868d1927916ca63af4",
+      "name": "javax/annotation/CheckForNull",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/CheckForNull"
+      ]
+    },
+    {
+      "entry": "javax/annotation/CheckForSigned.class",
+      "occurrence": 0,
+      "sha256": "d8a347f815d20158998dd5be8280459fd0babf792ada6656ad5872b82da1802b",
+      "name": "javax/annotation/CheckForSigned",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/CheckForSigned"
+      ]
+    },
+    {
+      "entry": "javax/annotation/CheckReturnValue.class",
+      "occurrence": 0,
+      "sha256": "2b6d2054baadaf5db7fcc6df157b83abb0e16fa9a2067a97aeb8018d142e9bb6",
+      "name": "javax/annotation/CheckReturnValue",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/CheckReturnValue"
+      ]
+    },
+    {
+      "entry": "javax/annotation/concurrent/GuardedBy.class",
+      "occurrence": 0,
+      "sha256": "c60ab8afab8f6597f3b48807c5d7b17090067ba9d8d77b1c1ae44c7931527fdf",
+      "name": "javax/annotation/concurrent/GuardedBy",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/concurrent/GuardedBy"
+      ]
+    },
+    {
+      "entry": "javax/annotation/concurrent/Immutable.class",
+      "occurrence": 0,
+      "sha256": "35ac11c7bbc605bc81763310ae2646ebdd61e97f0e841f022f4707ee5552482f",
+      "name": "javax/annotation/concurrent/Immutable",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/concurrent/Immutable"
+      ]
+    },
+    {
+      "entry": "javax/annotation/concurrent/NotThreadSafe.class",
+      "occurrence": 0,
+      "sha256": "8da8a5626599f3357c117fc105c8f693e6cb50de88ad92200850374916ae677b",
+      "name": "javax/annotation/concurrent/NotThreadSafe",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/concurrent/NotThreadSafe"
+      ]
+    },
+    {
+      "entry": "javax/annotation/concurrent/ThreadSafe.class",
+      "occurrence": 0,
+      "sha256": "5473ba9cba72d2560e7f311026cbcf0bf8d971b8e705bc2cf6c3a201a94f1e95",
+      "name": "javax/annotation/concurrent/ThreadSafe",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/concurrent/ThreadSafe"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Detainted.class",
+      "occurrence": 0,
+      "sha256": "dbff06a53974a4aab588e70c00eccf5ba8ad633942ab23cfeb8faca9a1f6c8ac",
+      "name": "javax/annotation/Detainted",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Detainted"
+      ]
+    },
+    {
+      "entry": "javax/annotation/MatchesPattern$Checker.class",
+      "occurrence": 0,
+      "sha256": "1d0903d9b801dbc95ac5929cc7bc78ba78dadf8c8b48ba4bd54831f401a3bd39",
+      "name": "javax/annotation/MatchesPattern$Checker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/annotation/meta/TypeQualifierValidator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljavax/annotation/MatchesPattern;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 1,
+          "code_sha256": "273d834264dcdb7735e08ee0fce2ab552df4e9bc2c9ff873201749a3e2131214",
+          "code_length": 38
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljava/lang/annotation/Annotation;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 4161,
+          "code_sha256": "e492f02832ff9556a49bb93afca93d5d2edf6e41c257f3b20631292ef666ba64",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/annotation/meta/TypeQualifierValidator<Ljavax/annotation/MatchesPattern;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "javax/annotation/MatchesPattern",
+        "javax/annotation/MatchesPattern$Checker",
+        "javax/annotation/meta/TypeQualifierValidator",
+        "javax/annotation/meta/When"
+      ]
+    },
+    {
+      "entry": "javax/annotation/MatchesPattern.class",
+      "occurrence": 0,
+      "sha256": "80a8ca877069ed4b96c332dcf72d23125e026a7fb7d1fd4aceea963cf85e110f",
+      "name": "javax/annotation/MatchesPattern",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "flags",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/MatchesPattern",
+        "javax/annotation/MatchesPattern$Checker"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/Exclusive.class",
+      "occurrence": 0,
+      "sha256": "582f4687e28058857069d15aab567c56db8c8b21e4533f05cee7a77c0366290c",
+      "name": "javax/annotation/meta/Exclusive",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/meta/Exclusive"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/Exhaustive.class",
+      "occurrence": 0,
+      "sha256": "52fa2ba25b5c13c98b334bf913003870979c45961b57c33d55142eb7d97ae76c",
+      "name": "javax/annotation/meta/Exhaustive",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/meta/Exhaustive"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifier.class",
+      "occurrence": 0,
+      "sha256": "65c01688d5002219c9dcb8a0defc5871e9587a1fdc23f9fe4ca3d0d129effb34",
+      "name": "javax/annotation/meta/TypeQualifier",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "applicableTo",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/meta/TypeQualifier"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierDefault.class",
+      "occurrence": 0,
+      "sha256": "246eef37fc67c2b37cbb9d97944e897fec1100e5aad3e3c240ee87e6c09e7d81",
+      "name": "javax/annotation/meta/TypeQualifierDefault",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/annotation/ElementType;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/meta/TypeQualifierDefault"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierNickname.class",
+      "occurrence": 0,
+      "sha256": "60756aa9e427037f5d14c6b88716c62383acf6bb73b2f4579118b73391a087c3",
+      "name": "javax/annotation/meta/TypeQualifierNickname",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/meta/TypeQualifierNickname"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/TypeQualifierValidator.class",
+      "occurrence": 0,
+      "sha256": "b955f075af35f689055ed007eaf80446e460d61e2c78e99c7674a7236b1666d5",
+      "name": "javax/annotation/meta/TypeQualifierValidator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljava/lang/annotation/Annotation;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 1025,
+          "generic_signature": "(TA;Ljava/lang/Object;)Ljavax/annotation/meta/When;"
+        }
+      ],
+      "generic_signature": "<A::Ljava/lang/annotation/Annotation;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "javax/annotation/meta/TypeQualifierValidator"
+      ]
+    },
+    {
+      "entry": "javax/annotation/meta/When.class",
+      "occurrence": 0,
+      "sha256": "2a8f8892c3c3bf72c1ba8b0bfe9fd09fe0ad68558954aa36f7aaf8f20eba5104",
+      "name": "javax/annotation/meta/When",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ALWAYS",
+          "descriptor": "Ljavax/annotation/meta/When;",
+          "access": 16409
+        },
+        {
+          "name": "UNKNOWN",
+          "descriptor": "Ljavax/annotation/meta/When;",
+          "access": 16409
+        },
+        {
+          "name": "MAYBE",
+          "descriptor": "Ljavax/annotation/meta/When;",
+          "access": 16409
+        },
+        {
+          "name": "NEVER",
+          "descriptor": "Ljavax/annotation/meta/When;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Ljavax/annotation/meta/When;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Ljavax/annotation/meta/When;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Ljavax/annotation/meta/When;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Ljavax/annotation/meta/When;>;",
+      "class_references": [
+        "[Ljavax/annotation/meta/When;",
+        "java/lang/Enum",
+        "javax/annotation/meta/When"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Nonnegative$Checker.class",
+      "occurrence": 0,
+      "sha256": "11130af801137746c018270467cba6764d1fa1f507d39edaa2007bd35d7f062b",
+      "name": "javax/annotation/Nonnegative$Checker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/annotation/meta/TypeQualifierValidator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljavax/annotation/Nonnegative;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 1,
+          "code_sha256": "98a33f388a1c2ca54cc77de06507c0516f194b1ebda3b11b5214f4dedf29deb1",
+          "code_length": 124
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljava/lang/annotation/Annotation;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 4161,
+          "code_sha256": "25d4744660534d11234325c4634424c80426ea33a699f6d41ea37014bf8bac4d",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/annotation/meta/TypeQualifierValidator<Ljavax/annotation/Nonnegative;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Long",
+        "java/lang/Number",
+        "java/lang/Object",
+        "javax/annotation/Nonnegative",
+        "javax/annotation/Nonnegative$Checker",
+        "javax/annotation/meta/TypeQualifierValidator",
+        "javax/annotation/meta/When"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Nonnegative.class",
+      "occurrence": 0,
+      "sha256": "50b23189867f2129fa7f6e68e0285106dd1a98a611a4974b668ca5329a3f8b89",
+      "name": "javax/annotation/Nonnegative",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Nonnegative",
+        "javax/annotation/Nonnegative$Checker"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Nonnull$Checker.class",
+      "occurrence": 0,
+      "sha256": "a179bdcda05127d700befba901422bf8170b28d3136921fa7f19ff3cea7a3b4e",
+      "name": "javax/annotation/Nonnull$Checker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/annotation/meta/TypeQualifierValidator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljavax/annotation/Nonnull;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 1,
+          "code_sha256": "5c4e71cb7e6333c289fbcfe6219c9a7f0c0504fd90bc56b812e508b41e92857a",
+          "code_length": 12
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljava/lang/annotation/Annotation;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 4161,
+          "code_sha256": "c647dfdc5cb7bc09fc76f50bd062a2d294fe01e3017b1f31f8ab9044aaef6fff",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/annotation/meta/TypeQualifierValidator<Ljavax/annotation/Nonnull;>;",
+      "class_references": [
+        "java/lang/Object",
+        "javax/annotation/Nonnull",
+        "javax/annotation/Nonnull$Checker",
+        "javax/annotation/meta/TypeQualifierValidator",
+        "javax/annotation/meta/When"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Nonnull.class",
+      "occurrence": 0,
+      "sha256": "c0572d5c061ece17c11160bfeaed18ed7845d738fb76e0262ff19d4192f60178",
+      "name": "javax/annotation/Nonnull",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Nonnull",
+        "javax/annotation/Nonnull$Checker"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Nullable.class",
+      "occurrence": 0,
+      "sha256": "ec67e16bda9e00f06bbb6dca85e39ee88239db8c6ea410bc322839af67373ded",
+      "name": "javax/annotation/Nullable",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Nullable"
+      ]
+    },
+    {
+      "entry": "javax/annotation/OverridingMethodsMustInvokeSuper.class",
+      "occurrence": 0,
+      "sha256": "acb4b3e96eb9045ae3ae8c43be71870cdac6b5b958bc2df1510a166cf422cdc8",
+      "name": "javax/annotation/OverridingMethodsMustInvokeSuper",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/OverridingMethodsMustInvokeSuper"
+      ]
+    },
+    {
+      "entry": "javax/annotation/ParametersAreNonnullByDefault.class",
+      "occurrence": 0,
+      "sha256": "730fe9f413e529cc10e98f624c5552834ca07343f1b9451903c4027f964be4d0",
+      "name": "javax/annotation/ParametersAreNonnullByDefault",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/ParametersAreNonnullByDefault"
+      ]
+    },
+    {
+      "entry": "javax/annotation/ParametersAreNullableByDefault.class",
+      "occurrence": 0,
+      "sha256": "e986fcd305a1b512ddca018d194e2c3709e12a374c5399e0e4ee7b6ef7b77de4",
+      "name": "javax/annotation/ParametersAreNullableByDefault",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/ParametersAreNullableByDefault"
+      ]
+    },
+    {
+      "entry": "javax/annotation/PropertyKey.class",
+      "occurrence": 0,
+      "sha256": "e4e5548e071a2f0b5e6e191bdfaa98e80b7053b3bd3566913973b9684badf31d",
+      "name": "javax/annotation/PropertyKey",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/PropertyKey"
+      ]
+    },
+    {
+      "entry": "javax/annotation/RegEx$Checker.class",
+      "occurrence": 0,
+      "sha256": "2b2cad66ce6254c4a7117aa5eabff360077c3aaa46eb43f06472ef0f5c49c806",
+      "name": "javax/annotation/RegEx$Checker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/annotation/meta/TypeQualifierValidator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljavax/annotation/RegEx;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 1,
+          "code_sha256": "98efd6e674f6c13bdaf66969ee747021f1003d2db79d396f9b6d6e013c13d42a",
+          "code_length": 31
+        },
+        {
+          "name": "forConstantValue",
+          "descriptor": "(Ljava/lang/annotation/Annotation;Ljava/lang/Object;)Ljavax/annotation/meta/When;",
+          "access": 4161,
+          "code_sha256": "54f8f6c1d6be6edd4f3d555c89f5dc5def52d72b89f49ca21e822fef56167c29",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/annotation/meta/TypeQualifierValidator<Ljavax/annotation/RegEx;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/regex/Pattern",
+        "java/util/regex/PatternSyntaxException",
+        "javax/annotation/RegEx",
+        "javax/annotation/RegEx$Checker",
+        "javax/annotation/meta/TypeQualifierValidator",
+        "javax/annotation/meta/When"
+      ]
+    },
+    {
+      "entry": "javax/annotation/RegEx.class",
+      "occurrence": 0,
+      "sha256": "dd4449a4d6cb80594d1a1d0523daed49fd2008c2e54a5aa4f7507d0de7d4dfa6",
+      "name": "javax/annotation/RegEx",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/RegEx",
+        "javax/annotation/RegEx$Checker"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Signed.class",
+      "occurrence": 0,
+      "sha256": "3235c957f0d766a7f72955875c663f078fb33eb3e2ba6c0f3ff494cb63c48c6a",
+      "name": "javax/annotation/Signed",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Signed"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Syntax.class",
+      "occurrence": 0,
+      "sha256": "1179a64e0c0556d7f0040caaa4219c4f7c0e9b26e8f4ace9d764b01a23f0ca54",
+      "name": "javax/annotation/Syntax",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Syntax"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Tainted.class",
+      "occurrence": 0,
+      "sha256": "2aaf8d9de64111525186d8019835ec19e6c25a2735e2e2c34be80a2ca5370ec7",
+      "name": "javax/annotation/Tainted",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Tainted"
+      ]
+    },
+    {
+      "entry": "javax/annotation/Untainted.class",
+      "occurrence": 0,
+      "sha256": "b1d1e05dffd012fc3541002955db5acb653c7d5497b12d3866d7b67769730209",
+      "name": "javax/annotation/Untainted",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "when",
+          "descriptor": "()Ljavax/annotation/meta/When;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/Untainted"
+      ]
+    },
+    {
+      "entry": "javax/annotation/WillClose.class",
+      "occurrence": 0,
+      "sha256": "599ca8acb5ed1bec57ab6d2b2eb4674327de774cc37d68f5b1cfb20a2a15f3ca",
+      "name": "javax/annotation/WillClose",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/WillClose"
+      ]
+    },
+    {
+      "entry": "javax/annotation/WillCloseWhenClosed.class",
+      "occurrence": 0,
+      "sha256": "7eb5c0b358f08f56c927a9676630852e438c5474eb044a6d85b51d6de7a87017",
+      "name": "javax/annotation/WillCloseWhenClosed",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/WillCloseWhenClosed"
+      ]
+    },
+    {
+      "entry": "javax/annotation/WillNotClose.class",
+      "occurrence": 0,
+      "sha256": "dc518608313b1d11a78cd378bc9a40cc1e9b977e5136d1ee7e412009ef9e8793",
+      "name": "javax/annotation/WillNotClose",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/annotation/WillNotClose"
+      ]
+    }
+  ]
+}

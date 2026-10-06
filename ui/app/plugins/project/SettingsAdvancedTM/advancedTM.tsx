@@ -3,7 +3,7 @@ import { AddNewExitPopup } from './addNewExitPopup';
 import { SqdCheckbox, SqdFieldset, SqdSpinner } from '../ProjectWorkbench/settings/SettingsControls';
 
 /**
- * "ATM" tab (donor evidence SQX144-EV-000042): Advanced Trade Management
+ * "ATM" tab (donor evidence retained target UI; current donor equivalence unverified): Advanced Trade Management
  * surface. The donor editor is 1,206 template lines of method/parameter
  * tables; this is the donor-style structure with the demo method set
  * derived from the exit formulas of the Build template.

@@ -15,7 +15,7 @@ import { RankingTab } from './settings/RankingTab';
 import { NotesTab } from './settings/NotesTab';
 
 /**
- * SQX-parity Full settings panel (donor evidence SQX144-EV-000038): the
+ * SQX-style Full settings panel (donor evidence retained target UI; current donor equivalence unverified): the
  * "Advanced settings" window with conditional Build tabs, per-tab
  * description header with Help, lock overlay while the project runs, and
  * the prev/Close/next navigation. Close returns to the Progress panel.

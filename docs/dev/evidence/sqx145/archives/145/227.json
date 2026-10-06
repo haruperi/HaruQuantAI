@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
+  "sha256": "bd40d7d7d7f71c7e7553bbfb3e08f5b700038e8d98263d3ac5dc78a4d4fdc7b7",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet.class": "2cd3aa0798f8ff3c7fa8903405b5e2429d3c65fa71ae227b6df16fe5b0b96fe8",
+    "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServletPlugin.class": "ff1b4f7ee23459293eeed2cf938dd906bf575e856ed65d4de1878e28da0d2182"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet.class",
+      "occurrence": 0,
+      "sha256": "2cd3aa0798f8ff3c7fa8903405b5e2429d3c65fa71ae227b6df16fe5b0b96fe8",
+      "member_shard": "docs/dev/evidence/sqx145/members/227/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "ff1b4f7ee23459293eeed2cf938dd906bf575e856ed65d4de1878e28da0d2182",
+      "member_shard": "docs/dev/evidence/sqx145/members/227/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/227/001.json",
+      "sha256": "4d9f1ba57e954314c9bd4f067d652acafd05f0dbf055dccbde1af1305edeb806"
+    }
+  ]
+}

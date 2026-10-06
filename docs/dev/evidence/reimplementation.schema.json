@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "reimplementation.schema.json",
-  "title": "HaruQuantAI StrategyQuant X Reimplementation Evidence Ledger (current version 2)",
+  "title": "HaruQuantAI SQX145 current-source evidence ledger (version 4)",
   "description": "A strict clean-room evidence ledger. Each record is one atomic, independently testable claim.",
   "type": "object",
   "additionalProperties": false,
@@ -11,18 +11,18 @@
     "ledger_id",
     "reference_product",
     "target_project",
-    "backfill",
     "source_catalog",
     "records",
-    "historical_snapshot",
-    "installed_product_status"
+    "installed_product_status",
+    "minimum_record_number",
+    "allocation_high_water_mark"
   ],
   "properties": {
     "$schema": {
       "const": "./reimplementation.schema.json"
     },
     "schema_version": {
-      "const": 2
+      "const": 4
     },
     "ledger_id": {
       "const": "haruquantai.sqx.reimplementation"
@@ -32,9 +32,6 @@
     },
     "target_project": {
       "$ref": "#/$defs/targetProject"
-    },
-    "backfill": {
-      "$ref": "#/$defs/backfill"
     },
     "source_catalog": {
       "type": "object",
@@ -49,40 +46,8 @@
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
-        "^SQX144-EV-[0-9]{6}$": {
+        "^SQX145-EV-[0-9]{6}$": {
           "$ref": "#/$defs/evidenceRecord"
-        }
-      }
-    },
-    "historical_snapshot": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "commit",
-        "ledger_locator",
-        "ledger_sha256",
-        "schema_locator",
-        "schema_sha256",
-        "maximum_id"
-      ],
-      "properties": {
-        "commit": {
-          "const": "3ede688544b1c161984573cdc25e7a36b01d4a37"
-        },
-        "ledger_locator": {
-          "const": "docs/dev/evidence/history/3ede688/reimplementation.json"
-        },
-        "ledger_sha256": {
-          "const": "6c5c2dd71f7668ea0f48de1cb5bba670d8a2c0ec745ee8e9458455105f16cef2"
-        },
-        "schema_locator": {
-          "const": "docs/dev/evidence/history/3ede688/reimplementation.schema.json"
-        },
-        "schema_sha256": {
-          "const": "ce33590ae38bb1f9ca67a191ee9eb8bf8033d3e9bd42a90cce4d3d0430d48801"
-        },
-        "maximum_id": {
-          "const": 88
         }
       }
     },
@@ -105,6 +70,13 @@
           "const": "unqualified"
         }
       }
+    },
+    "minimum_record_number": {
+      "const": 132
+    },
+    "allocation_high_water_mark": {
+      "type": "integer",
+      "minimum": 132
     }
   },
   "$defs": {
@@ -142,10 +114,10 @@
           "const": "StrategyQuant X"
         },
         "build": {
-          "const": "144.2953"
+          "const": "145-dev1"
         },
         "installation_root_variable": {
-          "const": "SQX_REFERENCE_ROOT"
+          "const": "SQX_145_REFERENCE_ROOT"
         }
       }
     },
@@ -170,41 +142,6 @@
           "items": {
             "type": "string",
             "pattern": "^(?![A-Za-z]:[\\\\/])(?![\\\\/]).+"
-          },
-          "uniqueItems": true
-        }
-      }
-    },
-    "backfill": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "status",
-        "catalog_snapshot_commit",
-        "recorded_at",
-        "notes"
-      ],
-      "properties": {
-        "status": {
-          "enum": [
-            "none",
-            "partial",
-            "complete"
-          ]
-        },
-        "catalog_snapshot_commit": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{7,40}$"
-        },
-        "recorded_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "notes": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/nonEmptyString"
           },
           "uniqueItems": true
         }
@@ -240,8 +177,8 @@
           "oneOf": [
             {
               "enum": [
-                "SQX_REFERENCE_ROOT",
-                "HARUQUANTAI_ROOT"
+                "HARUQUANTAI_ROOT",
+                "SQX_145_REFERENCE_ROOT"
               ]
             },
             {
@@ -317,7 +254,9 @@
           "then": {
             "properties": {
               "root": {
-                "const": "SQX_REFERENCE_ROOT"
+                "enum": [
+                  "SQX_145_REFERENCE_ROOT"
+                ]
               }
             }
           }
@@ -419,7 +358,7 @@
       ],
       "properties": {
         "build": {
-          "const": "144.2953"
+          "const": "145-dev1"
         },
         "application_areas": {
           "$ref": "#/$defs/stringSet"
@@ -547,7 +486,10 @@
         "feature_ids",
         "requirement_ids",
         "decision_ids",
-        "documentation_targets"
+        "documentation_targets",
+        "registration_status",
+        "registration_gap",
+        "proposed_owner_readme"
       ],
       "properties": {
         "domain": {
@@ -588,7 +530,7 @@
             "pattern": "^FR-[A-Z]+-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
           },
           "uniqueItems": true,
-          "minItems": 1
+          "minItems": 0
         },
         "decision_ids": {
           "type": "array",
@@ -597,7 +539,7 @@
             "pattern": "^DEC-[A-Z]+-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
           },
           "uniqueItems": true,
-          "minItems": 1
+          "minItems": 0
         },
         "documentation_targets": {
           "type": "array",
@@ -607,8 +549,59 @@
             "pattern": "^(?![A-Za-z]:[\\\\/])(?![\\\\/]).+"
           },
           "uniqueItems": true
+        },
+        "registration_status": {
+          "enum": [
+            "registered",
+            "proposed"
+          ]
+        },
+        "registration_gap": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "proposed_owner_readme": {
+          "$ref": "#/$defs/nullableString"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "registration_status": {
+                "const": "registered"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "requirement_ids": {
+                "minItems": 1
+              },
+              "decision_ids": {
+                "minItems": 1
+              },
+              "registration_gap": {
+                "type": "null"
+              },
+              "proposed_owner_readme": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "registration_gap": {
+                "type": "string",
+                "minLength": 1
+              },
+              "proposed_owner_readme": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
     },
     "validation": {
       "type": "object",
@@ -725,7 +718,7 @@
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^SQX144-EV-[0-9]{6}$"
+              "pattern": "^SQX145-EV-[0-9]{6}$"
             },
             {
               "type": "null"
@@ -738,7 +731,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^SQX144-EV-[0-9]{6}$"
+        "pattern": "^SQX145-EV-[0-9]{6}$"
       },
       "uniqueItems": true
     },
@@ -887,7 +880,7 @@
                 "properties": {
                   "superseded_by": {
                     "type": "string",
-                    "pattern": "^SQX144-EV-[0-9]{6}$"
+                    "pattern": "^SQX145-EV-[0-9]{6}$"
                   }
                 }
               }

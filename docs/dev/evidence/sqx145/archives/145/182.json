@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.jar",
+  "sha256": "41c3a4e9037ddde57eefcafb911db5d3fb9626d76c7adead17217bceaa7fdeeb",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Engine/impl/Panel/EngineDb.class": "67fc355c40b6f9ceb9bae7b571c3478ffc8da5b7251a5bc17a422c3e33621f80",
+    "com/strategyquant/plugin/Engine/impl/Panel/EngineServlet$1.class": "b7db48f3fbea8ea72f3a3c68049b718559f482618ae296c2b42fad904b6918c8",
+    "com/strategyquant/plugin/Engine/impl/Panel/EngineServlet.class": "964d057046d836fcba36b8ca5f761c568683fb3225ea6df7f452221b8d7ddc10",
+    "com/strategyquant/plugin/Engine/impl/Panel/EngineServletPlugin.class": "fdde13bfe838f0f74a8d820ec3fff52d16ff142030fd7a4b25b11b9644453c45"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Engine/impl/Panel/EngineDb.class",
+      "occurrence": 0,
+      "sha256": "67fc355c40b6f9ceb9bae7b571c3478ffc8da5b7251a5bc17a422c3e33621f80",
+      "member_shard": "docs/dev/evidence/sqx145/members/182/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Engine/impl/Panel/EngineServlet$1.class",
+      "occurrence": 0,
+      "sha256": "b7db48f3fbea8ea72f3a3c68049b718559f482618ae296c2b42fad904b6918c8",
+      "member_shard": "docs/dev/evidence/sqx145/members/182/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Engine/impl/Panel/EngineServlet.class",
+      "occurrence": 0,
+      "sha256": "964d057046d836fcba36b8ca5f761c568683fb3225ea6df7f452221b8d7ddc10",
+      "member_shard": "docs/dev/evidence/sqx145/members/182/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Engine/impl/Panel/EngineServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "fdde13bfe838f0f74a8d820ec3fff52d16ff142030fd7a4b25b11b9644453c45",
+      "member_shard": "docs/dev/evidence/sqx145/members/182/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/182/001.json",
+      "sha256": "02c121f21a4c5b6f517c98ad8943a9a2016d34a08627f68e9d716c56e84e295c"
+    }
+  ]
+}

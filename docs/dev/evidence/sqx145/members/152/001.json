@@ -1,0 +1,372 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckSequentialOptimization/CrossCheckSequentialOptimization.jar",
+  "archive_sha256": "d1b45af45898fbb7c875b9b670a5d423eac1386ad13953be08c7dabcfc93cec0",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1.class",
+      "occurrence": 0,
+      "sha256": "a54ae8077f1879e01f5e2405b015a93364ad58bd395e8f12d3fd813e356bd05b",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/ISequentialOptimizationCompleteListener"
+      ],
+      "fields": [
+        {
+          "name": "val$rg",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 4112
+        },
+        {
+          "name": "val$mainResultFitness",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization;Lcom/strategyquant/tradinglib/ResultsGroup;D)V",
+          "access": 0,
+          "code_sha256": "d652019f50a624991a4445ef9b1a48db41a4723132f6dcc51240ab5a14457112",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "onFinish",
+          "descriptor": "(ZLcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 1,
+          "code_sha256": "72692e44a7ec8a351db403578df482e567cac41c0806ac147c3d070c2394d137",
+          "code_length": 183
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization",
+        "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckMethod",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/optimization/ISequentialOptimizationCompleteListener",
+        "com/strategyquant/tradinglib/optimization/SequentialOptimizationSettings",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization.class",
+      "occurrence": 0,
+      "sha256": "e1f218fbaa3080b0efa10d8f040dfbc6a23152fecf8535aaad096bcd643b58e0",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+      "interfaces": [
+        "com/strategyquant/tradinglib/project/ILastEventListener"
+      ],
+      "fields": [
+        {
+          "name": "fitnessFunction",
+          "descriptor": "Lcom/strategyquant/tradinglib/fitnessfunction/IFitnessFunction;",
+          "access": 2
+        },
+        {
+          "name": "chartSetups",
+          "descriptor": "Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 2
+        },
+        {
+          "name": "seqOptSettings",
+          "descriptor": "Lcom/strategyquant/tradinglib/optimization/SequentialOptimizationSettings;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2fb8f914858a87b2f968ea2091ad0200f23c0c49bc2b3d593ac36c6331a13eca",
+          "code_length": 18
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "df7673e9b9005556a23bc6b94128babc13ee9175757874c84ae7a52c7c87835d",
+          "code_length": 4
+        },
+        {
+          "name": "getShortName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ed1f9aa3d6b0371e434f7fee56159b4b40842df61c60dcd72d156e26b4bcee64",
+          "code_length": 6
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "59177c2efb9d78e643d11176a42ca85d2f7cb3f8e6f0eb097886fc9838bf411a",
+          "code_length": 6
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2ebc6432ff90ab89a724c475bd169e5f400a850bf7f02e124ba4eb34c57c06da",
+          "code_length": 8
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c768920d4f179759808038ec8414ad81437383a4b567f7f9357d2473e2814f4f",
+          "code_length": 4
+        },
+        {
+          "name": "getNumberOfSimulations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "doesRetest",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "doesForEverySetup",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "085ad5843ebfe3c18506795aab68eae9243dae2768cad1f698a0bf8a373f5ba3",
+          "code_length": 92
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "5102648e4e63a8d76e6a13673a62f2284599cec8dded12965c417147b93212fc",
+          "code_length": 209,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runTest",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;IDLcom/strategyquant/gridlib/client/GridJob;ZLcom/strategyquant/tradinglib/project/ILastEventListener;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "f3ad9694c3672c5b546fcfd8d30e9e7f0ca47edd121504a7a780ffb996b94bd4",
+          "code_length": 216,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;I)Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getColumnTitleTemplate",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "16f3514f1468f4a26485cc75153d778e69a7ecc448a89ad9deab7dc7729a2344",
+          "code_length": 30
+        },
+        {
+          "name": "getStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)D",
+          "access": 129,
+          "code_sha256": "ff136043e539670cb9c69b367e7363758e780c1e32006c685217b83419245510",
+          "code_length": 80,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "hasStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Z",
+          "access": 129,
+          "code_sha256": "251bdbd18691df1e8686b086b4de9a6c73c6a8339ef2b729a548204752778d1e",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getChartSetups",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;)Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 1,
+          "code_sha256": "3bf697a697bc3c8192e3397474cc57a765e5596f3255a404cd9c295a88de694b",
+          "code_length": 11
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;",
+          "access": 1,
+          "code_sha256": "47a065faf82adbdac0199f0ef506cd1a58e9563d8b9221aebb26f483a56f7fd6",
+          "code_length": 62
+        },
+        {
+          "name": "printSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "91ca2dcdbbb676f17a7cf9e2510ed5233391e78b7ff35431fd7a106dfc70ea42",
+          "code_length": 215,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "saveDataToFile",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarOutputStream;)V",
+          "access": 1,
+          "code_sha256": "f90cd90c1fae201fae9fbc19b8d37b008b0ef42aea1faab4404ec2acd2a0614b",
+          "code_length": 143,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadDataFromFile",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarFile;)V",
+          "access": 1,
+          "code_sha256": "dc5270d1967cbfe5b9a5379959f707246ed23be0a190aadefe06203c5b5ee9ef",
+          "code_length": 100,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getBadStrategyReason",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "687948bf230ed3d2ed197e22c7c151c78b851d6508ecb7eb2ddd190ff271b01f",
+          "code_length": 4
+        },
+        {
+          "name": "doesCreateSubjobs",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "setLastEvent",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "prepareSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lorg/jdom2/Element;Z)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "disabledForSpecialTrial",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization;)Lcom/strategyquant/tradinglib/optimization/SequentialOptimizationSettings;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization",
+        "com/strategyquant/plugin/CrossCheck/impl/SequentialOptimization/SequentialOptimization$1",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckDataNotExistException",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckTypes",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/optimization/SequentialOptimizationEngine",
+        "com/strategyquant/tradinglib/optimization/SequentialOptimizationSettings",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults",
+        "java/io/BufferedWriter",
+        "java/io/OutputStreamWriter",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "java/util/jar/JarOutputStream",
+        "org/jdom2/Document",
+        "org/jdom2/Element",
+        "org/jdom2/output/Format",
+        "org/jdom2/output/XMLOutputter"
+      ]
+    }
+  ]
+}

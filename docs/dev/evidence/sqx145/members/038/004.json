@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/httpcore-nio-4.4.13.jar",
+  "archive_sha256": "71fcfbe869002c48563cc5979fc734571c8d0d167ccce42970c932f337981f19",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/http/impl/nio/reactor/BaseIOReactor.class",
+      "occurrence": 0,
+      "sha256": "6c499b3345fe376f42b87cadb96e38d00c13f7ba3788dd5bf3ca40f65001081b",
+      "name": "org/apache/http/impl/nio/reactor/BaseIOReactor",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/http/impl/nio/reactor/AbstractIOReactor",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "timeoutCheckInterval",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "bufferingSessions",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lorg/apache/http/nio/reactor/IOSession;>;"
+        },
+        {
+          "name": "lastTimeoutCheck",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "exceptionHandler",
+          "descriptor": "Lorg/apache/http/nio/reactor/IOReactorExceptionHandler;",
+          "access": 2
+        },
+        {
+          "name": "eventDispatch",
+          "descriptor": "Lorg/apache/http/nio/reactor/IOEventDispatch;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "88fe9d76e8bf56bb2fcf50a398ac7c13168374a181b059054203dbd09ca31c99",
+          "code_length": 7,
+          "throws": [
+            "org/apache/http/nio/reactor/IOReactorException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(JZ)V",
+          "access": 1,
+          "code_sha256": "8d6d02c5768bd5effe9639a2867824ee77242e96e33a1d98a60e82d3d775f128",
+          "code_length": 40,
+          "throws": [
+            "org/apache/http/nio/reactor/IOReactorException"
+          ]
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOEventDispatch;)V",
+          "access": 1,
+          "code_sha256": "7c1f9f28f6601e9839c4dc2f75939438fd93a52674520b5ca54a9070fdfe87aa",
+          "code_length": 17,
+          "throws": [
+            "java/io/InterruptedIOException",
+            "org/apache/http/nio/reactor/IOReactorException"
+          ]
+        },
+        {
+          "name": "setExceptionHandler",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOReactorExceptionHandler;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "handleRuntimeException",
+          "descriptor": "(Ljava/lang/RuntimeException;)V",
+          "access": 4,
+          "code_sha256": "7265492410595b178ef0f9170b254904f5938406fa2f466ae2c05b9533602583",
+          "code_length": 23
+        },
+        {
+          "name": "acceptable",
+          "descriptor": "(Ljava/nio/channels/SelectionKey;)V",
+          "access": 4,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "connectable",
+          "descriptor": "(Ljava/nio/channels/SelectionKey;)V",
+          "access": 4,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "readable",
+          "descriptor": "(Ljava/nio/channels/SelectionKey;)V",
+          "access": 4,
+          "code_sha256": "0e6472298fb4f69be77054964006ca2c20f16bd15351da414cf57976b879a45a",
+          "code_length": 85
+        },
+        {
+          "name": "writable",
+          "descriptor": "(Ljava/nio/channels/SelectionKey;)V",
+          "access": 4,
+          "code_sha256": "5a208bf83ae38979d04ead535348eb13b3a818fc8e58fcae7c82c2c9bc5664aa",
+          "code_length": 29
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "f56abfad35b247f0e64df1d7bece9a06470767d8dff2d1029709803d2c2dea06",
+          "code_length": 206,
+          "generic_signature": "(Ljava/util/Set<Ljava/nio/channels/SelectionKey;>;)V"
+        },
+        {
+          "name": "sessionCreated",
+          "descriptor": "(Ljava/nio/channels/SelectionKey;Lorg/apache/http/nio/reactor/IOSession;)V",
+          "access": 4,
+          "code_sha256": "1aa526ebbca7f57e47647d87f4c0d205f555081de844c2fbf95097362bf1ed56",
+          "code_length": 23
+        },
+        {
+          "name": "sessionTimedOut",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;)V",
+          "access": 4,
+          "code_sha256": "50f58a9a9629e19f75382502bf0d015ce78be79c1c3f297806cf46a905c22253",
+          "code_length": 23
+        },
+        {
+          "name": "sessionClosed",
+          "descriptor": "(Lorg/apache/http/nio/reactor/IOSession;)V",
+          "access": 4,
+          "code_sha256": "95e4c7a6c34ef002b1ef0b2c582beeb215bbd2ca83f8f6a13d02a740ab1873ed",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/io/InterruptedIOException",
+        "java/lang/RuntimeException",
+        "java/lang/System",
+        "java/nio/channels/CancelledKeyException",
+        "java/nio/channels/SelectionKey",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Set",
+        "org/apache/http/impl/nio/reactor/AbstractIOReactor",
+        "org/apache/http/impl/nio/reactor/BaseIOReactor",
+        "org/apache/http/nio/reactor/IOEventDispatch",
+        "org/apache/http/nio/reactor/IOReactorException",
+        "org/apache/http/nio/reactor/IOReactorExceptionHandler",
+        "org/apache/http/nio/reactor/IOSession",
+        "org/apache/http/util/Args"
+      ]
+    },
+    {
+      "entry": "org/apache/http/impl/nio/reactor/AbstractMultiworkerIOReactor$Worker.class",
+      "occurrence": 0,
+      "sha256": "09a07a17c70ac270fb6b71c0dc7f066ed1ce58f4b8d1a99c30207835216c323d",
+      "name": "org/apache/http/impl/nio/reactor/AbstractMultiworkerIOReactor$Worker",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "dispatcher",
+          "descriptor": "Lorg/apache/http/impl/nio/reactor/BaseIOReactor;",
+          "access": 16
+        },
+        {
+          "name": "eventDispatch",
+          "descriptor": "Lorg/apache/http/nio/reactor/IOEventDispatch;",
+          "access": 16
+        },
+        {
+          "name": "exception",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/http/impl/nio/reactor/BaseIOReactor;Lorg/apache/http/nio/reactor/IOEventDispatch;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9c49c7258616a44034ef360c9fb2e40d659e432c5bfd3b39c4b712e963158d9e",
+          "code_length": 29
+        },
+        {
+          "name": "getThrowable",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/apache/http/impl/nio/reactor/AbstractMultiworkerIOReactor",
+        "org/apache/http/impl/nio/reactor/AbstractMultiworkerIOReactor$Worker",
+        "org/apache/http/impl/nio/reactor/BaseIOReactor"
+      ]
+    }
+  ]
+}

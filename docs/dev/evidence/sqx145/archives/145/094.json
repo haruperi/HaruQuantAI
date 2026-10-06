@@ -1,0 +1,198 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-semconv-1.40.0.jar",
+  "sha256": "27eb65c14b91487cc25d35bd6f455193aac981d1ebe1b9472d5160cece573ba4",
+  "class_count": 25,
+  "unique_class_entries": 25,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "io/opentelemetry/semconv/AttributeKeyTemplate.class": "40b3c8b7b6b112d8d61240ac78742805d82d07c8b7fc2d2e984860e3bdec3c31",
+    "io/opentelemetry/semconv/ClientAttributes.class": "0fec4a26fda01f26d61ad174fff53bbe0bb38a208fc2d8ed6857ef1d4188c66b",
+    "io/opentelemetry/semconv/CodeAttributes.class": "e8b7e113001ceb7ffbf0b05793960b01fb7af56a9eacf61675cef96a21e1f92c",
+    "io/opentelemetry/semconv/DbAttributes$DbSystemNameValues.class": "4b11955243b252c0cc68a393c62877036a13698e89b7d50010bde8e7ad365206",
+    "io/opentelemetry/semconv/DbAttributes.class": "b535c06b904f35485adf11f9018257ff1c5bf3dcfbeb8a6a0169050ba7d6b718",
+    "io/opentelemetry/semconv/ErrorAttributes$ErrorTypeValues.class": "4b19f3b7f6c069b9d3d38ebac8af3022a38f49674186b845db2b0cd76129cf75",
+    "io/opentelemetry/semconv/ErrorAttributes.class": "7fedf90709e6c6414d98f38b6b806cdf41bfa75c0ed8c6c0589972bc3567dfcd",
+    "io/opentelemetry/semconv/ExceptionAttributes.class": "41e8e41a27364e520de3a9df31d6cff5128253ae32d9c014de9529ff69046b31",
+    "io/opentelemetry/semconv/HttpAttributes$HttpRequestMethodValues.class": "4ffabfe654065cda96e3e2d944d6979a473cbbf5d40d1eb8f5484734db155d72",
+    "io/opentelemetry/semconv/HttpAttributes.class": "19d7201c45228a137df319e8a34a46123e5364cc196de694c1485a47f4e6c2cd",
+    "io/opentelemetry/semconv/JvmAttributes$JvmMemoryTypeValues.class": "130d76866290994f1e17b77af136801ce8933a360af59a18d20b853afd1a3ba9",
+    "io/opentelemetry/semconv/JvmAttributes$JvmThreadStateValues.class": "71e0bb95bc51c6eceae7cbe09f1551653f2263fe26076bff5a3f9e92a741fc18",
+    "io/opentelemetry/semconv/JvmAttributes.class": "7fa96f9790bb4aa5bb337fb70c526c18a23a9d45ecc9e777de04fa8064242f88",
+    "io/opentelemetry/semconv/NetworkAttributes$NetworkTransportValues.class": "71ee3bf65b2902c36a4d92b03a2f2218b85755bab7d49733efc5b11b7a938a26",
+    "io/opentelemetry/semconv/NetworkAttributes$NetworkTypeValues.class": "41b41d945017c78c665e79653d5dcd6d301006ca3437121ea9ab6746229f4190",
+    "io/opentelemetry/semconv/NetworkAttributes.class": "e5eb1e1a9b16d48d86c1c02930acc86571e2937b03f4c170061dabf51e47a286",
+    "io/opentelemetry/semconv/OtelAttributes$OtelStatusCodeValues.class": "661ce17f9b83af04e9d43ee44856671272e933371e38ff086d1a0acce141d203",
+    "io/opentelemetry/semconv/OtelAttributes.class": "d62e62b30a73315f04283928e8d58824754353dff7af4ece02c80cbb45f586dc",
+    "io/opentelemetry/semconv/SchemaUrls.class": "b2877266ea124a6a33a439f117d207e5c2ab4be51cbcedc3ae8bb9e6bc9b6ae3",
+    "io/opentelemetry/semconv/ServerAttributes.class": "ccf401a3132c32c59e9c6d1b833f07d782ba3ef2f7e365c18d00356b120de89b",
+    "io/opentelemetry/semconv/ServiceAttributes.class": "ac043c3c22fe61a5989bb8da117590a7652f68dc47cee1f8c78a47fd9a2fcabe",
+    "io/opentelemetry/semconv/TelemetryAttributes$TelemetrySdkLanguageValues.class": "11ba2a8928b7ad3e612b070998ef4c5bc5b0a8e0e7071b160c58ef7f58d55731",
+    "io/opentelemetry/semconv/TelemetryAttributes.class": "97c8c31d2ba8479462d4f13364337f1269521d78b62435a1fef0d95bc9391b18",
+    "io/opentelemetry/semconv/UrlAttributes.class": "909a6536b3527f12f6137533b5a265065ca48f7507299fe8b85e42f01535aad3",
+    "io/opentelemetry/semconv/UserAgentAttributes.class": "085ac6436d309ae7b008a8ab8a2b91a7ac284f14dd19e4beffe41386fc67b807"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "5936ad93582f19fd6634044aa8eaa52c02a93e1588787480afd93129f9d9c4dd"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/opentelemetry/semconv/AttributeKeyTemplate.class",
+      "occurrence": 0,
+      "sha256": "40b3c8b7b6b112d8d61240ac78742805d82d07c8b7fc2d2e984860e3bdec3c31",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ClientAttributes.class",
+      "occurrence": 0,
+      "sha256": "0fec4a26fda01f26d61ad174fff53bbe0bb38a208fc2d8ed6857ef1d4188c66b",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/CodeAttributes.class",
+      "occurrence": 0,
+      "sha256": "e8b7e113001ceb7ffbf0b05793960b01fb7af56a9eacf61675cef96a21e1f92c",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/DbAttributes$DbSystemNameValues.class",
+      "occurrence": 0,
+      "sha256": "4b11955243b252c0cc68a393c62877036a13698e89b7d50010bde8e7ad365206",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/DbAttributes.class",
+      "occurrence": 0,
+      "sha256": "b535c06b904f35485adf11f9018257ff1c5bf3dcfbeb8a6a0169050ba7d6b718",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ErrorAttributes$ErrorTypeValues.class",
+      "occurrence": 0,
+      "sha256": "4b19f3b7f6c069b9d3d38ebac8af3022a38f49674186b845db2b0cd76129cf75",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ErrorAttributes.class",
+      "occurrence": 0,
+      "sha256": "7fedf90709e6c6414d98f38b6b806cdf41bfa75c0ed8c6c0589972bc3567dfcd",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ExceptionAttributes.class",
+      "occurrence": 0,
+      "sha256": "41e8e41a27364e520de3a9df31d6cff5128253ae32d9c014de9529ff69046b31",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/HttpAttributes$HttpRequestMethodValues.class",
+      "occurrence": 0,
+      "sha256": "4ffabfe654065cda96e3e2d944d6979a473cbbf5d40d1eb8f5484734db155d72",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/HttpAttributes.class",
+      "occurrence": 0,
+      "sha256": "19d7201c45228a137df319e8a34a46123e5364cc196de694c1485a47f4e6c2cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/JvmAttributes$JvmMemoryTypeValues.class",
+      "occurrence": 0,
+      "sha256": "130d76866290994f1e17b77af136801ce8933a360af59a18d20b853afd1a3ba9",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/JvmAttributes$JvmThreadStateValues.class",
+      "occurrence": 0,
+      "sha256": "71e0bb95bc51c6eceae7cbe09f1551653f2263fe26076bff5a3f9e92a741fc18",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/JvmAttributes.class",
+      "occurrence": 0,
+      "sha256": "7fa96f9790bb4aa5bb337fb70c526c18a23a9d45ecc9e777de04fa8064242f88",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/NetworkAttributes$NetworkTransportValues.class",
+      "occurrence": 0,
+      "sha256": "71ee3bf65b2902c36a4d92b03a2f2218b85755bab7d49733efc5b11b7a938a26",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/NetworkAttributes$NetworkTypeValues.class",
+      "occurrence": 0,
+      "sha256": "41b41d945017c78c665e79653d5dcd6d301006ca3437121ea9ab6746229f4190",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/NetworkAttributes.class",
+      "occurrence": 0,
+      "sha256": "e5eb1e1a9b16d48d86c1c02930acc86571e2937b03f4c170061dabf51e47a286",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/OtelAttributes$OtelStatusCodeValues.class",
+      "occurrence": 0,
+      "sha256": "661ce17f9b83af04e9d43ee44856671272e933371e38ff086d1a0acce141d203",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/OtelAttributes.class",
+      "occurrence": 0,
+      "sha256": "d62e62b30a73315f04283928e8d58824754353dff7af4ece02c80cbb45f586dc",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/SchemaUrls.class",
+      "occurrence": 0,
+      "sha256": "b2877266ea124a6a33a439f117d207e5c2ab4be51cbcedc3ae8bb9e6bc9b6ae3",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ServerAttributes.class",
+      "occurrence": 0,
+      "sha256": "ccf401a3132c32c59e9c6d1b833f07d782ba3ef2f7e365c18d00356b120de89b",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/ServiceAttributes.class",
+      "occurrence": 0,
+      "sha256": "ac043c3c22fe61a5989bb8da117590a7652f68dc47cee1f8c78a47fd9a2fcabe",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/TelemetryAttributes$TelemetrySdkLanguageValues.class",
+      "occurrence": 0,
+      "sha256": "11ba2a8928b7ad3e612b070998ef4c5bc5b0a8e0e7071b160c58ef7f58d55731",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/TelemetryAttributes.class",
+      "occurrence": 0,
+      "sha256": "97c8c31d2ba8479462d4f13364337f1269521d78b62435a1fef0d95bc9391b18",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/UrlAttributes.class",
+      "occurrence": 0,
+      "sha256": "909a6536b3527f12f6137533b5a265065ca48f7507299fe8b85e42f01535aad3",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/semconv/UserAgentAttributes.class",
+      "occurrence": 0,
+      "sha256": "085ac6436d309ae7b008a8ab8a2b91a7ac284f14dd19e4beffe41386fc67b807",
+      "member_shard": "docs/dev/evidence/sqx145/members/094/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/094/001.json",
+      "sha256": "a9b9fe31cb2bcfac7846ebdd86f87ac5a4b676a12064a19969832b657caa7833"
+    }
+  ]
+}

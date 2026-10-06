@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
+  "archive_sha256": "73a05e6d594be525c4068892f3fdea77929b2740dba3338c4e212360e98067a9",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewPlugin.class",
+      "occurrence": 0,
+      "sha256": "c2f33620aaa0cdc4ec1d3f4429bf1656c5b31033fee0a4a85e8400f9da2dc340",
+      "name": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "f85d8ad1caa044d8e9a4306d7e63e6ac0e088c647a1aab60413ab7635295cd01",
+          "code_length": 5
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "64afbfe5f4d61b6b75cd2a8a561856b2b1be2e4c2468e68d905dd2625889898a",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewPlugin",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock.class",
+      "occurrence": 0,
+      "sha256": "cd957738c9438789a41f0db844cdf37d518513803bcad767cbd0e159730a173d",
+      "name": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pl",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "volume",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "trades",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "5e813b94bc0c3294ff5ba0730719cc5e3bb9b060145ab8ae2449b227a367b920",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL.class",
+      "occurrence": 0,
+      "sha256": "326c849c8c7857f0bb8c9c861f499c9afe82f052dc24ab43751f8bd3843d5e2e",
+      "name": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;)V",
+          "access": 1,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;)I",
+          "access": 1,
+          "code_sha256": "0d19a615a28fdc941789cbcc8ed7d54dbc716cebac387d01728f7f1c1c86f9bc",
+          "code_length": 30
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "8e9b2ad65f101c043d55f6cf489afba2ac95915371d417392899e78f5ad13218",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume.class",
+      "occurrence": 0,
+      "sha256": "63722913967dc828de96d0006a56109747def8d60f52ace7d7921813ea4e23bf",
+      "name": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet;)V",
+          "access": 1,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;)I",
+          "access": 1,
+          "code_sha256": "0d19a615a28fdc941789cbcc8ed7d54dbc716cebac387d01728f7f1c1c86f9bc",
+          "code_length": 30
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "8e9b2ad65f101c043d55f6cf489afba2ac95915371d417392899e78f5ad13218",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet.class",
+      "occurrence": 0,
+      "sha256": "a2e39e842b2879e27ebc95c25d042d4ed6c60322af03d12af9580418f51b2f9c",
+      "name": "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_SPOVERVIEWSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "strategyConfig",
+          "descriptor": "Lcom/strategyquant/tradinglib/strategyConfig/StrategyConfig;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "8d8fb21f95abe0f6cc3a21f03702d28ca1e547b3f683248599c92d16c8e19ea8",
+          "code_length": 20
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "5caf44c57b42fe6fd8ba2009eabb8051255f52af8a90987161aa79c05b68dbc9",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onPrint",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "62dd22307323c59095fc23275fcb4b5ac21e0e102bc4f6d4c71ef45db56566be",
+          "code_length": 1016,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getStats",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "1d06264ba70f7943b69b2f18d52270e3954f40a3406756ec13bf964f97390734",
+          "code_length": 251,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "copyData",
+          "descriptor": "(Ljava/util/List;Lorg/json/JSONArray;DZZ)V",
+          "access": 2,
+          "code_sha256": "51ba6bed8b7d087af5585a220e436c06d35273a7d9a3f236831e94dfcb1a0f9d",
+          "code_length": 164,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock;>;Lorg/json/JSONArray;DZZ)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3755b8735e5ceccdc7734819da4ee33e712b594651505ef1f3cdd36c193433ae",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$SPStock",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByPL",
+        "com/strategyquant/plugin/Results/impl/SPOverview/SPOverviewServlet$StockComparatorByVolume",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/strategyConfig/StrategyConfig",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

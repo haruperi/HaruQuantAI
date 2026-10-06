@@ -1,0 +1,101 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskBuild/TaskBuild.jar",
+  "sha256": "38d7920fafa619f5521a5d147f2f57d2bc265f251aae02d6076bd972c49643d4",
+  "class_count": 11,
+  "unique_class_entries": 11,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/Build/ArtificalBuilderJob.class": "ec234e7eea4c9e5edb013d488a5b169ed1281a308f37846537e7427aba6edb36",
+    "com/strategyquant/plugin/Task/impl/Build/BuildStopConditionsChecker.class": "1fbb44e0994a320aac1294219b14403d60d15af45ff602fba853358c9f3a46a6",
+    "com/strategyquant/plugin/Task/impl/Build/BuildTask$1.class": "8209d46cb058f8c549b097a8d6d7fa90669bd3ca09f5c95aa9bd828b4f16db3d",
+    "com/strategyquant/plugin/Task/impl/Build/BuildTask.class": "b58c801fb00abea9926e1c7842d804cb5256049ea1d5662fddd600ad763c2b51",
+    "com/strategyquant/plugin/Task/impl/Build/BuilderJob.class": "c9217d21c59a54a75a0ed4b4e648aa58a4933004c8c9a4e21c3acf257617d751",
+    "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine$1.class": "03994de6bf799921f3671c0a3d807c71e33f266fa67563dcd9a8d743947b6165",
+    "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine$2.class": "b950daa28023f615764d0b49ca6cc7dcb2456134d86cca9f71d460ef0b20497d",
+    "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine.class": "f6ad2ddcbb7ae1578931916e2f5b09bd810ec672d9f54268de07dbc354cf100f",
+    "com/strategyquant/plugin/Task/impl/Build/IBuildEngine.class": "0fa0ee4b89adc77034c81501d6de93cc0bebe5073272c5eb9731ee9375225ef0",
+    "com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine$1.class": "f8bef83df29433f5be90287aeac6a20b592185a2c813ddec96a8645b10fedb1b",
+    "com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine.class": "d66801dc2dac2a3899f55fb2cc95c43fab0689a878e87777790241501083c5a2"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/ArtificalBuilderJob.class",
+      "occurrence": 0,
+      "sha256": "ec234e7eea4c9e5edb013d488a5b169ed1281a308f37846537e7427aba6edb36",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/BuildStopConditionsChecker.class",
+      "occurrence": 0,
+      "sha256": "1fbb44e0994a320aac1294219b14403d60d15af45ff602fba853358c9f3a46a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/BuildTask$1.class",
+      "occurrence": 0,
+      "sha256": "8209d46cb058f8c549b097a8d6d7fa90669bd3ca09f5c95aa9bd828b4f16db3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/BuildTask.class",
+      "occurrence": 0,
+      "sha256": "b58c801fb00abea9926e1c7842d804cb5256049ea1d5662fddd600ad763c2b51",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/BuilderJob.class",
+      "occurrence": 0,
+      "sha256": "c9217d21c59a54a75a0ed4b4e648aa58a4933004c8c9a4e21c3acf257617d751",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine$1.class",
+      "occurrence": 0,
+      "sha256": "03994de6bf799921f3671c0a3d807c71e33f266fa67563dcd9a8d743947b6165",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine$2.class",
+      "occurrence": 0,
+      "sha256": "b950daa28023f615764d0b49ca6cc7dcb2456134d86cca9f71d460ef0b20497d",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/GeneticBuildEngine.class",
+      "occurrence": 0,
+      "sha256": "f6ad2ddcbb7ae1578931916e2f5b09bd810ec672d9f54268de07dbc354cf100f",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/IBuildEngine.class",
+      "occurrence": 0,
+      "sha256": "0fa0ee4b89adc77034c81501d6de93cc0bebe5073272c5eb9731ee9375225ef0",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine$1.class",
+      "occurrence": 0,
+      "sha256": "f8bef83df29433f5be90287aeac6a20b592185a2c813ddec96a8645b10fedb1b",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine.class",
+      "occurrence": 0,
+      "sha256": "d66801dc2dac2a3899f55fb2cc95c43fab0689a878e87777790241501083c5a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/270/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/270/001.json",
+      "sha256": "db53e6744bf48f4a7c773f8bc614e6330783d642450bf4b107889d6c15a59679"
+    }
+  ]
+}

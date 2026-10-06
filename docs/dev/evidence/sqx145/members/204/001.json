@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsExplore/ResultsExplore.jar",
+  "archive_sha256": "bb8f0211b555d30032a8807b0082d34adcb0291567b6a30c2950d0a1947120ef",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExplorePlugin.class",
+      "occurrence": 0,
+      "sha256": "9c1f973c76d38563d7e494770285db5be74c9bbfe6a94af8eab003f6c143a40b",
+      "name": "com/strategyquant/plugin/Results/impl/Explore/ExplorePlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/Explore/ExploreServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "b74949376b9715cd7eb763aa6a1a8caeea22536af4ef2eb79c510695106e311e",
+          "code_length": 11
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "498ce7904e460308111cf0147c24f419248cfe0e342ea1acfff9fd15e1c15292",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/Explore/ExplorePlugin",
+        "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache.class",
+      "occurrence": 0,
+      "sha256": "fd2619a7569e7f2557e6e1a1bd229a5e10460f787d2861d7e61312363cf97212",
+      "name": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/LinkedHashMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "maxEntries",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "3b100c72643ac181d5a834e7ad6b3f6b60977341b2465867efae19b28ea1e3c6",
+          "code_length": 15
+        },
+        {
+          "name": "removeEldestEntry",
+          "descriptor": "(Ljava/util/Map$Entry;)Z",
+          "access": 4,
+          "code_sha256": "ca1ba76af06d15ec73ed7bccdaaf8473a9c1763dbbd7494812e90ac62cb1d552",
+          "code_length": 17,
+          "generic_signature": "(Ljava/util/Map$Entry<Ljava/lang/String;Ljava/util/ArrayList<[Ljava/lang/Object;>;>;)Z"
+        }
+      ],
+      "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/util/ArrayList<[Ljava/lang/Object;>;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet",
+        "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache",
+        "java/util/LinkedHashMap",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet.class",
+      "occurrence": 0,
+      "sha256": "26a1bae8fc39889289af00f39ceaa5583bef93c521b5d963be7b4fe00886efeb",
+      "name": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_EXPLORESERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "MAX_CACHED_RESULTS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "dataCache",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "f6831037c6f6e78aaf90e27ba6f36e3cda826125ce3be4dfc2175092320f7f57",
+          "code_length": 22
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "d0e718454d7ed60adebb3f4589dae0c371d8912a501c03d25af839cf3aee3895",
+          "code_length": 200,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dfa59678448b83d8292b55e9ff4f1beb4c8c857c6484bd756f6ce7e667283bb0",
+          "code_length": 250,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onInfo",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "aacd3002075ea84be2dc2857fb7aa4ffb67f5cd03f511d64b36044dc351dda90",
+          "code_length": 386,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onAll",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d0c373e320e9c8c168d7e43fb147343192eb2cd042e9c4c8130a9e74c0d6e862",
+          "code_length": 294,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRelease",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "44a5518742ae013abab3fc27afc36e7a620225a7c0c127c1953da4844f711e3a",
+          "code_length": 156,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "loadData",
+          "descriptor": "(Ljava/util/Map;Lcom/strategyquant/tradinglib/explore/Explore;Ljava/lang/String;Lcom/strategyquant/lib/utils/JsonCreator;)V",
+          "access": 2,
+          "code_sha256": "d978691ce116fcdb8836f37f7d3bc9a3b213519e7df22fee2f70643fad4b5243",
+          "code_length": 415,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Lcom/strategyquant/tradinglib/explore/Explore;Ljava/lang/String;Lcom/strategyquant/lib/utils/JsonCreator;)V"
+        },
+        {
+          "name": "generateNewData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/explore/Explore;Ljava/util/Map;)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "517b5ad6a2f3064190885056ae0ad5d5bb130622dcc6edce9f156485d3ee4ebe",
+          "code_length": 227,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/explore/Explore;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/util/ArrayList<[Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getDataIdentificator",
+          "descriptor": "(Ljava/util/Map;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3cae3ed2b2aeb17f2981eb6ee6ef0ae7c5f1a2a4b75009c9d8d3dc9bed62eb89",
+          "code_length": 157,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c0f6e55f4a0fcc216a3660553a6fa17bf14c2721f5df8dfd3a2d1f7f2e3fc524",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet",
+        "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/explore/Explore",
+        "com/strategyquant/tradinglib/explore/ExploreOpenPositionMarks",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectAVLTreeMap",
+        "it/unimi/dsi/fastutil/longs/LongSortedSet",
+        "it/unimi/dsi/fastutil/objects/Object2ObjectOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "it/unimi/dsi/fastutil/objects/ObjectSet",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Base64",
+        "java/util/Base64$Encoder",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

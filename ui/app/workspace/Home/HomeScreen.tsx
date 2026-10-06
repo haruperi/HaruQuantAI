@@ -27,7 +27,7 @@ export function HomeScreen() {
           <p>Continue a research project, manage market data, or author a trading strategy.</p>
         </div>
         <div className="version">
-          Build 144 · recreation<br/>
+          SQX145 reference<br/>
           <small>Frontend mock profile</small>
         </div>
       </div>

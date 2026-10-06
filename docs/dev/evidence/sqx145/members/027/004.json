@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/filters-2.0.235.jar",
+  "archive_sha256": "be6a1d54ebb043495e31e25e72b440f69156a5624cdd7e1c55c47e30d4fae308",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/jhlabs/vecmath/Vector4f.class",
+      "occurrence": 0,
+      "sha256": "189f6cbe016960074d9152fe8cb7c27a2702d3a1372e048fac49177e7ebba39e",
+      "name": "com/jhlabs/vecmath/Vector4f",
+      "major": 45,
+      "minor": 3,
+      "access": 33,
+      "superclass": "com/jhlabs/vecmath/Tuple4f",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7287c65044b4e9d196a1985e39ea59a342efb62ccf3d6709e2d32a256f63ea41",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([F)V",
+          "access": 1,
+          "code_sha256": "422122578c39a70560fa32589ee20681acfb5f96562251ae83943be22145c1ba",
+          "code_length": 33
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(FFFF)V",
+          "access": 1,
+          "code_sha256": "0b65ce9954f73fbc3a3aa7cdb418ab188316eea67ec063b15a0b43ce3e677abc",
+          "code_length": 26
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jhlabs/vecmath/Vector4f;)V",
+          "access": 1,
+          "code_sha256": "db24c29afe7521f1ff4a3742abbcbb03566c9efae4f79eeae492537427878ece",
+          "code_length": 37
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jhlabs/vecmath/Tuple4f;)V",
+          "access": 1,
+          "code_sha256": "db24c29afe7521f1ff4a3742abbcbb03566c9efae4f79eeae492537427878ece",
+          "code_length": 37
+        },
+        {
+          "name": "dot",
+          "descriptor": "(Lcom/jhlabs/vecmath/Vector4f;)F",
+          "access": 1,
+          "code_sha256": "1f8ec56d9edbeebd31a48045e5ab2b93b5f02e96c5f7fcad3aa1b98db152fa09",
+          "code_length": 40
+        },
+        {
+          "name": "length",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "7c021e56fa17e1e348a751d6beaaa77a2a7f9880db085a08150bb2af5305a410",
+          "code_length": 45
+        },
+        {
+          "name": "normalize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f72e1f5168f13bf6b394b2cfaa19cd12a9887e46032bb74531792747054eed98",
+          "code_length": 83
+        }
+      ],
+      "class_references": [
+        "com/jhlabs/vecmath/Tuple4f",
+        "com/jhlabs/vecmath/Vector4f",
+        "java/lang/Math"
+      ]
+    }
+  ]
+}

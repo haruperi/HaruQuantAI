@@ -1,0 +1,5099 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/Snippets.jar",
+  "archive_sha256": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "SQ/Blocks/Indicators/VWAP/VWAPFalling.class",
+      "occurrence": 0,
+      "sha256": "71f2095aa35a0f6a6827009433d90590a41f760554a21e32c8f78e24d98f4399",
+      "name": "SQ/Blocks/Indicators/VWAP/VWAPFalling",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "VWAPPeriod",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b625007bb51b8b69b79530177b008cdaa502a7196f24677944dbf3050ebfd9af",
+          "code_length": 59,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/VWAP/VWAP",
+        "SQ/Blocks/Indicators/VWAP/VWAPFalling",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/VWAP/VWAPRising.class",
+      "occurrence": 0,
+      "sha256": "4e92581c8abab3698af9f6416e455ef6c78fdc1a4cd3dec0231ebd9da1ee7e80",
+      "name": "SQ/Blocks/Indicators/VWAP/VWAPRising",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "VWAPPeriod",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95b2bec9a6a6d51621f452cf64147c3e76d3f7698c2f94654a624c999296a3ce",
+          "code_length": 59,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/VWAP/VWAP",
+        "SQ/Blocks/Indicators/VWAP/VWAPRising",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrend.class",
+      "occurrence": 0,
+      "sha256": "e71fa40c751ece198e12a0e22856912fe90b986d8d80480e062f19b9dfa4ab0b",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/IndicatorBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "WT1",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "WT2",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "avgPrice",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "esa",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "d",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "ci",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "esaMultiplier",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "dMultiplier",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "tciMultiplier",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "wt2Multiplier",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "9f50e8db35b4a03f7810545bc4410ffdc7cba4caa13cd966ac9f24cc44e524fa",
+          "code_length": 53,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "46e49590cc15e144b582600d88a477a0320e3b6c5028507a420851310518444f",
+          "code_length": 323,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Internal/IndicatorBlock",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesDown.class",
+      "occurrence": 0,
+      "sha256": "9d7ad01eb2fcbd0787fb3752c8e40ad12f4479df33fb67247694f1e686d5a572",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesDown",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "284814bbcf5d31f64a3381b94bb5e07dcb42843876367d1e2ef2c832101b83f0",
+          "code_length": 86,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesDown",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesUp.class",
+      "occurrence": 0,
+      "sha256": "28ead3052688196e6d2f06b52fc8fcdf6a6ca1737342a6e17d8a293cfdd1454f",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesUp",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6cc8b1aadbe5bd33bef8ebdb2186273c222fb8b106cd10ed781d1f7048f6bb89",
+          "code_length": 86,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainChangesUp",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAbove.class",
+      "occurrence": 0,
+      "sha256": "794c94cd45454e268a18ab7a990fbc861302cc23d27d226e0dc277aa7895e7b6",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAbove",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a62c2aeca91915b2fa581daa906ab93adfb4c43fcf72344864e7c54289d8c9d2",
+          "code_length": 75,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAbove",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveSignal.class",
+      "occurrence": 0,
+      "sha256": "f0b3a9a3b18c7b0557b384f9cd5d83b5d36c300511a0975ab8869634d1ead971",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveSignal",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0865dd3ad7d48ee88a94ea11b7c1010ce1d7aabfe8867152338a9c1bfc7e363f",
+          "code_length": 99,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveSignal",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveZero.class",
+      "occurrence": 0,
+      "sha256": "a2d695c2952f3330960dc27ffd7cd1747229ef3133158bfb4ad2498828926c78",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveZero",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "12c299962561888e69d91c62a1a6f8cf7a3f798ffb8df4ebc271ca0a49bd4dd0",
+          "code_length": 69,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossAboveZero",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelow.class",
+      "occurrence": 0,
+      "sha256": "7cedc9f0230783bdb25bc6dafa14744814b305ff9d2d7d2ac885b0672c1e4cad",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelow",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "280df3306c5bdff0c29607e76851ba6759f78751af0abcaaf5949dfabfed66eb",
+          "code_length": 75,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelow",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowSignal.class",
+      "occurrence": 0,
+      "sha256": "03a96829bd5d11c3e20adcc0086d2cb33453d5983cd55a5c3852369ef98badf1",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowSignal",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "92e979ab116e103a163d809149f9f107e77941474546c47849482090b5f59d36",
+          "code_length": 99,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowSignal",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowZero.class",
+      "occurrence": 0,
+      "sha256": "243a87ac5f8ba8eed9276ddfd9aa8db1de077e6c2247f33383b245ad1dc732a2",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowZero",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9fa9e34f0b9d111a26c8912eab9683f9fc5f632aaa129f244cb60f1cc4f676e0",
+          "code_length": 69,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainCrossBelowZero",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainFalling.class",
+      "occurrence": 0,
+      "sha256": "f5fa8219d2a6c93ea24171722b4de9398e7f04c9bbc44012875b6360a32218d4",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainFalling",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4a3c73885983ee8f4526a8c10d722da6ad81cf5cc0306dd4760c3ae54a3b9d11",
+          "code_length": 63,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainFalling",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigher.class",
+      "occurrence": 0,
+      "sha256": "eee314381e345bd0cf05000b6e3b9099dec62593c0589313d4ce8d0d586a17c8",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigher",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cb2acfd8fe2779ffb239dddcd64a3ed972394a2e59da5fdf0b6ded381141bd13",
+          "code_length": 50,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigher",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherSignal.class",
+      "occurrence": 0,
+      "sha256": "b49c24c2e3672f62d5698dc1f59fd2ddf26cb0f044aa0b1cdd13df81592fcd21",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherSignal",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e8d75d6c43f0986c4d17a67f5ce2ddfcd17c3bff330ae0fe9c38fecee0706694",
+          "code_length": 61,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherSignal",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherZero.class",
+      "occurrence": 0,
+      "sha256": "0fbac393b4b55070b6ce1f8147bcf88f9cc7c4da8d643385135c67b4687696aa",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherZero",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "396d124360f8fb053ebd042944802b0475c8d5385f33b05042d9289d063d09c6",
+          "code_length": 47,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainHigherZero",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLower.class",
+      "occurrence": 0,
+      "sha256": "f3e1ed739948897cdfcf4b20302f0c13acc74d799546916ecfc3e138f919a66e",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLower",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9d56cf954284568e76da2f2a10e6aba91af2e217d06ab3a348ebf5472e15b22c",
+          "code_length": 50,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLower",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerSignal.class",
+      "occurrence": 0,
+      "sha256": "0490faf0e0090324c84f47f46dbda5bff6028503410b580eb2f1e33d389e25ba",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerSignal",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2c29d38b8948838918bb8061385d081bd2a5f36667330ec7adfd3cafb661495f",
+          "code_length": 61,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerSignal",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerZero.class",
+      "occurrence": 0,
+      "sha256": "f2f8d07670c1ca0f495f843566db551280a716bf5846ea335ce6f361ccba468c",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerZero",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4c559bb11ad88ad1ae6b81e55aee52e99f722142babd5224c96e3603dd15f0c4",
+          "code_length": 47,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainLowerZero",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainRising.class",
+      "occurrence": 0,
+      "sha256": "7f25d8939c0b5a9cdb9998e8f8152b6c29649868d1c8cfe1aa2739d225a1f37c",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainRising",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2d8af9e3fc8ce182d9d72b3f3b25d58eec9a9654a5c3585dcb28b96697e912c5",
+          "code_length": 63,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendMainRising",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalFalling.class",
+      "occurrence": 0,
+      "sha256": "39b501fe58a15bed830bad2c1f9bfe20a39b8305b70a000b4554c6cff3840192",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalFalling",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4a3c73885983ee8f4526a8c10d722da6ad81cf5cc0306dd4760c3ae54a3b9d11",
+          "code_length": 63,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalFalling",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalRising.class",
+      "occurrence": 0,
+      "sha256": "98c9e8264252cda04a984f7b7d45dd7a16a105d3900c58a9437c78c8328e0534",
+      "name": "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalRising",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "ChannelLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AverageLength",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2d8af9e3fc8ce182d9d72b3f3b25d58eec9a9654a5c3585dcb28b96697e912c5",
+          "code_length": 63,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrend",
+        "SQ/Blocks/Indicators/WaveTrend/WaveTrendSignalRising",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR.class",
+      "occurrence": 0,
+      "sha256": "b3d3c54afa7b8764951ab55cdbab727a1a731e24df83ae55057585c85d3d8f61",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/IndicatorBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Value",
+          "descriptor": "Lcom/strategyquant/datalib/DataSeries;",
+          "access": 1
+        },
+        {
+          "name": "highestCalculator",
+          "descriptor": "LSQ/Calculators/HighestCalculator;",
+          "access": 2
+        },
+        {
+          "name": "lowestCalculator",
+          "descriptor": "LSQ/Calculators/LowestCalculator;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "ce0acb298b65723557c3cf3e0983117a8fbc2ccdf57f80623132a38548a9ef3a",
+          "code_length": 31,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "OnBarUpdate",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d2f051649578350d78fbfda5f7faaf57c84ed855d16c26ecedab02dde3b5f6d2",
+          "code_length": 106,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Calculators/HighestCalculator",
+        "SQ/Calculators/LowestCalculator",
+        "SQ/Internal/IndicatorBlock",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRChangesDown.class",
+      "occurrence": 0,
+      "sha256": "d3cf8834726d12e27405aaceb9de6bbb0fc9ea9c955e5f18cff46989b04adcbb",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRChangesDown",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5d7aa46b0d36e915a5c8d5027d93c4b8790124a6c754c9b6388791c8db23cf61",
+          "code_length": 82,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRChangesDown",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRChangesUp.class",
+      "occurrence": 0,
+      "sha256": "51217de169f12ebe456df53f55a65289694ad1c28fd63a12020a6a1311d3bb44",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRChangesUp",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b73dd2fb1e03505a4ab9700724eaeb28ee1afd7ac9396b17a21d7d095db107e8",
+          "code_length": 82,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRChangesUp",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRCrossDown.class",
+      "occurrence": 0,
+      "sha256": "e162e1e05e156960dde8b17d390f67e5a8f6e20fbce117e69ea634d86fe3b4a2",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRCrossDown",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "80512ed01852a4935a0d457e377ab76fbb6805e6846191f294e58095680334a9",
+          "code_length": 71,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRCrossDown",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRCrossUp.class",
+      "occurrence": 0,
+      "sha256": "87c721c61ea92b9bb3e68142588a739e66f363c2136fbed0dd736e4c80897e7a",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRCrossUp",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "71b1c913b93756c0a385e91064c0f8ad771efcedf78e8e5ddd6523f7e20807fc",
+          "code_length": 71,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRCrossUp",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRFalling.class",
+      "occurrence": 0,
+      "sha256": "2833af89906ad9b16d9f73c81ef69735784445247c9972d1ef6bc33971602207",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRFalling",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4e07c709e581085d53631c1ce573981c83a755513d30870c5e1c14818878c924",
+          "code_length": 59,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRFalling",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRHigher.class",
+      "occurrence": 0,
+      "sha256": "55ead577717253d8850e6e0c0cbf17673fa5a9ae84d0cd130407c167c9b9acc7",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRHigher",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3dd3530ec1fdd91adead83578ba7c6845b7aa9b8f22de497b831489c5516ec94",
+          "code_length": 46,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRHigher",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRLower.class",
+      "occurrence": 0,
+      "sha256": "e523998a73dfd1c4b9dee20f5f2e5248dcb4c9435ceedf7f2eb7b22e35b02344",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRLower",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Level",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "72c0a3be3841f4a06249ea026a305efce45e79b71384aedac06e9db56488df5a",
+          "code_length": 46,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRLower",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Indicators/WilliamsPR/WPRRising.class",
+      "occurrence": 0,
+      "sha256": "fe7f81a7baa369f67e4a5077b1cff028e14de45d02a3b94aaeecd5bc49b9985f",
+      "name": "SQ/Blocks/Indicators/WilliamsPR/WPRRising",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ConditionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Input",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Period",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "194b9d7c2b63c717d3f725f23c29d2c9fae055e07b19d325a0c507a23f624adc",
+          "code_length": 59,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/WilliamsPR/WPRRising",
+        "SQ/Blocks/Indicators/WilliamsPR/WilliamsPR",
+        "SQ/Internal/ConditionBlock",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/CloseAllPendingOrders.class",
+      "occurrence": 0,
+      "sha256": "5c79749ee69751c1fc1741736fe13345c253703b13fe2630190e37dd976e2cf8",
+      "name": "SQ/Blocks/Order/Close/CloseAllPendingOrders",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c103c1c5f69abefbdbf48674b61a17e6b2a5bd9e0133f7453d25caf996d09db3",
+          "code_length": 85,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/CloseAllPendingOrders",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/CloseAllPositions.class",
+      "occurrence": 0,
+      "sha256": "dd17ca706f8a8dd04e90da7dd73d0e72227f2487ddfed3065e63bcd392c95e6c",
+      "name": "SQ/Blocks/Order/Close/CloseAllPositions",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2fe2833d8bb368c0c6c44b3a1b649c48cf76e2bdd134abaa146690324777ff4a",
+          "code_length": 84,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/CloseAllPositions",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/CloseBestPosition.class",
+      "occurrence": 0,
+      "sha256": "964995a625d586e1377b15b8b716b5225a6cf3e8986404033064c4f7c4a6d66a",
+      "name": "SQ/Blocks/Order/Close/CloseBestPosition",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "64774e58a529ec58f728c7be37e91ecf82e615772ede779c597d4a57c7cefc7d",
+          "code_length": 122,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/CloseBestPosition",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "java/lang/Double"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/ClosePendingOrder.class",
+      "occurrence": 0,
+      "sha256": "8c751a0f751e6ff6e3c4afc225565e8989bfe360e354e12605feb5141732172c",
+      "name": "SQ/Blocks/Order/Close/ClosePendingOrder",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ab6567359058e6222d271cbc9918ba3d2cf10fba21ff9d6a8c9a70c4033d0563",
+          "code_length": 83,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/ClosePendingOrder",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/ClosePosition.class",
+      "occurrence": 0,
+      "sha256": "d989a2661962fa9c18e473d07aaddce18a3b8394334734130eafa4409d73f0c8",
+      "name": "SQ/Blocks/Order/Close/ClosePosition",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Size",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "80ad602e401e6b5a7c6b364406a6e4998342e5a5e772a8300f7579d9b5296df3",
+          "code_length": 82,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/ClosePosition",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Close/CloseWorstPosition.class",
+      "occurrence": 0,
+      "sha256": "6360dfe6084ce8973994baefe9bb597e1dc4831ae6e73d9a1729e8469989e9f6",
+      "name": "SQ/Blocks/Order/Close/CloseWorstPosition",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1e20760b1f898f048dfa7d68def869b752d6c893d714dde37691f3a856570389",
+          "code_length": 122,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Close/CloseWorstPosition",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "java/lang/Double"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Modify/SetProfitTarget.class",
+      "occurrence": 0,
+      "sha256": "221cb63d1b4e3008fc0708b2ac21452e5a2b5153f75aaa293971b9c25118e9ce",
+      "name": "SQ/Blocks/Order/Modify/SetProfitTarget",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "ProfitTarget",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1f2c7ac7614e7d631069462b97bd36726c9841362d8ac79ae5b01d1a1a7dab5b",
+          "code_length": 127,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Modify/SetProfitTarget",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Modify/SetStopLoss.class",
+      "occurrence": 0,
+      "sha256": "959e120ed3725e5350e2770736f980a74e9178cfa4894ef4dc24b9eb1391a61f",
+      "name": "SQ/Blocks/Order/Modify/SetStopLoss",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "StopLoss",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1f2c7ac7614e7d631069462b97bd36726c9841362d8ac79ae5b01d1a1a7dab5b",
+          "code_length": 127,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Modify/SetStopLoss",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Trader"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtLimit.class",
+      "occurrence": 0,
+      "sha256": "182513a3f5d1468d0e2accc1be0b248b8b87bd7eea4c820d12955c33f186f4a1",
+      "name": "SQ/Blocks/Order/Open/EnterAtLimit",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Blocks/Order/Open/EnterAtStop",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "81175da9a10794090143621f5099c497038e5d1b3f43aa20aee033c575e9e72f",
+          "code_length": 391,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtLimit",
+        "SQ/Blocks/Order/Open/EnterAtStop",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/ATM",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Throwable",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$1$1.class",
+      "occurrence": 0,
+      "sha256": "bddeb448de588073c6961a92764cffe182b19a70fcf576c1f21bcc10512c6322",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$1$1",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket$1;)V",
+          "access": 0,
+          "code_sha256": "ddb202ebd68fb90504f73179abb585f5c1055c994d83210321cfa59f16991fc4",
+          "code_length": 15
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "13b994ddf49441fee197a49f4f1c26cf37340ccca6f4bcf1b27a442ca633db29",
+          "code_length": 29,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$1",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$1$2.class",
+      "occurrence": 0,
+      "sha256": "942b514d00ec24bf7f556c30ed112ab37bcb029f54063ca3338725313d344801",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$1$2",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$mainOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "this$1",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket$1;Lcom/strategyquant/tradinglib/ILiveOrder;)V",
+          "access": 0,
+          "code_sha256": "ab79229c8e56ae65c7d0ceefa5a5eff6288a34ac51e87278e01b5f8f5a2e759b",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "0f99b88b867d3699cbdfa6772c91ec4e3505666b17ffd2204b373722210cee79",
+          "code_length": 93,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$2",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$1$3.class",
+      "occurrence": 0,
+      "sha256": "2ba0120e218af21affbba904bf5a3198240cb948ba5d209239259ab1a4657f3e",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$1$3",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket$1;)V",
+          "access": 0,
+          "code_sha256": "ddb202ebd68fb90504f73179abb585f5c1055c994d83210321cfa59f16991fc4",
+          "code_length": 15
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "13b994ddf49441fee197a49f4f1c26cf37340ccca6f4bcf1b27a442ca633db29",
+          "code_length": 29,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$3",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$1.class",
+      "occurrence": 0,
+      "sha256": "7df86de935ea68efef3d7855e5ef405d39ac09dae25cb8eda6c25c3c9925dc3e",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$1",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "exitOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 2
+        },
+        {
+          "name": "actualSL",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "actualPT",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "lastTS",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "filled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "val$mainOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$atmExit",
+          "descriptor": "Lcom/strategyquant/tradinglib/ATMExit;",
+          "access": 4112
+        },
+        {
+          "name": "val$size",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$exitIndex",
+          "descriptor": "B",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ATMExit;DB)V",
+          "access": 0,
+          "code_sha256": "67d79623d9afa8abf4a9b0de9dbd2e59e9717ff2111d53c2d9bb5b7c15e32c93",
+          "code_length": 68,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "5acf82ae3c87d15c4fe1e91d911c6cc1ce2557c86303bf3ae5d36142760d1d4e",
+          "code_length": 805,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$2",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$3",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/UpdateEventTypes",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/ATMExit",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/atm/exits/AbstractExitLevel",
+        "com/strategyquant/tradinglib/atm/exits/None",
+        "com/strategyquant/tradinglib/atm/exits/TrailingStop",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$2.class",
+      "occurrence": 0,
+      "sha256": "4b674d41a97f9e74143d271384653c6a547d05d149fa2b9bb477a458855477a7",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$2",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$mainOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$atmExit",
+          "descriptor": "Lcom/strategyquant/tradinglib/ATMExit;",
+          "access": 4112
+        },
+        {
+          "name": "val$size",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$exitIndex",
+          "descriptor": "B",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ATMExit;DB)V",
+          "access": 0,
+          "code_sha256": "d6e42babccba6debe390bc23c92c4240e90bfbeb49575be083dbbc6e10868778",
+          "code_length": 37,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "ccbd7f71aa6eea8cd5c20baa7038963e8a4ce3b55c31056b9461610dca7f9320",
+          "code_length": 140,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$2",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ATMExit",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/atm/exits/None",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$3$1.class",
+      "occurrence": 0,
+      "sha256": "4433b4ba6b1549dd0b3a5f9ccd3125e687ec1504e56bd4ca23773d13fc89696c",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$3$1",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket$3;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket$3;)V",
+          "access": 0,
+          "code_sha256": "ddb202ebd68fb90504f73179abb585f5c1055c994d83210321cfa59f16991fc4",
+          "code_length": 15
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "13b994ddf49441fee197a49f4f1c26cf37340ccca6f4bcf1b27a442ca633db29",
+          "code_length": 29,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3$1",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$3.class",
+      "occurrence": 0,
+      "sha256": "66fd6faf8b510e73a9eb90f9580a07fd652cc3c8c4cdc768220af15ec9b2528c",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$3",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "exitOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 2
+        },
+        {
+          "name": "lastTS",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "filled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "val$mainOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$atmExit",
+          "descriptor": "Lcom/strategyquant/tradinglib/ATMExit;",
+          "access": 4112
+        },
+        {
+          "name": "val$size",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$exitIndex",
+          "descriptor": "B",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ATMExit;DB)V",
+          "access": 0,
+          "code_sha256": "f3a850ba95fd89d06ec9d294220c623a2c471296908902869d51da88003a8c6b",
+          "code_length": 54,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "acd5cdd89eb85fa7199f018205504780f06afc4c747b6ec7c77e108f96baec06",
+          "code_length": 376,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3$1",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/UpdateEventTypes",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/ATMExit",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/atm/exits/AbstractExitLevel",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$4.class",
+      "occurrence": 0,
+      "sha256": "9d5e7c0dc7ea9315159714b0a5b49e4eff379edfc627e6f89e02d056b99e2326",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$4",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$mainOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$exitOrder",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ILiveOrder;)V",
+          "access": 0,
+          "code_sha256": "1d1000dafc6217fba3b91f15038f0810fc23c9bc54e3b58ac34660779fb1d9b4",
+          "code_length": 25,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "8e7201b7515701f62171a9ff2eb1d62680ed0b8a79af867731173ea461d2f2ae",
+          "code_length": 84,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$4",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$5.class",
+      "occurrence": 0,
+      "sha256": "4b0c3430997898febf0f77bf7ad447eac1b0a522dfab6c172060f650648e7223",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$5",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$order",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;)V",
+          "access": 0,
+          "code_sha256": "ab79229c8e56ae65c7d0ceefa5a5eff6288a34ac51e87278e01b5f8f5a2e759b",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "ddbbd5e14294f31daecb7cbf7728ec322d826a062f070ea43695617110a60cbe",
+          "code_length": 92,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$5",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ExitMethod",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$6.class",
+      "occurrence": 0,
+      "sha256": "7eed64761e5ea9c4bbf61442420892cbbe2ed883f2ec1e14e5829316eaa17110",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$6",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$order",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$barsSeen",
+          "descriptor": "[I",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;[I)V",
+          "access": 0,
+          "code_sha256": "3f8ada0a4f6e7585638be87d86a57e572a32d86dd1c08aa503ebb65e144258ca",
+          "code_length": 22,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "869f667e4e3bc67fa3dab797a83467addde6ad4daf6d863fd4a34059620d6e41",
+          "code_length": 58,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$6",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket$7.class",
+      "occurrence": 0,
+      "sha256": "093ac82505d6aea0412c58ae52e35c61626f46aed7fefc1751d9ef4ab8797bfb",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket$7",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$order",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$barsValid",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/Blocks/Order/Open/EnterAtMarket;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/Blocks/Order/Open/EnterAtMarket;Lcom/strategyquant/tradinglib/ILiveOrder;I)V",
+          "access": 0,
+          "code_sha256": "141f37aa25c45d6f687269168380c60dca53d4a4fcf7fed35acea6d8bbbd1d9b",
+          "code_length": 25,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "aa8176c8d83ff51d7c33f21f0cfd91ce87df6412dc9529018db86722696a76f4",
+          "code_length": 16,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$7",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtMarket.class",
+      "occurrence": 0,
+      "sha256": "20f714604c54bff424bac2d636ef390359ea73e0c24715b0f1887421fb541912",
+      "name": "SQ/Blocks/Order/Open/EnterAtMarket",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MaxDistanceFromMarketHash",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MaxDistanceFromMarketPctHash",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Direction",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Size",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        },
+        {
+          "name": "MagicNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Comment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "AllowDuplicateTrades",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "ExitMethods",
+          "descriptor": "[Lcom/strategyquant/tradinglib/ExitMethod;",
+          "access": 1
+        },
+        {
+          "name": "ntPendingFallback",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5888b85951c09476a872a2fbf72f11ad3828aeec26813100f5d18b35056cd04e",
+          "code_length": 9,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "sqNtOppositeEntryWorking",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "565d2275a311f1c9c14bd8d6854ba509d1df947700438ffd7ce72926b02a291e",
+          "code_length": 45,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "sqNtSnapshotWorkingEntries",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "e4383d463104dea6d74a453080f0787699ae03c21b578f678f73a663553eaaab",
+          "code_length": 201,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "sqNtRecordPark",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "75a47556db9295eac2a576a280c88b9b967ba1fc545c244a2c31bb1f124f4090",
+          "code_length": 94,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "marketEntry",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "ea452dce1fa8042f680f659eb4e0238780aa88ca257d02a61755947dcbdb78ac",
+          "code_length": 206,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "openATMOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ATM;DDDDBI)V",
+          "access": 4,
+          "code_sha256": "cb8f5535869f7edd123ec65437e135acd70eb06439998f70720a30430ba8cc64",
+          "code_length": 442,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "openNewTSATMOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ATMExit;DDDB)D",
+          "access": 2,
+          "code_sha256": "54bd595f0e74ecc33bb69e45404bdac8ea10fe40ea6bb18308df836e782233fc",
+          "code_length": 22,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "openNewATMNettingOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/ATMExit;DDDB)D",
+          "access": 2,
+          "code_sha256": "4e66db362c5671a337962ba8cfb26cae2c85c2c7e54dc67dc19fd7b33ad60c69",
+          "code_length": 203,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "exitWasFilled",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;)Z",
+          "access": 2,
+          "code_sha256": "29eb18557a0c53f8ae10443170405e35c2b965cc02c0ec40ef367ffc10dbd63c",
+          "code_length": 26
+        },
+        {
+          "name": "openNormalOrder",
+          "descriptor": "(DDDBI)V",
+          "access": 4,
+          "code_sha256": "b1f0dd48d54f8504fa983e26e768850a560a0cc429af44ff9294da0e2fcf36a8",
+          "code_length": 439,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "armPendingExitsAfterFill",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;B)V",
+          "access": 4,
+          "code_sha256": "1257422c64fe0736741213730962ca271d631ae7d1dfcb44e552a87b14b4b093",
+          "code_length": 52,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "handleBarsValid",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;I)V",
+          "access": 4,
+          "code_sha256": "6b2c10e7a9f5336af7dbd777c1115cc42ef169b498fdab16b9ecf6599c8e8a91",
+          "code_length": 75,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkBarsValid",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;I)V",
+          "access": 4,
+          "code_sha256": "8e7884c6410d65dbd7f93f0251b56f6a0e525b8d776674a24f51c1a72ca73c0b",
+          "code_length": 39,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "computeSL",
+          "descriptor": "(BD)D",
+          "access": 4,
+          "code_sha256": "1b98b3a18736d9468472a01f9ea35a97bec84a9060001ceb7ee97aac37d42bdf",
+          "code_length": 146,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "computePT",
+          "descriptor": "(BD)D",
+          "access": 4,
+          "code_sha256": "2b945e862f83d3d64adf7334125eb022ff6dd045ca9264e4503774fbd7a45f06",
+          "code_length": 48,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getStopLossExit",
+          "descriptor": "()Lcom/strategyquant/tradinglib/ExitMethod;",
+          "access": 1,
+          "code_sha256": "3d03a1cd528e95c31213c5aab2d65e7cfd52cd3107a74b6ce68bfbb66895b16e",
+          "code_length": 48
+        },
+        {
+          "name": "getProfitTargetExit",
+          "descriptor": "()Lcom/strategyquant/tradinglib/ExitMethod;",
+          "access": 1,
+          "code_sha256": "e33931b7dde4b7adaebf90f0903d9288db514f164f9d0eade21a69b4debe79a3",
+          "code_length": 48
+        },
+        {
+          "name": "getExitAfterBarsExit",
+          "descriptor": "()Lcom/strategyquant/tradinglib/ExitMethod;",
+          "access": 1,
+          "code_sha256": "256cb0928413f48aaa0a188054790e03314133373cd9bf1016ce38ef0dd3b89f",
+          "code_length": 48
+        },
+        {
+          "name": "computeSize",
+          "descriptor": "(BDD)D",
+          "access": 1,
+          "code_sha256": "c87e1af0aa8e233117ffbe8104d7f7d9ea645327eb96581258e416c617d87e3e",
+          "code_length": 27,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkLiveOrderExists",
+          "descriptor": "(IZ)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4,
+          "code_sha256": "b12bb2302277ce5ada908ba2f15a4bed3f8804c72b1147ad6d627a11b5bf6549",
+          "code_length": 111
+        },
+        {
+          "name": "OnApplyExits",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b8bf63067775fb2694a3767f5191e631d7cc32461f5bcdd66f70cd3dd8101ed9",
+          "code_length": 273,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "getOpenOrders",
+          "descriptor": "(I)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "19d7b28110b91525dd6d5a54bb646450d741636fefbb60a4179cfed7df776caa",
+          "code_length": 108,
+          "generic_signature": "(I)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ILiveOrder;>;"
+        },
+        {
+          "name": "engineSupportsDuplicateTrades",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "6a9598ae29d11bd5dd618220fbca771aef55c867145fc052e125967497b1f871",
+          "code_length": 11
+        },
+        {
+          "name": "tryCloneATMExit",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ATMExit;)Lcom/strategyquant/tradinglib/ATMExit;",
+          "access": 2,
+          "code_sha256": "1e4d91185c2e706161e4ed26f83109984bca296ef8a2127e280e71ff90e7c85d",
+          "code_length": 22,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkOpenPriceWithinRange",
+          "descriptor": "(D)Z",
+          "access": 4,
+          "code_sha256": "35c8b3066c54b3bba0538b614541fe4ea94624efed22fd526f76f82d6303d8f2",
+          "code_length": 183
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "149a8cb2339b0ada12251744b9d1046f19eb172a77f8893c5cd663d34a77865e",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$2",
+        "SQ/Blocks/Order/Open/EnterAtMarket$1$3",
+        "SQ/Blocks/Order/Open/EnterAtMarket$2",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3",
+        "SQ/Blocks/Order/Open/EnterAtMarket$3$1",
+        "SQ/Blocks/Order/Open/EnterAtMarket$4",
+        "SQ/Blocks/Order/Open/EnterAtMarket$5",
+        "SQ/Blocks/Order/Open/EnterAtMarket$6",
+        "SQ/Blocks/Order/Open/EnterAtMarket$7",
+        "SQ/ExitMethods/StopLoss",
+        "SQ/ExitMethods/TrailingStop",
+        "SQ/Formulas/RangeLevel/None",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/MMFormulaBlock",
+        "SQ/Internal/XmlStrategy",
+        "[Lcom/strategyquant/tradinglib/ExitMethod;",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/UpdateEventTypes",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ATM",
+        "com/strategyquant/tradinglib/ATMExit",
+        "com/strategyquant/tradinglib/BlockDefinitionException",
+        "com/strategyquant/tradinglib/ExitMethod",
+        "com/strategyquant/tradinglib/ExitTypes",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/StrategyBase$EntryBarState",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/atm/exits/AbstractExitLevel",
+        "com/strategyquant/tradinglib/atm/exits/None",
+        "com/strategyquant/tradinglib/atm/exits/TrailingStop",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/ArrayList",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterAtStop.class",
+      "occurrence": 0,
+      "sha256": "384b2d8acb714de261c44c690e0dd68bc6a0d8224b861ea415052bea7d1554ae",
+      "name": "SQ/Blocks/Order/Open/EnterAtStop",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Blocks/Order/Open/EnterAtMarket",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Price",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        },
+        {
+          "name": "BarsValid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ReplaceExisting",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "39cb782f70dcc845aeefbb79ef26ee7c810109dfe857ae06788b784442616e02",
+          "code_length": 392,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "sqEvaluatePendingLevel",
+          "descriptor": "()D",
+          "access": 4,
+          "code_sha256": "7bfc4cbf762b2beb792df5bae24d5caae0f1b60349d24603e4d51f3d45f795c8",
+          "code_length": 23,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkPendingOrdersExists",
+          "descriptor": "(I)Ljava/util/ArrayList;",
+          "access": 4,
+          "code_sha256": "097a63a07d361176556da95b0bd261c40a37c003ca0f3f6ace84818a6ce06a7d",
+          "code_length": 154,
+          "generic_signature": "(I)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ILiveOrder;>;"
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterAtStop",
+        "SQ/Functions/OrderFunctions",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/ATM",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Throwable",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Order/Open/EnterReverseAtMarket.class",
+      "occurrence": 0,
+      "sha256": "859fa7cb94748d1303ad28558e62764befc96b1e00d18c3c4e92d734503721cd",
+      "name": "SQ/Blocks/Order/Open/EnterReverseAtMarket",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Blocks/Order/Open/EnterAtMarket",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9c3355f0e3e139d63a00e84fa73abbf747beb4b256d90d6f983aa29077370d3f",
+          "code_length": 278,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Order/Open/EnterAtMarket",
+        "SQ/Blocks/Order/Open/EnterReverseAtMarket",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ATM",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Other/Boolean.class",
+      "occurrence": 0,
+      "sha256": "2df6404355d5cae603bcfe846242e311661f4363fe2ffbd5a29c7dd3bc5040f3",
+      "name": "SQ/Blocks/Other/Boolean",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Value",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "8a53628aa5c9c7a4b6f7ee6f7b836ff74cc6f999cd5531a3db4365f6d64f9ce0",
+          "code_length": 10
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "eb934ed467e0b84cdf812a001a1cd6ddf04f26d0f4fd9cc38f01096b77bb4ab0",
+          "code_length": 14,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Other/Boolean",
+        "SQ/Internal/ValueBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Other/BooleanVariable.class",
+      "occurrence": 0,
+      "sha256": "b489d5cad2ec7a048a1bee8994064469d7f4a3731b6097a9a69f54d6fc510b55",
+      "name": "SQ/Blocks/Other/BooleanVariable",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Variable",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "eb934ed467e0b84cdf812a001a1cd6ddf04f26d0f4fd9cc38f01096b77bb4ab0",
+          "code_length": 14,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Other/BooleanVariable",
+        "SQ/Internal/ValueBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Other/DoubleVariable.class",
+      "occurrence": 0,
+      "sha256": "d9b675cc3d964c9e58eadcfdcf5a29b5fc2e87dbedd05b0fa99c99f492294cde",
+      "name": "SQ/Blocks/Other/DoubleVariable",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Variable",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "34c25fc3e412c3dfa25329217331cbc31c623afa2225c914914ba0c77944499c",
+          "code_length": 5,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Other/DoubleVariable",
+        "SQ/Internal/ValueBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Other/IntVariable.class",
+      "occurrence": 0,
+      "sha256": "9ab36915ac2b314e6582b84ce65d54875e52007d1bb8b93d7b8500867ac41803",
+      "name": "SQ/Blocks/Other/IntVariable",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Variable",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "d43ab09dd19f3fc52e714e83a506d5204311bc1bea625f2c500d8edff2a6d2be",
+          "code_length": 6,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Other/IntVariable",
+        "SQ/Internal/ValueBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Other/Number.class",
+      "occurrence": 0,
+      "sha256": "6438cd3f9620147b6e502d4d8db03610aede108a104e46752e620119e6c7f603",
+      "name": "SQ/Blocks/Other/Number",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Number",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "34c25fc3e412c3dfa25329217331cbc31c623afa2225c914914ba0c77944499c",
+          "code_length": 5,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Other/Number",
+        "SQ/Internal/ValueBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/AssignVariable.class",
+      "occurrence": 0,
+      "sha256": "4a1919786f146b567fc34d15eaefa445a03f11d7987793a13cc94f234b057b4c",
+      "name": "SQ/Blocks/OtherActions/AssignVariable",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Variable",
+          "descriptor": "Lcom/strategyquant/tradinglib/Variable;",
+          "access": 1
+        },
+        {
+          "name": "Value",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b92259176c314f749d581852e68effe6d66a5b6b8b0bd29b77c53311fce8a3ca",
+          "code_length": 94,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/AssignVariable",
+        "SQ/Internal/ActionBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/Variable"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/CustomAction.class",
+      "occurrence": 0,
+      "sha256": "3c81cbd436cca5b799f21f0096534998bd7c1ff5e2d4756a0b127f8526c5275d",
+      "name": "SQ/Blocks/OtherActions/CustomAction",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Command",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/CustomAction",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/DrawDownArrow.class",
+      "occurrence": 0,
+      "sha256": "434de95fb9b6b7649e4b2cf0c2bc56e869e3206f77c130b9082fb4d51b60bf0e",
+      "name": "SQ/Blocks/OtherActions/DrawDownArrow",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/DrawDownArrow",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/DrawUpArrow.class",
+      "occurrence": 0,
+      "sha256": "2febaf63d93d1fb582bf64be0bd5ab641780ab518acbb970752896520604ec05",
+      "name": "SQ/Blocks/OtherActions/DrawUpArrow",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/DrawUpArrow",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/DrawVerticalLine.class",
+      "occurrence": 0,
+      "sha256": "815f385ae049371ea2c2924c95f07c6da408384478ae284df22bc20d73191d69",
+      "name": "SQ/Blocks/OtherActions/DrawVerticalLine",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/DrawVerticalLine",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/LogToFile.class",
+      "occurrence": 0,
+      "sha256": "1454503e260c2d1b071b2248e1516022d87dbb5899095fafc90464f92a6caac6",
+      "name": "SQ/Blocks/OtherActions/LogToFile",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Filename",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Message",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/LogToFile",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/LogToJournal.class",
+      "occurrence": 0,
+      "sha256": "8bd5f8794399791820a6c7bdc15f70dd911a4fb2c9939a17b8ca792965d9d12b",
+      "name": "SQ/Blocks/OtherActions/LogToJournal",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Message",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/LogToJournal",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/OtherActions/SendEmail.class",
+      "occurrence": 0,
+      "sha256": "e48a046abba74c727c41ab4388996dab81e6b8c0727116222281736dcb1b4952",
+      "name": "SQ/Blocks/OtherActions/SendEmail",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ActionBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EmailSubject",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Message",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnAction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/OtherActions/SendEmail",
+        "SQ/Internal/ActionBlock",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/Ask.class",
+      "occurrence": 0,
+      "sha256": "1383b41675dd8dd10f2539c01a8ff6c1e14717b172f5320685377a1e63e234d8",
+      "name": "SQ/Blocks/Price/Ask",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "581bba89f259bba78a350f83310f0c177fc0efeff18f5710a9c7f36665a9dae9",
+          "code_length": 13,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/Ask",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/Bid.class",
+      "occurrence": 0,
+      "sha256": "5a8a15574d19ab3f3b5edb2882b46969bc36e31d231115a03f47dc629633f1a2",
+      "name": "SQ/Blocks/Price/Bid",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "581bba89f259bba78a350f83310f0c177fc0efeff18f5710a9c7f36665a9dae9",
+          "code_length": 13,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/Bid",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/Close.class",
+      "occurrence": 0,
+      "sha256": "471fcedcd49913207f8b37c9ffb2423110f4db90660336e72772ed92bffec8cd",
+      "name": "SQ/Blocks/Price/Close",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "4523af82adf75c46f8510a77bf344afcf2956acdb23923f5bde715e92780d1d0",
+          "code_length": 95,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/Close",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/CloseD.class",
+      "occurrence": 0,
+      "sha256": "64d949e516ae5ce598b99e444ae7870aa65c62b881645e045f7c46a5a829bf92",
+      "name": "SQ/Blocks/Price/CloseD",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "943cac288cbd9df4e8f826eca11d86488b19d96ee1db631263e940f038d65c0a",
+          "code_length": 287,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/CloseD",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "com/strategyquant/tradinglib/simulator/Engines"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/CloseM.class",
+      "occurrence": 0,
+      "sha256": "59661cb35b65bbad844c02d5d166b03d380abed33328537ab9b36b3e6bb32c86",
+      "name": "SQ/Blocks/Price/CloseM",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "fd46d6072ea443c9ca0709af004174955dfa19904f5820724feba32427545cb7",
+          "code_length": 286,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/CloseM",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "com/strategyquant/tradinglib/simulator/Engines"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/CloseW.class",
+      "occurrence": 0,
+      "sha256": "ac387a37f996a6668027da808e84dc5484ae3cf19dac8f8d59fd4c5321077712",
+      "name": "SQ/Blocks/Price/CloseW",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "fd46d6072ea443c9ca0709af004174955dfa19904f5820724feba32427545cb7",
+          "code_length": 286,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/CloseW",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "com/strategyquant/tradinglib/simulator/Engines"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HeikenAshiClose.class",
+      "occurrence": 0,
+      "sha256": "6974d8d019b0be303b1b91021943e043d4f27551ed846bb09ed0630fee242410",
+      "name": "SQ/Blocks/Price/HeikenAshiClose",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "de9a58ef67cbbed76ce738639d540aed1359eed2615d893b4910d5eeb94edfbe",
+          "code_length": 27,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/HeikenAshi/HeikenAshi",
+        "SQ/Blocks/Price/HeikenAshiClose",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HeikenAshiHigh.class",
+      "occurrence": 0,
+      "sha256": "1f7b6fe7237ce5f9fd4157f0d80ede44eff78eaacf54741660b070ff7f654e79",
+      "name": "SQ/Blocks/Price/HeikenAshiHigh",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "e975be34330916966fbe64a1b73cf22c0644da5849c5c7110a5556cc62730855",
+          "code_length": 72,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/HeikenAshi/HeikenAshi",
+        "SQ/Blocks/Price/HeikenAshiHigh",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HeikenAshiLow.class",
+      "occurrence": 0,
+      "sha256": "625796914cec8469a694ab6a81525dac12eed02d3020a8dbc9c41f92466e6a41",
+      "name": "SQ/Blocks/Price/HeikenAshiLow",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "e975be34330916966fbe64a1b73cf22c0644da5849c5c7110a5556cc62730855",
+          "code_length": 72,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/HeikenAshi/HeikenAshi",
+        "SQ/Blocks/Price/HeikenAshiLow",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HeikenAshiOpen.class",
+      "occurrence": 0,
+      "sha256": "76fb9c6596631498e71915e239d3b638c161c18e94c5d61674321df1bf242e16",
+      "name": "SQ/Blocks/Price/HeikenAshiOpen",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "de9a58ef67cbbed76ce738639d540aed1359eed2615d893b4910d5eeb94edfbe",
+          "code_length": 27,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Indicators/HeikenAshi/HeikenAshi",
+        "SQ/Blocks/Price/HeikenAshiOpen",
+        "SQ/Internal/Indicators",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/High.class",
+      "occurrence": 0,
+      "sha256": "da5af4725278b51b03e4a0dc3066940d9da0cda6af58fe283c3c6e95d79578b3",
+      "name": "SQ/Blocks/Price/High",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "4523af82adf75c46f8510a77bf344afcf2956acdb23923f5bde715e92780d1d0",
+          "code_length": 95,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/High",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HighD.class",
+      "occurrence": 0,
+      "sha256": "57b717546747f34a91cfce5e2da7f07e8676d8b364cb12c5cb996ea00520b839",
+      "name": "SQ/Blocks/Price/HighD",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "11b58dc95f2972f620f14fc10162fbc5b53459b2a678e4d03715c6df5589d350",
+          "code_length": 294,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "calculateHighDUpToBar",
+          "descriptor": "(II)D",
+          "access": 2,
+          "code_sha256": "d09192c8d36063ba92dc89d4b3aaff89e65fdaac3b8f59fa102391cb64e442dc",
+          "code_length": 67,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/HighD",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/dataseries/TimeDataSeries",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "java/lang/Double",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HighM.class",
+      "occurrence": 0,
+      "sha256": "d92c7a640dd6d90f6e663db5e7369001a82350b300afa7a37b9d9b45d5d07031",
+      "name": "SQ/Blocks/Price/HighM",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "aa5d8c28906c770aec40e54419dabb381a345e4856e0f073774995c23931e864",
+          "code_length": 296,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "calculateHighDUpToBar",
+          "descriptor": "(II)D",
+          "access": 2,
+          "code_sha256": "259e99d9af107e13b02876024eb9aaa3d49c523db240ffe90866da6cba2de574",
+          "code_length": 67,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/HighM",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/dataseries/TimeDataSeries",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "java/lang/Double",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Blocks/Price/HighW.class",
+      "occurrence": 0,
+      "sha256": "118cf1885a4d353cf157c359e814c75fa9f78950904bde199a11f9b420a8917d",
+      "name": "SQ/Blocks/Price/HighW",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "SQ/Internal/ValueBlock",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/ChartData;",
+          "access": 1
+        },
+        {
+          "name": "Shift",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "OnInit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "daf3899210ab45c7bdc822bb2cc7430d417365668cae3b126307f2b8b79077b7",
+          "code_length": 47
+        },
+        {
+          "name": "OnDeinit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8b3fed5f5ed7f4d5cffc89d4d6b64db662e9d3f1dca925d685e6b6ea2cb940ec",
+          "code_length": 15
+        },
+        {
+          "name": "OnBlockEvaluate",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "aa5d8c28906c770aec40e54419dabb381a345e4856e0f073774995c23931e864",
+          "code_length": 296,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "calculateHighDUpToBar",
+          "descriptor": "(II)D",
+          "access": 2,
+          "code_sha256": "8c9ee9d631b062697cfb62cafb839cca2f6bd644e6fc9dad6c0367785837060d",
+          "code_length": 68,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Blocks/Price/HighW",
+        "SQ/Internal/ValueBlock",
+        "SQ/Internal/XmlStrategy",
+        "SQ/Utils/TimeDiffUtil",
+        "com/strategyquant/datalib/DataSeries",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/dataseries/TimeDataSeries",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/engine/stockpicker/Stockpicker",
+        "com/strategyquant/tradinglib/engine/stockpicker/backtester/BacktestData",
+        "com/strategyquant/tradinglib/engine/stockpicker/constants/PickerTriggerTypes",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "java/lang/Double",
+        "java/lang/Math"
+      ]
+    }
+  ]
+}

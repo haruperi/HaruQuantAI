@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppPortfolioMaster/AppPortfolioMaster.jar",
+  "sha256": "93dd223deb0421c07cc1bcd572ae1328513e525a288715933b22d98f56a9a9dd",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/PortfolioMaster/PortfolioMasterAppPlugin.class": "c885fcb67628fac8a8480d2f9234ea16e490db1acb4a78d97b3f66fea9c4b971"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/PortfolioMaster/PortfolioMasterAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "c885fcb67628fac8a8480d2f9234ea16e490db1acb4a78d97b3f66fea9c4b971",
+      "member_shard": "docs/dev/evidence/sqx145/members/134/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/134/001.json",
+      "sha256": "f1766808a52f3b326b44c273e0ecce65da280bcd0c2130151db8147aefecd7e3"
+    }
+  ]
+}

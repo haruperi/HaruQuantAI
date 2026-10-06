@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+  "sha256": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f",
+  "class_count": 7,
+  "unique_class_entries": 7,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels.class": "9da86a745177e0ecc30a77d5daa6e6d7bbc5aa208ae4fa0b132b8eb2395654ba",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart.class": "da06adfff72a1da918a0287cab57e4196444053c1e126229a5bec7728a9134da",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins.class": "59807e943212d15dfd0556d05c192870aa0d1520af2c271da89bafafc0f622ca",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet.class": "59abb6fbb1a6ab143180d8e3159372b40e3629ee9f7f2e27644725d9e1dba901",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServletPlugin.class": "a4c952e045b29c499de9852bcb5c252cdaaab4ff6bf528a3da9e10c8e7a8c9c4",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews.class": "c19ee7be63dfb499b60f9387821f5d0b54ae7e220db77c938b80fee1e6710d40",
+    "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager.class": "f5ec50799d8f596ba8e196088e58b484fb30140ab87bd6f0528a52f0fcf5a875"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/ConfidenceLevels.class",
+      "occurrence": 0,
+      "sha256": "9da86a745177e0ecc30a77d5daa6e6d7bbc5aa208ae4fa0b132b8eb2395654ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RTChart.class",
+      "occurrence": 0,
+      "sha256": "da06adfff72a1da918a0287cab57e4196444053c1e126229a5bec7728a9134da",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RiskOfRuins.class",
+      "occurrence": 0,
+      "sha256": "59807e943212d15dfd0556d05c192870aa0d1520af2c271da89bafafc0f622ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet.class",
+      "occurrence": 0,
+      "sha256": "59abb6fbb1a6ab143180d8e3159372b40e3629ee9f7f2e27644725d9e1dba901",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "a4c952e045b29c499de9852bcb5c252cdaaab4ff6bf528a3da9e10c8e7a8c9c4",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViews.class",
+      "occurrence": 0,
+      "sha256": "c19ee7be63dfb499b60f9387821f5d0b54ae7e220db77c938b80fee1e6710d40",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager.class",
+      "occurrence": 0,
+      "sha256": "f5ec50799d8f596ba8e196088e58b484fb30140ab87bd6f0528a52f0fcf5a875",
+      "member_shard": "docs/dev/evidence/sqx145/members/212/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/212/001.json",
+      "sha256": "acfd1066643d63b457c4d5267afab792877ac1e2a523ccbdeab111db827b07f0"
+    }
+  ]
+}

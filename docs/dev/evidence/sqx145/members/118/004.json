@@ -1,0 +1,5391 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/weblaf-ui-1.2.9.jar",
+  "archive_sha256": "ab416d026e7d496fac337c9087bc11fb0346f9372c40b4493962551abe52b730",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/alee/laf/spinner/SpinnerDescriptor.class",
+      "occurrence": 0,
+      "sha256": "3b1243bb146b0982698ede10da6c647b04aa67086b066b64f0c87d5fa30aa8dd",
+      "name": "com/alee/laf/spinner/SpinnerDescriptor",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/laf/spinner/AbstractSpinnerDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9d62e77dfb943a08757612b830c4584a2135602f133f0da1da7e9695977c77b3",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "Lcom/alee/laf/spinner/AbstractSpinnerDescriptor<Ljavax/swing/JSpinner;Lcom/alee/laf/spinner/WebSpinnerUI;>;",
+      "class_references": [
+        "com/alee/laf/spinner/AbstractSpinnerDescriptor",
+        "com/alee/laf/spinner/SpinnerDescriptor",
+        "com/alee/laf/spinner/WebSpinnerUI",
+        "com/alee/managers/style/StyleId",
+        "javax/swing/JSpinner"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/label/AbstractLabelDescriptor.class",
+      "occurrence": 0,
+      "sha256": "fe9fd10b42f6d89c60822a961495ec4383ef126d56f496d06074757e066fb9c3",
+      "name": "com/alee/laf/label/AbstractLabelDescriptor",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/managers/style/AbstractComponentDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Lcom/alee/managers/style/StyleId;)V",
+          "access": 1,
+          "code_sha256": "448aae53b31807e983761042d0fe00dcce11dbcb3bec238c3f554636bda63fec",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Class<TC;>;Ljava/lang/String;Ljava/lang/Class<TU;>;Ljava/lang/Class<+TU;>;Lcom/alee/managers/style/StyleId;)V"
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JLabel;U:Lcom/alee/laf/label/WLabelUI;>Lcom/alee/managers/style/AbstractComponentDescriptor<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/label/AbstractLabelDescriptor",
+        "com/alee/managers/style/AbstractComponentDescriptor"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/label/LabelIcon.class",
+      "occurrence": 0,
+      "sha256": "33b4cfb761face2ba0c02f2e36e8f3680156d0aaaae2bbc76c80d9c3e7099ead",
+      "name": "com/alee/laf/label/LabelIcon",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/painter/decoration/content/AbstractIconContent",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljavax/swing/JLabel;Lcom/alee/painter/decoration/IDecoration;)Ljavax/swing/Icon;",
+          "access": 4,
+          "code_sha256": "15012643455f21b0e9c1fa33e53feeb31407acbba9bab2a79f4d14b9feb6214a",
+          "code_length": 19,
+          "generic_signature": "(TC;TD;)Ljavax/swing/Icon;"
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljavax/swing/JComponent;Lcom/alee/painter/decoration/IDecoration;)Ljavax/swing/Icon;",
+          "access": 4164,
+          "code_sha256": "9979415f51398841777dc7a30c86048571a17b14fb7863ff70a7b80dd79b0118",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JLabel;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;I:Lcom/alee/laf/label/LabelIcon<TC;TD;TI;>;>Lcom/alee/painter/decoration/content/AbstractIconContent<TC;TD;TI;>;",
+      "class_references": [
+        "com/alee/laf/label/LabelIcon",
+        "com/alee/painter/decoration/content/AbstractIconContent",
+        "javax/swing/Icon",
+        "javax/swing/JLabel"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/combobox/WebComboBoxUI$2.class",
+      "occurrence": 0,
+      "sha256": "ad4687a03fa70f9627e44b644c7224f025a875193f66addba8bf5d9a8aada747",
+      "name": "com/alee/laf/combobox/WebComboBoxUI$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/beans/PropertyChangeListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/combobox/WebComboBoxUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/combobox/WebComboBoxUI;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "propertyChange",
+          "descriptor": "(Ljava/beans/PropertyChangeEvent;)V",
+          "access": 1,
+          "code_sha256": "7a80212f930aff54288e14f2b3ce286d62d3250df82f043c2df3cfc5744b5f2e",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "com/alee/api/jdk/Objects",
+        "com/alee/laf/WebLookAndFeel",
+        "com/alee/laf/combobox/WebComboBoxUI",
+        "com/alee/laf/combobox/WebComboBoxUI$2",
+        "java/beans/PropertyChangeEvent",
+        "java/beans/PropertyChangeListener",
+        "java/lang/Object",
+        "javax/swing/JComboBox"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/desktoppane/WebDesktopPaneUI$1.class",
+      "occurrence": 0,
+      "sha256": "4a4fb57dd5e9a2b55bf749b8a83e41ca95f2ae56b372c37191ddac8f6eaff8ec",
+      "name": "com/alee/laf/desktoppane/WebDesktopPaneUI$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Consumer"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/desktoppane/WebDesktopPaneUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/desktoppane/WebDesktopPaneUI;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Lcom/alee/laf/desktoppane/IDesktopPanePainter;)V",
+          "access": 1,
+          "code_sha256": "010ab402d970a463694473794a0c12afc2a3cc86d3e4997f59c85fa8f636503e",
+          "code_length": 9
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "f360d5bef84e1dc1749f701d35a6e5dbb5c3abbf296f1d0f3b02e577a2cb4db1",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Consumer<Lcom/alee/laf/desktoppane/IDesktopPanePainter;>;",
+      "class_references": [
+        "com/alee/api/jdk/Consumer",
+        "com/alee/laf/desktoppane/IDesktopPanePainter",
+        "com/alee/laf/desktoppane/WebDesktopPaneUI",
+        "com/alee/laf/desktoppane/WebDesktopPaneUI$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/NativeFonts$18.class",
+      "occurrence": 0,
+      "sha256": "f3fc60c1845c3437828439dfcbc94b11fb18a917797f8528f8d11d29a1775daf",
+      "name": "com/alee/laf/NativeFonts$18",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljavax/swing/plaf/FontUIResource;",
+          "access": 1,
+          "code_sha256": "f446f4fef41bfe09515744762729642fb7ecf3b051057b00c2235fa473137f54",
+          "code_length": 13
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<Ljavax/swing/plaf/FontUIResource;>;",
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/laf/NativeFonts",
+        "com/alee/laf/NativeFonts$18",
+        "java/awt/Font",
+        "java/lang/Object",
+        "javax/swing/plaf/FontUIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/window/WebFrame$WebFrameRootPane.class",
+      "occurrence": 0,
+      "sha256": "e5f834a29bc3f1805aecd2d9db6b45d2aa86cc6bee13e986cec344248b1ed022",
+      "name": "com/alee/laf/window/WebFrame$WebFrameRootPane",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/rootpane/WebRootPane",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/window/WebFrame;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/window/WebFrame;)V",
+          "access": 1,
+          "code_sha256": "efc831471017d143c2393e1549d8a9bd7d0df4d736969dece2f8cb75bfe64b9d",
+          "code_length": 20
+        },
+        {
+          "name": "getDefaultStyleId",
+          "descriptor": "()Lcom/alee/managers/style/StyleId;",
+          "access": 1,
+          "code_sha256": "1a252605b07209661eecc2941b5a0abd3d20a574772e2c971469f14579f79589",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/rootpane/WebRootPane",
+        "com/alee/laf/window/WebFrame",
+        "com/alee/laf/window/WebFrame$WebFrameRootPane",
+        "com/alee/managers/style/ComponentDescriptor",
+        "com/alee/managers/style/StyleManager",
+        "javax/swing/JRootPane"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/window/WindowMethodsImpl.class",
+      "occurrence": 0,
+      "sha256": "4404d52584bcda698d99be382408b7075a25ec767870394921e7a38158064bf7",
+      "name": "com/alee/laf/window/WindowMethodsImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isWindowOpaque",
+          "descriptor": "(Ljava/awt/Window;)Z",
+          "access": 9,
+          "code_sha256": "eb40d5f039611f79c4950d9814cc544b03c10ec84f3c30c68d8eceea0217f978",
+          "code_length": 5,
+          "generic_signature": "<W:Ljava/awt/Window;>(TW;)Z"
+        },
+        {
+          "name": "setWindowOpaque",
+          "descriptor": "(Ljava/awt/Window;Z)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "e8606746d4de9c24c0720bcf46df8f0bcf71630bcd80792d5a5a6826220b455b",
+          "code_length": 7,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;Z)TT;"
+        },
+        {
+          "name": "getWindowOpacity",
+          "descriptor": "(Ljava/awt/Window;)F",
+          "access": 9,
+          "code_sha256": "8085b0141a4f75c16184c80e5ffda99790b66527f732c1aee095e81b78b2a0db",
+          "code_length": 5,
+          "generic_signature": "<W:Ljava/awt/Window;>(TW;)F"
+        },
+        {
+          "name": "setWindowOpacity",
+          "descriptor": "(Ljava/awt/Window;F)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "18b549ba320d733cf693dee5db4139a9db73fa3123083f6b7ab2cef007bcddb2",
+          "code_length": 7,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;F)TT;"
+        },
+        {
+          "name": "center",
+          "descriptor": "(Ljava/awt/Window;)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "c468220362f5310b2961ee1cb681c90d95a15d9adc965465658944e7fd71270f",
+          "code_length": 7,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;)TT;"
+        },
+        {
+          "name": "center",
+          "descriptor": "(Ljava/awt/Window;Ljava/awt/Component;)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "7583e449103746007ff0af1a41a51295acbae3ad50ed28892872906919cb082e",
+          "code_length": 7,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;Ljava/awt/Component;)TT;"
+        },
+        {
+          "name": "center",
+          "descriptor": "(Ljava/awt/Window;II)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "0688e7f05b60449cb745deeb6c92998d35234048b6342c09a285d6e7177e35ec",
+          "code_length": 13,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;II)TT;"
+        },
+        {
+          "name": "center",
+          "descriptor": "(Ljava/awt/Window;Ljava/awt/Component;II)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "4ea07c3ae095130f1ead9addb7661174732ab3585ef43e1c8bf8964239f2eb5e",
+          "code_length": 13,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;Ljava/awt/Component;II)TT;"
+        },
+        {
+          "name": "packToWidth",
+          "descriptor": "(Ljava/awt/Window;I)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "9d1bf1b7dd33cf14c665d0eda25a6cc1fd2a4ab33ed8da59013c2679a73acc97",
+          "code_length": 14,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;I)TT;"
+        },
+        {
+          "name": "packToHeight",
+          "descriptor": "(Ljava/awt/Window;I)Ljava/awt/Window;",
+          "access": 9,
+          "code_sha256": "dfabbb0ca875a2b2ec761ca4c861c0ce8ebe1d09289c5e087366984cea0e2579",
+          "code_length": 14,
+          "generic_signature": "<W:Ljava/awt/Window;T:TW;>(TW;I)TT;"
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/window/WindowMethodsImpl",
+        "com/alee/utils/ProprietaryUtils",
+        "java/awt/Dimension",
+        "java/awt/Window",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/window/WindowEventMethods.class",
+      "occurrence": 0,
+      "sha256": "eed5c5f7f6a9c9a446aa84325cc942734445e3c1e7531604acdad61cc5f46c57",
+      "name": "com/alee/laf/window/WindowEventMethods",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/utils/swing/extensions/MethodExtension"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onClosing",
+          "descriptor": "(Lcom/alee/laf/window/WindowEventRunnable;)Ljava/awt/event/WindowAdapter;",
+          "access": 1025
+        },
+        {
+          "name": "onClose",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/ComponentEventRunnable;)Lcom/alee/utils/swing/extensions/WindowCloseAdapter;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/window/WindowEventMethods",
+        "com/alee/utils/swing/extensions/MethodExtension",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/WebPopupMenuSeparator.class",
+      "occurrence": 0,
+      "sha256": "26c636db7389e88f30e1b885182f1ec50fa021a8f6518a81415612f9d0cf3694",
+      "name": "com/alee/laf/menu/WebPopupMenuSeparator",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/JPopupMenu$Separator",
+      "interfaces": [
+        "com/alee/managers/style/Styleable",
+        "com/alee/painter/Paintable",
+        "com/alee/managers/style/ShapeMethods",
+        "com/alee/managers/style/MarginMethods",
+        "com/alee/managers/style/PaddingMethods",
+        "com/alee/utils/swing/extensions/EventMethods",
+        "com/alee/managers/settings/SettingsMethods",
+        "com/alee/utils/swing/extensions/FontMethods",
+        "com/alee/utils/swing/extensions/SizeMethods"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/style/StyleId;)V",
+          "access": 1,
+          "code_sha256": "2993cb7b4849b640a94e173710a79bdaee3fb39cb3d171e67fdd40d932818601",
+          "code_length": 11
+        },
+        {
+          "name": "getDefaultStyleId",
+          "descriptor": "()Lcom/alee/managers/style/StyleId;",
+          "access": 1,
+          "code_sha256": "5f68107637f46ea355ce889725fce8ae59bf62377222d99f4e9456a8a7970043",
+          "code_length": 4
+        },
+        {
+          "name": "getStyleId",
+          "descriptor": "()Lcom/alee/managers/style/StyleId;",
+          "access": 1,
+          "code_sha256": "16bea948ac886b34e6a1099f0ada21e14c2b9b693ae037b9ad83d3a3807a0fef",
+          "code_length": 5
+        },
+        {
+          "name": "setStyleId",
+          "descriptor": "(Lcom/alee/managers/style/StyleId;)Lcom/alee/managers/style/StyleId;",
+          "access": 1,
+          "code_sha256": "b73796a756bab71d795da49934925732b2f951ceb4b6d7173d54e2804b20f01b",
+          "code_length": 6
+        },
+        {
+          "name": "resetStyleId",
+          "descriptor": "()Lcom/alee/managers/style/StyleId;",
+          "access": 1,
+          "code_sha256": "a3f9b22dab790f5659153d6467aa5c9df0a4a38e7d06c4e31ee5bb5024e15008",
+          "code_length": 5
+        },
+        {
+          "name": "getSkin",
+          "descriptor": "()Lcom/alee/managers/style/Skin;",
+          "access": 1,
+          "code_sha256": "3197674797e6ef7dd063cdfcfbc7cca3c0b5f126ff9a486559a2c872dc5adfbb",
+          "code_length": 5
+        },
+        {
+          "name": "setSkin",
+          "descriptor": "(Lcom/alee/managers/style/Skin;)Lcom/alee/managers/style/Skin;",
+          "access": 1,
+          "code_sha256": "c989f212b258cf5c199fabc00ae0c1ad075ba46614409c005971db1ebce88341",
+          "code_length": 6
+        },
+        {
+          "name": "setSkin",
+          "descriptor": "(Lcom/alee/managers/style/Skin;Z)Lcom/alee/managers/style/Skin;",
+          "access": 1,
+          "code_sha256": "09505ad676a58f837286257c6df9c207c538ab084be3b9882e9073ba847da391",
+          "code_length": 7
+        },
+        {
+          "name": "resetSkin",
+          "descriptor": "()Lcom/alee/managers/style/Skin;",
+          "access": 1,
+          "code_sha256": "ac713bfe0d26e615620a3fc3384d823720666c1bcd07dbdcf26b4be3067506db",
+          "code_length": 5
+        },
+        {
+          "name": "addStyleListener",
+          "descriptor": "(Lcom/alee/managers/style/StyleListener;)V",
+          "access": 1,
+          "code_sha256": "a675f14a496eb80da4334b317669a35434f8e6d50296a092a0b7be9d4f949c61",
+          "code_length": 6
+        },
+        {
+          "name": "removeStyleListener",
+          "descriptor": "(Lcom/alee/managers/style/StyleListener;)V",
+          "access": 1,
+          "code_sha256": "c6ce1655bf1fef8a06c4a49704edae8507289401273a02d2d1be0e77e2398759",
+          "code_length": 6
+        },
+        {
+          "name": "getCustomPainter",
+          "descriptor": "()Lcom/alee/painter/Painter;",
+          "access": 1,
+          "code_sha256": "360f50ce5d596a6d1659c41dab1b2cf700af0147978531c4d0974374bb3d8557",
+          "code_length": 5
+        },
+        {
+          "name": "setCustomPainter",
+          "descriptor": "(Lcom/alee/painter/Painter;)Lcom/alee/painter/Painter;",
+          "access": 1,
+          "code_sha256": "9417fba4dc547fa3b1ecb83a472df2b478540005de6961b3c872b4dec5209ddb",
+          "code_length": 6
+        },
+        {
+          "name": "resetCustomPainter",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3f56d4cd66daf28fb5900188beb3ad3c618b25155a6fe99d4ec042c860fd4b70",
+          "code_length": 5
+        },
+        {
+          "name": "getShape",
+          "descriptor": "()Ljava/awt/Shape;",
+          "access": 1,
+          "code_sha256": "760f9e9bc8a88747d9bdc8f683404e7c2759196bc00478baef61b595a95a5c0b",
+          "code_length": 5
+        },
+        {
+          "name": "isShapeDetectionEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c22fe19790683a6c6d3728d52c54e519fde5d8c7768953794095d1b974e90ba7",
+          "code_length": 5
+        },
+        {
+          "name": "setShapeDetectionEnabled",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "a51538de708ba17fdd9e51c46d929f4cf92ef8f442f3e6e896a4cec93335b0fe",
+          "code_length": 6
+        },
+        {
+          "name": "getMargin",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "67286b898607521f9e5db6ef776ef9ffd1eecb007ef89fa09f9822034721be64",
+          "code_length": 5
+        },
+        {
+          "name": "setMargin",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "24b6caf9344b4bc111305517efe0f568d55234d0eac8e2a947e4302a4079f018",
+          "code_length": 6
+        },
+        {
+          "name": "setMargin",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "3265e3c8d183bf71827ef24fef9849768de80c17864fbb1cc4cc86fdd52d0301",
+          "code_length": 10
+        },
+        {
+          "name": "setMargin",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "cf42ca7129497267658da2a34d311638a1b27ff874ea89e6118955612c67e67c",
+          "code_length": 6
+        },
+        {
+          "name": "getPadding",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "b71a9da55f8d7c2a855ab0513389719834d5e7cfbfcbabf5ad32eafe29e5a49b",
+          "code_length": 5
+        },
+        {
+          "name": "setPadding",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "3008cf000e61dba8dbe3613aea9b4044214cf9d3d013ca17df0dc78fe922d377",
+          "code_length": 6
+        },
+        {
+          "name": "setPadding",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "55a56296df3209c4d3f0719da83c9778da9a2a821bd754d48bf0cd5647094028",
+          "code_length": 10
+        },
+        {
+          "name": "setPadding",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "be498894e8df2e37c425f29bf5d978b588dc6aecff3643156490f7ad6f666fc1",
+          "code_length": 6
+        },
+        {
+          "name": "onMousePress",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "1c08482eece9953652394f3114b94c9488d9d976fa1cf67ed6297fab166ce8c3",
+          "code_length": 6
+        },
+        {
+          "name": "onMousePress",
+          "descriptor": "(Lcom/alee/utils/swing/MouseButton;Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "e78af4db2deced50ae3b49a3c158a42d9dfa242616698497d92fec6c1b64220e",
+          "code_length": 7
+        },
+        {
+          "name": "onMouseEnter",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "7749d2ead4c789108312ea60f13e613583ad1a63d3a2bf0a69a83f9474c0e8ac",
+          "code_length": 6
+        },
+        {
+          "name": "onMouseExit",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "a65ec60ead44a4df0b0a7f61b546285100542f79be746506ba98ca5bd8dc415d",
+          "code_length": 6
+        },
+        {
+          "name": "onMouseDrag",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "daa73aa3cac26aee5771ef4dfa655470ea18c65d50ec21363b796198f910c4f3",
+          "code_length": 6
+        },
+        {
+          "name": "onMouseDrag",
+          "descriptor": "(Lcom/alee/utils/swing/MouseButton;Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "2923a7ed0f7999738d52f7830f4dbe8fa01af12c933fca33f274863989096edf",
+          "code_length": 7
+        },
+        {
+          "name": "onMouseClick",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "568bef11526e791a85e8589903ce35a84d0a0d225970d3d137e67c195079afe5",
+          "code_length": 6
+        },
+        {
+          "name": "onMouseClick",
+          "descriptor": "(Lcom/alee/utils/swing/MouseButton;Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "b8a3e7e67fdeea72742c8ab4b39dbbf7985796f4e88b673eee203f41f4704114",
+          "code_length": 7
+        },
+        {
+          "name": "onDoubleClick",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "c3d88fbbfff0418af0458375a83a882680432332930bd30a7f5e2690688b1706",
+          "code_length": 6
+        },
+        {
+          "name": "onMenuTrigger",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "03003f46472d836b8720d2ac987d0d44cc21b3845d1fb1357c6df1fe065d814a",
+          "code_length": 6
+        },
+        {
+          "name": "onKeyType",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "cbb079251450058c7af00ad7150b2f7cd3df5316771c5875833f54dacf164dff",
+          "code_length": 6
+        },
+        {
+          "name": "onKeyType",
+          "descriptor": "(Lcom/alee/managers/hotkey/HotkeyData;Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "0fd014f53c4117499743314c448ed72dfa53475bdacb76cbe814c1009cbc2d4c",
+          "code_length": 7
+        },
+        {
+          "name": "onKeyPress",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "cfe32e69b6d96d67b8eab98f4f7a427916b11ce78293cde2de0a42ebab2ac30a",
+          "code_length": 6
+        },
+        {
+          "name": "onKeyPress",
+          "descriptor": "(Lcom/alee/managers/hotkey/HotkeyData;Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "ef73742b3d4da93bff3bb7bab99398111363b8ab08ceac9462798161acad847c",
+          "code_length": 7
+        },
+        {
+          "name": "onKeyRelease",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "8560b0d0888c115166a527275e5f62e172202851bd62de01062e68e482102d09",
+          "code_length": 6
+        },
+        {
+          "name": "onKeyRelease",
+          "descriptor": "(Lcom/alee/managers/hotkey/HotkeyData;Lcom/alee/utils/swing/extensions/KeyEventRunnable;)Ljava/awt/event/KeyAdapter;",
+          "access": 1,
+          "code_sha256": "e81b6114e6fb8e979d48bb212363bd90e9e4ed6d0e841ed011c97752e7001d14",
+          "code_length": 7
+        },
+        {
+          "name": "onFocusGain",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/FocusEventRunnable;)Ljava/awt/event/FocusAdapter;",
+          "access": 1,
+          "code_sha256": "5151839eb12454dd0a41aff7696db7f50b15ebe6f2a51a7798b72b40f7984847",
+          "code_length": 6
+        },
+        {
+          "name": "onFocusLoss",
+          "descriptor": "(Lcom/alee/utils/swing/extensions/FocusEventRunnable;)Ljava/awt/event/FocusAdapter;",
+          "access": 1,
+          "code_sha256": "2cc2b70b74b96604ef94d1a11cf01186714f9abfb4e78cbd993a956dc0f8a916",
+          "code_length": 6
+        },
+        {
+          "name": "onDragStart",
+          "descriptor": "(ILcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "e80cb44aa9d02f560c4ee4186dd447ca46e4aa2c3ec270f3c8308b0475357b1b",
+          "code_length": 7
+        },
+        {
+          "name": "onDragStart",
+          "descriptor": "(ILcom/alee/utils/swing/MouseButton;Lcom/alee/utils/swing/extensions/MouseEventRunnable;)Ljava/awt/event/MouseAdapter;",
+          "access": 1,
+          "code_sha256": "de9372b6806d05317fc38495025fb729931a38e1ccddf1379e8394d0636b8372",
+          "code_length": 8
+        },
+        {
+          "name": "registerSettings",
+          "descriptor": "(Lcom/alee/managers/settings/Configuration;)V",
+          "access": 1,
+          "code_sha256": "cd3f85c347f97a4fc747ff03a26dd6f862bff698467ca7809c1d3761db5b3a6c",
+          "code_length": 6
+        },
+        {
+          "name": "registerSettings",
+          "descriptor": "(Lcom/alee/managers/settings/SettingsProcessor;)V",
+          "access": 1,
+          "code_sha256": "db15556de9f992d718e7debeac3532ffeebea89c7d126b3919cb614102d59458",
+          "code_length": 6
+        },
+        {
+          "name": "unregisterSettings",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "24f03d731ebd64093b208bfe19607c10a8c16dfec8b40dcac1ec738e8b057515",
+          "code_length": 5
+        },
+        {
+          "name": "loadSettings",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "13ce2c3916de19096cb71d5c2a36c5fdff2b825759cfe73d0e6678120168377d",
+          "code_length": 5
+        },
+        {
+          "name": "saveSettings",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0f503056f2232f9f2df66b5f47979c22b055dffc87d789830cfc0dcf1bfbcb43",
+          "code_length": 5
+        },
+        {
+          "name": "setPlainFont",
+          "descriptor": "()Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "ee6279265575ad1c4b0f8d552389f92af40b28559fae53d207a462ff1ad56e29",
+          "code_length": 8
+        },
+        {
+          "name": "setPlainFont",
+          "descriptor": "(Z)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "4ae7b645ab19a4c61d5732d93249dbafde20a9850f0573b61fdc459437c3b940",
+          "code_length": 9
+        },
+        {
+          "name": "isPlainFont",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5f0499c6055f7b40a0654619833b6f7156cef74149aafe7d26263a027d98c896",
+          "code_length": 5
+        },
+        {
+          "name": "setBoldFont",
+          "descriptor": "()Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "203baf15ed11e839951d4943744fd968acb4f43b83e303cd0aecdaeaaa02566f",
+          "code_length": 8
+        },
+        {
+          "name": "setBoldFont",
+          "descriptor": "(Z)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "1756a60d83540f1e0b0b2522dbdeeb043a64075e04b94cef658a265a45aa9064",
+          "code_length": 9
+        },
+        {
+          "name": "isBoldFont",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7808d20618f2c4474ba537f42e1f4e9e5b40bd46149d73b86e312439f7b45334",
+          "code_length": 5
+        },
+        {
+          "name": "setItalicFont",
+          "descriptor": "()Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "23676b276d3e8445f3baa5cec7326ff09eb69921e6a11e52eb3686e6f3d15553",
+          "code_length": 8
+        },
+        {
+          "name": "setItalicFont",
+          "descriptor": "(Z)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "b87d8a4f312f5d4c39da944885546a896884c5ef940d8537b691022790e8049d",
+          "code_length": 9
+        },
+        {
+          "name": "isItalicFont",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "dcf07149609c815a5bbb9aa943c52c7a28ecedaf8fc3d9adb24b7b8e62db731b",
+          "code_length": 5
+        },
+        {
+          "name": "setFontStyle",
+          "descriptor": "(ZZ)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "c18f7d3f89758b918f93dd31bb8062f010aa9aa4c610c16723f58c17942ef5e0",
+          "code_length": 10
+        },
+        {
+          "name": "setFontStyle",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "ebdb08cadf22d0e1c4af4fbea2dd7e97055b47fd7c2e3e97523777b28faa9bdd",
+          "code_length": 9
+        },
+        {
+          "name": "setFontSize",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "ee7e6127286cc14e1c4f4ed025f9f3751a21b6d01b5ee8acad127b059b50a4de",
+          "code_length": 9
+        },
+        {
+          "name": "changeFontSize",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "98a215e76808152122c0efd770663980e39584fedf61cd8a7ac1e25efbe7c7da",
+          "code_length": 9
+        },
+        {
+          "name": "getFontSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f86068f72b3561dfd4eaeba02e30bc8226aa3ad261a77850e64ede9b62479147",
+          "code_length": 5
+        },
+        {
+          "name": "setFontSizeAndStyle",
+          "descriptor": "(IZZ)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "1509d6d2013522234304354c14674c4836c8a067d3f78aee4964556c6d99296a",
+          "code_length": 11
+        },
+        {
+          "name": "setFontSizeAndStyle",
+          "descriptor": "(II)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "321cc17ba67d8da02db9d404b7107ecc20f7be3ec8da618b8dec4933322fbee3",
+          "code_length": 10
+        },
+        {
+          "name": "setFontName",
+          "descriptor": "(Ljava/lang/String;)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "437ed78f5465d833ca24c7c6faec9c433bbfb69e8496993bede412c6f3444c4b",
+          "code_length": 9
+        },
+        {
+          "name": "getFontName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c6ad4a42070695cfd7aba72a69b3462d345ca71f4af82590b9d26d635b505aea",
+          "code_length": 5
+        },
+        {
+          "name": "getPreferredWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bf4820a3e9696a7f0f202330ed68edb4d727d1e9dfccd8831a3b6ed5e30b7fde",
+          "code_length": 5
+        },
+        {
+          "name": "setPreferredWidth",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "64675bbd525885c725f9d8f85010a0738318a913d17713713ea40c2ae8cda72d",
+          "code_length": 9
+        },
+        {
+          "name": "getPreferredHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "81e1e65aa9bc46f1de870a832baaae7246042636cf5f34cbfe11cf6e0c0980f4",
+          "code_length": 5
+        },
+        {
+          "name": "setPreferredHeight",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "4647c741d595f0872d255cc1b1c531686b39ead8b5ff8c1057808c4cefbb4296",
+          "code_length": 9
+        },
+        {
+          "name": "getMinimumWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5153ca7200fc684b4fd83e30377986083ea2709fd11074b119cc7ad3e7534270",
+          "code_length": 5
+        },
+        {
+          "name": "setMinimumWidth",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "8afeca24b0b2270a1f60c8ab85288fc88c19fef5fe1caa7c20e6aac22832fa62",
+          "code_length": 9
+        },
+        {
+          "name": "getMinimumHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c3f0f5e7557be5186c5a62d558eec71342e81ac345f5a2949d3fe06fe1c41bf5",
+          "code_length": 5
+        },
+        {
+          "name": "setMinimumHeight",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "9001be7c56b65466e16cc93da1fdcca70275bcafed3ec243883908316abaefb1",
+          "code_length": 9
+        },
+        {
+          "name": "getMaximumWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "47e1dba089cce0ca0617b1e7688cdc96a7545fbfd893255614398856cb0874ae",
+          "code_length": 5
+        },
+        {
+          "name": "setMaximumWidth",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "c2cbe634138da09bdd6e727999194bf10a2258cc975b5e9d4df607df5aa8b6e9",
+          "code_length": 9
+        },
+        {
+          "name": "getMaximumHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5097d68b074eb07ddf2c860173caf7495a64b367988d006fb7ca4ec924324244",
+          "code_length": 5
+        },
+        {
+          "name": "setMaximumHeight",
+          "descriptor": "(I)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "2ce041342d52c58025fbdbd90eeb1897f2c53281ad3bf2490a8f0c8e2d891f36",
+          "code_length": 9
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "7e5fcf11f964bd1e1adc66810618e758842e2e4ae1645b3914931e8b472d6099",
+          "code_length": 9
+        },
+        {
+          "name": "getOriginalPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "7cbc455e574f36448b0fac18f621f496399c91846c54a8300f7775296069a9c9",
+          "code_length": 9
+        },
+        {
+          "name": "setPreferredSize",
+          "descriptor": "(II)Lcom/alee/laf/menu/WebPopupMenuSeparator;",
+          "access": 1,
+          "code_sha256": "40266ae0dfd316f58eb1d7411c9d08e5eb71e25a3262ed5a6bb19435f1132b1d",
+          "code_length": 10
+        },
+        {
+          "name": "getUI",
+          "descriptor": "()Lcom/alee/laf/menu/WPopupMenuSeparatorUI;",
+          "access": 1,
+          "code_sha256": "e4f9f9dc58aac69e300d9eedd021244d7154e7b94edac87cedf8e3dab6a7e8d0",
+          "code_length": 8
+        },
+        {
+          "name": "setUI",
+          "descriptor": "(Lcom/alee/laf/menu/WPopupMenuSeparatorUI;)V",
+          "access": 1,
+          "code_sha256": "07cbfa921582135e1d8f6d35b2e08756442384953dca9f4c04e707aa7e787b84",
+          "code_length": 6
+        },
+        {
+          "name": "updateUI",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "09babdbcf45afe27520fd049ab6f46b81d84f5542afb1b0ff16808ca3b2396b9",
+          "code_length": 11
+        },
+        {
+          "name": "getUIClassID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bd395c9ba3f62a01601e46a2715d355c54cd5fba8ce263029c9e2d10903cc7af",
+          "code_length": 10
+        },
+        {
+          "name": "getUI",
+          "descriptor": "()Ljavax/swing/plaf/SeparatorUI;",
+          "access": 4161,
+          "code_sha256": "61c7c344f3e297a79bbbc0496eb1064c455ef3220fcc28b9f11ece5aede249b9",
+          "code_length": 5
+        },
+        {
+          "name": "setFontName",
+          "descriptor": "(Ljava/lang/String;)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "547362ec5febf4d5dc7319498e30493d69ba588694606167ddc2b8594d51d0b4",
+          "code_length": 6
+        },
+        {
+          "name": "setFontSizeAndStyle",
+          "descriptor": "(II)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "aee3caa5220b773f1ab5bb1a707946621427342258977b11b9d4f93f10041b72",
+          "code_length": 7
+        },
+        {
+          "name": "setFontSizeAndStyle",
+          "descriptor": "(IZZ)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "175d9f6303012443a18db0579c3c7d0da59ca93132259587e4bdc5be495ce966",
+          "code_length": 8
+        },
+        {
+          "name": "changeFontSize",
+          "descriptor": "(I)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "bdc8a103072e10667ca9d104bf6b35e582e31cd9d3877d89bbc08ad64564f94c",
+          "code_length": 6
+        },
+        {
+          "name": "setFontSize",
+          "descriptor": "(I)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "c8ad96f852b5440c2b86a28428a32798b55c36ca61bd4b29f09eee9e4af05649",
+          "code_length": 6
+        },
+        {
+          "name": "setFontStyle",
+          "descriptor": "(I)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "df77fd07a4f3cd3d1b939c2cb81e471ffce0330457838e04f0d4b422ab1eab32",
+          "code_length": 6
+        },
+        {
+          "name": "setFontStyle",
+          "descriptor": "(ZZ)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "5c216ef4cfb472dcb2d1b37882979d3dfc8f0d44966d97b3f481f0d5e660aea4",
+          "code_length": 7
+        },
+        {
+          "name": "setItalicFont",
+          "descriptor": "(Z)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "e8caa7e5eb6fa65fd7f3864700209d9e384afcde55cf3c7e1c5b887e2cf9f9fc",
+          "code_length": 6
+        },
+        {
+          "name": "setItalicFont",
+          "descriptor": "()Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "3f82d774d04a762b27160c7149391a540e48f46d3d263185475b16086f426eb2",
+          "code_length": 5
+        },
+        {
+          "name": "setBoldFont",
+          "descriptor": "(Z)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "ecc411f371dbb4fb199e3f8980350a8a1c1dffd2e3d7a11e78dae68534ef89d8",
+          "code_length": 6
+        },
+        {
+          "name": "setBoldFont",
+          "descriptor": "()Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "c64536261e9c92a115db63fa72b902333149b294fba5bba8b7c71530b6471a33",
+          "code_length": 5
+        },
+        {
+          "name": "setPlainFont",
+          "descriptor": "(Z)Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "7dd8492a32bd4f9d5dd7f0b13626dc535d52395ff18fb743676359115c2b0404",
+          "code_length": 6
+        },
+        {
+          "name": "setPlainFont",
+          "descriptor": "()Ljava/awt/Component;",
+          "access": 4161,
+          "code_sha256": "a7c9038059618b6710bae6efb969f43d890f543a6490390fb0f5eaf2c8f6f7d6",
+          "code_length": 5
+        },
+        {
+          "name": "setPreferredSize",
+          "descriptor": "(II)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "d71a49a6b601819874486e0f0ae9d9a0207c0095512ec6ca466b6d2e21677a8b",
+          "code_length": 7
+        },
+        {
+          "name": "setMaximumHeight",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "ebb777bec799f3cf0d87b2d2854ad859e4ded422f2ae9ce4cac53d4308eb9b07",
+          "code_length": 6
+        },
+        {
+          "name": "setMaximumWidth",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "dddc25e80592988a6873e9e463693abe40bacc8f26eeef8bbe97f8571c541c3a",
+          "code_length": 6
+        },
+        {
+          "name": "setMinimumHeight",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "37e095948bcbf0a97ee92edf3c37708bfd0c1f58fe18c994677fda8bab5b0caf",
+          "code_length": 6
+        },
+        {
+          "name": "setMinimumWidth",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "25eaaa4ece6c731882a7f9dd6ad4cde659e4d626c36f5f22cdf07cfb3c4f6c9f",
+          "code_length": 6
+        },
+        {
+          "name": "setPreferredHeight",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "f867885ec6a62be6f52c5253555584268cb756369d2c7d0129c49900be3cb3ad",
+          "code_length": 6
+        },
+        {
+          "name": "setPreferredWidth",
+          "descriptor": "(I)Ljavax/swing/JComponent;",
+          "access": 4161,
+          "code_sha256": "d867da163ad6592a7ff60daec7ee29de578b7598ca83ae51d6dedf53219c5002",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljavax/swing/JPopupMenu$Separator;Lcom/alee/managers/style/Styleable;Lcom/alee/painter/Paintable;Lcom/alee/managers/style/ShapeMethods;Lcom/alee/managers/style/MarginMethods;Lcom/alee/managers/style/PaddingMethods;Lcom/alee/utils/swing/extensions/EventMethods;Lcom/alee/managers/settings/SettingsMethods;Lcom/alee/utils/swing/extensions/FontMethods<Lcom/alee/laf/menu/WebPopupMenuSeparator;>;Lcom/alee/utils/swing/extensions/SizeMethods<Lcom/alee/laf/menu/WebPopupMenuSeparator;>;",
+      "class_references": [
+        "com/alee/laf/menu/WPopupMenuSeparatorUI",
+        "com/alee/laf/menu/WebPopupMenuSeparator",
+        "com/alee/managers/settings/SettingsMethods",
+        "com/alee/managers/settings/UISettingsManager",
+        "com/alee/managers/style/ComponentDescriptor",
+        "com/alee/managers/style/MarginMethods",
+        "com/alee/managers/style/MarginMethodsImpl",
+        "com/alee/managers/style/PaddingMethods",
+        "com/alee/managers/style/PaddingMethodsImpl",
+        "com/alee/managers/style/ShapeMethods",
+        "com/alee/managers/style/ShapeMethodsImpl",
+        "com/alee/managers/style/StyleId",
+        "com/alee/managers/style/StyleManager",
+        "com/alee/managers/style/Styleable",
+        "com/alee/painter/Paintable",
+        "com/alee/utils/swing/extensions/EventMethods",
+        "com/alee/utils/swing/extensions/EventMethodsImpl",
+        "com/alee/utils/swing/extensions/FontMethods",
+        "com/alee/utils/swing/extensions/FontMethodsImpl",
+        "com/alee/utils/swing/extensions/SizeMethods",
+        "com/alee/utils/swing/extensions/SizeMethodsImpl",
+        "javax/swing/JPopupMenu",
+        "javax/swing/JPopupMenu$Separator"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/WPopupMenuUI.class",
+      "occurrence": 0,
+      "sha256": "2a3359ca4d8ecd11907bc4977cda3999ff4577a1ace538cc974f6be3d89bf15e",
+      "name": "com/alee/laf/menu/WPopupMenuUI",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "javax/swing/plaf/basic/BasicPopupMenuUI",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setPopupMenuWay",
+          "descriptor": "(Lcom/alee/laf/menu/PopupMenuWay;)V",
+          "access": 1025
+        },
+        {
+          "name": "getPopupMenuWay",
+          "descriptor": "()Lcom/alee/laf/menu/PopupMenuWay;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/menu/WPopupMenuUI",
+        "javax/swing/plaf/basic/BasicPopupMenuUI"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/WebMenuBarUI.class",
+      "occurrence": 0,
+      "sha256": "c748f63bfb183133ea214bf6fa98f45ab75a229b8b38c7aebb29a2f89a9f2da0",
+      "name": "com/alee/laf/menu/WebMenuBarUI",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/plaf/basic/BasicMenuBarUI",
+      "interfaces": [
+        "com/alee/managers/style/ShapeSupport",
+        "com/alee/managers/style/MarginSupport",
+        "com/alee/managers/style/PaddingSupport"
+      ],
+      "fields": [
+        {
+          "name": "painter",
+          "descriptor": "Lcom/alee/laf/menu/IMenuBarPainter;",
+          "access": 4
+        },
+        {
+          "name": "oldLayout",
+          "descriptor": "Ljava/awt/LayoutManager;",
+          "access": 132
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createUI",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljavax/swing/plaf/ComponentUI;",
+          "access": 9,
+          "code_sha256": "7a5fece39a606d562da81eb599f7e8ac65198226792497a113c93088153c170f",
+          "code_length": 8
+        },
+        {
+          "name": "installUI",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "e5bde65364b394881d89f652565db68bb9ddab003ae460a58ff2e476625c3d0c",
+          "code_length": 17
+        },
+        {
+          "name": "uninstallUI",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "c6b50f3c84511bc80e0534138c3ac153e92c3f73237d0ad97486ebac15104132",
+          "code_length": 17
+        },
+        {
+          "name": "installLayout",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0e2abc2ca77fb7da1c6b074fcb739e2d0d29a35b6354ebe823b2d5c8a2503f27",
+          "code_length": 23
+        },
+        {
+          "name": "uninstallLayout",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "9b7730ebafef8c285712536a6c9e7b4a1d9618866492304482a72dd4be7209d0",
+          "code_length": 17
+        },
+        {
+          "name": "createLayout",
+          "descriptor": "()Ljava/awt/LayoutManager;",
+          "access": 4,
+          "code_sha256": "fdfd612d02b8e378445c79c832f8ecfe1babe3acd485cfb9f86a188abc482285",
+          "code_length": 8
+        },
+        {
+          "name": "getShape",
+          "descriptor": "()Ljava/awt/Shape;",
+          "access": 1,
+          "code_sha256": "0a0c6582a2c7cd65ab62c6f425e4a84c4c95c995eaf8ae01713a8b9a67326f04",
+          "code_length": 12
+        },
+        {
+          "name": "isShapeDetectionEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "06e1d87b471476ca2b56635335cca0d10c439ca585fc5a2c886a9132ccef4331",
+          "code_length": 12
+        },
+        {
+          "name": "setShapeDetectionEnabled",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "742b3e24333c796fcef314b1bbd2ca732bdb59100a7cc076dcbc4047e7b28622",
+          "code_length": 13
+        },
+        {
+          "name": "getMargin",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "913ee345cd2f824972a2c008cd80edd5b6245a84039c727984f7939abb8c68a6",
+          "code_length": 8
+        },
+        {
+          "name": "setMargin",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "3f3d1f89a38f8e8740960dfc57bfa5944c58582871ffd307a6c7ce9ab7084d78",
+          "code_length": 9
+        },
+        {
+          "name": "getPadding",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "892b9554ede0eac7d8436bc09e95bda1cf9c1b51e92c7bd4089d71d3788edebd",
+          "code_length": 8
+        },
+        {
+          "name": "setPadding",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "48c0b99839572e92ccb97421aba36fe57b57f05ff4700d56a0c8418c72df8432",
+          "code_length": 9
+        },
+        {
+          "name": "getPainter",
+          "descriptor": "()Lcom/alee/painter/Painter;",
+          "access": 1,
+          "code_sha256": "3bd8d7510be9c4c52ec3a324de8097e1afa76cb67ad02f33dc37938082be8a60",
+          "code_length": 8
+        },
+        {
+          "name": "setPainter",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "089d6c92fde0a5ad5a59a697d3dffb92e834b706856b8c305d72f04f99b52ef7",
+          "code_length": 25
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljavax/swing/JComponent;II)Z",
+          "access": 1,
+          "code_sha256": "bf26758cfa0daeceb0d21ae45f2e9f7b446e70e955629265c06071c203d3640f",
+          "code_length": 12
+        },
+        {
+          "name": "getBaseline",
+          "descriptor": "(Ljavax/swing/JComponent;II)I",
+          "access": 1,
+          "code_sha256": "c34385dfbaed0d4ff7b16c1f2aaf13dfeab8f6eaa17f80a78f7408dc37815d09",
+          "code_length": 12
+        },
+        {
+          "name": "getBaselineResizeBehavior",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljava/awt/Component$BaselineResizeBehavior;",
+          "access": 1,
+          "code_sha256": "ab8e5e8ea8ecfe8be4101b1fc25a5f9b67727954bc4e717bb6770dce58e4594a",
+          "code_length": 10
+        },
+        {
+          "name": "paint",
+          "descriptor": "(Ljava/awt/Graphics;Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "c6c6ed7a37f9c98aae414e27ed58658759a01c41501b30b484d85c3f16037942",
+          "code_length": 31
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/menu/AdaptiveMenuBarPainter",
+        "com/alee/laf/menu/IMenuBarPainter",
+        "com/alee/laf/menu/MenuBarLayout",
+        "com/alee/laf/menu/WebMenuBarUI",
+        "com/alee/laf/menu/WebMenuBarUI$1",
+        "com/alee/managers/style/Bounds",
+        "com/alee/managers/style/MarginSupport",
+        "com/alee/managers/style/PaddingSupport",
+        "com/alee/managers/style/ShapeSupport",
+        "com/alee/managers/style/StyleManager",
+        "com/alee/painter/PainterSupport",
+        "java/awt/Component",
+        "java/awt/Component$BaselineResizeBehavior",
+        "java/awt/Graphics2D",
+        "javax/swing/JMenuBar",
+        "javax/swing/plaf/basic/BasicMenuBarUI"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/MenuBarDescriptor.class",
+      "occurrence": 0,
+      "sha256": "5f142c5060f8aaa46e7e13a5525d520d1706625b96cd6dd2c813118ad074ef72",
+      "name": "com/alee/laf/menu/MenuBarDescriptor",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/laf/menu/AbstractMenuBarDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9d62e77dfb943a08757612b830c4584a2135602f133f0da1da7e9695977c77b3",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "Lcom/alee/laf/menu/AbstractMenuBarDescriptor<Ljavax/swing/JMenuBar;Lcom/alee/laf/menu/WebMenuBarUI;>;",
+      "class_references": [
+        "com/alee/laf/menu/AbstractMenuBarDescriptor",
+        "com/alee/laf/menu/MenuBarDescriptor",
+        "com/alee/laf/menu/WebMenuBarUI",
+        "com/alee/managers/style/StyleId",
+        "javax/swing/JMenuBar"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/WebMenuItemUI.class",
+      "occurrence": 0,
+      "sha256": "dab170a76e11f910e9e9ff6a222998a46bfee3ab9f7adf3aedb25641a461960d",
+      "name": "com/alee/laf/menu/WebMenuItemUI",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/plaf/basic/BasicMenuItemUI",
+      "interfaces": [
+        "com/alee/managers/style/ShapeSupport",
+        "com/alee/managers/style/MarginSupport",
+        "com/alee/managers/style/PaddingSupport"
+      ],
+      "fields": [
+        {
+          "name": "painter",
+          "descriptor": "Lcom/alee/laf/menu/IMenuItemPainter;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createUI",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljavax/swing/plaf/ComponentUI;",
+          "access": 9,
+          "code_sha256": "7a5fece39a606d562da81eb599f7e8ac65198226792497a113c93088153c170f",
+          "code_length": 8
+        },
+        {
+          "name": "installUI",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "b92d0d022d0796e075593434920c763c0a72d21b5db4b6d195a12b2468a43325",
+          "code_length": 13
+        },
+        {
+          "name": "uninstallUI",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "4836949b7987a3e8dfcec43578c11bf735afb80685cd483b689de5ea37784200",
+          "code_length": 13
+        },
+        {
+          "name": "getShape",
+          "descriptor": "()Ljava/awt/Shape;",
+          "access": 1,
+          "code_sha256": "0d7c76934a8727099cc43e1a4e63c93de875aecc6ce1ebb4de7806d9a55f0c15",
+          "code_length": 12
+        },
+        {
+          "name": "isShapeDetectionEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e96f5c63f1f1bf03020c6710304137d9a2c48ddb93ae851162eebce45119ca46",
+          "code_length": 12
+        },
+        {
+          "name": "setShapeDetectionEnabled",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "16d1cbc3a048422e8e254c781b17d5624ecea186d5e4ddac22671f962271dae2",
+          "code_length": 13
+        },
+        {
+          "name": "getMargin",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "a76ecd5a253bb0f42635e820ae5dbdc7696efaa88f003b7f5df39e8ad16d1e12",
+          "code_length": 8
+        },
+        {
+          "name": "setMargin",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "bd5edbbb42b19424258a1a31930463912c489c3f1b509da64c64b5c6298b3304",
+          "code_length": 9
+        },
+        {
+          "name": "getPadding",
+          "descriptor": "()Ljava/awt/Insets;",
+          "access": 1,
+          "code_sha256": "4e32bc2730779726968d233338e21bad7de611acb58275a2d380f03d235b5793",
+          "code_length": 8
+        },
+        {
+          "name": "setPadding",
+          "descriptor": "(Ljava/awt/Insets;)V",
+          "access": 1,
+          "code_sha256": "2a9e32601ba1352c4221f81e9c64721d084c54372e5f6851ec271d165a67d532",
+          "code_length": 9
+        },
+        {
+          "name": "getPainter",
+          "descriptor": "()Lcom/alee/painter/Painter;",
+          "access": 1,
+          "code_sha256": "7ccf1b0b6916cfd154911ee7e70f2754f0093ccab9469243f2f6b03fce910a48",
+          "code_length": 8
+        },
+        {
+          "name": "setPainter",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "9cd15fb1a880c2e88a10b3b088703703b2e2da35ea3265bfe0063c138a72cf58",
+          "code_length": 25
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljavax/swing/JComponent;II)Z",
+          "access": 1,
+          "code_sha256": "b287a42c5c69970662fba98d2c2ddcaafb9112a6a562ab9c937f37e9e2fc9cd3",
+          "code_length": 12
+        },
+        {
+          "name": "getBaseline",
+          "descriptor": "(Ljavax/swing/JComponent;II)I",
+          "access": 1,
+          "code_sha256": "1a4d55f59832bddcc8256bd5d534dcb0e798652da31b4be382ceffdf2c627aca",
+          "code_length": 12
+        },
+        {
+          "name": "getBaselineResizeBehavior",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljava/awt/Component$BaselineResizeBehavior;",
+          "access": 1,
+          "code_sha256": "577777bd04a923bb8066358f5c42174f44e7e8fd0c02f293d4becd59f84ab38d",
+          "code_length": 10
+        },
+        {
+          "name": "paint",
+          "descriptor": "(Ljava/awt/Graphics;Ljavax/swing/JComponent;)V",
+          "access": 1,
+          "code_sha256": "d5fe2a339be0425771a473b40a7682f5f55fbd76456adf664c27709eb4a5b0f2",
+          "code_length": 31
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "cd12c3c9048baeea7ebc28f14b9cb044a6ca4443124ab9e324086aabec4fbc6c",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/menu/AdaptiveMenuItemPainter",
+        "com/alee/laf/menu/IMenuItemPainter",
+        "com/alee/laf/menu/WebMenuItemUI",
+        "com/alee/laf/menu/WebMenuItemUI$1",
+        "com/alee/managers/style/Bounds",
+        "com/alee/managers/style/MarginSupport",
+        "com/alee/managers/style/PaddingSupport",
+        "com/alee/managers/style/ShapeSupport",
+        "com/alee/managers/style/StyleManager",
+        "com/alee/painter/PainterSupport",
+        "java/awt/Component",
+        "java/awt/Component$BaselineResizeBehavior",
+        "java/awt/Graphics2D",
+        "javax/swing/plaf/basic/BasicMenuItemUI"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/MenuPainter.class",
+      "occurrence": 0,
+      "sha256": "2729ebb141b0d018943cb9e8afe55d021af407e4b08f463c71471a43dcebe040",
+      "name": "com/alee/laf/menu/MenuPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/menu/AbstractMenuItemPainter",
+      "interfaces": [
+        "com/alee/laf/menu/IMenuPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "hierarchyChanged",
+          "descriptor": "(Ljava/awt/event/HierarchyEvent;)V",
+          "access": 4,
+          "code_sha256": "10dc2a0b225fe7a77650268ee044f988a78e0e2080ece66457f84543d44e2a18",
+          "code_length": 20
+        },
+        {
+          "name": "getDecorationStates",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "2719896fad2b591fae89940ac58432269c21bede77a07e04b16ad5d0b2f0e823",
+          "code_length": 66,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JMenu;U:Lcom/alee/laf/menu/WebMenuUI;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;>Lcom/alee/laf/menu/AbstractMenuItemPainter<TC;TU;TD;>;Lcom/alee/laf/menu/IMenuPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/menu/AbstractMenuItemPainter",
+        "com/alee/laf/menu/IMenuPainter",
+        "com/alee/laf/menu/MenuPainter",
+        "com/alee/managers/style/ComponentDescriptor",
+        "com/alee/managers/style/StyleManager",
+        "java/awt/event/HierarchyEvent",
+        "java/lang/Class",
+        "java/util/List",
+        "javax/swing/JMenu",
+        "javax/swing/JMenuBar",
+        "javax/swing/JPopupMenu"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/menu/WebMenuBarUI$1.class",
+      "occurrence": 0,
+      "sha256": "75160230c79af36e02e8ea85a27ab366dd8ccdd47434826692f1526ffee439ec",
+      "name": "com/alee/laf/menu/WebMenuBarUI$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Consumer"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/menu/WebMenuBarUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/menu/WebMenuBarUI;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Lcom/alee/laf/menu/IMenuBarPainter;)V",
+          "access": 1,
+          "code_sha256": "010ab402d970a463694473794a0c12afc2a3cc86d3e4997f59c85fa8f636503e",
+          "code_length": 9
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "f360d5bef84e1dc1749f701d35a6e5dbb5c3abbf296f1d0f3b02e577a2cb4db1",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Consumer<Lcom/alee/laf/menu/IMenuBarPainter;>;",
+      "class_references": [
+        "com/alee/api/jdk/Consumer",
+        "com/alee/laf/menu/IMenuBarPainter",
+        "com/alee/laf/menu/WebMenuBarUI",
+        "com/alee/laf/menu/WebMenuBarUI$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/radiobutton/IRadioButtonPainter.class",
+      "occurrence": 0,
+      "sha256": "cd29e6149b7a574932b03da4890dcb4cf511e29ea16b981437c629738d5f99cd",
+      "name": "com/alee/laf/radiobutton/IRadioButtonPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/laf/radiobutton/IAbstractStateButtonPainter"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<C:Ljavax/swing/JRadioButton;U:Lcom/alee/laf/radiobutton/WRadioButtonUI<TC;>;>Ljava/lang/Object;Lcom/alee/laf/radiobutton/IAbstractStateButtonPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/radiobutton/IAbstractStateButtonPainter",
+        "com/alee/laf/radiobutton/IRadioButtonPainter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/NativeFonts$10.class",
+      "occurrence": 0,
+      "sha256": "cac6ed429348cdd280bd92fa6670e05a9d8e64ba3d8890a6cc314934daa26f63",
+      "name": "com/alee/laf/NativeFonts$10",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljavax/swing/plaf/FontUIResource;",
+          "access": 1,
+          "code_sha256": "b5459db5c9c524e4cd3d7d5808bd3ddafa0ae9a891b9ca054acd463a9c62994b",
+          "code_length": 13
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<Ljavax/swing/plaf/FontUIResource;>;",
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/laf/NativeFonts",
+        "com/alee/laf/NativeFonts$10",
+        "java/awt/Font",
+        "java/lang/Object",
+        "javax/swing/plaf/FontUIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/StrictEventThreadListeners.class",
+      "occurrence": 0,
+      "sha256": "ef71eae337cb87dc526ac15f7122a771914eda28ba0cf0067cc02dcaf68c321e",
+      "name": "com/alee/laf/StrictEventThreadListeners",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/event/HierarchyListener",
+        "java/beans/PropertyChangeListener",
+        "java/awt/event/ComponentListener",
+        "java/awt/event/MouseListener",
+        "java/awt/event/MouseWheelListener",
+        "java/awt/event/MouseMotionListener",
+        "java/awt/event/KeyListener",
+        "java/awt/event/FocusListener"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "hierarchyChanged",
+          "descriptor": "(Ljava/awt/event/HierarchyEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "propertyChange",
+          "descriptor": "(Ljava/beans/PropertyChangeEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "componentResized",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "componentMoved",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "componentShown",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "componentHidden",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseClicked",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mousePressed",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseReleased",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseEntered",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseExited",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseWheelMoved",
+          "descriptor": "(Ljava/awt/event/MouseWheelEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseDragged",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "mouseMoved",
+          "descriptor": "(Ljava/awt/event/MouseEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "keyTyped",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "keyPressed",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "keyReleased",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "focusGained",
+          "descriptor": "(Ljava/awt/event/FocusEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        },
+        {
+          "name": "focusLost",
+          "descriptor": "(Ljava/awt/event/FocusEvent;)V",
+          "access": 1,
+          "code_sha256": "288a9c3931eda68658c6d77d64d0cc81d08e2bbcaeffa7903e2c9996d1f5251d",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/StrictEventThreadListeners",
+        "com/alee/laf/WebLookAndFeel",
+        "java/awt/event/ComponentListener",
+        "java/awt/event/FocusListener",
+        "java/awt/event/HierarchyListener",
+        "java/awt/event/KeyListener",
+        "java/awt/event/MouseListener",
+        "java/awt/event/MouseMotionListener",
+        "java/awt/event/MouseWheelListener",
+        "java/beans/PropertyChangeListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/AdaptiveTablePainter.class",
+      "occurrence": 0,
+      "sha256": "6b64069ea471554db745ae3e6397ab9efb3a8cafd20b4d6b53b1595e30236ae8",
+      "name": "com/alee/laf/table/AdaptiveTablePainter",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/painter/AdaptivePainter",
+      "interfaces": [
+        "com/alee/laf/table/ITablePainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "prepareToPaint",
+          "descriptor": "(Ljavax/swing/CellRendererPane;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JTable;U:Lcom/alee/laf/table/WebTableUI;>Lcom/alee/painter/AdaptivePainter<TC;TU;>;Lcom/alee/laf/table/ITablePainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/table/AdaptiveTablePainter",
+        "com/alee/laf/table/ITablePainter",
+        "com/alee/painter/AdaptivePainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/renderers/WebTableCellRenderer$UIResource.class",
+      "occurrence": 0,
+      "sha256": "aab64f3e8240643bafaf6caf2be85eb77e966ce9a0c8294dc4959b080bdafdf2",
+      "name": "com/alee/laf/table/renderers/WebTableCellRenderer$UIResource",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/laf/table/renderers/WebTableCellRenderer",
+      "interfaces": [
+        "javax/swing/plaf/UIResource"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;C:Ljavax/swing/JTable;P:Lcom/alee/laf/table/TableCellParameters<TV;TC;>;>Lcom/alee/laf/table/renderers/WebTableCellRenderer<TV;TC;TP;>;Ljavax/swing/plaf/UIResource;",
+      "class_references": [
+        "com/alee/laf/table/renderers/WebTableCellRenderer",
+        "com/alee/laf/table/renderers/WebTableCellRenderer$UIResource",
+        "javax/swing/plaf/UIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/renderers/WebTableDoubleCellRenderer$UIResource.class",
+      "occurrence": 0,
+      "sha256": "567ff676d9de706a07e8657d2468c71fab1c74ec9d856f926a771ba24fae577f",
+      "name": "com/alee/laf/table/renderers/WebTableDoubleCellRenderer$UIResource",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/laf/table/renderers/WebTableDoubleCellRenderer",
+      "interfaces": [
+        "javax/swing/plaf/UIResource"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Double;C:Ljavax/swing/JTable;P:Lcom/alee/laf/table/TableCellParameters<TV;TC;>;>Lcom/alee/laf/table/renderers/WebTableDoubleCellRenderer<TV;TC;TP;>;Ljavax/swing/plaf/UIResource;",
+      "class_references": [
+        "com/alee/laf/table/renderers/WebTableDoubleCellRenderer",
+        "com/alee/laf/table/renderers/WebTableDoubleCellRenderer$UIResource",
+        "javax/swing/plaf/UIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/renderers/WebTableDateCellRenderer.class",
+      "occurrence": 0,
+      "sha256": "4b19109d32ce823cd4cf94c79ee00b5323eb7afceaf754d0f9b9c249e6fbfa34",
+      "name": "com/alee/laf/table/renderers/WebTableDateCellRenderer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/table/renderers/WebTableCellRenderer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dateFormat",
+          "descriptor": "Ljava/text/DateFormat;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "updateStyleId",
+          "descriptor": "(Lcom/alee/laf/table/TableCellParameters;)V",
+          "access": 4,
+          "code_sha256": "4df6fa054c283547511546dd781a1885fbdde252d948346ce3728aed2c68271f",
+          "code_length": 16,
+          "generic_signature": "(TP;)V"
+        },
+        {
+          "name": "textForValue",
+          "descriptor": "(Lcom/alee/laf/table/TableCellParameters;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c9d317abcc16ecf27cc5921f42e99ba2362e81803b35894b62394a57f1b4d2d4",
+          "code_length": 27,
+          "generic_signature": "(TP;)Ljava/lang/String;"
+        },
+        {
+          "name": "getDateFormat",
+          "descriptor": "()Ljava/text/DateFormat;",
+          "access": 4,
+          "code_sha256": "7e798467ca92061c170333214c34a81c42ae581bc1f1f79006e85f1a29783e94",
+          "code_length": 19
+        }
+      ],
+      "generic_signature": "<V:Ljava/util/Date;C:Ljavax/swing/JTable;P:Lcom/alee/laf/table/TableCellParameters<TV;TC;>;>Lcom/alee/laf/table/renderers/WebTableCellRenderer<TV;TC;TP;>;",
+      "class_references": [
+        "com/alee/laf/table/TableCellParameters",
+        "com/alee/laf/table/renderers/WebTableCellRenderer",
+        "com/alee/laf/table/renderers/WebTableDateCellRenderer",
+        "com/alee/laf/table/renderers/WebTableDateCellRenderer$UIResource",
+        "com/alee/managers/style/ChildStyleId",
+        "com/alee/managers/style/StyleId",
+        "java/lang/String",
+        "java/text/DateFormat",
+        "java/util/Date"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/editors/WebBooleanEditor.class",
+      "occurrence": 0,
+      "sha256": "0e429e9e474c66c43eed0f05da137da4d2dc599c3a2a41db8d7f2af1045e4ca3",
+      "name": "com/alee/laf/table/editors/WebBooleanEditor",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/utils/swing/WebDefaultCellEditor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "65003b336d0bca414e045b08d2420f813d7b25d7741efe292365471d873c8a86",
+          "code_length": 17
+        },
+        {
+          "name": "getTableCellEditorComponent",
+          "descriptor": "(Ljavax/swing/JTable;Ljava/lang/Object;ZII)Ljava/awt/Component;",
+          "access": 1,
+          "code_sha256": "4e57be5f8d7d1514b7b1a37477af9df8a43dd7014927ccead6e44354d61dcb69",
+          "code_length": 43
+        }
+      ],
+      "generic_signature": "Lcom/alee/utils/swing/WebDefaultCellEditor<Lcom/alee/laf/checkbox/WebCheckBox;>;",
+      "class_references": [
+        "com/alee/laf/checkbox/WebCheckBox",
+        "com/alee/laf/table/editors/WebBooleanEditor",
+        "com/alee/managers/style/ChildStyleId",
+        "com/alee/managers/style/StyleId",
+        "com/alee/utils/swing/WebDefaultCellEditor",
+        "java/awt/Component",
+        "javax/swing/JTable"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/TableSelectionPainter.class",
+      "occurrence": 0,
+      "sha256": "26ed1648a3448c61c1478d23616875314c1ff939e6686f927870ec7622b6cf2f",
+      "name": "com/alee/laf/table/TableSelectionPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/painter/decoration/AbstractSectionDecorationPainter",
+      "interfaces": [
+        "com/alee/laf/table/ITableSelectionPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSectionId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        },
+        {
+          "name": "isFocused",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JTable;U:Lcom/alee/laf/table/WebTableUI;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;>Lcom/alee/painter/decoration/AbstractSectionDecorationPainter<TC;TU;TD;>;Lcom/alee/laf/table/ITableSelectionPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/table/ITableSelectionPainter",
+        "com/alee/laf/table/TableSelectionPainter",
+        "com/alee/painter/decoration/AbstractSectionDecorationPainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/table/TableRowPainter.class",
+      "occurrence": 0,
+      "sha256": "ec1cd953980751e88b947f478713309f973b978927eeef29298ff03c7049ce32",
+      "name": "com/alee/laf/table/TableRowPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/painter/decoration/AbstractSectionDecorationPainter",
+      "interfaces": [
+        "com/alee/laf/table/ITableRowPainter"
+      ],
+      "fields": [
+        {
+          "name": "row",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 132
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSectionId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        },
+        {
+          "name": "isFocused",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getDecorationStates",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0b298d5ad35549d5c11fc71eb77dede18b491331140263faafd1010fba9b267a",
+          "code_length": 113,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "prepareToPaint",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "284c964642895f7ffd428f05e28d6a8482e26728c1c3ff7b8e50b12834eaeac7",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JTable;U:Lcom/alee/laf/table/WebTableUI;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;>Lcom/alee/painter/decoration/AbstractSectionDecorationPainter<TC;TU;TD;>;Lcom/alee/laf/table/ITableRowPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/table/ITableRowPainter",
+        "com/alee/laf/table/TableRowPainter",
+        "com/alee/painter/decoration/AbstractSectionDecorationPainter",
+        "com/alee/painter/decoration/DecorationState",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/util/List",
+        "javax/swing/JTable"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/viewport/AdaptiveViewportPainter.class",
+      "occurrence": 0,
+      "sha256": "d980733f30234270843479300749ac74e466034105ef07b418d154d40d060bb2",
+      "name": "com/alee/laf/viewport/AdaptiveViewportPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/painter/AdaptivePainter",
+      "interfaces": [
+        "com/alee/laf/viewport/IViewportPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JViewport;U:Lcom/alee/laf/viewport/WViewportUI;>Lcom/alee/painter/AdaptivePainter<TC;TU;>;Lcom/alee/laf/viewport/IViewportPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/viewport/AdaptiveViewportPainter",
+        "com/alee/laf/viewport/IViewportPainter",
+        "com/alee/painter/AdaptivePainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/NativeFonts$9.class",
+      "occurrence": 0,
+      "sha256": "40d31a5b184f316aaf14575b917a5e2b95aceb8d65fe5a47eb87a8137f8bd461",
+      "name": "com/alee/laf/NativeFonts$9",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljavax/swing/plaf/FontUIResource;",
+          "access": 1,
+          "code_sha256": "fb016eaedd372cfed1a8f587259a263180cb2e79b7ee1e09ecdaedb2e554b290",
+          "code_length": 13
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<Ljavax/swing/plaf/FontUIResource;>;",
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/laf/NativeFonts",
+        "com/alee/laf/NativeFonts$9",
+        "java/awt/Font",
+        "java/lang/Object",
+        "javax/swing/plaf/FontUIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/toolbar/ToolBarDescriptor.class",
+      "occurrence": 0,
+      "sha256": "820b3f9cc766c5b8069519e8c1e615febe6807c21a5d8ddf444a0f7a446b847b",
+      "name": "com/alee/laf/toolbar/ToolBarDescriptor",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/laf/toolbar/AbstractToolBarDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9d62e77dfb943a08757612b830c4584a2135602f133f0da1da7e9695977c77b3",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "Lcom/alee/laf/toolbar/AbstractToolBarDescriptor<Ljavax/swing/JToolBar;Lcom/alee/laf/toolbar/WebToolBarUI;>;",
+      "class_references": [
+        "com/alee/laf/toolbar/AbstractToolBarDescriptor",
+        "com/alee/laf/toolbar/ToolBarDescriptor",
+        "com/alee/laf/toolbar/WebToolBarUI",
+        "com/alee/managers/style/StyleId",
+        "javax/swing/JToolBar"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/toolbar/ToolBarSeparatorPainter.class",
+      "occurrence": 0,
+      "sha256": "8a8d14694549ffa1e9961d670f25206c296613ebd9d55142ef1f498cb366ab1b",
+      "name": "com/alee/laf/toolbar/ToolBarSeparatorPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/separator/AbstractSeparatorPainter",
+      "interfaces": [
+        "com/alee/laf/toolbar/IToolBarSeparatorPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JToolBar$Separator;U:Lcom/alee/laf/toolbar/WToolBarSeparatorUI;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;>Lcom/alee/laf/separator/AbstractSeparatorPainter<TC;TU;TD;>;Lcom/alee/laf/toolbar/IToolBarSeparatorPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/separator/AbstractSeparatorPainter",
+        "com/alee/laf/toolbar/IToolBarSeparatorPainter",
+        "com/alee/laf/toolbar/ToolBarSeparatorPainter",
+        "javax/swing/JToolBar",
+        "javax/swing/JToolBar$Separator"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/progressbar/AdaptiveProgressBarPainter.class",
+      "occurrence": 0,
+      "sha256": "5c3b11cb2825f992b909c57cbd3bef1566e1e6bbad7f57e78317b4e705ae47d9",
+      "name": "com/alee/laf/progressbar/AdaptiveProgressBarPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/painter/AdaptivePainter",
+      "interfaces": [
+        "com/alee/laf/progressbar/IProgressBarPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JProgressBar;U:Lcom/alee/laf/progressbar/WebProgressBarUI;>Lcom/alee/painter/AdaptivePainter<TC;TU;>;Lcom/alee/laf/progressbar/IProgressBarPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/progressbar/AdaptiveProgressBarPainter",
+        "com/alee/laf/progressbar/IProgressBarPainter",
+        "com/alee/painter/AdaptivePainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/SimpleButtonIcon.class",
+      "occurrence": 0,
+      "sha256": "ab7b5ba6b146c56d97a13beb6612b84ca1f80eb09108a155d75920f08b030866",
+      "name": "com/alee/laf/button/SimpleButtonIcon",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/painter/decoration/content/AbstractIconContent",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljavax/swing/AbstractButton;Lcom/alee/painter/decoration/IDecoration;)Ljavax/swing/Icon;",
+          "access": 4,
+          "code_sha256": "8ae76e442ce68e2d26a08ceb8057e2a0b20522cc50892bb6e8a49d7ef56e332b",
+          "code_length": 5,
+          "generic_signature": "(TC;TD;)Ljavax/swing/Icon;"
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljavax/swing/JComponent;Lcom/alee/painter/decoration/IDecoration;)Ljavax/swing/Icon;",
+          "access": 4164,
+          "code_sha256": "64c23e01ef14c8f42445b13f5cd52375dc6d79ae78bc2776e7d288fa158708e0",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/AbstractButton;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;I:Lcom/alee/laf/button/SimpleButtonIcon<TC;TD;TI;>;>Lcom/alee/painter/decoration/content/AbstractIconContent<TC;TD;TI;>;",
+      "class_references": [
+        "com/alee/laf/button/SimpleButtonIcon",
+        "com/alee/painter/decoration/content/AbstractIconContent",
+        "javax/swing/AbstractButton"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/ButtonPainter.class",
+      "occurrence": 0,
+      "sha256": "f9637cc80f28cc583f2692d554d3809e1ba7ab845c6720e7fe2be776a630ab61",
+      "name": "com/alee/laf/button/ButtonPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/button/AbstractButtonPainter",
+      "interfaces": [
+        "com/alee/laf/button/IButtonPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JButton;U:Lcom/alee/laf/button/WButtonUI<TC;>;D::Lcom/alee/painter/decoration/IDecoration<TC;TD;>;>Lcom/alee/laf/button/AbstractButtonPainter<TC;TU;TD;>;Lcom/alee/laf/button/IButtonPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/button/AbstractButtonPainter",
+        "com/alee/laf/button/ButtonPainter",
+        "com/alee/laf/button/IButtonPainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/IToggleButtonPainter.class",
+      "occurrence": 0,
+      "sha256": "d198cc4ada01956409287d3989ab83b94f808e7603509b81d950fbd7b932ffb4",
+      "name": "com/alee/laf/button/IToggleButtonPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/laf/button/IAbstractButtonPainter"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<C:Ljavax/swing/JToggleButton;U:Lcom/alee/laf/button/WToggleButtonUI;>Ljava/lang/Object;Lcom/alee/laf/button/IAbstractButtonPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/button/IAbstractButtonPainter",
+        "com/alee/laf/button/IToggleButtonPainter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/AbstractCheckBoxDescriptor.class",
+      "occurrence": 0,
+      "sha256": "db0b2fd8beceb7792b74c49ad904c9345dfdbaf0280fe3945dc980bd26ea72d6",
+      "name": "com/alee/laf/button/AbstractCheckBoxDescriptor",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/managers/style/AbstractComponentDescriptor",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Class;Lcom/alee/managers/style/StyleId;)V",
+          "access": 1,
+          "code_sha256": "448aae53b31807e983761042d0fe00dcce11dbcb3bec238c3f554636bda63fec",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/Class<TC;>;Ljava/lang/String;Ljava/lang/Class<TU;>;Ljava/lang/Class<+TU;>;Lcom/alee/managers/style/StyleId;)V"
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JCheckBox;U:Lcom/alee/laf/checkbox/WCheckBoxUI;>Lcom/alee/managers/style/AbstractComponentDescriptor<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/button/AbstractCheckBoxDescriptor",
+        "com/alee/managers/style/AbstractComponentDescriptor"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/WToggleButtonUI.class",
+      "occurrence": 0,
+      "sha256": "6e51e966734f481ca92fb34a8e2207b4ba749ebfc7a9fc683b06ab0c3c32f644",
+      "name": "com/alee/laf/button/WToggleButtonUI",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/laf/button/WButtonUI",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getPropertyPrefix",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JToggleButton;>Lcom/alee/laf/button/WButtonUI<TC;>;",
+      "class_references": [
+        "com/alee/laf/button/WButtonUI",
+        "com/alee/laf/button/WToggleButtonUI"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/AdaptiveToggleButtonPainter.class",
+      "occurrence": 0,
+      "sha256": "c85fbb599f3d6e0aa021a4b804b7ce64a625ad3b65b331c6740643a7c15b1912",
+      "name": "com/alee/laf/button/AdaptiveToggleButtonPainter",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/painter/AdaptivePainter",
+      "interfaces": [
+        "com/alee/laf/button/IToggleButtonPainter"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/painter/Painter;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JToggleButton;U:Lcom/alee/laf/button/WebToggleButtonUI;>Lcom/alee/painter/AdaptivePainter<TC;TU;>;Lcom/alee/laf/button/IToggleButtonPainter<TC;TU;>;",
+      "class_references": [
+        "com/alee/laf/button/AdaptiveToggleButtonPainter",
+        "com/alee/laf/button/IToggleButtonPainter",
+        "com/alee/painter/AdaptivePainter"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/button/WButtonListener$Action.class",
+      "occurrence": 0,
+      "sha256": "10a11ef127b2b83913ab98d86c72ea3795c8e7ea597774cc2d1e47c6bb2a9d1f",
+      "name": "com/alee/laf/button/WButtonListener$Action",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/UIAction",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRESSED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RELEASED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/button/WButtonListener;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/button/WButtonListener;Ljavax/swing/AbstractButton;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1c7da7a921a5fb01799f8e2a45470cc9771f2a39b0187fa23e0c1da5e7d027bd",
+          "code_length": 12,
+          "generic_signature": "(TB;Ljava/lang/String;)V"
+        },
+        {
+          "name": "actionPerformed",
+          "descriptor": "(Ljava/awt/event/ActionEvent;)V",
+          "access": 1,
+          "code_sha256": "024bc30d916aa829881f3a921df9d589118be289794ebf780d70beaf087eaa1d",
+          "code_length": 85
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b6dc25bf41b7acb99aa3c6db93fd3a1dcceaaf03d324b00db5f75bbe0473348b",
+          "code_length": 30
+        }
+      ],
+      "generic_signature": "<B:Ljavax/swing/AbstractButton;>Lcom/alee/laf/UIAction<TB;>;",
+      "class_references": [
+        "com/alee/api/jdk/Objects",
+        "com/alee/laf/UIAction",
+        "com/alee/laf/button/WButtonListener",
+        "com/alee/laf/button/WButtonListener$Action",
+        "javax/swing/AbstractButton",
+        "javax/swing/ButtonModel"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabSelectionHandler.class",
+      "occurrence": 0,
+      "sha256": "579d5820bd67dc9368f59aca7db61f3f37fb1529a5c5168dd8749fb5584ba3dc",
+      "name": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabSelectionHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/swing/event/ChangeListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "stateChanged",
+          "descriptor": "(Ljavax/swing/event/ChangeEvent;)V",
+          "access": 1,
+          "code_sha256": "7296496286a3058fd667dc5308fe1369fc1761f9b2c5abc68bbc06fbc7f41afc",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$Handler",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabSelectionHandler",
+        "java/lang/Object",
+        "javax/swing/event/ChangeListener"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabPanel.class",
+      "occurrence": 0,
+      "sha256": "724102901779df03b137b0fd6a52b8803c5ed14711924de772af0c4e9c657ee0",
+      "name": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabPanel",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "javax/swing/JPanel",
+      "interfaces": [
+        "javax/swing/plaf/UIResource"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;)V",
+          "access": 1,
+          "code_sha256": "34520dba5041532cfcdc9bf9666d267f9b9b8c29e945c11035758fa368a1c2d8",
+          "code_length": 45
+        },
+        {
+          "name": "paintComponent",
+          "descriptor": "(Ljava/awt/Graphics;)V",
+          "access": 1,
+          "code_sha256": "0bdb4d8f89fcd4812c5a77043a586b232c221da16cbd102b0cd0c0fa51a7ddcb",
+          "code_length": 122
+        },
+        {
+          "name": "doLayout",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d8523aa95253fa62a80ea6fcad8787265290f5b3d163df0de0500c65bff44df4",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$CroppedEdge",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabPanel",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabSupport",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabContainer",
+        "java/awt/Color",
+        "java/awt/Component",
+        "java/awt/Graphics",
+        "java/awt/Rectangle",
+        "javax/swing/JPanel",
+        "javax/swing/JTabbedPane",
+        "javax/swing/UIManager",
+        "javax/swing/plaf/UIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/WebTabbedPaneStyle.class",
+      "occurrence": 0,
+      "sha256": "842187470499d8930b658aa894e171e9ccd705060d139d1f9b62a8e943b94611",
+      "name": "com/alee/laf/tabbedpane/WebTabbedPaneStyle",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tabbedPaneStyle",
+          "descriptor": "Lcom/alee/laf/tabbedpane/TabbedPaneStyle;",
+          "access": 9
+        },
+        {
+          "name": "topBg",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "bottomBg",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "selectedTopBg",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "selectedBottomBg",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "round",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "shadeWidth",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "rotateTabInsets",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "contentInsets",
+          "descriptor": "Ljava/awt/Insets;",
+          "access": 9
+        },
+        {
+          "name": "tabInsets",
+          "descriptor": "Ljava/awt/Insets;",
+          "access": 9
+        },
+        {
+          "name": "painter",
+          "descriptor": "Lcom/alee/painter/Painter;",
+          "access": 9
+        },
+        {
+          "name": "tabRunIndent",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "tabOverlay",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "tabStretchType",
+          "descriptor": "Lcom/alee/laf/tabbedpane/TabStretchType;",
+          "access": 9
+        },
+        {
+          "name": "tabBorderColor",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "contentBorderColor",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 9
+        },
+        {
+          "name": "paintBorderOnlyOnSelectedTab",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "forceUseSelectedTabBgColors",
+          "descriptor": "Z",
+          "access": 9
+        },
+        {
+          "name": "paintOnlyTopBorder",
+          "descriptor": "Z",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e9125906a345abae5dc4776bbe2d1b33a8572720aa36acbd0872533b709edffd",
+          "code_length": 152
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/tabbedpane/TabStretchType",
+        "com/alee/laf/tabbedpane/TabbedPaneStyle",
+        "com/alee/laf/tabbedpane/WebTabbedPaneStyle",
+        "java/awt/Color",
+        "java/awt/Insets",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabbedPaneScrollLayout.class",
+      "occurrence": 0,
+      "sha256": "a4035880d12961d04f4c2b92686e4cbefd23198ce33b6c94f87c3ffd80dc275b",
+      "name": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabbedPaneScrollLayout",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabbedPaneLayout",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;)V",
+          "access": 1,
+          "code_sha256": "df32b8f748b9fffc0e6cc777be8945922a76a03a3af2deb70badb136daddf9be",
+          "code_length": 11
+        },
+        {
+          "name": "preferredTabAreaHeight",
+          "descriptor": "(II)I",
+          "access": 4,
+          "code_sha256": "900f32c490ed79222dc56b1bf87ce29c64816a680c069e4befc20ec2c9858216",
+          "code_length": 9
+        },
+        {
+          "name": "preferredTabAreaWidth",
+          "descriptor": "(II)I",
+          "access": 4,
+          "code_sha256": "adf42b8d4e91df7c064af50ecba2b71f7a7568e938b48a97057e298739fd97fe",
+          "code_length": 9
+        },
+        {
+          "name": "layoutContainer",
+          "descriptor": "(Ljava/awt/Container;)V",
+          "access": 1,
+          "code_sha256": "cce9ef95854fbbebc993d7bcdbec31eda30a81aa0c90caa7d5aff7f31f311f3f",
+          "code_length": 1629
+        },
+        {
+          "name": "layoutCroppedEdge",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "86f4d330a3d3c61f3220c783a3083e0d784fa6ccc558cf09cec716e0d2a62330",
+          "code_length": 242
+        },
+        {
+          "name": "calculateTabRects",
+          "descriptor": "(II)V",
+          "access": 4,
+          "code_sha256": "b87e5d729f4879063ce96c770cf5b0c531750ef9cb1eef944754e27cba6049e5",
+          "code_length": 691
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$CroppedEdge",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabPanel",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabSupport",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$ScrollableTabViewport",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabbedPaneLayout",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabbedPaneScrollLayout",
+        "com/alee/utils/SwingUtils",
+        "java/awt/Component",
+        "java/awt/ComponentOrientation",
+        "java/awt/Container",
+        "java/awt/Dimension",
+        "java/awt/FontMetrics",
+        "java/awt/Insets",
+        "java/awt/Rectangle",
+        "java/lang/Math",
+        "javax/swing/JButton",
+        "javax/swing/JTabbedPane",
+        "javax/swing/JViewport",
+        "javax/swing/SwingConstants"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/NeoTabbedPaneUI.class",
+      "occurrence": 0,
+      "sha256": "ce16c5d8a662585e4d588e9f8a44c59b5180b2002cd3951040b1e1aa47dbcda5",
+      "name": "com/alee/laf/tabbedpane/NeoTabbedPaneUI",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/plaf/basic/BasicTabbedPaneUI",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "borderColor",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 18
+        },
+        {
+          "name": "innerBorderColor",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "529610f0a654ca3ac644249b468ef858ce7df7f44d7013f75cd9a4362817cf35",
+          "code_length": 45
+        },
+        {
+          "name": "createUI",
+          "descriptor": "(Ljavax/swing/JComponent;)Ljavax/swing/plaf/ComponentUI;",
+          "access": 9,
+          "code_sha256": "be48b75e80aa158f21b6896520d82244dd6e40df594b72f3a704c8b7dd84bead",
+          "code_length": 8
+        },
+        {
+          "name": "paintTabArea",
+          "descriptor": "(Ljava/awt/Graphics;II)V",
+          "access": 4,
+          "code_sha256": "46c2628c1b0d0a2681b71a484007eb28a9d1f3d04f8ff2831cef0e453f6979f2",
+          "code_length": 269
+        },
+        {
+          "name": "paintTab",
+          "descriptor": "(Ljava/awt/Graphics2D;I[Ljava/awt/Rectangle;IIIILjava/awt/Rectangle;Ljava/awt/Rectangle;)V",
+          "access": 4,
+          "code_sha256": "0473dd8f1ca01d1ea04607d5c845e300053b8abc7851e037cb2f501a9fd30361",
+          "code_length": 183
+        },
+        {
+          "name": "paintText",
+          "descriptor": "(Ljava/awt/Graphics;ILjava/awt/Font;Ljava/awt/FontMetrics;ILjava/lang/String;Ljava/awt/Rectangle;Z)V",
+          "access": 4,
+          "code_sha256": "189bfd412dd614d827d7cb14bc62f4b912bdffddb6f67167dc90ec8355e62e9c",
+          "code_length": 232
+        },
+        {
+          "name": "paintTabBackground",
+          "descriptor": "(Ljava/awt/Graphics2D;IIIIIIIIIZ)V",
+          "access": 4,
+          "code_sha256": "858d1a3835e0eb60e3f573d50c47826d5a613fb72a8a43c1d8614ce14678aec4",
+          "code_length": 600
+        },
+        {
+          "name": "paintContentBorder",
+          "descriptor": "(Ljava/awt/Graphics;II)V",
+          "access": 4,
+          "code_sha256": "44ac99e98dcea754e2c49cac4a9019980d189fc3b5983c86da28b053d40c2029",
+          "code_length": 411
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/awt/Rectangle;",
+        "com/alee/laf/tabbedpane/NeoTabbedPaneUI",
+        "com/alee/utils/SwingUtils",
+        "java/awt/Color",
+        "java/awt/Font",
+        "java/awt/FontMetrics",
+        "java/awt/GradientPaint",
+        "java/awt/Graphics",
+        "java/awt/Graphics2D",
+        "java/awt/Insets",
+        "java/awt/Rectangle",
+        "java/lang/String",
+        "java/util/Map",
+        "javax/swing/Icon",
+        "javax/swing/JTabbedPane",
+        "javax/swing/UIManager",
+        "javax/swing/plaf/UIResource",
+        "javax/swing/plaf/basic/BasicTabbedPaneUI",
+        "javax/swing/text/View"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$CroppedEdge.class",
+      "occurrence": 0,
+      "sha256": "fccf9f6df5636ee5ce5069c6c51ff9bf8ca2e43c07ebdc3f6de60d9e9c97212d",
+      "name": "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$CroppedEdge",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/swing/JPanel",
+      "interfaces": [
+        "javax/swing/plaf/UIResource"
+      ],
+      "fields": [
+        {
+          "name": "shape",
+          "descriptor": "Ljava/awt/Shape;",
+          "access": 2
+        },
+        {
+          "name": "tabIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cropline",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cropx",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cropy",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/laf/tabbedpane/WebBasicTabbedPaneUI;)V",
+          "access": 1,
+          "code_sha256": "d0a53bc97b7ef95db5ea073c92f3f5820a4cd8e9f1717cd1714a750b8122002f",
+          "code_length": 15
+        },
+        {
+          "name": "setParams",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "4a1b336af52a4e7581975ec6ad5ca9f9a3da77ad345b975e2593931ab0e80228",
+          "code_length": 89
+        },
+        {
+          "name": "resetParams",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ed994d1f955203fec753be30aa3729f213fa1d001123b249ad1b96c41d92de1c",
+          "code_length": 41
+        },
+        {
+          "name": "isParamsSet",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "82ce9523a4e5b9d35beed50ff4c8299c754773af6cd259dc540cf62f484ead1e",
+          "code_length": 13
+        },
+        {
+          "name": "getTabIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getCropline",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "getCroppedSideWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2aa3b8c641f9fb2da52054da18aeb7ce8524fd71d21f4ce9d042f43f527cc675",
+          "code_length": 2
+        },
+        {
+          "name": "getBgColor",
+          "descriptor": "()Ljava/awt/Color;",
+          "access": 2,
+          "code_sha256": "c26d026060bbd132ff2e56c8c63425ae93fd23b0016ae483281e11097974c7d9",
+          "code_length": 32
+        },
+        {
+          "name": "paintComponent",
+          "descriptor": "(Ljava/awt/Graphics;)V",
+          "access": 4,
+          "code_sha256": "2fb0d0e8ef13ac6b00448476b61ebf0a0549b1218d19b73476015c8830fa3fed",
+          "code_length": 89
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$CroppedEdge",
+        "com/alee/laf/tabbedpane/WebBasicTabbedPaneUI$TabContainer",
+        "java/awt/Component",
+        "java/awt/Graphics2D",
+        "java/awt/Rectangle",
+        "javax/swing/JPanel",
+        "javax/swing/JTabbedPane",
+        "javax/swing/UIManager",
+        "javax/swing/plaf/UIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/NativeFonts$22.class",
+      "occurrence": 0,
+      "sha256": "fbda1b330517af5cfd9d34af5c024bfbcacc155c2f8acaecb4866eb376af8db2",
+      "name": "com/alee/laf/NativeFonts$22",
+      "major": 50,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$com$alee$laf$ControlType",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$com$alee$utils$system$SystemType",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9e2548ed7657fc8f08ba605b3d9db3bc615060d89fd8a538179970eff94bebaa",
+          "code_length": 201
+        }
+      ],
+      "class_references": [
+        "com/alee/laf/ControlType",
+        "com/alee/laf/NativeFonts",
+        "com/alee/laf/NativeFonts$22",
+        "com/alee/utils/system/SystemType",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/AltProcessor.class",
+      "occurrence": 0,
+      "sha256": "7e496160f5d41746913d15c661965fef3fb7200ca837c362feab6e859f2a709c",
+      "name": "com/alee/laf/AltProcessor",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/KeyEventPostProcessor"
+      ],
+      "fields": [
+        {
+          "name": "altKeyPressed",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "menuCanceledOnPress",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "root",
+          "descriptor": "Ljavax/swing/JRootPane;",
+          "access": 10
+        },
+        {
+          "name": "winAncestor",
+          "descriptor": "Ljava/awt/Window;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "postProcessKeyEvent",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)Z",
+          "access": 1,
+          "code_sha256": "afc6c3796c342862f5952ed884b43a4af58cd4f37b4504924aaceea0d464d3e5",
+          "code_length": 143
+        },
+        {
+          "name": "altPressed",
+          "descriptor": "(Ljava/awt/event/KeyEvent;)V",
+          "access": 2,
+          "code_sha256": "91c331158e8a1c82b11e907a8f3094145336375f20e4497d1da60c210abce1ea",
+          "code_length": 150
+        },
+        {
+          "name": "altReleased",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "2a16feeff9ce12072cb5ce6992c4177fa0a0c3def47c3d834919db46b77f30fe",
+          "code_length": 157
+        },
+        {
+          "name": "repaintMnemonicsInWindow",
+          "descriptor": "(Ljava/awt/Window;)V",
+          "access": 2,
+          "code_sha256": "0e4a54d7f04e169e6c3a9743505cc1f85437a1f5e5302f4380a967ef50bdf869",
+          "code_length": 57
+        },
+        {
+          "name": "repaintMnemonicsInContainer",
+          "descriptor": "(Ljava/awt/Container;)V",
+          "access": 2,
+          "code_sha256": "5e874ba07dcc0f55693738ecac921f54a8917fd3bc1b79c121f3186c4908329a",
+          "code_length": 100
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "884576cb8ffc76215bf1ef584f69fc156078f3772ee1ccadafc4db12c504d093",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[Ljava/awt/Window;",
+        "[Ljavax/swing/MenuElement;",
+        "com/alee/laf/AltProcessor",
+        "com/alee/laf/WebLookAndFeel",
+        "com/alee/utils/CoreSwingUtils",
+        "java/awt/Component",
+        "java/awt/Container",
+        "java/awt/KeyEventPostProcessor",
+        "java/awt/Window",
+        "java/awt/event/KeyEvent",
+        "java/lang/Object",
+        "javax/swing/AbstractButton",
+        "javax/swing/JFrame",
+        "javax/swing/JLabel",
+        "javax/swing/JMenu",
+        "javax/swing/JMenuBar",
+        "javax/swing/JRootPane",
+        "javax/swing/MenuElement",
+        "javax/swing/MenuSelectionManager",
+        "javax/swing/SwingUtilities",
+        "javax/swing/plaf/basic/ComboPopup"
+      ]
+    },
+    {
+      "entry": "com/alee/laf/NativeFonts$14.class",
+      "occurrence": 0,
+      "sha256": "3512c0ddc914916ea9b435048d6b296210726144d03e05cf9345f0f07c01f7ad",
+      "name": "com/alee/laf/NativeFonts$14",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljavax/swing/plaf/FontUIResource;",
+          "access": 1,
+          "code_sha256": "4d21aaf3d09bde0b11df2cbf3c77e24b7dbef6ea825828ed95c0e8d984312529",
+          "code_length": 13
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<Ljavax/swing/plaf/FontUIResource;>;",
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/laf/NativeFonts",
+        "com/alee/laf/NativeFonts$14",
+        "java/awt/Font",
+        "java/lang/Object",
+        "javax/swing/plaf/FontUIResource"
+      ]
+    },
+    {
+      "entry": "com/alee/api/ui/StyleIdBridge.class",
+      "occurrence": 0,
+      "sha256": "3c4a185d2a2d2598499ed7e488eaef1f08ed6b96dbf2032eb8d3ba0abc8287e8",
+      "name": "com/alee/api/ui/StyleIdBridge",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/ui/RenderingBridge"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getStyleId",
+          "descriptor": "(Lcom/alee/api/ui/RenderingParameters;)Lcom/alee/managers/style/StyleId;",
+          "access": 1025,
+          "generic_signature": "(TP;)Lcom/alee/managers/style/StyleId;"
+        }
+      ],
+      "generic_signature": "<P::Lcom/alee/api/ui/RenderingParameters;>Ljava/lang/Object;Lcom/alee/api/ui/RenderingBridge;",
+      "class_references": [
+        "com/alee/api/ui/RenderingBridge",
+        "com/alee/api/ui/StyleIdBridge",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/api/ui/ChildStyleIdBridge.class",
+      "occurrence": 0,
+      "sha256": "3ee971161824108cfdc91ca7666aa104deb5a277e3b8a342c37bc1bf71287f7a",
+      "name": "com/alee/api/ui/ChildStyleIdBridge",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/ui/RenderingBridge"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getChildStyleId",
+          "descriptor": "(Lcom/alee/api/ui/RenderingParameters;)Lcom/alee/managers/style/ChildStyleId;",
+          "access": 1025,
+          "generic_signature": "(TP;)Lcom/alee/managers/style/ChildStyleId;"
+        }
+      ],
+      "generic_signature": "<P::Lcom/alee/api/ui/RenderingParameters;>Ljava/lang/Object;Lcom/alee/api/ui/RenderingBridge;",
+      "class_references": [
+        "com/alee/api/ui/ChildStyleIdBridge",
+        "com/alee/api/ui/RenderingBridge",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/skin/web/WebSkin.class",
+      "occurrence": 0,
+      "sha256": "3cc34858cc35c436c8f4333433fd236fe3af9e376052e8bb50fd08c9d1aa6706",
+      "name": "com/alee/skin/web/WebSkin",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/managers/style/XmlSkin",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3ccfd0e9db8e0518c442363e9cb816639c909e82187fab0146c5bc8dc4cf61e3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/style/XmlSkin",
+        "com/alee/skin/web/WebSkin"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/drag/view/SimpleDragViewHandler.class",
+      "occurrence": 0,
+      "sha256": "fa72d66d5fc13ee9fe9bd3f580e082ec7870a1b9406db62785b10b7391d5da7e",
+      "name": "com/alee/managers/drag/view/SimpleDragViewHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/managers/drag/view/DragViewHandler"
+      ],
+      "fields": [
+        {
+          "name": "margin",
+          "descriptor": "Ljava/awt/Insets;",
+          "access": 28
+        },
+        {
+          "name": "textSideSpacing",
+          "descriptor": "I",
+          "access": 28
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getFontMetrics",
+          "descriptor": "(Ljava/lang/Object;)Ljava/awt/FontMetrics;",
+          "access": 4,
+          "code_sha256": "7da9dd61ff61968819edb8f9bbfe2d440373f2a1cc610a357a981a82f44f2769",
+          "code_length": 4,
+          "generic_signature": "(TT;)Ljava/awt/FontMetrics;"
+        },
+        {
+          "name": "getIcon",
+          "descriptor": "(Ljava/lang/Object;)Ljavax/swing/Icon;",
+          "access": 1028,
+          "generic_signature": "(TT;)Ljavax/swing/Icon;"
+        },
+        {
+          "name": "getForeground",
+          "descriptor": "(Ljava/lang/Object;)Ljava/awt/Color;",
+          "access": 1028,
+          "generic_signature": "(TT;)Ljava/awt/Color;"
+        },
+        {
+          "name": "getText",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1028,
+          "generic_signature": "(TT;)Ljava/lang/String;"
+        },
+        {
+          "name": "getView",
+          "descriptor": "(Ljava/lang/Object;Ljava/awt/dnd/DragSourceDragEvent;)Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "5ac07225eb2f7f7426a2ed2a494dd83309f92ff888e1bd3cfdf3feff1bae90fe",
+          "code_length": 303,
+          "generic_signature": "(TT;Ljava/awt/dnd/DragSourceDragEvent;)Ljava/awt/image/BufferedImage;"
+        },
+        {
+          "name": "getViewRelativeLocation",
+          "descriptor": "(Ljava/lang/Object;Ljava/awt/dnd/DragSourceDragEvent;Ljava/awt/image/BufferedImage;)Ljava/awt/Point;",
+          "access": 1,
+          "code_sha256": "c37416275eeab65a99a37b862c4dd4527881d83186687fb50e55c58346e8d071",
+          "code_length": 11,
+          "generic_signature": "(TT;Ljava/awt/dnd/DragSourceDragEvent;Ljava/awt/image/BufferedImage;)Ljava/awt/Point;"
+        },
+        {
+          "name": "dragEnded",
+          "descriptor": "(Ljava/lang/Object;Ljava/awt/dnd/DragSourceDropEvent;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(TT;Ljava/awt/dnd/DragSourceDropEvent;)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6cbb280e31fc99e33aa6aa875f1fa6fb9465cd6e77beb59282aa52a19cc13d0e",
+          "code_length": 19
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lcom/alee/managers/drag/view/DragViewHandler<TT;>;",
+      "class_references": [
+        "com/alee/managers/drag/view/DragViewHandler",
+        "com/alee/managers/drag/view/SimpleDragViewHandler",
+        "com/alee/managers/language/LM",
+        "com/alee/painter/decoration/content/TextRasterization",
+        "com/alee/utils/GraphicsUtils",
+        "com/alee/utils/ImageUtils",
+        "com/alee/utils/LafUtils",
+        "com/alee/utils/SwingUtils",
+        "java/awt/Color",
+        "java/awt/FontMetrics",
+        "java/awt/Graphics2D",
+        "java/awt/Insets",
+        "java/awt/Point",
+        "java/awt/Transparency",
+        "java/awt/dnd/DragSourceDragEvent",
+        "java/awt/image/BufferedImage",
+        "java/lang/Float",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "javax/swing/Icon"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/notification/NotificationManager$3.class",
+      "occurrence": 0,
+      "sha256": "0ac285cacef6da8125a32a915d33e3b7448a6224f159dcf63e5fe98e373ac5ae",
+      "name": "com/alee/managers/notification/NotificationManager$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/BiConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Lcom/alee/managers/notification/WebNotification;Ljava/awt/Window;)V",
+          "access": 1,
+          "code_sha256": "59ca869a915cb3efa7800e272968a4ca4c05dc8b68b6a99bf18125b214f1a5de",
+          "code_length": 6
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "052dfb572f45d0e6c6c1982274ea6d6d635172f6ccc34fc9e0164c78daefd47d",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/BiConsumer<Lcom/alee/managers/notification/WebNotification;Ljava/awt/Window;>;",
+      "class_references": [
+        "com/alee/api/jdk/BiConsumer",
+        "com/alee/managers/notification/NotificationManager",
+        "com/alee/managers/notification/NotificationManager$3",
+        "com/alee/managers/notification/WebNotification",
+        "java/awt/Window",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/notification/WebNotification$3.class",
+      "occurrence": 0,
+      "sha256": "6404f2d14270429123b5aac6d9074eaa6e25bdd810328b74f8f1e912201dc73f",
+      "name": "com/alee/managers/notification/WebNotification$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/event/ActionListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/notification/WebNotification;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/notification/WebNotification;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "actionPerformed",
+          "descriptor": "(Ljava/awt/event/ActionEvent;)V",
+          "access": 1,
+          "code_sha256": "25fb5e84e7becdf18e4b001b6158ef37e0308acce6eef56daf6c87e052828766",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/notification/WebNotification",
+        "com/alee/managers/notification/WebNotification$3",
+        "java/awt/event/ActionListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/notification/NotificationsLayoutUtils.class",
+      "occurrence": 0,
+      "sha256": "3b7cc8997348d2f8f4faec45dc2f9fa74a1e16640d34cff22de3471ed09cbd15",
+      "name": "com/alee/managers/notification/NotificationsLayoutUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/swing/SwingConstants"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "layout",
+          "descriptor": "(Ljava/util/List;Ljava/awt/Rectangle;)V",
+          "access": 9,
+          "code_sha256": "82e0653e4747ce2ec28157f90a596432afa1d794794d13038c8799bb95eef95b",
+          "code_length": 448,
+          "generic_signature": "(Ljava/util/List<+Ljava/awt/Component;>;Ljava/awt/Rectangle;)V"
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/notification/DisplayType",
+        "com/alee/managers/notification/NotificationManager",
+        "com/alee/managers/notification/NotificationsLayoutUtils",
+        "java/awt/Component",
+        "java/awt/Dimension",
+        "java/awt/Insets",
+        "java/awt/Rectangle",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/List",
+        "javax/swing/SwingConstants"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/WebInnerPopup$4.class",
+      "occurrence": 0,
+      "sha256": "dee3c7d16ea65e08dd78ef6fc37ac8840f95bf378ef71a8dcf427366f801d214",
+      "name": "com/alee/managers/popup/WebInnerPopup$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Supplier"
+      ],
+      "fields": [
+        {
+          "name": "val$component",
+          "descriptor": "Ljava/awt/Component;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/WebInnerPopup;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/WebInnerPopup;Ljava/awt/Component;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/awt/Rectangle;",
+          "access": 1,
+          "code_sha256": "123a281512eb969490b8c1f8e0855292e057747bc60e43cb79fbdf58820676bb",
+          "code_length": 182
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f523d4d194e98af8cfed4f6084be102bb92f40ee9797f3a5d09958e93a45c9c5",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Supplier<Ljava/awt/Rectangle;>;",
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/managers/popup/WebInnerPopup",
+        "com/alee/managers/popup/WebInnerPopup$4",
+        "com/alee/utils/CoreSwingUtils",
+        "java/awt/Dimension",
+        "java/awt/Point",
+        "java/awt/Rectangle",
+        "java/lang/Object",
+        "javax/swing/JRootPane"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/PopupManager$1.class",
+      "occurrence": 0,
+      "sha256": "72f98bd1c9f2d222ee1a12e8a1e49d7d34c9e31e6164af88d23edd593c839948",
+      "name": "com/alee/managers/popup/PopupManager$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/BiConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljavax/swing/JComponent;Lcom/alee/managers/popup/ShadeLayer;)V",
+          "access": 1,
+          "code_sha256": "bb9d88e953a9690ab548616ca8f0dd59746891dcfac4cd523954a84b25caab80",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "052dfb572f45d0e6c6c1982274ea6d6d635172f6ccc34fc9e0164c78daefd47d",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/BiConsumer<Ljavax/swing/JComponent;Lcom/alee/managers/popup/ShadeLayer;>;",
+      "class_references": [
+        "com/alee/api/jdk/BiConsumer",
+        "com/alee/managers/popup/PopupManager",
+        "com/alee/managers/popup/PopupManager$1",
+        "com/alee/managers/popup/ShadeLayer",
+        "java/lang/Object",
+        "javax/swing/JComponent"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/ShadeLayer$2.class",
+      "occurrence": 0,
+      "sha256": "97f387d8a4bcec29090cb48d73df6dc25817d96504a8eca8ab95de7b62cc0389",
+      "name": "com/alee/managers/popup/ShadeLayer$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/event/ActionListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/ShadeLayer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/ShadeLayer;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "actionPerformed",
+          "descriptor": "(Ljava/awt/event/ActionEvent;)V",
+          "access": 1,
+          "code_sha256": "3e68a121b0507aea40170fb68758a1840d09932ee7e3af6bee59723421e6c01d",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/popup/ShadeLayer",
+        "com/alee/managers/popup/ShadeLayer$2",
+        "com/alee/utils/swing/WebTimer",
+        "java/awt/event/ActionListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/WebInnerPopup$3.class",
+      "occurrence": 0,
+      "sha256": "596599a2fc52af69a32802dc4115946635282e1a8b9b148e63069009d68def05",
+      "name": "com/alee/managers/popup/WebInnerPopup$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/alee/managers/focus/DefaultFocusTracker",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/WebInnerPopup;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/WebInnerPopup;Ljavax/swing/JComponent;Z)V",
+          "access": 0,
+          "code_sha256": "1c97ef622e4dd9dbe53f104b7d840eb9c3f03918dfc3c3140ca4b0f1b35b6baf",
+          "code_length": 12
+        },
+        {
+          "name": "focusChanged",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "793fe0dfd50510fab3ba164c967273348931b59941cafd089df2e96e446c43d3",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/focus/DefaultFocusTracker",
+        "com/alee/managers/popup/WebInnerPopup",
+        "com/alee/managers/popup/WebInnerPopup$3"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/PopupManager$3.class",
+      "occurrence": 0,
+      "sha256": "f67fee80608f15f6a7dfdee88c11308915bfa48ba6ec406680113d7e8a2f5aad",
+      "name": "com/alee/managers/popup/PopupManager$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Function"
+      ],
+      "fields": [
+        {
+          "name": "val$rootPane",
+          "descriptor": "Ljavax/swing/JRootPane;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/swing/JRootPane;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljavax/swing/JComponent;)Lcom/alee/managers/popup/PopupLayer;",
+          "access": 1,
+          "code_sha256": "7ed396fd580ecefc8462e98ecc0e1813f1619220d7e806667578ce42893dfe81",
+          "code_length": 44
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b397ffa11892530b224289c43f00a6f1bc673f6ae76ace9f9f8246e5c7c412c3",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Function<Ljavax/swing/JComponent;Lcom/alee/managers/popup/PopupLayer;>;",
+      "class_references": [
+        "com/alee/api/jdk/Function",
+        "com/alee/managers/popup/PopupLayer",
+        "com/alee/managers/popup/PopupManager",
+        "com/alee/managers/popup/PopupManager$3",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "javax/swing/JComponent",
+        "javax/swing/JLayeredPane",
+        "javax/swing/JRootPane"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/WebButtonPopup$7.class",
+      "occurrence": 0,
+      "sha256": "9f0c9065caddc1422ac113a7021337034873d9df59ce254a8ec8e8de2ede9d20",
+      "name": "com/alee/managers/popup/WebButtonPopup$7",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/alee/utils/swing/AncestorAdapter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/WebButtonPopup;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/WebButtonPopup;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "ancestorAdded",
+          "descriptor": "(Ljavax/swing/event/AncestorEvent;)V",
+          "access": 1,
+          "code_sha256": "b35e99c5766ddf2aaf54074cb1b24074dcfeead7d32dd50440db7e6063b776b8",
+          "code_length": 8
+        },
+        {
+          "name": "ancestorMoved",
+          "descriptor": "(Ljavax/swing/event/AncestorEvent;)V",
+          "access": 1,
+          "code_sha256": "b35e99c5766ddf2aaf54074cb1b24074dcfeead7d32dd50440db7e6063b776b8",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/popup/WebButtonPopup",
+        "com/alee/managers/popup/WebButtonPopup$7",
+        "com/alee/utils/swing/AncestorAdapter"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/PopupManager$4.class",
+      "occurrence": 0,
+      "sha256": "d35cc1cf136e97c00b4887564717c1f200c0aa6a39c489fbe1d471d7df0c69cb",
+      "name": "com/alee/managers/popup/PopupManager$4",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/Function"
+      ],
+      "fields": [
+        {
+          "name": "val$rootPane",
+          "descriptor": "Ljavax/swing/JRootPane;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/swing/JRootPane;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljavax/swing/JComponent;)Lcom/alee/managers/popup/ShadeLayer;",
+          "access": 1,
+          "code_sha256": "a5ad788b66e5b5997d342800674ad6647f6b5584fefc533b34ee70a2e2a39a18",
+          "code_length": 44
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "b397ffa11892530b224289c43f00a6f1bc673f6ae76ace9f9f8246e5c7c412c3",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/Function<Ljavax/swing/JComponent;Lcom/alee/managers/popup/ShadeLayer;>;",
+      "class_references": [
+        "com/alee/api/jdk/Function",
+        "com/alee/managers/popup/PopupManager",
+        "com/alee/managers/popup/PopupManager$4",
+        "com/alee/managers/popup/ShadeLayer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "javax/swing/JComponent",
+        "javax/swing/JLayeredPane",
+        "javax/swing/JRootPane"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/WebInnerPopup$6.class",
+      "occurrence": 0,
+      "sha256": "31ac93c3c61d7c967a37f793a91d8640469fc7e78b9ce4f0d0e7a00501f055d6",
+      "name": "com/alee/managers/popup/WebInnerPopup$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/alee/utils/swing/AncestorAdapter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$component",
+          "descriptor": "Ljava/awt/Component;",
+          "access": 4112
+        },
+        {
+          "name": "val$x",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$y",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$width",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$height",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/WebInnerPopup;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/WebInnerPopup;Ljava/awt/Component;IIII)V",
+          "access": 0,
+          "code_sha256": "c943cd85ef3a7bf5d14087b4d02fb64a88c626bd4e9ffc2e81ab6282f5ad0973",
+          "code_length": 38
+        },
+        {
+          "name": "ancestorMoved",
+          "descriptor": "(Ljavax/swing/event/AncestorEvent;)V",
+          "access": 1,
+          "code_sha256": "eb8c4378e8cfc09c58c1d4c10d244d73024d867ecda7a667cf765b1f481bd4a4",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/popup/WebInnerPopup",
+        "com/alee/managers/popup/WebInnerPopup$6",
+        "com/alee/utils/swing/AncestorAdapter"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/popup/WebInnerPopup$7.class",
+      "occurrence": 0,
+      "sha256": "d014287cc172804877688755f3ca4981e17b5725209e5152e20fce56406a4783",
+      "name": "com/alee/managers/popup/WebInnerPopup$7",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/awt/event/ComponentAdapter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$component",
+          "descriptor": "Ljava/awt/Component;",
+          "access": 4112
+        },
+        {
+          "name": "val$boundsSupplier",
+          "descriptor": "Lcom/alee/api/jdk/Supplier;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/popup/WebInnerPopup;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/popup/WebInnerPopup;Ljava/awt/Component;Lcom/alee/api/jdk/Supplier;)V",
+          "access": 0,
+          "code_sha256": "6df851e594d2f852ca23f9b66080831cfbe8e8ae7cc0dbd69f721b0a005621df",
+          "code_length": 20
+        },
+        {
+          "name": "componentResized",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "2aa72f0a205269208f0b4ae334dffa34014cd8a31f2b7c2e6c55a3957a1a965d",
+          "code_length": 24
+        },
+        {
+          "name": "componentMoved",
+          "descriptor": "(Ljava/awt/event/ComponentEvent;)V",
+          "access": 1,
+          "code_sha256": "2aa72f0a205269208f0b4ae334dffa34014cd8a31f2b7c2e6c55a3957a1a965d",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "com/alee/api/jdk/Supplier",
+        "com/alee/managers/popup/WebInnerPopup",
+        "com/alee/managers/popup/WebInnerPopup$7",
+        "java/awt/Rectangle",
+        "java/awt/event/ComponentAdapter"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/transition/AbstractTransition$4.class",
+      "occurrence": 0,
+      "sha256": "ae235d6bda111dbbe9687c8276762c7c3c80af7dc02e549cb8317b14c3bf9daa",
+      "name": "com/alee/managers/animation/transition/AbstractTransition$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/alee/managers/animation/transition/AbstractTransition;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/alee/managers/animation/transition/AbstractTransition;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c5aa50a0be7f0f214c12923eb7471d12fb40323d591fa6e3da2671f45914e847",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/transition/AbstractTransition",
+        "com/alee/managers/animation/transition/AbstractTransition$4",
+        "com/alee/managers/animation/transition/TransitionListener",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/Iterator",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Elastic$In.class",
+      "occurrence": 0,
+      "sha256": "e99d5c6b38fdc9f6a22290e71bb5742ee459d988e33f7fb5419904094adbe858",
+      "name": "com/alee/managers/animation/easing/Elastic$In",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/managers/animation/easing/Elastic",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49ed2a14cf2e84f4146db4a45f75f43c290cfb2c7da76027d2bba2cb1fd58e4f",
+          "code_length": 23
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 4,
+          "code_sha256": "09d7dea408946b85fe48551739e05b20a0debc5a055f3193a03722725a30a7ea",
+          "code_length": 120
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/Elastic",
+        "com/alee/managers/animation/easing/Elastic$In",
+        "java/lang/Math",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Cubic$Out.class",
+      "occurrence": 0,
+      "sha256": "c50f871b9d649c58b12b6cf68197d7036f869a26ba77d8ca33e8631f9be77815",
+      "name": "com/alee/managers/animation/easing/Cubic$Out",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/managers/animation/easing/Cubic",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49ed2a14cf2e84f4146db4a45f75f43c290cfb2c7da76027d2bba2cb1fd58e4f",
+          "code_length": 23
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 4,
+          "code_sha256": "d82abf95b650f293ecc028d88e1dd2c5ad5dd359f6906c790492991867738fff",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/Cubic",
+        "com/alee/managers/animation/easing/Cubic$Out",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Cubic.class",
+      "occurrence": 0,
+      "sha256": "f1e9c1e1882b9c4d23d29a8cd4399480d6c2ae53462bf0058b51452b387f94af",
+      "name": "com/alee/managers/animation/easing/Cubic",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/managers/animation/easing/AbstractEasing",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/AbstractEasing",
+        "com/alee/managers/animation/easing/Cubic",
+        "com/alee/managers/animation/easing/Cubic$In",
+        "com/alee/managers/animation/easing/Cubic$InOut",
+        "com/alee/managers/animation/easing/Cubic$Out"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Circular.class",
+      "occurrence": 0,
+      "sha256": "cb71298b2c12d40ba9c9cd957aa04df905041236590732ba5c4515f54418213c",
+      "name": "com/alee/managers/animation/easing/Circular",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/managers/animation/easing/AbstractEasing",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/AbstractEasing",
+        "com/alee/managers/animation/easing/Circular",
+        "com/alee/managers/animation/easing/Circular$In",
+        "com/alee/managers/animation/easing/Circular$InOut",
+        "com/alee/managers/animation/easing/Circular$Out"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Quintic$In.class",
+      "occurrence": 0,
+      "sha256": "de47b22f7dd1901da783629a2ddcb162d096d7ee816b7b1278b71a71857050d0",
+      "name": "com/alee/managers/animation/easing/Quintic$In",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/managers/animation/easing/Quintic",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49ed2a14cf2e84f4146db4a45f75f43c290cfb2c7da76027d2bba2cb1fd58e4f",
+          "code_length": 23
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 4,
+          "code_sha256": "6df50104acefecae308fd5f9f36be6d247b93804447b2cd0b369941d30056394",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/Quintic",
+        "com/alee/managers/animation/easing/Quintic$In",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Elastic$Out.class",
+      "occurrence": 0,
+      "sha256": "39261f285f2245043c34b1d5163c8b9ce49278c0fd0014247fade05aaf829053",
+      "name": "com/alee/managers/animation/easing/Elastic$Out",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/managers/animation/easing/Elastic",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49ed2a14cf2e84f4146db4a45f75f43c290cfb2c7da76027d2bba2cb1fd58e4f",
+          "code_length": 23
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 4,
+          "code_sha256": "6d99b88f17c9dc73eb80648916cd074a8889623631e2fb210b9441ee62b28f12",
+          "code_length": 116
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/Elastic",
+        "com/alee/managers/animation/easing/Elastic$Out",
+        "java/lang/Math",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Exponential.class",
+      "occurrence": 0,
+      "sha256": "b2686ccb039c1f3e3adb203180d5deb8d5a079064bfc97119e369d60cb57abc6",
+      "name": "com/alee/managers/animation/easing/Exponential",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/alee/managers/animation/easing/AbstractEasing",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/AbstractEasing",
+        "com/alee/managers/animation/easing/Exponential",
+        "com/alee/managers/animation/easing/Exponential$In",
+        "com/alee/managers/animation/easing/Exponential$InOut",
+        "com/alee/managers/animation/easing/Exponential$Out"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/AbstractEasing.class",
+      "occurrence": 0,
+      "sha256": "ce49755cc13cea0018387e2bbad445f08ad9d54486d2d4c575857d07386b2155",
+      "name": "com/alee/managers/animation/easing/AbstractEasing",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/managers/animation/easing/Easing"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isOverwrite",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "calculate",
+          "descriptor": "(DDDD)D",
+          "access": 1,
+          "code_sha256": "7955a0262f0b27ffba8a9d7ca25e1f61343ae1e427bd2482b3a6c552db847252",
+          "code_length": 32
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 1028
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1a23dbd02110184ffb76bf77bcade8e415f91c0551b7cc42d21a227c3e5beeda",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/AbstractEasing",
+        "com/alee/managers/animation/easing/Easing",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/Back$In.class",
+      "occurrence": 0,
+      "sha256": "8647d3112680660658d9a87658da1716546068a5dad8c3bf814564cdacee427c",
+      "name": "com/alee/managers/animation/easing/Back$In",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/alee/managers/animation/easing/Back",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getTitle",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49ed2a14cf2e84f4146db4a45f75f43c290cfb2c7da76027d2bba2cb1fd58e4f",
+          "code_length": 23
+        },
+        {
+          "name": "calculateImpl",
+          "descriptor": "(DDDD)D",
+          "access": 4,
+          "code_sha256": "bdc7cfb700a68ade257d2025dda91ff228f926dacc4099640e417f1b78fd340f",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/easing/Back",
+        "com/alee/managers/animation/easing/Back$In",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/easing/EasingViewer.class",
+      "occurrence": 0,
+      "sha256": "81141fbba1fffad6fa4ead37fcf9275d948af2b3a4ac3161d8843bdabe4866fe",
+      "name": "com/alee/managers/animation/easing/EasingViewer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/alee/extended/canvas/WebCanvas",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "progressFormat",
+          "descriptor": "Ljava/text/DecimalFormat;",
+          "access": 20
+        },
+        {
+          "name": "padding",
+          "descriptor": "Ljava/awt/Insets;",
+          "access": 20
+        },
+        {
+          "name": "steps",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "progress",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "easing",
+          "descriptor": "Lcom/alee/managers/animation/easing/Easing;",
+          "access": 4
+        },
+        {
+          "name": "duration",
+          "descriptor": "J",
+          "access": 4
+        },
+        {
+          "name": "transition",
+          "descriptor": "Lcom/alee/managers/animation/transition/AbstractTransition;",
+          "access": 4,
+          "generic_signature": "Lcom/alee/managers/animation/transition/AbstractTransition<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "listeners",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Lcom/alee/managers/animation/transition/TransitionListener<Ljava/lang/Integer;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "831153dbe2201f21c4449334122f6fe69c818121ba333631a7a523ac0d5957fc",
+          "code_length": 89
+        },
+        {
+          "name": "getSteps",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getProgress",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "getEasedProgress",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "6739c6c0393c276b6c39d571272c4566e58311b487f3e078668368b254751c0c",
+          "code_length": 24
+        },
+        {
+          "name": "addListener",
+          "descriptor": "(Lcom/alee/managers/animation/transition/TransitionListener;)V",
+          "access": 1,
+          "code_sha256": "fd93e7959a4f8aee77fe3b9aba57815925350d869f3f9f38d2a6f89dba8293eb",
+          "code_length": 12,
+          "generic_signature": "(Lcom/alee/managers/animation/transition/TransitionListener<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "preview",
+          "descriptor": "(Lcom/alee/managers/animation/easing/Easing;J)V",
+          "access": 1,
+          "code_sha256": "4867f9f540e244346dd9d5909e46ee072ada92e5b8bc5d7acae70eae3a30d7e2",
+          "code_length": 15
+        },
+        {
+          "name": "restartTransition",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "1f0d98651f93045a2f2cff9194ae1fa6b9b7164372fc4cd7094c768d6d680511",
+          "code_length": 83
+        },
+        {
+          "name": "paintComponent",
+          "descriptor": "(Ljava/awt/Graphics;)V",
+          "access": 4,
+          "code_sha256": "28300a9cb2de48062138246d8c523125ab37587ceaf628c704815db10a173d34",
+          "code_length": 280
+        },
+        {
+          "name": "paintGraph",
+          "descriptor": "(Ljava/awt/Graphics2D;Ljava/awt/Rectangle;Ljava/awt/Point;)V",
+          "access": 4,
+          "code_sha256": "245ed7c39baf544ebba7970a1c405e3c99d89ba30da67d45d6dc9c087d6f1285",
+          "code_length": 501
+        },
+        {
+          "name": "paintProgress",
+          "descriptor": "(Ljava/awt/Graphics2D;Lcom/alee/graphics/data/Line;Ljava/awt/Point;)V",
+          "access": 2,
+          "code_sha256": "adced0211f57f078199b405fc13191c87854ec1be6cc912ce6f49211d7cd4945",
+          "code_length": 308
+        },
+        {
+          "name": "paintValue",
+          "descriptor": "(Ljava/awt/Graphics2D;Lcom/alee/graphics/data/Line;Ljava/awt/Point;D)V",
+          "access": 2,
+          "code_sha256": "3c22fba01f1e988dcc21f0da0add02542084dc9de1f606dd982fc4facb932ed3",
+          "code_length": 378
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "aaad83cfc59964611353cdda8e49ebb2263179832e9febd89a765ff0d5665ffd",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/alee/extended/canvas/WebCanvas",
+        "com/alee/graphics/data/Line",
+        "com/alee/managers/animation/easing/Easing",
+        "com/alee/managers/animation/easing/EasingViewer",
+        "com/alee/managers/animation/easing/EasingViewer$1",
+        "com/alee/managers/animation/easing/EasingViewer$2",
+        "com/alee/managers/animation/easing/Linear",
+        "com/alee/managers/animation/transition/AbstractTransition",
+        "com/alee/managers/animation/transition/TimedTransition",
+        "com/alee/painter/decoration/content/TextRasterization",
+        "com/alee/utils/GraphicsUtils",
+        "com/alee/utils/SwingUtils",
+        "com/alee/utils/swing/MouseButton",
+        "java/awt/BasicStroke",
+        "java/awt/Color",
+        "java/awt/Dimension",
+        "java/awt/FontMetrics",
+        "java/awt/Graphics2D",
+        "java/awt/Insets",
+        "java/awt/Point",
+        "java/awt/Rectangle",
+        "java/awt/Stroke",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Path2D",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/text/DecimalFormat",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/event/EventDispatchThreadHandler.class",
+      "occurrence": 0,
+      "sha256": "4ae722768de1c8ea0cad35f1ac5d1aff00247991128789874a30db99f46ebf94",
+      "name": "com/alee/managers/animation/event/EventDispatchThreadHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/managers/animation/event/EventHandler"
+      ],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lcom/alee/managers/animation/event/EventDispatchThreadHandler;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/alee/managers/animation/event/EventDispatchThreadHandler;",
+          "access": 9,
+          "code_sha256": "7719bede588f360182c30d0520098b1f2e6a895704c1e529327e61e20537b113",
+          "code_length": 41
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 1,
+          "code_sha256": "32d88419dbc65023b710f5ca6a32d8ba9fb8df2589c7051dc019e8e91c944e35",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/event/EventDispatchThreadHandler",
+        "com/alee/managers/animation/event/EventHandler",
+        "com/alee/utils/CoreSwingUtils",
+        "java/lang/Object",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/event/DaemonThreadHandler.class",
+      "occurrence": 0,
+      "sha256": "e43dea4031da8bbeb5da1286d2a785f674162f2a466df177cb3fa209913082d4",
+      "name": "com/alee/managers/animation/event/DaemonThreadHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/managers/animation/event/EventHandler"
+      ],
+      "fields": [
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "05c55816c749c301d6360bae8602267f885f5e8b5361f5b2a7be74cafcf90206",
+          "code_length": 21
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 1,
+          "code_sha256": "afca6024833d68acab3f4645f21d7b58de26e02f5351f1b976a5d7e17ad7f957",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/event/DaemonThreadHandler",
+        "com/alee/managers/animation/event/EventHandler",
+        "com/alee/utils/concurrent/DaemonThreadFactory",
+        "java/lang/Object",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/animation/AnimationException.class",
+      "occurrence": 0,
+      "sha256": "3b8f017302b24b78725db21a2f21997cb462b28ba0f65b4bb22ecdd089ed021a",
+      "name": "com/alee/managers/animation/AnimationException",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/alee/managers/animation/AnimationException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/settings/Configuration.class",
+      "occurrence": 0,
+      "sha256": "ea4e0d5c2055f009dcf67df58323d191352791481a8de8b760208aedb790c1f0",
+      "name": "com/alee/managers/settings/Configuration",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "group",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        },
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        },
+        {
+          "name": "defaultValue",
+          "descriptor": "Lcom/alee/api/jdk/SerializableSupplier;",
+          "access": 20,
+          "generic_signature": "Lcom/alee/api/jdk/SerializableSupplier<TV;>;"
+        },
+        {
+          "name": "loadInitialSettings",
+          "descriptor": "Z",
+          "access": 20
+        },
+        {
+          "name": "applySettingsChanges",
+          "descriptor": "Z",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "56af8368d8a9007eec9d154f6669232315c3127d2e7cb08637bcaf97cbcb72f0",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ZZ)V",
+          "access": 1,
+          "code_sha256": "56af8368d8a9007eec9d154f6669232315c3127d2e7cb08637bcaf97cbcb72f0",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Serializable;)V",
+          "access": 1,
+          "code_sha256": "6c6579c637a90bb23e1fbcd614f30c57562e9b011ee1e000b87dfdf25235ec68",
+          "code_length": 19,
+          "generic_signature": "(Ljava/lang/String;TV;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier;)V",
+          "access": 1,
+          "code_sha256": "f0d5bc8f52650246a4a7038bce2e326f4f7604824861ee46646957f6e6623438",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier<TV;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Serializable;ZZ)V",
+          "access": 1,
+          "code_sha256": "11c36a57f45cf665b30af4fb4e2de75ace9be52da065ca89430392057aaeabc9",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/String;TV;ZZ)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier;ZZ)V",
+          "access": 1,
+          "code_sha256": "7d27a0f20f3f5add12578223c0452a0dea1e44c5d9a99b66eae3bebdfebdfa70",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier<TV;>;ZZ)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "872af91333555ad6c8abfed907823483a7210484e4fbb8085c70af07576fe19f",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ZZ)V",
+          "access": 1,
+          "code_sha256": "4659f3aa1589701f91d24a06a54a038d0bb88c7657f3129d5bef8d3a2ca0a1c6",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/Serializable;)V",
+          "access": 1,
+          "code_sha256": "ad8ef4d58ab93f0933b2407fdd10c3392fc55808fed6d61cea684e29f86cccab",
+          "code_length": 17,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;TV;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier;)V",
+          "access": 1,
+          "code_sha256": "16fd425cfefa6a202fce7a95b48f36bcfdb5b5ade8953bc841dc9e57312770ba",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier<TV;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/io/Serializable;ZZ)V",
+          "access": 1,
+          "code_sha256": "50718e95279a168241be6022ed8d83d5bcd5677f8d0d057af916be2479a93d93",
+          "code_length": 27,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;TV;ZZ)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier;ZZ)V",
+          "access": 1,
+          "code_sha256": "10f0beef0d004b6a9830ae220f2c8ec688b26652d887a8514dbe46a4d920440d",
+          "code_length": 32,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Lcom/alee/api/jdk/SerializableSupplier<TV;>;ZZ)V"
+        },
+        {
+          "name": "group",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "key",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "defaultValue",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 1,
+          "code_sha256": "ce622d9cc80afb866ee9b4f302bb5a2aa4c1672a907d7400a1d4e6f24bddec82",
+          "code_length": 24,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "isLoadInitialSettings",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "isApplySettingsChanges",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f928ce34853d2653e7422db3879e424741e25710c488b895e33d1c6c97b78d40",
+          "code_length": 67
+        }
+      ],
+      "generic_signature": "<V::Ljava/io/Serializable;>Ljava/lang/Object;Ljava/io/Serializable;",
+      "class_references": [
+        "com/alee/api/jdk/SerializableSupplier",
+        "com/alee/managers/settings/Configuration",
+        "com/alee/managers/settings/Configuration$StaticDefaultValue",
+        "com/alee/managers/settings/SettingsManager",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/settings/UISettingsManager$2.class",
+      "occurrence": 0,
+      "sha256": "c7b9d723224a12a5872bef30de861651fc3950039e010a426f21770e94793402",
+      "name": "com/alee/managers/settings/UISettingsManager$2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/alee/api/jdk/BiConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljavax/swing/JComponent;Lcom/alee/managers/settings/SettingsProcessor;)V",
+          "access": 1,
+          "code_sha256": "bb9d88e953a9690ab548616ca8f0dd59746891dcfac4cd523954a84b25caab80",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "052dfb572f45d0e6c6c1982274ea6d6d635172f6ccc34fc9e0164c78daefd47d",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lcom/alee/api/jdk/BiConsumer<Ljavax/swing/JComponent;Lcom/alee/managers/settings/SettingsProcessor;>;",
+      "class_references": [
+        "com/alee/api/jdk/BiConsumer",
+        "com/alee/managers/settings/SettingsProcessor",
+        "com/alee/managers/settings/UISettingsManager",
+        "com/alee/managers/settings/UISettingsManager$2",
+        "java/lang/Object",
+        "javax/swing/JComponent"
+      ]
+    },
+    {
+      "entry": "com/alee/managers/settings/SettingsProcessor.class",
+      "occurrence": 0,
+      "sha256": "2e5f096b779dd67d880611dae67359223563535d36ebd64fb56c7bad14324ad9",
+      "name": "com/alee/managers/settings/SettingsProcessor",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "component",
+          "descriptor": "Ljavax/swing/JComponent;",
+          "access": 4,
+          "generic_signature": "TC;"
+        },
+        {
+          "name": "configuration",
+          "descriptor": "Lcom/alee/managers/settings/Configuration;",
+          "access": 4,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "loading",
+          "descriptor": "Z",
+          "access": 132
+        },
+        {
+          "name": "saving",
+          "descriptor": "Z",
+          "access": 132
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/swing/JComponent;Lcom/alee/managers/settings/Configuration;)V",
+          "access": 1,
+          "code_sha256": "c863a81d6934a11a97585c5a6855737f258a6d108244b2de4614fe9f2df66374",
+          "code_length": 36,
+          "generic_signature": "(TC;TK;)V"
+        },
+        {
+          "name": "loadInitialSettings",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "08345face26b3a2172061b46c176f3776a6821ed6e0133456f820d5fe1769bc4",
+          "code_length": 15
+        },
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8d1f9e183ee4f42120b2c395b622f413a79aaaba65deddad0d583b5f7bfb9960",
+          "code_length": 58
+        },
+        {
+          "name": "register",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1028,
+          "generic_signature": "(TC;)V"
+        },
+        {
+          "name": "destroy",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "b227b3825fcc020a2515f495a96043ca80e0a933b4c29b6f107769195d0f312f",
+          "code_length": 71
+        },
+        {
+          "name": "unregister",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1028,
+          "generic_signature": "(TC;)V"
+        },
+        {
+          "name": "component",
+          "descriptor": "()Ljavax/swing/JComponent;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5,
+          "generic_signature": "()TC;"
+        },
+        {
+          "name": "configuration",
+          "descriptor": "()Lcom/alee/managers/settings/Configuration;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()TK;"
+        },
+        {
+          "name": "defaultValue",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 17,
+          "code_sha256": "03eaa04698abac4361044e6b9421849e4a4c7a1c166eb56e980fae1249a0448b",
+          "code_length": 19,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "createDefaultValue",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "load",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "484b0d1ad43ddb5918ef6a96e9130f220f7b2d3106b32c421f280999ce82e192",
+          "code_length": 104
+        },
+        {
+          "name": "loadSettings",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1028,
+          "generic_signature": "(TC;)V"
+        },
+        {
+          "name": "loadSettings",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4,
+          "code_sha256": "ad1af6aebae496dfe9504a2af1a405e40210a0a06f949988a5f023777657e9c8",
+          "code_length": 24,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "save",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "e7a614ac989d1e320cbaaa4b57f84fb8fbcb2dff8712b047d13b288d209253e9",
+          "code_length": 6
+        },
+        {
+          "name": "save",
+          "descriptor": "(Z)V",
+          "access": 17,
+          "code_sha256": "4e93ce7aef0477fc717d902a65fa303579e4468b2c9ae570069765ffcb39a702",
+          "code_length": 117
+        },
+        {
+          "name": "saveSettings",
+          "descriptor": "(Ljavax/swing/JComponent;)V",
+          "access": 1028,
+          "generic_signature": "(TC;)V"
+        },
+        {
+          "name": "saveSettings",
+          "descriptor": "(Ljava/io/Serializable;)V",
+          "access": 4,
+          "code_sha256": "f6718457d03d98cd524cab6c7c62755a78b2fe8fa608c4a04a9e2c2465021e19",
+          "code_length": 19,
+          "generic_signature": "(TV;)V"
+        }
+      ],
+      "generic_signature": "<C:Ljavax/swing/JComponent;V::Ljava/io/Serializable;K:Lcom/alee/managers/settings/Configuration<TV;>;>Ljava/lang/Object;Ljava/io/Serializable;",
+      "class_references": [
+        "com/alee/laf/WebLookAndFeel",
+        "com/alee/managers/settings/Configuration",
+        "com/alee/managers/settings/SettingsManager",
+        "com/alee/managers/settings/SettingsProcessor",
+        "java/io/Serializable",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,726 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/reactive-streams-1.0.4.jar",
+  "archive_sha256": "f75ca597789b3dac58f61857b9ac2e1034a68fa672db35055a8fb4509e325f28",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/reactivestreams/FlowAdapters$FlowPublisherFromReactive.class",
+      "occurrence": 0,
+      "sha256": "a985c33363dd7f604fedf230949295dcd3d077a1dad2db645fd2b2593737fe96",
+      "name": "org/reactivestreams/FlowAdapters$FlowPublisherFromReactive",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Flow$Publisher"
+      ],
+      "fields": [
+        {
+          "name": "reactiveStreams",
+          "descriptor": "Lorg/reactivestreams/Publisher;",
+          "access": 16,
+          "generic_signature": "Lorg/reactivestreams/Publisher<+TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Publisher;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lorg/reactivestreams/Publisher<+TT;>;)V"
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscriber;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26,
+          "generic_signature": "(Ljava/util/concurrent/Flow$Subscriber<-TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Flow$Publisher<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Publisher",
+        "java/util/concurrent/Flow$Subscriber",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowPublisherFromReactive",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber",
+        "org/reactivestreams/Publisher"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$FlowToReactiveProcessor.class",
+      "occurrence": 0,
+      "sha256": "f8a830422a8871234d3e0f157c31a06124e21d78a6d0cd1e5c05c9d16ca5cd9b",
+      "name": "org/reactivestreams/FlowAdapters$FlowToReactiveProcessor",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Flow$Processor"
+      ],
+      "fields": [
+        {
+          "name": "reactiveStreams",
+          "descriptor": "Lorg/reactivestreams/Processor;",
+          "access": 16,
+          "generic_signature": "Lorg/reactivestreams/Processor<-TT;+TU;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Processor;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lorg/reactivestreams/Processor<-TT;+TU;>;)V"
+        },
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscription;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "d5141ec68642dfe5d7022c0507e8ba180dff574815c2e998bf736b376cb595b3",
+          "code_length": 11,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a794e301303e31210678a74c8bf4b3212aae53ff466acf65ab618ce7bf1c704c",
+          "code_length": 11
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10880dd60a7dbe22f2ea126c5141373188cb4500e0e418b654594c950a3cb265",
+          "code_length": 10
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscriber;)V",
+          "access": 1,
+          "code_sha256": "d78be2a183521bf65828aaaab5e8109cf1d1558ab492931c01738446a3c3cf56",
+          "code_length": 26,
+          "generic_signature": "(Ljava/util/concurrent/Flow$Subscriber<-TU;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Flow$Processor<TT;TU;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Processor",
+        "java/util/concurrent/Flow$Subscriber",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveProcessor",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription",
+        "org/reactivestreams/Processor"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber.class",
+      "occurrence": 0,
+      "sha256": "cdc0329a4a74bd8ad8ceeb4bf88d99dbad2e41cb1592e7cbb7e25c244b05ed92",
+      "name": "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Flow$Subscriber"
+      ],
+      "fields": [
+        {
+          "name": "reactiveStreams",
+          "descriptor": "Lorg/reactivestreams/Subscriber;",
+          "access": 16,
+          "generic_signature": "Lorg/reactivestreams/Subscriber<-TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TT;>;)V"
+        },
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscription;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "d5141ec68642dfe5d7022c0507e8ba180dff574815c2e998bf736b376cb595b3",
+          "code_length": 11,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a794e301303e31210678a74c8bf4b3212aae53ff466acf65ab618ce7bf1c704c",
+          "code_length": 11
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10880dd60a7dbe22f2ea126c5141373188cb4500e0e418b654594c950a3cb265",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Flow$Subscriber<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Subscriber",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription",
+        "org/reactivestreams/Subscriber"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription.class",
+      "occurrence": 0,
+      "sha256": "61d3c69441efcd62af3a6c4830da24c87ac592e311715c87f9bb12b3314953d2",
+      "name": "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Flow$Subscription"
+      ],
+      "fields": [
+        {
+          "name": "reactiveStreams",
+          "descriptor": "Lorg/reactivestreams/Subscription;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/reactivestreams/Subscription;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "request",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "8ea427f43ffa37990f1e864aaabb13bc8a9f52a4e914a52ded9e2f29c14ebde9",
+          "code_length": 11
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "46083e8e106904d9be052043db26c23f7ff608f68dd15ed1dbcd8a074d1f12f6",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription",
+        "org/reactivestreams/Subscription"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$ReactivePublisherFromFlow.class",
+      "occurrence": 0,
+      "sha256": "184582134108643a06dceca1a6a2f2ff353963117fc21230c2b6a32028b87453",
+      "name": "org/reactivestreams/FlowAdapters$ReactivePublisherFromFlow",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/reactivestreams/Publisher"
+      ],
+      "fields": [
+        {
+          "name": "flow",
+          "descriptor": "Ljava/util/concurrent/Flow$Publisher;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/Flow$Publisher<+TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/Flow$Publisher;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/concurrent/Flow$Publisher<+TT;>;)V"
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/reactivestreams/Publisher<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Publisher",
+        "java/util/concurrent/Flow$Subscriber",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber",
+        "org/reactivestreams/FlowAdapters$ReactivePublisherFromFlow",
+        "org/reactivestreams/Publisher",
+        "org/reactivestreams/Subscriber"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$ReactiveToFlowProcessor.class",
+      "occurrence": 0,
+      "sha256": "ee10b6243fbf749ba17c8b546fa331b857c789664c8e6821e4598e7532b9d045",
+      "name": "org/reactivestreams/FlowAdapters$ReactiveToFlowProcessor",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/reactivestreams/Processor"
+      ],
+      "fields": [
+        {
+          "name": "flow",
+          "descriptor": "Ljava/util/concurrent/Flow$Processor;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/Flow$Processor<-TT;+TU;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/Flow$Processor;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/concurrent/Flow$Processor<-TT;+TU;>;)V"
+        },
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscription;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "d5141ec68642dfe5d7022c0507e8ba180dff574815c2e998bf736b376cb595b3",
+          "code_length": 11,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a794e301303e31210678a74c8bf4b3212aae53ff466acf65ab618ce7bf1c704c",
+          "code_length": 11
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10880dd60a7dbe22f2ea126c5141373188cb4500e0e418b654594c950a3cb265",
+          "code_length": 10
+        },
+        {
+          "name": "subscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;)V",
+          "access": 1,
+          "code_sha256": "d78be2a183521bf65828aaaab5e8109cf1d1558ab492931c01738446a3c3cf56",
+          "code_length": 26,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TU;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>Ljava/lang/Object;Lorg/reactivestreams/Processor<TT;TU;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Processor",
+        "java/util/concurrent/Flow$Subscriber",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowProcessor",
+        "org/reactivestreams/Processor",
+        "org/reactivestreams/Subscriber",
+        "org/reactivestreams/Subscription"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber.class",
+      "occurrence": 0,
+      "sha256": "2308bf666a8af52fed92ed870da107c45188de92ef82a2547be4c64a3ec507e9",
+      "name": "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/reactivestreams/Subscriber"
+      ],
+      "fields": [
+        {
+          "name": "flow",
+          "descriptor": "Ljava/util/concurrent/Flow$Subscriber;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/Flow$Subscriber<-TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscriber;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/concurrent/Flow$Subscriber<-TT;>;)V"
+        },
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscription;)V",
+          "access": 1,
+          "code_sha256": "c9d91147fc2bfa324c788a01708789f04de14a9c032a778f39d2c6e533d8e6b2",
+          "code_length": 26
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "d5141ec68642dfe5d7022c0507e8ba180dff574815c2e998bf736b376cb595b3",
+          "code_length": 11,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a794e301303e31210678a74c8bf4b3212aae53ff466acf65ab618ce7bf1c704c",
+          "code_length": 11
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10880dd60a7dbe22f2ea126c5141373188cb4500e0e418b654594c950a3cb265",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/reactivestreams/Subscriber<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Subscriber",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber",
+        "org/reactivestreams/Subscriber",
+        "org/reactivestreams/Subscription"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription.class",
+      "occurrence": 0,
+      "sha256": "1a0b45af9b8f1acaa268697c3929550ceba68b68f29c4e43e1e7310b9b79c319",
+      "name": "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/reactivestreams/Subscription"
+      ],
+      "fields": [
+        {
+          "name": "flow",
+          "descriptor": "Ljava/util/concurrent/Flow$Subscription;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscription;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "request",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "8ea427f43ffa37990f1e864aaabb13bc8a9f52a4e914a52ded9e2f29c14ebde9",
+          "code_length": 11
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "46083e8e106904d9be052043db26c23f7ff608f68dd15ed1dbcd8a074d1f12f6",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Subscription",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription",
+        "org/reactivestreams/Subscription"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/FlowAdapters.class",
+      "occurrence": 0,
+      "sha256": "a94d044b325a545c8724e1ce4357cc7655d57224be66e762b69712227a44f962",
+      "name": "org/reactivestreams/FlowAdapters",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "toPublisher",
+          "descriptor": "(Ljava/util/concurrent/Flow$Publisher;)Lorg/reactivestreams/Publisher;",
+          "access": 9,
+          "code_sha256": "b85494d2dff6e203a83d299423d3c4259a31f3cd99881920fd0e7b7aca3cf6d2",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Flow$Publisher<+TT;>;)Lorg/reactivestreams/Publisher<TT;>;"
+        },
+        {
+          "name": "toFlowPublisher",
+          "descriptor": "(Lorg/reactivestreams/Publisher;)Ljava/util/concurrent/Flow$Publisher;",
+          "access": 9,
+          "code_sha256": "efd1de7c20e1fcc27b8785942accef1176fd75f764248754161c1057a057fc22",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lorg/reactivestreams/Publisher<+TT;>;)Ljava/util/concurrent/Flow$Publisher<TT;>;"
+        },
+        {
+          "name": "toProcessor",
+          "descriptor": "(Ljava/util/concurrent/Flow$Processor;)Lorg/reactivestreams/Processor;",
+          "access": 9,
+          "code_sha256": "46d7d4e8a7cce00e778c7027384312bd3035e1996eae1d9763ced31681689415",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(Ljava/util/concurrent/Flow$Processor<-TT;+TU;>;)Lorg/reactivestreams/Processor<TT;TU;>;"
+        },
+        {
+          "name": "toFlowProcessor",
+          "descriptor": "(Lorg/reactivestreams/Processor;)Ljava/util/concurrent/Flow$Processor;",
+          "access": 9,
+          "code_sha256": "b8988381d03c027f479ad03b9065b04a689f12abbe2c01923e81939ac2682295",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(Lorg/reactivestreams/Processor<-TT;+TU;>;)Ljava/util/concurrent/Flow$Processor<TT;TU;>;"
+        },
+        {
+          "name": "toFlowSubscriber",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;)Ljava/util/concurrent/Flow$Subscriber;",
+          "access": 9,
+          "code_sha256": "2a873467a1bcdabb1b055a9cc8c2a973539018db09934cede09d48a15c92db56",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lorg/reactivestreams/Subscriber<TT;>;)Ljava/util/concurrent/Flow$Subscriber<TT;>;"
+        },
+        {
+          "name": "toSubscriber",
+          "descriptor": "(Ljava/util/concurrent/Flow$Subscriber;)Lorg/reactivestreams/Subscriber;",
+          "access": 9,
+          "code_sha256": "87b17bf378e18aa0bbff3344d0a62c43ba55635dad281cadaad5495d9d07d259",
+          "code_length": 51,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Flow$Subscriber<TT;>;)Lorg/reactivestreams/Subscriber<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/Objects",
+        "java/util/concurrent/Flow",
+        "java/util/concurrent/Flow$Processor",
+        "java/util/concurrent/Flow$Publisher",
+        "java/util/concurrent/Flow$Subscriber",
+        "org/reactivestreams/FlowAdapters",
+        "org/reactivestreams/FlowAdapters$FlowPublisherFromReactive",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveProcessor",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscriber",
+        "org/reactivestreams/FlowAdapters$FlowToReactiveSubscription",
+        "org/reactivestreams/FlowAdapters$ReactivePublisherFromFlow",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowProcessor",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscriber",
+        "org/reactivestreams/FlowAdapters$ReactiveToFlowSubscription",
+        "org/reactivestreams/Processor",
+        "org/reactivestreams/Publisher",
+        "org/reactivestreams/Subscriber"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/Processor.class",
+      "occurrence": 0,
+      "sha256": "ba50adf006330032ff3f125f63418a6e9dafeae543bb461362e0673ee6426ace",
+      "name": "org/reactivestreams/Processor",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/reactivestreams/Subscriber",
+        "org/reactivestreams/Publisher"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;R:Ljava/lang/Object;>Ljava/lang/Object;Lorg/reactivestreams/Subscriber<TT;>;Lorg/reactivestreams/Publisher<TR;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/reactivestreams/Processor",
+        "org/reactivestreams/Publisher",
+        "org/reactivestreams/Subscriber"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/Publisher.class",
+      "occurrence": 0,
+      "sha256": "62762e7ddb03a886d827b7d9e623bb21269f87e4c63d5287868d68abfddfafc3",
+      "name": "org/reactivestreams/Publisher",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "subscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscriber;)V",
+          "access": 1025,
+          "generic_signature": "(Lorg/reactivestreams/Subscriber<-TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/reactivestreams/Publisher"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/Subscriber.class",
+      "occurrence": 0,
+      "sha256": "ec8ccf55aa1898e490a89fec4c1cb34d631bffa97fb19a06f91265d51311dadb",
+      "name": "org/reactivestreams/Subscriber",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onSubscribe",
+          "descriptor": "(Lorg/reactivestreams/Subscription;)V",
+          "access": 1025
+        },
+        {
+          "name": "onNext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1025
+        },
+        {
+          "name": "onComplete",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/reactivestreams/Subscriber"
+      ]
+    },
+    {
+      "entry": "org/reactivestreams/Subscription.class",
+      "occurrence": 0,
+      "sha256": "d6e40610ee7a1e14498bab196e22fb5aa8725cf3d6c4056491439c321068071e",
+      "name": "org/reactivestreams/Subscription",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "request",
+          "descriptor": "(J)V",
+          "access": 1025
+        },
+        {
+          "name": "cancel",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/reactivestreams/Subscription"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar",
+  "archive_sha256": "fcec4232af5eccc490262dae6ea853be6edbf8e02d341ac784d1bf222add7a05",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/CoinbasePro/CryptoExchangeCoinbaseProPlugin.class",
+      "occurrence": 0,
+      "sha256": "f63b7cf66e9272b9e4309501e0a2466caa949dc53f1eac038dbaf3831ee91da4",
+      "name": "com/strategyquant/plugin/CryptoExchange/impl/CoinbasePro/CryptoExchangeCoinbaseProPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/exchange/Exchange",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "availableSymbols",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70e8411ed87192ad55eaaf582299ae93aae251f70e9c737839e631b2d4e4d677",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getSymbols",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "ac3d79acd3f2d32c4c6e5ee25871eff9f6d730f3fe3b4f8bf9dd559b1716bda8",
+          "code_length": 107,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/exchange/IExchange;",
+          "access": 1,
+          "code_sha256": "a53438d6568ca511200b2312ea08523c9606adf44983ba7b6f8aa7842752cd8a",
+          "code_length": 8
+        },
+        {
+          "name": "getEarliestTime",
+          "descriptor": "()J",
+          "access": 2,
+          "code_sha256": "7adf031f157b420f3a97c162e0b9d3071166b28fbbe6d6166b48fa45493a3e44",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFutureEarliestAndLargestTime",
+          "descriptor": "(J)[J",
+          "access": 2,
+          "code_sha256": "16390d57cc5d3abb70796abf5aad8837b90973bb5f302c181c363261830315f0",
+          "code_length": 210,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "download",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a295c4682552bdc1a92247b0aab6725a83029bdf0eb03e1e28f15df86fee4b42",
+          "code_length": 624,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "parseData",
+          "descriptor": "(Lorg/json/JSONArray;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "199c942758eadec2889e98f5e114500fb1aaa4b3474b88c1126d0588fd028c60",
+          "code_length": 68
+        },
+        {
+          "name": "availableTimeframes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "91a291b6aaf1556b62ecded7399fe6745de18c9310cc7fd0f826d7b2e7ca8a83",
+          "code_length": 44
+        },
+        {
+          "name": "convertTimeframe",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "01e2ee0de4cb70801638d1573f07cc97cbe55fe62b79ee14deeb0e8f8c8a80f7",
+          "code_length": 212,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkSymbolExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "30ba1c2fbdc346f201e1e98e5923dea38e0d62764bdbc496a0c374e99a57732a",
+          "code_length": 149
+        },
+        {
+          "name": "getSymbolInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 1,
+          "code_sha256": "ff4c39c24312fe3141780b17b06fdc30b09a391422a58c2dc7d51f12e66b3a50",
+          "code_length": 102
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "5f66ca1cb0e67a9ebe062b490d59bbbf7e661efd9d36303763885f8f348dea8b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[J",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/CryptoExchange/impl/CoinbasePro/CryptoExchangeCoinbaseProPlugin",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/exchange/Exchange",
+        "com/strategyquant/tradinglib/exchange/SymbolInfo",
+        "com/strategyquant/tradinglib/historyData/HttpApacheManager",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/text/SimpleDateFormat",
+        "java/util/Date",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only Tools/select/passed bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/select/passed",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-    "version": 1,
-    "state": "owner-approved-plan"
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
   },
   "owner": {
     "requirements": [
@@ -29,22 +29,27 @@
     {
       "family": "bounded installed Tools artifacts",
       "id": "sqx-resultsdatabankactions-tools-select-passed-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed"
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-tools-select-passed-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/passed/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural inventory and responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "Independent frontend mapping or justified exclusion",
       "access_date": "2026-10-06",
-      "sha256": "e2892d445131954d5651957da8032dd353fd6ecc88d897e9dca15c6fdb2cc8bc",
+      "sha256": "c5d5ca1fa1234f8764de45404d1c032894c80ff6403037fa5298e4dc184c4b55",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -52,5 +57,10 @@
       "reason": "Structural manifest; not behavioral ledger",
       "path": "source-map.json"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

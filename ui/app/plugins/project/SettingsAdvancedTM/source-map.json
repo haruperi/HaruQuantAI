@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only SettingsAdvancedTM recursive bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsAdvancedTM",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,101 +28,136 @@
   "source_catalog": [
     {
       "id": "sqx-settingsadvancedtm-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM",
       "family": "bounded installed project-settings frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/addNewExitPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/addNewExitPopup.html",
       "relative_path": "addNewExitPopup.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "b9eebb2b24048e5cfb0a8dd7be1fdeb94ed1639481a1538b1011af9c82b9aa02",
+      "sha256": "4d70be970791b9928e5c1dedb3dd405f0b36cdbef534428dc4246bf3288d6ae0",
       "target": "addNewExitPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/advancedTM.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/advancedTM.html",
       "relative_path": "advancedTM.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "e08576a8ef8fcfb948a35165a46fd99cbcfcc323c705493c965ad29fb2be426e",
+      "sha256": "8630945107f2154c768c82e1048c1b176eeae1df51ca7c4e3cca62877de579b7",
       "target": "advancedTM.tsx",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMCtrl.js",
       "relative_path": "AdvancedTMCtrl.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "504826b7310e6d21f73ff68a3c7c43f5e75d6e492ff9fdecf25512d4ee9039c5",
+      "sha256": "63d5caea9ece232638a6eda7c21dc09e13730042c9a8836a762d8213901d6fea",
       "target": "AdvancedTMCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMService.js",
       "relative_path": "AdvancedTMService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "0ca2bb2ac49ad703985d2d60bb4d2d5ae9892b0bd0349d911ba96ddb114c85f6",
+      "sha256": "1780a60293a3b043a081c3b54f5f7926c588198eb843f1f37c4e584da11c8922",
       "target": null,
       "classification": "excluded",
-      "limitation": "Native remote/schema/XML load-save service has no assigned target counterpart; shared independent defaults and local drafts remain explicit target support."
+      "limitation": "Native remote/schema/XML load-save service has no assigned target counterpart; shared independent defaults and local drafts remain explicit target support. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "c77cb61799ef72c0b3bf2bc9fb8f92bfd6b8bbfa9e3774d9030a9d09a9bd2510",
+      "sha256": "5e872e34f232b518579cf1877a6cde5e01886a7aa514cad4cd9e778374b15b19",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
       "relative_path": "SettingsAdvancedTM.jar",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "a3cf16125b42b41df82e5ceebd1b74d1380e6eef82a7179188023f94d7e1e460",
+      "sha256": "4a62d88b22f87eeeded005cd121990f373b30fc125a8fe608b1e8ae95b11e30f",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary outside approved frontend-only scope."
+      "limitation": "Backend binary outside approved frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsadvancedtm-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "caa0a4b595b1cf09ad6ad687ee2cd4c6d71a78ce078273778fc4ba40417e676f",
+      "sha256": "3ce7c636dae6360f162a6cdd08b33883a08a0ea9be642403b4930fda40f18603",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Coordinator-owned existing exclusive style subset; creation and cascade verification pending integration."
+      "limitation": "Coordinator-owned existing exclusive style subset; creation and cascade verification pending integration. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -148,6 +183,9 @@
   "limitations": [
     "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity.",
     "Existing local state/defaults/form primitives and simulation limitations retained.",
-    "Coordinator CSS, registry and facade integration pending."
-  ]
+    "Coordinator CSS, registry and facade integration pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

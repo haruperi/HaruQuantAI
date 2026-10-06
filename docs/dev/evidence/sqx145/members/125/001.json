@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
+  "archive_sha256": "df88cbdf4baae6ee27892d389cefd6349fee81962f12d21ff45b663094826a15",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1.class",
+      "occurrence": 0,
+      "sha256": "3469cd77e8c932b8e2477c64e837917b08b5b64002555d3a0c4fc3918f05a0ec",
+      "name": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6c1a351e34b1189e70d85e44380227bf24ef4116ac09f08b135b2526fc3b8100",
+          "code_length": 150
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/hw/OperatingSystem",
+        "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin",
+        "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "b913491d012397337013670990b0396289e33d18006b4d23b5ac83c5e255b13c",
+      "name": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d9dc94f1b3406ebb44edfe38c788ba48d4c8a75249d7a288d339728b16fcb885",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getContextPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "aed7f09de38983c08565c402a248f888e7775ec7fbb0c47cc092ccd8be0ac835",
+          "code_length": 3
+        },
+        {
+          "name": "getAppCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a29e49df37936bdd15bb93decd6418849cc3eddffa952a9b0a48d8200a1224c1",
+          "code_length": 3
+        },
+        {
+          "name": "getTooltip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "a77f08fed72cc27c193251c5fc79d4a303e250c63b32eeb86b8aac0c03121460",
+          "code_length": 22,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9d0112e4dfd9b389fe93f773778c8b9b96d04d9f2d5e6ace0f51c2e1a63f61b4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin",
+        "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPluginException.class",
+      "occurrence": 0,
+      "sha256": "8dd567d4f12cc5ea0f3c4dc607f5449c25a8949f634ada25f6d9637a08c2c8d0",
+      "name": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPluginException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPluginException",
+        "java/lang/Exception"
+      ]
+    }
+  ]
+}

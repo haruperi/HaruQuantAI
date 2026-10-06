@@ -1,0 +1,5019 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jspf.core.jar",
+  "archive_sha256": "94f287909bc8fb0970819f165cf091b08f1787053c9875824b6deb9a12ea0185",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "net/xeoh/plugins/base/annotations/configuration/IsDisabled.class",
+      "occurrence": 0,
+      "sha256": "435bd24492faa55f4487887857a791f8568e74f5cc32c766f07eba2f5ef0a7ec",
+      "name": "net/xeoh/plugins/base/annotations/configuration/IsDisabled",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/configuration/IsDisabled"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/events/Init.class",
+      "occurrence": 0,
+      "sha256": "7be8b33284613b4becf426f0c840f914b61bf36be093a76667b9f8d9cb584b37",
+      "name": "net/xeoh/plugins/base/annotations/events/Init",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/events/Init"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/events/PluginLoaded.class",
+      "occurrence": 0,
+      "sha256": "0f61a8dbad6f5239d5154e6794d73681b4eb74dedd83147799074287181462ae",
+      "name": "net/xeoh/plugins/base/annotations/events/PluginLoaded",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/events/PluginLoaded"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/events/Shutdown.class",
+      "occurrence": 0,
+      "sha256": "dda7a9b604a2bf532072ad5d651e276d5705b17545cb7d665e6b1df8b53c01b9",
+      "name": "net/xeoh/plugins/base/annotations/events/Shutdown",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/events/Shutdown"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/injections/InjectPlugin.class",
+      "occurrence": 0,
+      "sha256": "007262e675d5ca33d0feb69941936b47801d03934066a7f47eb59a49c5b1ce21",
+      "name": "net/xeoh/plugins/base/annotations/injections/InjectPlugin",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "requiredCapabilities",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isOptional",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/injections/InjectPlugin"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/meta/Author.class",
+      "occurrence": 0,
+      "sha256": "951b03015e1ddd6b741fba3c4356e5ef98b4779d8e645b6b447c426aa6ff15cc",
+      "name": "net/xeoh/plugins/base/annotations/meta/Author",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "name",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/meta/Author"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/meta/RecognizesOption.class",
+      "occurrence": 0,
+      "sha256": "38881bde115f80bd0964a302b4df4695303bd62e0d967a5f4b610767db39b3bc",
+      "name": "net/xeoh/plugins/base/annotations/meta/RecognizesOption",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "option",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Class<+Lnet/xeoh/plugins/base/Option;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/meta/RecognizesOption"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/meta/Stateless.class",
+      "occurrence": 0,
+      "sha256": "e63269186f977d19500b498dc1a6ef74564c9a5370d272126f63fc6a0d26631f",
+      "name": "net/xeoh/plugins/base/annotations/meta/Stateless",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/meta/Stateless"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/annotations/meta/Version.class",
+      "occurrence": 0,
+      "sha256": "ea5b9c484977959bbb1839e76e9c85ed3e7b383514d5ad3bb0e43cd5d9f4929d",
+      "name": "net/xeoh/plugins/base/annotations/meta/Version",
+      "major": 50,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [
+        {
+          "name": "UNIT_MAJOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UNIT_MINOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UNIT_RELEASE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "version",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "net/xeoh/plugins/base/annotations/meta/Version"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/diagnosis/channels/tracing/ClassPathTracer.class",
+      "occurrence": 0,
+      "sha256": "19c1a9f54128493af488e2828b9375505db8dbfe5fe7550247b09c4a465bf187",
+      "name": "net/xeoh/plugins/base/diagnosis/channels/tracing/ClassPathTracer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d617b29c9b39026522f5d07c73f51f846d6b75956abd146b1b0333caf869a29a",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/io/Serializable;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "64c23e01ef14c8f42445b13f5cd52375dc6d79ae78bc2776e7d288fa158708e0",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/String",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/ClassPathTracer",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/diagnosis/channels/tracing/PluginManagerTracer.class",
+      "occurrence": 0,
+      "sha256": "c906c825779980cf69e05c2ecec472cfd365e9a915a09781488e373999dff041",
+      "name": "net/xeoh/plugins/base/diagnosis/channels/tracing/PluginManagerTracer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d617b29c9b39026522f5d07c73f51f846d6b75956abd146b1b0333caf869a29a",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/io/Serializable;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "64c23e01ef14c8f42445b13f5cd52375dc6d79ae78bc2776e7d288fa158708e0",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/String",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/PluginManagerTracer",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/diagnosis/channels/tracing/SpawnerTracer.class",
+      "occurrence": 0,
+      "sha256": "f4fe51cec5b730da88a8031ae81533a78cb80bd183cfd5de7a79e4c104aac4ee",
+      "name": "net/xeoh/plugins/base/diagnosis/channels/tracing/SpawnerTracer",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d617b29c9b39026522f5d07c73f51f846d6b75956abd146b1b0333caf869a29a",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/io/Serializable;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "64c23e01ef14c8f42445b13f5cd52375dc6d79ae78bc2776e7d288fa158708e0",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/String",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/SpawnerTracer",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginConfigurationImpl.class",
+      "occurrence": 0,
+      "sha256": "3e93e4c8db7557eafe5e156e7cf60ef24b7e8c91f867182a391447fe1a410c4c",
+      "name": "net/xeoh/plugins/base/impl/PluginConfigurationImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/PluginConfiguration"
+      ],
+      "fields": [
+        {
+          "name": "configuration",
+          "descriptor": "Ljava/util/Properties;",
+          "access": 16
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Properties;)V",
+          "access": 4,
+          "code_sha256": "21e51cae67fac4662e088965fa96a09b73257d3a46d4b27c179f46598bf1b453",
+          "code_length": 24
+        },
+        {
+          "name": "getConfiguration",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "b4cc5cb39c603815965d860e99dc50cd220c87cc81ec9577ab4fc71eaa1a61d5",
+          "code_length": 66,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "setConfiguration",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 33,
+          "code_sha256": "e06e47c0b730bec6c385d1ac6817919b99f5e58297895e635a31b4b18e4cc1d4",
+          "code_length": 66,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;Ljava/lang/String;)V"
+        },
+        {
+          "name": "getKey",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9c11961946835df7339631b0386d86b64497734ed4c779a372b027963d63edf2",
+          "code_length": 84,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Properties",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/PluginConfiguration",
+        "net/xeoh/plugins/base/impl/PluginConfigurationImpl"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginInformationImpl$1.class",
+      "occurrence": 0,
+      "sha256": "2a2e0992542ff5874e7e6d68f385e33d2f90f3d22f7567f8cfdfc20d5f77a389",
+      "name": "net/xeoh/plugins/base/impl/PluginInformationImpl$1",
+      "major": 50,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$net$xeoh$plugins$base$PluginInformation$Information",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "30d04f9da2a65e0dea9f300f16bddb766bc0c175b0cdf003d97691879fda3b51",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "net/xeoh/plugins/base/PluginInformation",
+        "net/xeoh/plugins/base/PluginInformation$Information",
+        "net/xeoh/plugins/base/impl/PluginInformationImpl",
+        "net/xeoh/plugins/base/impl/PluginInformationImpl$1"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginInformationImpl.class",
+      "occurrence": 0,
+      "sha256": "cd49b896e7fa4e156c0ad6cdfcadaff87a379e04c88091434c78bb18815ae567",
+      "name": "net/xeoh/plugins/base/impl/PluginInformationImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/PluginInformation"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        },
+        {
+          "name": "pluginManager",
+          "descriptor": "Lnet/xeoh/plugins/base/PluginManager;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "70477d47bb120697413f36b8ba1193ddd879b2a330cc6053f55b332e0d376ab0",
+          "code_length": 19
+        },
+        {
+          "name": "getInformation",
+          "descriptor": "(Lnet/xeoh/plugins/base/PluginInformation$Information;Lnet/xeoh/plugins/base/Plugin;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "4b53840fabaabbd69d893279e28ce535e59844e1ba987168e79411243596e737",
+          "code_length": 265,
+          "generic_signature": "(Lnet/xeoh/plugins/base/PluginInformation$Information;Lnet/xeoh/plugins/base/Plugin;)Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getCaps",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)[Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "433cad51ebf827c6eaf7fd892ca707b4dd7149e811b26b1fd0d40888208f62c6",
+          "code_length": 116
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Ljava/lang/reflect/Method;",
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/net/URI",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/PluginInformation",
+        "net/xeoh/plugins/base/PluginInformation$Information",
+        "net/xeoh/plugins/base/annotations/Capabilities",
+        "net/xeoh/plugins/base/annotations/meta/Author",
+        "net/xeoh/plugins/base/annotations/meta/Version",
+        "net/xeoh/plugins/base/impl/PluginInformationImpl",
+        "net/xeoh/plugins/base/impl/PluginInformationImpl$1",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginManagerFactory.class",
+      "occurrence": 0,
+      "sha256": "063cfcee0639bd67cdabb193f5e339f2620e7224941a3ef587ec2b63f3f4adb1",
+      "name": "net/xeoh/plugins/base/impl/PluginManagerFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createPluginManager",
+          "descriptor": "()Lnet/xeoh/plugins/base/PluginManager;",
+          "access": 9,
+          "code_sha256": "a6b2a9df1e2cf05573e1796265ba71977f4cfcdca751dd025ec20e301a8ae2dc",
+          "code_length": 11
+        },
+        {
+          "name": "createPluginManager",
+          "descriptor": "(Ljava/util/Properties;)Lnet/xeoh/plugins/base/PluginManager;",
+          "access": 9,
+          "code_sha256": "c5b8cc3a597c0155a6ffa0227b8b2153384219173fcefb96fa34588700c66c50",
+          "code_length": 43
+        },
+        {
+          "name": "setLogLevel",
+          "descriptor": "(Ljava/util/logging/Level;)V",
+          "access": 10,
+          "code_sha256": "abb4f31ec4f90508301f1f0b9d00d7b8e16f0e8cedbedb3457caa5b8f4edf3e8",
+          "code_length": 51
+        }
+      ],
+      "class_references": [
+        "[Ljava/util/logging/Handler;",
+        "java/lang/Object",
+        "java/util/Properties",
+        "java/util/logging/Handler",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/PluginManagerFactory",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginManagerImpl$1.class",
+      "occurrence": 0,
+      "sha256": "5a385680b23e1123e1ce893fee14dbe979f74ac61d0c01790c90ca9784a5f75d",
+      "name": "net/xeoh/plugins/base/impl/PluginManagerImpl$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector"
+      ],
+      "fields": [
+        {
+          "name": "val$caps",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/PluginManagerImpl;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;Ljava/util/Collection;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "selectPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Z",
+          "access": 1,
+          "code_sha256": "404cacc4fe0b501459f3b9d772d87331229da09af815abdd85f07046b1907292",
+          "code_length": 48
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "net/xeoh/plugins/base/PluginInformation",
+        "net/xeoh/plugins/base/PluginInformation$Information",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl$1",
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/PluginManagerImpl.class",
+      "occurrence": 0,
+      "sha256": "d69a9e8455bb5996cef01f6b7dc1da6bf86a3f65d7ce1379abdc8be2dfeb846b",
+      "name": "net/xeoh/plugins/base/impl/PluginManagerImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/PluginManager"
+      ],
+      "fields": [
+        {
+          "name": "configuration",
+          "descriptor": "Lnet/xeoh/plugins/base/PluginConfiguration;",
+          "access": 18
+        },
+        {
+          "name": "pluginRegistry",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginRegistry;",
+          "access": 18
+        },
+        {
+          "name": "classPathManager",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/ClassPathManager;",
+          "access": 18
+        },
+        {
+          "name": "spawner",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/Spawner;",
+          "access": 18
+        },
+        {
+          "name": "shutdownPerformed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "information",
+          "descriptor": "Lnet/xeoh/plugins/base/PluginInformation;",
+          "access": 0
+        },
+        {
+          "name": "diagnosis",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/Diagnosis;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Properties;)V",
+          "access": 4,
+          "code_sha256": "ac761ae96b64a15c8ef1a4fe0445f99bb9f4cbac1540f259214c40e77597be39",
+          "code_length": 92
+        },
+        {
+          "name": "addPluginsFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 129,
+          "code_sha256": "309a3692987e95c8e597f0fcc1ff168d42cad2cd58569fa45d0d05904e13b6d3",
+          "code_length": 154
+        },
+        {
+          "name": "getPlugin",
+          "descriptor": "(Ljava/lang/Class;[Lnet/xeoh/plugins/base/options/GetPluginOption;)Lnet/xeoh/plugins/base/Plugin;",
+          "access": 129,
+          "code_sha256": "eb8c3ccc5ab114bb9645c8d414cb6a83210835bf3e00e7a2bf1b9c4e1c8833c6",
+          "code_length": 561,
+          "generic_signature": "<P::Lnet/xeoh/plugins/base/Plugin;>(Ljava/lang/Class<TP;>;[Lnet/xeoh/plugins/base/options/GetPluginOption;)TP;"
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "299a853d9c890cba10544baf61b7eb7bc479e31711cebf56c5e7b26bf8f928d8",
+          "code_length": 199
+        },
+        {
+          "name": "applyConfig",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f208f80c90798643528e29fb675d4cfa5f728337ba46924e20c4707f5ae0c552",
+          "code_length": 108
+        },
+        {
+          "name": "loadAdditionalPlugins",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c7a437b5d49aecdc712e3773f8290d790bb3161257e1f0f0a9b4c2909568597d",
+          "code_length": 171
+        },
+        {
+          "name": "hookPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;)V",
+          "access": 1,
+          "code_sha256": "3e0dd9cbd3eebbce16fae4a58fdd330548df1a074c7a4eea40158bb84d9bde94",
+          "code_length": 42
+        },
+        {
+          "name": "getClassPathManager",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/ClassPathManager;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "getPluginRegistry",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/registry/PluginRegistry;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getPluginConfiguration",
+          "descriptor": "()Lnet/xeoh/plugins/base/PluginConfiguration;",
+          "access": 1,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5
+        },
+        {
+          "name": "getDiagnosis",
+          "descriptor": "()Lnet/xeoh/plugins/diagnosis/local/Diagnosis;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "getSpawner",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/spawning/Spawner;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreObject",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/PluginConfiguration",
+        "net/xeoh/plugins/base/PluginInformation",
+        "net/xeoh/plugins/base/PluginManager",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/PluginManagerTracer",
+        "net/xeoh/plugins/base/impl/PluginConfigurationImpl",
+        "net/xeoh/plugins/base/impl/PluginInformationImpl",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl$1",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/options/addpluginsfrom/OptionReportAfter",
+        "net/xeoh/plugins/base/options/getplugin/OptionCapabilities",
+        "net/xeoh/plugins/base/options/getplugin/OptionPluginSelector",
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector",
+        "net/xeoh/plugins/base/util/OptionUtils",
+        "net/xeoh/plugins/base/util/PluginConfigurationUtil",
+        "net/xeoh/plugins/diagnosis/local/Diagnosis",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+        "net/xeoh/plugins/diagnosis/local/options/ChannelOption",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo",
+        "net/xeoh/plugins/informationbroker/impl/InformationBrokerImpl"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/ClassPathManager$1.class",
+      "occurrence": 0,
+      "sha256": "12128d308840ddfe08b4f649696d2085414251332fe2b3e4cdc46b7ae90b09ba",
+      "name": "net/xeoh/plugins/base/impl/classpath/ClassPathManager$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/ClassPathManager;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/ClassPathManager;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6f768b59f9c54eea3c52f96eb2a0526bfdd8f58d3cbf72d90d163a9f7a5281ff",
+          "code_length": 68
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/security/PrivilegedAction",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager$1",
+        "org/codehaus/classworlds/ClassWorld",
+        "org/codehaus/classworlds/DuplicateRealmException"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/ClassPathManager.class",
+      "occurrence": 0,
+      "sha256": "8458f5fe8904d4ee78ed3148215f67f57c585d812cdb5ed36810959e0db8bcc3",
+      "name": "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 18
+        },
+        {
+          "name": "cacheLock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "jarCache",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;",
+          "access": 18
+        },
+        {
+          "name": "locator",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator;",
+          "access": 18
+        },
+        {
+          "name": "pluginLoader",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/classpath/loader/AbstractLoader;>;"
+        },
+        {
+          "name": "classWorld",
+          "descriptor": "Lorg/codehaus/classworlds/ClassWorld;",
+          "access": 0
+        },
+        {
+          "name": "initializedProperly",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "eccd8cca2e9318333d065373e5a87baa0dc4e713f56a4678fbd4cc0c64d36960",
+          "code_length": 139
+        },
+        {
+          "name": "addFromLocation",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)Z",
+          "access": 1,
+          "code_sha256": "5c67fb2e32a3732b61bfabf9487b9b9dbf2972c14688bfe6f6f546ba42f87f5d",
+          "code_length": 129
+        },
+        {
+          "name": "loadClass",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "f07b9ad7e0b0d31cead1bef8a4e74d805a2c862a19c6241975217e45950f9671",
+          "code_length": 79,
+          "throws": [
+            "java/lang/ClassNotFoundException"
+          ],
+          "generic_signature": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/String;)Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "findSubclassesFor",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/Class;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "73f8769f74087fec81b47e95c218e93739c3b2373f9aafed41a27cca10c3c49d",
+          "code_length": 480,
+          "generic_signature": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/Class<*>;)Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "registerLocation",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;)V",
+          "access": 1,
+          "code_sha256": "b8b286a5442548bfeceb64e4c6ea32e4bbaecd0a1161c5ed252d27b455db1209",
+          "code_length": 87
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "2fd72346995bf5b2f2ccab979269099a06e17cf3b9499dbadb409b9af20a13a9",
+          "code_length": 46
+        },
+        {
+          "name": "getLocator",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "getCache",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/ClassPathManager;)Ljava/util/logging/Logger;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/net/URI;",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/net/MalformedURLException",
+        "java/net/URI",
+        "java/security/AccessController",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager$1",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation",
+        "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/FileLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/HTTPLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/InternalClasspathLoader",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation",
+        "org/codehaus/classworlds/ClassRealm",
+        "org/codehaus/classworlds/ClassWorld",
+        "org/codehaus/classworlds/DuplicateRealmException",
+        "org/codehaus/classworlds/NoSuchRealmException"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation.class",
+      "occurrence": 0,
+      "sha256": "4eed2515c3f969b5ab1bbefb9688ad537c1f3bc65e0fdd140a77e1f1735d3e36",
+      "name": "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "classes",
+          "descriptor": "Ljava/util/List;",
+          "access": 1,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "subclasses",
+          "descriptor": "Ljava/util/Map;",
+          "access": 1,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/util/Collection<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "lastAccess",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "usageCount",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "classesValid",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2ba558ce13d68f433ff50a0cd591dc70f636ae845895efc0bb4792e6de59892c",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/cache/JARCache.class",
+      "occurrence": 0,
+      "sha256": "e5d53af58346deb41bb6ed70df0aef9dd1e91a0dbb3af01847639e4a806f2016",
+      "name": "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        },
+        {
+          "name": "DEFAULT_CACHE_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "cacheEnabled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "cacheMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation;>;"
+        },
+        {
+          "name": "weakMode",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "cachePath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d7bfdd92d1d9c372dc3b19f89c71bdca3c080fbd14b94fd217a87e132e0afea2",
+          "code_length": 40
+        },
+        {
+          "name": "loadCache",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a42ac108e6a6f61f94fda1764d364323a0dc20c65366530ff002a4063940177a",
+          "code_length": 101
+        },
+        {
+          "name": "getJARInformationFor",
+          "descriptor": "(Ljava/net/URI;)Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation;",
+          "access": 1,
+          "code_sha256": "437456c0754f8d221255e8856f7c8b97d175cc09c382e7d194e9fde5e66d5527",
+          "code_length": 134
+        },
+        {
+          "name": "saveCache",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d341f1131070dbec7fa4fda7a0da1f5e5bb8356dcf810fa799ab3cab7a8f959b",
+          "code_length": 63
+        },
+        {
+          "name": "generateWeakHash",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "28747ec4e09c49cd662f81f236102632f5532756aa45147c871d0b69670deeee",
+          "code_length": 43
+        },
+        {
+          "name": "generateStrongHash",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "99f78b53b21385fd6e52f9c73e88f6c6c64bd36c00586dea6bd46f941e741b1c",
+          "code_length": 430
+        },
+        {
+          "name": "setEnabled",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "6f3ccd4392c6b6479276b26491c6f3882711e31c99d821ce1873c018919326d5",
+          "code_length": 6
+        },
+        {
+          "name": "setWeakMode",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "0baecc81a3a6a02c6f31f7bdd0d08c529c17aa8437c38f15e046bdb5d92f5ce1",
+          "code_length": 20
+        },
+        {
+          "name": "setCachePath",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "31aaee38ace5ee5e60a16dfda67e573c0bac2df9b69a2a5567cd9fdf37b96d9f",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/EOFException",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/Byte",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/security/MessageDigest",
+        "java/security/NoSuchAlgorithmException",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader.class",
+      "occurrence": 0,
+      "sha256": "7f85e6dc0e9c7365d1be1f43212d6fbcb9d294dc9aa37fcc338d508426b92c38",
+      "name": "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 20
+        },
+        {
+          "name": "pluginManager",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/PluginManagerImpl;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "21e51cae67fac4662e088965fa96a09b73257d3a46d4b27c179f46598bf1b453",
+          "code_length": 24
+        },
+        {
+          "name": "handlesURI",
+          "descriptor": "(Ljava/net/URI;)Z",
+          "access": 1025
+        },
+        {
+          "name": "loadFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 1025
+        },
+        {
+          "name": "tryToLoadClassAsPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "397bec16c890a30066dad765337acdf4742786254b8f41d7a06c4f94ef7be149",
+          "code_length": 754
+        },
+        {
+          "name": "processPending",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "3a7e2d0422792e3b01e9365e798389223ce0515a1535ef95a8b7de645d03a657",
+          "code_length": 530
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalStateException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "java/net/URISyntaxException",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Properties",
+        "java/util/Set",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/PluginConfiguration",
+        "net/xeoh/plugins/base/annotations/PluginImplementation",
+        "net/xeoh/plugins/base/annotations/configuration/ConfigurationFile",
+        "net/xeoh/plugins/base/annotations/configuration/IsDisabled",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/options/getplugin/OptionCapabilities",
+        "net/xeoh/plugins/base/util/PluginConfigurationUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/loader/FileLoader.class",
+      "occurrence": 0,
+      "sha256": "dd1608d27276d920bba58fbccc4695c9ad748771d0c51bcfaa4c053bd232529f",
+      "name": "net/xeoh/plugins/base/impl/classpath/loader/FileLoader",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "handlesURI",
+          "descriptor": "(Ljava/net/URI;)Z",
+          "access": 1,
+          "code_sha256": "d0b64ed7db66b427bb00d3fd25cd9916264bf786818e0e8490161b7655333b0f",
+          "code_length": 16
+        },
+        {
+          "name": "loadFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 1,
+          "code_sha256": "994c7d14187ccfc83e3b2f7c2e6fd7e65add1855d9b0c74cb642b7d43085c8d6",
+          "code_length": 125
+        },
+        {
+          "name": "locateAllPluginsAt",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 0,
+          "code_sha256": "7bd44c7f276eca585dfa65f8e6683fe09b8565b7c4891bc85ee8d7d2e7587c17",
+          "code_length": 147
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "java/net/URLDecoder",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/FileLoader",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/loader/HTTPLoader.class",
+      "occurrence": 0,
+      "sha256": "c1d69ca428ad7b3abdac2ff22b1e1cfd9e72150e98054a063504afe44e483fe6",
+      "name": "net/xeoh/plugins/base/impl/classpath/loader/HTTPLoader",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/loader/FileLoader",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "handlesURI",
+          "descriptor": "(Ljava/net/URI;)Z",
+          "access": 1,
+          "code_sha256": "d0b64ed7db66b427bb00d3fd25cd9916264bf786818e0e8490161b7655333b0f",
+          "code_length": 16
+        },
+        {
+          "name": "loadFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 1,
+          "code_sha256": "774618c3f4a21ab12950f1d09f2198ef3c768ffbdbea117cd60cc89b91a371a8",
+          "code_length": 127
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "java/net/URL",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/classpath/loader/FileLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/HTTPLoader"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/loader/InternalClasspathLoader.class",
+      "occurrence": 0,
+      "sha256": "b2bf75523fe2655d91a0f9fe39722143ec3b982d8e301e10e03b4dfd3dc755c9",
+      "name": "net/xeoh/plugins/base/impl/classpath/loader/InternalClasspathLoader",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "handlesURI",
+          "descriptor": "(Ljava/net/URI;)Z",
+          "access": 1,
+          "code_sha256": "d0b64ed7db66b427bb00d3fd25cd9916264bf786818e0e8490161b7655333b0f",
+          "code_length": 16
+        },
+        {
+          "name": "loadFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 1,
+          "code_sha256": "376326a02f116c19ebe8c85e3e78821cdb1f4e4df79c5fda9c3b494b4b0c31e0",
+          "code_length": 123
+        },
+        {
+          "name": "loadAllClasspathPluginClasses",
+          "descriptor": "(Ljava/lang/String;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 2,
+          "code_sha256": "fcfc743a616961366a7f6da3ae636b3c8d1eea21bedb72b2dae747459319ac26",
+          "code_length": 251
+        },
+        {
+          "name": "loadClassFromClasspathByName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "1eeef6a3db281c75015ef2e16a6cffb5980c1116f7f2fdb1f0d7865b24ecb535",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;",
+        "java/lang/OutOfMemoryError",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/logging/Logger",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/classpath/ClassPathManager",
+        "net/xeoh/plugins/base/impl/classpath/loader/AbstractLoader",
+        "net/xeoh/plugins/base/impl/classpath/loader/InternalClasspathLoader",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType.class",
+      "occurrence": 0,
+      "sha256": "b0dc3cd5aeb4e6342ed37bdf5416a42501784fecb0cf7b15eda8ceabfdecfe64",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "JAR",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 16409
+        },
+        {
+          "name": "DIRECTORY",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 16409
+        },
+        {
+          "name": "MULTI_PLUGIN",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;>;",
+      "class_references": [
+        "[Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+        "java/lang/Enum",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation.class",
+      "occurrence": 0,
+      "sha256": "1e16ada8362c691fbaa3f9e4176a2ffc8d828a832537e3f83263bcb2bdd0c9a9",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 20
+        },
+        {
+          "name": "location",
+          "descriptor": "Ljava/net/URI;",
+          "access": 20
+        },
+        {
+          "name": "realm",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        },
+        {
+          "name": "cache",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;",
+          "access": 20
+        },
+        {
+          "name": "cacheEntry",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;Ljava/lang/String;Ljava/net/URI;)V",
+          "access": 4,
+          "code_sha256": "bb09f7eb295ec75ad89e87457188f9af0ed75cb18f21a1816c7a578d74062703",
+          "code_length": 39
+        },
+        {
+          "name": "newClasspathLocation",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;Ljava/lang/String;Ljava/net/URI;)Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;",
+          "access": 9,
+          "code_sha256": "41378de63ed2e952acb747096d97445211c030d5ff67e17f6d34b7c03f1844fc",
+          "code_length": 72
+        },
+        {
+          "name": "getToplevelLocation",
+          "descriptor": "()Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getClasspathLocations",
+          "descriptor": "()[Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "6d3e6cdc731a6c33aa3100035ef341aa9791129a5d7f5d6460348b8e0bc772a5",
+          "code_length": 12
+        },
+        {
+          "name": "getRealm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 1025
+        },
+        {
+          "name": "listToplevelClassNames",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listAllEntries",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/net/URI",
+        "java/util/logging/Logger",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreURI",
+        "net/jcores/options/Option",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/FileClasspathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/MultiPluginClasspathLocation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator$1.class",
+      "occurrence": 0,
+      "sha256": "d1823860429dc2897b66aaddc3a7108e178ab519aefc7ccb23374629e6d35baf",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "val$channel",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/util/DiagnosisChannelUtil;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator;Lnet/xeoh/plugins/diagnosis/local/util/DiagnosisChannelUtil;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f408c6965cf4dc7111471b1d088b21e9ad87975fd4e40219a7f8833bc42c4025",
+          "code_length": 27
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9d18a256f56b210893072023432f54581d7a854519f09e1c61578808a47ffe09",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Ljava/io/File;Ljava/lang/String;>;",
+      "class_references": [
+        "java/io/File",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "net/jcores/interfaces/functions/F1",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator$1",
+        "net/xeoh/plugins/diagnosis/local/util/DiagnosisChannelUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator.class",
+      "occurrence": 0,
+      "sha256": "1eb0e8c8b0278b026f028a0790c3b65c6cc78b66ba69ff7b8025bd495e3f958a",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cache",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;",
+          "access": 18
+        },
+        {
+          "name": "pluginManager",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/PluginManagerImpl;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "findBelow",
+          "descriptor": "(Ljava/net/URI;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "fe2d497dfff63e037b8b33f16b6f490e88a1883695d0e62f412e43dd4c00b9c9",
+          "code_length": 316,
+          "generic_signature": "(Ljava/net/URI;)Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;>;"
+        },
+        {
+          "name": "findInCurrentClassPath",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "b7908f5956818c5b4951ca9daf4233ad14b150648a0496a22c22ac58feb4a148",
+          "code_length": 633,
+          "generic_signature": "()Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation;>;"
+        },
+        {
+          "name": "blacklisted",
+          "descriptor": "([Ljava/lang/String;Ljava/net/URL;)Z",
+          "access": 2,
+          "code_sha256": "ce2abf39608d4606efff72d3ad57fcb83191a0c99c7985f5452a1cbed3495678",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "[Ljava/net/URL;",
+        "java/io/File",
+        "java/io/PrintStream",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/net/MalformedURLException",
+        "java/net/URI",
+        "java/net/URL",
+        "java/net/URLClassLoader",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/List",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreURI",
+        "net/jcores/options/Option",
+        "net/xeoh/plugins/base/PluginManager",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/SpawnerTracer",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator",
+        "net/xeoh/plugins/base/impl/classpath/locator/ClassPathLocator$1",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/util/PluginConfigurationUtil",
+        "net/xeoh/plugins/diagnosis/local/Diagnosis",
+        "net/xeoh/plugins/diagnosis/local/options/ChannelOption",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/util/DiagnosisChannelUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/locations/FileClasspathLocation.class",
+      "occurrence": 0,
+      "sha256": "996724eb48f6836c6f2ac934f477785a7b46212ff3a6d29e0c8640291747155a",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/locations/FileClasspathLocation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;Ljava/lang/String;Ljava/net/URI;)V",
+          "access": 1,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "b7135a7109733a0dc4c21cc0cedb4b2d74c2b797499c8a07dff6a17fefe59993",
+          "code_length": 60
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 1,
+          "code_sha256": "488e046b0339cdd055af549006d75fd7a0410124bbffda8b737dc41c02b7d401",
+          "code_length": 4
+        },
+        {
+          "name": "listAllEntries",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "56fb43bb237f15684a12011d97420e8c499191a18707c75424f841872eb18f54",
+          "code_length": 142,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listToplevelClassNames",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "03d6a2cfa6a25113c91de1a0f25e85c6231a8cbb4b0cdabb317ffc04c142b83f",
+          "code_length": 184,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getFileListing",
+          "descriptor": "(Ljava/io/File;Ljava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "411a191a7a9718754ef8fdf351c9b85a8b34cff2a53beea9f4390192b8177cfe",
+          "code_length": 281,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ],
+          "generic_signature": "(Ljava/io/File;Ljava/util/List<Ljava/lang/String;>;)Ljava/util/List<Ljava/io/File;>;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/logging/Logger",
+        "java/util/regex/Pattern",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/FileClasspathLocation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation.class",
+      "occurrence": 0,
+      "sha256": "3e65739ee60ed399df88908a66a441105ececd1d06ae0e2ca6f8e7809592066f",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;Ljava/lang/String;Ljava/net/URI;)V",
+          "access": 1,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        },
+        {
+          "name": "getCacheEntry",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation;",
+          "access": 1,
+          "code_sha256": "e554ba9616aa480a01baa5a5b4debf81e904ace91c71c00dcceaad9ca5d0293b",
+          "code_length": 37
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 1,
+          "code_sha256": "7dce45470ce11b005c4bd504408c0a8d8802f3d308124b41edb171ccc07c237c",
+          "code_length": 4
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "5474e025b31ad11a84a6055e1559ccdd7dfa727f222c7fa87860be907c1215a6",
+          "code_length": 140
+        },
+        {
+          "name": "getPredefinedPluginList",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listAllEntries",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "5a00e438758914eefbe64af1134d813bd1080f2e9e69dfef48a47b5f95e2b89f",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listToplevelClassNames",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "42a836de0b438384547bf4ee487f2899f5c48858f1ae3d105a8d06daae196b32",
+          "code_length": 25,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listAllEntriesFor",
+          "descriptor": "(Ljava/net/URI;)Ljava/util/Collection;",
+          "access": 9,
+          "code_sha256": "15f4a4f0384bbd38da9e65b6dfc6215f9a1eb04943e6db665e1375ad2bc1b153",
+          "code_length": 138,
+          "generic_signature": "(Ljava/net/URI;)Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listToplevelClassNamesForURI",
+          "descriptor": "(Ljava/net/URI;)Ljava/util/Collection;",
+          "access": 9,
+          "code_sha256": "61b53d81e7565930250a2cf0a47e82b59c7386c4b073e56f25d406f246142edb",
+          "code_length": 191,
+          "generic_signature": "(Ljava/net/URI;)Ljava/util/Collection<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/JarURLConnection",
+        "java/net/MalformedURLException",
+        "java/net/URI",
+        "java/net/URISyntaxException",
+        "java/net/URL",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Enumeration",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache",
+        "net/xeoh/plugins/base/impl/classpath/cache/JARCache$JARInformation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/classpath/locator/locations/MultiPluginClasspathLocation.class",
+      "occurrence": 0,
+      "sha256": "37da5e761f5c08892ed18d832be91216907a039a1ed04c0696cfe15212c7d7ac",
+      "name": "net/xeoh/plugins/base/impl/classpath/locator/locations/MultiPluginClasspathLocation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "entryMapping",
+          "descriptor": "Ljava/util/Map;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "allJARs",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Collection<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/classpath/cache/JARCache;Ljava/lang/String;Ljava/net/URI;)V",
+          "access": 1,
+          "code_sha256": "e5b6400fd122e5fa1ab3b6ebdd58beb19e8640e3e2b8bbc6b15c6177d5371384",
+          "code_length": 59
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lnet/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType;",
+          "access": 1,
+          "code_sha256": "30964dee0d5291b07f18e5d16c6504139b196b31bb6bd5dfae8317382ab4874b",
+          "code_length": 4
+        },
+        {
+          "name": "getClasspathLocations",
+          "descriptor": "()[Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "883492f54ddd97da0c977f316082d0187b23e5330c4ecf46532eb334da3e1384",
+          "code_length": 26
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "073ddd7c7b398bdccad5cce47da2706ea367c82cf1a94814911061a89dfd458f",
+          "code_length": 170
+        },
+        {
+          "name": "listAllEntries",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "badb1172a54581c4215a3066c54e303c7f4bdce25c199fc4d87005c832f74357",
+          "code_length": 105,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "listToplevelClassNames",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "a7111883697e7dbe674577845f868cda3248f602127a9ca399b613a398b44f32",
+          "code_length": 112,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/net/URI;",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/JarURLConnection",
+        "java/net/MalformedURLException",
+        "java/net/URI",
+        "java/net/URISyntaxException",
+        "java/net/URL",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Enumeration",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreFile",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/cores/CoreURI",
+        "net/jcores/options/Option",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/AbstractClassPathLocation$LocationType",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/JARClasspathLocation",
+        "net/xeoh/plugins/base/impl/classpath/locator/locations/MultiPluginClasspathLocation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/jmx/MBeansDiagnosisProvider.class",
+      "occurrence": 0,
+      "sha256": "42fc1c95a0de1b48ec678245815e67187c6311de8cb0b8b6dedc64e268ca8a29",
+      "name": "net/xeoh/plugins/base/impl/jmx/MBeansDiagnosisProvider",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/management/DynamicMBean"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cfcb83f42714c118fea22238dfc4bdc4b68fb5e47b4552e36eba915dd012a9bf",
+          "code_length": 97,
+          "throws": [
+            "javax/management/InstanceAlreadyExistsException",
+            "javax/management/MBeanRegistrationException",
+            "javax/management/NotCompliantMBeanException",
+            "javax/management/MalformedObjectNameException",
+            "javax/management/ReflectionException",
+            "javax/management/MBeanException",
+            "java/lang/NullPointerException"
+          ]
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "24a7f3162fdb8672543a0aac243f59872783cadbd4c382135dda5aa30b634d9f",
+          "code_length": 15,
+          "throws": [
+            "javax/management/InstanceAlreadyExistsException",
+            "javax/management/MBeanRegistrationException",
+            "javax/management/NotCompliantMBeanException",
+            "javax/management/MalformedObjectNameException",
+            "javax/management/ReflectionException",
+            "javax/management/MBeanException",
+            "java/lang/NullPointerException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8d2fda6e89fd8e0270c4764f12efcbd60d0bb269fd1ebac391fdf4d1d0dfaaf1",
+          "code_length": 27,
+          "throws": [
+            "javax/management/AttributeNotFoundException",
+            "javax/management/MBeanException",
+            "javax/management/ReflectionException"
+          ]
+        },
+        {
+          "name": "getAttributes",
+          "descriptor": "([Ljava/lang/String;)Ljavax/management/AttributeList;",
+          "access": 1,
+          "code_sha256": "b733216ef8dca47866ec5e365e464bb4dc620cfdb48d5172cea831b12535222c",
+          "code_length": 10
+        },
+        {
+          "name": "getMBeanInfo",
+          "descriptor": "()Ljavax/management/MBeanInfo;",
+          "access": 1,
+          "code_sha256": "4484fd7a2676b11e30633c17f1d2db9531d3016c6a089b3d1d837553a77147b5",
+          "code_length": 116
+        },
+        {
+          "name": "invoke",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "javax/management/MBeanException",
+            "javax/management/ReflectionException"
+          ]
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljavax/management/Attribute;)V",
+          "access": 1,
+          "code_sha256": "44f2bde99cfee1bcc0431bfd75340c5ca7a51fd6a1b3049061638f5e52310f8e",
+          "code_length": 9,
+          "throws": [
+            "javax/management/AttributeNotFoundException",
+            "javax/management/InvalidAttributeValueException",
+            "javax/management/MBeanException",
+            "javax/management/ReflectionException"
+          ]
+        },
+        {
+          "name": "setAttributes",
+          "descriptor": "(Ljavax/management/AttributeList;)Ljavax/management/AttributeList;",
+          "access": 1,
+          "code_sha256": "c62397ff696b00ffea436785844ae309069d4fefacdfebda59c27c6d8715a620",
+          "code_length": 10
+        },
+        {
+          "name": "test",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3b3abe2d21ca01351cb599e1ab0a544029a883b7cbdedae7ee6817cad1450a41",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/InterruptedException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/management/ManagementFactory",
+        "java/util/Iterator",
+        "java/util/Set",
+        "javax/management/AttributeNotFoundException",
+        "javax/management/DynamicMBean",
+        "javax/management/InstanceAlreadyExistsException",
+        "javax/management/IntrospectionException",
+        "javax/management/InvalidAttributeValueException",
+        "javax/management/MBeanAttributeInfo",
+        "javax/management/MBeanConstructorInfo",
+        "javax/management/MBeanException",
+        "javax/management/MBeanInfo",
+        "javax/management/MBeanNotificationInfo",
+        "javax/management/MBeanOperationInfo",
+        "javax/management/MBeanRegistrationException",
+        "javax/management/MBeanServer",
+        "javax/management/MalformedObjectNameException",
+        "javax/management/NotCompliantMBeanException",
+        "javax/management/ObjectInstance",
+        "javax/management/ObjectName",
+        "javax/management/ReflectionException",
+        "net/xeoh/plugins/base/impl/jmx/MBeansDiagnosisProvider"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency.class",
+      "occurrence": 0,
+      "sha256": "40b0ba7430bafb458a98c626789c39a6e0ca78fb1a7f79d66173fd8bf3025f49",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pluginClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 1,
+          "generic_signature": "Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;"
+        },
+        {
+          "name": "capabilites",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "isOptional",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bf22728a4b4a99cddf59ac9b75b94f3c3d328128c56afd44c2f12305202cf055",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus.class",
+      "occurrence": 0,
+      "sha256": "3269247a45315904b35901ab58f24bc14619dbfb230a174a053c876aae12457e",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNDEFINED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "ACCEPTED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "DISABLED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "CONTAINS_UNRESOLVED_DEPENDENCIES",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "SPAWNABLE",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "LAZY_SPAWNED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "SPAWNED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "FAILED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1c6f686821606b876d8e4a9a466949db9b2fb56fd152b3a9168b1625f261e17d",
+          "code_length": 165
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;>;",
+      "class_references": [
+        "[Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+        "java/lang/Enum",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation.class",
+      "occurrence": 0,
+      "sha256": "fb674ee0f36d0a283ecbca15ab9ae0883b16563626ca135bbf1ea50659f99475",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pluginClassStatus",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;",
+          "access": 1
+        },
+        {
+          "name": "pluginOrigin",
+          "descriptor": "Ljava/net/URI;",
+          "access": 1
+        },
+        {
+          "name": "dependencies",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 1,
+          "generic_signature": "Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5bc888f0979f84ab32e0770886de0211e77e552e045ce8de588afc195c3f810",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation.class",
+      "occurrence": 0,
+      "sha256": "a8647d80c5395da9460bf5945710d72de51f3848139fafce821607e816582c8d",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "method",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 1
+        },
+        {
+          "name": "baseType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 1,
+          "generic_signature": "Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;"
+        },
+        {
+          "name": "calledWith",
+          "descriptor": "Ljava/util/List;",
+          "access": 1,
+          "generic_signature": "Ljava/util/List<Lnet/xeoh/plugins/base/Plugin;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus.class",
+      "occurrence": 0,
+      "sha256": "3d6aa39ab32fb5c139e5a23bf4e721534061784062355a7fb0db0d557142efd1",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNDEFINED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "SPAWNED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "INITIALIZED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "ACTIVE",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "TERMINATED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "FAILED",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a2379a0d04ba332bc09778f3fcaaeb79d96df13f17600922b9eb27d073d2e846",
+          "code_length": 123
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;>;",
+      "class_references": [
+        "[Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+        "java/lang/Enum",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation.class",
+      "occurrence": 0,
+      "sha256": "a9477ad823e2d3a2b8d6fd1f0d84cc23eb5b3e8126839478bd574ab6d0f42f28",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pluginStatus",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus;",
+          "access": 1
+        },
+        {
+          "name": "classMeta",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;",
+          "access": 1
+        },
+        {
+          "name": "threads",
+          "descriptor": "Ljava/util/List;",
+          "access": 17,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Thread;>;"
+        },
+        {
+          "name": "timerTasks",
+          "descriptor": "Ljava/util/List;",
+          "access": 17,
+          "generic_signature": "Ljava/util/List<Ljava/util/TimerTask;>;"
+        },
+        {
+          "name": "timers",
+          "descriptor": "Ljava/util/List;",
+          "access": 17,
+          "generic_signature": "Ljava/util/List<Ljava/util/Timer;>;"
+        },
+        {
+          "name": "pluginLoadedInformation",
+          "descriptor": "Ljava/util/List;",
+          "access": 17,
+          "generic_signature": "Ljava/util/List<Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation;>;"
+        },
+        {
+          "name": "spawnTime",
+          "descriptor": "J",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "359d79723d26178e4ff6815d49be50ef8b5fd4f9a253cb05943b5b97989620b0",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginRegistry$1.class",
+      "occurrence": 0,
+      "sha256": "6d27962629f1a4c21f36d830314f47d66bde314f853122ecc1577764d3e51eac",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginRegistry$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/jcores/interfaces/functions/F1"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginRegistry;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/registry/PluginRegistry;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "f",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "77f99f8fd26dcf72a74ff92f8df32330a6cfcf817ff8d6763b747dfece345afc",
+          "code_length": 8
+        },
+        {
+          "name": "f",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "33f1560dd118727396d2341011ce2c7fe381c13671af0280528a10afaf72c200",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/jcores/interfaces/functions/F1<Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency;Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "net/jcores/interfaces/functions/F1",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry$1"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/registry/PluginRegistry.class",
+      "occurrence": 0,
+      "sha256": "7f1407c6535fef7963b5914b29a266fbb1a98bc64beba6328c32f988142eb2fb",
+      "name": "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pluginMetaInformation",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Lnet/xeoh/plugins/base/Plugin;Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;>;"
+        },
+        {
+          "name": "pluginClassMetaInformation",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "07b03827efea17be9500c0a7aa317d38cc1d93a8d71dd30b14218113e9ab2d5c",
+          "code_length": 27
+        },
+        {
+          "name": "getAllPlugins",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "388ce9986d9f8c4930d4621feb287e5a84ca312e2464bb17ff2f21d6a49541f5",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/Collection<Lnet/xeoh/plugins/base/Plugin;>;"
+        },
+        {
+          "name": "getMetaInformationFor",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;",
+          "access": 1,
+          "code_sha256": "8da908fdc2baf8f0a83e55835f10d3d437750988a7aca336f92129b7bc3f7a08",
+          "code_length": 14
+        },
+        {
+          "name": "getMetaInformationFor",
+          "descriptor": "(Ljava/lang/Class;)Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;",
+          "access": 1,
+          "code_sha256": "c1c8365bda26bef6c110d2a874678a558c6665cad7a9ebc678006c98ec16c752",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d5c9a903db28f069e0d1534ad29ff0f0e0fb679e0db4e298e3b30673fa702ce1",
+          "code_length": 19
+        },
+        {
+          "name": "registerPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;)V",
+          "access": 1,
+          "code_sha256": "dc3b984efb918a602c89ebd41168b3911618c1b38b0295ab8fd5e357431ea1fc",
+          "code_length": 13
+        },
+        {
+          "name": "registerPluginClass",
+          "descriptor": "(Ljava/lang/Class;Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;)V",
+          "access": 1,
+          "code_sha256": "4344bdec3f2773c87244654e2843cb06cab0b7101a7b3ec873ee21027f655c0b",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation;)V"
+        },
+        {
+          "name": "getPluginClassesWithStatus",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "7c8a7d4d6bd58df5b9f38815de8d5ca7f30824d345078323b0625a6d07463566",
+          "code_length": 87,
+          "generic_signature": "(Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus;)Ljava/util/Collection<Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;>;"
+        },
+        {
+          "name": "report",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c6c78e3bd64d7603b404d2e6bfc05b1f10558666e9a0896e1c98db26372826a4",
+          "code_length": 325
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/jcores/options/Option",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$PluginClassStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry$1"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/SpawnResult.class",
+      "occurrence": 0,
+      "sha256": "a47f42db119e812318a94a29203c45cc22c27f98ddd37cc2ca7d1131f63d6d25",
+      "name": "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "plugin",
+          "descriptor": "Lnet/xeoh/plugins/base/Plugin;",
+          "access": 17
+        },
+        {
+          "name": "metaInformation",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;",
+          "access": 17
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "7b6bb5876301f6206e7c3d2af49c2d69f913adedef567f045f11caca8e202398",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/Spawner$1.class",
+      "occurrence": 0,
+      "sha256": "139de1d873b2afafaac59048b1012ac5f6e3645bd46d14109363204b9067c5a4",
+      "name": "net/xeoh/plugins/base/impl/spawning/Spawner$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/TimerTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$c",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/Spawner;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/Spawner;Ljava/lang/Class;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f1b544eb58e40b8425deaf37dd6cc4299204d79869e3af4b64da693173d6b936",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/util/TimerTask",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$1",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/Spawner$2.class",
+      "occurrence": 0,
+      "sha256": "cee1f6bdf21b72ffc793e5d6b725d5a0764f004237cddd0e39a6cc6a9c394754",
+      "name": "net/xeoh/plugins/base/impl/spawning/Spawner$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$method",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 4112
+        },
+        {
+          "name": "val$spawnResult",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/Spawner;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/Spawner;Ljava/lang/reflect/Method;Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;)V",
+          "access": 0,
+          "code_sha256": "6df851e594d2f852ca23f9b66080831cfbe8e8ae7cc0dbd69f721b0a005621df",
+          "code_length": 20
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "10c4721a098043c4f2fe46346c565610a0d06de37ad9e85348765572acbbd3d9",
+          "code_length": 188
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$2",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/Spawner$3.class",
+      "occurrence": 0,
+      "sha256": "f33ecb021853c8fde04dcfa6a6932353fd284ef26e8de415e717eee0aca7d4fc",
+      "name": "net/xeoh/plugins/base/impl/spawning/Spawner$3",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/TimerTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$method",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 4112
+        },
+        {
+          "name": "val$spawnResult",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;",
+          "access": 4112
+        },
+        {
+          "name": "val$t",
+          "descriptor": "Ljava/util/Timer;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/spawning/Spawner;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/Spawner;Ljava/lang/reflect/Method;Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;Ljava/util/Timer;)V",
+          "access": 0,
+          "code_sha256": "e7df5de3f86295b83769a03058ab4a6e9cfc736dbdf1120b93fc74e6e83a2ef4",
+          "code_length": 26
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "46286a85753d0111a40ec9fef735da0267df4af2a61a6d49af3c2826545a85e0",
+          "code_length": 216
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/util/Timer",
+        "java/util/TimerTask",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$3",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/Spawner.class",
+      "occurrence": 0,
+      "sha256": "8d1ea2984b45e18e3c517ce41d6e4d7c191bce51090edf3b834ad67f4ad4170f",
+      "name": "net/xeoh/plugins/base/impl/spawning/Spawner",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "diagnosis",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel;",
+          "access": 0,
+          "generic_signature": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel<Ljava/lang/String;>;"
+        },
+        {
+          "name": "pluginManager",
+          "descriptor": "Lnet/xeoh/plugins/base/impl/PluginManagerImpl;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/PluginManagerImpl;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "destroyPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;)V",
+          "access": 1,
+          "code_sha256": "22139d1cc9884ad3b793cc26ec7c39f330334c69746b6de0e594900aeedc0963",
+          "code_length": 189
+        },
+        {
+          "name": "processThisPluginLoadedAnnotation",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;Lnet/xeoh/plugins/base/impl/registry/PluginMetaInformation;)V",
+          "access": 1,
+          "code_sha256": "eb768adf1c91b453ea91398db4791bf36cc96204bde699db61547766424cbca8",
+          "code_length": 151
+        },
+        {
+          "name": "processOtherPluginLoadedAnnotation",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "7db8bb38f1cb45941eea088fbb4fe426d41e1b581fe54ad18498b01b5b92e54c",
+          "code_length": 181
+        },
+        {
+          "name": "spawnPlugin",
+          "descriptor": "(Ljava/lang/Class;)Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;",
+          "access": 1,
+          "code_sha256": "0dc3f3a963524f307ad05c26f42ac7aa8fe2bef041272cd45fa98a89354e20c9",
+          "code_length": 810
+        },
+        {
+          "name": "callInitMethods",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;[Ljava/lang/reflect/Method;)Z",
+          "access": 2,
+          "code_sha256": "6b2d198dcb3811c8c7638cdba5283d406e39b3f31e5d53cc05953fd0e28eb718",
+          "code_length": 447,
+          "throws": [
+            "java/lang/IllegalAccessException"
+          ]
+        },
+        {
+          "name": "callShutdownMethods",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 2,
+          "code_sha256": "834b843627e6f1ec3210da85d6b00812f0a42318b5d061872f2a1019fccdb465",
+          "code_length": 345
+        },
+        {
+          "name": "getMethods",
+          "descriptor": "(Ljava/lang/Class;)[Ljava/lang/reflect/Method;",
+          "access": 2,
+          "code_sha256": "5c0abb0be6b10f4aff9f99fced75e5e0a2b803e00537dcc04ccb5c35d9bf60fb",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)[Ljava/lang/reflect/Method;"
+        },
+        {
+          "name": "spawnThreads",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;[Ljava/lang/reflect/Method;)V",
+          "access": 2,
+          "code_sha256": "009505dfc2ce7b395954465ff107ad96fb39470436a26a08c8bf578ee2af3c4f",
+          "code_length": 265
+        },
+        {
+          "name": "obtainPluginLoadedMethods",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;[Ljava/lang/reflect/Method;)V",
+          "access": 2,
+          "code_sha256": "a5d12f666e8497535b8e68eef22d98afc64ce8066218e7d1f14386ee16bc483d",
+          "code_length": 159
+        },
+        {
+          "name": "spawnTimer",
+          "descriptor": "(Lnet/xeoh/plugins/base/impl/spawning/SpawnResult;[Ljava/lang/reflect/Method;)V",
+          "access": 2,
+          "code_sha256": "2591165a6d675ec9be8bfe5aab4824532804b6703fc88ab2ebd15846f51c66dc",
+          "code_length": 239
+        },
+        {
+          "name": "getDependencies",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "f73ce44c770ed1cc6c7d25cf2707698cbab78d5c824a68f8398e831e6e04b5cd",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency;>;"
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/lang/String;[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;)V",
+          "access": 128,
+          "code_sha256": "3c22bb2b1f7e09e4cd5b0118d171ad0ed7fec9d021b0ebc900d091e8870118a9",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/reflect/Method;",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Timer",
+        "java/util/TimerTask",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/annotations/Thread",
+        "net/xeoh/plugins/base/annotations/Timer",
+        "net/xeoh/plugins/base/annotations/Timer$TimerType",
+        "net/xeoh/plugins/base/annotations/events/Init",
+        "net/xeoh/plugins/base/annotations/events/PluginLoaded",
+        "net/xeoh/plugins/base/annotations/events/Shutdown",
+        "net/xeoh/plugins/base/diagnosis/channels/tracing/SpawnerTracer",
+        "net/xeoh/plugins/base/impl/PluginManagerImpl",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginLoadedInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginMetaInformation$PluginStatus",
+        "net/xeoh/plugins/base/impl/registry/PluginRegistry",
+        "net/xeoh/plugins/base/impl/spawning/SpawnResult",
+        "net/xeoh/plugins/base/impl/spawning/Spawner",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$1",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$2",
+        "net/xeoh/plugins/base/impl/spawning/Spawner$3",
+        "net/xeoh/plugins/base/impl/spawning/handler/InjectHandler",
+        "net/xeoh/plugins/base/util/PluginManagerUtil",
+        "net/xeoh/plugins/diagnosis/local/Diagnosis",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel",
+        "net/xeoh/plugins/diagnosis/local/options/ChannelOption",
+        "net/xeoh/plugins/diagnosis/local/options/StatusOption",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/handler/AbstractHandler.class",
+      "occurrence": 0,
+      "sha256": "c3567e798e18fba6d45504f3881e30a6bd060b5a1440955864b7f6008d548e46",
+      "name": "net/xeoh/plugins/base/impl/spawning/handler/AbstractHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pluginManager",
+          "descriptor": "Lnet/xeoh/plugins/base/PluginManager;",
+          "access": 16
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/PluginManager;)V",
+          "access": 1,
+          "code_sha256": "21e51cae67fac4662e088965fa96a09b73257d3a46d4b27c179f46598bf1b453",
+          "code_length": 24
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "deinit",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/impl/spawning/handler/AbstractHandler"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/spawning/handler/InjectHandler.class",
+      "occurrence": 0,
+      "sha256": "53d0e6d821794c2b2cd0126342a49e2ab009f92f81326856a4bd8a9b492a3cef",
+      "name": "net/xeoh/plugins/base/impl/spawning/handler/InjectHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/impl/spawning/handler/AbstractHandler",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/PluginManager;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "32a02da62036ba4ae2b60340778f9d146d4ec100a6b91eaf232bed0c8ffaee77",
+          "code_length": 381,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "deinit",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getTrueDependencyInterfaceType",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 0,
+          "code_sha256": "b0739f4fca8ba5c7afe7382396f41ec38c3b1b6268cdd28ee62adaf9897e7ee2",
+          "code_length": 85,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "getEntityForType",
+          "descriptor": "(Ljava/lang/Class;[Ljava/lang/String;)Lnet/xeoh/plugins/base/Plugin;",
+          "access": 128,
+          "code_sha256": "c3b654866a27e6de204b8bd351f49722c49398c13768d70549367b743c311bdd",
+          "code_length": 174,
+          "generic_signature": "(Ljava/lang/Class<*>;[Ljava/lang/String;)Lnet/xeoh/plugins/base/Plugin;"
+        },
+        {
+          "name": "getDependencies",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "94f0f1eb0494acc6630a427200a86a9aa5de81ca23cadd32290ba5c9ed268d61",
+          "code_length": 278,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)Ljava/util/Collection<Lnet/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency;>;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/String;",
+        "[Ljava/lang/reflect/Constructor;",
+        "[Ljava/lang/reflect/Field;",
+        "[Ljava/lang/reflect/Method;",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/PluginManager",
+        "net/xeoh/plugins/base/annotations/injections/InjectPlugin",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation",
+        "net/xeoh/plugins/base/impl/registry/PluginClassMetaInformation$Dependency",
+        "net/xeoh/plugins/base/impl/spawning/handler/AbstractHandler",
+        "net/xeoh/plugins/base/impl/spawning/handler/InjectHandler",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/options/getplugin/OptionCapabilities"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/impl/util/Benchmarker.class",
+      "occurrence": 0,
+      "sha256": "812043608c3b6f59cb98fff0baedea31f17d0efe3fa8466b5678aed23d7890d0",
+      "name": "net/xeoh/plugins/base/impl/util/Benchmarker",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "times",
+          "descriptor": "Ljava/util/Map;",
+          "access": 8,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Integer;Ljava/lang/Long;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "start",
+          "descriptor": "(I)V",
+          "access": 9,
+          "code_sha256": "cc3ff31fd37bda229ef5e15995037855f3ded138c8bb31c3e428eb1aeb0c0e90",
+          "code_length": 20
+        },
+        {
+          "name": "stop",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "2d4766bbbea9bdbeab471955549252f82b21de921dddae4d01adc28c9714ed0c",
+          "code_length": 61
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d1158f7bcd620cc8e3af91d340ecb67ed22507017b18723672b8b1138b0b5349",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/HashMap",
+        "java/util/Map",
+        "net/xeoh/plugins/base/impl/util/Benchmarker"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/AddPluginsFromOption.class",
+      "occurrence": 0,
+      "sha256": "440929a2269a9de8b3ae912ece2aabef5a05d89121ee0d7c8f85a1becd913391",
+      "name": "net/xeoh/plugins/base/options/AddPluginsFromOption",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/Option"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/Option",
+        "net/xeoh/plugins/base/options/AddPluginsFromOption"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/GetPluginOption.class",
+      "occurrence": 0,
+      "sha256": "e11fc4c5057839a185fa80a97580c8078d1151cb45959936bf0ff493a9a48569",
+      "name": "net/xeoh/plugins/base/options/GetPluginOption",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/Option"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/Option",
+        "net/xeoh/plugins/base/options/GetPluginOption"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/addpluginsfrom/OptionReportAfter.class",
+      "occurrence": 0,
+      "sha256": "8148f495cb7286be2df25951417718f004cc2c4b07634cb88a99707503538d95",
+      "name": "net/xeoh/plugins/base/options/addpluginsfrom/OptionReportAfter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/AddPluginsFromOption"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/options/AddPluginsFromOption",
+        "net/xeoh/plugins/base/options/addpluginsfrom/OptionReportAfter"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/getplugin/OptionCapabilities.class",
+      "occurrence": 0,
+      "sha256": "eb66925fc190723e3fa53d10fb62a7ba0c6cc047bfb35b2c2c1271bd5fa949ef",
+      "name": "net/xeoh/plugins/base/options/getplugin/OptionCapabilities",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/GetPluginOption"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "caps",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 129,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getCapabilities",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/options/getplugin/OptionCapabilities"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/getplugin/OptionPluginSelector.class",
+      "occurrence": 0,
+      "sha256": "238a8ef58f4bffeac2f595270dfe22d95a9c9ec66b60b034bc72b1c24a5043c6",
+      "name": "net/xeoh/plugins/base/options/getplugin/OptionPluginSelector",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/GetPluginOption"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;",
+          "access": 2,
+          "generic_signature": "Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;)V"
+        },
+        {
+          "name": "getSelector",
+          "descriptor": "()Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;"
+        }
+      ],
+      "generic_signature": "<P::Lnet/xeoh/plugins/base/Plugin;>Ljava/lang/Object;Lnet/xeoh/plugins/base/options/GetPluginOption;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/options/getplugin/OptionPluginSelector"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/options/getplugin/PluginSelector.class",
+      "occurrence": 0,
+      "sha256": "d91ce971003d700a7691c55b9f2a87a971dd8d72a991df1c39d938e014850b4c",
+      "name": "net/xeoh/plugins/base/options/getplugin/PluginSelector",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "selectPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Z",
+          "access": 1025,
+          "generic_signature": "(TT;)Z"
+        }
+      ],
+      "generic_signature": "<T::Lnet/xeoh/plugins/base/Plugin;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/JSPFProperties.class",
+      "occurrence": 0,
+      "sha256": "cfc0fe8a3614d6f6f607e2597870cfbbecf13f8f3750fbd279dc069eb3a7957f",
+      "name": "net/xeoh/plugins/base/util/JSPFProperties",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Properties",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cddc5bccf0407ebaa15b8736e8a16f17ffdb06d08493beebc0907c25dfa9504b",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;Ljava/lang/String;)V"
+        },
+        {
+          "name": "getKey",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "1d2a8aa28a57cc17635771cc51a70acd3eefb6837de80dc16b5d1d0d4b63c227",
+          "code_length": 49,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/String;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Properties",
+        "net/xeoh/plugins/base/util/JSPFProperties"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/OptionHandler.class",
+      "occurrence": 0,
+      "sha256": "a496ad5d931f8b3667a492dbc1df3f8713f97a3b5a1847d6cb302e6e56c73a40",
+      "name": "net/xeoh/plugins/base/util/OptionHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "handle",
+          "descriptor": "(Lnet/xeoh/plugins/base/Option;)V",
+          "access": 1025,
+          "generic_signature": "(TT;)V"
+        }
+      ],
+      "generic_signature": "<T::Lnet/xeoh/plugins/base/Option;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/util/OptionHandler"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/OptionUtils.class",
+      "occurrence": 0,
+      "sha256": "61386bda8ba134582cb1b9043a2b664f8bbe4cecf475b05427941b9c4e2cb213",
+      "name": "net/xeoh/plugins/base/util/OptionUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/util/VanillaUtil",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lnet/xeoh/plugins/base/Option;)V",
+          "access": 129,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6,
+          "generic_signature": "([TT;)V"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "b2367f71b1f4ef940f8f4e0c219063e399e0c2d8011ccbf05dcc0b0f06ef8b3a",
+          "code_length": 56,
+          "generic_signature": "(Ljava/lang/Class<+TT;>;)Z"
+        },
+        {
+          "name": "containsAny",
+          "descriptor": "([Ljava/lang/Class;)Z",
+          "access": 129,
+          "code_sha256": "34e670540dd241cd83420516a25250beaae2f54aa514b93937ed2f914c34e050",
+          "code_length": 88,
+          "generic_signature": "([Ljava/lang/Class<+TT;>;)Z"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;[Lnet/xeoh/plugins/base/Option;)Lnet/xeoh/plugins/base/Option;",
+          "access": 129,
+          "code_sha256": "01c812f09399f9e9e3894b8d9c61a5e4d2a268866895dcda48f8eb8dc9273e13",
+          "code_length": 68,
+          "generic_signature": "<O:TT;>(Ljava/lang/Class<+TO;>;[TO;)TO;"
+        },
+        {
+          "name": "getAll",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "2fe8a1ab08d1fb84e21ef59823672323caf4571a24a4ab9c484d440112fa76ce",
+          "code_length": 73,
+          "generic_signature": "<O:TT;>(Ljava/lang/Class<+TO;>;)Ljava/util/Collection<TO;>;"
+        },
+        {
+          "name": "handle",
+          "descriptor": "(Ljava/lang/Class;Lnet/xeoh/plugins/base/util/OptionHandler;)V",
+          "access": 1,
+          "code_sha256": "a7b1485c6cabec7d52745d7b9d5f328e56b2ff145ec6e1b3bfc43ac9b80cf825",
+          "code_length": 63,
+          "generic_signature": "<O:TT;>(Ljava/lang/Class<+TO;>;Lnet/xeoh/plugins/base/util/OptionHandler<TO;>;)V"
+        }
+      ],
+      "generic_signature": "<T::Lnet/xeoh/plugins/base/Option;>Lnet/xeoh/plugins/base/util/VanillaUtil<[TT;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Lnet/xeoh/plugins/base/Option;",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "net/xeoh/plugins/base/Option",
+        "net/xeoh/plugins/base/util/OptionHandler",
+        "net/xeoh/plugins/base/util/OptionUtils",
+        "net/xeoh/plugins/base/util/VanillaUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/PluginConfigurationUtil.class",
+      "occurrence": 0,
+      "sha256": "c27ff998a9e0d953e447e811033a9f0a4283095022f2e9b8d3fd135cefcecb75",
+      "name": "net/xeoh/plugins/base/util/PluginConfigurationUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/util/VanillaPluginUtil",
+      "interfaces": [
+        "net/xeoh/plugins/base/PluginConfiguration"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/PluginConfiguration;)V",
+          "access": 1,
+          "code_sha256": "412d1a0f25278168e7609d5c40a303fa5a77c265cc9c1e573a6957c5895072a6",
+          "code_length": 20
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Integer;)I",
+          "access": 129,
+          "code_sha256": "d9ae1ed7c531e27e0b66f110023adcef466a47b68b15e62eb17b0bef303379b2",
+          "code_length": 68,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/Integer;)I"
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "ce19a01a497a75d8e2adea738492718eb0b1aaf782b3e107c954d36223bda01f",
+          "code_length": 63,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Float;)F",
+          "access": 129,
+          "code_sha256": "18c5f22ebfc65d6bfde36ec92d1b820d93403862937a04cf47c06ffe55d41b01",
+          "code_length": 68,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/Float;)F"
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Boolean;)Z",
+          "access": 129,
+          "code_sha256": "ebd5f3dc4e1f6ef5eb4d4be9daff174b73a918967525376dd27d086661fa1d30",
+          "code_length": 68,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/Boolean;)Z"
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Double;)D",
+          "access": 129,
+          "code_sha256": "e405fd9493e20e495d727d0ca599a1bfdbc11e9e2585050ecc5189e29fd4c789",
+          "code_length": 68,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/Double;)D"
+        },
+        {
+          "name": "getConfiguration",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "416dd011459600b934b9bed63468051c51d6799ac03009e9d9f81483f2f56667",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "setConfiguration",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "652941142090ced65e0275355cbd250468f13ddc16daf3253af896a054756147",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;Ljava/lang/String;)V"
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/base/util/VanillaPluginUtil<Lnet/xeoh/plugins/base/PluginConfiguration;>;Lnet/xeoh/plugins/base/PluginConfiguration;",
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/PluginConfiguration",
+        "net/xeoh/plugins/base/util/PluginConfigurationUtil",
+        "net/xeoh/plugins/base/util/VanillaPluginUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/PluginManagerUtil$1.class",
+      "occurrence": 0,
+      "sha256": "0a74d31ce9bcd6b78d4df3993c3dab3226821e8d02857481632775d58233b8d1",
+      "name": "net/xeoh/plugins/base/util/PluginManagerUtil$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/util/PluginManagerUtil;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/util/PluginManagerUtil;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "selectPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2,
+          "generic_signature": "(TP;)Z"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector",
+        "net/xeoh/plugins/base/util/PluginManagerUtil",
+        "net/xeoh/plugins/base/util/PluginManagerUtil$1"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/PluginManagerUtil$2.class",
+      "occurrence": 0,
+      "sha256": "4f9c1466f6bc0ad3efdb52b2943c7221d0d9f95b6141816090c2bcc14fc3e1e5",
+      "name": "net/xeoh/plugins/base/util/PluginManagerUtil$2",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector"
+      ],
+      "fields": [
+        {
+          "name": "val$selector",
+          "descriptor": "Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;",
+          "access": 4112
+        },
+        {
+          "name": "val$allPlugins",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/base/util/PluginManagerUtil;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/util/PluginManagerUtil;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;Ljava/util/Collection;)V",
+          "access": 0,
+          "code_sha256": "6df851e594d2f852ca23f9b66080831cfbe8e8ae7cc0dbd69f721b0a005621df",
+          "code_length": 20
+        },
+        {
+          "name": "selectPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Z",
+          "access": 1,
+          "code_sha256": "972c9f938180d147d9d8739ee8cb5fc6e51459a6a1a21b01f2b1cb4facb583f8",
+          "code_length": 26,
+          "generic_signature": "(TP;)Z"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "net/xeoh/plugins/base/options/getplugin/PluginSelector",
+        "net/xeoh/plugins/base/util/PluginManagerUtil",
+        "net/xeoh/plugins/base/util/PluginManagerUtil$2"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/PluginManagerUtil.class",
+      "occurrence": 0,
+      "sha256": "a47146d78aec8ad2f632486b7562bd34dfce7f9906633fbed7c8504062effbf9",
+      "name": "net/xeoh/plugins/base/util/PluginManagerUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/util/VanillaPluginUtil",
+      "interfaces": [
+        "net/xeoh/plugins/base/PluginManager"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/PluginManager;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getPlugins",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "1ec4046a2e2892704ab83bd9f19050504c65462faaa9cfb75766edd7c3b26a55",
+          "code_length": 14,
+          "generic_signature": "<P::Lnet/xeoh/plugins/base/Plugin;>(Ljava/lang/Class<TP;>;)Ljava/util/Collection<TP;>;"
+        },
+        {
+          "name": "getPlugins",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "5bc4feed056041bfacdad9eb5f32071a1ea3d92360442472a115087a9b7655a7",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Collection<Lnet/xeoh/plugins/base/Plugin;>;"
+        },
+        {
+          "name": "getPlugins",
+          "descriptor": "(Ljava/lang/Class;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector;)Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "78cfef3aaf225ada7bac521dce1ecf1b936197f01cc83ff80f3517a53627ef21",
+          "code_length": 48,
+          "generic_signature": "<P::Lnet/xeoh/plugins/base/Plugin;>(Ljava/lang/Class<TP;>;Lnet/xeoh/plugins/base/options/getplugin/PluginSelector<TP;>;)Ljava/util/Collection<TP;>;"
+        },
+        {
+          "name": "addPluginsFrom",
+          "descriptor": "(Ljava/net/URI;[Lnet/xeoh/plugins/base/options/AddPluginsFromOption;)V",
+          "access": 129,
+          "code_sha256": "f3001c0525e36d6ad1d8216ef34e5e76552c00ef3691a5b9b4a058dba74bddb5",
+          "code_length": 15
+        },
+        {
+          "name": "getPlugin",
+          "descriptor": "(Ljava/lang/Class;[Lnet/xeoh/plugins/base/options/GetPluginOption;)Lnet/xeoh/plugins/base/Plugin;",
+          "access": 129,
+          "code_sha256": "846d221bf2359af0c15a6fea844886d345948728143b9388e2d0517050d5ac93",
+          "code_length": 15,
+          "generic_signature": "<P::Lnet/xeoh/plugins/base/Plugin;>(Ljava/lang/Class<TP;>;[Lnet/xeoh/plugins/base/options/GetPluginOption;)TP;"
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3b90ff332cfd3060ff6a58e70e03e95176c59bcccfaecc36d5db0b1a96b1b672",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/base/util/VanillaPluginUtil<Lnet/xeoh/plugins/base/PluginManager;>;Lnet/xeoh/plugins/base/PluginManager;",
+      "class_references": [
+        "java/util/ArrayList",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/PluginManager",
+        "net/xeoh/plugins/base/options/GetPluginOption",
+        "net/xeoh/plugins/base/options/getplugin/OptionPluginSelector",
+        "net/xeoh/plugins/base/util/PluginManagerUtil",
+        "net/xeoh/plugins/base/util/PluginManagerUtil$1",
+        "net/xeoh/plugins/base/util/PluginManagerUtil$2",
+        "net/xeoh/plugins/base/util/VanillaPluginUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/PluginUtil.class",
+      "occurrence": 0,
+      "sha256": "8ca3b5b91ade8faa035a700a9e557f10e293c55097b57d745121294f502ddb6d",
+      "name": "net/xeoh/plugins/base/util/PluginUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/util/VanillaPluginUtil",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getPrimaryInterfaces",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "566df81a4ef6754d1183a67c29f98837aa5d0680330eb74d916288ba4bb4d185",
+          "code_length": 163,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;>;"
+        },
+        {
+          "name": "getPluginInterfaces",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "826a069f27fa1ed38ed8de94c7b7ac7d2161186b966902184219263a7c83d4fd",
+          "code_length": 173,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;>;"
+        },
+        {
+          "name": "getAllPluginInterfaces",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "dbd10f444f2149b1a134413776d14d2db4841683a0c3448031b075327bdb1ef0",
+          "code_length": 128,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;>;"
+        }
+      ],
+      "generic_signature": "Lnet/xeoh/plugins/base/util/VanillaPluginUtil<Lnet/xeoh/plugins/base/Plugin;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/util/PluginUtil",
+        "net/xeoh/plugins/base/util/VanillaPluginUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/VanillaPluginUtil.class",
+      "occurrence": 0,
+      "sha256": "db712c2eb502bd4638aab40215d30a137472c59f56e7303afd63317216bbf688",
+      "name": "net/xeoh/plugins/base/util/VanillaPluginUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "net/xeoh/plugins/base/util/VanillaUtil",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6,
+          "generic_signature": "(TT;)V"
+        }
+      ],
+      "generic_signature": "<T::Lnet/xeoh/plugins/base/Plugin;>Lnet/xeoh/plugins/base/util/VanillaUtil<TT;>;",
+      "class_references": [
+        "net/xeoh/plugins/base/util/VanillaPluginUtil",
+        "net/xeoh/plugins/base/util/VanillaUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/VanillaUtil.class",
+      "occurrence": 0,
+      "sha256": "ddbc1442efee45f1715d16a9edfe92572eb45c3164399bfc7d8bd11cc200073a",
+      "name": "net/xeoh/plugins/base/util/VanillaUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "object",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 20,
+          "generic_signature": "TT;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/util/VanillaUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/uri/ClassURI.class",
+      "occurrence": 0,
+      "sha256": "f5fa9ddc26c8aaaeec42f21d5fba6f54544e98827a35068200508535d6b30cfb",
+      "name": "net/xeoh/plugins/base/util/uri/ClassURI",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/xeoh/plugins/base/util/uri/URIUtil",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CLASSPATH",
+          "descriptor": "Ljava/net/URI;",
+          "access": 25
+        },
+        {
+          "name": "clazz",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "CLASSPATH",
+          "descriptor": "(Ljava/lang/String;)Ljava/net/URI;",
+          "access": 25,
+          "code_sha256": "f0c675e454075b86907d137ecfe55561eaeb18fffeddc7fb04b7c3cdb1fc1243",
+          "code_length": 23
+        },
+        {
+          "name": "PLUGIN",
+          "descriptor": "(Ljava/lang/Class;)Ljava/net/URI;",
+          "access": 25,
+          "code_sha256": "d45089323894d560799902f36cc14139e416f097860727f8b324f67d2ea02de1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)Ljava/net/URI;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "46c41791b17219a15473567437cd0b59dafedaad18bf1ae1e9c8905f82e53eed",
+          "code_length": 27,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/base/Plugin;>;)V"
+        },
+        {
+          "name": "toURI",
+          "descriptor": "()Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "27745258e791ddeceb97682011ccebe2a681fcfa6d37b1ed6b5a80fb8c5e8079",
+          "code_length": 40
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f4f389d628f781218ded80f000a4a354984106aca71dce20b168bae242d2c882",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/StringBuilder",
+        "java/net/URI",
+        "java/net/URISyntaxException",
+        "net/xeoh/plugins/base/util/uri/ClassURI",
+        "net/xeoh/plugins/base/util/uri/URIUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/base/util/uri/URIUtil.class",
+      "occurrence": 0,
+      "sha256": "6ccd135915aee58165d730ff18b879adb638a33f5fc642a94097d3942cd789d6",
+      "name": "net/xeoh/plugins/base/util/uri/URIUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toURI",
+          "descriptor": "()Ljava/net/URI;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/util/uri/URIUtil"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/Diagnosis.class",
+      "occurrence": 0,
+      "sha256": "b3d2bbc948685a3f140da2b5afb4f829e17d4351bdea734cc62b05592fa11236",
+      "name": "net/xeoh/plugins/diagnosis/local/Diagnosis",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/Plugin"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "channel",
+          "descriptor": "(Ljava/lang/Class;[Lnet/xeoh/plugins/diagnosis/local/options/ChannelOption;)Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel;",
+          "access": 1153,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;[Lnet/xeoh/plugins/diagnosis/local/options/ChannelOption;)Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel<TT;>;"
+        },
+        {
+          "name": "registerMonitor",
+          "descriptor": "(Ljava/lang/Class;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;)V",
+          "access": 1025,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor<TT;>;)V"
+        },
+        {
+          "name": "replay",
+          "descriptor": "(Ljava/lang/String;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;)V",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/String;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor<*>;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/diagnosis/local/Diagnosis"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/DiagnosisChannel.class",
+      "occurrence": 0,
+      "sha256": "a530d20f2fe007042d9c9ecca185d494b704926c244ab15a13e090d35fbe683f",
+      "name": "net/xeoh/plugins/diagnosis/local/DiagnosisChannel",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "status",
+          "descriptor": "(Ljava/lang/Object;[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;)V",
+          "access": 1153,
+          "generic_signature": "(TT;[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID.class",
+      "occurrence": 0,
+      "sha256": "745078da93fa21553af6df98aaa5d7bc82d4b1af898ca0de81fa40b1d537dc98",
+      "name": "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toUserRepresentation",
+          "descriptor": "(Ljava/io/Serializable;Ljava/util/Map;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6901a90da89cfc8b551ba97eda2dca120b8d2594f503ab663edb945f5472f88d",
+          "code_length": 12,
+          "generic_signature": "(TT;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<T::Ljava/io/Serializable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannelID"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/DiagnosisMonitor.class",
+      "occurrence": 0,
+      "sha256": "1b723cd5f38e53fbca52bbefe0cceb67ce95fa85efc6a603a9592e4786a1dae1",
+      "name": "net/xeoh/plugins/diagnosis/local/DiagnosisMonitor",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onStatusChange",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus;)V",
+          "access": 1025,
+          "generic_signature": "(Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus<TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T::Ljava/io/Serializable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisMonitor"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/DiagnosisStatus.class",
+      "occurrence": 0,
+      "sha256": "7be95c0c57d72af30e8fb480fa00b6298dbe02e54f5357e1257172bd449b7f59",
+      "name": "net/xeoh/plugins/diagnosis/local/DiagnosisStatus",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getChannel",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;"
+        },
+        {
+          "name": "getChannelAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getInfos",
+          "descriptor": "()[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;",
+          "access": 1025
+        },
+        {
+          "name": "getDate",
+          "descriptor": "()J",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T::Ljava/io/Serializable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisStatus"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelDummyImpl.class",
+      "occurrence": 0,
+      "sha256": "49fd3983ae6e89eb71339c8863a14ebfd448943f69582bb70825fe8cf86ec31f",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelDummyImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5,
+          "generic_signature": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<*>;>;)V"
+        },
+        {
+          "name": "status",
+          "descriptor": "(Ljava/lang/Object;[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;)V",
+          "access": 129,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelDummyImpl"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelImpl.class",
+      "occurrence": 0,
+      "sha256": "aed5698a049c012c9d9eb2ddc06d03fc2455964b4ec1eb090773b418ad787b26",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel"
+      ],
+      "fields": [
+        {
+          "name": "diagnosis",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;",
+          "access": 18
+        },
+        {
+          "name": "channel",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<*>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15,
+          "generic_signature": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<*>;>;)V"
+        },
+        {
+          "name": "status",
+          "descriptor": "(Ljava/lang/Object;[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;)V",
+          "access": 129,
+          "code_sha256": "a0745ccdaf54f7053470c98d67464d4904da40b8a9b82020762602dd5e0a46d1",
+          "code_length": 217
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel<Ljava/lang/Object;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lnet/xeoh/plugins/diagnosis/local/options/StatusOption;",
+        "[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/Map",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreObject",
+        "net/jcores/cores/CoreString",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisChannel",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisStatusImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$1.class",
+      "occurrence": 0,
+      "sha256": "efd0d0d9c93d8c5f7724658cd23bc7da49695f4727406944ce7e6b53b6f0180e",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/EntryCallback"
+      ],
+      "fields": [
+        {
+          "name": "val$listener",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "nextEntry",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry;)V",
+          "access": 1,
+          "code_sha256": "7e25a2aae99f4e62219db7852c9e597e4d7531e64ccff67861076035f61da575",
+          "code_length": 123
+        }
+      ],
+      "class_references": [
+        "[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "net/jcores/CoreKeeper",
+        "net/jcores/cores/CoreObject",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisMonitor",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$1",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisStatusImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/EntryCallback",
+        "net/xeoh/plugins/diagnosis/local/options/status/OptionInfo"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry.class",
+      "occurrence": 0,
+      "sha256": "cc8e22cb32432d664040182e4687839dec3373144535147372e8deb73e8d5676",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "entryLock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 16
+        },
+        {
+          "name": "allListeners",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Collection<Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor<*>;>;"
+        },
+        {
+          "name": "lastItem",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus;",
+          "access": 0,
+          "generic_signature": "Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus<*>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl;)V",
+          "access": 0,
+          "code_sha256": "9802cefe70c8a54e5a0cce9f8b1388ebefa880cce28192817ddd2a235a4cd2ec",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/concurrent/locks/ReentrantLock",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl.class",
+      "occurrence": 0,
+      "sha256": "b1f37c9364e9c81c3bd4d71bd392cc0b361044dd5102d0cfd89071bdc374f866",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/diagnosis/local/Diagnosis"
+      ],
+      "fields": [
+        {
+          "name": "items",
+          "descriptor": "Ljava/util/Map;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<*>;>;Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry;>;"
+        },
+        {
+          "name": "configuration",
+          "descriptor": "Lnet/xeoh/plugins/base/PluginConfiguration;",
+          "access": 1
+        },
+        {
+          "name": "isDisabled",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "useStackTraces",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "compressOutput",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "stackTracesDepth",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "recordingFile",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "serializer",
+          "descriptor": "Lnet/xeoh/plugins/diagnosis/local/impl/serialization/java/LogFileWriter;",
+          "access": 64
+        },
+        {
+          "name": "recordingEnabled",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f7e3dd014cc236ffcc34be7c48f00501b81a221aa16fe4e478fe6fa96b622819",
+          "code_length": 51
+        },
+        {
+          "name": "channel",
+          "descriptor": "(Ljava/lang/Class;[Lnet/xeoh/plugins/diagnosis/local/options/ChannelOption;)Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel;",
+          "access": 129,
+          "code_sha256": "0c06aefa8952c92a8ea9cb2e833f0150479dec7c63236ecb6bf99378cb7b1169",
+          "code_length": 69,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;[Lnet/xeoh/plugins/diagnosis/local/options/ChannelOption;)Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannel<TT;>;"
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "()Lnet/xeoh/plugins/diagnosis/local/impl/serialization/java/LogFileWriter;",
+          "access": 0,
+          "code_sha256": "739604552d38017859910ca166c043edfd7c1ce955b414cc39a89af8472f1794",
+          "code_length": 60
+        },
+        {
+          "name": "recordEntry",
+          "descriptor": "(Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus;Lnet/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry;)V",
+          "access": 1,
+          "code_sha256": "2543ca0f7bbd87454c1424759008644b4a9740c9affec98b9043070b3c55a456",
+          "code_length": 121,
+          "generic_signature": "(Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus<*>;Lnet/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry;)V"
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9a878e53b6cb260cfddadf4a7d8355348ecbb4413ced977a63cd4dc16a98b99f",
+          "code_length": 186
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "registerMonitor",
+          "descriptor": "(Ljava/lang/Class;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;)V",
+          "access": 1,
+          "code_sha256": "e2d96c5829a094839006d8e65667a72e6fdb3976c95baaef2ae7e9dc8fecc876",
+          "code_length": 89,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor<TT;>;)V"
+        },
+        {
+          "name": "getKeyEntry",
+          "descriptor": "(Ljava/lang/Class;)Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry;",
+          "access": 2,
+          "code_sha256": "af51c83db0ebe1edd7627214565e5194bd35b55cb7f6775163c8c9c03a26fe2a",
+          "code_length": 62,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<*>;>;)Lnet/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry;"
+        },
+        {
+          "name": "replay",
+          "descriptor": "(Ljava/lang/String;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor;)V",
+          "access": 1,
+          "code_sha256": "3e4da4bd5bbc204e1f380e020fcee804566c580adba06f323c839de25a0eb9cf",
+          "code_length": 23,
+          "generic_signature": "(Ljava/lang/String;Lnet/xeoh/plugins/diagnosis/local/DiagnosisMonitor<*>;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/locks/Lock",
+        "net/xeoh/plugins/base/util/PluginConfigurationUtil",
+        "net/xeoh/plugins/diagnosis/local/Diagnosis",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisMonitor",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisStatus",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelDummyImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisChannelImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$1",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisImpl$KeyEntry",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/LogFileReader",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/LogFileWriter"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisStatusImpl.class",
+      "occurrence": 0,
+      "sha256": "479944ecaf05ceee3d055ac2d3662d95021ec5a7c1b64a6ae0c2f4acc5cf9395",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/DiagnosisStatusImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/diagnosis/local/DiagnosisStatus"
+      ],
+      "fields": [
+        {
+          "name": "channel",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;"
+        },
+        {
+          "name": "channelString",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/io/Serializable;",
+          "access": 18,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "date",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "infos",
+          "descriptor": "[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/io/Serializable;J[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;)V",
+          "access": 1,
+          "code_sha256": "326cc7510c6a6467f2d6052c10ced2bd7e0fffa68a17c61360446ee426672345",
+          "code_length": 34,
+          "generic_signature": "(Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;TT;J[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Serializable;J[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;)V",
+          "access": 1,
+          "code_sha256": "5682288dd2fab8e551f787cfbadead03a6cb6390168421c277117da5662bc4dd",
+          "code_length": 31,
+          "generic_signature": "(Ljava/lang/String;TT;J[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;)V"
+        },
+        {
+          "name": "getChannel",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()Ljava/lang/Class<+Lnet/xeoh/plugins/diagnosis/local/DiagnosisChannelID<TT;>;>;"
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getInfos",
+          "descriptor": "()[Lnet/xeoh/plugins/diagnosis/local/options/status/OptionInfo;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getDate",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "getChannelAsString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T::Ljava/io/Serializable;>Ljava/lang/Object;Lnet/xeoh/plugins/diagnosis/local/DiagnosisStatus<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "net/xeoh/plugins/diagnosis/local/DiagnosisStatus",
+        "net/xeoh/plugins/diagnosis/local/impl/DiagnosisStatusImpl"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry.class",
+      "occurrence": 0,
+      "sha256": "c76853edd84e1eca3e31b21f5e97b3d1ae837091f1ef36b67049366ae45273c5",
+      "name": "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "version",
+          "descriptor": "S",
+          "access": 2
+        },
+        {
+          "name": "date",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "threadID",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "stackTrace",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "channel",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 1
+        },
+        {
+          "name": "additionalInfo",
+          "descriptor": "Ljava/util/Map;",
+          "access": 1,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d66df04f89b79546c6d91f6c0c66ce801a73ad5a9e6171e0e953ba9764e8e1d5",
+          "code_length": 21
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "ed37cfa2750c9725dd4fa691063d795ad7ae97ebdaa17fcb6b048e3cebd53e14",
+          "code_length": 57,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "8e316f23b1f7ccc04727e1bad9f7a1348daf211ac3836ba0092a2d55402bc603",
+          "code_length": 111,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Map",
+        "net/xeoh/plugins/diagnosis/local/impl/serialization/java/Entry"
+      ]
+    }
+  ]
+}

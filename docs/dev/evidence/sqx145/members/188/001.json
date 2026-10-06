@@ -1,0 +1,423 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolio.jar",
+  "archive_sha256": "f9bb50732b5da16ec971304e37e05db9429e457bf83e6e1041d9eab7ce484350",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1.class",
+      "occurrence": 0,
+      "sha256": "a22db42af6f2f62568f04e17b3be5b05b54da5a45e5fc46830f6faf073ec3f12",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal.class",
+      "occurrence": 0,
+      "sha256": "16068125b01e2a3d5fc3b342929912bbeab9c79602f9363c0ede2183f46cb359",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "valueType",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "use",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "statsValueName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "weight",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "target",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio;)V",
+          "access": 2,
+          "code_sha256": "fd47d0c7fba732c2ad89a9316fa1a76155de77ef7d9b6947b584e38dcb19e3fc",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio;Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio.class",
+      "occurrence": 0,
+      "sha256": "8dd9e06bf878b811cf3b83a2dafd114169239e5b2180351909cc51e485f4df4d",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "databankColumnName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "weightedGoals",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a907987c1faaead3e68ebcfa366ecb20bfdeeea5e9e7ea4fffd0d563cd66eb64",
+          "code_length": 21
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7f40213b624e991c07bd11203f997129e0c3e28ec5d7b662027536f1f44109b2",
+          "code_length": 26
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6bb5e3db34b58b5a1199d1587f26728031e570b466b40e4d20782ba8e96d1f50",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "026f82dd6bcf6f5c9b9fe77a164a8902bdd1e213bc5f9bc84c5606b32f608ef2",
+          "code_length": 4
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BB)D",
+          "access": 1,
+          "code_sha256": "3415eeef6296532722389594e09ede35ee371a2c41861a53fe5a1bd4e75855f0",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBZ)D",
+          "access": 1,
+          "code_sha256": "a990006a870a75c68d0e9388bc196c5b89c6eab24f920af31ca42ae613e7a338",
+          "code_length": 63,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;DBZ)D",
+          "access": 2,
+          "code_sha256": "0420d895a488e83e9786d815629c70da02966cdabe97444cd1ddf5fe0895045b",
+          "code_length": 207,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeWeightedFitness",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBZ)D",
+          "access": 2,
+          "code_sha256": "1602c043a6baba8e7f05e249bc0f1b34bac2e771efcf827988c6803093a4ef12",
+          "code_length": 159,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initFitnessFromXml",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "85d9b127cd541da3956142983454b4b67d1c7b9e330453422c82d00d8dd34962",
+          "code_length": 212
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "548731b475a94d588486c02c54d55d44660e03b67c85da4e0e40fa3935e1899f",
+          "code_length": 56
+        },
+        {
+          "name": "getFitnessType",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "f0e122d99edc4c512d1764b92037a222627cacc2a3ce5840d5c339b5a8cf8835",
+          "code_length": 31,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFitnessKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b1b538c739adfc8c18a9eaee3b893b02f79b797963a9ec9a6ce6fa471ca1f18",
+          "code_length": 3
+        },
+        {
+          "name": "getFitnessName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3126f9fd53066a120425607db75bce72fe2db37826ae0b7427beebd453a1f4e3",
+          "code_length": 6
+        },
+        {
+          "name": "getFitnessDatabankColumnName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getUsedStatValues",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "6523640f47aea211443ac41a69e3d5bd862620e931033a3d412788b9f5d4aabe",
+          "code_length": 102,
+          "throws": [
+            "com/strategyquant/lib/snippets/NonexistingCustomClassException"
+          ],
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/DatabankColumn;>;"
+        },
+        {
+          "name": "printWeightedGoals",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "23f0b5704d0d5301aac65124935757d2bc9ea62b69d222e33af5ba8aefcbd83d",
+          "code_length": 110
+        },
+        {
+          "name": "getMetricsForFitness",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "8f786cf645c5076f45518d1b4319c573002ede580e21fadc953ec0d599629a7b",
+          "code_length": 192,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/optimization/MetricForFitness;>;"
+        },
+        {
+          "name": "getMetricValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "95f8944dbe39504a4e100f3da25e86e1abe91dbe45ac6faa4f6ceaa01ba76993",
+          "code_length": 30,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/fitnessfunction/IFitnessFunction;",
+          "access": 1,
+          "code_sha256": "b5aeb86657c0b8500ef32dd0aeaec185c90c70089f6370e352895613c83ce0e0",
+          "code_length": 34
+        },
+        {
+          "name": "cloneGoals",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "5770fa61d6a6a375c725292dadbf3b5471b4228f0b51c1a16e120423c099c019",
+          "code_length": 104,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal;>;"
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9b27d07826aa8db74c65731cc20d1f4a216cdafd4f73708c57ae8c11c99f945b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4c48eb32e67555c3ac02cd9db3e7723f946894968729379c0b8ca5b72358e7b4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/snippets/NonexistingCustomClassException",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal",
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/optimization/MetricForFitness",
+        "com/strategyquant/tradinglib/results/stats/StatsComputer",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet.class",
+      "occurrence": 0,
+      "sha256": "814456cf93e58468ccef628bb84474d2adf9387a2fcc07b93c364ea7e53cc6be",
+      "name": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "10e48550fd6f056c5cbb0b686d3daa4ec198e35f4688f4a3e36e4909a80cdb24",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6c58cf85b1a0be19ea813d9e315003d266b4a9822c2cd91b2f6ff803d0ebfaad",
+          "code_length": 4,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0a86f3fdbe07098bd74cb7c6c7b5333d6510a3d88f124fe5bf2f77ae0f4a8325",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet",
+        "com/strategyquant/tradinglib/fitnessfunction/FitnessOptions",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EquityChartDailyChart/EquityChartDailyChart.jar",
+  "sha256": "e70883d13d5ef50e59ae98d080c1a9bf4ba751696edab02720c6a292f2767b50",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/EquityChart/impl/DailyChart/DailyChart.class": "0f39afec91a48856137e322be33f4fe7c69c3dfa838ba60b6b281a16195913d8"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/DailyChart/DailyChart.class",
+      "occurrence": 0,
+      "sha256": "0f39afec91a48856137e322be33f4fe7c69c3dfa838ba60b6b281a16195913d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/184/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/184/001.json",
+      "sha256": "271b32baf62ec2c5e8ff863b85f3b89867ff0862cf459549029ff74481a94211"
+    }
+  ]
+}

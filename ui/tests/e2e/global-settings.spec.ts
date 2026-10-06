@@ -187,12 +187,13 @@ test('a save renews an expired host session and commits the change', async ({ pa
 });
 
 test('benchmark, remote, MCP, SMTP, license, about and exit surfaces are functional', async ({ page }) => {
+  await expect(page.locator('.home-screen .version')).toContainText('SQX145 reference');
   const open = async (name: string) => { await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.getByRole('menuitem', { name, exact: true }).click(); };
   await open('Benchmark...'); await page.getByRole('button', { name: 'Start benchmark' }).click(); await expect(page.getByRole('heading', { name: 'Benchmark finished' })).toBeVisible({ timeout: 5000 }); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('Remote access...'); const remote = page.getByRole('dialog', { name: 'Remote access' }); await remote.getByRole('checkbox', { name: 'Allow remote access to this application' }).check(); await remote.getByRole('checkbox', { name: 'Require a password' }).check(); await remote.getByRole('textbox', { name: 'Password', exact: true }).fill('ephemeral'); await remote.getByRole('button', { name: 'Save' }).click();
   await open('MCP Server...'); await expect(page.getByLabel('Client configuration (JSON)')).toContainText('mcpServers'); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('SMTP server...'); const smtp = page.getByRole('dialog', { name: 'SMTP server' }); await smtp.getByRole('button', { name: 'Send test email' }).click(); await smtp.getByLabel('Test recipient').fill('owner@example.test'); await smtp.getByRole('button', { name: 'Send test email' }).click(); await expect(smtp.getByRole('status')).toContainText('simulated'); await smtp.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('Update license'); await page.getByLabel('License key').fill('local-only'); await page.getByRole('button', { name: 'Update license' }).click(); await expect(page.getByRole('status')).toContainText('simulated'); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
-  await open('About'); await expect(page.getByRole('dialog', { name: 'About HaruQuantAI' }).getByText('Build 144.2953 reference')).toBeVisible(); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
+  await open('About'); await expect(page.getByRole('dialog', { name: 'About HaruQuantAI' }).getByText('SQX145 reference')).toBeVisible(); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('Exit'); const exitDialog = page.getByRole('dialog', { name: 'Exit HaruQuantAI' }); await exitDialog.getByRole('button', { name: 'Exit' }).click(); await expect(exitDialog).toHaveCount(0);
 });

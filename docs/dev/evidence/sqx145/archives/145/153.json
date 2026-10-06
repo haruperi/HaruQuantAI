@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckWalkForwardMatrix/CrossCheckWalkForwardMatrix.jar",
+  "sha256": "f007a6c8f3edeee29044a0c357cd51a1a60768b4daa06d621fd1508789543c1a",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/WalkForwardMatrix/WalkForwardMatrix.class": "296598d81a203721b005a6ae6a40428602ba0000bf4efeb470261e2131e9e07d"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/WalkForwardMatrix/WalkForwardMatrix.class",
+      "occurrence": 0,
+      "sha256": "296598d81a203721b005a6ae6a40428602ba0000bf4efeb470261e2131e9e07d",
+      "member_shard": "docs/dev/evidence/sqx145/members/153/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/153/001.json",
+      "sha256": "9b91d347156d969375a4d5a79a84973245e9b8e13de8ece9fd0d370dc80de3a0"
+    }
+  ]
+}

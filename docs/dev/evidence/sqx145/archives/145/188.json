@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolio.jar",
+  "sha256": "f9bb50732b5da16ec971304e37e05db9429e457bf83e6e1041d9eab7ce484350",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1.class": "a22db42af6f2f62568f04e17b3be5b05b54da5a45e5fc46830f6faf073ec3f12",
+    "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal.class": "16068125b01e2a3d5fc3b342929912bbeab9c79602f9363c0ede2183f46cb359",
+    "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio.class": "8dd9e06bf878b811cf3b83a2dafd114169239e5b2180351909cc51e485f4df4d",
+    "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet.class": "814456cf93e58468ccef628bb84474d2adf9387a2fcc07b93c364ea7e53cc6be"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$1.class",
+      "occurrence": 0,
+      "sha256": "a22db42af6f2f62568f04e17b3be5b05b54da5a45e5fc46830f6faf073ec3f12",
+      "member_shard": "docs/dev/evidence/sqx145/members/188/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio$Goal.class",
+      "occurrence": 0,
+      "sha256": "16068125b01e2a3d5fc3b342929912bbeab9c79602f9363c0ede2183f46cb359",
+      "member_shard": "docs/dev/evidence/sqx145/members/188/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolio.class",
+      "occurrence": 0,
+      "sha256": "8dd9e06bf878b811cf3b83a2dafd114169239e5b2180351909cc51e485f4df4d",
+      "member_shard": "docs/dev/evidence/sqx145/members/188/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/ExistingPortfolio/FitnessExistingPortfolioServlet.class",
+      "occurrence": 0,
+      "sha256": "814456cf93e58468ccef628bb84474d2adf9387a2fcc07b93c364ea7e53cc6be",
+      "member_shard": "docs/dev/evidence/sqx145/members/188/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/188/001.json",
+      "sha256": "deb67f57c850c172441bc0137b7296d2112659ab077ba4842eaf0abfa7f1b913"
+    }
+  ]
+}

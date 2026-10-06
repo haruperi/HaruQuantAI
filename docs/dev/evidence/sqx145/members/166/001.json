@@ -1,0 +1,736 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
+  "archive_sha256": "84d9f257022e864c7fd738ef335783557b059f3367e61fedc2de3d5982af0c45",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1.class",
+      "occurrence": 0,
+      "sha256": "6cd4ef50c31efd36d5fb6d22fa1e765d5c97726c971a0c3b609173ced3a6bfe4",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$sessions",
+          "descriptor": "Ljava/util/List;",
+          "access": 4112
+        },
+        {
+          "name": "val$brokerId",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$postfix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$broker",
+          "descriptor": "Lcom/strategyquant/datalib/broker/BrokerDto;",
+          "access": 4112
+        },
+        {
+          "name": "val$total",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Ljava/util/List;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;I)V",
+          "access": 0,
+          "code_sha256": "b20ba454008296faea04ec27c5a2cba5ba2104284d7464e44b2042da68180177",
+          "code_length": 38
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "41c0a82f526eb0983e8fc3c57997c272c5d7cd0566725ed1e0d9b5c52e9203b0",
+          "code_length": 303
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2.class",
+      "occurrence": 0,
+      "sha256": "989461f8d4134b976b9525c94bf1631fcdb1eba07ba4cba57dfae740c92d2ae5",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$instruments",
+          "descriptor": "Ljava/util/List;",
+          "access": 4112
+        },
+        {
+          "name": "val$brokerId",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$postfix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$broker",
+          "descriptor": "Lcom/strategyquant/datalib/broker/BrokerDto;",
+          "access": 4112
+        },
+        {
+          "name": "val$total",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Ljava/util/List;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;I)V",
+          "access": 0,
+          "code_sha256": "b20ba454008296faea04ec27c5a2cba5ba2104284d7464e44b2042da68180177",
+          "code_length": 38
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "21a558937833c8fc218a8632d68876cc3518360f6d8e1bac6d49fad8f1b9a083",
+          "code_length": 303
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3.class",
+      "occurrence": 0,
+      "sha256": "e731412b92573f76ee9fe697beb58f525b85e4cc3868041316c99b38fe8f8c88",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$stocks",
+          "descriptor": "Ljava/util/List;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a16746d37e4549efd701412512f64819d66b2da73e4490f81e54a5e788a40ebc",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet.class",
+      "occurrence": 0,
+      "sha256": "03f93f4628ce2d4764495e06c4c2dc5082a259ff980ae37d6f4a878ba44312e1",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3cbf10796c8b68343919f56bd75d1061d3aefdbd02f8763313f594d895cc67df",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c338f449746597414a1a0efb607b4133ef10c547c11551f36ad8cd7fbf1f3d3f",
+          "code_length": 514,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportGetOverview",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8965823f702b248e184f775e3e48aff7f39ea75b3b8e1a4d87d8fc01c6032d8f",
+          "code_length": 285,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportSessionInstrument",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a4fa78d1cc0105765265e6e6361082ec2fc54a0f89710e642f889495a09c78b7",
+          "code_length": 417,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "importSessionAsync",
+          "descriptor": "(Ljava/util/List;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 2,
+          "code_sha256": "8bc9a5efcee37ef52fcd95188a6c5b6e18d72dd66a1aa9e01908200ee6b49fee",
+          "code_length": 27,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/datalib/session/Session;>;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V"
+        },
+        {
+          "name": "performImportSession",
+          "descriptor": "(Lcom/strategyquant/datalib/session/Session;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 2,
+          "code_sha256": "7e8df20c4aa718353f279b4a20c1e72e615975074409ae916d368ae7bbb93a01",
+          "code_length": 77,
+          "throws": [
+            "com/strategyquant/datalib/session/SessionException"
+          ]
+        },
+        {
+          "name": "performImportInstrument",
+          "descriptor": "(Lcom/strategyquant/datalib/InstrumentInfo;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 2,
+          "code_sha256": "e26a304b1235c336db426b057a0ce355a23c74c974b4753c33bacb6d989180e3",
+          "code_length": 52,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "importInstrumentsAsync",
+          "descriptor": "(Ljava/util/List;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 2,
+          "code_sha256": "62b45b2da3b4344934450be276689be200456b9ac184e0a9fbfffe6233a93b7f",
+          "code_length": 27,
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/datalib/InstrumentInfo;>;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V"
+        },
+        {
+          "name": "onLoad",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "df5befe7c33998bfa25de41f494ee20c08db641d2c91b0bc352c032b8a50d0d3",
+          "code_length": 691,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportProfile",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d112db0d57f800bae3c1559bf00dabb0dc31c30aae6c3be88f725d1833bbdc6a",
+          "code_length": 1234,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toJsonArray",
+          "descriptor": "(Ljava/util/List;)Lorg/json/JSONArray;",
+          "access": 10,
+          "code_sha256": "794597993c87c276fe66bc00aabc5bb97d1ad1f219746aacfbf73ba1697981c8",
+          "code_length": 45,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "onSave",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "44ae79c2131b1a24ec993a03fd1f4809b743fdee634a19ea1c2fcbb80169912a",
+          "code_length": 171,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "toXML",
+          "descriptor": "(Lcom/strategyquant/datalib/broker/BrokerDto;Ljava/util/List;)Lorg/jdom2/Element;",
+          "access": 2,
+          "code_sha256": "a2e6e727f2056a05e86523ceea750bfe003ed254dbdde3ba5d61b0fd0840f783",
+          "code_length": 196,
+          "generic_signature": "(Lcom/strategyquant/datalib/broker/BrokerDto;Ljava/util/List<Ljava/lang/String;>;)Lorg/jdom2/Element;"
+        },
+        {
+          "name": "onUpdateData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c9c9afb523684340bd27f99c04a27773c87624e0d38f870c5b58a55ad8df84ee",
+          "code_length": 282,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onUpdateData",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "450f606248d5170be325c855ce7004fe77adf94e434760515520c03ecd4cac2f",
+          "code_length": 302,
+          "throws": [
+            "com/strategyquant/pluginlib/program/ProgramDoesntExistException",
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onExportStocks",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "65bc0ef96d1fac6a067788d69f8c6c8946add7dc684acec9d7e37b5a24fa151e",
+          "code_length": 105,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "writeStocksToCsv",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "6ffa59b4ee94abfb7dcc2889a4614c03a2d5a9c10f08f3d87e68fe68c8af25e9",
+          "code_length": 86,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onImportStocks",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4906d9bf1180f8fbfcfb3684fb58648ffaabecf698f9646aff875d6ab6da0323",
+          "code_length": 203,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onDeleteBroker",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7669f09f5f994d7deb27d4f8f408f88506ec7401ca2eb03ee7244853ec7ae926",
+          "code_length": 145,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getSuccessResult",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9af9bb9aa06c273a39e93baf9d66c359af5a6e0416c7ad23d57a1f6514ea76cb",
+          "code_length": 21
+        },
+        {
+          "name": "onSaveBroker",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6d9abbb00f7b6778a18ddfd2cc45611f99ea73b8a1c0439f426acae2b080f4fe",
+          "code_length": 247,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onListBroker",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d1043b64f73d2dae1893e60509d2c878774703574a6596d1f3737002a87881c2",
+          "code_length": 398,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onEditStocks",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6614c00a4b9c9bea2ae15f2b502d4877f0a267b927e4c2eba959c73459150422",
+          "code_length": 176,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onListStocks",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4f8ac5b74c487099252f8585b9f6f55bd2cfcb2d725c3b326e4aba53e5264411",
+          "code_length": 156,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Lcom/strategyquant/datalib/session/Session;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 4104,
+          "code_sha256": "771ec6e29ef763f0c362f8aea6b1c9367103ebb26daf3669bd3a465a05616f5a",
+          "code_length": 10,
+          "throws": [
+            "com/strategyquant/datalib/session/SessionException"
+          ]
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "69504e68c5dd0f69aa9fdb156626f660226aa21732623ca4311afc9e4257054a",
+          "code_length": 4
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Lcom/strategyquant/datalib/InstrumentInfo;ILjava/lang/String;Lcom/strategyquant/datalib/broker/BrokerDto;)V",
+          "access": 4104,
+          "code_sha256": "0db3cc7d57c51e0697e5f029ea4e6cf586f7fac0a0bbe27e3f45e9e7661dd7e7",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;Ljava/util/List;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6,
+          "throws": [
+            "com/strategyquant/pluginlib/program/ProgramDoesntExistException",
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3e5f23532e35701465e6c602a81ddf9bcd717ab62631c137638a70ae1d68b90b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/broker/BrokerDto",
+        "com/strategyquant/datalib/broker/BrokerManager",
+        "com/strategyquant/datalib/broker/BrokerStockDto",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/DownloadSemaphore",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/datalib/session/SessionException",
+        "com/strategyquant/datalib/session/SessionManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/pluginlib/program/ProgramDoesntExistException",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerConfirm",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketNotification",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/nio/file/Files",
+        "java/nio/file/OpenOption",
+        "java/nio/file/StandardOpenOption",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "2ba8e5938571bb845cb7d4299fe1abc9f0013d025a1619dcc96ae330e6537a0c",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "dataServlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet;",
+          "access": 2
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter.class",
+      "occurrence": 0,
+      "sha256": "62247e4de211c5b5cd42cf7d8a01ab0d9814b2df931261826d5b17cb94e2d835",
+      "name": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "importSessions",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "be8790bda77549410c490af143937d9aba8f41036c9b70ad95ad8f8469c3b9c7",
+          "code_length": 229,
+          "throws": [
+            "org/jdom2/JDOMException",
+            "java/io/IOException",
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)Ljava/util/List<Lcom/strategyquant/datalib/session/Session;>;"
+        },
+        {
+          "name": "importInstruments",
+          "descriptor": "(Ljava/lang/String;Ljava/util/List;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0f017d25c131c7dfdc39e017d8c1afeffe78bcf832622f9b075b2bb84774bd97",
+          "code_length": 113,
+          "throws": [
+            "org/jdom2/JDOMException",
+            "java/io/IOException",
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/List<Ljava/lang/String;>;)Ljava/util/List<Lcom/strategyquant/datalib/InstrumentInfo;>;"
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/datalib/session/SessionElement",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/jdom2/JDOMException"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
+  "archive_sha256": "b3a965b9aed288cf77ff6c30c6a7a60719bae6593e65e415a8b8ac59691e9ea1",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDPlugin.class",
+      "occurrence": 0,
+      "sha256": "1f66f7bf664c54bfc5480045762aae7a791749d4a778e0f0d143122e04cd2b12",
+      "name": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDPlugin",
+        "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet.class",
+      "occurrence": 0,
+      "sha256": "b3cba15f2d5af286d178cf577febde78923a9b1254c2e956a76d6a62fc74983c",
+      "name": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formaterDate",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 0
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "88593308bbc476b07a9708e8a49dde8f2a86bf0fba4df1fd3807cd70195d3802",
+          "code_length": 14
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "4441c50cdca222abc86f5ef0db034681e4b44eb70047ba809e3398dd0e632a81",
+          "code_length": 152,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onLoadAvailableSymbols",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dcc32794b5d04c5441246c6065a27ecc921ea3f4db5c40df7d8493b5247db1cb",
+          "code_length": 182,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9332918025a501097406831ceecdfd86f68bbb1a14a8d03ad48c1afed332fa7c",
+          "code_length": 497,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onImportAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "99071afffcb1f5484a9ebf6a75f3738d29793aaf4ad7e82f4cef2b46adb472bd",
+          "code_length": 216,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "37b66ed70edb999d1e6ee3cf1909552e0b02be0fe9c3f7a780a0924ff01961f4",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/SymbolData",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/DukasDataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet",
+        "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Map",
+        "org/joda/time/format/DateTimeFormat",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager.class",
+      "occurrence": 0,
+      "sha256": "676fc6b4cd2d19f71cd68b836b7294af838e76e0ed33f866531b5e34cb42f638",
+      "name": "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "IMPORT_TDDATA_JOB",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/TD/TDDataManager;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "get",
+          "descriptor": "()Lcom/strategyquant/plugin/DataSource/impl/TD/TDDataManager;",
+          "access": 41,
+          "code_sha256": "839cebf37003c0bf318401c03a84e2288348a46b3964e08231b43431b1114324",
+          "code_length": 20
+        },
+        {
+          "name": "stopTDImport",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f73c01142bf380f42f9eea9489d9691b728946347f9ad360bc24a01ab2c876f3",
+          "code_length": 28
+        },
+        {
+          "name": "pauseTDImport",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "8d2629f8d84fff03c9f13997a58479ebdf87740088ed3a61096d20c05e6486b0",
+          "code_length": 28
+        },
+        {
+          "name": "restartTDImport",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "299854a1f0f40e148362d7b62fa16bdca7f96425034435e946749cc0cf6fbbdf",
+          "code_length": 28
+        },
+        {
+          "name": "importTDData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;Ljava/lang/String;Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;)V",
+          "access": 1,
+          "code_sha256": "be92a345cc5ca4400471b1a8cf4dea69ec7ca4fea57fc6566e3e07d8527c65e3",
+          "code_length": 210
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4574260b6dc730d34569b776e24bef537bef6f1a36714e85522cf524c3da9fad",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager",
+        "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1.class",
+      "occurrence": 0,
+      "sha256": "da75bf5b8da2953f15fb67cc10546e308a51b400ab731d883a125c8b78a0b185",
+      "name": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/FilenameFilter"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "b55b8e743ee64826a70512d37a4f3a2814fc96bccc49914d18d443d106b69b64",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob",
+        "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1",
+        "java/io/File",
+        "java/io/FilenameFilter",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob.class",
+      "occurrence": 0,
+      "sha256": "03ddddff6b8e5096e936823a08d8735d0b13ca2df069e07924c6bcb82318c807",
+      "name": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "HOURS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "reader",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/newDataFormat/DataBinReaderNew;",
+          "access": 2
+        },
+        {
+          "name": "writer",
+          "descriptor": "Lcom/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew;",
+          "access": 2
+        },
+        {
+          "name": "merger",
+          "descriptor": "Lcom/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger;",
+          "access": 2
+        },
+        {
+          "name": "importInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;",
+          "access": 2
+        },
+        {
+          "name": "path",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "paused",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "listener",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/dukascopy/ImportInfo;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "6440999cbc5d4be722c15600d3f478314540d7c33e48404b6b66006849d45962",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "evalFromTo",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 2,
+          "code_sha256": "66f204ab9a91b1de1a6537d0ffd7161effd655d21d249fae0971f846971fe8ad",
+          "code_length": 51
+        },
+        {
+          "name": "getFolderDate",
+          "descriptor": "(Ljava/lang/String;Z)Ljava/lang/Long;",
+          "access": 2,
+          "code_sha256": "19ebb60fa961eb4ea0323ef665d353fdde13f6f8b6b5f75eb7f8e078547a1c6b",
+          "code_length": 323
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "689067c890c9b6a6250b5e5187fe5f02c7c3400b8c9bb25b025cb15ed802d6c6",
+          "code_length": 58
+        },
+        {
+          "name": "finish",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "6a5625be3be98be9cb3185dbf332aa9e7f91d564037411c3093d0d9691b1dbd0",
+          "code_length": 189
+        },
+        {
+          "name": "getSortedFolders",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ce4f2213f26262f6948fb2dc5e5dbcea16beb86f4f413904f23c82d6f0d4047c",
+          "code_length": 37
+        },
+        {
+          "name": "getMinMaxFromFolder",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/lib/utils/Pair;",
+          "access": 2,
+          "code_sha256": "049c7fb8bcbcba6c39e226fbda1106e3dff62a02f40486a7a1c1a7a22b602b1b",
+          "code_length": 41,
+          "generic_signature": "(Ljava/lang/String;)Lcom/strategyquant/lib/utils/Pair<Ljava/lang/Integer;Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "prepareFiles",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c4701f2c413b6ee0a85f11361c206e8f062d7c7924567536d7a93f5e3ff4e033",
+          "code_length": 52,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "setProgressListener",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/websocket/DataManagerProgressListener;)V",
+          "access": 1,
+          "code_sha256": "f93fd0eeb13cc6703a49a5cc67988feffd9d4c660e1dd9a53c53631c7e86d5fc",
+          "code_length": 6
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Void;",
+          "access": 1,
+          "code_sha256": "632448674a48abe2856e991d6241c0e87be94d786e9408700f0ca8012e5eeccf",
+          "code_length": 668,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkPaused",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0f895193cb59afbe32168e6dd3dfb1cb81abdc8e809664720bcc674f6fdda941",
+          "code_length": 46,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "sendRefreshMessage",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "079948f56ba4d739acde749a7639021f666381ef7a2260400088d6b991f10cfb",
+          "code_length": 52
+        },
+        {
+          "name": "handleBinaryFile",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;J)V",
+          "access": 2,
+          "code_sha256": "25b13cb9cc1fba748a8784d23ec1a78bb0b5b199b81bd369f42cbb16ed94735e",
+          "code_length": 114
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "52440b568fca330ed676607f852768d5d9b8ed1618915a756124300160a37a9b",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1d90d6f683b3c573f017982bbb108368f19606180cb4a78f51789f1cb61b3abb",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Ljava/lang/Void;>;",
+      "class_references": [
+        "[B",
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/basket/BasketOfStocksManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/newDataFormat/DataBinReaderNew",
+        "com/strategyquant/datalib/data/io/newDataFormat/DataBinWriterNew",
+        "com/strategyquant/datalib/timezone/Timezone",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/utils/Pair",
+        "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob",
+        "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1",
+        "com/strategyquant/tradinglib/dukascopy/DownloadResultDto",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyUtils",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/nio/file/Files",
+        "java/util/Arrays",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,131 +1,41 @@
 # AppTaskManager.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/AppTaskManager/AppTaskManager.jar`.
-- SHA-256: `b6f06d8c73fe74ddbb08bbcc2219551c1300c508703f5ac7ca4e1b1fb79fbd80`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **2**; non-nested: **2**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppTaskManager/AppTaskManager.jar`.
+- **SHA-256:** `c6d7819512130bf30f32f2368f0fc64f2532718b71dc0df5d0b2089d1d9db8d7`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 2 raw entries; 2 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-PROJECT-APP-TASK-MANAGER`, P13; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [140.json](../../dev/evidence/sqx145/archives/145/140.json).
 
-The `CustomProjects` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/140/001.json) — SHA-256 `658cc27ac3b98732f402fbcaa866b8a79cd55681e26fe85bdb3e43ca21478a49`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.App.impl.TaskManager`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C3a3aec5f5d21["TaskManagerAppPlugin"] {
-        +Log
-        +getName()
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getContextPath()
-        +getAppCode()
-    }
-    class Cee9df49f0126["TaskManagerProgressPublisher"] {
-        -projectsStats
-        -data
-        -lastData
-        +getData()
-        +resetLastData()
-    }
-    class C71ae2af47347["IAppPlugin"]
-    class C6128eed56b6d["DataToSend"]
-    class Ce87cf9854aad["SynchronizedWebSocketPublisher"]
-    C71ae2af47347 <|.. C3a3aec5f5d21 : declared interface
-    Ce87cf9854aad <|-- Cee9df49f0126 : declared extends
-    Cee9df49f0126 ..> C6128eed56b6d : field type
+    class C0["TaskManagerAppPlugin"]
+    class C1["TaskManagerProgressPublisher"]
+    class E0["IAppPlugin"]
+    E0 <|.. C0
+    class E1["SynchronizedWebSocketPublisher"]
+    E1 <|-- C1
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C3a3aec5f5d21` | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` (this JAR) | this diagram |
-| `Cee9df49f0126` | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` (this JAR) | this diagram |
-| `C71ae2af47347` | [`com.strategyquant.tradinglib.plugindef.app.IAppPlugin`](../Shared/SQTradingLib.md) | referenced external type |
-| `C6128eed56b6d` | [`com.strategyquant.tradinglib.project.websocket.DataToSend`](../Shared/SQTradingLib.md) | referenced external type |
-| `Ce87cf9854aad` | [`com.strategyquant.tradinglib.project.websocket.SynchronizedWebSocketPublisher`](../Shared/SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` | class | non-nested |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` | [`com.strategyquant.tradinglib.plugindef.app.IAppPlugin`](../Shared/SQTradingLib.md) | implements | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` / class declaration: `public class com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin implements com.strategyquant.tradinglib.plugindef.app.IAppPlugin` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` / field declaration: `public static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` / method signature: `public java.lang.String getName();`<br>`public java.lang.String getProduct();`<br>`public java.lang.String getContextPath();`<br>`public java.lang.String getAppCode();`<br>`public java.lang.String getTooltip();`<br>`public java.lang.String getProject();`<br>`public java.lang.String getDefaultTaskType();`<br>`public java.lang.String getDefaultTaskName();` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | [`com.strategyquant.tradinglib.project.websocket.SynchronizedWebSocketPublisher`](../Shared/SQTradingLib.md) | extends | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` / class declaration: `public class com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher extends com.strategyquant.tradinglib.project.websocket.SynchronizedWebSocketPublisher` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | `org.json.JSONArray` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` / field declaration: `private org.json.JSONArray projectsStats;` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | [`com.strategyquant.tradinglib.project.websocket.DataToSend`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` / field declaration: `private com.strategyquant.tradinglib.project.websocket.DataToSend data;` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | [`com.strategyquant.tradinglib.project.websocket.DataToSend`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` / method signature: `public com.strategyquant.tradinglib.project.websocket.DataToSend getData();` |
-| `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher` / field declaration: `private java.lang.String lastData;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin implements com.strategyquant.tradinglib.plugindef.app.IAppPlugin
-    public static final org.slf4j.Logger Log;
-    public com.strategyquant.plugin.App.impl.TaskManager.TaskManagerAppPlugin();
-    public java.lang.String getName();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public java.lang.String getContextPath();
-    public java.lang.String getAppCode();
-    public java.lang.String getTooltip();
-    public java.lang.String getProject();
-    public java.lang.String getDefaultTaskType();
-    public java.lang.String getDefaultTaskName();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher</summary>
-
-```text
-public class com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher extends com.strategyquant.tradinglib.project.websocket.SynchronizedWebSocketPublisher
-    private org.json.JSONArray projectsStats;
-    private com.strategyquant.tradinglib.project.websocket.DataToSend data;
-    private java.lang.String lastData;
-    public com.strategyquant.plugin.App.impl.TaskManager.TaskManagerProgressPublisher();
-    public com.strategyquant.tradinglib.project.websocket.DataToSend getData();
-    public void resetLastData();
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/App/impl/TaskManager/TaskManagerAppPlugin.class` | 0 | `773e1708458054894db3826ef9753059c50ce09326596f626bda8c246782a0b6` | 1 | 12 |
+| `com/strategyquant/plugin/App/impl/TaskManager/TaskManagerProgressPublisher.class` | 0 | `65a465539ed0d1871e15a621e488aa2b08e87e651e92ee0153b6437dff44cb93` | 3 | 3 |

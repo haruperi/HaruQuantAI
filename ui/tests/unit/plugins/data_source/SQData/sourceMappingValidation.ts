@@ -20,7 +20,7 @@ export function validateSourceMapping(
     !path.split('/').some((part) => part === '..' || part === '.' || part === '');
   if (mapping.schema_version !== 1) fail('Unsupported mapping version');
   if (
-    !['Equity', 'Futures'].some(provider => mapping.donor_root === `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQ${provider}Data` && mapping.target_root === `HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/${provider}`)
+    !['Equity', 'Futures'].some(provider => mapping.donor_root === `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQ${provider}Data` && mapping.target_root === `HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/${provider}`)
   )
     fail('Invalid logical roots');
   if (!/^[a-f0-9]{40}$/.test(mapping.source_head)) fail('Invalid source commit');

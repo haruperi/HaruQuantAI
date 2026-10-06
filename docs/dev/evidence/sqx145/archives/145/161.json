@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar",
+  "sha256": "17330cbe60fbd5a601ef69ffd9d8c6d751143dbdbc6760f0619d4dfad0fad136",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CryptoExchange/impl/Poloniex/CryptoExchangePoloniexPlugin.class": "be41dd51f1d030431265cbb8ac6c640d86c788a41af9af400daa53be1045cc3e"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/Poloniex/CryptoExchangePoloniexPlugin.class",
+      "occurrence": 0,
+      "sha256": "be41dd51f1d030431265cbb8ac6c640d86c788a41af9af400daa53be1045cc3e",
+      "member_shard": "docs/dev/evidence/sqx145/members/161/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/161/001.json",
+      "sha256": "fd132b65c5477f3bf52c0ff7a7997617d692455432f44d0c6765b4c07ad8e754"
+    }
+  ]
+}

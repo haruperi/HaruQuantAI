@@ -1,0 +1,213 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
+  "sha256": "63a15c31d3c44356a360c32c988b22e30b8c8ddfe581a9bc7ac62050e887e8ce",
+  "class_count": 27,
+  "unique_class_entries": 27,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder.class": "9831510756e8232bf5193b0100ff49ae8549e50eaef22e9cc58da3d8d29b8653",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilderTask.class": "c2b5c0ce1d62fe2e059344aff4ac50443d36123a6027c0c89fb983184c4259b9",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask.class": "610c8e00f3953ab3141c5f42565f167dfe5e82819a0f7e35570c986a8a529067",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer.class": "57826be5a6e0d68548a4ba2b2c1da2dd80d1005f751b028a460c56c622bd831e",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener.class": "a3c1a8c12321c3216763554300158f8fc6aeb405385ee399806452bd6e0fddcc",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter.class": "5b515e2a6ec5ba3d9d837f277e8002bb707021b7d985218090baa71501b54702",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer.class": "185d5ea7314493e303dd06d8188ffb8a7f2142b7ab7a3799c3d803ad09b87d78",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker.class": "60049f2d5f86f11adfe80cd8d0179b2060a26fb45b15b7efb47a2365bd72c541",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination.class": "bb223e9ba005178c600ba3ef37400fd1904b076d06d74499b57b663001b37bb0",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator.class": "8d89f7907fce71a1d0c0d3e93fe43588cd3af2f2172affd49346cca376131f01",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1.class": "df7f77ab6ad98b12bb5867e90e2ab3801e76d44238c7e789a28db477aeb2ad64",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer.class": "e3777a18cfbcc8e66f0254ad603b6a6be5c8d474bfd9a4e59ec7d4fc39b75f5a",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger.class": "0faa8ddbc7f0e5089f1366bdcd0b54b28904330efa853d2773f4fb8fab451ab4",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker.class": "617bd07aafc5bffb84a40e89438bc68a5666802bf35d6845bad207516f417c6c",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask.class": "113e1f6b4230368cd4b46a38a758a43c386877fdbb003437e9c54d7c45e4b17f",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer.class": "862faf0340ee60a21299feb15a4abc5e658377bf814466dddd952c594692ab51",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer.class": "4201a9f1482ed45e0eb410290ecdb5a3b764cda6083c47262fbc1e46d36a3d6d",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings.class": "7e5baeb68736535aaa4657f30dc74adb60f7a013338d0e83d2411fdb338b2aa1",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache.class": "47529a22c100746c3f2e89be1def5fb5f6465be127b7cdc80ef4548323e0b38f",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene.class": "f4fedb93f5bd457c96e5c54b7d2cf39bead55c2adaf7910b8aceef6ffdf97677",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator.class": "a9415309992925670550b63d40aac87ddf40d30a0bac30b45ebaa8dca8b63da6",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome.class": "908b229e96a2be927d13674177ec896c1ed7be0e0f2f268bdf23dbc1ce3494bc",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeCrossover.class": "1a478d8ca3b201cd5839f7c020b90eb8a45a9179be76fb2b7f75197e9e12f67b",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator.class": "3d9601bc13ad2ae23c0495638c9a7ab395eebfef90d8db32e6d7ae638d578582",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory.class": "16a55c27c7be0d67464a94eb434d4fe047de96a54d52b7ae2045a2b2d7b76171",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation.class": "0ad9e072c7d044efcd2f14a95c19eba148a5ed884f597d341328d6d1a6c0ab6c",
+    "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine.class": "394ab526dedde39d7f7f62c0794b249097bfe05c42522de2e75bf859e965dbab"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder.class",
+      "occurrence": 0,
+      "sha256": "9831510756e8232bf5193b0100ff49ae8549e50eaef22e9cc58da3d8d29b8653",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilderTask.class",
+      "occurrence": 0,
+      "sha256": "c2b5c0ce1d62fe2e059344aff4ac50443d36123a6027c0c89fb983184c4259b9",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputeTask.class",
+      "occurrence": 0,
+      "sha256": "610c8e00f3953ab3141c5f42565f167dfe5e82819a0f7e35570c986a8a529067",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/BFPortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "57826be5a6e0d68548a4ba2b2c1da2dd80d1005f751b028a460c56c622bd831e",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMComputationListener.class",
+      "occurrence": 0,
+      "sha256": "a3c1a8c12321c3216763554300158f8fc6aeb405385ee399806452bd6e0fddcc",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMDatabankFilter.class",
+      "occurrence": 0,
+      "sha256": "5b515e2a6ec5ba3d9d837f277e8002bb707021b7d985218090baa71501b54702",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PMPortfolioComputer.class",
+      "occurrence": 0,
+      "sha256": "185d5ea7314493e303dd06d8188ffb8a7f2142b7ab7a3799c3d803ad09b87d78",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioChecker.class",
+      "occurrence": 0,
+      "sha256": "60049f2d5f86f11adfe80cd8d0179b2060a26fb45b15b7efb47a2365bd72c541",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombination.class",
+      "occurrence": 0,
+      "sha256": "bb223e9ba005178c600ba3ef37400fd1904b076d06d74499b57b663001b37bb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioCombinator.class",
+      "occurrence": 0,
+      "sha256": "8d89f7907fce71a1d0c0d3e93fe43588cd3af2f2172affd49346cca376131f01",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer$1.class",
+      "occurrence": 0,
+      "sha256": "df7f77ab6ad98b12bb5867e90e2ab3801e76d44238c7e789a28db477aeb2ad64",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/bruteForce/PortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "e3777a18cfbcc8e66f0254ad603b6a6be5c8d474bfd9a4e59ec7d4fc39b75f5a",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/EvolutionLogger.class",
+      "occurrence": 0,
+      "sha256": "0faa8ddbc7f0e5089f1366bdcd0b54b28904330efa853d2773f4fb8fab451ab4",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvaluationWorker.class",
+      "occurrence": 0,
+      "sha256": "617bd07aafc5bffb84a40e89438bc68a5666802bf35d6845bad207516f417c6c",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/FitnessEvalutationTask.class",
+      "occurrence": 0,
+      "sha256": "113e1f6b4230368cd4b46a38a758a43c386877fdbb003437e9c54d7c45e4b17f",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "862faf0340ee60a21299feb15a4abc5e658377bf814466dddd952c594692ab51",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GPortfolioMasterComputer.class",
+      "occurrence": 0,
+      "sha256": "4201a9f1482ed45e0eb410290ecdb5a3b764cda6083c47262fbc1e46d36a3d6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/GenomeSettings.class",
+      "occurrence": 0,
+      "sha256": "7e5baeb68736535aaa4657f30dc74adb60f7a013338d0e83d2411fdb338b2aa1",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioFitnessCache.class",
+      "occurrence": 0,
+      "sha256": "47529a22c100746c3f2e89be1def5fb5f6465be127b7cdc80ef4548323e0b38f",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGene.class",
+      "occurrence": 0,
+      "sha256": "f4fedb93f5bd457c96e5c54b7d2cf39bead55c2adaf7910b8aceef6ffdf97677",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome$StrategyGenesComparator.class",
+      "occurrence": 0,
+      "sha256": "a9415309992925670550b63d40aac87ddf40d30a0bac30b45ebaa8dca8b63da6",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenome.class",
+      "occurrence": 0,
+      "sha256": "908b229e96a2be927d13674177ec896c1ed7be0e0f2f268bdf23dbc1ce3494bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeCrossover.class",
+      "occurrence": 0,
+      "sha256": "1a478d8ca3b201cd5839f7c020b90eb8a45a9179be76fb2b7f75197e9e12f67b",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeEvaluator.class",
+      "occurrence": 0,
+      "sha256": "3d9601bc13ad2ae23c0495638c9a7ab395eebfef90d8db32e6d7ae638d578582",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeFactory.class",
+      "occurrence": 0,
+      "sha256": "16a55c27c7be0d67464a94eb434d4fe047de96a54d52b7ae2045a2b2d7b76171",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/PortfolioGenomeMutation.class",
+      "occurrence": 0,
+      "sha256": "0ad9e072c7d044efcd2f14a95c19eba148a5ed884f597d341328d6d1a6c0ab6c",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/genetic/SQGenerationalEvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "394ab526dedde39d7f7f62c0794b249097bfe05c42522de2e75bf859e965dbab",
+      "member_shard": "docs/dev/evidence/sqx145/members/268/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/268/001.json",
+      "sha256": "7b1f7ae4bc9e8e876f0d5c86b0e3774d0dd7b0c3ac19605021772182c742a4f6"
+    }
+  ]
+}

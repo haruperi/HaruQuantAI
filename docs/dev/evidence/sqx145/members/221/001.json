@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+  "archive_sha256": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin.class",
+      "occurrence": 0,
+      "sha256": "da22bcb2d70490f30d2b70dd8661df033fb37100fb7dfd3048d86e8c3946cec9",
+      "name": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin",
+        "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet.class",
+      "occurrence": 0,
+      "sha256": "7821216b00cb3d457ff9c5e08cee05eae7db5b6eed103142a1a5b76ae5dbabd2",
+      "name": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "727ffa6e73bb8838f1a67859ad85e4f5126d085b720174632c5bb4c0c9ebddb0",
+          "code_length": 252,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetColumns",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dc7d52215a3b26b00d1daa7310b3a935f8ac99c4534a590a801c0faacef4cbc8",
+          "code_length": 40
+        },
+        {
+          "name": "onGetViews",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c430694ccf24cff6d88fc3ae0a1c8cd5255bee4471e23f882e81406608cab3d2",
+          "code_length": 42
+        },
+        {
+          "name": "getColumns",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "da60540a77e16da827882b26e5e32caa4802dbf9dbe0da1bf57ba4335c748223",
+          "code_length": 118
+        },
+        {
+          "name": "sendWSUpdate",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3ffa2a5a4fcdbaf154e78057bbffa5a90a6bcd20ee59ae78b2a3ee71a0e57951",
+          "code_length": 42
+        },
+        {
+          "name": "onAddView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b2053237c290f261cbdfd28c907c47b8a4cb634bae81a5782c4e4a1193e00073",
+          "code_length": 105,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6ff3b3477076e2fcf408ae79963c361075c2026aca9d3100d3e0e7fb902b5001",
+          "code_length": 112,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d6e9258a9ba0fba81072ec9f55973ba128a1d9a2fa424b3e83cd97b60bd43311",
+          "code_length": 115,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onChangeView",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "504d4b6b06dda76cf831b927b30b4698e2086db4d9f4b16ecd8b77207e359473",
+          "code_length": 87,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ed17d0b60cdf021bd8d15796bf10c3bc7dd0699a471534717452f40ee1ff8b03",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/tradinglib/tradelist/TradelistColumnsList",
+        "com/strategyquant/tradinglib/tradelist/TradelistTableView",
+        "com/strategyquant/tradinglib/tradelist/TradelistViewsManager",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

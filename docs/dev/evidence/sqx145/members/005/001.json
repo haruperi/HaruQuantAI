@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/animal-sniffer-annotations-1.14.jar",
+  "archive_sha256": "2068320bd6bad744c3673ab048f67e30bef8f518996fa380033556600669905d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/codehaus/mojo/animal_sniffer/IgnoreJRERequirement.class",
+      "occurrence": 0,
+      "sha256": "4bf035981108344316103d7e72ca4a5a8f340701af8142102ef82c688caf785f",
+      "name": "org/codehaus/mojo/animal_sniffer/IgnoreJRERequirement",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/codehaus/mojo/animal_sniffer/IgnoreJRERequirement"
+      ]
+    }
+  ]
+}

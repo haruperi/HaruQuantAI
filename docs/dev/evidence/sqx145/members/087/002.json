@@ -1,0 +1,537 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-api-incubator-1.61.0-alpha.jar",
+  "archive_sha256": "0f3f4eacb0a29579cb56e94bfbb75fab6aa4e893e7c1e37e91da874d06dbc7ce",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer.class",
+      "occurrence": 0,
+      "sha256": "1ebd925c113d0e28baa62c1581d7d0b13c4657d795ba678be358e37ebe00aebd",
+      "name": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/api/incubator/trace/ExtendedTracer"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/api/trace/Tracer;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "getNoop",
+          "descriptor": "()Lio/opentelemetry/api/trace/Tracer;",
+          "access": 8,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "spanBuilder",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "63ceef94c0fbb4d351362de466a4c2dda3bbc7ddf10a43482e2b7685a23a47be",
+          "code_length": 5
+        },
+        {
+          "name": "spanBuilder",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "22f8da68662ddf5d2facf4d4adaed3c6086c57d8f889e6f22105ebeea5936375",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0e22db8ff8ab047078abb3f4bf41f1f6d3a4528ab882225df5541746c6db5cf5",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer",
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer$NoopSpanBuilder",
+        "io/opentelemetry/api/incubator/trace/ExtendedTracer",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerBuilder.class",
+      "occurrence": 0,
+      "sha256": "b45090a53d914c69c61805e6538ee512bb3b28c9beede6e546e4d337880320f7",
+      "name": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/api/trace/TracerBuilder"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/api/incubator/trace/ExtendedDefaultTracerBuilder;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lio/opentelemetry/api/trace/TracerBuilder;",
+          "access": 8,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "setSchemaUrl",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/TracerBuilder;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "setInstrumentationVersion",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/TracerBuilder;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/opentelemetry/api/trace/Tracer;",
+          "access": 1,
+          "code_sha256": "0f838e3d483644a8593f02a4843758da850e22f35a0d1aa6ccf948db959dd267",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "21de62ad602b1265cfc27d69b6845208a85721636cc4c2e888a52a7261ad0361",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer",
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerBuilder",
+        "io/opentelemetry/api/trace/TracerBuilder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerProvider.class",
+      "occurrence": 0,
+      "sha256": "9085f806a832757260ed46ca653c6207951a139a42d46779dfdc5158b2877cb6",
+      "name": "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerProvider",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/api/trace/TracerProvider"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/api/trace/TracerProvider;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "getNoop",
+          "descriptor": "()Lio/opentelemetry/api/trace/TracerProvider;",
+          "access": 9,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/Tracer;",
+          "access": 1,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lio/opentelemetry/api/trace/Tracer;",
+          "access": 1,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        },
+        {
+          "name": "tracerBuilder",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/TracerBuilder;",
+          "access": 1,
+          "code_sha256": "0f838e3d483644a8593f02a4843758da850e22f35a0d1aa6ccf948db959dd267",
+          "code_length": 4
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3cbf10796c8b68343919f56bd75d1061d3aefdbd02f8763313f594d895cc67df",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "359c5842c249260bc6bcd9d1e8e18a362943d357f01c52fd1b9b7adcc11a53c2",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracer",
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerBuilder",
+        "io/opentelemetry/api/incubator/trace/ExtendedDefaultTracerProvider",
+        "io/opentelemetry/api/trace/TracerProvider",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/ExtendedSpanBuilder.class",
+      "occurrence": 0,
+      "sha256": "0f6c9a7baa02b46d539d077d049a02f0a33df7c4e0deab90002f71330bf8031b",
+      "name": "io/opentelemetry/api/incubator/trace/ExtendedSpanBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/api/trace/SpanBuilder"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setParentFrom",
+          "descriptor": "(Lio/opentelemetry/context/propagation/ContextPropagators;Ljava/util/Map;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025,
+          "generic_signature": "(Lio/opentelemetry/context/propagation/ContextPropagators;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;"
+        },
+        {
+          "name": "startAndCall",
+          "descriptor": "(Lio/opentelemetry/api/incubator/trace/SpanCallable;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;E:Ljava/lang/Throwable;>(Lio/opentelemetry/api/incubator/trace/SpanCallable<TT;TE;>;)TT;^TE;"
+        },
+        {
+          "name": "startAndCall",
+          "descriptor": "(Lio/opentelemetry/api/incubator/trace/SpanCallable;Ljava/util/function/BiConsumer;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;E:Ljava/lang/Throwable;>(Lio/opentelemetry/api/incubator/trace/SpanCallable<TT;TE;>;Ljava/util/function/BiConsumer<Lio/opentelemetry/api/trace/Span;Ljava/lang/Throwable;>;)TT;^TE;"
+        },
+        {
+          "name": "startAndRun",
+          "descriptor": "(Lio/opentelemetry/api/incubator/trace/SpanRunnable;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<E:Ljava/lang/Throwable;>(Lio/opentelemetry/api/incubator/trace/SpanRunnable<TE;>;)V^TE;"
+        },
+        {
+          "name": "startAndRun",
+          "descriptor": "(Lio/opentelemetry/api/incubator/trace/SpanRunnable;Ljava/util/function/BiConsumer;)V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<E:Ljava/lang/Throwable;>(Lio/opentelemetry/api/incubator/trace/SpanRunnable<TE;>;Ljava/util/function/BiConsumer<Lio/opentelemetry/api/trace/Span;Ljava/lang/Throwable;>;)V^TE;"
+        },
+        {
+          "name": "setParent",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setNoParent",
+          "descriptor": "()Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "addLink",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanContext;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "addLink",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanContext;Lio/opentelemetry/api/common/Attributes;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;J)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;D)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Z)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Ljava/lang/Object;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lio/opentelemetry/api/common/AttributeKey<TT;>;TT;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;"
+        },
+        {
+          "name": "setAllAttributes",
+          "descriptor": "(Lio/opentelemetry/api/common/Attributes;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1,
+          "code_sha256": "71a543fd245b93a0988a5d6d8c98e42b9dcb57f4a9f4de5ec367f8c778c69b70",
+          "code_length": 9
+        },
+        {
+          "name": "setSpanKind",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanKind;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setStartTimestamp",
+          "descriptor": "(JLjava/util/concurrent/TimeUnit;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "setStartTimestamp",
+          "descriptor": "(Ljava/time/Instant;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1,
+          "code_sha256": "f0ad24125088abae2801425c9a1743cfbb4072e473dc947d9094e145c723fd3f",
+          "code_length": 9
+        },
+        {
+          "name": "setStartTimestamp",
+          "descriptor": "(Ljava/time/Instant;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "e8a00db61bf6a5c93942a604d1065a6b748cdeca3e7ba35686311df5859ef3d1",
+          "code_length": 8
+        },
+        {
+          "name": "setStartTimestamp",
+          "descriptor": "(JLjava/util/concurrent/TimeUnit;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "9695211023cf0c297fcf791713f58bd6c28e8d7521da7de676c7f2e36146f461",
+          "code_length": 9
+        },
+        {
+          "name": "setSpanKind",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanKind;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "cc7dc7254ec0f608b36714f86994d0ca121c777fb4dce577d2ed06a405986c65",
+          "code_length": 8
+        },
+        {
+          "name": "setAllAttributes",
+          "descriptor": "(Lio/opentelemetry/api/common/Attributes;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "6be40ff57614c0f17ac14ed928fc5dd89616a6daa5c0162414507d5e21793a1d",
+          "code_length": 8
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Ljava/lang/Object;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "2d8c6a8c19b797f068f7107c701778e7ceaec11ddf8fb9abb0e066f91736dcc4",
+          "code_length": 9
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Z)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "c983e271a87d68b42f51eb96766ef9ad195f387dca6ce3b3684d82ebbe3d2fc8",
+          "code_length": 9
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;D)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "0abd09a8551a079f9425a2955f1c09d5baf7ff645f49af6f0251e0ff26a263cd",
+          "code_length": 9
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;J)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "d8d490a717bed20f8bf2e6d03eff214b63af447a65445e39d29ff8385d267eb0",
+          "code_length": 9
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "2319dee5abfa47f6fbd97f6ee47fbdc4e1be465adf739bc12540691e50b1783f",
+          "code_length": 9
+        },
+        {
+          "name": "addLink",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanContext;Lio/opentelemetry/api/common/Attributes;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "e49f66acfdd0fd9a915f78f9ff0bafdd70efa6bdb46d534a9dbe39f31109db7a",
+          "code_length": 9
+        },
+        {
+          "name": "addLink",
+          "descriptor": "(Lio/opentelemetry/api/trace/SpanContext;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "618069b7368dd2563957b5fe35c9854bebf8487b81308c1b9006d53ef9659994",
+          "code_length": 8
+        },
+        {
+          "name": "setNoParent",
+          "descriptor": "()Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "8bdeb867b6907603813d6d94717fbdaa97299a499cbd173ee7648f766d955ddc",
+          "code_length": 7
+        },
+        {
+          "name": "setParent",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "f1fedc5414d055283697522c9cbd92dcc15426ac7350ffada51685db057c364d",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/ExtendedSpanBuilder",
+        "io/opentelemetry/api/trace/SpanBuilder",
+        "java/lang/Object",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/ExtendedTracer.class",
+      "occurrence": 0,
+      "sha256": "37aa00f5f1bc9721deeddc929a5bf451b1fe5a1f7a341d03b435fa2336efb901",
+      "name": "io/opentelemetry/api/incubator/trace/ExtendedTracer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/api/trace/Tracer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "spanBuilder",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/incubator/trace/ExtendedSpanBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "spanBuilder",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/api/trace/SpanBuilder;",
+          "access": 4161,
+          "code_sha256": "8ad658c347010c328b52a56cf4b66efd877bea2d7f27c58b4d17eeaee16ada57",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/ExtendedTracer",
+        "io/opentelemetry/api/trace/Tracer",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/SpanCallable.class",
+      "occurrence": 0,
+      "sha256": "bea49ad8af5b3ec433fce3725bc1dce4d37d07cbaefe44ca481612fc04387d32",
+      "name": "io/opentelemetry/api/incubator/trace/SpanCallable",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "callInSpan",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "()TT;^TE;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;E:Ljava/lang/Throwable;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/SpanCallable",
+        "java/lang/Object",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/api/incubator/trace/SpanRunnable.class",
+      "occurrence": 0,
+      "sha256": "37fb681a92058b093adfe88f5660050fbf9ea4e309840c2363a49c60946c845a",
+      "name": "io/opentelemetry/api/incubator/trace/SpanRunnable",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "runInSpan",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "()V^TE;"
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Throwable;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/incubator/trace/SpanRunnable",
+        "java/lang/Object",
+        "java/lang/Throwable"
+      ]
+    }
+  ]
+}

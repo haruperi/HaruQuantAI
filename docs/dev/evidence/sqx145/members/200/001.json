@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsChart/ResultsChart.jar",
+  "archive_sha256": "e7806d3052e6f1d1df42c1237e7a28f443f42d66c44a526893de285635bde1e2",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Chart/ChartServlet.class",
+      "occurrence": 0,
+      "sha256": "cbc3b5927023cfebcd907de509c47d21547e13f7e25bf874d23da9c9d0e11b3d",
+      "name": "com/strategyquant/plugin/Results/impl/Chart/ChartServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "formaterDate",
+          "descriptor": "Lorg/joda/time/format/DateTimeFormatter;",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_CHARTSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "994b73f31d31784d0797d6f7cf457b877e22b562d5a65f321ec044c3806c7e17",
+          "code_length": 9
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "e2d6c65e9aa037b62f182b90cffd7965e74842cedb2ba5c06dfab57177611335",
+          "code_length": 84,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "tryToParseTime",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Long;",
+          "access": 2,
+          "code_sha256": "b02fb0402d1c4bc389c2d4748ffd86fdabec92f4ec270448bd29ebe3ec856695",
+          "code_length": 14
+        },
+        {
+          "name": "onLoadChartData",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2d7651375deb8f082bce5bbec820aebb522a83fa7e27c81807f85033c93d2320",
+          "code_length": 708,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1eb77ee3994f5eb647bce4b24074322cf67ca72cd88991de27fb57ff4d436fb1",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/Chart/ChartServlet",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/tradinglib/results/SymbolsMap",
+        "com/strategyquant/tradinglib/stockchart/StockData",
+        "com/strategyquant/tradinglib/stockchart/StockLoader",
+        "com/strategyquant/tradinglib/stockchart/StockLoaderForStockPicking",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "java/util/jar/JarFile",
+        "org/joda/time/format/DateTimeFormat",
+        "org/joda/time/format/DateTimeFormatter",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Chart/ChartServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "210949208fc6e6f5723240607b8fe38cc69563b3d35822ffb8d1c77913aefb38",
+      "name": "com/strategyquant/plugin/Results/impl/Chart/ChartServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "6aa3303fb937fe13fe157f7b0f28f6e5ac0f5bef19226e17ce06dc9d300f1a6f",
+          "code_length": 60
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "136972cfed4af8092c99963b9fccdced0a597dea27a949d6cd973394eb01064a",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "correctResultKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bf9de586279797bc63ca924fc8ad98c429c0b765988da9ae6626ca8f5e0494f6",
+          "code_length": 9
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a6797cbc87f1a643d7ce9b6fafb70bc98959da91eb7ae23f788d6df31ebdc777",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/Chart/ChartServlet",
+        "com/strategyquant/plugin/Results/impl/Chart/ChartServletPlugin",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "java/lang/String",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

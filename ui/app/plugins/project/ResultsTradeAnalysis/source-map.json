@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsTradeAnalysis bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsTradeAnalysis",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,127 +28,172 @@
   "source_catalog": [
     {
       "id": "sqx-resultstradeanalysis-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
       "family": "bounded installed frontend plugin artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.js",
       "relative_path": "controllers/TradeAnalysisCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0884b270c33638f11ce5fd4b08da4fb8a126f3382d7c7fcf1c3cd1bd5f0bfb1c",
+      "sha256": "c83584f72b7356e726857f0b171803316b9d3ec371ec6a55ed2354556cdf14fe",
       "target": "controllers/TradeAnalysisCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/tradeAnalysisPanel.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/tradeAnalysisPanel.html",
       "relative_path": "directives/tradeAnalysisPanel.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "572242e55bd727d83f8e040396d47dbfef5b88f4253520d5be9c6f00918b1521",
+      "sha256": "385751fc9ba27460d8fd89fc327a8aba8cacf374b3f3ebca4d7e1a985bfca9dd",
       "target": "directives/tradeAnalysisPanel.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanel.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanel.js",
       "relative_path": "directives/TradeAnalysisPanel.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "94aabb543d97f3b6fcd8a93cf4cc01b5ca675ca6c70befbf47fd0374eddf866d",
+      "sha256": "a39e23ce63fc43495828ec87a34f3a725aa70c56718a25285c4ae4f28c0bf6b8",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanelCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanelCtrl.js",
       "relative_path": "directives/TradeAnalysisPanelCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "54325b1eb665bec5ade14742ec8847d720e8a9b3e4f4ddd36fdfc265e8461588",
+      "sha256": "14defd72a4f534eea36d8dc536f10fba69c237dc7c9f53273aab58953e49a1d1",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "77b533a3f983858dca302d3f4def900dea0fd89c861ae06c2443f586e0fcc1a2",
+      "sha256": "93b78ea569a5e4c77e1d4ddbc822966dcdb1d60b628d6fd43546fb214e197806",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
       "relative_path": "ResultsTradeAnalysis.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "7c7ba403d569744e36cd88fa4e8e62640249db056c36171fe781e58e30a17816",
+      "sha256": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js",
       "relative_path": "services/TradeAnalysisService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "9ed855a4573a998550cf41ac30e8c395b920f863e451ed3d2236de9ca969bd81",
+      "sha256": "f41dd2661c0bfb889a82710b0b0e08131304303384c4b1ff151e25656a114780",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/styles/TradeAnalysis.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/styles/TradeAnalysis.css",
       "relative_path": "styles/TradeAnalysis.css",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "cad9367b16729a17ef64a84328fff9abe727b4bf893a58f249ea5df498f1913e",
+      "sha256": "e3d118441c8f9ee216caf015893a811c7bbe70881fda3e1a8cef6845a1bc946c",
       "target": "styles/TradeAnalysis.css",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultstradeanalysis-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/views/tradeAnalysis.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/views/tradeAnalysis.html",
       "relative_path": "views/tradeAnalysis.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9eb224b3e2a2a8506f5bc8fd483fae6b8bacc7ac36f2acfde0d95707012109a7",
+      "sha256": "b1dda0978a28159c469fec868c7247184d56d7874a4b0e5283eb2419ae339547",
       "target": "views/tradeAnalysis.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -190,6 +235,9 @@
   "limitations": [
     "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
     "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
-    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
-  ]
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsOptimizationProfile recursive bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/optimization/ResultsOptimizationProfile",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,153 +28,208 @@
   "source_catalog": [
     {
       "id": "sqx-resultsoptimizationprofile-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
       "family": "bounded installed optimization-profile frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3f2753acccba0f400b004eef12f2249f57ad00e8b4bd1b4539b97e22388c14d0",
+      "sha256": "22c51cd05617791a2d4021c9fd87ecfcb857183c9532a3d7ab4484287a651d66",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimizationProfile.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimizationProfile.html",
       "relative_path": "optimizationProfile.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "d18bc958b15587d887299934a9031c49dc33257ad06dfb390f83fec0e0e39be7",
+      "sha256": "e1282ea33c9cdfe061b5dfa63fac5cbb284db721815f770d3bd27c4e4634c839",
       "target": "optimizationProfile.tsx",
       "classification": "counterpart",
-      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileCtrl.js",
       "relative_path": "OptimizationProfileCtrl.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "eb07997ce42c3460de1138b0471250b9b07d83c9a6dbf2071c9e6194db2a278b",
+      "sha256": "e89b51a199c41d406b3a1006597b809fb71045ab682193f40546e4d9e9bb90f3",
       "target": "OptimizationProfileCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js",
       "relative_path": "OptimizationProfileService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "f3c538b8658d235e09f63ecb5b63fa1655e0142ca7fae86a592222a629a21379",
+      "sha256": "c5367f15d9e8b88b4165b3a367e46b9489187d83e1c3299ad6d7e3916632012e",
       "target": null,
       "classification": "excluded",
-      "limitation": "Remote optimization-result, parameter, chart and export service is absent. Independent synthetic logic is explicitly target-only."
+      "limitation": "Remote optimization-result, parameter, chart and export service is absent. Independent synthetic logic is explicitly target-only. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimProfileLevelsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimProfileLevelsPopup.html",
       "relative_path": "optimProfileLevelsPopup.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "92070923ee145aba6c99dbdebf420d4ec2ce7d2e3fa69f33b7b5ea1ec1a40ddb",
+      "sha256": "66a1635dae5139e4c2c67f3a81dba94b71f1ca230ddd8d1705df8d7fa2110470",
       "target": null,
       "classification": "excluded",
-      "limitation": "The current surface has no configurable-checks-level dialog; adding it would enable new functionality."
+      "limitation": "The current surface has no configurable-checks-level dialog; adding it would enable new functionality. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
       "relative_path": "ResultsOptimizationProfile.jar",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "f3fbf5808631df75cf45cdac71080efb9b1c05dfb5d0d800b4fd56a56cd4c62f",
+      "sha256": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary is outside the approved frontend-only scope."
+      "limitation": "Backend binary is outside the approved frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
       "sha256": "884fd27ed580152b44b5b9ce6a670bdc7bcacf431ebfdadf13d8fd96d1b7d276",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing donor-class stylesheet is owned by this surface; retained target utility classes and inline canvas colors stay in its independent view."
+      "limitation": "No existing donor-class stylesheet is owned by this surface; retained target utility classes and inline canvas colors stay in its independent view. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/manageviews.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/manageviews.html",
       "relative_path": "directives/manageviews/manageviews.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "acaecb3037500baf2922516377c3db52e4f2fe266c4391367286aa920e5968c3",
+      "sha256": "8e6ff2e6c1208d3db6e1e6504357e57972ad171296abf16232078ddcdca27489",
       "target": null,
       "classification": "excluded",
-      "limitation": "No optimization-results table view-selection or management workflow exists in the assigned target."
+      "limitation": "No optimization-results table view-selection or management workflow exists in the assigned target. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViews.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViews.js",
       "relative_path": "directives/manageviews/ManageViews.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "84984a9ca12481c11dfdc0284a3c02f2fdd2165533955513c0f0f64cba1bdc20",
+      "sha256": "eb1edb025b5aa2ab91f79ab9569557d19fec1b55f27cf3673e93d8751509652b",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing optimization-specific view-management component registration responsibility."
+      "limitation": "No existing optimization-specific view-management component registration responsibility. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js",
       "relative_path": "directives/manageviews/ManageViewsService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "44925f3e388ac8eb362821bca0e8aa9c213c063b61f90e2f51551f5a2b875ac4",
+      "sha256": "084b19861cb1a36dbdc41c56c2ae259142b4cf089b47c17b61c724f4e5cffaaf",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing optimization-view persistence or remote-management service; backend behavior is excluded."
+      "limitation": "No existing optimization-view persistence or remote-management service; backend behavior is excluded. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsoptimizationprofile-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/OptManageViewsCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/OptManageViewsCtrl.js",
       "relative_path": "directives/manageviews/OptManageViewsCtrl.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing target responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "019dfcc667531e6f90ae14ec5b48d10a746bb43ebf25ea812cd5d88f4338d453",
+      "sha256": "3a07b7658501f999a14ad35e9ee7ee95cc82156b2a1bf6f8f26e616d45c4715f",
       "target": null,
       "classification": "excluded",
-      "limitation": "No existing optimization-specific view-selection/editor state to relocate."
+      "limitation": "No existing optimization-specific view-selection/editor state to relocate. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -196,6 +251,9 @@
   "limitations": [
     "Canonical reimplementation ledger/schema absent; no new behavioral evidence IDs or parity claims.",
     "Current synthetic grid, fixed canvas, hardcoded dark styling, mouse-only orbit and reset/remount behavior retained.",
-    "Owning registry integration and shared import rewiring are coordinator responsibilities."
-  ]
+    "Owning registry integration and shared import rewiring are coordinator responsibilities.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

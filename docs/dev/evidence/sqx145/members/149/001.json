@@ -1,0 +1,391 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckOptProfileSysParamPermutation/CrossCheckOptProfileSysParamPermutation.jar",
+  "archive_sha256": "c4e99b61351649ea64d8ea64d88a719336b0a249edd7ae3d28a34b097080d6da",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutation.class",
+      "occurrence": 0,
+      "sha256": "0908225cb7a24231ae1c3d1be9b183816c11083396e204bf6e4827415dd37d58",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutation",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "CROSSCHECK_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "optProfileLevels",
+          "descriptor": "Lcom/strategyquant/tradinglib/optimization/OptProfileChecksLevels;",
+          "access": 2
+        },
+        {
+          "name": "distributionUp",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "distributionDown",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxSteps",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "paramTypesOPSPP",
+          "descriptor": "Lcom/strategyquant/lib/ValuesMap;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "47d7921075aa58159da823d947bd776d2184c1842a0ce8e342e0249d96e979c2",
+          "code_length": 47
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c943ffa0ad636f6ab3aac0c0beca0f84ef8c64657ee2f0ceaef5d0345d1a6b52",
+          "code_length": 4
+        },
+        {
+          "name": "getShortName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dc2b27fb0678c725c1eef22f3eee67d2c187d4b5bfe67f8ed3ad31c812f71f6b",
+          "code_length": 6
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0d2ebeab643885205f077db640eede08ed36037a0f44bfee573463a6e264ee37",
+          "code_length": 6
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b3c220f6959794889469d4fe536b89fae17083b23ac4ad165b31abf7367825ea",
+          "code_length": 56
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "85306007047ac3b5ea20a5671f3e292959a93eb91de3d3ca6d27c21879425d89",
+          "code_length": 8
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "43a8ae9b6dbc0009ceb6a2ed5613fd36f7a7bb1612f0cd55957565206fba757f",
+          "code_length": 4
+        },
+        {
+          "name": "getNumberOfSimulations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "doesRetest",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "doesForEverySetup",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "ff8c5864298640c8ed15b133bce4708e869168ab8151de28aea4e45a1f356741",
+          "code_length": 6
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "dca34c7b37b264f87bdbf8fb36dc68c10fedd2876a90f6bb58c6a150d19ee590",
+          "code_length": 331,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "prepareSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lorg/jdom2/Element;Z)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4,
+          "code_sha256": "a6e83f6610a36c7178cd561661d7e9a9a6a03152bc6ebb6b5c65aecd3ee5a72f",
+          "code_length": 230,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runTest",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;IDLcom/strategyquant/gridlib/client/GridJob;ZLcom/strategyquant/tradinglib/project/ILastEventListener;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "d05ef7fcba2e9765cb89e35fdcb4f884ebae739ac827f06361ae81fbe84c8630",
+          "code_length": 30,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 4,
+          "code_sha256": "c4a30ca9cf942e4853c0cf125274a218170f55b8b0c57706d4632794259bcd93",
+          "code_length": 49
+        },
+        {
+          "name": "checkOptimizationProfileConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 2,
+          "code_sha256": "410f640927831caefc7b9067c2692a00ac9bf5a70bca2363137147d17f949bbe",
+          "code_length": 76,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;I)Z",
+          "access": 4,
+          "code_sha256": "8eae5b332bb4e4040fb70461c9cd5379dc3bc9c27c662e5a9c28cfc09b02ffa6",
+          "code_length": 193
+        },
+        {
+          "name": "getStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)D",
+          "access": 129,
+          "code_sha256": "9ac0965455156ead85a4babad6003bc7f53892196ad82c14c6d3f0d41d0e4069",
+          "code_length": 37,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "hasStatsValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Z",
+          "access": 129,
+          "code_sha256": "9314082ac88959fb9ef5cdda11d4bab032017a125584da803e9077daa75f88be",
+          "code_length": 15,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printSpecialValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "458bbbdd7bda3a879b7bacbd7d334b133bafa5b8e3821ac0509b7de7f3725747",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getColumnTitle",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Element;[Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 129,
+          "code_sha256": "86f3bd9f818476773e05e8d23335f364d900f9be3b9982ae31f9deca8e2d087a",
+          "code_length": 20
+        },
+        {
+          "name": "getColumnTitleTemplate",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c52d0ee54862856f62921b81d6db2cce5ee848a047fbf838987d8a0e66b1baad",
+          "code_length": 4
+        },
+        {
+          "name": "getChartSetups",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;)Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;",
+          "access": 1,
+          "code_sha256": "21fb0d7b26b5a27ad9a0b931deceb189a42a968f3d8e1d3b6d49496f76dfd03d",
+          "code_length": 94
+        },
+        {
+          "name": "printSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "661d60771af2c223e8e5f9a2451625410a973ce72e1e625181ea588422f0b444",
+          "code_length": 561,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getBadStrategyReason",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8587bed235be0db0cbc513798736ecfd0e0d5efcde1cb4dedd42b83237d9e596",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/ValuesMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutation",
+        "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutationServlet",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Variables",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/conditions/ConditionsChecker",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckDataNotExistException",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckTypes",
+        "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/optimization/OptProfileChecksLevels",
+        "com/strategyquant/tradinglib/optimization/OptimizationMethods",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/optimization/OptimizationSettings",
+        "com/strategyquant/tradinglib/optimization/OptimizationTypes",
+        "com/strategyquant/tradinglib/optimization/SysParamPermutationsTable",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutationServlet.class",
+      "occurrence": 0,
+      "sha256": "b7343493848041ce7b79dbaf419385e0d0b892cfba10ccd1e8757f2af8adf1ca",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutationServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "25502fa9f9eb30c601a007d8f31eb1744fb23ca04bbe5d97c636406a230c9cd4",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetDefaultSPPConditions",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2f6f75d8f61e16d468782dc353cde6cbab34f28bbcd3f89b88a02d6e42746632",
+          "code_length": 64,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "710eda22ec87f24bd96095950e6d55192e37722419b6662797771b46dbdc0a4c",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/plugin/CrossCheck/impl/OptProfileSysParamPermutation/OptProfileSysParamPermutationServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

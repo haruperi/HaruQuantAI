@@ -1,0 +1,1312 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
+  "archive_sha256": "e197dc620cdeb9bccc53742aa8c3aa6a3a9bc41aea320f3e95eb3b052e503d7d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge.class",
+      "occurrence": 0,
+      "sha256": "2e4ca5a995a1289182449cf3e6582ff5c2d99bdd552df852a7ff8c951493342c",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/jfx/strategy/Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "coordinationInterval",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "activeOrders",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "orderClosed",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/Boolean;>;"
+        },
+        {
+          "name": "activeSymbols",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "connectionManager",
+          "descriptor": "Lcom/strategyquant/tradinglib/connection/ConnectionManager;",
+          "access": 2
+        },
+        {
+          "name": "connectionName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "connectionHash",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "PL",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "balance",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "openOrders",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "status",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "disconnectBridge",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "coordinationCalled",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/connection/ConnectionManager;Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "069e58caf11c639b3ffba0b2e2e4f9cf692556496a5b53b0eb73527fadbc63d2",
+          "code_length": 76
+        },
+        {
+          "name": "registerSymbol",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7f8a654aacba816d634e62d67b4b500b2b5f08d947ebaaa8c532d612097afa74",
+          "code_length": 168,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "buyNow",
+          "descriptor": "(Ljava/lang/String;D)J",
+          "access": 1,
+          "code_sha256": "0aed8140ff25176d169e607aa8ce30c81bb919ddb6ca3273d530b1d4d94e254c",
+          "code_length": 79,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sellNow",
+          "descriptor": "(Ljava/lang/String;D)J",
+          "access": 1,
+          "code_sha256": "c025bb95bcef2ea56de924d7bcbf77ea1c9bdb8f21d282ef9319f83082e7eba9",
+          "code_length": 79,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendOrder",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/TradeOperation;DIIILjava/lang/String;ILjava/util/Date;)J",
+          "access": 1,
+          "code_sha256": "91356e9f89d25f17db3c9e28be9c243a23888e30bb3fc4f87485345783fc673c",
+          "code_length": 273,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendOrder",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/TradeOperation;DIDDLjava/lang/String;ILjava/util/Date;)J",
+          "access": 1,
+          "code_sha256": "358b90ffdb0eac4c3a17122e1f0dedab92f4b65b9f32d8c489d9f18bf14218cb",
+          "code_length": 203,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "closeOrder",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "9d146f56a0936574823a6e9519ba0b2e3d107705eccd7692d3b352e6cae9d272",
+          "code_length": 102,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "modifyOrder",
+          "descriptor": "(JDDDLjava/util/Date;)V",
+          "access": 1,
+          "code_sha256": "b735d099506d48dc84ba38c055700c1a8de7c6c72f177a9008984f2ff1ddced5",
+          "code_length": 64,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "addActiveOrders",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "35d85c5e8357fd1cc9252c51c93b0cfc27730223823f13909a69bc141ce060f6",
+          "code_length": 203
+        },
+        {
+          "name": "dumpActiveOrders",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6d03b4f264c73d25313615acb4846dbae8b4ab8e05f3fbc1ce7dd0fba7514a4f",
+          "code_length": 149,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateOrdersInfo",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "1e8b7deba72338d79feab4dd5e8aa77a93cca2d0150c988e073199f956797d5e",
+          "code_length": 218
+        },
+        {
+          "name": "getHistoryBars",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "8ee2b88af884c34902d3aec6680d60bf5698084eeb51a882ae9bf4a0b2f16326",
+          "code_length": 115
+        },
+        {
+          "name": "init",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/strategy/StrategyRunner;)V",
+          "access": 1,
+          "code_sha256": "c3f63274f4a8d2b5e49c7cd76e95b1625eb1d88058d7dd8058980db546721a8d",
+          "code_length": 46
+        },
+        {
+          "name": "deinit",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e4e5222ad1e1921fbf8e5f5ef26903c1a50b0534b9e44dedecd3d0350de02a18",
+          "code_length": 16
+        },
+        {
+          "name": "coordinate",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aed8b671a4ff0172cc2a3365ea440fe3dc1d6fa8f770ce1d797395e6178f142e",
+          "code_length": 408
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/Broker;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)V",
+          "access": 33,
+          "code_sha256": "3b0d7d13548e5ea24704ecbb72db4a07ed80530cb1476b63c5750d74fadc0621",
+          "code_length": 26,
+          "throws": [
+            "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException",
+            "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException",
+            "com/jfx/strategy/NJ4XNoConnectionToServerException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "disconnectBridge",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ebc69d6c6e4c7b798be592f210fadeca2cd37d0b569a1b4fdb55a17ecfcfb045",
+          "code_length": 26
+        },
+        {
+          "name": "disconnect",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d621b9b6f7d53364be41bceec5d45855dffb3e060222c4590cec01595d5591c8",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "coordinationIntervalMillis",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "70bfdbca4b08553a706cd7309ef58ad46d9bf273f932edbddc5b84567ddf9580",
+          "code_length": 4
+        },
+        {
+          "name": "isConnected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "65e9197b10e36bd395458fb726faf7debeb0306a091c1b28f3ca9a794cc58a31",
+          "code_length": 27
+        },
+        {
+          "name": "isDisconnectedByUser",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "firePLChangedEvent",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f59f971ef107c2ca7b87b2f666eec20780bb34111807c91211eb9ca09ffbd52e",
+          "code_length": 16
+        },
+        {
+          "name": "fireAccountBalanceChangedEvent",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "743b9eb1033e6e52373c120b8d735b4031b9532cf110ef6357a2446cb3561cd4",
+          "code_length": 16
+        },
+        {
+          "name": "fireOpenOrdersChangedEvent",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0c0e936c611c5e6bf9aa34d30f137519c68f80003167a8dcd3e9084f0b1de925",
+          "code_length": 16
+        },
+        {
+          "name": "fireOrderAddEvent",
+          "descriptor": "(JLjava/lang/String;Ljava/lang/String;DD)V",
+          "access": 2,
+          "code_sha256": "c972eb382bba3d2bd1c1186fb4ba75490008ee1a5e77f366afd9ce4fdd662cd3",
+          "code_length": 16
+        },
+        {
+          "name": "fireOrderClosedEvent",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "e70e2bc1d37f82a299b81a3410f58f539428751bb977c9c27b7b79c529a88355",
+          "code_length": 9
+        },
+        {
+          "name": "fireOrderChangedEvent",
+          "descriptor": "(JLjava/lang/String;DD)V",
+          "access": 2,
+          "code_sha256": "e851aaa7ced18d0f81f0dc8b7558e93e7d1b0304780786066435ae108c9c517c",
+          "code_length": 14
+        },
+        {
+          "name": "fireStateChangedEvent",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "e88f01216d65efae6ddccdc047d769aaf95f89e57338019401c5afbceeedc887",
+          "code_length": 16
+        },
+        {
+          "name": "fireConnectionErrorEvent",
+          "descriptor": "(Ljava/lang/Exception;)V",
+          "access": 2,
+          "code_sha256": "8d4c47ac27ffd33ab337380cb8e4506a17a8d2ea2a110ca914a4cb4a97942b4c",
+          "code_length": 13
+        },
+        {
+          "name": "getConnectionState",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5a3399aaa9c804fa00978b648250992476fd6d720ef74b7ca1a440cdfd4b035",
+          "code_length": 5
+        },
+        {
+          "name": "getOpenOrdersCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4203d6dc602114cacb82db36c868db68fafecae492d9bdcd309af7920ba09733",
+          "code_length": 5
+        },
+        {
+          "name": "getTotalPL",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "800603a188cff54b8da7541a039fa02d91c08d848e85f5299e0f9d3b8c5f0898",
+          "code_length": 5
+        },
+        {
+          "name": "getAccountBalance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "2554d26a8d5b56a20ae952512f2407bc9553a1aac2099eb327d80fdaa2047a53",
+          "code_length": 5
+        },
+        {
+          "name": "getStatus",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5a3399aaa9c804fa00978b648250992476fd6d720ef74b7ca1a440cdfd4b035",
+          "code_length": 5
+        },
+        {
+          "name": "setStatus",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a5a680a9cc1945809ff484ee4af6150c712c2c0869510593017c821eedb8da80",
+          "code_length": 21
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "406bdf139bb8ce37fccad43f869c931241489854ae81b669dcbb7f6115108393",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Z",
+        "com/jfx/ErrUnknownSymbol",
+        "com/jfx/MarketInfo",
+        "com/jfx/SelectionPool",
+        "com/jfx/SelectionType",
+        "com/jfx/Timeframe",
+        "com/jfx/TradeOperation",
+        "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException",
+        "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException",
+        "com/jfx/strategy/NJ4XNoConnectionToServerException",
+        "com/jfx/strategy/OrderInfo",
+        "com/jfx/strategy/Strategy",
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/datalib/data/IDataBuffer",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge",
+        "com/strategyquant/tradinglib/connection/ConnectionManager",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Date",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Set",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1.class",
+      "occurrence": 0,
+      "sha256": "68b504dcbdaa50ea44ea9ff9fdd0db8c0d4dea3fd6942bb7f84f240eae918494",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f5da1b26e8ac4d1218fc248e318ba1a99d2b458d44a28ec1a567101f2db93624",
+          "code_length": 69
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1",
+        "com/strategyquant/tradinglib/connection/ConnectionManager",
+        "java/lang/InterruptedException",
+        "java/lang/String",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection.class",
+      "occurrence": 0,
+      "sha256": "33aca15343911716b373872306b7f985322ce6ace7ff4e6880d34768a7059b30",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/connection/Connection",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "mt4Bridge",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;",
+          "access": 2
+        },
+        {
+          "name": "connStateCheckThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "endConnStateCheck",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin;Lcom/strategyquant/tradinglib/connection/ConnectionManager;Ljava/lang/String;Lcom/strategyquant/lib/ValuesMap;)V",
+          "access": 1,
+          "code_sha256": "fe2b58b387fa6329929c6defae7291cfd1d572e2e1f41d4b54ed2705cfb2f23b",
+          "code_length": 22,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initializeEngines",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "af7719137bcf8348fbfcc7d02350a9de292b42dbcabdf08e384f227c7a897506",
+          "code_length": 56
+        },
+        {
+          "name": "checkConnection",
+          "descriptor": "(Lcom/strategyquant/tradinglib/connection/ConnectionManager;Lcom/strategyquant/lib/ValuesMap;)V",
+          "access": 2,
+          "code_sha256": "90c302928ad261b5b9fe9b5f4366d4d496702db50676f06192e084f7bf7f9f00",
+          "code_length": 192,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "connect",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8da5def7c50ebb6ec581e8c8c89fb3449e94fb99ba83f965b5b681a8cd282129",
+          "code_length": 249,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "startConnectionStateCheck",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "19b9aa73783d02b39e90c24da12a9a18ec735ba5b341e5e665840bf75f25101f",
+          "code_length": 69
+        },
+        {
+          "name": "disconnect",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "525257f5032fc267486962bed104ad1c791f89c2ed3fbaa1fa0eee6dbda0b5b6",
+          "code_length": 94,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isConnected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4d3542744ee319887bd81cd8fa520f526d64a7f950b9ed642722226fcc4b8622",
+          "code_length": 8
+        },
+        {
+          "name": "getStatus",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4b29346df986f4417d0d86a563acac0609a1d0b7acf3a911905b7c8a86a231ca",
+          "code_length": 8
+        },
+        {
+          "name": "buyNow",
+          "descriptor": "(Ljava/lang/String;D)J",
+          "access": 1,
+          "code_sha256": "0d9cf5588b0d47cecd435d43739692e970be6634abf43c982a4de7e4e9e6ee42",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sellNow",
+          "descriptor": "(Ljava/lang/String;D)J",
+          "access": 1,
+          "code_sha256": "71fe4b4d345ea529cde9200c92941def3defb6fba5e08c342c3ce03e2a18aa3e",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendOrder",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;DIIILjava/lang/String;ILjava/util/Date;)J",
+          "access": 1,
+          "code_sha256": "caaf8344c9c21ecc3d5ff3b5428ec3d45aae9d98b410b9be819fe37145d89d69",
+          "code_length": 102,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendOrder",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;DIDDLjava/lang/String;ILjava/util/Date;)J",
+          "access": 1,
+          "code_sha256": "6671a534eb0d415299023f882cf671b7f956a01e6e237d7ef2950c48ef75302c",
+          "code_length": 102,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "modifyOrder",
+          "descriptor": "(JDDDLjava/util/Date;)V",
+          "access": 1,
+          "code_sha256": "071fa176b4bee44f558b1a44768fa28b0735ff08df351485eb53f56369f4b54c",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "closeOrder",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "9aef8ef385c95f80d828f62d3c7b07140cc6cd42559fa557ccb7ce9d3d31d713",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getConnectionName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;)Z",
+          "access": 4104,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;)Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "30f13ac66e403353831593e6c7de9c4f1a4c61e5f55745ce0e37abdfd778c7bc",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/jfx/TradeOperation",
+        "com/strategyquant/lib/ValuesMap",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection$1",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager",
+        "com/strategyquant/tradinglib/connection/Connection",
+        "com/strategyquant/tradinglib/connection/ConnectionManager",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin.class",
+      "occurrence": 0,
+      "sha256": "5db4a84c516ab15bec920e33038751ae31b7aa71979b1756ef664934a53efade",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bfc8c60490611adc6aae8c963a4d07eff82b988f6ff3ecd656a7d75c0039150e",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getPluginName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3d42e25276a899ef9e801ad70778e18b5d1ed2d642b5f0da323e254f72177c7a",
+          "code_length": 3
+        },
+        {
+          "name": "createConnection",
+          "descriptor": "(Lcom/strategyquant/tradinglib/connection/ConnectionManager;Ljava/lang/String;Lcom/strategyquant/lib/ValuesMap;)Lcom/strategyquant/tradinglib/connection/Connection;",
+          "access": 1,
+          "code_sha256": "9daa378324e5ce67aaef5d1bc0f5ba4afdaca7b254b675ecf6af1e99441c7b94",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isDataFeed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isExecutionEngine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1746acaedd6aa66f7d133f8ee490b131ced4572fa7c6b17a7bf6ed07ebd91ecd",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Connection",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager",
+        "com/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed.class",
+      "occurrence": 0,
+      "sha256": "ed243e16f3a63cfb9da535164446917e6eff9e6e8ddb982299b370c951621f5e",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/connection/IDataFeed"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "availableSymbols",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "mt4Connection",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;",
+          "access": 2
+        },
+        {
+          "name": "mt4Bridge",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15
+        },
+        {
+          "name": "registerSymbol",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3aad625270c36ad843d06139f01e12a7037964e19e3021d85721f203068a5a48",
+          "code_length": 49,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkSymbolIsSupported",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "7b487e9bb376a3d2cf55fea61156bd97eed42e6ddbbe5d19e4d5873dc5fa98ef",
+          "code_length": 64
+        },
+        {
+          "name": "getHistoryData",
+          "descriptor": "(Lcom/strategyquant/datalib/ChartDef;IJJ)Lcom/strategyquant/tradinglib/connection/HistoryData;",
+          "access": 1,
+          "code_sha256": "35c26ff5a004d8cddb6f865eaded5aa473267610ab94a7157c19f43677d1dad2",
+          "code_length": 410
+        },
+        {
+          "name": "loadAvailableSymbols",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "7e61028588cdd6d62f56b73ab3031f49c89f87cfd01f6fd54c7b51de30434bc1",
+          "code_length": 29
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "936d387b3861980b75d5016aaf25a8de94af32663f0d475400b39991eae3276f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/jfx/ErrHistoryWillUpdated",
+        "com/jfx/ErrUnknownSymbol",
+        "com/jfx/Timeframe",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4Bridge",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4DataFeed",
+        "com/strategyquant/tradinglib/connection/HistoryData",
+        "com/strategyquant/tradinglib/connection/IDataFeed",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Date",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine.class",
+      "occurrence": 0,
+      "sha256": "b7efeb2e8935cca7cbabe87f2b87ae87c7072072b98d142a19b16e88719a04fb",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/execution/IExecutionEngine"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "mt4Connection",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;",
+          "access": 2
+        },
+        {
+          "name": "mt4Bridge",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;",
+          "access": 2
+        },
+        {
+          "name": "tradingEventsArray",
+          "descriptor": "Lcom/strategyquant/tradinglib/event/TradingEventsArray;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Connection;Lcom/strategyquant/plugin/Connection/impl/MT4/MT4Bridge;)V",
+          "access": 1,
+          "code_sha256": "2830239b49317fb6e64fe5fb72d528978ff88dacc6529ef7a3c527cf1422b0fb",
+          "code_length": 26
+        },
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "orderOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;ILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "579945ebda307fd7a600a7d56dbeb070db5cc4539377637b6fd381eee05f8a38",
+          "code_length": 46
+        },
+        {
+          "name": "orderClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;BILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "orderModify",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;ILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "sendEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/event/ITradingEventListener;ILcom/strategyquant/tradinglib/ILiveOrder;)V",
+          "access": 2,
+          "code_sha256": "436e38c4e3a2f890be92ac61cef24228c5714b590600b5dc644ebfec3b012dd3",
+          "code_length": 80
+        },
+        {
+          "name": "getOpenOrdersCount",
+          "descriptor": "(Z)I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getAccountBalance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getAccountEquity",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getTotalPL",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getMainCurrency",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e4e45ba54ea28271dd83ab61717fea13fa62a2cde49c819e1072a35c85777c59",
+          "code_length": 3
+        },
+        {
+          "name": "getHistoryOrders",
+          "descriptor": "()Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOpenOrder",
+          "descriptor": "(IZ)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getInitialBalance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getTickData",
+          "descriptor": "()Lcom/strategyquant/datalib/TickEvent;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getHistoryOrdersCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getHistoryOrder",
+          "descriptor": "(I)Lcom/strategyquant/tradinglib/Order;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "fillAtRealAskBidPrice",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getWorstDailyEquity",
+          "descriptor": "()Lit/unimi/dsi/fastutil/longs/Long2FloatRBTreeMap;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getAmbiguousTrades",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "reuseOpenOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/strategy/LiveOrderObj;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "evaluateActionListeners",
+          "descriptor": "(ILcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "supportsDuplicateTrades",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "IsMarketOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "557c00dc22bd713fe9a5f9ddc2d6f45b3307624105701a7e11f231de03d00349",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4ExecutionEngine",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/event/ITradingEventListener",
+        "com/strategyquant/tradinglib/event/TradingEventObj",
+        "com/strategyquant/tradinglib/event/TradingEventTypes",
+        "com/strategyquant/tradinglib/event/TradingEventsArray",
+        "com/strategyquant/tradinglib/execution/IExecutionEngine",
+        "com/strategyquant/tradinglib/strategy/LiveOrderObj",
+        "com/strategyquant/tradinglib/strategy/WorkingStatus",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager.class",
+      "occurrence": 0,
+      "sha256": "314e2022010038ae942ba66bf8b0d1bd999bea1a22c0c1e0e14a2ba7f3125ee8",
+      "name": "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "curTerminalPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "terminalsFolder",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "zipPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "host",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "port",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "terminalPIDs",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 10,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "668c3a8fda39e2d93759bffb900b62b36f40de6c8421bdfdb7089bb3b626ac6c",
+          "code_length": 128,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "deinit",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "f03b3975c0db1c6f8031de4cc4afa0fe6bcac2b3ac8dd0b0b6b7697b7d434ac1",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createTerminal",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/jfx/strategy/Strategy;ZZZ)V",
+          "access": 9,
+          "code_sha256": "e1c703d9d260b9df2a6ee218e6165ff1ea6580e53f6d3b0ad455a20bc79bd308",
+          "code_length": 52,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createTerminalFolderFromZip",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "d5d4ca0cdd480475df6ca2819d39a57fb3a23c85d6fec4b7ef05700a303416b8",
+          "code_length": 198,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "startMetaTrader",
+          "descriptor": "(Ljava/lang/String;ZZ)V",
+          "access": 10,
+          "code_sha256": "a2630efafc749c10d1509d7bf59a97f3f12caa3bee46313f96c1d554b94af3cb",
+          "code_length": 145
+        },
+        {
+          "name": "createMTInitFile",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "ed59b4525161ac0bc50c8f9001b4baab8d8b6582396d884b320dd409e2733958",
+          "code_length": 338,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createEASetFile",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "14baeee8e540477f182ce3dfb2ec38b10279202078769bc47b766515e1aa609f",
+          "code_length": 274,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "removeAllTerminals",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "6641dfeffe6b86a3161d66100af6055abf28f995a8719683242a5ca52883b501",
+          "code_length": 39,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "removeTerminal",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "e23405935bd424250c3f1012f0ab71c69acca58e9c2f2021272b96e1e4e5061a",
+          "code_length": 191,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "terminalExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "00b077269e846a82c7a49e33e8e951e627bc4d9550b06bb1d071574aea41c8a8",
+          "code_length": 46
+        },
+        {
+          "name": "deleteDirectory",
+          "descriptor": "(Ljava/io/File;)Z",
+          "access": 10,
+          "code_sha256": "c44b1346e99bc51976bdd1dd3c3c44bfc2ca6e56fdcab05658ab2248dae3c2fd",
+          "code_length": 62
+        },
+        {
+          "name": "getTerminalPID",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "d56263adcf77495359f854c063889462463b8148ac0683f9d4e77b1a173d687f",
+          "code_length": 14
+        },
+        {
+          "name": "killTerminalProcess",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "c5a512268046b6a9d1933801c30870a6af6b4283aac108148517b572bb290938",
+          "code_length": 53
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "95aa0d4bf7b154e5cd94b43c5f05be067d4a4d8caaf0841bae5780236be66b1e",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/jfx/net/JFXServer",
+        "com/jfx/ts/io/PSUtils",
+        "com/strategyquant/plugin/Connection/impl/MT4/MT4TerminalManager",
+        "java/io/File",
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Set",
+        "net/lingala/zip4j/core/ZipFile",
+        "net/lingala/zip4j/exception/ZipException",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1483 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-math3-3.6.1.jar",
+  "archive_sha256": "1e56d7b058d28b65abd256b8458e3885b674c1d588fa43cd7d1cbb9c7ef2b308",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/math3/genetics/PermutationChromosome.class",
+      "occurrence": 0,
+      "sha256": "2d7d69fd25efd0e0eeeda9854f892098167e4e268835d5bca5a912cff7b6ab99",
+      "name": "org/apache/commons/math3/genetics/PermutationChromosome",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/List<TT;>;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/genetics/PermutationChromosome"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/genetics/TournamentSelection$1.class",
+      "occurrence": 0,
+      "sha256": "0fc5f7df385b786ec548e6cadecf14f3920b1e8ab095d3d91fba96872bff28c8",
+      "name": "org/apache/commons/math3/genetics/TournamentSelection$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/math3/genetics/ListPopulation",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/math3/genetics/TournamentSelection;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/genetics/TournamentSelection;I)V",
+          "access": 0,
+          "code_sha256": "99e95681580398a1b8ec18b9b25a6b8bd3a3111b3d00366300aa99310f54767d",
+          "code_length": 11
+        },
+        {
+          "name": "nextGeneration",
+          "descriptor": "()Lorg/apache/commons/math3/genetics/Population;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/math3/genetics/ListPopulation",
+        "org/apache/commons/math3/genetics/TournamentSelection",
+        "org/apache/commons/math3/genetics/TournamentSelection$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/genetics/Fitness.class",
+      "occurrence": 0,
+      "sha256": "9f357fd6663f7c6eb53fca23ec35d8196b373ad4e78c4844db6b7be6cc8e6e56",
+      "name": "org/apache/commons/math3/genetics/Fitness",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "fitness",
+          "descriptor": "()D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/genetics/Fitness"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/genetics/BinaryMutation.class",
+      "occurrence": 0,
+      "sha256": "777286103d6194a1cb721d02fac109c4e95fd08c2eac81ba62704769fb4ca56d",
+      "name": "org/apache/commons/math3/genetics/BinaryMutation",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/genetics/MutationPolicy"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "mutate",
+          "descriptor": "(Lorg/apache/commons/math3/genetics/Chromosome;)Lorg/apache/commons/math3/genetics/Chromosome;",
+          "access": 1,
+          "code_sha256": "63bb17bf9ffd9d704cb0c48b5b4e90e857cbbafe1604366016e25213bf1d5b8e",
+          "code_length": 100,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/genetics/BinaryChromosome",
+        "org/apache/commons/math3/genetics/BinaryMutation",
+        "org/apache/commons/math3/genetics/GeneticAlgorithm",
+        "org/apache/commons/math3/genetics/MutationPolicy",
+        "org/apache/commons/math3/random/RandomGenerator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/RealTransformer.class",
+      "occurrence": 0,
+      "sha256": "ebd45542fa25de672c3402a966c5e7732e5fd204b6d9d17fda241133e610b52e",
+      "name": "org/apache/commons/math3/transform/RealTransformer",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "transform",
+          "descriptor": "([DLorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        },
+        {
+          "name": "transform",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDILorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/math3/exception/NonMonotonicSequenceException",
+            "org/apache/commons/math3/exception/NotStrictlyPositiveException",
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/NonMonotonicSequenceException",
+        "org/apache/commons/math3/exception/NotStrictlyPositiveException",
+        "org/apache/commons/math3/transform/RealTransformer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastHadamardTransformer.class",
+      "occurrence": 0,
+      "sha256": "857ef8c38db70431aaa1562c768f25a4dd2f0b0af01f171b4acb1057bf6dc555",
+      "name": "org/apache/commons/math3/transform/FastHadamardTransformer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/transform/RealTransformer",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "transform",
+          "descriptor": "([DLorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "c012f43b6e817f321a43ac3595e643766006b1a6cf0d2f794dcca1cb24bdae68",
+          "code_length": 27
+        },
+        {
+          "name": "transform",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDILorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "1e791ca865764663c6dc7537f977c2c200071b85c45733337d64e71309c69bb1",
+          "code_length": 16
+        },
+        {
+          "name": "transform",
+          "descriptor": "([I)[I",
+          "access": 1,
+          "code_sha256": "9302dfcaaeb45bb99fdc3b0a96cc60258c3a49b204f30776ac4ba990d9811b78",
+          "code_length": 6
+        },
+        {
+          "name": "fht",
+          "descriptor": "([D)[D",
+          "access": 4,
+          "code_sha256": "5a52eb33616f30498a9a01504fd11bbc5bb1e64e33f5a8a205354f6b19642105",
+          "code_length": 166,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        },
+        {
+          "name": "fht",
+          "descriptor": "([I)[I",
+          "access": 4,
+          "code_sha256": "505a20ccbb7aba697962e40a006f10a9f654d4dc150dd21ce3fd6c5d1b62d36a",
+          "code_length": 166,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[I",
+        "java/io/Serializable",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/transform/FastHadamardTransformer",
+        "org/apache/commons/math3/transform/RealTransformer",
+        "org/apache/commons/math3/transform/TransformType",
+        "org/apache/commons/math3/transform/TransformUtils",
+        "org/apache/commons/math3/util/ArithmeticUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastFourierTransformer.class",
+      "occurrence": 0,
+      "sha256": "1332ba7b71b666d0ce644349080b7176530accf01d57bc7d75daae87be2f576c",
+      "name": "org/apache/commons/math3/transform/FastFourierTransformer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "W_SUB_N_R",
+          "descriptor": "[D",
+          "access": 26
+        },
+        {
+          "name": "W_SUB_N_I",
+          "descriptor": "[D",
+          "access": 26
+        },
+        {
+          "name": "normalization",
+          "descriptor": "Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/transform/DftNormalization;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "bitReversalShuffle2",
+          "descriptor": "([D[D)V",
+          "access": 10,
+          "code_sha256": "40e3edde6991c28d75a6a7d9fa6d205aed3014a133dfd76e4cd4e4d80a8f8173",
+          "code_length": 131
+        },
+        {
+          "name": "normalizeTransformedData",
+          "descriptor": "([[DLorg/apache/commons/math3/transform/DftNormalization;Lorg/apache/commons/math3/transform/TransformType;)V",
+          "access": 10,
+          "code_sha256": "f2b24efce661f02c78982d87f8d6f785386b4affe000c0396ed7800818b68389",
+          "code_length": 177
+        },
+        {
+          "name": "transformInPlace",
+          "descriptor": "([[DLorg/apache/commons/math3/transform/DftNormalization;Lorg/apache/commons/math3/transform/TransformType;)V",
+          "access": 9,
+          "code_sha256": "5616a06631b1fd47bc5115b0b1679173109bf8c6f192e455a73d3b346f1045f1",
+          "code_length": 873
+        },
+        {
+          "name": "transform",
+          "descriptor": "([DLorg/apache/commons/math3/transform/TransformType;)[Lorg/apache/commons/math3/complex/Complex;",
+          "access": 1,
+          "code_sha256": "7a7c1aaf3c5cc6df92ae9b6092f8591e0cb05d89900af3f2b16d64dfa1571a30",
+          "code_length": 35
+        },
+        {
+          "name": "transform",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDILorg/apache/commons/math3/transform/TransformType;)[Lorg/apache/commons/math3/complex/Complex;",
+          "access": 1,
+          "code_sha256": "f25941ca8d88804158b6b06091c56f99b7620ddf3fe5a35aad839945a1d65d28",
+          "code_length": 20
+        },
+        {
+          "name": "transform",
+          "descriptor": "([Lorg/apache/commons/math3/complex/Complex;Lorg/apache/commons/math3/transform/TransformType;)[Lorg/apache/commons/math3/complex/Complex;",
+          "access": 1,
+          "code_sha256": "09bbabffb333478d95a1443291ccdf9bb0aea1cd7ed27887053004b10f1e9f37",
+          "code_length": 19
+        },
+        {
+          "name": "mdfft",
+          "descriptor": "(Ljava/lang/Object;Lorg/apache/commons/math3/transform/TransformType;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ef8dff6c14e6e9853f3f43aed14f478f5fddf21143100f0725a03c76b3fc2ae6",
+          "code_length": 54
+        },
+        {
+          "name": "mdfft",
+          "descriptor": "(Lorg/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix;Lorg/apache/commons/math3/transform/TransformType;I[I)V",
+          "access": 2,
+          "code_sha256": "4688f9f686088d839b3a774afe050ced7469e62d4c3e02786ae9153d747a092e",
+          "code_length": 190
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2ca3a15d624c71506728c434f26431affd78dbc4894b21976edc95d39e91e5e7",
+          "code_length": 834
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/io/Serializable",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/complex/Complex",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/MathIllegalStateException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/transform/DftNormalization",
+        "org/apache/commons/math3/transform/FastFourierTransformer",
+        "org/apache/commons/math3/transform/FastFourierTransformer$1",
+        "org/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix",
+        "org/apache/commons/math3/transform/TransformType",
+        "org/apache/commons/math3/transform/TransformUtils",
+        "org/apache/commons/math3/util/ArithmeticUtils",
+        "org/apache/commons/math3/util/FastMath",
+        "org/apache/commons/math3/util/MathArrays"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/DftNormalization.class",
+      "occurrence": 0,
+      "sha256": "36b97eb4dbbf2922e49cf2c2faacb6a5d3d9355c805f9aac8beaab17e074578b",
+      "name": "org/apache/commons/math3/transform/DftNormalization",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STANDARD",
+          "descriptor": "Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "UNITARY",
+          "descriptor": "Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/transform/DftNormalization;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/transform/DftNormalization;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/transform/DftNormalization;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/transform/DftNormalization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/TransformUtils.class",
+      "occurrence": 0,
+      "sha256": "8fb0264987cfab3faeb192613420a6801f6e31f1ea5da97a0eb925ea386e8b48",
+      "name": "org/apache/commons/math3/transform/TransformUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "POWERS_OF_TWO",
+          "descriptor": "[I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "scaleArray",
+          "descriptor": "([DD)[D",
+          "access": 9,
+          "code_sha256": "3c4a25bc401c9966a2e261d1fa3530b8e4237117c45970812b428820cb08aaae",
+          "code_length": 23
+        },
+        {
+          "name": "scaleArray",
+          "descriptor": "([Lorg/apache/commons/math3/complex/Complex;D)[Lorg/apache/commons/math3/complex/Complex;",
+          "access": 9,
+          "code_sha256": "af58737a94f86999b44e8e1d631c15caac311827b2df906072a2f9a3fadaf764",
+          "code_length": 42
+        },
+        {
+          "name": "createRealImaginaryArray",
+          "descriptor": "([Lorg/apache/commons/math3/complex/Complex;)[[D",
+          "access": 9,
+          "code_sha256": "9aacb95dd9c0171e075d7b17de7d6a9d75a2f9e637341e777a63c082fb9275d1",
+          "code_length": 58
+        },
+        {
+          "name": "createComplexArray",
+          "descriptor": "([[D)[Lorg/apache/commons/math3/complex/Complex;",
+          "access": 9,
+          "code_sha256": "90177a98e20088e3883725f70f8ac4fdeb727fe5a31a37b64a75ea14a191eea1",
+          "code_length": 91,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "exactLog2",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "ebc9b029ef750bcf09490b2be601397dd84e4c8930aa7196f90c9098a962b53c",
+          "code_length": 36,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e26b940efa64ba589a36a809b59353df80b0b26def5f8462dca36a946fadce3e",
+          "code_length": 193
+        }
+      ],
+      "class_references": [
+        "[[D",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/Arrays",
+        "org/apache/commons/math3/complex/Complex",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/transform/TransformUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastSineTransformer.class",
+      "occurrence": 0,
+      "sha256": "3bf55a86e556fabb54cbbd00465e14eaf7df777b3a75c4cdb79b48ebd43d37a9",
+      "name": "org/apache/commons/math3/transform/FastSineTransformer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/transform/RealTransformer",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "normalization",
+          "descriptor": "Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/transform/DstNormalization;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "transform",
+          "descriptor": "([DLorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "67068fa6d7148d6b50005233d9b5707e3f59ae6cc277ad362eaa70e79375a4b1",
+          "code_length": 62
+        },
+        {
+          "name": "transform",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDILorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "8ebd99b53c6ae2e596a9826df9725165f09df91c50a3225beea3116f9854277b",
+          "code_length": 25
+        },
+        {
+          "name": "fst",
+          "descriptor": "([D)[D",
+          "access": 4,
+          "code_sha256": "448cd684994fc2d3c74e374eaca1cad73798329117658185f0904945d4b29533",
+          "code_length": 292,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/complex/Complex",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/transform/DftNormalization",
+        "org/apache/commons/math3/transform/DstNormalization",
+        "org/apache/commons/math3/transform/FastFourierTransformer",
+        "org/apache/commons/math3/transform/FastSineTransformer",
+        "org/apache/commons/math3/transform/RealTransformer",
+        "org/apache/commons/math3/transform/TransformType",
+        "org/apache/commons/math3/transform/TransformUtils",
+        "org/apache/commons/math3/util/ArithmeticUtils",
+        "org/apache/commons/math3/util/FastMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/TransformType.class",
+      "occurrence": 0,
+      "sha256": "9aafafdf0e662443a1f5b9abb5783dd00681246304dde6c7490690242c78879d",
+      "name": "org/apache/commons/math3/transform/TransformType",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FORWARD",
+          "descriptor": "Lorg/apache/commons/math3/transform/TransformType;",
+          "access": 16409
+        },
+        {
+          "name": "INVERSE",
+          "descriptor": "Lorg/apache/commons/math3/transform/TransformType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/transform/TransformType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/transform/TransformType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/transform/TransformType;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/transform/TransformType;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/transform/TransformType;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/transform/TransformType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastFourierTransformer$1.class",
+      "occurrence": 0,
+      "sha256": "7062fa7d07f40607c128d5e087589a30788e26f5b034c593561f4ce62ac0127a",
+      "name": "org/apache/commons/math3/transform/FastFourierTransformer$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$commons$math3$transform$DftNormalization",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a65055f54fe9718bc4fd114d0c09fb2217fa9377a4b3710e3bdc42962d342194",
+          "code_length": 40
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/commons/math3/transform/DftNormalization",
+        "org/apache/commons/math3/transform/FastFourierTransformer",
+        "org/apache/commons/math3/transform/FastFourierTransformer$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/DctNormalization.class",
+      "occurrence": 0,
+      "sha256": "2e292e678ca03b7014818ce20d64924e1cb2465f1fa76a95dd790415d615d38a",
+      "name": "org/apache/commons/math3/transform/DctNormalization",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STANDARD_DCT_I",
+          "descriptor": "Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "ORTHOGONAL_DCT_I",
+          "descriptor": "Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/transform/DctNormalization;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/transform/DctNormalization;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/transform/DctNormalization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastCosineTransformer.class",
+      "occurrence": 0,
+      "sha256": "adb93e024b5bb598975acc6f03de32cf1fd05bce3f0703b41f6eb78954008946",
+      "name": "org/apache/commons/math3/transform/FastCosineTransformer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/transform/RealTransformer",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "normalization",
+          "descriptor": "Lorg/apache/commons/math3/transform/DctNormalization;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/transform/DctNormalization;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "transform",
+          "descriptor": "([DLorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "6bbebd34dfd90dd760403d7d79d2f5eb3a53d25c08041aee9e840e3d56557c59",
+          "code_length": 89,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        },
+        {
+          "name": "transform",
+          "descriptor": "(Lorg/apache/commons/math3/analysis/UnivariateFunction;DDILorg/apache/commons/math3/transform/TransformType;)[D",
+          "access": 1,
+          "code_sha256": "167e75327b5e26c8ce66bdc9a82f7fbba2c0b4c14ad9f0aa7625cfda057ea978",
+          "code_length": 20,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        },
+        {
+          "name": "fct",
+          "descriptor": "([D)[D",
+          "access": 4,
+          "code_sha256": "4f58265c927dd8c7c10f19020af8771d22626122d5a70315c24bc9018940d98f",
+          "code_length": 346,
+          "throws": [
+            "org/apache/commons/math3/exception/MathIllegalArgumentException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/apache/commons/math3/analysis/FunctionUtils",
+        "org/apache/commons/math3/complex/Complex",
+        "org/apache/commons/math3/exception/MathIllegalArgumentException",
+        "org/apache/commons/math3/exception/util/LocalizedFormats",
+        "org/apache/commons/math3/transform/DctNormalization",
+        "org/apache/commons/math3/transform/DftNormalization",
+        "org/apache/commons/math3/transform/FastCosineTransformer",
+        "org/apache/commons/math3/transform/FastFourierTransformer",
+        "org/apache/commons/math3/transform/RealTransformer",
+        "org/apache/commons/math3/transform/TransformType",
+        "org/apache/commons/math3/transform/TransformUtils",
+        "org/apache/commons/math3/util/ArithmeticUtils",
+        "org/apache/commons/math3/util/FastMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix.class",
+      "occurrence": 0,
+      "sha256": "60179a8974f00b6e038ee51d14ff27f0dd321e2ca9c1be09ab62228b692cca47",
+      "name": "org/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "dimensionSize",
+          "descriptor": "[I",
+          "access": 4
+        },
+        {
+          "name": "multiDimensionalComplexArray",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "5200b55db013bfd5c74739f6cc4a8e30f503a9e298c7737985ad516de1d73248",
+          "code_length": 88
+        },
+        {
+          "name": "get",
+          "descriptor": "([I)Lorg/apache/commons/math3/complex/Complex;",
+          "access": 129,
+          "code_sha256": "53fc4c605728c14407a70dd4f2abfbff75cab3fa744d2bacb979fa398ff25cd9",
+          "code_length": 92,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "set",
+          "descriptor": "(Lorg/apache/commons/math3/complex/Complex;[I)Lorg/apache/commons/math3/complex/Complex;",
+          "access": 129,
+          "code_sha256": "ecc50717e9929f193dbaa1c6c344ff6bf5e7dfe389bf1fc66867c4ec8fae926e",
+          "code_length": 129,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "getDimensionSizes",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "6bdfd2342271f8027080dea69a00905d0b272cb293439519c86a2eac280a8978",
+          "code_length": 11
+        },
+        {
+          "name": "getArray",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "364d8dbed33be699411ba6f63210f6b587687cdaa100e70bafe215683f3cf088",
+          "code_length": 25
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lorg/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix;)V",
+          "access": 2,
+          "code_sha256": "edb54b2d90c4eda4666e671b68d97f228febf1990bd00a834de030a883a31c9d",
+          "code_length": 191
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/lang/Object;",
+        "[[I",
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/reflect/Array",
+        "org/apache/commons/math3/complex/Complex",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/transform/FastFourierTransformer",
+        "org/apache/commons/math3/transform/FastFourierTransformer$MultiDimensionalComplexMatrix"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/transform/DstNormalization.class",
+      "occurrence": 0,
+      "sha256": "b994ff34410d5728374065421d730de56b09667fadb6d69f840769b38e95c8c4",
+      "name": "org/apache/commons/math3/transform/DstNormalization",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STANDARD_DST_I",
+          "descriptor": "Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "ORTHOGONAL_DST_I",
+          "descriptor": "Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/math3/transform/DstNormalization;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/math3/transform/DstNormalization;>;",
+      "class_references": [
+        "[Lorg/apache/commons/math3/transform/DstNormalization;",
+        "java/lang/Enum",
+        "org/apache/commons/math3/transform/DstNormalization"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/filter/DefaultProcessModel.class",
+      "occurrence": 0,
+      "sha256": "29e8a9061b2905dbdabd0bc05b97a95217730df39d4613ac239a3fa20d6cf47d",
+      "name": "org/apache/commons/math3/filter/DefaultProcessModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/filter/ProcessModel"
+      ],
+      "fields": [
+        {
+          "name": "stateTransitionMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "controlMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "processNoiseCovMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "initialStateEstimateVector",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealVector;",
+          "access": 2
+        },
+        {
+          "name": "initialErrorCovMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([[D[[D[[D[D[[D)V",
+          "access": 1,
+          "code_sha256": "27158b3710c45fdc72f2b9013931b7f5c9b431584a63255e128f98c258776426",
+          "code_length": 47,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/exception/NoDataException",
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([[D[[D[[D)V",
+          "access": 1,
+          "code_sha256": "1041d62e80e89f9926ca7ca6d89cf0545e49b1fcedfb9c72571157da1e7afc7a",
+          "code_length": 31,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/exception/NoDataException",
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/linear/RealMatrix;Lorg/apache/commons/math3/linear/RealMatrix;Lorg/apache/commons/math3/linear/RealMatrix;Lorg/apache/commons/math3/linear/RealVector;Lorg/apache/commons/math3/linear/RealMatrix;)V",
+          "access": 1,
+          "code_sha256": "831c4c6f21d1016f77c63e1e7d584e1a672cb98e85c6a1a390b01656fa8450ac",
+          "code_length": 32
+        },
+        {
+          "name": "getStateTransitionMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getControlMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getProcessNoise",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "getInitialStateEstimate",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealVector;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "getInitialErrorCovariance",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/NoDataException",
+        "org/apache/commons/math3/exception/NullArgumentException",
+        "org/apache/commons/math3/filter/DefaultProcessModel",
+        "org/apache/commons/math3/filter/ProcessModel",
+        "org/apache/commons/math3/linear/Array2DRowRealMatrix",
+        "org/apache/commons/math3/linear/ArrayRealVector"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/filter/KalmanFilter.class",
+      "occurrence": 0,
+      "sha256": "173e48086505879d0edd1bf382d2fc790a317d45582d7c317ef62842e72b5f34",
+      "name": "org/apache/commons/math3/filter/KalmanFilter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "processModel",
+          "descriptor": "Lorg/apache/commons/math3/filter/ProcessModel;",
+          "access": 18
+        },
+        {
+          "name": "measurementModel",
+          "descriptor": "Lorg/apache/commons/math3/filter/MeasurementModel;",
+          "access": 18
+        },
+        {
+          "name": "transitionMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "transitionMatrixT",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "controlMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "measurementMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "measurementMatrixT",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "stateEstimation",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealVector;",
+          "access": 2
+        },
+        {
+          "name": "errorCovariance",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/filter/ProcessModel;Lorg/apache/commons/math3/filter/MeasurementModel;)V",
+          "access": 1,
+          "code_sha256": "c5cfdfe5f9b242e0bbf825a34d26ba0f5e21e5014cbe22630578cd8d93664a39",
+          "code_length": 551,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/linear/NonSquareMatrixException",
+            "org/apache/commons/math3/exception/DimensionMismatchException",
+            "org/apache/commons/math3/linear/MatrixDimensionMismatchException"
+          ]
+        },
+        {
+          "name": "getStateDimension",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "472b5590a1e3f0a1a9d8aa566e6ef86495f539794a5777c2219fcf81b085bc68",
+          "code_length": 8
+        },
+        {
+          "name": "getMeasurementDimension",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "63f2e873d7668f8b9cee7c7b131d4ccf44ecbb4d8d77a6886a2e233488c33451",
+          "code_length": 10
+        },
+        {
+          "name": "getStateEstimation",
+          "descriptor": "()[D",
+          "access": 1,
+          "code_sha256": "83637d0ebb79b2374fc85c8d7f2f469d35174f3899ef9d8e39c6f8e3f9d624d8",
+          "code_length": 8
+        },
+        {
+          "name": "getStateEstimationVector",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealVector;",
+          "access": 1,
+          "code_sha256": "c84af1b4fb485d10a690dfe9d9fc4714cb5c452655a3419c7d39906239a84beb",
+          "code_length": 8
+        },
+        {
+          "name": "getErrorCovariance",
+          "descriptor": "()[[D",
+          "access": 1,
+          "code_sha256": "c3ff2a49a38e33940b1443d0528d9fc1ea54bf707d5a89df61c12b302842e56c",
+          "code_length": 10
+        },
+        {
+          "name": "getErrorCovarianceMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "8479840ceb0887d82888bef1a2bfbf639924ef2af6df37cbc753be8bb6fc3a56",
+          "code_length": 10
+        },
+        {
+          "name": "predict",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d04f7058f330b544182216afc7f6b2f9f7ebfd896875b808aa31d6720317c1f4",
+          "code_length": 9
+        },
+        {
+          "name": "predict",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "4cf120609eea683bfa24a5a6da710626d880e5303aece3f46b60759f88270f01",
+          "code_length": 14,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "predict",
+          "descriptor": "(Lorg/apache/commons/math3/linear/RealVector;)V",
+          "access": 1,
+          "code_sha256": "cf585ad76c5481d2612cf0f50f03c3a5fc423039db633f08ae99b514f7cf5e27",
+          "code_length": 124,
+          "throws": [
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "correct",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "47b83b6146712773f8bc9ddbbee2adc88089e7a27ea4820fc19f4b6ef40de73d",
+          "code_length": 14,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/exception/DimensionMismatchException",
+            "org/apache/commons/math3/linear/SingularMatrixException"
+          ]
+        },
+        {
+          "name": "correct",
+          "descriptor": "(Lorg/apache/commons/math3/linear/RealVector;)V",
+          "access": 1,
+          "code_sha256": "d5885066992300e927ec4d255fbc74090adab27ee683ab2924c1ecff6c9e0abf",
+          "code_length": 200,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/exception/DimensionMismatchException",
+            "org/apache/commons/math3/linear/SingularMatrixException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/NullArgumentException",
+        "org/apache/commons/math3/filter/KalmanFilter",
+        "org/apache/commons/math3/filter/MeasurementModel",
+        "org/apache/commons/math3/filter/ProcessModel",
+        "org/apache/commons/math3/linear/Array2DRowRealMatrix",
+        "org/apache/commons/math3/linear/ArrayRealVector",
+        "org/apache/commons/math3/linear/CholeskyDecomposition",
+        "org/apache/commons/math3/linear/DecompositionSolver",
+        "org/apache/commons/math3/linear/MatrixDimensionMismatchException",
+        "org/apache/commons/math3/linear/MatrixUtils",
+        "org/apache/commons/math3/linear/NonSquareMatrixException",
+        "org/apache/commons/math3/linear/RealMatrix",
+        "org/apache/commons/math3/linear/RealVector",
+        "org/apache/commons/math3/linear/SingularMatrixException",
+        "org/apache/commons/math3/util/MathUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/filter/DefaultMeasurementModel.class",
+      "occurrence": 0,
+      "sha256": "25c639e5b5d74d7ccc1991b9a2f2813e6b6a35f901351f7e9a08bd4f0aff8807",
+      "name": "org/apache/commons/math3/filter/DefaultMeasurementModel",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/math3/filter/MeasurementModel"
+      ],
+      "fields": [
+        {
+          "name": "measurementMatrix",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        },
+        {
+          "name": "measurementNoise",
+          "descriptor": "Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([[D[[D)V",
+          "access": 1,
+          "code_sha256": "e25da670161d44809416cd40fa4957f61422fcc131f547f0c669683b4b68ff39",
+          "code_length": 21,
+          "throws": [
+            "org/apache/commons/math3/exception/NullArgumentException",
+            "org/apache/commons/math3/exception/NoDataException",
+            "org/apache/commons/math3/exception/DimensionMismatchException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/math3/linear/RealMatrix;Lorg/apache/commons/math3/linear/RealMatrix;)V",
+          "access": 1,
+          "code_sha256": "089f737249fda83e92d70786d060c87fa1b24de8bf19c2377ca95e402e94e9df",
+          "code_length": 15
+        },
+        {
+          "name": "getMeasurementMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getMeasurementNoise",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/exception/DimensionMismatchException",
+        "org/apache/commons/math3/exception/NoDataException",
+        "org/apache/commons/math3/exception/NullArgumentException",
+        "org/apache/commons/math3/filter/DefaultMeasurementModel",
+        "org/apache/commons/math3/filter/MeasurementModel",
+        "org/apache/commons/math3/linear/Array2DRowRealMatrix"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/filter/MeasurementModel.class",
+      "occurrence": 0,
+      "sha256": "81c69bd771e4b17fe177b87dff20e663cdec9c03caa49c32234990d6e68da6ec",
+      "name": "org/apache/commons/math3/filter/MeasurementModel",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getMeasurementMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        },
+        {
+          "name": "getMeasurementNoise",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/filter/MeasurementModel"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/math3/filter/ProcessModel.class",
+      "occurrence": 0,
+      "sha256": "41c88c5e00ca157e934ec74b2b203cb95290c3c541061732b10412bc200b55cd",
+      "name": "org/apache/commons/math3/filter/ProcessModel",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getStateTransitionMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        },
+        {
+          "name": "getControlMatrix",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        },
+        {
+          "name": "getProcessNoise",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        },
+        {
+          "name": "getInitialStateEstimate",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealVector;",
+          "access": 1025
+        },
+        {
+          "name": "getInitialErrorCovariance",
+          "descriptor": "()Lorg/apache/commons/math3/linear/RealMatrix;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/math3/filter/ProcessModel"
+      ]
+    }
+  ]
+}

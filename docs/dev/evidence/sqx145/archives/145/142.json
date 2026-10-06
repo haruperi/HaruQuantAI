@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+  "sha256": "64d2f79b52a571d08aa90f0e56071bbc5fe1bfee5b30865bab8f18b1822ba990",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1.class": "ed79060eab94c8d07b7808f35984e6c095d8cd58a58ea020bb42eefcee4181a7",
+    "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager.class": "fe24f23f20d8080e98a213ade09e6e49c54295c5211eeb587feb2dded8482959",
+    "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap.class": "a8c467b50e1d8a566e67b6385eb633601469a6f24a143cc0a7cebacd858e4c6f",
+    "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportPlugin.class": "f2118236667a18b440cd89711e43a6b42a0e7ad22ca1ee09731f6943ca2604e8",
+    "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet.class": "6444184acf21d342c255d74fa3730c2128cb2e788f4747631f4c93a3686d1798"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1.class",
+      "occurrence": 0,
+      "sha256": "ed79060eab94c8d07b7808f35984e6c095d8cd58a58ea020bb42eefcee4181a7",
+      "member_shard": "docs/dev/evidence/sqx145/members/142/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager.class",
+      "occurrence": 0,
+      "sha256": "fe24f23f20d8080e98a213ade09e6e49c54295c5211eeb587feb2dded8482959",
+      "member_shard": "docs/dev/evidence/sqx145/members/142/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap.class",
+      "occurrence": 0,
+      "sha256": "a8c467b50e1d8a566e67b6385eb633601469a6f24a143cc0a7cebacd858e4c6f",
+      "member_shard": "docs/dev/evidence/sqx145/members/142/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportPlugin.class",
+      "occurrence": 0,
+      "sha256": "f2118236667a18b440cd89711e43a6b42a0e7ad22ca1ee09731f6943ca2604e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/142/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet.class",
+      "occurrence": 0,
+      "sha256": "6444184acf21d342c255d74fa3730c2128cb2e788f4747631f4c93a3686d1798",
+      "member_shard": "docs/dev/evidence/sqx145/members/142/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/142/001.json",
+      "sha256": "ca1433954b46658c71903080d139c2877440b0aeb1437174903886bae96f4c36"
+    }
+  ]
+}

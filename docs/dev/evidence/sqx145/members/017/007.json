@@ -1,0 +1,5252 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-compress-1.27.1.jar",
+  "archive_sha256": "293d80f54b536b74095dcd7ea3cf0a29bbfc3402519281332495f4420d370d16",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute.class",
+      "occurrence": 0,
+      "sha256": "6f90f2c934a0b8b01592cefde02736a728103fc13217f807e24a7f3f0c4f768d",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/BCIRenumberedAttribute",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lengths",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "body",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "pool",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;",
+          "access": 2
+        },
+        {
+          "name": "layoutIndex",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;I)V",
+          "access": 1,
+          "code_sha256": "a80945fd742b5b6e0c8911594c19b66d88874777f4f5dcb14ebd21d569e19e80",
+          "code_length": 33
+        },
+        {
+          "name": "addBCIndex",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "18ade74d6b53658b32ae515227200d54e2c4f791da9d9bc37aa9e77a25ce26a4",
+          "code_length": 33
+        },
+        {
+          "name": "addBCLength",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "b4069798fd19e34364d28ced05f13ac9b9c53294b2353e6d89d6fc6148361609",
+          "code_length": 33
+        },
+        {
+          "name": "addBCOffset",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "604276a5510a4e822646c6a122eaa1ca79fcbd53d44a598a2db4ccfbd6b34015",
+          "code_length": 33
+        },
+        {
+          "name": "addInteger",
+          "descriptor": "(IJ)V",
+          "access": 1,
+          "code_sha256": "08195738760e520633c777d7ea8cd02d342e2527d00b827067fd7407d9a2357e",
+          "code_length": 29
+        },
+        {
+          "name": "addToBody",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "896cef94e2c4ec088f018b362b5df92500e926d6d4dcd5f4c363bf774505de54",
+          "code_length": 26
+        },
+        {
+          "name": "getLayoutIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c3ee618f94f6d0a299215efb4305a6d1d2298178196a7dfce14be8f959a5200",
+          "code_length": 5
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "0e8449f7577a9c717d672d67b96f3130005c568881c474b8dec23844332ae5f3",
+          "code_length": 43
+        },
+        {
+          "name": "getNestedClassFileEntries",
+          "descriptor": "()[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+          "access": 4,
+          "code_sha256": "19772916611a04656232dce1078b9219e2b5b4da85376566d7a25e7f07d77f6e",
+          "code_length": 109
+        },
+        {
+          "name": "getStartPCs",
+          "descriptor": "()[I",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "renumber",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "4f761719b4b18fe3bffa7eee04f3d6a1cb2ea596fa6fb45b055d2d1ed6a05895",
+          "code_length": 293,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 4,
+          "code_sha256": "df5b230d95d54b3daf09d8a821e614780cac9db968e1d334eb2680a2cef00404",
+          "code_length": 55
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6766ed272144d2596e22cf15c0ecef89a45edf972e752e715b5dc9983a3a3151",
+          "code_length": 8
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 4,
+          "code_sha256": "bc0b064b0948a1c3efdfb9c4676ed156f82ada1ae2bb3578934a7b97cc3965b1",
+          "code_length": 206,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/BCIRenumberedAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute$1",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute$AbstractBcValue",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute$BCIndex",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute$BCLength",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/NewAttribute$BCOffset"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager.class",
+      "occurrence": 0,
+      "sha256": "cd41842baee1688aa9de2ddab23024c7dba76b8282b15c7022ac5d90a606ea6b",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bcCaseCount",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcCaseValue",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcByte",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcShort",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcLocal",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcLabel",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcIntRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcFloatRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcLongRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcDoubleRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcStringRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcClassRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcFieldRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcMethodRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcIMethodRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcThisField",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcSuperField",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcThisMethod",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcSuperMethod",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcInitRef",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "wideByteCodes",
+          "descriptor": "[I",
+          "access": 0
+        },
+        {
+          "name": "bcCaseCountIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcCaseValueIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcByteIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcShortIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcLocalIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcLabelIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcIntRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcFloatRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcLongRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcDoubleRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcStringRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcClassRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcFieldRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcMethodRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcIMethodRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcThisFieldIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcSuperFieldIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcThisMethodIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcSuperMethodIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bcInitRefIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "wideByteCodeIndex",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "segment",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/Segment;",
+          "access": 0
+        },
+        {
+          "name": "currentClass",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "superClass",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "newClass",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I[I)V",
+          "access": 1,
+          "code_sha256": "d9df3f42318521e493024c54779e620677268e4c6a225ca5d040b5ebf3927954",
+          "code_length": 128
+        },
+        {
+          "name": "getCurrentClass",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ccf55cab63814b091961a8d4b7d462ff22bbd69d42bafd03c198a211a0e32a75",
+          "code_length": 23
+        },
+        {
+          "name": "getNewClass",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "58e1f6e5d8e1d31868e3790d80ddf9e604e78507b2e4104423af1ccea151027f",
+          "code_length": 23
+        },
+        {
+          "name": "getSuperClass",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f3d13c1d796b59454799d21ee3e291215edd98ac8a4211d698222142252e3d4e",
+          "code_length": 23
+        },
+        {
+          "name": "globalConstantPool",
+          "descriptor": "()Lorg/apache/commons/compress/harmony/unpack200/SegmentConstantPool;",
+          "access": 1,
+          "code_sha256": "3bb578eacd77d476c93334ff643714a1e6c2bc081dd68e9634cd9289c9b068c9",
+          "code_length": 8
+        },
+        {
+          "name": "nextByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f7ad288cd9dcd1009525d978a6b64501812fe35c3b7b88d12298d29e9c6265c8",
+          "code_length": 17
+        },
+        {
+          "name": "nextCaseCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "74b2635d47e961fd89cb7519a397c8fca2a9e2144f550792ae851f8027466490",
+          "code_length": 17
+        },
+        {
+          "name": "nextCaseValues",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "69afe946e6baca75ea5dcfc76d96396952ea2dd500400590aba02863b69bf75a",
+          "code_length": 17
+        },
+        {
+          "name": "nextClassRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d6fec680c197597495ecf4eef9fed2698c0f861d5896b0f62967509a5fae73f2",
+          "code_length": 17
+        },
+        {
+          "name": "nextDoubleRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "48b6e6dd68b06b958640b328e27eee090f482bf6bccd6067f4fe8f5c1a6c3e37",
+          "code_length": 17
+        },
+        {
+          "name": "nextFieldRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8c14e6d7179eead4d1f02bc2a3accddf4fa2e5b2ed7935bfc92ffad7eaf1824f",
+          "code_length": 17
+        },
+        {
+          "name": "nextFloatRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a57d2e6dcda505014b982f105927911f9708f81f9f8ee2fe25347796f7aaeb17",
+          "code_length": 17
+        },
+        {
+          "name": "nextIMethodRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "31f376e0a9912dfa84aa5ce1ca0b2bc1fd86a43c2c8e6b6f5392285dee6c1bd3",
+          "code_length": 17
+        },
+        {
+          "name": "nextInitRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b84371788b97a4689cb0cc1b60b02ec8ded7127ea860daab1e7db3d4e8ff2e77",
+          "code_length": 17
+        },
+        {
+          "name": "nextIntRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "335c037d80cf8743b85fb175db66cb483ecb26f75867bdee78cead92208297ca",
+          "code_length": 17
+        },
+        {
+          "name": "nextLabel",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8e49c3dafd282214ab3c10577c27e07dbfaaa28f223b2f3b253abc4981f7cc5c",
+          "code_length": 17
+        },
+        {
+          "name": "nextLocal",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "04224f0fad5df275d9faa3ce68688eae2fb9e55c4ace102d47d73ef50e10bafc",
+          "code_length": 17
+        },
+        {
+          "name": "nextLongRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8439a97d4358bb07688b82ddb5fe237d1fbe2d5877a88e21c11087d42fa30b1f",
+          "code_length": 17
+        },
+        {
+          "name": "nextMethodRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "11e10baa4e6f9d751596b3fbf000f6058a00656289c74c252b0c2cae1569c5e9",
+          "code_length": 17
+        },
+        {
+          "name": "nextShort",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ca8763a91de750f89d59a86d18675b1a80b321f4a6ecbde6c41aaaa5ed8066f4",
+          "code_length": 17
+        },
+        {
+          "name": "nextStringRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03e35fb6b63a224753c7f9dd45f2c020f73dbf38272b4a1e8b60f3c7d752cbdb",
+          "code_length": 17
+        },
+        {
+          "name": "nextSuperFieldRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f68e441c01448766adb71f87c729dbc8b5dd64499480687bdf90845080072cc8",
+          "code_length": 17
+        },
+        {
+          "name": "nextSuperMethodRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d3765f974caac6949bd8763b695a76c01c384fe4b3dfcb88b57a56b31468bebe",
+          "code_length": 17
+        },
+        {
+          "name": "nextThisFieldRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "96d758ffdbec254bc8e58f7b6fee001d1e7c7a9719e4cdcfb03f228e07db233f",
+          "code_length": 17
+        },
+        {
+          "name": "nextThisMethodRef",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "76fe628308cdf9ccc6932190e2179d1c06b75c809f60dd3fd150fac36d1ffc93",
+          "code_length": 17
+        },
+        {
+          "name": "nextWideByteCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8c8874989bf6c482b861f0d7527cf3e712ab81f93f154e65125cc6ed661636ac",
+          "code_length": 17
+        },
+        {
+          "name": "setCurrentClass",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "25887db147c64877df1c63e101a01585c6ce5fe75661dde7fa890bb3da64d0a1",
+          "code_length": 6
+        },
+        {
+          "name": "setNewClass",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "20ab5e05ae1b2f51844b3d1c1a775e4d03d6c1a2cdd482a5c271adbdf8d6d327",
+          "code_length": 6
+        },
+        {
+          "name": "setSegment",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/Segment;)V",
+          "access": 1,
+          "code_sha256": "3401f63f54758026f7738378e949103541dd2d039e6ecf541ef525363b41a0eb",
+          "code_length": 6
+        },
+        {
+          "name": "setSuperClass",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9df45d2fde17612a43f7890be274f0d7b6a18938fb27aea8d5f19f3c3795a191",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Error",
+        "java/lang/Object",
+        "org/apache/commons/compress/harmony/unpack200/Segment",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleAnnotationsAttribute.class",
+      "occurrence": 0,
+      "sha256": "aa4fe7f3d4d5a35881aaa9ae31463f335c6d92269b5d9148b2d9a9bc81d0e0ce",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleAnnotationsAttribute",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "numAnnotations",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "annotations",
+          "descriptor": "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;[Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;)V",
+          "access": 1,
+          "code_sha256": "e39461749b7667e7fe698d354860a117fbb31a98f569810f8fd22bb0aa18c9f8",
+          "code_length": 17
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "55da11afbf9808c385b0404fb3af0e75bbe36ba572cb89b0febe2dbf0ed87780",
+          "code_length": 32
+        },
+        {
+          "name": "getNestedClassFileEntries",
+          "descriptor": "()[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+          "access": 4,
+          "code_sha256": "c66f319e90a3073eb3d79c73ed411e12761abb1b79134bc92d60147842814ea6",
+          "code_length": 73
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 4,
+          "code_sha256": "f7e75b22cd2a1ce4d66677cc67a7c5ca78d14fe27ccf2b471ee40ff9215490a9",
+          "code_length": 41
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "96b934c0e84f08ad281d087fa5da992cdc272825a3e4cd81fd1a7ba6f67f2159",
+          "code_length": 38
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 4,
+          "code_sha256": "06325626e917c48034ee87cccd7c5a3f821b93bde875eb6f598dc59b68a13436",
+          "code_length": 61,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;",
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Error",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleAnnotationsAttribute"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation.class",
+      "occurrence": 0,
+      "sha256": "fc9f099e4e79d311555f59184c8b93150484b87b5facf76844bc72c10b2eed2c",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "annotations",
+          "descriptor": "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;",
+          "access": 18
+        },
+        {
+          "name": "numAnnotations",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;)V",
+          "access": 1,
+          "code_sha256": "7135533d932f3791beb99ad0c848465dc0b88c0ff9e09ae892cf6bf827f84c7e",
+          "code_length": 16
+        },
+        {
+          "name": "getClassFileEntries",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "7a9078bf9f9790db5fe197dc8c56b3ffac4df4b5ca5f44024bf92594d7d6bbe0",
+          "code_length": 51,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "35726da27b4690c2c2d5e431607f4bf7714f2eb70e9e3428841d9383322dd05a",
+          "code_length": 41
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 1,
+          "code_sha256": "823782cb8b456833b5267977f112572e3082c6d7645c74e0c52fb89877348cd3",
+          "code_length": 36
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 1,
+          "code_sha256": "e4dd286e9d6f30c749551c4b0af9b9afc83c96ef18b1cdebbca74ac9b85fa523",
+          "code_length": 44,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation;",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute$Annotation",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute.class",
+      "occurrence": 0,
+      "sha256": "7557864f7731f80536a09ddb36de444db2f52a9845b643ab471cbc3dd5585e3f",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "numParameters",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "parameterAnnotations",
+          "descriptor": "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;[Lorg/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation;)V",
+          "access": 1,
+          "code_sha256": "e39461749b7667e7fe698d354860a117fbb31a98f569810f8fd22bb0aa18c9f8",
+          "code_length": 17
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "7ccb29f719da0480a7728b8acff914e107eceae33de83b174ac0b8c5daf28091",
+          "code_length": 32
+        },
+        {
+          "name": "getNestedClassFileEntries",
+          "descriptor": "()[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+          "access": 4,
+          "code_sha256": "c66f319e90a3073eb3d79c73ed411e12761abb1b79134bc92d60147842814ea6",
+          "code_length": 73
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 4,
+          "code_sha256": "f7e75b22cd2a1ce4d66677cc67a7c5ca78d14fe27ccf2b471ee40ff9215490a9",
+          "code_length": 41
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "96b934c0e84f08ad281d087fa5da992cdc272825a3e4cd81fd1a7ba6f67f2159",
+          "code_length": 38
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 4,
+          "code_sha256": "2b0f4811192b05b868d31c392b728638fbb1a6cbded2ced85bf7553a4ba2267a",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation;",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/AnnotationsAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/RuntimeVisibleorInvisibleParameterAnnotationsAttribute$ParameterAnnotation"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/SignatureAttribute.class",
+      "occurrence": 0,
+      "sha256": "d49a7db2d35e508625a97d392072395f52bd612e4ff0bdd21cc75f0822e8e311",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/SignatureAttribute",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/Attribute",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "attributeName",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;",
+          "access": 10
+        },
+        {
+          "name": "signatureIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "signature",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "setAttributeName",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;)V",
+          "access": 9,
+          "code_sha256": "b736b77e84930044333ba1d73184ecc3d724cc2db842a7a38d071527629cb9d6",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;)V",
+          "access": 1,
+          "code_sha256": "6603c67f937ced64d4d8672865c3a62d4cf1a90aed1a74b498d4a16af2f24ecc",
+          "code_length": 13
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getNestedClassFileEntries",
+          "descriptor": "()[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+          "access": 4,
+          "code_sha256": "626c356ab35f670f4a19b02d3e901637a14282b8185e28eecda4f25ee2e75612",
+          "code_length": 19
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 4,
+          "code_sha256": "f5534de75251fb9918fd446a7fcc8de62b278ad4f4c334e4c96050b77838bbc4",
+          "code_length": 26
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d7b70fa4aea7cbc41b877d35f00bb457f788fa30b51a9f953141fa468071d630",
+          "code_length": 23
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 4,
+          "code_sha256": "ae86e900384e5502f2b646f738201717b2fc182ab391cfcda90417d2ca950f59",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/Attribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/SignatureAttribute"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/SourceFileAttribute.class",
+      "occurrence": 0,
+      "sha256": "f7b6e00e2e0037c97d46313cacdb234113ad8fd69b8e7e3d9d6df0c7c74f576b",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/SourceFileAttribute",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/Attribute",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "attributeName",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;",
+          "access": 10
+        },
+        {
+          "name": "name",
+          "descriptor": "Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;",
+          "access": 18
+        },
+        {
+          "name": "nameIndex",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "setAttributeName",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;)V",
+          "access": 9,
+          "code_sha256": "b736b77e84930044333ba1d73184ecc3d724cc2db842a7a38d071527629cb9d6",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8;)V",
+          "access": 1,
+          "code_sha256": "6603c67f937ced64d4d8672865c3a62d4cf1a90aed1a74b498d4a16af2f24ecc",
+          "code_length": 13
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b460b051007870bf97d2f5af2e9520047e1685b8a30b23ff3c891f5f1ed2570c",
+          "code_length": 47
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getNestedClassFileEntries",
+          "descriptor": "()[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+          "access": 4,
+          "code_sha256": "6cb3cb9e59db461b9f81b0efc9f1fef610ea1dc64f10f07e7dd584d40483d56d",
+          "code_length": 19
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "83f2a153f2f48ee61f617c2b5fd013c4a7fa601b18272f96908fa2f7bb0a787b",
+          "code_length": 34
+        },
+        {
+          "name": "isSourceFileAttribute",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool;)V",
+          "access": 4,
+          "code_sha256": "4b838840ca3b21857cd6f89bb9507afb1e69f51de23ade717c80fa03d4d44878",
+          "code_length": 18
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6d780fa356bb07a95171c530f10a44944d8f838918a594a44922a7a214199dfa",
+          "code_length": 23
+        },
+        {
+          "name": "writeBody",
+          "descriptor": "(Ljava/io/DataOutputStream;)V",
+          "access": 4,
+          "code_sha256": "054d167f884712ba2df82bf9c84a3c40e0d395acad33f4b408b265d45c02c5eb",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Objects",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/Attribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPUTF8",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/SourceFileAttribute"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm.class",
+      "occurrence": 0,
+      "sha256": "17f697143e9a2a5e8664e533b9e82c6de9ac61ddab9760dc5df30f2a060de074",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WIDENED",
+          "descriptor": "Z",
+          "access": 28
+        },
+        {
+          "name": "byteCodeArray",
+          "descriptor": "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm;",
+          "access": 28
+        },
+        {
+          "name": "byteCodesByName",
+          "descriptor": "Ljava/util/Map;",
+          "access": 28,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm;>;"
+        },
+        {
+          "name": "opcode",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "rewrite",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "firstOperandIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "operandLength",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "(I)Lorg/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm;",
+          "access": 9,
+          "code_sha256": "6d21eab47d4a9ab48433f45f603bd7586cc4c1a87da730ecf6b1065e259c809b",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1d7149af6849312d0306ae607b6d285711edda4d2042a5448a92ebf5535bb819",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "480dc4458ddeae7032deeee0e0171be305c6d87a333da4305fc452e3729edcf6",
+          "code_length": 24
+        },
+        {
+          "name": "calculateOperandPosition",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "b1d3dda874228a12bdd234aa00655c4cc009f22d839e0d2e3fa0f70887692d60",
+          "code_length": 121
+        },
+        {
+          "name": "firstOperandIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        },
+        {
+          "name": "fixUpByteCodeTargets",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/CodeAttribute;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "getOpcode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e88f57acb743f9814252b0b6da76241e43852e726e8114d0947084449c5d49e9",
+          "code_length": 5
+        },
+        {
+          "name": "getRewrite",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "getRewriteCopy",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "8d336fd256926dfe3656ef1ef5731b216573abe339f55c25a976100708f12992",
+          "code_length": 13
+        },
+        {
+          "name": "hasMultipleByteCodes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "626df2e4c618442dbfd18b0d265233c627c417ba3c82cb3c9073b0e1546b8695",
+          "code_length": 37
+        },
+        {
+          "name": "hasNoOperand",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "nestedMustStartClassPool",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "operandLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a646e90b4a6c63b21bd632d705c86d4c461fd01da9b823ec6470917531af1574",
+          "code_length": 5
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dd623e568ba733d9029241e10a0faeaeadadd05520ae51be4f736d1b5f9d4bd9",
+          "code_length": 38
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b9872f59c8d4c218c5cae77609699536afbe2a385af83e73303cc3d55cdd2cbc",
+          "code_length": 6089
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm;",
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/DoubleForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FieldRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FloatRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IincForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IntRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LabelForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LocalForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LongForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LookupSwitchForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MultiANewArrayForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NarrowClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewInitMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NoArgumentForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ShortForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/StringRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperFieldRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperInitMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/TableSwitchForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisFieldRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisInitMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/WideForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteForm.class",
+      "occurrence": 0,
+      "sha256": "96988cb4ab1c53d4578ab8480b14523cb1d734b1fc08d44cdab387662f023c0a",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "f6433e283e481a5f1d0e9c3c07786cf9cc5cd23719c148d092261e249ca98cc7",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm.class",
+      "occurrence": 0,
+      "sha256": "1b92e27a5bc335a3a241c7e510deaef4c9ee313b587a7ed0efe47233f8769fac",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "widened",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "e47195e88e7c49fdcb371eb610dfcce6a820dc2c7b314559480b0b5476f8fc0a",
+          "code_length": 14
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "49edbbe6dd77b2d97b2f7849cc06c6834b0794e9006332246ab5184694d787b9",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "3d10585867ae6b9d94f86ca3c742ac18cd2312ffbb2ad8399a46c2ae5de238cd",
+          "code_length": 3
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "ea2d7fa14bafe662cec1208951f15d8f23d1c3d9b5b736f22f885817cc44a7ba",
+          "code_length": 67,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm.class",
+      "occurrence": 0,
+      "sha256": "7980b3b0aec1d5f843330270fc1f922d6e0e52317591388f2d610f6519e8ab18",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 1028
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 1028
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 1028
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "61f76dd77fb7a023c134b557b4d689e3421dd436c3473bd36dc6e936ca81bd21",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/DoubleForm.class",
+      "occurrence": 0,
+      "sha256": "e8ada10f08babe8bb1f07cadb130414bb5cc0184711ed8e6a0029afa4469e2bb",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/DoubleForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "84abad56e1dbb7b0a3fb49218b5277aaa689b3358eb1b09b5c630281ef147a9e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/DoubleForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FieldRefForm.class",
+      "occurrence": 0,
+      "sha256": "100a52f97e5eacc9cd8dc22d906fd820bf29b6071c2c492fb9689ce240ece1d7",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FieldRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FieldRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FloatRefForm.class",
+      "occurrence": 0,
+      "sha256": "41edb8e7dac7bcc87f8671b62903b9ad54338503da22523f8b6dc4c936fba866",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FloatRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "e47195e88e7c49fdcb371eb610dfcce6a820dc2c7b314559480b0b5476f8fc0a",
+          "code_length": 14
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "49edbbe6dd77b2d97b2f7849cc06c6834b0794e9006332246ab5184694d787b9",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "2aa3b8c641f9fb2da52054da18aeb7ce8524fd71d21f4ce9d042f43f527cc675",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/FloatRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "8b077e234ee54739d140c3893338b0b81a83348df4d2a1a2ba92e150052c8267",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "88a19f4453be07a60fef4e7c56b82b3beef50fb8691158f9e79bd86470e19002",
+          "code_length": 3
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "1d2e599b619ca3fc9a76b2446b74272157c907c59daa7f505024a8f52c2990d6",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPInterfaceMethodRef",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IMethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IincForm.class",
+      "occurrence": 0,
+      "sha256": "7fe85ea1257af401d50a2816fa81b666b3227f7dfbb5023615bec5e80971de15",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IincForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "6f5878d86c69f9bbd6e28c8950d6a18a41aad873a923713da0d0ebd35fbf33e2",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IincForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm.class",
+      "occurrence": 0,
+      "sha256": "a9496011b256394ca482f914a0b5033c52cb894bae6a3073b313a2bfe2a8ab15",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 1028
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "6a6a9b57889cb64fdc58f9f1eb8b4a8c55be5471ff37258a65e21d7af4d74f35",
+          "code_length": 58,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IntRefForm.class",
+      "occurrence": 0,
+      "sha256": "72a7099abe5de70ae296b9bc1bbad93a84edd406c702a7372b7e24a346b11f9d",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IntRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "e47195e88e7c49fdcb371eb610dfcce6a820dc2c7b314559480b0b5476f8fc0a",
+          "code_length": 14
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "49edbbe6dd77b2d97b2f7849cc06c6834b0794e9006332246ab5184694d787b9",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/IntRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LabelForm.class",
+      "occurrence": 0,
+      "sha256": "33d44a6abac5eb37e8446319f3a539262a449d0e249fe10493393152bb1ac213",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LabelForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "widened",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "e47195e88e7c49fdcb371eb610dfcce6a820dc2c7b314559480b0b5476f8fc0a",
+          "code_length": 14
+        },
+        {
+          "name": "fixUpByteCodeTargets",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/CodeAttribute;)V",
+          "access": 1,
+          "code_sha256": "cd8265f57d92b4bf647859d5e9c4f36517a66924155d78046201bf6c1866a59b",
+          "code_length": 122
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "20a05508358cf6c2df9a26703c54962af95217ead5a051d1f2eae86a12c06286",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/Integer",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CodeAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LabelForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LocalForm.class",
+      "occurrence": 0,
+      "sha256": "cd8d974f1598261e533ec727905e35e619b16b905f3d78f8d723a9b6ab75c771",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LocalForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "d77d0b08c9ec8c0e39efac191c208232b4adf75b51119e5d711bbd75d45515fa",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LocalForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LongForm.class",
+      "occurrence": 0,
+      "sha256": "e557baf325e6c403c7a8c844d7cb6fe69716e64bc22e6566486ad8b5a403a5b1",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LongForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LongForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LookupSwitchForm.class",
+      "occurrence": 0,
+      "sha256": "0365c869bfc2762c2a29795b780113e63a097c74f1c6fc9b0f61a699eb571d42",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LookupSwitchForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "811bb495f3c367f787ff2b7a2459a64692bb66511f5c6065289bb13bcdc2e6df",
+          "code_length": 298
+        },
+        {
+          "name": "lambda$setByteCodeOperands$1",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)I",
+          "access": 4106,
+          "code_sha256": "9981f09331591232a900a6f5cdc68ea88db0e6744de7b758b554f13d40c48884",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$setByteCodeOperands$0",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)I",
+          "access": 4106,
+          "code_sha256": "28470fb4ff3ece3bca0ce01339e3f4b927e96bff9816c34e30d0d808bb06b92b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/System",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Arrays",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/LookupSwitchForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "1b1b2f9a9f937d2e97b6408ecf84af7364fa12742e83079ad546515d059b4992",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "341de5e841816b9cadff69a2653c18333fac80ae6506f8482513a5542d124c49",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MethodRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MultiANewArrayForm.class",
+      "occurrence": 0,
+      "sha256": "e4f19bbcf96cb7d6641ced2771925a193faca7329a418ffab16a027452684e35",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MultiANewArrayForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "69e65d2b86bcb12faa04d5c463ffe2f7787e87c1960e716c3e47781efad596ba",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/MultiANewArrayForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NarrowClassRefForm.class",
+      "occurrence": 0,
+      "sha256": "7aebc0033f808317077a389f204899a9e37b27107f28728a02f82653d0fcaddd",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NarrowClassRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "c9621e26da7f33fddd36609f74c8f70229e3069a8f7a4686a50b78cb03f9d657",
+          "code_length": 10
+        },
+        {
+          "name": "nestedMustStartClassPool",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "a2d12c0f1f18b5b45fb98e2c31b99e5ca583345bbe467a6fd0b7f7e7cb342ac1",
+          "code_length": 13
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "32777adcc4e5d6d1d68ee16f63b78172b1b29d854e1afaa6a9c4538988cf43a0",
+          "code_length": 37,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NarrowClassRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewClassRefForm.class",
+      "occurrence": 0,
+      "sha256": "eea50798c78d450d4cba17bdbe693cf0cde33ac09b254c5dfaeac80cfcff5ae6",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewClassRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "c5822992f5008a8210860678b1b1d57f31675a59f35cdd3381f839aaff329b26",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/Error",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CPClass",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassRefForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewClassRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewInitMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "2cb5c1d2311d72bc87cf1cbcc8c36dc2427dfa54927744f566ef703904f60d71",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewInitMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "e37f8330e31dde01f0d4b72e51f2aa46acf02183798f7fdd71943b3fd7985bbf",
+          "code_length": 58,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NewInitMethodRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NoArgumentForm.class",
+      "occurrence": 0,
+      "sha256": "effbf185efa549c3c06fb015ee2e033dbb6899d6842972ffe40eace4673ca687",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NoArgumentForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/NoArgumentForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm.class",
+      "occurrence": 0,
+      "sha256": "49d18e442b15adaeff3466ad475a19c5ea89b03b7923db724db293d8a1d7d140",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 1028
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 1028
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "6db1f876ec5886fe9bebc9e8bc196de4bb58902bbccd887bc41b8536955a072e",
+          "code_length": 31
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "3a145adafd5a2ca9d1c7a1f638623e12d9bdfe5cb16558862259ec4f73d0e983",
+          "code_length": 65,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/Error",
+        "java/util/Objects",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ShortForm.class",
+      "occurrence": 0,
+      "sha256": "e997a29d9a0c7ccb017130f5b089335ee56a49dbd31e6dc7deaddd2ec9e7f685",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ShortForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "6f88e0801ccdf66025f13b6f23ab462ffd935ceeb50af2781706d289f7534332",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ShortForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm.class",
+      "occurrence": 0,
+      "sha256": "40da09ef727699a915c783812c9d23c300f6cdbcdd0b264f75d3c9e215e0737a",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "widened",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 1028
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 1028
+        },
+        {
+          "name": "nestedMustStartClassPool",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b55f510a2c0589549a49ee8092ea3e9363b6e21b76e4700eeb45d79f53ac679d",
+          "code_length": 13
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "84c1d65d0a7e1689e6e6eb0f6764ff149e499583a35b81703259f04550530bbe",
+          "code_length": 62,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/StringRefForm.class",
+      "occurrence": 0,
+      "sha256": "16a50052215b59ca0cca75e020a293941e0e3a1e7c1d2a2c005fb605c7173165",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/StringRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[IZ)V",
+          "access": 1,
+          "code_sha256": "e47195e88e7c49fdcb371eb610dfcce6a820dc2c7b314559480b0b5476f8fc0a",
+          "code_length": 14
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "49edbbe6dd77b2d97b2f7849cc06c6834b0794e9006332246ab5184694d787b9",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        },
+        {
+          "name": "setNestedEntries",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "6fac5c7d0643ccde80fdc66613d022c5cfd828b4c50353af8eca02d610db6b8c",
+          "code_length": 87,
+          "throws": [
+            "org/apache/commons/compress/harmony/pack200/Pack200Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Lorg/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry;",
+        "org/apache/commons/compress/harmony/pack200/Pack200Exception",
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ClassFileEntry",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SingleByteReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/StringRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperFieldRefForm.class",
+      "occurrence": 0,
+      "sha256": "ac0bb20077db65c22698af555911ab20ca9d9886f335cbd918c53b8a8571344e",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperFieldRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "4115f2005435064b7719af469e5791ab5f23667039e695d0622bf95013882756",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperFieldRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperInitMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "8fc71aa063cb354af8ed452627ed27d5e683421d12d3a6e1c4444371319d5e4e",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperInitMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperInitMethodRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "6d574ccb0f69eac136658f9e54838192ed9d5c8e0ef7bd3433d1622d57f30487",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "4115f2005435064b7719af469e5791ab5f23667039e695d0622bf95013882756",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SuperMethodRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm.class",
+      "occurrence": 0,
+      "sha256": "e6adcd0fec4028ff05a5a2f67c572d46576873cb3f1acb31488697e7e953caea",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "fixUpByteCodeTargets",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/CodeAttribute;)V",
+          "access": 1,
+          "code_sha256": "5d7bfcd574799c1e7dd2e8fdb147fbc3506bd6d4e0f387640be4d48f49c59499",
+          "code_length": 128
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/Integer",
+        "java/util/List",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/CodeAttribute",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/TableSwitchForm.class",
+      "occurrence": 0,
+      "sha256": "5de73d1bf51a12d7510e7ee59d2be13823d19a76b49b1d5fd09e0adc4d26680c",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/TableSwitchForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "507e66e0d413c7ea542af9566f6e14524d79080a337db603565b9f8c9bc89616",
+          "code_length": 286
+        },
+        {
+          "name": "lambda$setByteCodeOperands$0",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)I",
+          "access": 4106,
+          "code_sha256": "9981f09331591232a900a6f5cdc68ea88db0e6744de7b758b554f13d40c48884",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/lang/System",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Arrays",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/SwitchForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/TableSwitchForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisFieldRefForm.class",
+      "occurrence": 0,
+      "sha256": "2421fd409b7db0d7f5f22ad99ea4bda60ae9bc105cb9de7bae431712a24d738c",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisFieldRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "4115f2005435064b7719af469e5791ab5f23667039e695d0622bf95013882756",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisFieldRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisInitMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "6672d6343fd653dd2b459060685152f8cf7a41e1e2ed0760143b6b677df2e39e",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisInitMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/InitMethodReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisInitMethodRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisMethodRefForm.class",
+      "occurrence": 0,
+      "sha256": "33aee3d84954b799a1d13ec2b303d76568055b2b145a009dbc7590dfcfe7784d",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisMethodRefForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;[I)V",
+          "access": 1,
+          "code_sha256": "4a58ef5b39a039066f5fc76ab16402470cdfa56b0de24986feffae4c0c8150a2",
+          "code_length": 8
+        },
+        {
+          "name": "context",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b3cde0c33d2ff1b17a8e422f3c95e40fc1ac3dcbc4f9c31352188e386d90bfc8",
+          "code_length": 5
+        },
+        {
+          "name": "getOffset",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;)I",
+          "access": 4,
+          "code_sha256": "4115f2005435064b7719af469e5791ab5f23667039e695d0622bf95013882756",
+          "code_length": 5
+        },
+        {
+          "name": "getPoolID",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/SegmentConstantPool",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ClassSpecificReferenceForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ThisMethodRefForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm.class",
+      "occurrence": 0,
+      "sha256": "a2afa9d7bba418827c81738f861b171275ba87a8e40807ad671172037dbb2f0a",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "setRewrite2Bytes",
+          "descriptor": "(II[I)V",
+          "access": 1,
+          "code_sha256": "6a011dd0c4afa015fb0ea824d7971c9b867642c40a2c25379186a6e24164debe",
+          "code_length": 110
+        },
+        {
+          "name": "setRewrite4Bytes",
+          "descriptor": "(II[I)V",
+          "access": 1,
+          "code_sha256": "fc6b5526cc89429e43902c9873bc13d06d7daf7d3d3a6393bb0167169288908e",
+          "code_length": 134
+        },
+        {
+          "name": "setRewrite4Bytes",
+          "descriptor": "(I[I)V",
+          "access": 1,
+          "code_sha256": "8bea670d90895c6eed340d25f4ae242f8e757a68b3d7b2b8c1f5e298fef0b96d",
+          "code_length": 72
+        }
+      ],
+      "class_references": [
+        "java/lang/Error",
+        "java/lang/StringBuilder",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/ByteCodeForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/WideForm.class",
+      "occurrence": 0,
+      "sha256": "be6b86d4ba0330215fb0bf607dbfbe90af59dc75874520f19fb95620d10e8136",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/WideForm",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "00e64941b68070106e0f759137413f4f5e04ef0f4cf508f1c07ae28100cbe24b",
+          "code_length": 7
+        },
+        {
+          "name": "setByteCodeOperands",
+          "descriptor": "(Lorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 1,
+          "code_sha256": "d7389cf6e9c667eff24bd80845acbfe4b9ba9981bb8755d3c5bc154dc3a7e654",
+          "code_length": 36
+        },
+        {
+          "name": "setByteCodeOperandsFormat1",
+          "descriptor": "(ILorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "6dd3552c6a922a511db0e736cfbf807e66bc3117f01514f5eaa795874f1364bc",
+          "code_length": 55
+        },
+        {
+          "name": "setByteCodeOperandsFormat2",
+          "descriptor": "(ILorg/apache/commons/compress/harmony/unpack200/bytecode/ByteCode;Lorg/apache/commons/compress/harmony/unpack200/bytecode/OperandManager;I)V",
+          "access": 4,
+          "code_sha256": "b68531d13f9d9d9c2afbc44503342aa1831b63390874946c7490cf1d2ce6fc9c",
+          "code_length": 75
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/harmony/unpack200/bytecode/ByteCode",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/OperandManager",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/VariableInstructionForm",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/WideForm"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/package-info.class",
+      "occurrence": 0,
+      "sha256": "a621b7ba0d200ccb98455be5c9bdbd916f9895e2c7175002e285264c60a5bb3e",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/forms/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/forms/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/bytecode/package-info.class",
+      "occurrence": 0,
+      "sha256": "b828e6cbfbd1ee8e2a8fd31709a3528e42c891b726bfaf81e334732268f6ecb7",
+      "name": "org/apache/commons/compress/harmony/unpack200/bytecode/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/harmony/unpack200/bytecode/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/harmony/unpack200/package-info.class",
+      "occurrence": 0,
+      "sha256": "0b513223abdfbeff7d8f0625265d5177a18526fffeaf87ea1c5317544278212f",
+      "name": "org/apache/commons/compress/harmony/unpack200/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/harmony/unpack200/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/java/util/jar/Pack200$Packer.class",
+      "occurrence": 0,
+      "sha256": "0fb0cc561502d08dc39464973ddc6470c61246c88f1518e83ccdf9d29b4612ce",
+      "name": "org/apache/commons/compress/java/util/jar/Pack200$Packer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CLASS_ATTRIBUTE_PFX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CODE_ATTRIBUTE_PFX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFLATE_HINT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EFFORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ERROR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FALSE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FIELD_ATTRIBUTE_PFX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KEEP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KEEP_FILE_ORDER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LATEST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "METHOD_ATTRIBUTE_PFX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MODIFICATION_TIME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PASS_FILE_PFX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROGRESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SEGMENT_LIMIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "STRIP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TRUE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UNKNOWN_ATTRIBUTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "addPropertyChangeListener",
+          "descriptor": "(Ljava/beans/PropertyChangeListener;)V",
+          "access": 1025
+        },
+        {
+          "name": "pack",
+          "descriptor": "(Ljava/util/jar/JarFile;Ljava/io/OutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "pack",
+          "descriptor": "(Ljava/util/jar/JarInputStream;Ljava/io/OutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "properties",
+          "descriptor": "()Ljava/util/SortedMap;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/SortedMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "removePropertyChangeListener",
+          "descriptor": "(Ljava/beans/PropertyChangeListener;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/java/util/jar/Pack200",
+        "org/apache/commons/compress/java/util/jar/Pack200$Packer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/java/util/jar/Pack200$Unpacker.class",
+      "occurrence": 0,
+      "sha256": "7baf109d8bd65d5dd4ffd180f95115b8d45da424e15e764fa4ec3252d1d8b59c",
+      "name": "org/apache/commons/compress/java/util/jar/Pack200$Unpacker",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFLATE_HINT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FALSE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KEEP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROGRESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TRUE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "addPropertyChangeListener",
+          "descriptor": "(Ljava/beans/PropertyChangeListener;)V",
+          "access": 1025
+        },
+        {
+          "name": "properties",
+          "descriptor": "()Ljava/util/SortedMap;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/SortedMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "removePropertyChangeListener",
+          "descriptor": "(Ljava/beans/PropertyChangeListener;)V",
+          "access": 1025
+        },
+        {
+          "name": "unpack",
+          "descriptor": "(Ljava/io/File;Ljava/util/jar/JarOutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "unpack",
+          "descriptor": "(Ljava/io/InputStream;Ljava/util/jar/JarOutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/java/util/jar/Pack200",
+        "org/apache/commons/compress/java/util/jar/Pack200$Unpacker"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/java/util/jar/Pack200.class",
+      "occurrence": 0,
+      "sha256": "1e9977644117df7d4373c45f193b788405fd8e5359e21d727fbb7f94a84c75b9",
+      "name": "org/apache/commons/compress/java/util/jar/Pack200",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SYSTEM_PROPERTY_PACKER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SYSTEM_PROPERTY_UNPACKER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "0d37d0896337390c31b6cd622b00861bdb46b0cbf9427570de40f1821d529df2",
+          "code_length": 11
+        },
+        {
+          "name": "newPacker",
+          "descriptor": "()Lorg/apache/commons/compress/java/util/jar/Pack200$Packer;",
+          "access": 9,
+          "code_sha256": "e2253102274aa93986b5b7d2619e12b3eb4d2775b196d3084dfc8ab27df28182",
+          "code_length": 11
+        },
+        {
+          "name": "newUnpacker",
+          "descriptor": "()Lorg/apache/commons/compress/java/util/jar/Pack200$Unpacker;",
+          "access": 9,
+          "code_sha256": "1985e2ad8664c7325c6af14169d307506198de7a27572287178d3e2002b1e7aa",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "27752947d9209fda809a8fbf664c9e668287eaf0348eef8ecfbeead18478d14d",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$newInstance$0",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 4106,
+          "code_sha256": "9056ab46e917c01ec8f4f2f304dc5749f7da9fed9d6947b25680508960b7a8de",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Constructor",
+        "java/security/AccessController",
+        "java/util/Objects",
+        "org/apache/commons/compress/harmony/archive/internal/nls/Messages",
+        "org/apache/commons/compress/java/util/jar/Pack200",
+        "org/apache/commons/compress/java/util/jar/Pack200$Packer",
+        "org/apache/commons/compress/java/util/jar/Pack200$Unpacker"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/java/util/jar/package-info.class",
+      "occurrence": 0,
+      "sha256": "f57a4f4fb89ce47cf2b392ba95f1286f4906c371fc39eb512ddb918a3563a0e0",
+      "name": "org/apache/commons/compress/java/util/jar/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/java/util/jar/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/package-info.class",
+      "occurrence": 0,
+      "sha256": "d0dda9d69d710c4f55639e097a4e46481560bd5c4bf5480c95b2f93657b5512d",
+      "name": "org/apache/commons/compress/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/parallel/FileBasedScatterGatherBackingStore.class",
+      "occurrence": 0,
+      "sha256": "548968c83c93a77b0f71414989245a6dc5144bad5bcace803029a3bc3593f765",
+      "name": "org/apache/commons/compress/parallel/FileBasedScatterGatherBackingStore",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/compress/parallel/ScatterGatherBackingStore"
+      ],
+      "fields": [
+        {
+          "name": "target",
+          "descriptor": "Ljava/nio/file/Path;",
+          "access": 18
+        },
+        {
+          "name": "outputStream",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "819e3669ba1b0bd4889d36f744a56e0e1d2adcd49359411e15386dafd212a066",
+          "code_length": 9,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/file/Path;)V",
+          "access": 1,
+          "code_sha256": "7a6a7b023b8ab1106ff01be332825633d8be755c0c7ecdd0566fb369b3710983",
+          "code_length": 38,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7fc54097a35fafaf715d5ab4b543da7d0c10158a846b37c7f77a67ca897ddc4c",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "closeForWriting",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6c303ff04c169f393859dbaa95c271856914abaad1c25b4dfffa02cb970b0a23",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "50b54e2fca187f5de29127aac6f6bee9594069bcf59280b154155ae4f209d7c8",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeOut",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "5dc7fa92ca7b1e92805dd1d13ae889942cd713f116c9be2806e69c38142ae6d2",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/UncheckedIOException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/nio/file/Files",
+        "java/nio/file/OpenOption",
+        "java/nio/file/Path",
+        "org/apache/commons/compress/parallel/FileBasedScatterGatherBackingStore",
+        "org/apache/commons/compress/parallel/ScatterGatherBackingStore"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/parallel/InputStreamSupplier.class",
+      "occurrence": 0,
+      "sha256": "63387325c601e605173ae06bbcff06c0e3ca08312753c24ffa0fabc96e6f7475",
+      "name": "org/apache/commons/compress/parallel/InputStreamSupplier",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/parallel/InputStreamSupplier"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/parallel/ScatterGatherBackingStore.class",
+      "occurrence": 0,
+      "sha256": "8d40901eec40c9624bc1b20494a7d79f57c41b2f74b39d6ac40f2d613408b457",
+      "name": "org/apache/commons/compress/parallel/ScatterGatherBackingStore",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "closeForWriting",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeOut",
+          "descriptor": "([BII)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/parallel/ScatterGatherBackingStore"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/parallel/ScatterGatherBackingStoreSupplier.class",
+      "occurrence": 0,
+      "sha256": "3cb76ba37341ae113196ec5f8a009dbf80d01aef611035388732da3200b2c93e",
+      "name": "org/apache/commons/compress/parallel/ScatterGatherBackingStoreSupplier",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lorg/apache/commons/compress/parallel/ScatterGatherBackingStore;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/parallel/ScatterGatherBackingStoreSupplier"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/parallel/package-info.class",
+      "occurrence": 0,
+      "sha256": "6a44477d9491bc7630763bceaf86ac662cadfc1bf5bc384b07c0e78815f43ae5",
+      "name": "org/apache/commons/compress/parallel/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/parallel/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ArchiveUtils.class",
+      "occurrence": 0,
+      "sha256": "7e3355ce5478c53526773208930e05fcc88e34200ed128847f64b330a7c124a2",
+      "name": "org/apache/commons/compress/utils/ArchiveUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_SANITIZED_NAME_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "isArrayZero",
+          "descriptor": "([BI)Z",
+          "access": 9,
+          "code_sha256": "b22a51e3101440d60a0cd29935c32a98435ffc8f29ca31d11a0e1899e5dae644",
+          "code_length": 23
+        },
+        {
+          "name": "isEqual",
+          "descriptor": "([B[B)Z",
+          "access": 9,
+          "code_sha256": "86c62cce214002e09a5365c4854223afc6b3db41c3fee243f5489f78e2971671",
+          "code_length": 6
+        },
+        {
+          "name": "isEqual",
+          "descriptor": "([B[BZ)Z",
+          "access": 9,
+          "code_sha256": "e2bed41c67d2eaa9c35250ab92d19847821e0b466b09f5912635bf6832eb2128",
+          "code_length": 13
+        },
+        {
+          "name": "isEqual",
+          "descriptor": "([BII[BII)Z",
+          "access": 9,
+          "code_sha256": "c355371d1bc0c1ed09da8d81dbb0dc364a7b677904821d0e7688b7ce68ed386b",
+          "code_length": 13
+        },
+        {
+          "name": "isEqual",
+          "descriptor": "([BII[BIIZ)Z",
+          "access": 9,
+          "code_sha256": "8958fb76f5b707fb958affe344cf886decc58a50a6f377e77181f9a8a470e89f",
+          "code_length": 123
+        },
+        {
+          "name": "isEqualWithNull",
+          "descriptor": "([BII[BII)Z",
+          "access": 9,
+          "code_sha256": "d25a6341519a2d9090fe33ee035852a174e047e9ee96b7efd1ea3a8c9ab3e013",
+          "code_length": 13
+        },
+        {
+          "name": "matchAsciiBuffer",
+          "descriptor": "(Ljava/lang/String;[B)Z",
+          "access": 9,
+          "code_sha256": "cc54bb91c5b6a38cb72f1be3fc1ce5942aed26e6fdc5510a94ac4ea39019025a",
+          "code_length": 9
+        },
+        {
+          "name": "matchAsciiBuffer",
+          "descriptor": "(Ljava/lang/String;[BII)Z",
+          "access": 9,
+          "code_sha256": "47d41ec39cc09ae11c13caf20d8fffd0084edbb800ec184f8c9060dc40140661",
+          "code_length": 23
+        },
+        {
+          "name": "sanitize",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "cfdeca426e30728773f8a0ee827e058ca7fd0d137314a8834992ad10da8f9f6e",
+          "code_length": 134
+        },
+        {
+          "name": "toAsciiBytes",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 9,
+          "code_sha256": "2907d6cb7679f672b3bcf63dc9d6cd354dcb820a2ee92315c81c95c1335d813f",
+          "code_length": 8
+        },
+        {
+          "name": "toAsciiString",
+          "descriptor": "([B)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4dd1268d93de9ad57f05d52412e73441a8c87e03575010717c76247f559213aa",
+          "code_length": 12
+        },
+        {
+          "name": "toAsciiString",
+          "descriptor": "([BII)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "63e3206d2bbef6c4acfdfb571d52ed9ccf6b61e60f7f670f66b244f8e3946d7e",
+          "code_length": 14
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/apache/commons/compress/archivers/ArchiveEntry;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "36f6be865fb9d40185a0ceb5059cc378c20aa29ae4ae4bc7987444b1fee53f70",
+          "code_length": 97
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "8f7799e5f34bff81610784b2a046c3df74a78efd69692804d2a5e41ba459a1a0",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[C",
+        "java/lang/Character",
+        "java/lang/Character$UnicodeBlock",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/StandardCharsets",
+        "java/util/Arrays",
+        "org/apache/commons/compress/archivers/ArchiveEntry",
+        "org/apache/commons/compress/utils/ArchiveUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/BitInputStream.class",
+      "occurrence": 0,
+      "sha256": "5d1e3aab3b289cd5f3091bc792281f502cb71692ea706061bb7ed26f13000665",
+      "name": "org/apache/commons/compress/utils/BitInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "MAXIMUM_CACHE_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MASKS",
+          "descriptor": "[J",
+          "access": 26
+        },
+        {
+          "name": "in",
+          "descriptor": "Lorg/apache/commons/io/input/BoundedInputStream;",
+          "access": 18
+        },
+        {
+          "name": "byteOrder",
+          "descriptor": "Ljava/nio/ByteOrder;",
+          "access": 18
+        },
+        {
+          "name": "bitsCached",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "bitsCachedSize",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/nio/ByteOrder;)V",
+          "access": 1,
+          "code_sha256": "48865406e87cf5c526b1b44eb48c2d5ed5ae921c96a00d306b9b4391859f93e8",
+          "code_length": 35
+        },
+        {
+          "name": "alignWithByteBoundary",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "94b07f8a1f9cc7ea54fb77ade74eb6b82655fee52290ac52fa0f5253bf3bf330",
+          "code_length": 19
+        },
+        {
+          "name": "bitsAvailable",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "cfe1052e6b1aa26e69e6011a8fd686948e8d1dbff8343d847d9a4b63c4e85320",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "bitsCached",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7bf6b5cc666f60bedfb13ccd693d36ee92ac8e956b5163748e135ddb3486b434",
+          "code_length": 5
+        },
+        {
+          "name": "clearBitCache",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cd0b4469ebad3b61e1d183452120a6e91b91b46f0382c0a044fc29c2c9681ae5",
+          "code_length": 11
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7d5f0ca61cdc9de068b71fcfc16927f4bd5d923158cc90811adaedfed87a9c09",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "ensureCache",
+          "descriptor": "(I)Z",
+          "access": 2,
+          "code_sha256": "c141f2bd3e834f6b1bbf3b1802b5cb1df271be3205430fc6b2dd99ffa88644ee",
+          "code_length": 99,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBytesRead",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c098719f099d6a1b91c5e145f9d4ea32c6d1a7bb4058edcf218698834cebed11",
+          "code_length": 8
+        },
+        {
+          "name": "processBitsGreater57",
+          "descriptor": "(I)J",
+          "access": 2,
+          "code_sha256": "f028c0c324b60f7782714da65f5be9d65d256331b463063233396f22625ed5a4",
+          "code_length": 164,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readBits",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "e2e1f36657dabb226b538f7a2128ebb16f08fa690f9c211ff836d223d89c1bd0",
+          "code_length": 52,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readCachedBits",
+          "descriptor": "(I)J",
+          "access": 2,
+          "code_sha256": "efc2866fc586e2638b1b7799308704f10b5abbfc9e59066919f2093cfa6476a7",
+          "code_length": 64
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "58a33ae693587dc87f9839addd5d0b1b95cefe3b7e5612c9da8d9b688b32b028",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/IOException",
+        "java/lang/Byte",
+        "java/lang/Object",
+        "java/nio/ByteOrder",
+        "java/util/function/Supplier",
+        "org/apache/commons/compress/utils/BitInputStream",
+        "org/apache/commons/io/input/BoundedInputStream",
+        "org/apache/commons/io/input/BoundedInputStream$Builder"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/BoundedArchiveInputStream.class",
+      "occurrence": 0,
+      "sha256": "52c5a150a335e1cc48ccee20801c9b21451934f46cb51a1f37f0a676e4b07683",
+      "name": "org/apache/commons/compress/utils/BoundedArchiveInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "end",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "singleByteBuffer",
+          "descriptor": "Ljava/nio/ByteBuffer;",
+          "access": 2
+        },
+        {
+          "name": "loc",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJ)V",
+          "access": 1,
+          "code_sha256": "b8a3410b2860694ac099ccf38566f43093b0f70667aec7cdec0a2cb277a34926",
+          "code_length": 62
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 33,
+          "code_sha256": "0f65557fe1dc7ad5c2513b6590d24934ff60f7f26b1a82f84b6dde828b6436f1",
+          "code_length": 82,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 33,
+          "code_sha256": "aaecc6eb81ebe97fe9999b25bd662244a74769c3ac48ae3f024f27d6481b0006",
+          "code_length": 112,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(JLjava/nio/ByteBuffer;)I",
+          "access": 1028,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Math",
+        "java/lang/StringBuilder",
+        "java/nio/ByteBuffer",
+        "org/apache/commons/compress/utils/BoundedArchiveInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/BoundedInputStream.class",
+      "occurrence": 0,
+      "sha256": "c1927f04b936c7765192dfc4ec741add1c6e3f5fa73ffb1ba3ea3f8940d40bda",
+      "name": "org/apache/commons/compress/utils/BoundedInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/io/input/BoundedInputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;J)V",
+          "access": 1,
+          "code_sha256": "fe55437ce9801005cde4bea63ecb25cf9a29cc5ffa3fa4253eb4289b5e19fae3",
+          "code_length": 12
+        },
+        {
+          "name": "getBytesRemaining",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "a1598bcd268ceb3011c08e41954b76a428ed7ca5a1cbefc4e3684cf46f9eddde",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/compress/utils/BoundedInputStream",
+        "org/apache/commons/io/input/BoundedInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/BoundedSeekableByteChannelInputStream.class",
+      "occurrence": 0,
+      "sha256": "ef224b8653aee5883e865e32204cade0627b3e5a7b69d72aedb5d9b8416a94f2",
+      "name": "org/apache/commons/compress/utils/BoundedSeekableByteChannelInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/utils/BoundedArchiveInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "channel",
+          "descriptor": "Ljava/nio/channels/SeekableByteChannel;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJLjava/nio/channels/SeekableByteChannel;)V",
+          "access": 1,
+          "code_sha256": "d95c8be1b9a8813b224b34bd873e4e5d55c9ff8a52846b568f5721e9056e3a15",
+          "code_length": 13
+        },
+        {
+          "name": "read",
+          "descriptor": "(JLjava/nio/ByteBuffer;)I",
+          "access": 4,
+          "code_sha256": "977516788e2cc45e2e8706a358bf25801bd01b1a350af1d6b32d292bb1d3c5c3",
+          "code_length": 53,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/SeekableByteChannel",
+        "org/apache/commons/compress/utils/BoundedArchiveInputStream",
+        "org/apache/commons/compress/utils/BoundedSeekableByteChannelInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ByteUtils$ByteConsumer.class",
+      "occurrence": 0,
+      "sha256": "8ba5ae7643606e17b183d07e218442fecc578e5089e8a4e1d042e71ee79109a3",
+      "name": "org/apache/commons/compress/utils/ByteUtils$ByteConsumer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "accept",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/ByteUtils$ByteConsumer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ByteUtils$ByteSupplier.class",
+      "occurrence": 0,
+      "sha256": "b5a0d33074e200e46d0a959805fefcf1666e6e46bb5daf3b85e4232747c46b8c",
+      "name": "org/apache/commons/compress/utils/ByteUtils$ByteSupplier",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getAsByte",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/ByteUtils$ByteSupplier"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ByteUtils$InputStreamByteSupplier.class",
+      "occurrence": 0,
+      "sha256": "94faf46aedb08dcceb820d2241a9b6041d9ef4ad87fb1c3ed23cdfa4b2349474",
+      "name": "org/apache/commons/compress/utils/ByteUtils$InputStreamByteSupplier",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/compress/utils/ByteUtils$ByteSupplier"
+      ],
+      "fields": [
+        {
+          "name": "is",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "getAsByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "50ce3972894007e689319ee15a40c93ae2f6a4c221cc4110e7c26b7a1a2c0be7",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/ByteUtils$ByteSupplier",
+        "org/apache/commons/compress/utils/ByteUtils$InputStreamByteSupplier"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ByteUtils$OutputStreamByteConsumer.class",
+      "occurrence": 0,
+      "sha256": "01a028c7c7b03c90ab33da6cf92be76760808114c4962859e8d5f3938c779245",
+      "name": "org/apache/commons/compress/utils/ByteUtils$OutputStreamByteConsumer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/compress/utils/ByteUtils$ByteConsumer"
+      ],
+      "fields": [
+        {
+          "name": "os",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "accept",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "131e30a84585eb675663251d35914f0ae4ccc5d722e92f3252b113acc22f710b",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/ByteUtils$ByteConsumer",
+        "org/apache/commons/compress/utils/ByteUtils$OutputStreamByteConsumer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ByteUtils.class",
+      "occurrence": 0,
+      "sha256": "8771efaa964846e5f0b01e04a2847c25bfc48ee5b9f0bc2f32e98b746adefd1f",
+      "name": "org/apache/commons/compress/utils/ByteUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY_BYTE_ARRAY",
+          "descriptor": "[B",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "checkReadLength",
+          "descriptor": "(I)V",
+          "access": 10,
+          "code_sha256": "3ca6902a97f121616ee1c7b1294ef122c81d4296b2865921886c6c328d6d1c6a",
+          "code_length": 17
+        },
+        {
+          "name": "fromLittleEndian",
+          "descriptor": "([B)J",
+          "access": 9,
+          "code_sha256": "d87421fe30d223694a67478243114cfe453f9c76cd8ea5f2b969662d3bddc93e",
+          "code_length": 8
+        },
+        {
+          "name": "fromLittleEndian",
+          "descriptor": "([BII)J",
+          "access": 9,
+          "code_sha256": "f19f08889b4f4e2e062d8486afae3561fb14aefb8c2f9452ae210a3618444ebc",
+          "code_length": 43
+        },
+        {
+          "name": "fromLittleEndian",
+          "descriptor": "(Lorg/apache/commons/compress/utils/ByteUtils$ByteSupplier;I)J",
+          "access": 9,
+          "code_sha256": "bca7e7a6b1eaf5afce0a48ca0988e16cedd1ba70be86949827031cfe183b8789",
+          "code_length": 62,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "fromLittleEndian",
+          "descriptor": "(Ljava/io/DataInput;I)J",
+          "access": 9,
+          "code_sha256": "905bb98b0a7c25e7e788f893cd5ed13c8cb91e2c1e43ab9939bbab87e6144730",
+          "code_length": 43,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "fromLittleEndian",
+          "descriptor": "(Ljava/io/InputStream;I)J",
+          "access": 9,
+          "code_sha256": "42bf52365090f4894658c1fc90952ce9e59af68e333728f079a9414b4ea95141",
+          "code_length": 60,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toLittleEndian",
+          "descriptor": "([BJII)V",
+          "access": 9,
+          "code_sha256": "6d5f52d2c9f03391fecab4cd4c0d499ab1e6670618aaee40e31ab99f466287ba",
+          "code_length": 41
+        },
+        {
+          "name": "toLittleEndian",
+          "descriptor": "(Lorg/apache/commons/compress/utils/ByteUtils$ByteConsumer;JI)V",
+          "access": 9,
+          "code_sha256": "2fa37f58fe6a95ff71db73a3e4b0e84db6afe46ba9ca42135d783ed8b2b66d2a",
+          "code_length": 39,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toLittleEndian",
+          "descriptor": "(Ljava/io/DataOutput;JI)V",
+          "access": 9,
+          "code_sha256": "76521e2da4159467b9573e952461d59529a7c1554fac13a8c73ed54afb46e9b8",
+          "code_length": 39,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toLittleEndian",
+          "descriptor": "(Ljava/io/OutputStream;JI)V",
+          "access": 9,
+          "code_sha256": "76dfaedae63f750d40554a730fa376e1c41e63eaf8c908b9b81645a802443f6e",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "77be57ae11a66e5623674eab1db3eecee5031a0c27b40fec4d9bf8ed81e9acdc",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bf1ddde5868d128a80e68fee08af6743c80d0649f380c90f6130009201192b6c",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/io/DataInput",
+        "java/io/DataOutput",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ByteUtils",
+        "org/apache/commons/compress/utils/ByteUtils$ByteConsumer",
+        "org/apache/commons/compress/utils/ByteUtils$ByteSupplier",
+        "org/apache/commons/compress/utils/ByteUtils$InputStreamByteSupplier",
+        "org/apache/commons/compress/utils/ByteUtils$OutputStreamByteConsumer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/CRC32VerifyingInputStream.class",
+      "occurrence": 0,
+      "sha256": "85e87f6387fb0a2d5d35fad51e80dde5a5afc31cca984037975081f135e99fc5",
+      "name": "org/apache/commons/compress/utils/CRC32VerifyingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/compress/utils/ChecksumVerifyingInputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;JI)V",
+          "access": 1,
+          "code_sha256": "6945da25d6aa1bb83669edce499a049c1fcc4f2bc80f663a23cff4a763fe48f7",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;JJ)V",
+          "access": 1,
+          "code_sha256": "5d4b30b52b17550e32c40ce9758f443e556a5aa764196772d93b5774deb665a8",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/util/zip/CRC32",
+        "org/apache/commons/compress/utils/CRC32VerifyingInputStream",
+        "org/apache/commons/compress/utils/ChecksumVerifyingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/CharsetNames.class",
+      "occurrence": 0,
+      "sha256": "4171ff20f7fbb806b150bf57b5db12665889f28b24148459f2bf02ccb9e16306",
+      "name": "org/apache/commons/compress/utils/CharsetNames",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ISO_8859_1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "US_ASCII",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16BE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16LE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UTF_8",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0e11d4c23bae7659feeec955136c1b990f3e2e1791f9401b2790645190a763e9",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/nio/charset/Charset",
+        "java/nio/charset/StandardCharsets",
+        "org/apache/commons/compress/utils/CharsetNames"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/Charsets.class",
+      "occurrence": 0,
+      "sha256": "869f5215e8e6fef54f64682ac44e269a4f3d56b3f54212153087408bc0e0a0e4",
+      "name": "org/apache/commons/compress/utils/Charsets",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ISO_8859_1",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        },
+        {
+          "name": "US_ASCII",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16BE",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        },
+        {
+          "name": "UTF_16LE",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        },
+        {
+          "name": "UTF_8",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toCharset",
+          "descriptor": "(Ljava/nio/charset/Charset;)Ljava/nio/charset/Charset;",
+          "access": 9,
+          "code_sha256": "7e96553121ca50189e57f17e475ea475551f433101c677399b6d4c05a741d468",
+          "code_length": 12
+        },
+        {
+          "name": "toCharset",
+          "descriptor": "(Ljava/lang/String;)Ljava/nio/charset/Charset;",
+          "access": 9,
+          "code_sha256": "c44a975901506f4e9abe30aab98650b3ee2576fe6438a4e47f1a8ebcff686b9e",
+          "code_length": 15
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "729dfa45dc8d6f5a35281f54d84143cf572a10510750e57de647419a9cb067dc",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/nio/charset/Charset",
+        "java/nio/charset/StandardCharsets",
+        "org/apache/commons/compress/utils/Charsets"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ChecksumCalculatingInputStream.class",
+      "occurrence": 0,
+      "sha256": "ba631b2dbd754df24166714c5c9b7a1bfb940f07dcb5b84ddb396caa225e9d8f",
+      "name": "org/apache/commons/compress/utils/ChecksumCalculatingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/zip/CheckedInputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/zip/Checksum;Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "f7aa059a9bc85ab58221aae3b549be55001e6fdcf7a551856225e5f1485305de",
+          "code_length": 23
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "b6df149625f8815e55908d26a659b59451a9162366c19c4f277c085403c29340",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/io/InputStream",
+        "java/util/Objects",
+        "java/util/zip/CheckedInputStream",
+        "java/util/zip/Checksum",
+        "org/apache/commons/compress/utils/ChecksumCalculatingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ChecksumVerifyingInputStream.class",
+      "occurrence": 0,
+      "sha256": "d7740925190a90d37e205a2b53331507b7e9ce6861259feda58e40a9f1f4d97c",
+      "name": "org/apache/commons/compress/utils/ChecksumVerifyingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/zip/CheckedInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "remaining",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "expected",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/zip/Checksum;Ljava/io/InputStream;JJ)V",
+          "access": 1,
+          "code_sha256": "dd34e22ec5fc40e3637670fa90b0065e9f52f60e6c6a4563bdfec33060c91f42",
+          "code_length": 18
+        },
+        {
+          "name": "getBytesRemaining",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ea269802eef59ae40dafdde3d6de48574fb62589184008e761d829cccbce7427",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1fe1449df565e4f9de25c228501e034278cf9c9d5a4db0aba3ddeed33e227eac",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "32db6f57311ca738ff953b9234398e6e696b7029b881e552533c33e722b39d0a",
+          "code_length": 39,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "verify",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ad8e84c5899a1f07938d8aeec29d4fc49888f5521eb7f9fcbe49fb29e6c71bcb",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/util/zip/CheckedInputStream",
+        "java/util/zip/Checksum",
+        "org/apache/commons/compress/utils/ChecksumVerifyingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/CloseShieldFilterInputStream.class",
+      "occurrence": 0,
+      "sha256": "d9d55dcbca17740814a93950b0eb952da9e47141b87e717b351f0f29c46998ce",
+      "name": "org/apache/commons/compress/utils/CloseShieldFilterInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "org/apache/commons/compress/utils/CloseShieldFilterInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/CountingInputStream.class",
+      "occurrence": 0,
+      "sha256": "3d6e870d71c2150c1102351f5bed5b4385c3aff8306a69a0877f44f68f7c19ef",
+      "name": "org/apache/commons/compress/utils/CountingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bytesRead",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "count",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "5bfe1b559534d39182077f910ad6e64aa6a74c8297a58d9e8863b9be18bcdfef",
+          "code_length": 19
+        },
+        {
+          "name": "getBytesRead",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "297da201021403b620439dd24bf3368088499bd2b6307926a0d465041feaaa95",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b2d1c693c7694b428a1cec163a0c7652854cfac360a5d2b017b0789e9bb05bff",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([B)I",
+          "access": 1,
+          "code_sha256": "0094e8d340cd1a589aec4fae1dae7f28557f087231c979a592c6b31ad3c57bf2",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "9facd09b63f4aaeebc59282064504b719f118e4babf4e2f99a2ff54cd444da06",
+          "code_length": 33,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "org/apache/commons/compress/utils/CountingInputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/CountingOutputStream.class",
+      "occurrence": 0,
+      "sha256": "3af06d61ea840984c394810732ad9a3b308625681ecce7d459201d1dff4b3811",
+      "name": "org/apache/commons/compress/utils/CountingOutputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterOutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bytesWritten",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "count",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5bfe1b559534d39182077f910ad6e64aa6a74c8297a58d9e8863b9be18bcdfef",
+          "code_length": 19
+        },
+        {
+          "name": "getBytesWritten",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "297da201021403b620439dd24bf3368088499bd2b6307926a0d465041feaaa95",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "d9517ee9e7f3bfe4fa63cd37c63a330a87c38ee30f24ed9f3afed696a35844be",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "4b53a9863c1fca48db839739ebaf08a3e7cb0f68517bcc58aba31a1984b12968",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d9e2372ce392653a8e9cfab028d22c8122aeae81765843836c3db7a1e1f84a4",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FilterOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "org/apache/commons/compress/utils/CountingOutputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/ExactMath.class",
+      "occurrence": 0,
+      "sha256": "7f645cf241b4b0a46884347842d59c39aac8ef97a7a96a76143fb9acb1132048",
+      "name": "org/apache/commons/compress/utils/ExactMath",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(IJ)I",
+          "access": 9,
+          "code_sha256": "d0c8008b2e9640289267727e236867ad2d989ac5a6c3c316185431dbfa173945",
+          "code_length": 21
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "46202a05ae07ac9d2aac2ebbd079d457dde453f0987613b52558e8d5f968e0c8",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ArithmeticException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/ExactMath"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/FileNameUtils.class",
+      "occurrence": 0,
+      "sha256": "39f68b8713d198ff1c53b466711050ff05c31623b289c9fdcf7cd8f09a63ebae",
+      "name": "org/apache/commons/compress/utils/FileNameUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getBaseName",
+          "descriptor": "(Ljava/nio/file/Path;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f143cd28b3bdcd812f76d8df01a06874605a890f183acaad819c94ea93d4706a",
+          "code_length": 31
+        },
+        {
+          "name": "getBaseName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "41ea0aed98930070b14b0816b60134bd88ab98123ebfc71e0089f0e7dde3b1c3",
+          "code_length": 21
+        },
+        {
+          "name": "getExtension",
+          "descriptor": "(Ljava/nio/file/Path;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "02c08745e076b1c1c87c42c13417c4da6174740c0b8eaeed06d303d369eff96c",
+          "code_length": 31
+        },
+        {
+          "name": "getExtension",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b515139fb7f676b48b98a01e8e6ab10a2940c815d0be7a8ace105a8ea7b0dcba",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/nio/file/Path",
+        "org/apache/commons/compress/utils/FileNameUtils",
+        "org/apache/commons/io/FilenameUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$1.class",
+      "occurrence": 0,
+      "sha256": "bc097ff18ea03b65d68e88d6652c9e479276a21c3c16b37b46c13e4be772f171",
+      "name": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$BufferAtATimeOutputChannel.class",
+      "occurrence": 0,
+      "sha256": "70e1bf319347cf6946ea6f49828254f2fbec934717237fb21c1c294885aa4fe5",
+      "name": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$BufferAtATimeOutputChannel",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/nio/channels/WritableByteChannel"
+      ],
+      "fields": [
+        {
+          "name": "out",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 2,
+          "code_sha256": "9c146b8af1232123b9642172302e4a29d792989fbf7d3c88fe1da612a67fe1ab",
+          "code_length": 21
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "50d89ee747bf34af26da0c99d30c716cf9f5891987192af2a12443a83a031458",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "925e85d8bbae99cf76c2d933cf19c5fa375b03e217429c436bc8cb8a85b574ea",
+          "code_length": 16
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 1,
+          "code_sha256": "ce1be360e7af68d4c5f0ca3940f040c9d713d99bd973785f1b609bd9e8063c81",
+          "code_length": 84,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;Lorg/apache/commons/compress/utils/FixedLengthBlockOutputStream$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Object",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/ClosedChannelException",
+        "java/nio/channels/WritableByteChannel",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$1",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$BufferAtATimeOutputChannel"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream.class",
+      "occurrence": 0,
+      "sha256": "9300258a0ccac525535f00e532fe037e7d0d7966b15f3d8f5a22a21b077d5852",
+      "name": "org/apache/commons/compress/utils/FixedLengthBlockOutputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [
+        "java/nio/channels/WritableByteChannel"
+      ],
+      "fields": [
+        {
+          "name": "out",
+          "descriptor": "Ljava/nio/channels/WritableByteChannel;",
+          "access": 18
+        },
+        {
+          "name": "blockSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "buffer",
+          "descriptor": "Ljava/nio/ByteBuffer;",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicBoolean;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;I)V",
+          "access": 1,
+          "code_sha256": "fe992264803fb0fef19e59712acc49eb2256025a3e1aed26bdd961b89b1ff4f0",
+          "code_length": 73
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/channels/WritableByteChannel;I)V",
+          "access": 1,
+          "code_sha256": "5c19a83713be289a1ff1da313a3462ac94052b5c90778ec3f40d6bb2037450b5",
+          "code_length": 34
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5f6aeea083cd8f6d41a1071f342642b218d32ae8c7f2dc78f1a855248ae28220",
+          "code_length": 41,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flushBlock",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "718eaf75e003269b9b69b05f548d2ed62094b6fa338499d69575679cf080d78a",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5a7ed85afac85028c7ef24ff52680dd9a12d24ad5c90daa18b3cc7d480328a30",
+          "code_length": 36
+        },
+        {
+          "name": "maybeFlush",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "22a284df9bfadf33e92e753a56b94f6624048199f512b8b7c950a867ef469601",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "padBlock",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9ad484f0e716446d6bdf9c27336611e1040407c2e6934fa44d801d288f94a0ba",
+          "code_length": 117
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "ce8a934e8e0ec1b684c1f67929e2646776d31f39a5f24e5c7cf63ccd94108655",
+          "code_length": 75,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/nio/ByteBuffer;)I",
+          "access": 1,
+          "code_sha256": "631e092253010bf81963d1db00af110336ac623346a6bbae0e33e99bc7fee5cf",
+          "code_length": 161,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "91c7ac0447bd68cb6722eebb6fe78a459e9cb6e2b2a6dc7096699def6cc8a6cf",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeBlock",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "898736d7027a5afd4bedc1180ee2f17c9207fdb1393ec0c16aa0df775ec6b22e",
+          "code_length": 87,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/nio/ByteBuffer",
+        "java/nio/ByteOrder",
+        "java/nio/channels/ClosedChannelException",
+        "java/nio/channels/WritableByteChannel",
+        "java/util/concurrent/atomic/AtomicBoolean",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$1",
+        "org/apache/commons/compress/utils/FixedLengthBlockOutputStream$BufferAtATimeOutputChannel"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/FlushShieldFilterOutputStream.class",
+      "occurrence": 0,
+      "sha256": "5202d29c07307cdd4f3c26676e45772333ed9e0f821f262d611e7c986c93de8b",
+      "name": "org/apache/commons/compress/utils/FlushShieldFilterOutputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterOutputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FilterOutputStream",
+        "java/io/IOException",
+        "org/apache/commons/compress/utils/FlushShieldFilterOutputStream"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/compress/utils/IOUtils.class",
+      "occurrence": 0,
+      "sha256": "c0d6df4f1a9816085e5aabba94b54c3fde07da6d39999de11b4fb1b717ea5c9e",
+      "name": "org/apache/commons/compress/utils/IOUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY_LINK_OPTIONS",
+          "descriptor": "[Ljava/nio/file/LinkOption;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "closeQuietly",
+          "descriptor": "(Ljava/io/Closeable;)V",
+          "access": 9,
+          "code_sha256": "41263c2733d59ac089c8b364bc712603c0cfbc6d281bbc2f9386cdde19040257",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Ljava/io/File;Ljava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "37123069c5ace0fccbc0bf1c909f182fb9dc28410a96e3d9e4c020c5ddb06d49",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;)J",
+          "access": 9,
+          "code_sha256": "58129777b4beb6bc3f3e7ef1fccdaa97b68d6c332587ac662d66fc6e9e5af27d",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Ljava/io/InputStream;Ljava/io/OutputStream;I)J",
+          "access": 9,
+          "code_sha256": "1ad5f37bd0e70577405fb74f227b11721ce60ff593f0cc2d11481b8db63d0619",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copyRange",
+          "descriptor": "(Ljava/io/InputStream;JLjava/io/OutputStream;)J",
+          "access": 9,
+          "code_sha256": "bc672be914b34b7b909d209ad0129b0f505ad58bec59ef24253162a8b50230f8",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copyRange",
+          "descriptor": "(Ljava/io/InputStream;JLjava/io/OutputStream;I)J",
+          "access": 9,
+          "code_sha256": "e3199cc2fbc42689753c69cf9051c985635e15e5e3cd768e7a96947421e39005",
+          "code_length": 98,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/File;[B)I",
+          "access": 9,
+          "code_sha256": "c774b87cb3c9968f27c7047aba3a493c7a229eba70b96f5484f4f8f697b629cd",
+          "code_length": 53,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFully",
+          "descriptor": "(Ljava/io/InputStream;[B)I",
+          "access": 9,
+          "code_sha256": "eb8517aae42cef0e81d4ff004d314a3e5acb9916150d71472c8f6ef237451f27",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFully",
+          "descriptor": "(Ljava/io/InputStream;[BII)I",
+          "access": 9,
+          "code_sha256": "adc6044507e9c94e777089f1b4f76337143d889f2a335fea3a43ddfdfc151a5b",
+          "code_length": 38,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFully",
+          "descriptor": "(Ljava/nio/channels/ReadableByteChannel;Ljava/nio/ByteBuffer;)V",
+          "access": 9,
+          "code_sha256": "5e72f31f98be81e1c8debbab1a0f3bd8a0319cdb54ea911d09eb266ff9569260",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readRange",
+          "descriptor": "(Ljava/io/InputStream;I)[B",
+          "access": 9,
+          "code_sha256": "877086725d78d700bbdb95e21875b83f6da3c1fccd28d285251a7997e3d5319b",
+          "code_length": 22,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readRange",
+          "descriptor": "(Ljava/nio/channels/ReadableByteChannel;I)[B",
+          "access": 9,
+          "code_sha256": "3e81cf448ab69f7bda0bb6dfeb44da0b08a7f6bb8e292a8ca3e50e055ac249f8",
+          "code_length": 92,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "skip",
+          "descriptor": "(Ljava/io/InputStream;J)J",
+          "access": 9,
+          "code_sha256": "c7c5079acf51509d49866d14ff120f895f1c9966819a879552275c0a90d42168",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toByteArray",
+          "descriptor": "(Ljava/io/InputStream;)[B",
+          "access": 9,
+          "code_sha256": "0ef70b7dc92fe34526c94bd1ca38dc743b6994cae24a15ce57d2165223940538",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5677aef336d3b09c6fbce020020791db03047cace840dd6e827901bd11446f09",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2924b95d5efff2420febdff74922aaedb2cc3a622997846c814774db0b701f37",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/EOFException",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/ReadableByteChannel",
+        "java/nio/file/Files",
+        "java/nio/file/LinkOption",
+        "java/nio/file/OpenOption",
+        "org/apache/commons/compress/utils/IOUtils",
+        "org/apache/commons/io/FileUtils",
+        "org/apache/commons/io/IOUtils"
+      ]
+    }
+  ]
+}

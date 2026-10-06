@@ -1,0 +1,3483 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-codec-1.17.1.jar",
+  "archive_sha256": "f9f6cb103f2ddc3c99a9d80ada2ae7bf0685111fd6bffccb72033d1da4e6ff23",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/codec/language/bm/BeiderMorseEncoder.class",
+      "occurrence": 0,
+      "sha256": "9c38381535b4645773a2ffff936b452ec0cf4c3479db8e9f042d4b13f6dda9ad",
+      "name": "org/apache/commons/codec/language/bm/BeiderMorseEncoder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/StringEncoder"
+      ],
+      "fields": [
+        {
+          "name": "engine",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/PhoneticEngine;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "edf752c684a74514a39dcf56d8b982f1b82aea71dd66cae633c3ebad4ffbbc4d",
+          "code_length": 23
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2f96afeb3416cad9e082ca0456c8ca1d5ec0276296dbed8a5840bfc784f85110",
+          "code_length": 26,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50c54b74481336e371fa69ca8665a9587ae0fb81341a7f162597b55b251ce879",
+          "code_length": 15,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "getNameType",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 1,
+          "code_sha256": "3a027b0d899f7dd86897ce2e37abc6d65acc85bf7fba8dce42d9c50139d13f3e",
+          "code_length": 8
+        },
+        {
+          "name": "getRuleType",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 1,
+          "code_sha256": "ddb11451e75e6d3e5216a1cbec9c89ba627df8bfc052eca024d6149210f733bd",
+          "code_length": 8
+        },
+        {
+          "name": "isConcat",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "506f6d18db4fca6430c34a9f47d440119d47e053263a548fdf6eca6ddb26bed8",
+          "code_length": 8
+        },
+        {
+          "name": "setConcat",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "1ed0a338f8d6a1909cdc2374524a143086a8d4e1901577016eb4ff30aa7fea14",
+          "code_length": 34
+        },
+        {
+          "name": "setMaxPhonemes",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "8e1cd93fa55d3e91ac8c21bbca9d4d46373e428bc1de0087847019cc46a81f59",
+          "code_length": 34
+        },
+        {
+          "name": "setNameType",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;)V",
+          "access": 1,
+          "code_sha256": "773ccdae97d6aff54113a4eafe551f6fa9981fc7aa1d3639fa4e80dc04ed1c78",
+          "code_length": 34
+        },
+        {
+          "name": "setRuleType",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/RuleType;)V",
+          "access": 1,
+          "code_sha256": "3794b508dc12f4998b6f7720226355bc0572df897da657340d0c6396bdf42973",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/language/bm/BeiderMorseEncoder",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/PhoneticEngine",
+        "org/apache/commons/codec/language/bm/RuleType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang$1.class",
+      "occurrence": 0,
+      "sha256": "9ba04eb9b1cc329ed20891272f4de05701f45123dd11b722646cd983923e9ab6",
+      "name": "org/apache/commons/codec/language/bm/Lang$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/language/bm/Lang",
+        "org/apache/commons/codec/language/bm/Lang$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang$LangRule.class",
+      "occurrence": 0,
+      "sha256": "1b93d3f4de7978d8eeaad78a5beb20f41599810071905d040ac394efbccfd2f6",
+      "name": "org/apache/commons/codec/language/bm/Lang$LangRule",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "acceptOnMatch",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "languages",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "pattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Pattern;Ljava/util/Set;Z)V",
+          "access": 2,
+          "code_sha256": "2742266aaefef69f72600222c0c8bc2127428147266857822cd28339a1284184",
+          "code_length": 20,
+          "generic_signature": "(Ljava/util/regex/Pattern;Ljava/util/Set<Ljava/lang/String;>;Z)V"
+        },
+        {
+          "name": "matches",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "50efee12b68823cc81a2ce3de7a87f8d010c3a39171ea0eeea5aa3166f0c8d76",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Pattern;Ljava/util/Set;ZLorg/apache/commons/codec/language/bm/Lang$1;)V",
+          "access": 4096,
+          "code_sha256": "06d37432c3237cb16ca9dac58058963525ade4b48331a3e054c58d782d67640e",
+          "code_length": 8
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Lang$LangRule;)Z",
+          "access": 4104,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Lang$LangRule;)Ljava/util/Set;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/apache/commons/codec/language/bm/Lang",
+        "org/apache/commons/codec/language/bm/Lang$1",
+        "org/apache/commons/codec/language/bm/Lang$LangRule"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang.class",
+      "occurrence": 0,
+      "sha256": "66069725be28635ac5294e6eb18df9e8b4240695d917b5e5f12aedcdb6838c18",
+      "name": "org/apache/commons/codec/language/bm/Lang",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LANGS",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/Lang;>;"
+        },
+        {
+          "name": "LANGUAGE_RULES_RN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "languages",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Languages;",
+          "access": 18
+        },
+        {
+          "name": "rules",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/codec/language/bm/Lang$LangRule;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "instance",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;)Lorg/apache/commons/codec/language/bm/Lang;",
+          "access": 9,
+          "code_sha256": "5baa3872a58f25dee1abfc8d9dcde43f426bfc4e1835479baa9b2aa9490d253a",
+          "code_length": 13
+        },
+        {
+          "name": "loadFromResource",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/commons/codec/language/bm/Languages;)Lorg/apache/commons/codec/language/bm/Lang;",
+          "access": 9,
+          "code_sha256": "26eb052a9c69064f8d9836b50e4c4d08c94e78f1661c3b1df174a669087c936a",
+          "code_length": 283
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;Lorg/apache/commons/codec/language/bm/Languages;)V",
+          "access": 2,
+          "code_sha256": "f589b8fc87fce4346ed0c6c15e75d0e71f2bc6830f05d638a139fcd2d4520f4f",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/List<Lorg/apache/commons/codec/language/bm/Lang$LangRule;>;Lorg/apache/commons/codec/language/bm/Languages;)V"
+        },
+        {
+          "name": "guessLanguage",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7a64e7b37ba39ba2e681dcf6dba8dface26f7e9d54b5cec870142c9612206956",
+          "code_length": 23
+        },
+        {
+          "name": "guessLanguages",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "99accdbed8db0b70aee99d446cd60e390c2bbff9e88a37871397d45c926ff312",
+          "code_length": 65
+        },
+        {
+          "name": "lambda$guessLanguages$0",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;Lorg/apache/commons/codec/language/bm/Lang$LangRule;)V",
+          "access": 4106,
+          "code_sha256": "fbdda0eb93aa94b27acb8a4a9b6c9aa90ccb29865a16dad7bcf8d5eb1db6edec",
+          "code_length": 41
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c9fe2f625aba04384d1eba37489996be2098f50204258bcfaafab4485d48f9fd",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lorg/apache/commons/codec/language/bm/NameType;",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/EnumMap",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Scanner",
+        "java/util/Set",
+        "java/util/regex/Pattern",
+        "org/apache/commons/codec/Resources",
+        "org/apache/commons/codec/language/bm/Lang",
+        "org/apache/commons/codec/language/bm/Lang$1",
+        "org/apache/commons/codec/language/bm/Lang$LangRule",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/ResourceConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$1.class",
+      "occurrence": 0,
+      "sha256": "25f2b9439571e9610e515f19c16a0206503b5a3e46068ab2e040543fabcc16bf",
+      "name": "org/apache/commons/codec/language/bm/Languages$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getAny",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c2c86aed8795b242141aac670642d9f0047d00ba67872d4e73d0890ffde20f89",
+          "code_length": 10
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isSingleton",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2
+        },
+        {
+          "name": "restrictTo",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b10489192f3e926b805eb8f2c43e2f2095247895ed04fc68bd872b8ee0ba681",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/util/NoSuchElementException",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$1",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$2.class",
+      "occurrence": 0,
+      "sha256": "e649a449a432005ae7a23624e32d582c3794a25b20acd0cff112000e0c0b78b0",
+      "name": "org/apache/commons/codec/language/bm/Languages$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getAny",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c2c86aed8795b242141aac670642d9f0047d00ba67872d4e73d0890ffde20f89",
+          "code_length": 10
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isSingleton",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2
+        },
+        {
+          "name": "restrictTo",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b10489192f3e926b805eb8f2c43e2f2095247895ed04fc68bd872b8ee0ba681",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/util/NoSuchElementException",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$2",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$LanguageSet.class",
+      "occurrence": 0,
+      "sha256": "4cd307229f7dc50ad8555c94d32db0b7ef22975873195441a1dca49cddedfb6b",
+      "name": "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "from",
+          "descriptor": "(Ljava/util/Set;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 9,
+          "code_sha256": "95983964d0a1a932d6556e6acf3b7bca5105109feff4e0ee15eecece7b34482d",
+          "code_length": 25,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getAny",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isSingleton",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1024
+        },
+        {
+          "name": "restrictTo",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Set",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$1",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/Languages$SomeLanguages"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$SomeLanguages.class",
+      "occurrence": 0,
+      "sha256": "9bb4e25ed80bb3a73f26268730091017ea7128884f02c4d5007c2c4af9eb8b5b",
+      "name": "org/apache/commons/codec/language/bm/Languages$SomeLanguages",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "languages",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 2,
+          "code_sha256": "45240cc81ceb22d44ac9b90729033408bae7c880718bbb7132c8cbfe709bc3c1",
+          "code_length": 13,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "45eec093cc3b9769044e04a9fed5b8e076529bde8efb688fd1f5a8f0c6d2a4e7",
+          "code_length": 11
+        },
+        {
+          "name": "getAny",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f2f9c69fb069e0878938f20e606f27de2e00c190563c4412ff111bce49bc8669",
+          "code_length": 18
+        },
+        {
+          "name": "getLanguages",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "825e78da531a3cedb1c34ba8533477a6fb6afb6152eb14950d6a5f8ec7052ae2",
+          "code_length": 10
+        },
+        {
+          "name": "isSingleton",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1f4f26bf75b42f39c2831a735f63d3d5ca0a646900e34da9ee91231fbf43177f",
+          "code_length": 19
+        },
+        {
+          "name": "merge",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "23d8cac79418c88044718ff185eb2d935f328e7f074c252e6101be8f1d21f84a",
+          "code_length": 51
+        },
+        {
+          "name": "restrictTo",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "7b54f1b29a144cba6cd17f794ba9eacf6f51ffc458708d294b7541fcc3a9e35c",
+          "code_length": 58
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6df2352873a27a139e7fd56aea948e94d7dd3adbb91a8ff677688767519c514b",
+          "code_length": 31
+        },
+        {
+          "name": "lambda$restrictTo$0",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$SomeLanguages;Ljava/lang/String;)Z",
+          "access": 4106,
+          "code_sha256": "45eec093cc3b9769044e04a9fed5b8e076529bde8efb688fd1f5a8f0c6d2a4e7",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/codec/language/bm/Languages$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Collections",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Set",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$1",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/Languages$SomeLanguages"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages.class",
+      "occurrence": 0,
+      "sha256": "295ec0c6e99d1c2d7003c966988a884ee0b0ffc4dd0ce127f56a44b0708559e2",
+      "name": "org/apache/commons/codec/language/bm/Languages",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ANY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LANGUAGES",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/Languages;>;"
+        },
+        {
+          "name": "NO_LANGUAGES",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 25
+        },
+        {
+          "name": "ANY_LANGUAGE",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 25
+        },
+        {
+          "name": "languages",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "getInstance",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;)Lorg/apache/commons/codec/language/bm/Languages;",
+          "access": 9,
+          "code_sha256": "5baa3872a58f25dee1abfc8d9dcde43f426bfc4e1835479baa9b2aa9490d253a",
+          "code_length": 13
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/Languages;",
+          "access": 9,
+          "code_sha256": "b8bbe49ebb137d2ff2f63ce5b3e498022719de9b64f46510a909fec8c10a44fa",
+          "code_length": 133
+        },
+        {
+          "name": "langResourceName",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "94314d0fc424d32c651d998ba420627055c85b8bd905556ad12233947eda022d",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 2,
+          "code_sha256": "e1e9bf39cebb3da062c8e2cd626d6d905cc56b449c9c904ba736b0ce9b9ff46f",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "getLanguages",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "a4cf324b81813ee3ff66fedb91533ecb08995a084689f8c9efee44c7eb3383c9",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4a119a1e87f74772f22e4b6a3d93d2016a8c2783df15d19e0912905d2befd067",
+          "code_length": 74
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/commons/codec/language/bm/NameType;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/Collections",
+        "java/util/EnumMap",
+        "java/util/HashSet",
+        "java/util/Map",
+        "java/util/Scanner",
+        "java/util/Set",
+        "org/apache/commons/codec/Resources",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$1",
+        "org/apache/commons/codec/language/bm/Languages$2",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/Languages$SomeLanguages",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/ResourceConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/NameType.class",
+      "occurrence": 0,
+      "sha256": "305170d49312b454a2c8e792ce40fce02f419c60c9596e088374ef4ceb460772",
+      "name": "org/apache/commons/codec/language/bm/NameType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ASHKENAZI",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 16409
+        },
+        {
+          "name": "GENERIC",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 16409
+        },
+        {
+          "name": "SEPHARDIC",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 16409
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 9,
+          "code_sha256": "8c10ce266d366dafc2cd88271b8e0cd1df5dbfc5d799e8d011a3815c8056dd70",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 9,
+          "code_sha256": "68ae78c33536ab58d922da581a00630293b2e89e1b86ff6967d4311c5cfb08f4",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "ad95250c6bb1bf93b8a2dcce7b105074163be67c2d2aa5b182aa065190c41f4d",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 4106,
+          "code_sha256": "0f9deda2bc90cfe9d4a99c9a99b95dd6a7e7c78438d8147719304d04053b32df",
+          "code_length": 23
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b46bfc70043019ce016f806ab3d4b37adf3d5673291c60687bb1ef287785521a",
+          "code_length": 52
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/codec/language/bm/NameType;>;",
+      "class_references": [
+        "[Lorg/apache/commons/codec/language/bm/NameType;",
+        "java/lang/Enum",
+        "org/apache/commons/codec/language/bm/NameType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$1.class",
+      "occurrence": 0,
+      "sha256": "aee7e32c71bb5a0127959a7dd77a63db89e6f0f098b773de8db86bc355186cd6",
+      "name": "org/apache/commons/codec/language/bm/PhoneticEngine$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$commons$codec$language$bm$NameType",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f16671fa89b0633776cc94788c287c67742a22b59e6af4dc83aa06f9c5f82ebd",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/PhoneticEngine",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder.class",
+      "occurrence": 0,
+      "sha256": "1b29e603623d2b8122e6182bcfb6905e888d38d43488614e6f551bf0a61a002a",
+      "name": "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "phonemes",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "empty",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;",
+          "access": 9,
+          "code_sha256": "0223ebec27212d93aa6c0f3a62a729a96e7c6144c116d1d41465932b13f6519f",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)V",
+          "access": 2,
+          "code_sha256": "f1d585217c7c36710362702a3c6df161019fdf1338063a13e5c4cf4a6a6c7e3f",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 2,
+          "code_sha256": "774678749552d8737bda744a88e147c5f1bc8b37a7e0374debbd554bae3cdfd3",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/Set<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;)V"
+        },
+        {
+          "name": "append",
+          "descriptor": "(Ljava/lang/CharSequence;)V",
+          "access": 1,
+          "code_sha256": "bcd20ec15ffb69175206cdb579caaecb850dff21e7a743bf60c0aa77ef22d3b0",
+          "code_length": 16
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;I)V",
+          "access": 1,
+          "code_sha256": "6977eef424261a92fadf21faccdd566c8cd70bf22d0e8dda009362bae25f8019",
+          "code_length": 193
+        },
+        {
+          "name": "getPhonemes",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "6cba6d2f6e2925f8e14d21afb10699d04d863cd842458a9c097cb81bd8339e3c",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Set<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        },
+        {
+          "name": "makeString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fe151f52ebda7edb75499c57692803eaa1a288f8bc53c1fe7e765b02ee4932a1",
+          "code_length": 33
+        },
+        {
+          "name": "lambda$append$0",
+          "descriptor": "(Ljava/lang/CharSequence;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)V",
+          "access": 4106,
+          "code_sha256": "0517662701e53a58e7451195a9ec022c2c8a8a63b59d9a809d0a31931ef0a3a4",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/codec/language/bm/PhoneticEngine$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Iterable",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Iterator",
+        "java/util/LinkedHashSet",
+        "java/util/Set",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/PhoneticEngine",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$1",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication.class",
+      "occurrence": 0,
+      "sha256": "33158a36556c6dcb2cf428dc3f1720df2e1558d8a8337b59835f78b973081c78",
+      "name": "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "finalRules",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;"
+        },
+        {
+          "name": "input",
+          "descriptor": "Ljava/lang/CharSequence;",
+          "access": 18
+        },
+        {
+          "name": "phonemeBuilder",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;",
+          "access": 18
+        },
+        {
+          "name": "i",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxPhonemes",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "found",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/CharSequence;Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;II)V",
+          "access": 1,
+          "code_sha256": "b19462796d3d70552d452a643384adf8a1da779fa285a8cc915cae8bfb3fd187",
+          "code_length": 39,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;Ljava/lang/CharSequence;Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;II)V"
+        },
+        {
+          "name": "getI",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1010793b1c478cd9dba76622de9b5fa2602360d8c920264824d19123a73a9a0b",
+          "code_length": 5
+        },
+        {
+          "name": "getPhonemeBuilder",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;",
+          "access": 1,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "invoke",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication;",
+          "access": 1,
+          "code_sha256": "baa725306e9c9acb3e90ddf2ece7e22309168279211f0ce78bfbf2ae34e1551a",
+          "code_length": 147
+        },
+        {
+          "name": "isFound",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b2babbba1adb79364a260fcb1b4880924533c23e93ddc7f9cb76f76ae9648c5a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/CharSequence",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Objects",
+        "org/apache/commons/codec/language/bm/PhoneticEngine",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine.class",
+      "occurrence": 0,
+      "sha256": "73bcc2780b930206ea703fb1fc9d008fc5338228e86a345c0261bba86826d947",
+      "name": "org/apache/commons/codec/language/bm/PhoneticEngine",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_MAX_PHONEMES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NAME_PREFIXES",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Lorg/apache/commons/codec/language/bm/NameType;Ljava/util/Set<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "lang",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Lang;",
+          "access": 18
+        },
+        {
+          "name": "nameType",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 18
+        },
+        {
+          "name": "ruleType",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 18
+        },
+        {
+          "name": "concat",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "maxPhonemes",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "join",
+          "descriptor": "(Ljava/util/List;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "8e6474cbfbc76ff52472b1ccf491b0a52bb06a37b06231e27514f2f7bc08d7db",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Z)V",
+          "access": 1,
+          "code_sha256": "c6aa247e7fd3d13c7700d7f6cf85640796a480d4d7659fb9ac5b0efa6f8e7e51",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;ZI)V",
+          "access": 1,
+          "code_sha256": "5907924fde410a6c27f7d81318648229d0540490823754b91729df1f41f579e8",
+          "code_length": 70
+        },
+        {
+          "name": "applyFinalRules",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;Ljava/util/Map;)Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;",
+          "access": 2,
+          "code_sha256": "50f3961feb12371db83d6799e371b90b1ef0eb895a2c761f226a5ebb27ca2275",
+          "code_length": 61,
+          "generic_signature": "(Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;)Lorg/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder;"
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6d45d670a36a55173019484c4698822139d9687fa473a935bc0dff3506280abe",
+          "code_length": 16
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "986421ab918aa42378d47b1b33fc36b95f59e8ee626ee565dbe7c407a6cdf067",
+          "code_length": 652
+        },
+        {
+          "name": "getLang",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/Lang;",
+          "access": 1,
+          "code_sha256": "87728270fd45accd083d10e23af8bf412adc53b1e14586f9ccefbbdff4afff47",
+          "code_length": 5
+        },
+        {
+          "name": "getMaxPhonemes",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "90fb4883cbdcfec5b57f412343bad89313d8ea5e39efbeb2e60d133393027130",
+          "code_length": 5
+        },
+        {
+          "name": "getNameType",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/NameType;",
+          "access": 1,
+          "code_sha256": "53123c9389ef3e7f8c13eb6786f5de49bafbf7bb656cb0f7803f4e592c9f9245",
+          "code_length": 5
+        },
+        {
+          "name": "getRuleType",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 1,
+          "code_sha256": "7e2a9c6163dcaed1bbb8ef0ff4e9d4cd4b91b857ead5241e30be924fb548ce62",
+          "code_length": 5
+        },
+        {
+          "name": "isConcat",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "717968b0019d93377b1106e68364493184ad774839fb138a21ae7701bd68ab20",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$encode$3",
+          "descriptor": "(Ljava/lang/StringBuilder;Ljava/lang/String;)V",
+          "access": 4098,
+          "code_sha256": "8e7072883f90aa7120d72f6f0ec4750fe55eba897cf42dbf63b800d8ed2f84d8",
+          "code_length": 17
+        },
+        {
+          "name": "lambda$encode$2",
+          "descriptor": "(Ljava/util/List;Ljava/lang/String;)V",
+          "access": 4106,
+          "code_sha256": "417167158282421e729a04ceda86a4009e054e57edb4f7c5c1c44a9bbc7257aa",
+          "code_length": 23
+        },
+        {
+          "name": "lambda$applyFinalRules$1",
+          "descriptor": "(Ljava/util/Map;Ljava/util/Map;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)V",
+          "access": 4098,
+          "code_sha256": "766c24e58549bb5fc02f92d1ac798e61f9fc32d141d149e1eacdf6a5a006c17c",
+          "code_length": 118
+        },
+        {
+          "name": "lambda$applyFinalRules$0",
+          "descriptor": "(Ljava/util/Map;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)V",
+          "access": 4106,
+          "code_sha256": "251c359f5919247c4ee20eb221a0adc240fcd497b860a66a6c0bde9c051d7efb",
+          "code_length": 52
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "090de25586c5cc77c7a88ca3eb9aaeae17d70343270b3f91e9dbea9cc14b7bf3",
+          "code_length": 337
+        }
+      ],
+      "class_references": [
+        "java/lang/CharSequence",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/EnumMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Objects",
+        "java/util/Set",
+        "java/util/TreeMap",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/apache/commons/codec/language/bm/Lang",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/PhoneticEngine",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$1",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder",
+        "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/RuleType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/ResourceConstants.class",
+      "occurrence": 0,
+      "sha256": "e7f7265311fb522e97014bc2b0fc13927342dd00aa693631425aef2352ea6579",
+      "name": "org/apache/commons/codec/language/bm/ResourceConstants",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CMT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 24
+        },
+        {
+          "name": "ENCODING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 24
+        },
+        {
+          "name": "EXT_CMT_END",
+          "descriptor": "Ljava/lang/String;",
+          "access": 24
+        },
+        {
+          "name": "EXT_CMT_START",
+          "descriptor": "Ljava/lang/String;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cf1892bed9058ddd3aaa13d75f243a8080b6a854b0bf2169453b4d648ea129c1",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/CharEncoding",
+        "org/apache/commons/codec/language/bm/ResourceConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$1.class",
+      "occurrence": 0,
+      "sha256": "9135526b00226995c31d2494e8fb39554c61d0c4978dd769b5d3bfaa4a9c9bbf",
+      "name": "org/apache/commons/codec/language/bm/Rule$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/codec/language/bm/Rule",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "myLine",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "loc",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "val$cLine",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$location",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$pat",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$lCon",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$rCon",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b11b238c4157b0221de9ad7d5965565c4a665d06a63e19641312e86a871367b2",
+          "code_length": 56
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2c008f21cd89aa345173c6522feee804f6241b9950896315040b48ec317c2baf",
+          "code_length": 117
+        }
+      ],
+      "class_references": [
+        "java/lang/StringBuilder",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$1",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$2.class",
+      "occurrence": 0,
+      "sha256": "b0ee963885df9867b2304323ae45638f6d1afb817fc42468a17dbdc6f662b0f9",
+      "name": "org/apache/commons/codec/language/bm/Rule$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/language/bm/Rule$RPattern"
+      ],
+      "fields": [
+        {
+          "name": "pattern",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 16
+        },
+        {
+          "name": "val$regex",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "8f8a5983b22e18d18e8be6eebeeefc6d59774edcde69f2eeb86343bcecf5a996",
+          "code_length": 21,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "isMatch",
+          "descriptor": "(Ljava/lang/CharSequence;)Z",
+          "access": 1,
+          "code_sha256": "104523890d14b702a60f5231e0c48cffd6a5c6f4c3fb3e87ec66f0255892db98",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$2",
+        "org/apache/commons/codec/language/bm/Rule$RPattern"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$Phoneme.class",
+      "occurrence": 0,
+      "sha256": "9b339f66cb421362a159b2e0c0b7668b1ad227b2c40de9634328c5a1eb9a88d8",
+      "name": "org/apache/commons/codec/language/bm/Rule$Phoneme",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ],
+      "fields": [
+        {
+          "name": "COMPARATOR",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 25,
+          "generic_signature": "Ljava/util/Comparator<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        },
+        {
+          "name": "phonemeText",
+          "descriptor": "Ljava/lang/StringBuilder;",
+          "access": 18
+        },
+        {
+          "name": "languages",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/CharSequence;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)V",
+          "access": 1,
+          "code_sha256": "e31e3d3beea3f1d247705efe8912056e5aeda3b7cbea9329fef984948ebe540f",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$Phoneme;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)V",
+          "access": 1,
+          "code_sha256": "4aa5323b89151327db9ef2b12adc91d0a607457099b1a26b48b94312ea9c4c65",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$Phoneme;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)V",
+          "access": 1,
+          "code_sha256": "a1dabd7a905d20ad402d7cbbf51f5c39484a1c151c22655f34eaa78cf95bfe8e",
+          "code_length": 22
+        },
+        {
+          "name": "append",
+          "descriptor": "(Ljava/lang/CharSequence;)Lorg/apache/commons/codec/language/bm/Rule$Phoneme;",
+          "access": 1,
+          "code_sha256": "3b9acdf65cf43e67e84f3a69d02f5bddd527519cb09fe9951769f34a72d850a7",
+          "code_length": 11
+        },
+        {
+          "name": "getLanguages",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "getPhonemes",
+          "descriptor": "()Ljava/lang/Iterable;",
+          "access": 1,
+          "code_sha256": "35c521444521c5fe1b2b8a05d3e38053468863d552d558a0f8327efaab5b636a",
+          "code_length": 5,
+          "generic_signature": "()Ljava/lang/Iterable<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        },
+        {
+          "name": "getPhonemeText",
+          "descriptor": "()Ljava/lang/CharSequence;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "join",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)Lorg/apache/commons/codec/language/bm/Rule$Phoneme;",
+          "access": 1,
+          "code_sha256": "792815becc6592794f0b81e4c7b6e252b4eaed742b0a04904c2663bd4c3a3d61",
+          "code_length": 49
+        },
+        {
+          "name": "mergeWithLanguage",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Lorg/apache/commons/codec/language/bm/Rule$Phoneme;",
+          "access": 1,
+          "code_sha256": "533a16b87a630c03812efb6cb0d3dec6ec321e1a83bd57e94ed606d47e24ceff",
+          "code_length": 23
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "09ed539f924b4037658b66ebf55760633ab1e7df1566901bd857036b50275b84",
+          "code_length": 38
+        },
+        {
+          "name": "lambda$static$0",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/Rule$Phoneme;Lorg/apache/commons/codec/language/bm/Rule$Phoneme;)I",
+          "access": 4106,
+          "code_sha256": "8b3e62b5c89f9d2cd58f0177595bb788f360406691d8b5241948d6b724f313ee",
+          "code_length": 77
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d77ce5862ebbd7cf080920623b72f42dac0e26efd09b045194730ea8553b6c7f",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Collections",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$PhonemeExpr.class",
+      "occurrence": 0,
+      "sha256": "330903c153d134a58e325e59b8133fc32974514d14ad9f0dc3f8f0a40edd42db",
+      "name": "org/apache/commons/codec/language/bm/Rule$PhonemeExpr",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPhonemes",
+          "descriptor": "()Ljava/lang/Iterable;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Iterable<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e7c4a2eafa4b3617551bb776e94890a6e9d35add22867c63db3aee781a791d9a",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Iterable",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Spliterator",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$PhonemeList.class",
+      "occurrence": 0,
+      "sha256": "c8d40feacfad59c7419a263665db84463c9cb07a7492c30bad97a396d964c478",
+      "name": "org/apache/commons/codec/language/bm/Rule$PhonemeList",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr"
+      ],
+      "fields": [
+        {
+          "name": "phonemeList",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;)V"
+        },
+        {
+          "name": "getPhonemes",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule$Phoneme;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03f44f8167af94442eddecf6c60086e0983800edf59787705bd3e333073623a6",
+          "code_length": 10
+        },
+        {
+          "name": "getPhonemes",
+          "descriptor": "()Ljava/lang/Iterable;",
+          "access": 4161,
+          "code_sha256": "f964b2d0e1908ddde45891eb550c0e17b34ea5419abc1987f98b5af5ec127efd",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/List",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeList"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$RPattern.class",
+      "occurrence": 0,
+      "sha256": "b0b76a7c4bf59857a4ae74ad0804b586c3ab3d8142a42efec24692ffacdd0b42",
+      "name": "org/apache/commons/codec/language/bm/Rule$RPattern",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isMatch",
+          "descriptor": "(Ljava/lang/CharSequence;)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$RPattern"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule.class",
+      "occurrence": 0,
+      "sha256": "cc947723dc3300d229c510ac5f6dd4eb1f0b9924b9a3e80317cee7bb5d7ed428",
+      "name": "org/apache/commons/codec/language/bm/Rule",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ALL_STRINGS_RMATCHER",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 25
+        },
+        {
+          "name": "ALL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DOUBLE_QUOTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HASH_INCLUDE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HASH_INCLUDE_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "RULES",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Lorg/apache/commons/codec/language/bm/NameType;Ljava/util/Map<Lorg/apache/commons/codec/language/bm/RuleType;Ljava/util/Map<Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;>;>;>;"
+        },
+        {
+          "name": "lContext",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 18
+        },
+        {
+          "name": "pattern",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "phoneme",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;",
+          "access": 18
+        },
+        {
+          "name": "rContext",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/CharSequence;C)Z",
+          "access": 10,
+          "code_sha256": "29c0c9ff74a0993eed51d64f447e10aaeefaf8dcde92d2aec71e4f9c3c8dbe39",
+          "code_length": 18
+        },
+        {
+          "name": "createResourceName",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "6a0e74101cf35a84c6c83cf71a2cf49fbf1dcefaecf6806f4ef97420ad7e8593",
+          "code_length": 28
+        },
+        {
+          "name": "createScanner",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/util/Scanner;",
+          "access": 10,
+          "code_sha256": "21a4cf288bf52714fa0c2192341b5cee504d01f3f519baa0f42a1cfbad6bacb9",
+          "code_length": 22
+        },
+        {
+          "name": "createScanner",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Scanner;",
+          "access": 10,
+          "code_sha256": "a1e9fb7c594c2343a3a88e3c134686a6f89e1a1b1ce15dfa11611f514d69767a",
+          "code_length": 29
+        },
+        {
+          "name": "endsWith",
+          "descriptor": "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Z",
+          "access": 10,
+          "code_sha256": "e323665c77e4fdfb2e125ab6186a35c32422e8d5a7f0d4cd4485527b7530576d",
+          "code_length": 68
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "603be938b4f1ec02c76ed4f1f2916b318420045d70e33f35960ac2e2a48c851f",
+          "code_length": 37,
+          "generic_signature": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;"
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "36099b1272fac9137a6ec0c581d2d1ba355462a1a5fd1a039fb8edd8d3ac4a47",
+          "code_length": 27,
+          "generic_signature": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;"
+        },
+        {
+          "name": "getInstanceMap",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "838b96405cdf08e8008d7b910a2283372ec4d1745ab5a9bd51f257fc7abfc15b",
+          "code_length": 27,
+          "generic_signature": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Lorg/apache/commons/codec/language/bm/Languages$LanguageSet;)Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;"
+        },
+        {
+          "name": "getInstanceMap",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "cb109908dd4b5c68f6741bb66789a527156b764375091e0aac2e99c51d9c2643",
+          "code_length": 72,
+          "generic_signature": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/lang/String;)Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;"
+        },
+        {
+          "name": "parsePhoneme",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/Rule$Phoneme;",
+          "access": 10,
+          "code_sha256": "78b3b342a87c27d4c836825e1663f90b961331457b249b27f7ce32db22acbe1c",
+          "code_length": 95
+        },
+        {
+          "name": "parsePhonemeExpr",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;",
+          "access": 10,
+          "code_sha256": "842717bc80dcc7fc79fb404dccb343710a0b35ea9e49ecdde9e42fae10ae249f",
+          "code_length": 144
+        },
+        {
+          "name": "parseRules",
+          "descriptor": "(Ljava/util/Scanner;Ljava/lang/String;)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "913790023d2b9e8462023968db46ff23485816afa26a6abcc42d635166991187",
+          "code_length": 493,
+          "generic_signature": "(Ljava/util/Scanner;Ljava/lang/String;)Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/apache/commons/codec/language/bm/Rule;>;>;"
+        },
+        {
+          "name": "pattern",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 10,
+          "code_sha256": "84dd920a94817c62a7ccb2e22654f0fda877dadbf8263af01645b1a381bfe24f",
+          "code_length": 272
+        },
+        {
+          "name": "startsWith",
+          "descriptor": "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Z",
+          "access": 10,
+          "code_sha256": "6f4bb6becfd4b42bad4c5ef4e0070e19886ff4cd26870251736f9735e5cecc63",
+          "code_length": 56
+        },
+        {
+          "name": "stripQuotes",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "ca51386f4d4085642388cab5fdf53acd23ab30fe40de49058234222c4a4627a0",
+          "code_length": 40
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;)V",
+          "access": 1,
+          "code_sha256": "93ba28b93547d3371a2db9b634730760ac6039d61de6b6875b9ffc4205e79707",
+          "code_length": 70
+        },
+        {
+          "name": "getLContext",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 1,
+          "code_sha256": "11fea1333d6d29aaa4bd19e12579b33d19724c63dd1d37468f440b7525b9721f",
+          "code_length": 5
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1ec864ec004514ddb7cd9a16ed2efdd5d0a5cb25c9de4451dc88e021d2635c3f",
+          "code_length": 5
+        },
+        {
+          "name": "getPhoneme",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/Rule$PhonemeExpr;",
+          "access": 1,
+          "code_sha256": "e8e661c6c8c7a9f224801662e3f76cd1c3a37faa20737b136d14079864504f7d",
+          "code_length": 5
+        },
+        {
+          "name": "getRContext",
+          "descriptor": "()Lorg/apache/commons/codec/language/bm/Rule$RPattern;",
+          "access": 1,
+          "code_sha256": "9aca742b7b58b3a3fde7026fdc03207b41f94ec02d33151d2aab27331bd1f45f",
+          "code_length": 5
+        },
+        {
+          "name": "patternAndContextMatches",
+          "descriptor": "(Ljava/lang/CharSequence;I)Z",
+          "access": 1,
+          "code_sha256": "ed638be0edd3eb8444d56371f6ccddff43a4b5992bbe2ed691a973d34a553208",
+          "code_length": 108
+        },
+        {
+          "name": "lambda$pattern$11",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "b2aa146137fe5a254a8d946e75cbdcc0ca19e1a7eaa07f34291847e5f29f981e",
+          "code_length": 37
+        },
+        {
+          "name": "lambda$pattern$10",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "6dd7773d167560a9e068cbe7259e5f89bfa7e4ad7e9b609acd06188a85461d35",
+          "code_length": 30
+        },
+        {
+          "name": "lambda$pattern$9",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "41f799cdf867aa29c1ff39888feb90ca7513395e3d8fa815d94e611b97d5157e",
+          "code_length": 31
+        },
+        {
+          "name": "lambda$pattern$8",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "4a14e59ddc44df0a1235711cc9c241d447445864630d15ed23ff04887fabdc93",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$pattern$7",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "93625c37a67d48dbf60212769f772b74e910bea9d5d8472d25eb2539517be130",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$pattern$6",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "e4a0566adbf696f41cd0125fecd543846c001f6bceb40450f129bfc332971e34",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$pattern$5",
+          "descriptor": "(Ljava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "952b48997ad7232ae7d383bd853f05109536f084ca5c78a75bb2dc73b5076342",
+          "code_length": 15
+        },
+        {
+          "name": "lambda$parseRules$4",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 4106,
+          "code_sha256": "e15e3a65247107562aab33431a78b1856d5af33c9fcffdfc2bd9d5566d72abad",
+          "code_length": 8
+        },
+        {
+          "name": "lambda$getInstance$3",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;)V",
+          "access": 4106,
+          "code_sha256": "03e3cc1c7bb07f462b2f095a024ce35d71e199f48a1841db31e759095eb3b94f",
+          "code_length": 9
+        },
+        {
+          "name": "lambda$contains$2",
+          "descriptor": "(CI)Z",
+          "access": 4106,
+          "code_sha256": "416731e677017b5557f6dd7b60436c4f89653e28a3c55437194f584032457b15",
+          "code_length": 11
+        },
+        {
+          "name": "lambda$static$1",
+          "descriptor": "(Lorg/apache/commons/codec/language/bm/NameType;Lorg/apache/commons/codec/language/bm/RuleType;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 4106,
+          "code_sha256": "e9ac4de071f271647b81d06d7b0337faba5f5433c46301dae3fcbb12d748ace5",
+          "code_length": 108
+        },
+        {
+          "name": "lambda$static$0",
+          "descriptor": "(Ljava/lang/CharSequence;)Z",
+          "access": 4106,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0f68aa19c02d15de13563dc0d181fca85a5b8e69c46242e0e681424ba0c9c9a1",
+          "code_length": 249
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lorg/apache/commons/codec/language/bm/NameType;",
+        "[Lorg/apache/commons/codec/language/bm/RuleType;",
+        "java/lang/CharSequence",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/EnumMap",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Scanner",
+        "java/util/Set",
+        "java/util/stream/IntStream",
+        "org/apache/commons/codec/Resources",
+        "org/apache/commons/codec/language/bm/Languages",
+        "org/apache/commons/codec/language/bm/Languages$LanguageSet",
+        "org/apache/commons/codec/language/bm/NameType",
+        "org/apache/commons/codec/language/bm/ResourceConstants",
+        "org/apache/commons/codec/language/bm/Rule",
+        "org/apache/commons/codec/language/bm/Rule$1",
+        "org/apache/commons/codec/language/bm/Rule$2",
+        "org/apache/commons/codec/language/bm/Rule$Phoneme",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeExpr",
+        "org/apache/commons/codec/language/bm/Rule$PhonemeList",
+        "org/apache/commons/codec/language/bm/Rule$RPattern",
+        "org/apache/commons/codec/language/bm/RuleType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/RuleType.class",
+      "occurrence": 0,
+      "sha256": "61d088eadabba257c2af289cb8cad9a880907441354a820e96d867acf1daf00f",
+      "name": "org/apache/commons/codec/language/bm/RuleType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "APPROX",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 16409
+        },
+        {
+          "name": "EXACT",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 16409
+        },
+        {
+          "name": "RULES",
+          "descriptor": "Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 16409
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 9,
+          "code_sha256": "8c10ce266d366dafc2cd88271b8e0cd1df5dbfc5d799e8d011a3815c8056dd70",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 9,
+          "code_sha256": "68ae78c33536ab58d922da581a00630293b2e89e1b86ff6967d4311c5cfb08f4",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "ad95250c6bb1bf93b8a2dcce7b105074163be67c2d2aa5b182aa065190c41f4d",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;)V"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "42b11512746ff22e43e8750133edeaec1f5b89ee387a376647d6ed50ec657a6f",
+          "code_length": 5
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lorg/apache/commons/codec/language/bm/RuleType;",
+          "access": 4106,
+          "code_sha256": "0f9deda2bc90cfe9d4a99c9a99b95dd6a7e7c78438d8147719304d04053b32df",
+          "code_length": 23
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b46bfc70043019ce016f806ab3d4b37adf3d5673291c60687bb1ef287785521a",
+          "code_length": 52
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/commons/codec/language/bm/RuleType;>;",
+      "class_references": [
+        "[Lorg/apache/commons/codec/language/bm/RuleType;",
+        "java/lang/Enum",
+        "org/apache/commons/codec/language/bm/RuleType"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/package-info.class",
+      "occurrence": 0,
+      "sha256": "219dfa42b0f1a2e56bc16431328ce5ec9f609db1210763373db8b37dbc300a69",
+      "name": "org/apache/commons/codec/language/bm/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/language/bm/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/language/package-info.class",
+      "occurrence": 0,
+      "sha256": "df4ca0890d7c91a566ad295cb72d79393fe777e208f20f81e7b8ec2b6e181ea0",
+      "name": "org/apache/commons/codec/language/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/language/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/BCodec.class",
+      "occurrence": 0,
+      "sha256": "546c7926ae6d5f8e108e1d2d7c54577ae2038df26bd58d6030929161ee45f692",
+      "name": "org/apache/commons/codec/net/BCodec",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/codec/net/RFC1522Codec",
+      "interfaces": [
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/StringDecoder"
+      ],
+      "fields": [
+        {
+          "name": "DECODING_POLICY_DEFAULT",
+          "descriptor": "Lorg/apache/commons/codec/CodecPolicy;",
+          "access": 26
+        },
+        {
+          "name": "decodingPolicy",
+          "descriptor": "Lorg/apache/commons/codec/CodecPolicy;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "41d5dcc7073c606bae5dae3b56785d231e8ec29ccdad4e747ebb2bf42772d46c",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;)V",
+          "access": 1,
+          "code_sha256": "04d30069b3c72a8fff2f3286ac3897e9675765ac1f564e916d66d1833c3c8e21",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;Lorg/apache/commons/codec/CodecPolicy;)V",
+          "access": 1,
+          "code_sha256": "fe303485e0bbf5f804564c6284c91aed318217518982b9fbc701a6c1577c62d4",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e520cce494e6e55fa8835b92529441833165ce740537ce6d7f893a0d42215a6a",
+          "code_length": 9
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "cc647f4d43cea06a6cf808b2b360202b80e2acbfc6a487e3de78b17cefb7568e",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7e8fbff8c7bb06a8c031f68d3fb15a2dceba667a04ba4ab68cae153fc4383277",
+          "code_length": 20,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "doDecoding",
+          "descriptor": "([B)[B",
+          "access": 4,
+          "code_sha256": "eba25a644aaafb70860ae34f60e43d15849aed90ec3c684c0d580944d6496e91",
+          "code_length": 27
+        },
+        {
+          "name": "doEncoding",
+          "descriptor": "([B)[B",
+          "access": 4,
+          "code_sha256": "bb86533ffa1e7afb23198028059d905cfdee89831753872e19dbd2f56469c11b",
+          "code_length": 11
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0333936d596ef4456627bbd405a4cb2dbca700700befe261eb5cd195c2809386",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cfe3b60943baaaf28c7ad23e28562a1fcdbde573281f59dcb2792c1ba81e88e1",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "030a878d5490bc929c16bb20fc326d631f432038810acfe9d305a7d08e08dac8",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2a2a969c8b099c35776b651b24015ee16dae1a517bfaf08512d3b867ca3500b6",
+          "code_length": 21,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "2bb8c424b4e4ecf164b7a26be53de460770fa6ccbc8211dda016bf0b71672473",
+          "code_length": 3
+        },
+        {
+          "name": "isStrictDecoding",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "51bae27a461a4436f182870350a3f0605e15496dcf2465936863da9036862c5c",
+          "code_length": 16
+        },
+        {
+          "name": "getDefaultCharset",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "77208380f82f7cfb6596f9eaba7d2d8fcd8a56afc8ce1f5a7131c1eb7cfb9dc5",
+          "code_length": 5
+        },
+        {
+          "name": "getCharset",
+          "descriptor": "()Ljava/nio/charset/Charset;",
+          "access": 4161,
+          "code_sha256": "eb9470ea52af143086cbfa02a02608360b0a27ebc3e0dac043594a5ca3be6921",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2fc8f0d3a9a169176df1b574c92da2e593b2d23b2b45c5716c4ffbfb88f3e53d",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/charset/UnsupportedCharsetException",
+        "org/apache/commons/codec/CodecPolicy",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/StringDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/binary/Base64",
+        "org/apache/commons/codec/binary/BaseNCodec",
+        "org/apache/commons/codec/net/BCodec",
+        "org/apache/commons/codec/net/RFC1522Codec"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/PercentCodec.class",
+      "occurrence": 0,
+      "sha256": "5176804b57181097e695ece21ba3c3b72239900a79f3a449af0d5d808348fa69",
+      "name": "org/apache/commons/codec/net/PercentCodec",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/BinaryDecoder"
+      ],
+      "fields": [
+        {
+          "name": "ESCAPE_CHAR",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "alwaysEncodeChars",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 18
+        },
+        {
+          "name": "plusForSpace",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "alwaysEncodeCharsMin",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "alwaysEncodeCharsMax",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8fe96361d980f47ef25273c8d136b797e0fcd411884b7b2df9ce5688b23676da",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([BZ)V",
+          "access": 1,
+          "code_sha256": "8864641a762ac1c3f2c6f87303b320ef6695cb56f7983b514336f8b6a5993845",
+          "code_length": 38
+        },
+        {
+          "name": "canEncode",
+          "descriptor": "(B)Z",
+          "access": 2,
+          "code_sha256": "218b63655d08d947ef76b22904ca43284d350986ba974aa4146df826a137ace1",
+          "code_length": 33
+        },
+        {
+          "name": "containsSpace",
+          "descriptor": "([B)Z",
+          "access": 2,
+          "code_sha256": "9e0b9b409c359ee149f7d20bbc4e1654d3700e37bc4f8a9ae20b84c4b12e6a05",
+          "code_length": 37
+        },
+        {
+          "name": "decode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "831858e4b541b36adc2b28b164fec9782dbf8bda0535ed822ac901863fb6e57e",
+          "code_length": 129,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1545164b5f906d30e7c61a1eaa8fd4184da602e56bb443142639054c18d60a6a",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "doEncode",
+          "descriptor": "([BIZ)[B",
+          "access": 2,
+          "code_sha256": "f0ac92f4039f700b2b48e97aac7013a55a19615d2c12fc15cf932b4eb218cb47",
+          "code_length": 152
+        },
+        {
+          "name": "encode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "4cfc8ed5d92efc6328c9d2cd841f288c5409a9d52e8789875d515627fe429e63",
+          "code_length": 53,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "acd65675db4b632347d322af4b31ba172e06bcc48c90a71a8ac31d1e1ba12549",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "expectedDecodingBytes",
+          "descriptor": "([B)I",
+          "access": 2,
+          "code_sha256": "dd66c6c6843ab99a2677304345c6211c31ef2d9e6f345c14d1ac4a25393deed1",
+          "code_length": 38
+        },
+        {
+          "name": "expectedEncodingBytes",
+          "descriptor": "([B)I",
+          "access": 2,
+          "code_sha256": "79df438a17aee3cf3ea870c693a4ebee01d70eae429cb296bfc1b554ad06c8b3",
+          "code_length": 49
+        },
+        {
+          "name": "inAlwaysEncodeCharsRange",
+          "descriptor": "(B)Z",
+          "access": 2,
+          "code_sha256": "b604edbf9597888dd42852d4bad42f73ee8d6656f7cc1c3d7a97e8c25025ac8d",
+          "code_length": 22
+        },
+        {
+          "name": "insertAlwaysEncodeChar",
+          "descriptor": "(B)V",
+          "access": 2,
+          "code_sha256": "5b888edc79f4ffefe173e6210a026e8f99e2d2905415c4de6875a21b94488088",
+          "code_length": 49
+        },
+        {
+          "name": "insertAlwaysEncodeChars",
+          "descriptor": "([B)V",
+          "access": 2,
+          "code_sha256": "4772f171ee50d64bd6eadc349ede469f9ee43f81ca4930f85100206ed653e44f",
+          "code_length": 43
+        },
+        {
+          "name": "isAsciiChar",
+          "descriptor": "(B)Z",
+          "access": 2,
+          "code_sha256": "5873d0d999adbaa0c0c99697e9a37ae13a46c06da3938cc9501f858d19cfbdfd",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/nio/ByteBuffer",
+        "java/util/BitSet",
+        "org/apache/commons/codec/BinaryDecoder",
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/net/PercentCodec",
+        "org/apache/commons/codec/net/Utils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/QCodec.class",
+      "occurrence": 0,
+      "sha256": "0423e10c1a974e36afc99951172740dd38cdae417b2e380d2a61c7e76fef0fc3",
+      "name": "org/apache/commons/codec/net/QCodec",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/codec/net/RFC1522Codec",
+      "interfaces": [
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/StringDecoder"
+      ],
+      "fields": [
+        {
+          "name": "PRINTABLE_CHARS",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        },
+        {
+          "name": "SPACE",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "UNDERSCORE",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "encodeBlanks",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "41d5dcc7073c606bae5dae3b56785d231e8ec29ccdad4e747ebb2bf42772d46c",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;)V",
+          "access": 1,
+          "code_sha256": "95f116d2015e2a341f9ec298fe27a0debcf806c3eaf75b7f6b0bcc2864724791",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e2bc2b9a1d694cf8315cffd60196ecf201f4f548cf42e8dc211e564a400ce8c3",
+          "code_length": 9
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4661959f3df13d9637f9fc5313c52548033509c325801df907ff6b0f742c42e4",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0aca2dd46e6dd0e3c47255cd1e329970b28495ec0202d4a60accca12942afbe6",
+          "code_length": 20,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "doDecoding",
+          "descriptor": "([B)[B",
+          "access": 4,
+          "code_sha256": "128ceda7aa0c0cca141df065b2a4be5a0c7f8174053293bbdf0ee837b5b01055",
+          "code_length": 111,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "doEncoding",
+          "descriptor": "([B)[B",
+          "access": 4,
+          "code_sha256": "20dbaa139af2732db6ae729463847fda6967311f2109655656d61ac86f2a4662",
+          "code_length": 50
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "363a470a2d7627d22e36952e69a9701a1a0fd64ecf118c8cdfdd197cba765296",
+          "code_length": 60,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "49c2e774771a57a36ac36b55fb1f6fbb1d77b4d971e746d12df0f8db36e15dfc",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cb239a86ee08809039b9412f21d938fbd06c80f42fe70456414f0d8ecf811f6b",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "76076203275f03b33e463a7fb659b1e1e7972f4d7a615cebb91cec454a0ac480",
+          "code_length": 21,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "1395cf773478dcc2074cf53dea237ae6bf9b96912165d717c4126d22f789c250",
+          "code_length": 3
+        },
+        {
+          "name": "isEncodeBlanks",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6561e05b37d5656005cbb3f897bbaacc33010a477a28150705fd9c17632abb7f",
+          "code_length": 5
+        },
+        {
+          "name": "setEncodeBlanks",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "d65c0824538bc7aeb7e36eff70334df3dbbe6a9f73dfa061b239c92f06aa16b9",
+          "code_length": 6
+        },
+        {
+          "name": "getDefaultCharset",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "2019f285601a1bc88728f53d1efdcf6473ec95f43de2a4551063ce75515ae65f",
+          "code_length": 5
+        },
+        {
+          "name": "getCharset",
+          "descriptor": "()Ljava/nio/charset/Charset;",
+          "access": 4161,
+          "code_sha256": "cf86283b40311aef2e035c6187c25d04fa71a92824f4d694bcf8c87bacbb7502",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "253fb7ac6d7f721d428c7d24fc8e143a9d2e17be1c98cc3221e0848c5dad9782",
+          "code_length": 320
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/charset/UnsupportedCharsetException",
+        "java/util/BitSet",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/StringDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/net/QCodec",
+        "org/apache/commons/codec/net/QuotedPrintableCodec",
+        "org/apache/commons/codec/net/RFC1522Codec"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/QuotedPrintableCodec.class",
+      "occurrence": 0,
+      "sha256": "1b330bedee14d40c211d40a8ddb440a39d306abc4b9a4626bb0397477b9172aa",
+      "name": "org/apache/commons/codec/net/QuotedPrintableCodec",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/BinaryDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/StringDecoder"
+      ],
+      "fields": [
+        {
+          "name": "PRINTABLE_CHARS",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        },
+        {
+          "name": "ESCAPE_CHAR",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "TAB",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "SPACE",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "CR",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "LF",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "MIN_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SAFE_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 18
+        },
+        {
+          "name": "strict",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "decodeQuotedPrintable",
+          "descriptor": "([B)[B",
+          "access": 25,
+          "code_sha256": "c5e9f9c46507594d189007ab03aaadc20bce017f91e45cf8e101967759ddcaf1",
+          "code_length": 122,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "encodeByte",
+          "descriptor": "(IZLjava/io/ByteArrayOutputStream;)I",
+          "access": 10,
+          "code_sha256": "076b82e836053c1e70f13fd84ec0b6506847aea71477f2a56357607dfee15da1",
+          "code_length": 17
+        },
+        {
+          "name": "encodeQuotedPrintable",
+          "descriptor": "(Ljava/util/BitSet;[B)[B",
+          "access": 25,
+          "code_sha256": "a48392ef09a612b381a855702ee7d105dd12749796bde5a3632119ea574f72ac",
+          "code_length": 7
+        },
+        {
+          "name": "encodeQuotedPrintable",
+          "descriptor": "(Ljava/util/BitSet;[BZ)[B",
+          "access": 25,
+          "code_sha256": "7aa214edebd4d63f01649e50ff2e108e55816d17713dcbbd74ceac453e1bff12",
+          "code_length": 381
+        },
+        {
+          "name": "encodeQuotedPrintable",
+          "descriptor": "(ILjava/io/ByteArrayOutputStream;)I",
+          "access": 26,
+          "code_sha256": "1d4d2354610bb02fb84c0963feaf333c34ea473ca9e69a976fd7faa1381ff91a",
+          "code_length": 30
+        },
+        {
+          "name": "getUnsignedOctet",
+          "descriptor": "(I[B)I",
+          "access": 10,
+          "code_sha256": "df1cdb6c3cc976511e0c897ba32afbdd49ecf3dda231d94649a1042907400a99",
+          "code_length": 16
+        },
+        {
+          "name": "isWhitespace",
+          "descriptor": "(I)Z",
+          "access": 10,
+          "code_sha256": "3e9b3f28dd6d6d82eaef62f10ffd96bbf100827bec48e64816e197a1732a9c3a",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4b017eb6ffd9cf30320963fc91e461f547a8a7cc80b68e61a4a2f89b628259d5",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "aa3543e000d4319bc909c1738107864be6df0e445f58e3c87eef1886630182b8",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;)V",
+          "access": 1,
+          "code_sha256": "7ba2436185f20b578aa2e4304bbb4d5715f11c9f5fbd363421834a9482bf7671",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;Z)V",
+          "access": 1,
+          "code_sha256": "857b5cbd024d9ed2e1b6c02b94354508028a85d1f1b18af0c70c4a85c099bf4f",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4e2df6e9d1ddeeb390fd4d535685f1dbc2b96da604f55b5820c03e7c21b4b7af",
+          "code_length": 10,
+          "throws": [
+            "java/nio/charset/IllegalCharsetNameException",
+            "java/lang/IllegalArgumentException",
+            "java/nio/charset/UnsupportedCharsetException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "b02f9952ecbb70371918cde2287c326969987b8f50e0c69f1522328612167b14",
+          "code_length": 5,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4f24d86420cd7b1ca6eb06b88b9c5c44fbba928d7d7283fd361c058ff4e12de4",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0bfb5eb3292b652e95ba0f5d94e0c06d355ef72f0f9d3626d40fa2e9d53887d0",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "14aab8d4e4cf3309200e16e58c47d039982c340faad74dfbd1acf2fd87d28c8f",
+          "code_length": 23,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ca209b7f9bb41405b39201df89c59dac2fb8478a40d1f43182750d7e7b996015",
+          "code_length": 23,
+          "throws": [
+            "org/apache/commons/codec/DecoderException",
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "2c0dc30096566da5871a1dcebbca0301caaba400de0cd4c48fc4d669f8111a1d",
+          "code_length": 12
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1d1a1e09f56a96f3f112878c05f4d35b3b8ec22deaa2e7aead154491a4bee9a6",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "21e805ac106549915971bef4f524138b7e4742c66ef8fb2e093c6fe65f57ce2c",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4ae48379613b7c8a15e8658a850570238836b1523c60181c3af9c554fb08be61",
+          "code_length": 19
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8e5392e762f988b1529916b7bd66582fc91ffa561c741f2b607432d4aabe1200",
+          "code_length": 19,
+          "throws": [
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "getCharset",
+          "descriptor": "()Ljava/nio/charset/Charset;",
+          "access": 1,
+          "code_sha256": "87728270fd45accd083d10e23af8bf412adc53b1e14586f9ccefbbdff4afff47",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultCharset",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "70de0d1108743cf93c7cca72dcd64d09139261f3d1929f4183b4ff5047d65615",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "45d0a87fb22f8391606d64153127824407c9c0dc533548e7392f2e1cf379a63d",
+          "code_length": 74
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/nio/charset/IllegalCharsetNameException",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/charset/UnsupportedCharsetException",
+        "java/util/BitSet",
+        "org/apache/commons/codec/BinaryDecoder",
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/StringDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/binary/StringUtils",
+        "org/apache/commons/codec/net/QuotedPrintableCodec",
+        "org/apache/commons/codec/net/Utils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/RFC1522Codec.class",
+      "occurrence": 0,
+      "sha256": "f5b7af8b8dda37eb6a84f49c8a6e1b0eaf3e32d1a5fbb328fc8b27f81606e6e3",
+      "name": "org/apache/commons/codec/net/RFC1522Codec",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SEP",
+          "descriptor": "C",
+          "access": 28
+        },
+        {
+          "name": "POSTFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/charset/Charset;)V",
+          "access": 0,
+          "code_sha256": "41439457c90570f3258a8af86c3924fac7e1d31365fd52ff0ee6acf6ee371085",
+          "code_length": 18
+        },
+        {
+          "name": "decodeText",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "6a5eadf7a49d34e9fa6909e28fa83a4c8f2fd2c6439eddebaa141598dfd8132f",
+          "code_length": 225,
+          "throws": [
+            "org/apache/commons/codec/DecoderException",
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "doDecoding",
+          "descriptor": "([B)[B",
+          "access": 1028,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "doEncoding",
+          "descriptor": "([B)[B",
+          "access": 1028,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encodeText",
+          "descriptor": "(Ljava/lang/String;Ljava/nio/charset/Charset;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "975689af96b16f4e98f86effb8cb5cd41a5be59a8c4f2ad1675563976165187d",
+          "code_length": 79,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encodeText",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "92723189a942403143c43e7b24bc5849bb41496eeb9f4bcc26886b75beb2ee7b",
+          "code_length": 16,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "getCharset",
+          "descriptor": "()Ljava/nio/charset/Charset;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultCharset",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "25780818116004c0b0c0137c609821cb714d0e6dcd035ce9cdcbb70457e5e38a",
+          "code_length": 8
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/nio/charset/Charset",
+        "java/util/Objects",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/binary/StringUtils",
+        "org/apache/commons/codec/net/RFC1522Codec"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/URLCodec.class",
+      "occurrence": 0,
+      "sha256": "29e1a53f0b5ab109eda10d6742c799043eeeb1c70000eb646766e914caeff735",
+      "name": "org/apache/commons/codec/net/URLCodec",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/BinaryDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/StringDecoder"
+      ],
+      "fields": [
+        {
+          "name": "ESCAPE_CHAR",
+          "descriptor": "B",
+          "access": 28
+        },
+        {
+          "name": "WWW_FORM_URL",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 28
+        },
+        {
+          "name": "WWW_FORM_URL_SAFE",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/lang/String;",
+          "access": 68
+        }
+      ],
+      "methods": [
+        {
+          "name": "decodeUrl",
+          "descriptor": "([B)[B",
+          "access": 25,
+          "code_sha256": "a8ea42e5828596c2311b0f10251e7e545d5b996c5bafbe86fec735ac2cc49064",
+          "code_length": 114,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "encodeUrl",
+          "descriptor": "(Ljava/util/BitSet;[B)[B",
+          "access": 25,
+          "code_sha256": "3fb56eb8047002284bd95d9ddbe33ee37508fe91c752a67a36e66662db558378",
+          "code_length": 135
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ee96c627141e21a75679e6efcf230462bad28dc2c0cfc2c1846a619c109a14d5",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "31e3e1b96465275c72a451a7b2137155866dd96e8f0fe2af909bcb43ad4fd612",
+          "code_length": 10
+        },
+        {
+          "name": "decode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "5be70bea5dfe1387ea3317294ef585d23f809f62530dd6f58755652c06ebd72e",
+          "code_length": 5,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2e19276a5ff2563f10c1cc3e3a6ad854266f0c50193bded65c0db61794ffd599",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b2bfaecdaec99d321fdb6bb121ec81c6ad49cbabd0028b7b0ecaeb75ecffce2b",
+          "code_length": 30,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "decode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0d85fbd71d7ed8d0abfef7a7d4d29fa5c6b2b8f26ec09f970615617b9b5d183d",
+          "code_length": 23,
+          "throws": [
+            "org/apache/commons/codec/DecoderException",
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "([B)[B",
+          "access": 1,
+          "code_sha256": "3240e0206b1a6c1e8e3fbad734fcca65158b8582d15c813a7a81c51d28e9c0af",
+          "code_length": 8
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e0bc56e58c20ff3663b60920727f617e22f07235e8ff6ba5c7a18ea0666f6d09",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bfcc87f3ab11d1b4128e648f35abbe3a6f7a9c535418de318e890777de4a4515",
+          "code_length": 30,
+          "throws": [
+            "org/apache/commons/codec/EncoderException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "224505e1018ee2587e1ddfc6027692140bcc8437a6f548ef8b99b0b890c8c2ec",
+          "code_length": 19,
+          "throws": [
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "getDefaultCharset",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e79d57eb8d6dc0dfbb026dbbe6342e08dc4c772b2aafad9e2abe28af457cd333",
+          "code_length": 5
+        },
+        {
+          "name": "getEncoding",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e79d57eb8d6dc0dfbb026dbbe6342e08dc4c772b2aafad9e2abe28af457cd333",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f8426d985aae41d67b9d5131b9218f9573115181118bc9a034f0067b43134fd9",
+          "code_length": 132
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/BitSet",
+        "org/apache/commons/codec/BinaryDecoder",
+        "org/apache/commons/codec/BinaryEncoder",
+        "org/apache/commons/codec/CharEncoding",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/EncoderException",
+        "org/apache/commons/codec/StringDecoder",
+        "org/apache/commons/codec/StringEncoder",
+        "org/apache/commons/codec/binary/StringUtils",
+        "org/apache/commons/codec/net/URLCodec",
+        "org/apache/commons/codec/net/Utils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/Utils.class",
+      "occurrence": 0,
+      "sha256": "e61541e860c1b722d37118264ab7b482a2d102036f1ea115d888966180163da3",
+      "name": "org/apache/commons/codec/net/Utils",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RADIX",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "digit16",
+          "descriptor": "(B)I",
+          "access": 8,
+          "code_sha256": "c6e70463b18a72cffe98087442fbe30d5e25487aede5f4f331c36231aa69fea3",
+          "code_length": 42,
+          "throws": [
+            "org/apache/commons/codec/DecoderException"
+          ]
+        },
+        {
+          "name": "hexDigit",
+          "descriptor": "(I)C",
+          "access": 8,
+          "code_sha256": "8bcdf868485441314caa2df2dbe11225b475a2c2f809bc22e02ff88876086166",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/commons/codec/DecoderException",
+        "org/apache/commons/codec/net/Utils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/net/package-info.class",
+      "occurrence": 0,
+      "sha256": "ebc27f6cd7a4dbc4c9f573d72c3db10c373dc7044ea593228c74e84dd825f831",
+      "name": "org/apache/commons/codec/net/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/net/package-info"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/codec/package-info.class",
+      "occurrence": 0,
+      "sha256": "2ee921e00c3d48ffec7ba47038211de41307aabfbe7bd9ab212bcee017d4a5e6",
+      "name": "org/apache/commons/codec/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/codec/package-info"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "1bcf6b75638aac9283d03f904c2f28d9949e85a045364c91c9a5aa0011c36812",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

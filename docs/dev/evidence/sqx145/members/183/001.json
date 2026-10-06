@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
+  "archive_sha256": "c65c9be9aeb5d138615e44f463226419c856d192a6f309ba41c30cbcfa0261dc",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1.class",
+      "occurrence": 0,
+      "sha256": "c26a51016b2891733589728b2e730e2563b8ef5a218c1399b69e6001752e095a",
+      "name": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData.class",
+      "occurrence": 0,
+      "sha256": "e500cc1e9dfb324e344cd9ecde4a551279bc7905b93d43e9d2294de32ee700d4",
+      "name": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "equityMap",
+          "descriptor": "Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;",
+          "access": 1
+        },
+        {
+          "name": "equitySPY",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "dd",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "ddPct",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "ordersList",
+          "descriptor": "Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 1
+        },
+        {
+          "name": "initBuyAmount",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "ddMapMoney",
+          "descriptor": "Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;",
+          "access": 1
+        },
+        {
+          "name": "ddMapPct",
+          "descriptor": "Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;",
+          "access": 1
+        },
+        {
+          "name": "ddMapPips",
+          "descriptor": "Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;",
+          "access": 1
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark;)V",
+          "access": 2,
+          "code_sha256": "fd47d0c7fba732c2ad89a9316fa1a76155de77ef7d9b6947b584e38dcb19e3fc",
+          "code_length": 10
+        },
+        {
+          "name": "calculateStats",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lorg/jdom2/Element;BBB)Lcom/strategyquant/tradinglib/SQStats;",
+          "access": 1,
+          "code_sha256": "9a9eec7566d6696ddd1f77b9d09f88ff8a994a442c82e86db2f553e5e0a8e420",
+          "code_length": 118,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark;Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StatsTypeCombination",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/results/stats/StatsComputer",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/jdom2/Element",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark.class",
+      "occurrence": 0,
+      "sha256": "93a9cc82d35b7321d55cf068b95b6e62fdc8d61a85a25f2b36352dafc7f9e968",
+      "name": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon"
+      ],
+      "fields": [
+        {
+          "name": "NormOff",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "NormDD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "NormDDPct",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "NormMM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "NormExposure",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "453e557c6548b35730a6cc77039ad677c34240c042947f27d4cde64a2c487b62",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "431034cbe64ce7aa669460b922771c46e391bad78e1f55810986f31765f72009",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c768920d4f179759808038ec8414ad81437383a4b567f7f9357d2473e2814f4f",
+          "code_length": 4
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17d6a87ca8d58315940df726772e5c10bce2675804acd40d960781aac22bc3da",
+          "code_length": 3
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "72ebfa932fede7f6240d8448941a7e64e352d094321870472186cce4fef7188f",
+          "code_length": 1271,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "computeNormalizedByPctDD",
+          "descriptor": "(DLcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;Lit/unimi/dsi/fastutil/objects/ObjectArrayList;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/datalib/DataInfo;D)Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;",
+          "access": 2,
+          "code_sha256": "0f296c5a6e20e02b4fb31e28e246737e91916a200a14ad87599f35c65df1f32c",
+          "code_length": 275,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(DLcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Lcom/strategyquant/tradinglib/charts/linechart/series/XYValue;>;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/datalib/DataInfo;D)Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;"
+        },
+        {
+          "name": "normalizeByExposure",
+          "descriptor": "(Lit/unimi/dsi/fastutil/objects/ObjectArrayList;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/MoneyManagementMethod;Lcom/strategyquant/datalib/DataInfo;DDD)Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;",
+          "access": 2,
+          "code_sha256": "9a2e8cb099d57b4b318e59a33b4e512d980616742ec775e486da43921e2e632b",
+          "code_length": 544,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Lcom/strategyquant/tradinglib/charts/linechart/series/XYValue;>;Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/MoneyManagementMethod;Lcom/strategyquant/datalib/DataInfo;DDD)Lcom/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData;"
+        },
+        {
+          "name": "printHeader",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Z)V",
+          "access": 2,
+          "code_sha256": "c348753950b89b5f6dd72a9ffa3b192a87fc8e2a4ffaecac363c9109a68cc3c5",
+          "code_length": 130
+        },
+        {
+          "name": "printLine",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Ljava/lang/String;Ljava/lang/String;IDDDDDZ)V",
+          "access": 2,
+          "code_sha256": "34503a773f02c06bd3dbfcac90716f33c012f466fcc344da8137c5b1a3435d11",
+          "code_length": 156
+        },
+        {
+          "name": "fillDatasetValues",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/ChartDataset;Lit/unimi/dsi/fastutil/objects/ObjectArrayList;Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;)V",
+          "access": 2,
+          "code_sha256": "5f4d0fec31760d869cc03344a6568f2adc35adf03720e16d27996218e75d3e58",
+          "code_length": 49,
+          "generic_signature": "(Lcom/strategyquant/tradinglib/equitychart/ChartDataset;Lit/unimi/dsi/fastutil/objects/ObjectArrayList<Lcom/strategyquant/tradinglib/charts/linechart/series/XYValue;>;Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;)V"
+        },
+        {
+          "name": "calculateCorrelationStrategySPY",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lit/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap;)D",
+          "access": 2,
+          "code_sha256": "942af0c93d3277f927ce8bcd1940fa2f329d7bef1ac36ba12a6011cf1d12f52a",
+          "code_length": 86
+        },
+        {
+          "name": "specialSubtraction",
+          "descriptor": "(DD)D",
+          "access": 2,
+          "code_sha256": "838cd6889e70dfc22315bc8930910eb3dd3f8fc8fdf343d44c1e647b431ec566",
+          "code_length": 22
+        },
+        {
+          "name": "getPercentageDD",
+          "descriptor": "(DD)D",
+          "access": 2,
+          "code_sha256": "096d4d40b54daabb96a7625f6a708eb2debbfecdcf43791011672f7ce4215474",
+          "code_length": 24
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "206228c46ac70a01314258efd2f05b06850c5f89a8c16cb28e58a3100cbee033",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[J",
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/io/IDataLoader",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$1",
+        "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark$NormalizedData",
+        "com/strategyquant/tradinglib/MoneyManagementMethod",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/charts/linechart/series/XYValue",
+        "com/strategyquant/tradinglib/correlation/CorrelationComputer",
+        "com/strategyquant/tradinglib/equitychart/BenchmarkTable",
+        "com/strategyquant/tradinglib/equitychart/ChartDataset",
+        "com/strategyquant/tradinglib/equitychart/DomainAxisType",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/equitychart/EquityChartUtils",
+        "com/strategyquant/tradinglib/equitychart/MainChartDataset",
+        "com/strategyquant/tradinglib/equitychart/SubChart",
+        "com/strategyquant/tradinglib/equitychart/SubChartDataset",
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/results/stats/computer/OrderPLComputer",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap",
+        "it/unimi/dsi/fastutil/objects/ObjectArrayList",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

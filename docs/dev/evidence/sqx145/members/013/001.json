@@ -1,0 +1,4570 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/classmate-1.7.0.jar",
+  "archive_sha256": "cb868f231c5cceb89d795ea00e6e1b7a93b8f4ac1ce1d8be76dde322dff4a046",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration.class",
+      "occurrence": 0,
+      "sha256": "baa8fe6d61e1469f3a74db2213c57ad8cba8afc340a41f7aec60ca6184d343db",
+      "name": "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/AnnotationConfiguration",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "_defaultInclusion",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 20
+        },
+        {
+          "name": "_inclusions",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 20,
+          "generic_signature": "Ljava/util/HashMap<Lcom/fasterxml/classmate/util/ClassKey;Lcom/fasterxml/classmate/AnnotationInclusion;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/AnnotationInclusion;)V",
+          "access": 1,
+          "code_sha256": "75f282fdde081fc0538543675859c779e118c4ace01e2715e52206468e24edc4",
+          "code_length": 21
+        },
+        {
+          "name": "getInclusionForClass",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "3b376d3d24f160707753e02c35bb764bfa01b00a34eaae38c65b011e697960e1",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForConstructor",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "3b376d3d24f160707753e02c35bb764bfa01b00a34eaae38c65b011e697960e1",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForField",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "9302dfcaaeb45bb99fdc3b0a96cc60258c3a49b204f30776ac4ba990d9811b78",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForMethod",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "9302dfcaaeb45bb99fdc3b0a96cc60258c3a49b204f30776ac4ba990d9811b78",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForParameter",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "9302dfcaaeb45bb99fdc3b0a96cc60258c3a49b204f30776ac4ba990d9811b78",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "setInclusion",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/AnnotationInclusion;)V",
+          "access": 1,
+          "code_sha256": "1efc7f0d3b00e8d19dc1b3ed60afe192fa52c954958e6ad5ac48fb1afb67b00b",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Lcom/fasterxml/classmate/AnnotationInclusion;)V"
+        },
+        {
+          "name": "_inclusionFor",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 4,
+          "code_sha256": "a49cdd49e9bc16bb5957b5d9d541f71ba8842000e8f309f8fe57a636dfd2d5cd",
+          "code_length": 34,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationConfiguration",
+        "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration",
+        "com/fasterxml/classmate/AnnotationInclusion",
+        "com/fasterxml/classmate/util/ClassKey",
+        "java/io/Serializable",
+        "java/util/HashMap"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationConfiguration.class",
+      "occurrence": 0,
+      "sha256": "98ac27a159f779fa7cd65b917074710bff1f0563075d8bba6586150090236085",
+      "name": "com/fasterxml/classmate/AnnotationConfiguration",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getInclusionForClass",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForConstructor",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForField",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForMethod",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        },
+        {
+          "name": "getInclusionForParameter",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;)Lcom/fasterxml/classmate/AnnotationInclusion;"
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationConfiguration",
+        "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationInclusion.class",
+      "occurrence": 0,
+      "sha256": "355382e69d80081404ce9aa9edc988ca49db51bf3d546526d8a6b9474b0963c3",
+      "name": "com/fasterxml/classmate/AnnotationInclusion",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DONT_INCLUDE",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 16409
+        },
+        {
+          "name": "INCLUDE_BUT_DONT_INHERIT",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 16409
+        },
+        {
+          "name": "INCLUDE_AND_INHERIT_IF_INHERITED",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 16409
+        },
+        {
+          "name": "INCLUDE_AND_INHERIT",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/fasterxml/classmate/AnnotationInclusion;>;",
+      "class_references": [
+        "[Lcom/fasterxml/classmate/AnnotationInclusion;",
+        "com/fasterxml/classmate/AnnotationInclusion",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides$StdBuilder.class",
+      "occurrence": 0,
+      "sha256": "89c55ea8253f37bdb8818ce123f50c9d7c02e33560a7944afdd2a1d3793c13e8",
+      "name": "com/fasterxml/classmate/AnnotationOverrides$StdBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_targetsToOverrides",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 20,
+          "generic_signature": "Ljava/util/HashMap<Lcom/fasterxml/classmate/util/ClassKey;Ljava/util/List<Ljava/lang/Class<*>;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationOverrides$StdBuilder;",
+          "access": 1,
+          "code_sha256": "23a1ea924e69702db507c86e63ead891e0f1025cbedbd90530288db7bde0e49d",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/AnnotationOverrides$StdBuilder;"
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassKey;Ljava/lang/Class;)Lcom/fasterxml/classmate/AnnotationOverrides$StdBuilder;",
+          "access": 1,
+          "code_sha256": "2186dbcd8857fe57326265d4d8fa371912819aef7522fbf3f768fc7812090b79",
+          "code_length": 44,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassKey;Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/AnnotationOverrides$StdBuilder;"
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lcom/fasterxml/classmate/AnnotationOverrides;",
+          "access": 1,
+          "code_sha256": "58db2c67fb4ce8a814687efef0d95d99cc2598842e49cb5f53c6c195f810d45f",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationOverrides",
+        "com/fasterxml/classmate/AnnotationOverrides$StdBuilder",
+        "com/fasterxml/classmate/AnnotationOverrides$StdImpl",
+        "com/fasterxml/classmate/util/ClassKey",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides$StdImpl.class",
+      "occurrence": 0,
+      "sha256": "34626cf5218bd8dfa569f29c29554ed006335d09c00e603881b77aa0c666d602",
+      "name": "com/fasterxml/classmate/AnnotationOverrides$StdImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/AnnotationOverrides",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_targetsToOverrides",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 20,
+          "generic_signature": "Ljava/util/HashMap<Lcom/fasterxml/classmate/util/ClassKey;Ljava/util/List<Ljava/lang/Class<*>;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/HashMap;)V",
+          "access": 1,
+          "code_sha256": "12df46791ab4a146bfc0cbdaa86ff8b63dffb4039e68c1bca58cbf2305eadb01",
+          "code_length": 17,
+          "generic_signature": "(Ljava/util/HashMap<Lcom/fasterxml/classmate/util/ClassKey;Ljava/util/List<Ljava/lang/Class<*>;>;>;)V"
+        },
+        {
+          "name": "mixInsFor",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassKey;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c8cb6025df8e668a3aeac875e46ba186b716c1b0b352a81f7d39c9a2a4c984da",
+          "code_length": 12,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassKey;)Ljava/util/List<Ljava/lang/Class<*>;>;"
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationOverrides",
+        "com/fasterxml/classmate/AnnotationOverrides$StdImpl",
+        "java/util/HashMap",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides.class",
+      "occurrence": 0,
+      "sha256": "758acfd5dd5c918eb4e9867b669970bac50685c2f0c378c972e1045c56b90ef1",
+      "name": "com/fasterxml/classmate/AnnotationOverrides",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "mixInsFor",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "bb3ad8596ef5add7d3f8ad13ef31ac9f062b7dda2653a83f7ff47b3dec598a82",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/List<Ljava/lang/Class<*>;>;"
+        },
+        {
+          "name": "mixInsFor",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassKey;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassKey;)Ljava/util/List<Ljava/lang/Class<*>;>;"
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lcom/fasterxml/classmate/AnnotationOverrides$StdBuilder;",
+          "access": 9,
+          "code_sha256": "86cab20a34d8489520db9f990c5f3f979eca8916b21a41df8aa8e32e8385e577",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationOverrides",
+        "com/fasterxml/classmate/AnnotationOverrides$StdBuilder",
+        "com/fasterxml/classmate/AnnotationOverrides$StdImpl",
+        "com/fasterxml/classmate/util/ClassKey",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/Annotations.class",
+      "occurrence": 0,
+      "sha256": "9cef57c1c693c53c01f4af2583692b4ec71d31614442e2ae8ff382637adffd0a",
+      "name": "com/fasterxml/classmate/Annotations",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable",
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "NO_ANNOTATIONS",
+          "descriptor": "[Ljava/lang/annotation/Annotation;",
+          "access": 18
+        },
+        {
+          "name": "_annotations",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 4,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Ljava/lang/annotation/Annotation;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "50306ccc03f1f8670914de68a223e19de85aa038138fc3b21f88411adc828b71",
+          "code_length": 13
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "10b4695f942ddd1f3bfc79e091aad297d26cb85b6096d1eeca95198df396e371",
+          "code_length": 34
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(Lcom/fasterxml/classmate/Annotations;)V",
+          "access": 1,
+          "code_sha256": "6c4586c32dccad0e23ad1e2bcc59d8dc0d4f030d97c7e2b0e03bb070cb89bf5e",
+          "code_length": 69
+        },
+        {
+          "name": "addAsDefault",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "d64533694153dbd5fa7b94dcd0b923f2339ae651fbe65fa5c121791c04241683",
+          "code_length": 60
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "acd9a267acfe58ed3c3f0b7271e81d5192b1da4ebc4381bf66b81d333c38e11c",
+          "code_length": 31,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/annotation/Annotation;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "45895ac7189d003be6ec207dd8b3740c9eb7bd9569c81339818c71028f6addef",
+          "code_length": 19
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;",
+          "access": 1,
+          "code_sha256": "6d17adf66251d4008d78e9928228c9069066abe61d8d46c6c60bd31199684484",
+          "code_length": 21,
+          "generic_signature": "<A::Ljava/lang/annotation/Annotation;>(Ljava/lang/Class<TA;>;)TA;"
+        },
+        {
+          "name": "asArray",
+          "descriptor": "()[Ljava/lang/annotation/Annotation;",
+          "access": 1,
+          "code_sha256": "f01446fd8281a615b21cf617f2d45c2443dc58a4624e6bce30aae0052090849b",
+          "code_length": 42
+        },
+        {
+          "name": "asList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "f89c1bd92a62b41a0792b2eeed0c45f476f20242fccb783e82aa901970ae0917",
+          "code_length": 52,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/annotation/Annotation;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a7e78f63eff39abe8b4e86c4736f2cfa47707701fcf3c2719dd5eb05195a0ecf",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/io/Serializable;Ljava/lang/Iterable<Ljava/lang/annotation/Annotation;>;",
+      "class_references": [
+        "[Ljava/lang/annotation/Annotation;",
+        "com/fasterxml/classmate/Annotations",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/Filter.class",
+      "occurrence": 0,
+      "sha256": "98cb77a89aa2429779c032de09c68067fee66204923590ce9bae57c0e551751c",
+      "name": "com/fasterxml/classmate/Filter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "include",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025,
+          "generic_signature": "(TT;)Z"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "com/fasterxml/classmate/Filter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/GenericType.class",
+      "occurrence": 0,
+      "sha256": "7a7c83740c45114361fc7889ef2463af8f31c42f5caaa25184a90407796940c3",
+      "name": "com/fasterxml/classmate/GenericType",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/Type"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/reflect/Type;",
+      "class_references": [
+        "com/fasterxml/classmate/GenericType",
+        "java/lang/Object",
+        "java/lang/reflect/Type"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/MemberResolver.class",
+      "occurrence": 0,
+      "sha256": "28ddfb209f1aae24e8e97c46d5afe679c158c283e42c72d9be9ce1299ec0ef4d",
+      "name": "com/fasterxml/classmate/MemberResolver",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "_typeResolver",
+          "descriptor": "Lcom/fasterxml/classmate/TypeResolver;",
+          "access": 20
+        },
+        {
+          "name": "_cfgIncludeLangObject",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "_fieldFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "_methodFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "_constructorFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawConstructor;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/TypeResolver;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "setIncludeLangObject",
+          "descriptor": "(Z)Lcom/fasterxml/classmate/MemberResolver;",
+          "access": 1,
+          "code_sha256": "8c4873a8d7a160b1e35ae315fbf52abf7edd6937a2766632d371fb9809bfa964",
+          "code_length": 7
+        },
+        {
+          "name": "setFieldFilter",
+          "descriptor": "(Lcom/fasterxml/classmate/Filter;)Lcom/fasterxml/classmate/MemberResolver;",
+          "access": 1,
+          "code_sha256": "c80f5ec9f83882e94238a0047ad9f2701d0393cefc849700c93386eb118851b0",
+          "code_length": 7,
+          "generic_signature": "(Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawField;>;)Lcom/fasterxml/classmate/MemberResolver;"
+        },
+        {
+          "name": "setMethodFilter",
+          "descriptor": "(Lcom/fasterxml/classmate/Filter;)Lcom/fasterxml/classmate/MemberResolver;",
+          "access": 1,
+          "code_sha256": "df83593a4c4029b099c6a8ae8a0696a80f3e7902fc34f5c8727cb5165072eccc",
+          "code_length": 7,
+          "generic_signature": "(Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawMethod;>;)Lcom/fasterxml/classmate/MemberResolver;"
+        },
+        {
+          "name": "setConstructorFilter",
+          "descriptor": "(Lcom/fasterxml/classmate/Filter;)Lcom/fasterxml/classmate/MemberResolver;",
+          "access": 1,
+          "code_sha256": "7a22ee7905e2288a508a06d83cdc6ddee5b8ff25119130c65a75e02edd9f45ad",
+          "code_length": 7,
+          "generic_signature": "(Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawConstructor;>;)Lcom/fasterxml/classmate/MemberResolver;"
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/AnnotationConfiguration;Lcom/fasterxml/classmate/AnnotationOverrides;)Lcom/fasterxml/classmate/ResolvedTypeWithMembers;",
+          "access": 1,
+          "code_sha256": "a26e6f01c1ddf1dfcf7909d9d67d3c5a034bf1683cd15d3d8ecb463e4302ecc9",
+          "code_length": 335
+        },
+        {
+          "name": "_addOverrides",
+          "descriptor": "(Ljava/util/List;Ljava/util/Set;Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "276b5d028153d3d046219783112e7e84d30d5a71b37a59f81f1e6091970b1592",
+          "code_length": 119,
+          "generic_signature": "(Ljava/util/List<Lcom/fasterxml/classmate/members/HierarchicType;>;Ljava/util/Set<Lcom/fasterxml/classmate/util/ClassKey;>;Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "_addOverrides",
+          "descriptor": "(Ljava/util/List;Ljava/util/Set;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 2,
+          "code_sha256": "4b677275d2c1efb4f9a462df052848c8f34e436ac040ec5c91565635779643e8",
+          "code_length": 134,
+          "generic_signature": "(Ljava/util/List<Lcom/fasterxml/classmate/members/HierarchicType;>;Ljava/util/Set<Lcom/fasterxml/classmate/util/ClassKey;>;Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "_gatherTypes",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/util/Set;Ljava/util/List;)V",
+          "access": 4,
+          "code_sha256": "8672820a9ddc56c789197134626fae8dbbfe4b529db6ba82804c3e8d4eec8fee",
+          "code_length": 114,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/util/Set<Lcom/fasterxml/classmate/util/ClassKey;>;Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;)V"
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/members/HierarchicType;",
+        "com/fasterxml/classmate/AnnotationConfiguration",
+        "com/fasterxml/classmate/AnnotationOverrides",
+        "com/fasterxml/classmate/MemberResolver",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/TypeResolver",
+        "com/fasterxml/classmate/members/HierarchicType",
+        "com/fasterxml/classmate/util/ClassKey",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/reflect/Type",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedType.class",
+      "occurrence": 0,
+      "sha256": "26f104cf22c01fcaee8d7f82eb965f6de23d0243ba0adc54f96cbfbdecbf17ca",
+      "name": "com/fasterxml/classmate/ResolvedType",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/reflect/Type"
+      ],
+      "fields": [
+        {
+          "name": "NO_TYPES",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 25
+        },
+        {
+          "name": "NO_CONSTRUCTORS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawConstructor;",
+          "access": 28
+        },
+        {
+          "name": "NO_FIELDS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawField;",
+          "access": 28
+        },
+        {
+          "name": "NO_METHODS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawMethod;",
+          "access": 28
+        },
+        {
+          "name": "_erasedType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 20,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_typeBindings",
+          "descriptor": "Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)V",
+          "access": 4,
+          "code_sha256": "6b60e8aec565374eeb641c6fd22ea9489e5ca77bb1acbe0d6a1471c8653818d6",
+          "code_length": 25,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)V"
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "canCreateSubtype",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 17,
+          "code_sha256": "22640139b95a6d6fa3a53e236e833aabb67f547c77c75d554876f5be72543783",
+          "code_length": 24,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "getErasedType",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1025
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1025
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1025
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getTypeParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "e17d12d69ff4cab1d85dd251b4a3d776115e682a595703f75171335028cd5a96",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getTypeBindings",
+          "descriptor": "()Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "typeParametersFor",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d890f4b5db224027809b3ed476eab3ef8eb65a7988c0f26baeee97736b61c176",
+          "code_length": 17,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "findSupertype",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "56daa49cef833c5e06f1d20dd87d7ba4280d90c8cc7c44bf9cf5cf117d465fd4",
+          "code_length": 87,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isConcrete",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "35582bdf0fa2ff7c35dd905c8b8b59fd6f7ed98d072897444dd9681529b57432",
+          "code_length": 13
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "isInstanceOf",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 17,
+          "code_sha256": "77c6d0ad1629fb719e092e625fc65199dfde43eaacee50906f4717b179886e7e",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "getConstructors",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawConstructor;>;"
+        },
+        {
+          "name": "getMemberFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getMemberMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getStaticFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getStaticMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "662c34c4c345df67e9c34c4173dd174700f0aaa8ec33a051e854cb22738facb9",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getSignature",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f1d8412ba21a69387ad621ca8865139b4cc13ae89151295b9401635e5621eb86",
+          "code_length": 17
+        },
+        {
+          "name": "getErasedSignature",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cf87744e780a0e1d5f5b8e901fb4ef3349b5e3cca0fea21d5f28376a8364c896",
+          "code_length": 17
+        },
+        {
+          "name": "getFullDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "65cecc92b039d4b118d5bce95aa6eae6c5c26ba1b94bbe3d9563d53cad990eb5",
+          "code_length": 17
+        },
+        {
+          "name": "getBriefDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8a02c1bde7db7c8a49393adceb3554a9cfef812fea991e483b93d9d60830ae3a",
+          "code_length": 17
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "67445957a2c4ecee9205fabf761f00dfb9aac9d94f4a8e572c4924577f20c48b",
+          "code_length": 5
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "051a33b188f2425cafc798aa935e99528d746fca0ede9b27cbf5cc434610013d",
+          "code_length": 19
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "87e7f7f2ca29f786dcaf022867ffa01afb46b6d21a52a5117d62d755cf69bfb3",
+          "code_length": 54
+        },
+        {
+          "name": "_appendClassSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 4,
+          "code_sha256": "029fa2d564fc12b8831d6dd5f5cbbab646dac83c712868fe5d33e97b70f04428",
+          "code_length": 74
+        },
+        {
+          "name": "_appendErasedClassSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 4,
+          "code_sha256": "e78e104b16b4c551ed649dbf521b0600b63a50d9fe2a30dda719e101c9422a70",
+          "code_length": 22
+        },
+        {
+          "name": "_appendClassDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 4,
+          "code_sha256": "88b4175ed45ebcb85164649ee9c344e509201b79c9b87afd76c84e3eed068b4e",
+          "code_length": 77
+        },
+        {
+          "name": "_appendClassName",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 4,
+          "code_sha256": "c0654bd1bde11ed2807a0eafe35c79f293f16cd5e38f08dce718cd85a28d0aa6",
+          "code_length": 55
+        },
+        {
+          "name": "_getFields",
+          "descriptor": "(Z)[Lcom/fasterxml/classmate/members/RawField;",
+          "access": 4,
+          "code_sha256": "0fcd67bd79611b2010ae6768fe7dcf624553f7c599fa94a611bdda649f28d580",
+          "code_length": 100
+        },
+        {
+          "name": "_getMethods",
+          "descriptor": "(Z)[Lcom/fasterxml/classmate/members/RawMethod;",
+          "access": 4,
+          "code_sha256": "3bc6e70be757190b47bfbbde16fdd958fa1bd8c0df2a4009ef927ba729ac5834",
+          "code_length": 100
+        },
+        {
+          "name": "_getConstructors",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/RawConstructor;",
+          "access": 4,
+          "code_sha256": "55c036859cba69c204af75271494101dcc36fdfb389ffda7d0220baf305e2ae3",
+          "code_length": 86
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "534f2498c0b82a2104b80f9831f149e7215828482aea2a2a7baf2eb699343eea",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/members/RawConstructor;",
+        "[Lcom/fasterxml/classmate/members/RawField;",
+        "[Lcom/fasterxml/classmate/members/RawMethod;",
+        "[Ljava/lang/reflect/Constructor;",
+        "[Ljava/lang/reflect/Field;",
+        "[Ljava/lang/reflect/Method;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/members/RawConstructor",
+        "com/fasterxml/classmate/members/RawField",
+        "com/fasterxml/classmate/members/RawMethod",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier",
+        "java/lang/reflect/Type",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler.class",
+      "occurrence": 0,
+      "sha256": "2952ffb1918da9b650d3aa58694ad4b7058adb2c1f1f0dfd2b87f95dd877c747",
+      "name": "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_annotationConfig",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationConfiguration;",
+          "access": 18
+        },
+        {
+          "name": "_fieldInclusions",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Lcom/fasterxml/classmate/AnnotationInclusion;>;"
+        },
+        {
+          "name": "_constructorInclusions",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Lcom/fasterxml/classmate/AnnotationInclusion;>;"
+        },
+        {
+          "name": "_methodInclusions",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Lcom/fasterxml/classmate/AnnotationInclusion;>;"
+        },
+        {
+          "name": "_parameterInclusions",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Lcom/fasterxml/classmate/AnnotationInclusion;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/AnnotationConfiguration;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "includeConstructorAnnotation",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 1,
+          "code_sha256": "fa40bb6ca5cd10e328d2359f004d25d46972d8515cf24f63b92271597290a0be",
+          "code_length": 89
+        },
+        {
+          "name": "includeFieldAnnotation",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 1,
+          "code_sha256": "5664cf1817332f01293bc05b701fcc16a137409162134848427406f9571d72a2",
+          "code_length": 89
+        },
+        {
+          "name": "includeMethodAnnotation",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 1,
+          "code_sha256": "50d40970250ca5c2b4f1546aaf49277ec8385742a0a4187a3d58bff5d3b0f4eb",
+          "code_length": 17
+        },
+        {
+          "name": "methodInclusion",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "c25f204263f7803d756262c90d0cc1fa5a8f5af72c731826dcf97997532c5afa",
+          "code_length": 67
+        },
+        {
+          "name": "includeParameterAnnotation",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 1,
+          "code_sha256": "b4e88aa8bd0b8449103252524a4df719cbab211ba0b4efea1fafdd19fc86213a",
+          "code_length": 17
+        },
+        {
+          "name": "parameterInclusion",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Lcom/fasterxml/classmate/AnnotationInclusion;",
+          "access": 1,
+          "code_sha256": "992c9eaee721a35ea3b4961e47e357d46d059d019b4db39c7e0796b639e5b055",
+          "code_length": 67
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/AnnotationConfiguration",
+        "com/fasterxml/classmate/AnnotationInclusion",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "java/util/HashMap"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedTypeWithMembers.class",
+      "occurrence": 0,
+      "sha256": "ee002278878c9028effcff04597313edef0d9bdd24752ad282ae13ac80267932",
+      "name": "com/fasterxml/classmate/ResolvedTypeWithMembers",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NO_RESOLVED_TYPES",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 26
+        },
+        {
+          "name": "NO_RESOLVED_METHODS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 26
+        },
+        {
+          "name": "NO_RESOLVED_FIELDS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 26
+        },
+        {
+          "name": "NO_RESOLVED_CONSTRUCTORS",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_ANNOTATION_CONFIG",
+          "descriptor": "Lcom/fasterxml/classmate/AnnotationConfiguration;",
+          "access": 28
+        },
+        {
+          "name": "_typeResolver",
+          "descriptor": "Lcom/fasterxml/classmate/TypeResolver;",
+          "access": 20
+        },
+        {
+          "name": "_annotationHandler",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler;",
+          "access": 20
+        },
+        {
+          "name": "_mainType",
+          "descriptor": "Lcom/fasterxml/classmate/members/HierarchicType;",
+          "access": 20
+        },
+        {
+          "name": "_types",
+          "descriptor": "[Lcom/fasterxml/classmate/members/HierarchicType;",
+          "access": 20
+        },
+        {
+          "name": "_fieldFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "_constructorFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawConstructor;>;"
+        },
+        {
+          "name": "_methodFilter",
+          "descriptor": "Lcom/fasterxml/classmate/Filter;",
+          "access": 4,
+          "generic_signature": "Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "_staticMethods",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4
+        },
+        {
+          "name": "_staticFields",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 4
+        },
+        {
+          "name": "_memberMethods",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4
+        },
+        {
+          "name": "_memberFields",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 4
+        },
+        {
+          "name": "_constructors",
+          "descriptor": "[Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/TypeResolver;Lcom/fasterxml/classmate/AnnotationConfiguration;Lcom/fasterxml/classmate/members/HierarchicType;[Lcom/fasterxml/classmate/members/HierarchicType;Lcom/fasterxml/classmate/Filter;Lcom/fasterxml/classmate/Filter;Lcom/fasterxml/classmate/Filter;)V",
+          "access": 1,
+          "code_sha256": "d898a6afce4bb8597d74f0213308d115752dacee694efc33a2dbee0a368f68ed",
+          "code_length": 84,
+          "generic_signature": "(Lcom/fasterxml/classmate/TypeResolver;Lcom/fasterxml/classmate/AnnotationConfiguration;Lcom/fasterxml/classmate/members/HierarchicType;[Lcom/fasterxml/classmate/members/HierarchicType;Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawConstructor;>;Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawField;>;Lcom/fasterxml/classmate/Filter<Lcom/fasterxml/classmate/members/RawMethod;>;)V"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b8f1a1bf3480d6a9a0bf0853db0942531c0ad9679064d601bd1a7588f485b75d",
+          "code_length": 6
+        },
+        {
+          "name": "allTypesAndOverrides",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "7ccf1b0b6916cfd154911ee7e70f2754f0093ccab9469243f2f6b03fce910a48",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/HierarchicType;>;"
+        },
+        {
+          "name": "mainTypeAndOverrides",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "73b6981b1b135f443c0e40f6d8723a4b306ce8195db93964c53121db83c25dc6",
+          "code_length": 39,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/HierarchicType;>;"
+        },
+        {
+          "name": "overridesOnly",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "fe3f8343358501b8299abfb5c115914b9f9478b1890e68a6737a42d38f89db6b",
+          "code_length": 33,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/HierarchicType;>;"
+        },
+        {
+          "name": "getStaticFields",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 1,
+          "code_sha256": "62d48a095126c2f8242b671b48877db8d9f231562e203e35af2743f6eb8ef424",
+          "code_length": 20
+        },
+        {
+          "name": "getStaticMethods",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 1,
+          "code_sha256": "bce6301ba233230869887b4b5b488fc8ae40fb3a3ada5be4020dc509dbcf5c18",
+          "code_length": 20
+        },
+        {
+          "name": "getMemberFields",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 1,
+          "code_sha256": "1c60854310c18dd79d36cba5b76c243bef1cbbe2e01e6de5db1ff3e9ccb142bc",
+          "code_length": 20
+        },
+        {
+          "name": "getMemberMethods",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 1,
+          "code_sha256": "40de1fec4e7fbe96075f8f6c7905906be509ccffa33dd76a1ae56bfd74348e7d",
+          "code_length": 20
+        },
+        {
+          "name": "getConstructors",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+          "access": 1,
+          "code_sha256": "a4c664992ce0ffbbd8ad86cba044c96a6a6ea486e72331c927b00a1eb9ce5470",
+          "code_length": 20
+        },
+        {
+          "name": "resolveConstructors",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+          "access": 4,
+          "code_sha256": "8afd11bacc274cb947ab7db13822b32630eb7f57b4a0a5d01c626391d8daadf9",
+          "code_length": 335
+        },
+        {
+          "name": "resolveMemberFields",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 4,
+          "code_sha256": "aa2cef438e138221b660b2247c3679677f89c4c9efa6047b60e0bc02dd29ef00",
+          "code_length": 284
+        },
+        {
+          "name": "resolveMemberMethods",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4,
+          "code_sha256": "c16f28b62bab1429ed10585174c63937d2a895aaa39a31de3c7c5e0465efaf84",
+          "code_length": 796
+        },
+        {
+          "name": "resolveStaticFields",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 4,
+          "code_sha256": "ff8f954dd427db132cd02bee04e755d573c8263585908f328dfe3bf08448a293",
+          "code_length": 252
+        },
+        {
+          "name": "resolveStaticMethods",
+          "descriptor": "()[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4,
+          "code_sha256": "b24b47325007295f50388c50ba028a1f3f442b5889dbbf344a1995c79a3c2caa",
+          "code_length": 252
+        },
+        {
+          "name": "resolveConstructor",
+          "descriptor": "(Lcom/fasterxml/classmate/members/RawConstructor;)Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+          "access": 4,
+          "code_sha256": "41b20f415bb9c35b4b3689a6075bb4f43594f6e9e7ec699c133df3f04bf2ea3b",
+          "code_length": 239
+        },
+        {
+          "name": "resolveField",
+          "descriptor": "(Lcom/fasterxml/classmate/members/RawField;)Lcom/fasterxml/classmate/members/ResolvedField;",
+          "access": 4,
+          "code_sha256": "e6d5cafcfc3de812734e79f63a78c133f7e18c279459db7d9687fcd7f4922336",
+          "code_length": 103
+        },
+        {
+          "name": "resolveMethod",
+          "descriptor": "(Lcom/fasterxml/classmate/members/RawMethod;)Lcom/fasterxml/classmate/members/ResolvedMethod;",
+          "access": 4,
+          "code_sha256": "d50d2ce5fb75627be833ee52b9a6f129ea6467d5e4121a84631e73a1c8c8fc27",
+          "code_length": 272
+        },
+        {
+          "name": "methodCanInherit",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 4,
+          "code_sha256": "687e125ac8e19699e1fce282b1a98c229ff3b7a733abc4e9526f3258e978a5d0",
+          "code_length": 41
+        },
+        {
+          "name": "parameterCanInherit",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)Z",
+          "access": 4,
+          "code_sha256": "65eada00601e0491c88035c02e307922e1ebd4ee2afdebc017b2d45e1267754f",
+          "code_length": 41
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bd45ce3e5e8161a61ea1c6bb0132817c34ae08a302d2d736299e2bf88046c301",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/Annotations;",
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "[Lcom/fasterxml/classmate/members/HierarchicType;",
+        "[Lcom/fasterxml/classmate/members/ResolvedConstructor;",
+        "[Lcom/fasterxml/classmate/members/ResolvedField;",
+        "[Lcom/fasterxml/classmate/members/ResolvedMethod;",
+        "[Ljava/lang/annotation/Annotation;",
+        "[Ljava/lang/reflect/Type;",
+        "[[Ljava/lang/annotation/Annotation;",
+        "com/fasterxml/classmate/AnnotationConfiguration",
+        "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration",
+        "com/fasterxml/classmate/AnnotationInclusion",
+        "com/fasterxml/classmate/Annotations",
+        "com/fasterxml/classmate/Filter",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers",
+        "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/TypeResolver",
+        "com/fasterxml/classmate/members/HierarchicType",
+        "com/fasterxml/classmate/members/RawConstructor",
+        "com/fasterxml/classmate/members/RawField",
+        "com/fasterxml/classmate/members/RawMethod",
+        "com/fasterxml/classmate/members/ResolvedConstructor",
+        "com/fasterxml/classmate/members/ResolvedField",
+        "com/fasterxml/classmate/members/ResolvedMethod",
+        "com/fasterxml/classmate/util/MethodKey",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Void",
+        "java/lang/annotation/Annotation",
+        "java/lang/annotation/Inherited",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Type",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/TypeBindings.class",
+      "occurrence": 0,
+      "sha256": "5e634290b6182a3bf8fe8db0c69eba297f17fa687785ec94ca359ab43b628a25",
+      "name": "com/fasterxml/classmate/TypeBindings",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NO_STRINGS",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "NO_TYPES",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 26
+        },
+        {
+          "name": "EMPTY",
+          "descriptor": "Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 26
+        },
+        {
+          "name": "_names",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "_types",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 18
+        },
+        {
+          "name": "_unboundVariables",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/String;[Lcom/fasterxml/classmate/ResolvedType;[Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "1c2fc7dc44b024f33128b2bbcb6f9d17e1550213e62c3faecb57764aa06e6bbc",
+          "code_length": 149
+        },
+        {
+          "name": "emptyBindings",
+          "descriptor": "()Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 9,
+          "code_sha256": "afc8b9abcd858ca2fc039be08ff5a581a15c5fd9f66677daf2e27856f79770b9",
+          "code_length": 4
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Class;Ljava/util/List;)Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 9,
+          "code_sha256": "4d5be4ed78733b8c83426a0a4e7ba9d29f7d16e2f330417e8d98111b89238b7f",
+          "code_length": 39,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;)Lcom/fasterxml/classmate/TypeBindings;"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Class;[Lcom/fasterxml/classmate/ResolvedType;)Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 9,
+          "code_sha256": "569b4667e6976f3bdeefc2a591aa240751d6e3ec80cff78609591241597adbfe",
+          "code_length": 157,
+          "generic_signature": "(Ljava/lang/Class<*>;[Lcom/fasterxml/classmate/ResolvedType;)Lcom/fasterxml/classmate/TypeBindings;"
+        },
+        {
+          "name": "withUnboundVariable",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/classmate/TypeBindings;",
+          "access": 1,
+          "code_sha256": "5a9aff8b35d3e5bb9265812e0326431530c7e090570ef79e606f5438ce4fc49e",
+          "code_length": 63
+        },
+        {
+          "name": "findBoundType",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "06cd868c1fb72c42bd3cc832dd69fea3e78054fc914b0b4fae5a5237456b7373",
+          "code_length": 41
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7717b6186561ca1fcaf653ae2dd09efbf5849ad6ec43f9cf69a463092e5be91d",
+          "code_length": 14
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "0564646779292d014bdec7f90c1eaae463db975656bda226e05160017f98a671",
+          "code_length": 6
+        },
+        {
+          "name": "getBoundName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2d6baf8e92075cc02e1506d40cfe245ae32cc42ee1984c8d8816dbef0abf615d",
+          "code_length": 22
+        },
+        {
+          "name": "getBoundType",
+          "descriptor": "(I)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "da15bd105b7e9d28ddd2c63c0ea53e95eae88c0d50811fb1d8e02aee0c400e25",
+          "code_length": 22
+        },
+        {
+          "name": "getTypeParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8d5bc81ffa07af8a52db7d1a4526579daa2bae464ca6c5c2c8875cc389018970",
+          "code_length": 20,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "hasUnbound",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "fe2d96278aa4608c4d972ba0c4ccd6222423064c05a1ca15fe8cbc72e17a5c73",
+          "code_length": 37
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c34d526573365aead597cdddb7742dd1c0bf95a694f169b97e62211eb1975c86",
+          "code_length": 79
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "0444c148c33d0a5fcdd7611423c76c9593fda8461d10034848ff0d1c1ff22193",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2caf1e37128fdf340ea5a0994f9282c798fdefe37c54d59a867da6de59c8e2e6",
+          "code_length": 88
+        },
+        {
+          "name": "typeParameterArray",
+          "descriptor": "()[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 4,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7d5f6b21b47a3d6db23d8f53fae5ee7313ebfb90e7bc7521aaa0bb875c616d0c",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "[Ljava/lang/String;",
+        "[Ljava/lang/reflect/TypeVariable;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/TypeVariable",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/TypeResolver.class",
+      "occurrence": 0,
+      "sha256": "668f05d1f9733ff5aa30719a2cd7686f1130abd91ed11d2f064ef8b1bfdeff45",
+      "name": "com/fasterxml/classmate/TypeResolver",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "NO_TYPES",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 26
+        },
+        {
+          "name": "sJavaLangObject",
+          "descriptor": "Lcom/fasterxml/classmate/types/ResolvedObjectType;",
+          "access": 26
+        },
+        {
+          "name": "_primitiveTypes",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 28,
+          "generic_signature": "Ljava/util/HashMap<Lcom/fasterxml/classmate/util/ClassKey;Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "_resolvedTypes",
+          "descriptor": "Lcom/fasterxml/classmate/util/ResolvedTypeCache;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6afe6545ca7a6c886168dd55bce08008173def2341e9c568beff5f2cf3b9ee9a",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeCache;)V",
+          "access": 1,
+          "code_sha256": "a40defa2bc35dd51cbdb1b7b2f1dbbd9e3d0aa6811ec3114c2a4692ce471f24d",
+          "code_length": 10
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/reflect/Type;[Ljava/lang/reflect/Type;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 129,
+          "code_sha256": "73a6c944b77f36ee72aaaf640f0cce3ce360b850ef69e2d977bd60939e809622",
+          "code_length": 229
+        },
+        {
+          "name": "arrayType",
+          "descriptor": "(Ljava/lang/reflect/Type;)Lcom/fasterxml/classmate/types/ResolvedArrayType;",
+          "access": 1,
+          "code_sha256": "d8a1caeff3e3e0b664114475af0e11fd966f085800513a3cc003a40f31dae7fd",
+          "code_length": 34
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Lcom/fasterxml/classmate/TypeBindings;Ljava/lang/reflect/Type;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "6de61d509d5785bd286f36e4ad4775eafe9b49d6e279ef8f0e63035ff32d0966",
+          "code_length": 8
+        },
+        {
+          "name": "resolveSubtype",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/Class;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "2553a962213fc56a2d8b46ba395a32cd48207367c915674b6b8f361b080a87b7",
+          "code_length": 385,
+          "throws": [
+            "java/lang/IllegalArgumentException",
+            "java/lang/UnsupportedOperationException"
+          ],
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "isSelfReference",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)Z",
+          "access": 9,
+          "code_sha256": "8691159f97b64919380f32e08dcbf6cfba132643e9116b8d3be033aed81268a7",
+          "code_length": 5
+        },
+        {
+          "name": "_fromAny",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/Type;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "3a3fc5031fefe53d19e7bdfb90a0f2d14a0deaf9db5c3b0cb5625865539aaaca",
+          "code_length": 153
+        },
+        {
+          "name": "_fromClass",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "eac804b00f0a73b3e74aca7363f5dc862d6bd93b9e123488fde6805b4737a40f",
+          "code_length": 162,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_fromGenericType",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Lcom/fasterxml/classmate/GenericType;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "13b4e5bc66ef7da28a60fd3887bd116374ffde79885f5fce19f248608a350989",
+          "code_length": 127,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Lcom/fasterxml/classmate/GenericType<*>;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_constructType",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "d5372d458c6957e06349f906f8389da6ea79aa9f40aaa102cb107ace9e8093a1",
+          "code_length": 98,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_resolveSuperInterfaces",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "bbb83f4b710e20848f5d4c1b3620bd3f00569706bf6e8889a5a0619b83745ce0",
+          "code_length": 68,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)[Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_resolveSuperClass",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "9c811112a0835611167f4ad98f764e8436c56b1b886606d5d6b130e07f5338f8",
+          "code_length": 22,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_fromParamType",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/ParameterizedType;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "8f6bd4666c0f8dd57563169fc07a6219b9dd1181feb95fe0bd3ff5519e81e99b",
+          "code_length": 82
+        },
+        {
+          "name": "_fromArrayType",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/GenericArrayType;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "48a4f5e2ad1f5effbdaeef767f044eb8efa78cb34db2336a2a52143f9bf2cf47",
+          "code_length": 41
+        },
+        {
+          "name": "_fromWildcard",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/WildcardType;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "a28eeb9c05e82f9690fbf6fa203f1e8915e86b71c3a5bb6659e947d2cedbf13a",
+          "code_length": 15
+        },
+        {
+          "name": "_fromVariable",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/TypeVariable;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 2,
+          "code_sha256": "6def02ca4e8c5c56ab514e4aeb75c9c692a43b4d9c1766e8e75347968df3a589",
+          "code_length": 63,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/reflect/TypeVariable<*>;Lcom/fasterxml/classmate/TypeBindings;)Lcom/fasterxml/classmate/ResolvedType;"
+        },
+        {
+          "name": "_resolveTypePlaceholders",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 2,
+          "code_sha256": "7fb3df60873de750b0329512db2435fe5295d4f0f6830a491a63b9c7522241f8",
+          "code_length": 140,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "_verifyAndResolve",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/ResolvedType;)Z",
+          "access": 2,
+          "code_sha256": "9d3b7a77e7b6f7b56e5049d74e0d9e233e69f7dd37bedc3a61b7ca8b3e8f9914",
+          "code_length": 107
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6943aa1f1b12d2021dc94c332ba1a7e74567325b41276e58965f18bf4dc55260",
+          "code_length": 120
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "[Lcom/fasterxml/classmate/types/TypePlaceHolder;",
+        "[Ljava/lang/reflect/Type;",
+        "com/fasterxml/classmate/GenericType",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/TypeResolver",
+        "com/fasterxml/classmate/types/ResolvedArrayType",
+        "com/fasterxml/classmate/types/ResolvedInterfaceType",
+        "com/fasterxml/classmate/types/ResolvedObjectType",
+        "com/fasterxml/classmate/types/ResolvedPrimitiveType",
+        "com/fasterxml/classmate/types/ResolvedRecursiveType",
+        "com/fasterxml/classmate/types/TypePlaceHolder",
+        "com/fasterxml/classmate/util/ClassKey",
+        "com/fasterxml/classmate/util/ClassStack",
+        "com/fasterxml/classmate/util/ResolvedTypeCache",
+        "com/fasterxml/classmate/util/ResolvedTypeKey",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/Void",
+        "java/lang/reflect/Array",
+        "java/lang/reflect/GenericArrayType",
+        "java/lang/reflect/ParameterizedType",
+        "java/lang/reflect/Type",
+        "java/lang/reflect/TypeVariable",
+        "java/lang/reflect/WildcardType",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/HierarchicType.class",
+      "occurrence": 0,
+      "sha256": "1fcbd2a1bc10103021a668c02ae65336978d05c59a67946e075f6ef0fb32ca74",
+      "name": "com/fasterxml/classmate/members/HierarchicType",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_isMixin",
+          "descriptor": "Z",
+          "access": 20
+        },
+        {
+          "name": "_type",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_priority",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;ZI)V",
+          "access": 1,
+          "code_sha256": "36e88579d173b671dc31573652c7d18b3d6d6a9cd173793cbe10447f62cc1115",
+          "code_length": 20
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getErasedType",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "fc952e06b26f683a6f4f933f0d04ac34d3f91f25fe9cbcd8f78a8f20c2356c85",
+          "code_length": 8,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "isMixin",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getPriority",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79ee51fde0769d1eae9c8849583c96051eaffd9d2b5477c6203e1eedc5bd5f0d",
+          "code_length": 8
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4819026adda1454a683b5867c6aa3b60d55d0afc3774ab48df7cc05986cdc457",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b7069052a498e096c5159a641094b98dee6dd03272d091501d738f8e72d310f9",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/HierarchicType",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawConstructor.class",
+      "occurrence": 0,
+      "sha256": "6bf053d3bcbba4f7511b469eee6eb6d49b13525b47360895dbd155e9701c2529",
+      "name": "com/fasterxml/classmate/members/RawConstructor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/RawMember",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_constructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 20,
+          "generic_signature": "Ljava/lang/reflect/Constructor<*>;"
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/reflect/Constructor;)V",
+          "access": 1,
+          "code_sha256": "53aaf069e76a111e662ba121790759922c9511b46a3c6940bd56da82009051dc",
+          "code_length": 33,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/reflect/Constructor<*>;)V"
+        },
+        {
+          "name": "createKey",
+          "descriptor": "()Lcom/fasterxml/classmate/util/MethodKey;",
+          "access": 1,
+          "code_sha256": "bad098e98d56d13daab5a5bf09c2831becdbe2e494550b627d08d03b46dda707",
+          "code_length": 21
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Constructor;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()Ljava/lang/reflect/Constructor<*>;"
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "6d63863fbec59a41c807098ef1fdea0a6634cd4640ecb01a525c75cb4383c77e",
+          "code_length": 46
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Member;",
+          "access": 4161,
+          "code_sha256": "0ca38c7be0a1481246cacd1788ffabe730354c52b3565d1115821560e7edbb4c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/RawConstructor",
+        "com/fasterxml/classmate/members/RawMember",
+        "com/fasterxml/classmate/util/MethodKey",
+        "java/lang/Object",
+        "java/lang/reflect/Constructor"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawField.class",
+      "occurrence": 0,
+      "sha256": "4e6aa91afece2b78f47f8e3284e4732a24759d5e37d8a0576db0f1b10b8955d4",
+      "name": "com/fasterxml/classmate/members/RawField",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/RawMember",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_field",
+          "descriptor": "Ljava/lang/reflect/Field;",
+          "access": 20
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/reflect/Field;)V",
+          "access": 1,
+          "code_sha256": "53aaf069e76a111e662ba121790759922c9511b46a3c6940bd56da82009051dc",
+          "code_length": 33
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Field;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "isTransient",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "28ca14f2160878d73b370d74e55d5d3a80d2d528aadd50e638d748a12de9f7fc",
+          "code_length": 8
+        },
+        {
+          "name": "isVolatile",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cc58acc34d21952fd46d3fba0e4bbcfa5148a5d2fc57419c460ef221ea6d456f",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b41e19dbed6d5276e54176693470608b5ccf46402d189b03401d055c50c1bf4a",
+          "code_length": 46
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Member;",
+          "access": 4161,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/RawField",
+        "com/fasterxml/classmate/members/RawMember",
+        "java/lang/Object",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawMember.class",
+      "occurrence": 0,
+      "sha256": "efd5625dfd358f36fb75fb6984fc279ee6e095bb31ef249ffc2b4b73facd1a41",
+      "name": "com/fasterxml/classmate/members/RawMember",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_declaringType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getDeclaringType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 17,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Member;",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7827e3ff2081d360b150f8c2ddbbea3b350c6ba3d117e98abdc646e4f2132fdd",
+          "code_length": 10
+        },
+        {
+          "name": "isStatic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "28ca14f2160878d73b370d74e55d5d3a80d2d528aadd50e638d748a12de9f7fc",
+          "code_length": 8
+        },
+        {
+          "name": "isFinal",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cc58acc34d21952fd46d3fba0e4bbcfa5148a5d2fc57419c460ef221ea6d456f",
+          "code_length": 8
+        },
+        {
+          "name": "isPrivate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d7628b56721229a03425e6b265d2d70141d62e0e3e1fb7b4ce8666c66595d34c",
+          "code_length": 8
+        },
+        {
+          "name": "isProtected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ad1357ac3ee6650d0b261acc6cbfbcf79fe1340da3662400c4af6e316bc6e885",
+          "code_length": 8
+        },
+        {
+          "name": "isPublic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cec6610bc423248b7509621675fd6b976646ba0cd64f6275e945d5dad8600bcc",
+          "code_length": 8
+        },
+        {
+          "name": "getAnnotations",
+          "descriptor": "()[Ljava/lang/annotation/Annotation;",
+          "access": 1,
+          "code_sha256": "15d404b912a13e7358d934366529330e38a6faab487ad7579693e19c7e4d9447",
+          "code_length": 13
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ee92d8f8f4f2cb079968db2998c7cdb91aa84488e763e42565ef4525a5b47dd2",
+          "code_length": 5
+        },
+        {
+          "name": "getModifiers",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "5ed54edab161c8812270f631920debeff7e0f915d8313ac83b304588a97c688f",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/members/RawMember",
+        "java/lang/Object",
+        "java/lang/reflect/AnnotatedElement",
+        "java/lang/reflect/Member",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawMethod.class",
+      "occurrence": 0,
+      "sha256": "4b04c7882f3c4b3215b2a01fd70ea8fae18c56d227253aa32b42af75e1d274c3",
+      "name": "com/fasterxml/classmate/members/RawMethod",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/RawMember",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_method",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 20
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Ljava/lang/reflect/Method;)V",
+          "access": 1,
+          "code_sha256": "53aaf069e76a111e662ba121790759922c9511b46a3c6940bd56da82009051dc",
+          "code_length": 33
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "28ca14f2160878d73b370d74e55d5d3a80d2d528aadd50e638d748a12de9f7fc",
+          "code_length": 8
+        },
+        {
+          "name": "isStrict",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "cc58acc34d21952fd46d3fba0e4bbcfa5148a5d2fc57419c460ef221ea6d456f",
+          "code_length": 8
+        },
+        {
+          "name": "isNative",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d7628b56721229a03425e6b265d2d70141d62e0e3e1fb7b4ce8666c66595d34c",
+          "code_length": 8
+        },
+        {
+          "name": "isSynchronized",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ad1357ac3ee6650d0b261acc6cbfbcf79fe1340da3662400c4af6e316bc6e885",
+          "code_length": 8
+        },
+        {
+          "name": "createKey",
+          "descriptor": "()Lcom/fasterxml/classmate/util/MethodKey;",
+          "access": 1,
+          "code_sha256": "f6acda9ba707151a305b2983d23f9a17c63779af7d5362b58c78a693f8f7b4f6",
+          "code_length": 26
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ad7b73c745d256dc503e12ccf336b5ad7a96fff72716e4cb35d4ea0ec074b3aa",
+          "code_length": 46
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Member;",
+          "access": 4161,
+          "code_sha256": "ef1d76f32c0100e8c2e4ab7d587a002650fc55e4bf19126ab585197916d8412d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/RawMember",
+        "com/fasterxml/classmate/members/RawMethod",
+        "com/fasterxml/classmate/util/MethodKey",
+        "java/lang/Object",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedConstructor.class",
+      "occurrence": 0,
+      "sha256": "d9b3da750aadbf34d427679dad36d387fa469f425272d4ca84d31ebbebcba540",
+      "name": "com/fasterxml/classmate/members/ResolvedConstructor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/ResolvedParameterizedMember",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Constructor;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "eeca371c8f4d252e4c19d2e88dcef816ad3f5714d6804eae171842463ea2a779",
+          "code_length": 11,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Constructor<*>;[Lcom/fasterxml/classmate/ResolvedType;)V"
+        }
+      ],
+      "generic_signature": "Lcom/fasterxml/classmate/members/ResolvedParameterizedMember<Ljava/lang/reflect/Constructor<*>;>;",
+      "class_references": [
+        "com/fasterxml/classmate/members/ResolvedConstructor",
+        "com/fasterxml/classmate/members/ResolvedParameterizedMember"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedField.class",
+      "occurrence": 0,
+      "sha256": "18d1a8cc99a24a83ad780884dae09f7f838eeaaa351efe490aa3fe70f0429bba",
+      "name": "com/fasterxml/classmate/members/ResolvedField",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/ResolvedMember",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Field;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "1059002f9409270bc9a2d8c9852ea3378eb8c67ce8dded896cfd9aaa3db34144",
+          "code_length": 10
+        },
+        {
+          "name": "isTransient",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1ed31f55833183e2bc2b75394dbf7c75a028d3cb043d0e58c151631b0e1f0427",
+          "code_length": 8
+        },
+        {
+          "name": "isVolatile",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "47ecd18596514d8654026ede0cfa7de7e07a7562a7e5df618899bf9dea695c9a",
+          "code_length": 8
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedField;)I",
+          "access": 1,
+          "code_sha256": "bd1cb2af2045eceeb15528786bcc9f4dc6bd31aab7613f60a9cc806272c6e757",
+          "code_length": 12
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "2fc1a9a023eb76786aaea74d85ec72c1c033f8d40e790046195529841aef1ff7",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/fasterxml/classmate/members/ResolvedMember<Ljava/lang/reflect/Field;>;Ljava/lang/Comparable<Lcom/fasterxml/classmate/members/ResolvedField;>;",
+      "class_references": [
+        "com/fasterxml/classmate/members/ResolvedField",
+        "com/fasterxml/classmate/members/ResolvedMember",
+        "java/lang/Comparable",
+        "java/lang/String",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedMember.class",
+      "occurrence": 0,
+      "sha256": "5e65ca7805aa2a9adbe13b4338af8adbefb3fc5c0a29232940b37eb770949f47",
+      "name": "com/fasterxml/classmate/members/ResolvedMember",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_declaringType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_annotations",
+          "descriptor": "Lcom/fasterxml/classmate/Annotations;",
+          "access": 20
+        },
+        {
+          "name": "_member",
+          "descriptor": "Ljava/lang/reflect/Member;",
+          "access": 20,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "_type",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Member;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 4,
+          "code_sha256": "7c33712053c800f4bf131a6eb9ba074127554f056d653dcdd8b2473494003674",
+          "code_length": 48,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;TT;Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "applyOverride",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "b04c0144508462c1114818c4a9c97acb7d8d67637c7a511f5dc6bdac76037ac3",
+          "code_length": 9
+        },
+        {
+          "name": "applyOverrides",
+          "descriptor": "(Lcom/fasterxml/classmate/Annotations;)V",
+          "access": 1,
+          "code_sha256": "81da53bb4a863e40e3497fb9261ae15fd90d37e2539c8a0994149d3be749c942",
+          "code_length": 9
+        },
+        {
+          "name": "applyDefault",
+          "descriptor": "(Ljava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "4eef7d1cd3c4c4b9fe79472bbdabeef5e64b4a2fcdb082ea8a57a4dbd6874100",
+          "code_length": 9
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;",
+          "access": 1,
+          "code_sha256": "c4ebbe9f23e26a05e9534a7d9f7c41b7aed1ab65e3e0ef0eeb67bf328bbb96ed",
+          "code_length": 9,
+          "generic_signature": "<A::Ljava/lang/annotation/Annotation;>(Ljava/lang/Class<TA;>;)TA;"
+        },
+        {
+          "name": "getAnnotations",
+          "descriptor": "()Lcom/fasterxml/classmate/Annotations;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getDeclaringType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 17,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getRawMember",
+          "descriptor": "()Ljava/lang/reflect/Member;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "26f0789202d5b48eda266b2d2e1e39157203c3b3c9843953e0cd1b1728aaf645",
+          "code_length": 10
+        },
+        {
+          "name": "isStatic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "75a0a934a07c388f7e45a448a094b076b6a6677412eda940818240bc4f5eab1c",
+          "code_length": 8
+        },
+        {
+          "name": "isFinal",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6b70244d1673c76c44e1c33dec13eb7d92915eaee793c58a209553dc5f693f7a",
+          "code_length": 8
+        },
+        {
+          "name": "isPrivate",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e92a26bf574d1da27af2e190db5fdee53fc41c70d71a9d86f81d1aa41e4b5794",
+          "code_length": 8
+        },
+        {
+          "name": "isProtected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5bfc1c857b0bd5f1c98e36e3aaf03077ae7e351a43da1318dd9ef254bbe60148",
+          "code_length": 8
+        },
+        {
+          "name": "isPublic",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c976be2907d1638dfd85b70169a438650143c0244d4c8c1f9b0c024e384a2032",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f523d4d194e98af8cfed4f6084be102bb92f40ee9797f3a5d09958e93a45c9c5",
+          "code_length": 5
+        },
+        {
+          "name": "getModifiers",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "fdf8289b28c0b8a25dbecc9e6329c18f285d24e830bded04915c9299e995d0e1",
+          "code_length": 10
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "47796323ec0f03484f2d2bf2cafaeb6fd65acd68773c508a4606a624fe8f4144",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "<T::Ljava/lang/reflect/Member;>Ljava/lang/Object;",
+      "class_references": [
+        "com/fasterxml/classmate/Annotations",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/ResolvedMember",
+        "java/lang/Object",
+        "java/lang/reflect/Member",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedMethod.class",
+      "occurrence": 0,
+      "sha256": "7106827bd52db3ad04cba7982f1eaac5a59daa97a5ddb637a76853e265118fd8",
+      "name": "com/fasterxml/classmate/members/ResolvedMethod",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/members/ResolvedParameterizedMember",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Method;Lcom/fasterxml/classmate/ResolvedType;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "2ff526d4ac4a59ed6bf1d68b14b78626986d52f113f1751f39ca0e09357c3524",
+          "code_length": 12
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1ed31f55833183e2bc2b75394dbf7c75a028d3cb043d0e58c151631b0e1f0427",
+          "code_length": 8
+        },
+        {
+          "name": "isStrict",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "47ecd18596514d8654026ede0cfa7de7e07a7562a7e5df618899bf9dea695c9a",
+          "code_length": 8
+        },
+        {
+          "name": "isNative",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9c2ffa54e62ea376915df80d701a79150293b09bf5748db6f965751e6e1e2d84",
+          "code_length": 8
+        },
+        {
+          "name": "isSynchronized",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e7543ab8ce00df9da33edab4d250dc202a43a838d162febcb7dd6a3d016e02ac",
+          "code_length": 8
+        },
+        {
+          "name": "getReturnType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lcom/fasterxml/classmate/members/ResolvedMethod;)I",
+          "access": 1,
+          "code_sha256": "64cc6513072bf6a13d8bc3b7c971db3649f70b14c4ce5d7f9f7c48e37e3b52f9",
+          "code_length": 28
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "88439260b89c3917ab5461a9bea5c0397de9b1311476d22dd171527eddd37a42",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/fasterxml/classmate/members/ResolvedParameterizedMember<Ljava/lang/reflect/Method;>;Ljava/lang/Comparable<Lcom/fasterxml/classmate/members/ResolvedMethod;>;",
+      "class_references": [
+        "com/fasterxml/classmate/members/ResolvedMethod",
+        "com/fasterxml/classmate/members/ResolvedParameterizedMember",
+        "java/lang/Comparable",
+        "java/lang/String",
+        "java/lang/reflect/Modifier"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedParameterizedMember.class",
+      "occurrence": 0,
+      "sha256": "ca8ca6db32127cf8614c7c32035742d463e6cc2c876e6356408d15a0806fb8bd",
+      "name": "com/fasterxml/classmate/members/ResolvedParameterizedMember",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/fasterxml/classmate/members/ResolvedMember",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_paramTypes",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_paramAnnotations",
+          "descriptor": "[Lcom/fasterxml/classmate/Annotations;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;Ljava/lang/reflect/Member;Lcom/fasterxml/classmate/ResolvedType;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 4,
+          "code_sha256": "4da9e4b23de029a36c2b52dd34bd3501e8fb7b776d17218efefe75b4714db2f6",
+          "code_length": 39,
+          "generic_signature": "(Lcom/fasterxml/classmate/ResolvedType;Lcom/fasterxml/classmate/Annotations;TT;Lcom/fasterxml/classmate/ResolvedType;[Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "getParameterAnnotations",
+          "descriptor": "(I)Lcom/fasterxml/classmate/Annotations;",
+          "access": 1,
+          "code_sha256": "8ae1ca941b591338c18835d4dfdc71c8b13052e77a4f833d1b3d0dd4e63815d1",
+          "code_length": 70
+        },
+        {
+          "name": "applyParamOverride",
+          "descriptor": "(ILjava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "89ca36bde1e22d0adaa65f19f5ca45cfd9285aea3dd6e16ef2da87ef6503d098",
+          "code_length": 20
+        },
+        {
+          "name": "applyParamOverrides",
+          "descriptor": "(ILcom/fasterxml/classmate/Annotations;)V",
+          "access": 1,
+          "code_sha256": "ba737aa3997ef5c415da4c51cd6e20fc75d30951eff0edc30affe3a31320337b",
+          "code_length": 20
+        },
+        {
+          "name": "applyParamDefault",
+          "descriptor": "(ILjava/lang/annotation/Annotation;)V",
+          "access": 1,
+          "code_sha256": "542a2f5991940bcf5e22159a09d9532f95d265753abbe82ef63dcb791409a76a",
+          "code_length": 20
+        },
+        {
+          "name": "getParam",
+          "descriptor": "(ILjava/lang/Class;)Ljava/lang/annotation/Annotation;",
+          "access": 1,
+          "code_sha256": "dbae98dfa572d0905766a135c717812bbf1fdba46ea64fe7d00d0ee2dcdc51d5",
+          "code_length": 22,
+          "generic_signature": "<A::Ljava/lang/annotation/Annotation;>(ILjava/lang/Class<TA;>;)TA;"
+        },
+        {
+          "name": "getArgumentCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2e1cfb69af96d9fd94cbd75563582ba4908d15e812591dd6fd34b162c547f8ae",
+          "code_length": 6
+        },
+        {
+          "name": "getArgumentType",
+          "descriptor": "(I)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "2d6baf8e92075cc02e1506d40cfe245ae32cc42ee1984c8d8816dbef0abf615d",
+          "code_length": 22
+        }
+      ],
+      "generic_signature": "<T::Ljava/lang/reflect/Member;>Lcom/fasterxml/classmate/members/ResolvedMember<TT;>;",
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "com/fasterxml/classmate/Annotations",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/members/ResolvedMember",
+        "com/fasterxml/classmate/members/ResolvedParameterizedMember",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Member"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/package-info.class",
+      "occurrence": 0,
+      "sha256": "43f8be67b941cb8c7be38bbb25804f9712c3420df42cc56f135b9e60a6a6379d",
+      "name": "com/fasterxml/classmate/members/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/classmate/members/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/package-info.class",
+      "occurrence": 0,
+      "sha256": "1b4e39b1500127a921b840eca22b2475bd959f967cf18525415ca56ba5002530",
+      "name": "com/fasterxml/classmate/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/classmate/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedArrayType.class",
+      "occurrence": 0,
+      "sha256": "8fcd11fb81e44e66a807c5e744fe05a8ec2719bf90d9001df3469d61eb1d055a",
+      "name": "com/fasterxml/classmate/types/ResolvedArrayType",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PARENT_TYPE",
+          "descriptor": "Lcom/fasterxml/classmate/types/ResolvedObjectType;",
+          "access": 26
+        },
+        {
+          "name": "_elementType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "7c57ae1244505d5ee085aab875f02a69d8d692f3678fd949f9aef1a1c3ad172f",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "7dce45470ce11b005c4bd504408c0a8d8802f3d308124b41edb171ccc07c237c",
+          "code_length": 4
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "3c16d01b7f1ed15f274fe149adc9af27d430563a9d0f3ef98704f980fa99e198",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "6bf3bf32cad14a8ebaec33233bafe3b23ea9528fb1ad4705ad963272c590b0db",
+          "code_length": 16
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "48b1ded7063b3fed7c89429a06269ea78a3fc566e62080f5e817ad493a88ca7d",
+          "code_length": 16
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "1a8f40f84567613994963a17ebfebca9a5e6d05be1c7914284cb6a0e7f2bfa07",
+          "code_length": 18
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "748392999b0727638c23076ac42788caf0c864a492d459d3076ab58b06ed3de9",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5a9a0f93fe836f23e894e0a9ad986729e5571c2d167f1d4d1df4dfc589f860b9",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/types/ResolvedArrayType",
+        "com/fasterxml/classmate/types/ResolvedObjectType",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedInterfaceType.class",
+      "occurrence": 0,
+      "sha256": "c601fd95d4ba1a8a9111c2064e77b1b5a744359f29a75cc8a219021fdde368ce",
+      "name": "com/fasterxml/classmate/types/ResolvedInterfaceType",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_superInterfaces",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_constantFields",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawField;",
+          "access": 4
+        },
+        {
+          "name": "_memberMethods",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawMethod;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "db387a5d82235bb3b086a9a6f81a447e35f09dca2ba5073c72990c37087ca77f",
+          "code_length": 22,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;[Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "a669d697258beb703508ace67ee2144dfc4268d15a5a89b2e7ee83c40a59347f",
+          "code_length": 22,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getStaticFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "2b6551683d549d517a9c3c9f745aea2f1b74842ee7833b82caf3eca533f280f3",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getMemberMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "3d5e003aa692ef54a8916625cd48ed8444c40435dd6660b5ef1e2df89fdbfbe6",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "6b955745dcd67e85ba0d59809227174a0428a8ac5bc75e5a0f7476914c2725b1",
+          "code_length": 6
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "748392999b0727638c23076ac42788caf0c864a492d459d3076ab58b06ed3de9",
+          "code_length": 6
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "176202e3a169037ba448b16f0a5fa318d33d80e07d0812339aed7547e2fcb7b1",
+          "code_length": 6
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "0e4e6b01afe0ec9699ceb6be6c623dfdd2bd0589e1c9aa2bbfa6944f55de26f7",
+          "code_length": 60
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/types/ResolvedInterfaceType",
+        "java/lang/Class",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedObjectType.class",
+      "occurrence": 0,
+      "sha256": "be6149cd1a4c9641bde948a172cc49e117051a4c866babd909e3ea52ed0bee44",
+      "name": "com/fasterxml/classmate/types/ResolvedObjectType",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_superClass",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_superInterfaces",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 20
+        },
+        {
+          "name": "_modifiers",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "_constructors",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawConstructor;",
+          "access": 4
+        },
+        {
+          "name": "_memberFields",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawField;",
+          "access": 4
+        },
+        {
+          "name": "_staticFields",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawField;",
+          "access": 4
+        },
+        {
+          "name": "_memberMethods",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawMethod;",
+          "access": 4
+        },
+        {
+          "name": "_staticMethods",
+          "descriptor": "[Lcom/fasterxml/classmate/members/RawMethod;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "8a6223aeea83d089e45bd7037f3f3b78efbb2a26ef92ad1a081b3133e8cba1dc",
+          "code_length": 43,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "f447bd8a9f265ed896a2eb5d842679b274ffa07029cba7fd551c3703522dacfa",
+          "code_length": 100,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;[Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;Ljava/util/List;)Lcom/fasterxml/classmate/types/ResolvedObjectType;",
+          "access": 9,
+          "code_sha256": "8b679df58ff3850a01c841331aaecaaddc13a9962230332fd8f0a93bfb4eb570",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;Lcom/fasterxml/classmate/ResolvedType;Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;)Lcom/fasterxml/classmate/types/ResolvedObjectType;"
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/types/ResolvedObjectType;",
+          "access": 1,
+          "code_sha256": "6aa84dee39404822afd8af31534c2cf02dc86c4892accac264671c4421d90b13",
+          "code_length": 89
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "f2e54f39aac0b68ce03dabb8d34d3fcbddd6e1743dc769ceb362d978a6728a49",
+          "code_length": 22,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 17,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "052b6ff264bce5675a54341782f7283f282d6e4ea990d44743817edc2e285584",
+          "code_length": 8
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getMemberFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "79b1d14adca1a1390fba291f00614c1ddc51be94ce7de20fa5c5f8a076ae8d42",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getStaticFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "eaf6bcb2420eb3506c1f0104e18736f05ea74938120c56b466d76c8be8374c6e",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getMemberMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "6a4b6965471de964b245e632138d9c4490096e6d23e90eff375ed0bbab0d42f8",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getStaticMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "e7d24068e1a2eea07fbcb6928250e8e55414c594b8534cf69c94bd1458294304",
+          "code_length": 36,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getConstructors",
+          "descriptor": "()Ljava/util/List;",
+          "access": 33,
+          "code_sha256": "6d6d07899223044a85298bbd7b2f825e81b7d2a0514526ffcee2b9e21b79aac5",
+          "code_length": 35,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawConstructor;>;"
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "93d1a8c5abd803c5b9a7f32150f1dfe5c68226c8b2d8895adc7055caeba5c343",
+          "code_length": 6
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "3db317c6d621157cd9d2194b24c5d6fda029d9a5dfa82bde1750436448b53975",
+          "code_length": 6
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "11d8c7ef1bf04dce34decad8c126ac93120799f360feb4d5e8765722a09e030b",
+          "code_length": 6
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "f830b957cf44b8eb743d8fd515de12d91abe948712b6425e653db6c7b41df62c",
+          "code_length": 83
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 4161,
+          "code_sha256": "05093370dc92e47283b8cabb8093d94df908a96d2a314fd18fe109b5c01cce88",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/types/ResolvedObjectType",
+        "com/fasterxml/classmate/types/ResolvedRecursiveType",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Modifier",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedPrimitiveType.class",
+      "occurrence": 0,
+      "sha256": "1778840d583060d0fc3f86334fbed84450120cdb90a38fc10d7aacbbde96c853",
+      "name": "com/fasterxml/classmate/types/ResolvedPrimitiveType",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VOID",
+          "descriptor": "Lcom/fasterxml/classmate/types/ResolvedPrimitiveType;",
+          "access": 26
+        },
+        {
+          "name": "_signature",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        },
+        {
+          "name": "_description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;CLjava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "030742072c504848c89cc748c00ef843d9d9e27403d5024843a66ec2e1d63070",
+          "code_length": 22,
+          "generic_signature": "(Ljava/lang/Class<*>;CLjava/lang/String;)V"
+        },
+        {
+          "name": "all",
+          "descriptor": "()Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "d75af4820f357f00647034976d7fc9a08ec4c8408efe28c6ad46a6026a08b437",
+          "code_length": 162,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/types/ResolvedPrimitiveType;>;"
+        },
+        {
+          "name": "voidType",
+          "descriptor": "()Lcom/fasterxml/classmate/types/ResolvedPrimitiveType;",
+          "access": 9,
+          "code_sha256": "0774eafca420eb9621bd810107fd0d9aa29bd0e4daba9597bd9983ab78b0746a",
+          "code_length": 4
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "7c63f7c7df351ad9c557e7487a7b3103826a4eb994d0dbda42bc46050c5c52f8",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getSignature",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getErasedSignature",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getFullDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "65878686a6ae9756cd12f8818d0c919a47d2bc62546ef59459fb4f9cf85bd21f",
+          "code_length": 11
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "65878686a6ae9756cd12f8818d0c919a47d2bc62546ef59459fb4f9cf85bd21f",
+          "code_length": 11
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "234df3cebf7ae53e3bf05fc764a4d131dc552acd74697423f0cf78499adebe81",
+          "code_length": 11
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "234df3cebf7ae53e3bf05fc764a4d131dc552acd74697423f0cf78499adebe81",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2288282e7628f186d8898e0596605c1992a8926a35412001bd091d844ce185e1",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/types/ResolvedPrimitiveType",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Void",
+        "java/util/ArrayList",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedRecursiveType.class",
+      "occurrence": 0,
+      "sha256": "8f7afc37146c81aed8b69ba353d7026f153d24e1f96edd8d3a8f9959883d1cda",
+      "name": "com/fasterxml/classmate/types/ResolvedRecursiveType",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_referencedType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Lcom/fasterxml/classmate/TypeBindings;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/Class<*>;Lcom/fasterxml/classmate/TypeBindings;)V"
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        },
+        {
+          "name": "setReference",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "6b2c74c2b008509889609b93d69d9d7d6f8fdb3a8b14ede538a2ac05dd448eb9",
+          "code_length": 52
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0f838e3d483644a8593f02a4843758da850e22f35a0d1aa6ccf948db959dd267",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5c8a3d7ce978c5ca256633b58f6f475351529c17d8efa8ad2eea78f7fc6eeacd",
+          "code_length": 8
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b0dcc632a3e8daa6d53bb291d9b11638bba19208f820ce2f71a5d3ea03a75394",
+          "code_length": 11
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6002d40f6e04c40b4bde13997604e1b39432ed5e53d5e60db661e60af262a360",
+          "code_length": 8
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getMemberFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8d94bad2320e7979dde5d72df0c479eb69394ee83155653d9b943b21c3ca1a44",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getStaticFields",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "28b4eb0c406fef0f8b7177d0713a8a281ba8926d420d33cad1fecb83c2714764",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawField;>;"
+        },
+        {
+          "name": "getStaticMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "b4d7cde1fd00e2f55956a91bb95fef7b1bf19b407b2a5edb7cd0255fcd7f490a",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getMemberMethods",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c94bc9cee3ac5ff49185407d69e9a0b5428c553f67ac983e5417d8daef891c7d",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawMethod;>;"
+        },
+        {
+          "name": "getConstructors",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "56e1c517a19d62cc1205437777bfed26e63c77f368af4da30bdd8e717a19e799",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/members/RawConstructor;>;"
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "a1b94cb2cc9e0d27820a0157583df60b136305799f7fa45ee01341ec2206b5c8",
+          "code_length": 6
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "5ec236ec476c0df6144b0ca134bc3ab9f2aa641ffa5f04bea306cd558360168a",
+          "code_length": 6
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "2fc29bd25cdb9d0cc1b5ec10e30e5f8235bf0ef393b77dd6c17d0f8da0a2232b",
+          "code_length": 6
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "fabfca39faa84c7236c221c3694b56f73e7227f79b69c407a05d21697e62f911",
+          "code_length": 6
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d719c7c1e59e4e336cf16a6e6bd14c4f0cb304e8905f7f53798132f4172f6b68",
+          "code_length": 47
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "5c650d5b17b6202557e228734dfb4e88a9bca55a8d127af28241d779fbd38bb3",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/types/ResolvedRecursiveType",
+        "java/lang/Class",
+        "java/lang/IllegalStateException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Modifier",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/TypePlaceHolder.class",
+      "occurrence": 0,
+      "sha256": "3d03458100a7cdfad22b8dd3be435ae99fef5c7a6fe8788e62f0f221c40e5aad",
+      "name": "com/fasterxml/classmate/types/TypePlaceHolder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/ResolvedType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_ordinal",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "_actualType",
+          "descriptor": "Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e1a2e27c863bd082e534fb988abcdb9aedcac426a57680557f0a6a9971bba631",
+          "code_length": 15
+        },
+        {
+          "name": "canCreateSubtypes",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "actualType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "actualType",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "935836f6468fbbdce3aa550163b41db4acc66eaba962e885841470780dddd4d2",
+          "code_length": 6
+        },
+        {
+          "name": "getParentClass",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getSelfReferencedType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getImplementedInterfaces",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "1cf0ed757dd5d62179bfe731948a3b17851ad046df8e049b08ab3809249d4c1a",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/List<Lcom/fasterxml/classmate/ResolvedType;>;"
+        },
+        {
+          "name": "getArrayElementType",
+          "descriptor": "()Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "isInterface",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isAbstract",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isPrimitive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "appendSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "9302dfcaaeb45bb99fdc3b0a96cc60258c3a49b204f30776ac4ba990d9811b78",
+          "code_length": 6
+        },
+        {
+          "name": "appendErasedSignature",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "498e9856f7a51aada25560e6e2c54b7a2dd609f5816f223f0adc2d9514a825c9",
+          "code_length": 6
+        },
+        {
+          "name": "appendBriefDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "3898788ca6eb65c254f76af393eeb53e118a6c3343dc71296acddeb1c73a406c",
+          "code_length": 21
+        },
+        {
+          "name": "appendFullDescription",
+          "descriptor": "(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 1,
+          "code_sha256": "748392999b0727638c23076ac42788caf0c864a492d459d3076ab58b06ed3de9",
+          "code_length": 6
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b1c94692e6f88bcb912733a96359e4158fc19857d0da5eeebc414461e16ebe4e",
+          "code_length": 11
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/TypeBindings",
+        "com/fasterxml/classmate/types/TypePlaceHolder",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/package-info.class",
+      "occurrence": 0,
+      "sha256": "fbad5eaa7086c41b27d56b8a0c93a7235aca3973494004d9b4b47070d52e48e1",
+      "name": "com/fasterxml/classmate/types/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/classmate/types/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ClassKey.class",
+      "occurrence": 0,
+      "sha256": "5aad85eaf9a3b4ac81ff2b69d13af44b2431bbdf3cc15804d5078c4eb93b3995",
+      "name": "com/fasterxml/classmate/util/ClassKey",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Comparable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "_className",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "_class",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "4480af0ee9ccf99aceb6e7d9f35ace8daa3523d1be753ae092f28a07508382fb",
+          "code_length": 29,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassKey;)I",
+          "access": 1,
+          "code_sha256": "b4e6adf28aa3edff1e3e8a836ea9b59d0188b4b2628c292af43f08160875f21b",
+          "code_length": 12
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8dd0dc38ace4fbbcff41edcdfb2660f094ff8c8ff93f104c7130ae4bfc21219a",
+          "code_length": 48
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "cb6620cdc51b856318b40c75bbc3ae9cdbdc04043eccf3ffb37a3fb5540a558b",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Comparable<Lcom/fasterxml/classmate/util/ClassKey;>;Ljava/io/Serializable;",
+      "class_references": [
+        "com/fasterxml/classmate/util/ClassKey",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Comparable",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ClassStack.class",
+      "occurrence": 0,
+      "sha256": "447c2ce86e5b023a1a51b35f686792cdccfbf0c22b77da9ed68b709632070b20",
+      "name": "com/fasterxml/classmate/util/ClassStack",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_parent",
+          "descriptor": "Lcom/fasterxml/classmate/util/ClassStack;",
+          "access": 20
+        },
+        {
+          "name": "_current",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 20,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_selfRefs",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/fasterxml/classmate/types/ResolvedRecursiveType;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "41a20a42e3c2b90a6110b459607164bbbb9daea51d6c5a2cf48bdf2b287bb86d",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class;)V",
+          "access": 2,
+          "code_sha256": "d4565b16dedfeaf1abf4942ad32ae2966aea393d57a46c9a81b4c1f2447e4932",
+          "code_length": 15,
+          "generic_signature": "(Lcom/fasterxml/classmate/util/ClassStack;Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "child",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/util/ClassStack;",
+          "access": 1,
+          "code_sha256": "69690efb19649d5b04bb2d1cbc1903127c048060cf73c2bd7e4ecdeb437a6267",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/util/ClassStack;"
+        },
+        {
+          "name": "addSelfReference",
+          "descriptor": "(Lcom/fasterxml/classmate/types/ResolvedRecursiveType;)V",
+          "access": 1,
+          "code_sha256": "919650e7a033ce5bd098fcfc0a3a4f769a9657ffc029cf0bbf1e9124e2da5d5e",
+          "code_length": 28
+        },
+        {
+          "name": "resolveSelfReferences",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "de8fc12043a589e6823de47f51a2c2c3d5cd0f6e7af749220beaf140926fcb4c",
+          "code_length": 43
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/util/ClassStack;",
+          "access": 1,
+          "code_sha256": "171b1070ab11818098a18b41bf01486d68a965a5c2e6872edb56562a45ce5954",
+          "code_length": 39,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/util/ClassStack;"
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/types/ResolvedRecursiveType",
+        "com/fasterxml/classmate/util/ClassStack",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ConcurrentTypeCache.class",
+      "occurrence": 0,
+      "sha256": "aae0fe9a4b0d6d231cb0497ba01749e23cb5d36c3406b3dffb34f842374bf682",
+      "name": "com/fasterxml/classmate/util/ConcurrentTypeCache",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/util/ResolvedTypeCache",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "_maxEntries",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "_map",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 148,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "5153cff85d0dd04cdc51fc243d54cbdc8a4a9849bb3a2d68bb48e861258658f5",
+          "code_length": 25
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "c8af2683b1d9680b11c6f498d83094d970799a9812def9a71789f69bf5a1bfad",
+          "code_length": 12
+        },
+        {
+          "name": "find",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1,
+          "code_sha256": "74abdc6e35166a04a4e9e96af667f98e2601e2a758b35b22b2c3da61345ad287",
+          "code_length": 26
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6f02f9f9a9882e2450d2a88febe82f035ef64ccde6f4df50ccf9e2d691465818",
+          "code_length": 8
+        },
+        {
+          "name": "put",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "477c8b8a485994f689a6ddebd945fbe2005ac14422f8942a70acd03703948a64",
+          "code_length": 76
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/util/ConcurrentTypeCache",
+        "com/fasterxml/classmate/util/ResolvedTypeCache",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/LRUTypeCache$CacheMap.class",
+      "occurrence": 0,
+      "sha256": "768ccb120952523070dee0a28f53a375ef013b023ce75f89a38ce88304a49623",
+      "name": "com/fasterxml/classmate/util/LRUTypeCache$CacheMap",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/LinkedHashMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_maxEntries",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "removeEldestEntry",
+          "descriptor": "(Ljava/util/Map$Entry;)Z",
+          "access": 4,
+          "code_sha256": "091459ea17b62ce8f0f6fe7b4aa61bdf0eb08cb11a28e60a25d778c971b4167c",
+          "code_length": 17,
+          "generic_signature": "(Ljava/util/Map$Entry<Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;>;)Z"
+        }
+      ],
+      "generic_signature": "Ljava/util/LinkedHashMap<Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;>;",
+      "class_references": [
+        "com/fasterxml/classmate/util/LRUTypeCache",
+        "com/fasterxml/classmate/util/LRUTypeCache$CacheMap",
+        "java/util/LinkedHashMap",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/LRUTypeCache.class",
+      "occurrence": 0,
+      "sha256": "821134c5083a680dd2cebf62960a8452805d3d9edf0ec0282ab5f100b2a94013",
+      "name": "com/fasterxml/classmate/util/LRUTypeCache",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/classmate/util/ResolvedTypeCache",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "_maxEntries",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "_map",
+          "descriptor": "Lcom/fasterxml/classmate/util/LRUTypeCache$CacheMap;",
+          "access": 148
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "831d69d60298457766a2ead8124e0c254141e816667ba0a4432718fdf566cd41",
+          "code_length": 22
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "4517da9a663671104e2c866a890a0d019d1a6e7d34848e413239002f9976be3d",
+          "code_length": 12
+        },
+        {
+          "name": "find",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 33,
+          "code_sha256": "0f6b06c76a14103d990df5f4097f139140893ef3b68b70052c4ad8a0f89a875f",
+          "code_length": 26
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 33,
+          "code_sha256": "fb630f511d8fdb2df1202e73f72f7bd383dec0d834e1da8f347c004829d2e220",
+          "code_length": 8
+        },
+        {
+          "name": "put",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 33,
+          "code_sha256": "2cbce27a7da50f103c1a5a1a1065196d8e7f1d71c05d7c50e4ec793c7d751ca9",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/util/LRUTypeCache",
+        "com/fasterxml/classmate/util/LRUTypeCache$CacheMap",
+        "com/fasterxml/classmate/util/ResolvedTypeCache",
+        "java/lang/IllegalArgumentException"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/MethodKey.class",
+      "occurrence": 0,
+      "sha256": "d21ea768b6a4e6642c0e406f405f8a4d7b35fb8e03f407c9516e49166158cae8",
+      "name": "com/fasterxml/classmate/util/MethodKey",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "NO_CLASSES",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 26,
+          "generic_signature": "[Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "_argumentTypes",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "[Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b61c6fb0945eef56987ee07cdf730fed54fa999edf674b5f0ec4584e7fe573dd",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "e3797ce323549f297a6526a8d597595f75ea797bb86e04d977737f1f01a9fb82",
+          "code_length": 26,
+          "generic_signature": "(Ljava/lang/String;[Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b7d165ec653918ddfc0a86a46c740cc12549359c1886c3d094bb371b9f67ca86",
+          "code_length": 94
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b066651483e4ea99bc8476b05d4b80b4f71c46283801e799006494d57d668cd2",
+          "code_length": 80
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1a224780747e713e96b2ec0addde2a478c38b22eb0be61e7569fb7f8b352ab65",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "com/fasterxml/classmate/util/MethodKey",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ResolvedTypeCache.class",
+      "occurrence": 0,
+      "sha256": "52fdbb70ad6aa750fb89280220affdbcd40facf3a38d696881099900fc9f9a83",
+      "name": "com/fasterxml/classmate/util/ResolvedTypeCache",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "lruCache",
+          "descriptor": "(I)Lcom/fasterxml/classmate/util/ResolvedTypeCache;",
+          "access": 9,
+          "code_sha256": "6b27153817c4fcb6dc38d1f86c7b0180172a4a1da4b6f1b9e0ee4a07ede5a023",
+          "code_length": 9
+        },
+        {
+          "name": "concurrentCache",
+          "descriptor": "(I)Lcom/fasterxml/classmate/util/ResolvedTypeCache;",
+          "access": 9,
+          "code_sha256": "6719e4a1c2fd9818a31b04100874000849c59291573671b9f3910dc43c97e5af",
+          "code_length": 9
+        },
+        {
+          "name": "key",
+          "descriptor": "(Ljava/lang/Class;)Lcom/fasterxml/classmate/util/ResolvedTypeKey;",
+          "access": 1,
+          "code_sha256": "b5879919e6321e2cad847dd360beaac889a560f6357c6dbc2de73125a9ecb6aa",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lcom/fasterxml/classmate/util/ResolvedTypeKey;"
+        },
+        {
+          "name": "key",
+          "descriptor": "(Ljava/lang/Class;[Lcom/fasterxml/classmate/ResolvedType;)Lcom/fasterxml/classmate/util/ResolvedTypeKey;",
+          "access": 1,
+          "code_sha256": "7e55969c09ab3ad009aef70205d8d6c8fb86c32339d1bc35704b3c383cae3f6b",
+          "code_length": 61,
+          "generic_signature": "(Ljava/lang/Class<*>;[Lcom/fasterxml/classmate/ResolvedType;)Lcom/fasterxml/classmate/util/ResolvedTypeKey;"
+        },
+        {
+          "name": "find",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;)Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 1025
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "put",
+          "descriptor": "(Lcom/fasterxml/classmate/util/ResolvedTypeKey;Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1025
+        },
+        {
+          "name": "_addForTest",
+          "descriptor": "(Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 4,
+          "code_sha256": "5aae52b9e8ff575aa3efb33e9cb697fbd6656669374609defd8d5b929093beaf",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/types/TypePlaceHolder",
+        "com/fasterxml/classmate/util/ConcurrentTypeCache",
+        "com/fasterxml/classmate/util/LRUTypeCache",
+        "com/fasterxml/classmate/util/ResolvedTypeCache",
+        "com/fasterxml/classmate/util/ResolvedTypeKey",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ResolvedTypeKey.class",
+      "occurrence": 0,
+      "sha256": "c70d9b2a401859349ea7fdbd855f8d908deb1d8b2874a720f7aeca8777c3e498",
+      "name": "com/fasterxml/classmate/util/ResolvedTypeKey",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_erasedType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "_typeParameters",
+          "descriptor": "[Lcom/fasterxml/classmate/ResolvedType;",
+          "access": 18
+        },
+        {
+          "name": "_hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "377d03c50a6161615fc1f020e743f130743c14303ae68cf1ba3fdb10deb0a05b",
+          "code_length": 7,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;[Lcom/fasterxml/classmate/ResolvedType;)V",
+          "access": 1,
+          "code_sha256": "d69c1b9ec9073f8f25b5f31b4521229a3fb18a98265222953bc3974be20769f1",
+          "code_length": 48,
+          "generic_signature": "(Ljava/lang/Class<*>;[Lcom/fasterxml/classmate/ResolvedType;)V"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "025ed093630ed429114b57dfe58f02e5053e644ea21b79b56098372f285db1a6",
+          "code_length": 90
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "175a23211277aa852a78365732316a3875eeba998ad4a6394846f62d44a00907",
+          "code_length": 124
+        }
+      ],
+      "class_references": [
+        "[Lcom/fasterxml/classmate/ResolvedType;",
+        "com/fasterxml/classmate/ResolvedType",
+        "com/fasterxml/classmate/util/ResolvedTypeKey",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "118128dee871fe44449e8ff4ebce9645e590c0dde220324d125124ef3e3f2b51",
+      "name": "com/fasterxml/classmate/util/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/classmate/util/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "module-info.class",
+      "occurrence": 0,
+      "sha256": "68837cbdb9587006d0518bb0b3c1f7f54b3932647fdc1567832bdcad6e01e5fa",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

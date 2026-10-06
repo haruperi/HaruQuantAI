@@ -1,0 +1,265 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/itu-1.14.0.jar",
+  "sha256": "5cf40ab0cc77828ab2b875b1f3ecd71c8295d7721933476abc2e08fddcea164a",
+  "class_count": 34,
+  "unique_class_entries": 34,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "com/ethlo/time/DateTime.class": "0707d664bbdb8c516819222df24fedf955157313d019fb96362d2882e15294ce",
+    "com/ethlo/time/DateTimeParser.class": "2049d5e0ee82717807495d68c030b56e1759dbb4559ec0955936faa7c54df9f8",
+    "com/ethlo/time/DateTimeParsers.class": "625ba3906491ca671f0f088b292abf9b41048717be7700e8026e84de31dd285e",
+    "com/ethlo/time/DateTimeTokens.class": "b6e728d7c76196e1c55b59cefb837de390a62f1ce22604a49cde5bffb65abb1e",
+    "com/ethlo/time/Duration.class": "54f52b08258beb0b637ecdbe579c49a717814a9b4f2ab83f93b1cb0bc60ed768",
+    "com/ethlo/time/Field.class": "674747291d8775b78b0e10f128f69bbb00148956546a83b870af6dee5faa6ef1",
+    "com/ethlo/time/ITU$1.class": "4fb075ad14665fc828e5be5fa4e2465bd42e1f8204b09d42939d0b54764ee531",
+    "com/ethlo/time/ITU.class": "a9a952674edb37ead384ae4e1b61251cfc915b64a48dcc8e6683cba2fefefbee",
+    "com/ethlo/time/LeapSecondException.class": "f16804d49b054a6202eab9b06a102ec287fc25bda2f995e3c33b9012435c4187",
+    "com/ethlo/time/ParseConfig.class": "58c1fd2d14ed4a5dbde6753325f73085813e69e9723f1e91bd3b5f10ecd4b43d",
+    "com/ethlo/time/TemporalConsumer.class": "0873ebab9df712b27a1b2ff9479ffb8168a166d591ed640225625b6e2ec8f362",
+    "com/ethlo/time/TemporalHandler.class": "9587e406f1a70a4acaccc502557df67d4548838d45ea122b4a01540582feebc4",
+    "com/ethlo/time/TemporalType.class": "4304130fa736edc0e624af1ab11e8849744fea3a76f34a79b696762039e31968",
+    "com/ethlo/time/TimezoneOffset.class": "2fd97d35910ca21d26b335d0fc073ce32b0126a62fce2257385e05eaa9393856",
+    "com/ethlo/time/internal/DateTimeFormatException.class": "17317ef0a7a469bb1ae174399f4bc1fd276a92018effb888b673760eb950f884",
+    "com/ethlo/time/internal/DurationPartsConsumer.class": "e604c818a819e2b364d3388e1f4fbb134a2666f9f0d5484fe99afc143098ffa1",
+    "com/ethlo/time/internal/ItuDurationParser.class": "de1f90e0770a2630ff817a15f94fe09720294946548babd0f89d2e5198d70597",
+    "com/ethlo/time/internal/fixed/ITUFormatter.class": "528ed15ad332408e45c1a7dea127637f109211e6270da81cfc47d26f98854221",
+    "com/ethlo/time/internal/fixed/ITUParser.class": "7e20fc307a86ef076950db5fcd582ab4ae52ea80228c5b970223833e73cf8c79",
+    "com/ethlo/time/internal/token/DigitsToken.class": "5fb0dab2584709ac18cb777dea9819aed9ef85c8ad82f508b82ef3f5d5e72d37",
+    "com/ethlo/time/internal/token/FractionsToken.class": "e7ce88d71afca25e35d86ffb2bd7e78eb9ca6a3a8a7e9865e59b727daa4cb0b5",
+    "com/ethlo/time/internal/token/SeparatorToken.class": "dbefd27d04f1e40354a86d4fcc10d4d8027d7c177dc3c974819807942bb30e27",
+    "com/ethlo/time/internal/token/SeparatorsToken.class": "6c14580cc1ef58b6c448398b98e103733dead0f2320c50e8d7d7f2127eae1ba5",
+    "com/ethlo/time/internal/token/ZoneOffsetToken.class": "575cda0453ac86015366bf070877620d65a8e24f4f102c7a23286221486e5de5",
+    "com/ethlo/time/internal/util/ArrayUtils.class": "af408a1fb7afaafde5b37d700d9b6eb53430f3682ab0bedc5f1c31e9ff0dc863",
+    "com/ethlo/time/internal/util/DateTimeMath.class": "7ebb39efa21ccc862e34cd34710787d1b20d0eee3b62392795df2da8b0e031c5",
+    "com/ethlo/time/internal/util/DefaultLeapSecondHandler.class": "323286b4670730da51cb512e4d148c61caf4bf63e63c637e23c074c48309b25a",
+    "com/ethlo/time/internal/util/DurationFormatter.class": "f9fbd06863d21209009feb56e63d0d1b51d974dad3e2575dacde538a090e3e2b",
+    "com/ethlo/time/internal/util/ErrorUtil.class": "585a0a33b0c28d1d96ac5671849cd353ff213b5879c60f667a51bb4217e7a77b",
+    "com/ethlo/time/internal/util/LeapSecondHandler.class": "571d9de68f3ff6efcc4a93fdb5f965543e7148d9253f72d9caada8eaff1b08a9",
+    "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil.class": "a4f59e95eba849df61676d449fc2828e8d636e07d2d7c5f10f8c2374c037a49a",
+    "com/ethlo/time/token/ConfigurableDateTimeParser.class": "dfc4de6b9cee9b35855649192f720f9664e9e648d5b06bbd15d92ef7726943aa",
+    "com/ethlo/time/token/DateTimeToken.class": "a849f959ab6360a50d1e4ad6cf00fec85c8558cd38b255e2e56f34fd23c9740d",
+    "META-INF/versions/9/module-info.class": "e78c7417ddd9d81aacf7874a2e335b50c15556c7195c111e8e46fe7fcffbd117"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "bc42297ab0b70a3dad3e46976e35542d5dc58a926cef21a09e659c91d302a346",
+    "META-INF/maven/com.ethlo.time/itu/pom.properties": "250308a7b5564ea007518709d15ea95190f977dfad28cc59c9567c483113b7a3",
+    "META-INF/maven/com.ethlo.time/itu/pom.xml": "0d5ae0bec09495529c63cc8a6c13253870686832a4e3b206c138165035ae4bc5",
+    "THIRD-PARTY.txt": "e5e8fe25449652f4dc49c064c0440f1a871a5df744cb38ca24496141c2c48997",
+    "leap_second_dates.csv": "35a6dbdddbb94b18f4a38ed5b576278fa3626f4dc375f6f770e7f4e66f90af64"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/ethlo/time/DateTime.class",
+      "occurrence": 0,
+      "sha256": "0707d664bbdb8c516819222df24fedf955157313d019fb96362d2882e15294ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeParser.class",
+      "occurrence": 0,
+      "sha256": "2049d5e0ee82717807495d68c030b56e1759dbb4559ec0955936faa7c54df9f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeParsers.class",
+      "occurrence": 0,
+      "sha256": "625ba3906491ca671f0f088b292abf9b41048717be7700e8026e84de31dd285e",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/DateTimeTokens.class",
+      "occurrence": 0,
+      "sha256": "b6e728d7c76196e1c55b59cefb837de390a62f1ce22604a49cde5bffb65abb1e",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/Duration.class",
+      "occurrence": 0,
+      "sha256": "54f52b08258beb0b637ecdbe579c49a717814a9b4f2ab83f93b1cb0bc60ed768",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/Field.class",
+      "occurrence": 0,
+      "sha256": "674747291d8775b78b0e10f128f69bbb00148956546a83b870af6dee5faa6ef1",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/ITU$1.class",
+      "occurrence": 0,
+      "sha256": "4fb075ad14665fc828e5be5fa4e2465bd42e1f8204b09d42939d0b54764ee531",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/ITU.class",
+      "occurrence": 0,
+      "sha256": "a9a952674edb37ead384ae4e1b61251cfc915b64a48dcc8e6683cba2fefefbee",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/LeapSecondException.class",
+      "occurrence": 0,
+      "sha256": "f16804d49b054a6202eab9b06a102ec287fc25bda2f995e3c33b9012435c4187",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/ParseConfig.class",
+      "occurrence": 0,
+      "sha256": "58c1fd2d14ed4a5dbde6753325f73085813e69e9723f1e91bd3b5f10ecd4b43d",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/TemporalConsumer.class",
+      "occurrence": 0,
+      "sha256": "0873ebab9df712b27a1b2ff9479ffb8168a166d591ed640225625b6e2ec8f362",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/TemporalHandler.class",
+      "occurrence": 0,
+      "sha256": "9587e406f1a70a4acaccc502557df67d4548838d45ea122b4a01540582feebc4",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/TemporalType.class",
+      "occurrence": 0,
+      "sha256": "4304130fa736edc0e624af1ab11e8849744fea3a76f34a79b696762039e31968",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/TimezoneOffset.class",
+      "occurrence": 0,
+      "sha256": "2fd97d35910ca21d26b335d0fc073ce32b0126a62fce2257385e05eaa9393856",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/DateTimeFormatException.class",
+      "occurrence": 0,
+      "sha256": "17317ef0a7a469bb1ae174399f4bc1fd276a92018effb888b673760eb950f884",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/DurationPartsConsumer.class",
+      "occurrence": 0,
+      "sha256": "e604c818a819e2b364d3388e1f4fbb134a2666f9f0d5484fe99afc143098ffa1",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/ItuDurationParser.class",
+      "occurrence": 0,
+      "sha256": "de1f90e0770a2630ff817a15f94fe09720294946548babd0f89d2e5198d70597",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/fixed/ITUFormatter.class",
+      "occurrence": 0,
+      "sha256": "528ed15ad332408e45c1a7dea127637f109211e6270da81cfc47d26f98854221",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/fixed/ITUParser.class",
+      "occurrence": 0,
+      "sha256": "7e20fc307a86ef076950db5fcd582ab4ae52ea80228c5b970223833e73cf8c79",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/DigitsToken.class",
+      "occurrence": 0,
+      "sha256": "5fb0dab2584709ac18cb777dea9819aed9ef85c8ad82f508b82ef3f5d5e72d37",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/FractionsToken.class",
+      "occurrence": 0,
+      "sha256": "e7ce88d71afca25e35d86ffb2bd7e78eb9ca6a3a8a7e9865e59b727daa4cb0b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/SeparatorToken.class",
+      "occurrence": 0,
+      "sha256": "dbefd27d04f1e40354a86d4fcc10d4d8027d7c177dc3c974819807942bb30e27",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/SeparatorsToken.class",
+      "occurrence": 0,
+      "sha256": "6c14580cc1ef58b6c448398b98e103733dead0f2320c50e8d7d7f2127eae1ba5",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/token/ZoneOffsetToken.class",
+      "occurrence": 0,
+      "sha256": "575cda0453ac86015366bf070877620d65a8e24f4f102c7a23286221486e5de5",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/ArrayUtils.class",
+      "occurrence": 0,
+      "sha256": "af408a1fb7afaafde5b37d700d9b6eb53430f3682ab0bedc5f1c31e9ff0dc863",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DateTimeMath.class",
+      "occurrence": 0,
+      "sha256": "7ebb39efa21ccc862e34cd34710787d1b20d0eee3b62392795df2da8b0e031c5",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DefaultLeapSecondHandler.class",
+      "occurrence": 0,
+      "sha256": "323286b4670730da51cb512e4d148c61caf4bf63e63c637e23c074c48309b25a",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/DurationFormatter.class",
+      "occurrence": 0,
+      "sha256": "f9fbd06863d21209009feb56e63d0d1b51d974dad3e2575dacde538a090e3e2b",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/ErrorUtil.class",
+      "occurrence": 0,
+      "sha256": "585a0a33b0c28d1d96ac5671849cd353ff213b5879c60f667a51bb4217e7a77b",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/LeapSecondHandler.class",
+      "occurrence": 0,
+      "sha256": "571d9de68f3ff6efcc4a93fdb5f965543e7148d9253f72d9caada8eaff1b08a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/internal/util/LimitedCharArrayIntegerUtil.class",
+      "occurrence": 0,
+      "sha256": "a4f59e95eba849df61676d449fc2828e8d636e07d2d7c5f10f8c2374c037a49a",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/token/ConfigurableDateTimeParser.class",
+      "occurrence": 0,
+      "sha256": "dfc4de6b9cee9b35855649192f720f9664e9e648d5b06bbd15d92ef7726943aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "com/ethlo/time/token/DateTimeToken.class",
+      "occurrence": 0,
+      "sha256": "a849f959ab6360a50d1e4ad6cf00fec85c8558cd38b255e2e56f34fd23c9740d",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "e78c7417ddd9d81aacf7874a2e335b50c15556c7195c111e8e46fe7fcffbd117",
+      "member_shard": "docs/dev/evidence/sqx145/members/040/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/040/001.json",
+      "sha256": "9688cd3a34679eb3a986f1e1d91dd991afc2a131880ebe3074bba832554adb69"
+    }
+  ]
+}

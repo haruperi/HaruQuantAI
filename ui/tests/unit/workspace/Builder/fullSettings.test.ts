@@ -21,7 +21,7 @@ import {
   whatToBuildDefaults,
 } from '../../../../app/workspace/Builder/settings/settingsFixtures';
 
-describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
+describe('Full settings fixtures (donor retained target UI; current donor equivalence unverified)', () => {
   it('registers the eleven eligible Build tabs in the donor strip order', () => {
     expect(settingsTabs.map(t => t.title)).toEqual([
       'What to build',

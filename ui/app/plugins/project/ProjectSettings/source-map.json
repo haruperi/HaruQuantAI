@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ProjectSettings bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectSettings",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-    "version": 1,
-    "state": "owner-approved-plan"
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
   },
   "owner": {
     "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
@@ -28,75 +28,100 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings",
       "id": "sqx-projectsettings-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-projectsettings-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "771b6aa5a998912cddc55a7ed273b2eb7103c5ea8c4a3e2678ec779650709c77",
+      "sha256": "f86dd97766d3b6c0bd61ccfd08e0e6b9850d25b5df6ffba08f66b29e5d86c8e8",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectsettings-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsCtrl.js",
       "relative_path": "SettingsCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "ff5f1ee9f03f23f8d1777721a6f9cb098e1984c194b9b04ecb208f763fe8242a",
+      "sha256": "58b656d3427baf90647f1346fbdc936c767f6606844c08b6306d9183efd8529d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor simple-task/event/config lifecycle has no exact shared advanced-settings controller counterpart."
+      "limitation": "Donor simple-task/event/config lifecycle has no exact shared advanced-settings controller counterpart. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectsettings-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsService.js",
       "relative_path": "SettingsService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "12d730406524f61b500e73980fd8f75b8fc2709e2e9d7de875874d34d7fe4d7a",
+      "sha256": "d9ebf5df72e911056ec1d9ea6b255a0aec4d4485a4b659888624ab5651f6e420",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectsettings-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "artifact explicitly excluded from counterpart count",
       "access_date": "2026-10-06",
-      "sha256": "e77c42c662ce1842f6df9b2fb2e4336f558f5948afedc5bea1fa5f9c5e1cda28",
+      "sha256": "df64f057b4d9a92d6cf2f49bb24e6ee853ff7168f3dfdae49bcced9e061a56d9",
       "target": null,
       "classification": "excluded",
-      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles."
+      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectsettings-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/views/settings.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/views/settings.html",
       "relative_path": "views/settings.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "d6495f228c2c40f1099859194150fe11625fafa849799323e209d1df10177eb4",
+      "sha256": "71536692ecdd30e9fed5705f025469f72012ba861e4781a2088b2374f6bf1716",
       "target": "views/settings.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -137,6 +162,9 @@
   ],
   "limitations": [
     "No backend, database mutation, live engine capability, new route or SQX parity claim.",
-    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
-  ]
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

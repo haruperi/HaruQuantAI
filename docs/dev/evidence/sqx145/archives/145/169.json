@@ -1,0 +1,269 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+  "sha256": "4970124bec1bc7aead64d019b242d6895686981f9c338b4bee1d832aef28bcd5",
+  "class_count": 35,
+  "unique_class_entries": 35,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$1.class": "9e7a55ad91eb777f63ca366460a3259d597802b3c5bed40a29b7052fe7652b48",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$2.class": "7f2fa3bbe898c516edd28c2d1a8b13f55790ef8143913c13ed10776dba69baf2",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$3$1.class": "2c08cffe960b18dac132f401f0851c5d0b7126328d1e2d0a3a42520edf5fea62",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$3.class": "47b525bca7e1faae082ab6257bd3205fef8d510b42d46678365546818df7c0ba",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$4.class": "16e65742bd74c9123536c8b1da77f66da5a3d3a809621eaf19ecee76da079dc4",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$5.class": "05d2256669507f9361bb44346fa99dc2949325a616c25cbe9dbe4e72285be6e5",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServlet.class": "24bc7839216dd8e99f89f13996f0e4e50af645a1bda1b1b3e9e89d509d4cce60",
+    "com/strategyquant/plugin/DataManager/impl/Data/DataServletPlugin.class": "afd685a100fa01485a2059c49148ca1b2fdeae978b2a0db584f0aefa01a995e1",
+    "com/strategyquant/plugin/DataManager/impl/Data/ImportInfoPublisher.class": "b9641b70d31aa4befc285e1033088a78312ccc7c2a12d004f8d51ebb879f4121",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/CsvExportJob.class": "5ec7a7de631607dbb0306d6fe80770299fa5d2681eaed1c56766bb43ab0a9f22",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/CsvExporter.class": "89b9f36d0674fe14ede285c117cbe67efabc6f4ab80dc877bbb7fba869927775",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/format/Format.class": "84a320317573bad1246f622e33a5eb1ba5684638ae04f05c38ee370d5ba8a0ca",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/format/Formats.class": "63562eccce79c92e973ed6fa90c6fca4c53733b2940333b002ae3e7d08e6a753",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/AbstractItem.class": "38fb6ee0522dd450b2db4aae45b1dc13c168f0d0bba51beb76fc372ca4df169e",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/AskPrice.class": "b91f811eaec07d7ae5bbc6b6f998098740c9a1ffe9dff7e4287a5d41d576038d",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/BidPrice.class": "e657d6665a4129a190a9b190e59134563ffcd10bc9eb78c51712e47aadcf0bd8",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/ClosePrice.class": "8b912692a68621ac2231f3b5a90d8f3189e12562cf05c2e050e652e42daa5cdc",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Comma.class": "d8bc1ee9f33ecda33d2f60704fb9b893d6424f2b6b2e1e2a7959e52397d789b3",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Date.class": "b5ce84fcded97b66e1edcf5dbb64b99b7b018bd12ec771ee18d35af97c91d58e",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/DateTime.class": "85e6333c35e85d3fe1cccd852de96a1b43da931f26245cb44793c78739dec3be",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/HighPrice.class": "edbf98fab3cefbc45712e0f9677e6d382cc760939e008dfee9fec68a8203e550",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Items.class": "e69c275bcd28342c373cec7428667cc4bf6633ad7a97a73acad6add95edf8df5",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/LowPrice.class": "0dcb6ad134c2beda5733244e8f8d5cdf76d5e8a0336251330339bc1792a62771",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/OpenPrice.class": "272db981d52e5487fe2181ddc3498901841d81c3e41a6bd61af4ec2163385dbd",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Semicolon.class": "a1437b270243af998fcc20ab84406d79b0d32a4a1ee1a013b00aae188d9c766b",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Spread.class": "9473e7ea2ab5202304a6ae38fe98526508d39a4e55be2423445773ca8dd7e9d3",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Symbol.class": "f9158e7be3622b8f6b2e190028e2a836ae2e157a68d69b793a5ce428135847f9",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Tab.class": "19450edd2af758655657045de07f4ddec99c7d49a51822806f4eb8a94610a424",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/TextItem.class": "34810e2d2bfc64118cf3c325b89f01abf935912fe05473a954e54651512c0c41",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Time.class": "49e69a654bd248bb522590c7d73505dffbe65e7c69237b02e0b352f42c00ca98",
+    "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Volume.class": "0bc7e971c2ccdb8a0686b996f56061c29152f081ba6218b066b8732a261b786f",
+    "com/strategyquant/plugin/DataManager/impl/Data/job/CloneToTimezoneJob.class": "0bd91d4fbe181b0b3d2c3267cfcce17d652d63a35fa3521cf81e6ead64eaef57",
+    "com/strategyquant/plugin/DataManager/impl/Data/job/MT4ExportJob.class": "87cd2ea19ca579648df09d24ffbd98c2b5b5997a558e8767036f4a529e911b44",
+    "com/strategyquant/plugin/DataManager/impl/Data/job/MT5ExportJob.class": "ec0852a4512f01e72467e8d235851beaa2e38ad990778d9b51fb467ae2519fbb",
+    "com/strategyquant/plugin/DataManager/impl/Data/job/MT5Exporter.class": "8c4a4cd5e18e673cda4fef34205f2311f2bb56431751c240ff6a37f5d2eaf054"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$1.class",
+      "occurrence": 0,
+      "sha256": "9e7a55ad91eb777f63ca366460a3259d597802b3c5bed40a29b7052fe7652b48",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$2.class",
+      "occurrence": 0,
+      "sha256": "7f2fa3bbe898c516edd28c2d1a8b13f55790ef8143913c13ed10776dba69baf2",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$3$1.class",
+      "occurrence": 0,
+      "sha256": "2c08cffe960b18dac132f401f0851c5d0b7126328d1e2d0a3a42520edf5fea62",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$3.class",
+      "occurrence": 0,
+      "sha256": "47b525bca7e1faae082ab6257bd3205fef8d510b42d46678365546818df7c0ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$4.class",
+      "occurrence": 0,
+      "sha256": "16e65742bd74c9123536c8b1da77f66da5a3d3a809621eaf19ecee76da079dc4",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$5.class",
+      "occurrence": 0,
+      "sha256": "05d2256669507f9361bb44346fa99dc2949325a616c25cbe9dbe4e72285be6e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet.class",
+      "occurrence": 0,
+      "sha256": "24bc7839216dd8e99f89f13996f0e4e50af645a1bda1b1b3e9e89d509d4cce60",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/DataServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "afd685a100fa01485a2059c49148ca1b2fdeae978b2a0db584f0aefa01a995e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/ImportInfoPublisher.class",
+      "occurrence": 0,
+      "sha256": "b9641b70d31aa4befc285e1033088a78312ccc7c2a12d004f8d51ebb879f4121",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/CsvExportJob.class",
+      "occurrence": 0,
+      "sha256": "5ec7a7de631607dbb0306d6fe80770299fa5d2681eaed1c56766bb43ab0a9f22",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/CsvExporter.class",
+      "occurrence": 0,
+      "sha256": "89b9f36d0674fe14ede285c117cbe67efabc6f4ab80dc877bbb7fba869927775",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/format/Format.class",
+      "occurrence": 0,
+      "sha256": "84a320317573bad1246f622e33a5eb1ba5684638ae04f05c38ee370d5ba8a0ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/format/Formats.class",
+      "occurrence": 0,
+      "sha256": "63562eccce79c92e973ed6fa90c6fca4c53733b2940333b002ae3e7d08e6a753",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/AbstractItem.class",
+      "occurrence": 0,
+      "sha256": "38fb6ee0522dd450b2db4aae45b1dc13c168f0d0bba51beb76fc372ca4df169e",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/AskPrice.class",
+      "occurrence": 0,
+      "sha256": "b91f811eaec07d7ae5bbc6b6f998098740c9a1ffe9dff7e4287a5d41d576038d",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/BidPrice.class",
+      "occurrence": 0,
+      "sha256": "e657d6665a4129a190a9b190e59134563ffcd10bc9eb78c51712e47aadcf0bd8",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/ClosePrice.class",
+      "occurrence": 0,
+      "sha256": "8b912692a68621ac2231f3b5a90d8f3189e12562cf05c2e050e652e42daa5cdc",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Comma.class",
+      "occurrence": 0,
+      "sha256": "d8bc1ee9f33ecda33d2f60704fb9b893d6424f2b6b2e1e2a7959e52397d789b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Date.class",
+      "occurrence": 0,
+      "sha256": "b5ce84fcded97b66e1edcf5dbb64b99b7b018bd12ec771ee18d35af97c91d58e",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/DateTime.class",
+      "occurrence": 0,
+      "sha256": "85e6333c35e85d3fe1cccd852de96a1b43da931f26245cb44793c78739dec3be",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/HighPrice.class",
+      "occurrence": 0,
+      "sha256": "edbf98fab3cefbc45712e0f9677e6d382cc760939e008dfee9fec68a8203e550",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Items.class",
+      "occurrence": 0,
+      "sha256": "e69c275bcd28342c373cec7428667cc4bf6633ad7a97a73acad6add95edf8df5",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/LowPrice.class",
+      "occurrence": 0,
+      "sha256": "0dcb6ad134c2beda5733244e8f8d5cdf76d5e8a0336251330339bc1792a62771",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/OpenPrice.class",
+      "occurrence": 0,
+      "sha256": "272db981d52e5487fe2181ddc3498901841d81c3e41a6bd61af4ec2163385dbd",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Semicolon.class",
+      "occurrence": 0,
+      "sha256": "a1437b270243af998fcc20ab84406d79b0d32a4a1ee1a013b00aae188d9c766b",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Spread.class",
+      "occurrence": 0,
+      "sha256": "9473e7ea2ab5202304a6ae38fe98526508d39a4e55be2423445773ca8dd7e9d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Symbol.class",
+      "occurrence": 0,
+      "sha256": "f9158e7be3622b8f6b2e190028e2a836ae2e157a68d69b793a5ce428135847f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Tab.class",
+      "occurrence": 0,
+      "sha256": "19450edd2af758655657045de07f4ddec99c7d49a51822806f4eb8a94610a424",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/TextItem.class",
+      "occurrence": 0,
+      "sha256": "34810e2d2bfc64118cf3c325b89f01abf935912fe05473a954e54651512c0c41",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Time.class",
+      "occurrence": 0,
+      "sha256": "49e69a654bd248bb522590c7d73505dffbe65e7c69237b02e0b352f42c00ca98",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/csvexport/items/Volume.class",
+      "occurrence": 0,
+      "sha256": "0bc7e971c2ccdb8a0686b996f56061c29152f081ba6218b066b8732a261b786f",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/job/CloneToTimezoneJob.class",
+      "occurrence": 0,
+      "sha256": "0bd91d4fbe181b0b3d2c3267cfcce17d652d63a35fa3521cf81e6ead64eaef57",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/job/MT4ExportJob.class",
+      "occurrence": 0,
+      "sha256": "87cd2ea19ca579648df09d24ffbd98c2b5b5997a558e8767036f4a529e911b44",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/job/MT5ExportJob.class",
+      "occurrence": 0,
+      "sha256": "ec0852a4512f01e72467e8d235851beaa2e38ad990778d9b51fb467ae2519fbb",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Data/job/MT5Exporter.class",
+      "occurrence": 0,
+      "sha256": "8c4a4cd5e18e673cda4fef34205f2311f2bb56431751c240ff6a37f5d2eaf054",
+      "member_shard": "docs/dev/evidence/sqx145/members/169/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/169/001.json",
+      "sha256": "ed85372442101157fdf0f606f6ef33c55dc626819fd664d34d14c2688ed3d7dd"
+    }
+  ]
+}

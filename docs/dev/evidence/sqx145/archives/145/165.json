@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
+  "sha256": "15d1dee0a9a962a2302f5eabf025c5486452ccfba39f9f57023c1642ba903c60",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet$1.class": "f2cb5154e61009a43b3eef8829310ccd985ad103d391f58e2016099ea0948980",
+    "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet.class": "7d4353adc05899f34a046faf2673f256863c0d1f33ce0bf4171a2761eaaf61ed",
+    "com/strategyquant/plugin/DataManager/impl/Basket/BasketServletPlugin.class": "791d7c4b435d8e9f8b8c47eee019923cdfd89091f80632ee4efaa99c5b9e13cb"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet$1.class",
+      "occurrence": 0,
+      "sha256": "f2cb5154e61009a43b3eef8829310ccd985ad103d391f58e2016099ea0948980",
+      "member_shard": "docs/dev/evidence/sqx145/members/165/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet.class",
+      "occurrence": 0,
+      "sha256": "7d4353adc05899f34a046faf2673f256863c0d1f33ce0bf4171a2761eaaf61ed",
+      "member_shard": "docs/dev/evidence/sqx145/members/165/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Basket/BasketServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "791d7c4b435d8e9f8b8c47eee019923cdfd89091f80632ee4efaa99c5b9e13cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/165/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/165/001.json",
+      "sha256": "b2cb75a28e4de23c57b2b6f0b88c4b28e74a90224b09a75e0966828f0f377156"
+    }
+  ]
+}

@@ -1,0 +1,3400 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/xz-1.9.jar",
+  "archive_sha256": "211b306cfc44f8f96df3a0a3ddaf75ba8c5289eed77d60d72f889bb855f535e5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/tukaani/xz/lz/Hash234.class",
+      "occurrence": 0,
+      "sha256": "188f7e10eea97820114b7cc50249ab2e0a07f6ef8d2532142716a098c453c374",
+      "name": "org/tukaani/xz/lz/Hash234",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/tukaani/xz/lz/CRC32Hash",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "HASH_2_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "HASH_2_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "HASH_3_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "HASH_3_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "hash4Mask",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "hash2Table",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "hash3Table",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "hash4Table",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "hash4Size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "hash2Value",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "hash3Value",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "hash4Value",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "getHash4Size",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "825aa2117083edf60ff0844167f7e083174bc89eea0a3ff4704add357dd1c575",
+          "code_length": 52
+        },
+        {
+          "name": "getMemoryUsage",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "67220384773e2624ed5e6c5d618b9c6ac2d10173bc3a0d8464bb1c89ab7a0763",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/tukaani/xz/ArrayCache;)V",
+          "access": 0,
+          "code_sha256": "4a4f6612974909d589eca349b46f7ea2599de95e90893038f355db82e60c3135",
+          "code_length": 74
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 0,
+          "code_sha256": "55946b3e3336fbf247de445978c4ac0eab82cd3fb583d4f3dc693fab8980ee53",
+          "code_length": 25
+        },
+        {
+          "name": "calcHashes",
+          "descriptor": "([BI)V",
+          "access": 0,
+          "code_sha256": "752dedecb502c7d3a24848fa01b3ec168358db52bad98061ddc9ce8a46a28f5e",
+          "code_length": 83
+        },
+        {
+          "name": "getHash2Pos",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "5eed9fa7c9774ca7155d4ad3483f6781f54fb746225588bfa090bbb7ebcff70b",
+          "code_length": 10
+        },
+        {
+          "name": "getHash3Pos",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "429299aa6b093eec74b2493cc89d31fa5da0cd498a27d3ced415c5edb320e72b",
+          "code_length": 10
+        },
+        {
+          "name": "getHash4Pos",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "806001e143e622edc9bf103b522b76fa7ab6990bda85346224f97642df7a5ebe",
+          "code_length": 10
+        },
+        {
+          "name": "updateTables",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "4552ec567dd18533e56a9e9da52d8872ad557f29625f173b320672768ca851aa",
+          "code_length": 31
+        },
+        {
+          "name": "normalize",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "7674d94be24c44bb1357080d695509b1e32ca74eb83d3266b0cf9cc6eeba1ee3",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/lz/CRC32Hash",
+        "org/tukaani/xz/lz/Hash234",
+        "org/tukaani/xz/lz/LZEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lz/LZDecoder.class",
+      "occurrence": 0,
+      "sha256": "3e4ea627b40e41a40d9b958f932fea1f8592e81653a176b29fd0148e2067ae31",
+      "name": "org/tukaani/xz/lz/LZDecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "bufSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "start",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "full",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "limit",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pendingLen",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pendingDist",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I[BLorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "985b50935974a539ab66f6bfa8ab2ffd26d646ca366a63e4847ff9efc5d632c4",
+          "code_length": 103
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "95a0b62592b80a0d12877813e353b1c87bd62bdc8415d2b9d47ca4ed276bf5b6",
+          "code_length": 9
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3748a83dfc39b9dc02cc77df2e10d92ac7f87a1287d5713d93860ec0971faea9",
+          "code_length": 33
+        },
+        {
+          "name": "setLimit",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "80b770a19af5ef1ae808ac6e488c61de9d1b6fd7184dbf8335937bbb0f274a2a",
+          "code_length": 35
+        },
+        {
+          "name": "hasSpace",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "53e3920ddb1528777baba903dee17d4ab4837dc4179cdb74b65e9ed4459821ec",
+          "code_length": 17
+        },
+        {
+          "name": "hasPending",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "82149b495ced94088443f67a3a72938ad2bc50a73268141d39154f06f01a30ac",
+          "code_length": 13
+        },
+        {
+          "name": "getPos",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "7e680bf764e6aaced3a036bc29af57884fb2eab2420e16b864567628ce3e049c",
+          "code_length": 35
+        },
+        {
+          "name": "putByte",
+          "descriptor": "(B)V",
+          "access": 1,
+          "code_sha256": "b5b55a980f544e467b4dbb9780ad1d6cc4f6799ccb4097212cbd21cc508f8bda",
+          "code_length": 37
+        },
+        {
+          "name": "repeat",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "a03bbf200578629b1d753689c3231c6b5ff24d6205b275d973f58bb9b0fc9827",
+          "code_length": 286,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "repeatPending",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8096092fc16148c8903b30f50b917d5734895c8942f3e8dd3e782858830bc348",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copyUncompressed",
+          "descriptor": "(Ljava/io/DataInputStream;I)V",
+          "access": 1,
+          "code_sha256": "abfaaf83d7a7c0f31c37e8b681350bb17827760f69fd23117911c2ebd7166c36",
+          "code_length": 57,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "([BI)I",
+          "access": 1,
+          "code_sha256": "7bd5b841a8b8c43afe2fc83080e2047abbfdce66235c0a0d089edb69e046d19f",
+          "code_length": 50
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "734c0823e2b4806bef78d72fa643a510d73a6d2da25a1d5692ab78bdb10f683a",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/DataInputStream",
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/CorruptedInputException",
+        "org/tukaani/xz/lz/LZDecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lz/LZEncoder.class",
+      "occurrence": 0,
+      "sha256": "e64ce1791ce213a25830341c76f2c8c554e76ee57eb426e9f0d94dfde2800b24",
+      "name": "org/tukaani/xz/lz/LZEncoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MF_HC4",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MF_BT4",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "keepSizeBefore",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "keepSizeAfter",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "matchLenMax",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "niceLen",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 16
+        },
+        {
+          "name": "bufSize",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "readPos",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "readLimit",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "finishing",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "writePos",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pendingSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "normalize",
+          "descriptor": "([III)V",
+          "access": 8,
+          "code_sha256": "b108e9032f09a1f5708a70d6b09dd16141c268d68d8eda0c38374c0befaffa8b",
+          "code_length": 35
+        },
+        {
+          "name": "getBufSize",
+          "descriptor": "(IIII)I",
+          "access": 10,
+          "code_sha256": "ec769e61045728a164caf80e9a1f0dbc05c63abfef1e7aaab212c4ece61b2dca",
+          "code_length": 32
+        },
+        {
+          "name": "getMemoryUsage",
+          "descriptor": "(IIIII)I",
+          "access": 9,
+          "code_sha256": "0107bfe32f0f39a5006f339ef5273ea6a35f2b0c51d8791ee984bcaf4599e612",
+          "code_length": 79
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(IIIIIIILorg/tukaani/xz/ArrayCache;)Lorg/tukaani/xz/lz/LZEncoder;",
+          "access": 9,
+          "code_sha256": "c0004f373690fa153d0d87ac0cea11f389ccda61618d5bf882a0b3668526f86b",
+          "code_length": 72
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIIIILorg/tukaani/xz/ArrayCache;)V",
+          "access": 0,
+          "code_sha256": "e5a8277ab5f87e50fa7d3ebe66dbd69fb4164a00af30bbe1ea710d3799e66a2e",
+          "code_length": 83
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "6c71df7a95a183c47b01ccd69bde4551cd8cdda5266533e15c23e4cb2c53f078",
+          "code_length": 9
+        },
+        {
+          "name": "setPresetDict",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "3980e53ced13ffa08ec7ebcfba79e7bae9f984c28590306463d6f60f233fc7a1",
+          "code_length": 87
+        },
+        {
+          "name": "moveWindow",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b0d37d49776166604b06a61aa8bac23639a277b595677cb27274de86fdf27bcd",
+          "code_length": 67
+        },
+        {
+          "name": "fillWindow",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "33d5e7f7e28afa9656c0598311c6cd5555bd21132fc24f9d5e8b6669bf4b102c",
+          "code_length": 118
+        },
+        {
+          "name": "processPendingBytes",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "718711e4faca928754519088b936b189e8ce3706c9fb512690e2c94d50fdeebe",
+          "code_length": 69
+        },
+        {
+          "name": "isStarted",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4f8cf1cc58dbf88a0b1b72ee14a1606692fa1ec52ec59772ec76072d6ccc7a73",
+          "code_length": 14
+        },
+        {
+          "name": "setFlushing",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6105fff137a2d755a13d58b6b6f5271cdcc6be39f508c53323a21c2e47daf2d7",
+          "code_length": 15
+        },
+        {
+          "name": "setFinishing",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7f18858a0a611915211eb7786874aef0e76970f408a9c33e9501b2b5fe695f70",
+          "code_length": 20
+        },
+        {
+          "name": "hasEnoughData",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "4ff25336918e479fbe15d9ad3066b23250a5b09eb7b9920a6c184c909a3f5dea",
+          "code_length": 19
+        },
+        {
+          "name": "copyUncompressed",
+          "descriptor": "(Ljava/io/OutputStream;II)V",
+          "access": 1,
+          "code_sha256": "9a4028d6acfff09b7c50063082dd2560a50602f273c08795b6f86aeb80e554bf",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getAvail",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42f9e7a75f88f9f2d16b4d678904da24a07f7109388c314e983e7b03b1fb6216",
+          "code_length": 31
+        },
+        {
+          "name": "getPos",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2d459b467ac0b79bcc0bcad6ca538566d38d28b282cb706a07e5bd7d23d8b1af",
+          "code_length": 5
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "afda43a241275bdf5a84160e048a05c31288344ae4bef5dcd4d1ee0ff54d8dad",
+          "code_length": 16
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(II)I",
+          "access": 1,
+          "code_sha256": "929eacbf117b4a185ce54d6c3b43e75b026a358fbee538838f25b3e596933724",
+          "code_length": 18
+        },
+        {
+          "name": "getMatchLen",
+          "descriptor": "(II)I",
+          "access": 1,
+          "code_sha256": "1b9ac2c881f0d54bde0c84e2f5735b6677fdc2f87f7aaaee5f525fcfb87fe081",
+          "code_length": 51
+        },
+        {
+          "name": "getMatchLen",
+          "descriptor": "(III)I",
+          "access": 1,
+          "code_sha256": "64594d122150ed6f674d4e8c66583a7aceae4e7fd4c5e35d92a10aca3681200c",
+          "code_length": 57
+        },
+        {
+          "name": "verifyMatches",
+          "descriptor": "(Lorg/tukaani/xz/lz/Matches;)Z",
+          "access": 1,
+          "code_sha256": "9a9c51421af1e943e3b7d7b89334fd6a51261e077b5773c6be42255deae486e8",
+          "code_length": 52
+        },
+        {
+          "name": "movePos",
+          "descriptor": "(II)I",
+          "access": 0,
+          "code_sha256": "5c08bba245757610387ec18cb54c0ad08d250cb8e211a9e2acfbbd79c854755b",
+          "code_length": 70
+        },
+        {
+          "name": "getMatches",
+          "descriptor": "()Lorg/tukaani/xz/lz/Matches;",
+          "access": 1025
+        },
+        {
+          "name": "skip",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b72c0e90db51c9d55b843a325b28ec43985494b45d772e5b9a289849422cd159",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/lz/BT4",
+        "org/tukaani/xz/lz/HC4",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lz/Matches"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lz/Matches.class",
+      "occurrence": 0,
+      "sha256": "7b3665f440eb3ff9bb6726e43619a6d9e7c53bad176ca132855eadd95d61eafb",
+      "name": "org/tukaani/xz/lz/Matches",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "len",
+          "descriptor": "[I",
+          "access": 17
+        },
+        {
+          "name": "dist",
+          "descriptor": "[I",
+          "access": 17
+        },
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "9e32a20125225299255082df118d4778070a820d06ad7215b5214c8b8c4b2d96",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lz/Matches"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LengthCoder.class",
+      "occurrence": 0,
+      "sha256": "8daee14358b76886683d5a48a45f6bf81a4b9768ddc80ad5c9b8b8c86c1d438a",
+      "name": "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOW_SYMBOLS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MID_SYMBOLS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HIGH_SYMBOLS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "choice",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "low",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "mid",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "high",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMACoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMACoder;)V",
+          "access": 0,
+          "code_sha256": "dd4f8a7fde404c6c50e352f69d22eeb78d4131a83a9f4fc8c21ee6c2d9dbced1",
+          "code_length": 50
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "c3da95f7eadc4bf6c68f8aa50399b31e7d9d721c893db06e91c4bdb2f23d0af2",
+          "code_length": 67
+        }
+      ],
+      "class_references": [
+        "[[S",
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+        "org/tukaani/xz/rangecoder/RangeCoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder.class",
+      "occurrence": 0,
+      "sha256": "cd1b421cb9e6aac03422c211e6836c2e4fb34237344d14d9070125b5d3289c01",
+      "name": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "probs",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "this$1",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMACoder$LiteralCoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMACoder$LiteralCoder;)V",
+          "access": 0,
+          "code_sha256": "941f93cdc905a9fb6a2ad8d818fde2b86d3cea9e83d91390d9e4ebb16ba2df13",
+          "code_length": 19
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "78bdb22d2a9a53614fd914c16ac369daa2086a784c908e5c6d7238c4c3d912ac",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+        "org/tukaani/xz/rangecoder/RangeCoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder.class",
+      "occurrence": 0,
+      "sha256": "3e77f20d3be9510e35552381018add39d49643c39a14e3d46c06c84e51b590a1",
+      "name": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lc",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "literalPosMask",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMACoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMACoder;II)V",
+          "access": 0,
+          "code_sha256": "5e94d18bcd7ac857e571b8376d095725d8b31132c6adb854c8f9014267591826",
+          "code_length": 24
+        },
+        {
+          "name": "getSubcoderIndex",
+          "descriptor": "(II)I",
+          "access": 16,
+          "code_sha256": "84ca0bc9f1fd65448682aafd916edf7310a5481ea66c37126b211a8e0694cd63",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder.class",
+      "occurrence": 0,
+      "sha256": "81d35671719dd41a1ce1b41bf5b51607ba2f4c98d3247fdceac26af600350b33",
+      "name": "org/tukaani/xz/lzma/LZMACoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "POS_STATES_MAX",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MATCH_LEN_MIN",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MATCH_LEN_MAX",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DIST_STATES",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DIST_SLOTS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DIST_MODEL_START",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DIST_MODEL_END",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "FULL_DISTANCES",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ALIGN_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ALIGN_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ALIGN_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "REPS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "posMask",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "reps",
+          "descriptor": "[I",
+          "access": 16
+        },
+        {
+          "name": "state",
+          "descriptor": "Lorg/tukaani/xz/lzma/State;",
+          "access": 16
+        },
+        {
+          "name": "isMatch",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "isRep",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "isRep0",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "isRep1",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "isRep2",
+          "descriptor": "[S",
+          "access": 16
+        },
+        {
+          "name": "isRep0Long",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "distSlots",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "distSpecial",
+          "descriptor": "[[S",
+          "access": 16
+        },
+        {
+          "name": "distAlign",
+          "descriptor": "[S",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "getDistState",
+          "descriptor": "(I)I",
+          "access": 24,
+          "code_sha256": "59832cf630dcd391ed3103e6aca2c34c392f39044c8443301808dacc7b494be9",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "1c90a2b4d2894446c04396063f0df8f5633e9504ea997da95f48a1aa58fc7221",
+          "code_length": 186
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "a6317026ba9dfd10912ac1f9425c2c7a57a0f06541e8dd929d59a8198cf68b0f",
+          "code_length": 175
+        }
+      ],
+      "class_references": [
+        "[S",
+        "[[S",
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeCoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$1.class",
+      "occurrence": 0,
+      "sha256": "8f3483429d2f087cd0ee90bb84452bc61105c8fa6ff1aad713d3d36925e8a11d",
+      "name": "org/tukaani/xz/lzma/LZMADecoder$1",
+      "major": 51,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMADecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$1"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder.class",
+      "occurrence": 0,
+      "sha256": "ae3d88e988b6e66cb939f74b09fc21c9b5a0860aa212c6e996e9ce4aa040098e",
+      "name": "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder;)V",
+          "access": 2,
+          "code_sha256": "a047e5d8444b7f93de927e2758e65490516c205d3491bd6d416faf4c97c936f8",
+          "code_length": 11
+        },
+        {
+          "name": "decode",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "c6f4dcfa635a9fa8add3c9d22a9a3d815c55babd7ddf421e0cbd45d90f05e28a",
+          "code_length": 100,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder;Lorg/tukaani/xz/lzma/LZMADecoder$1;)V",
+          "access": 4096,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+        "org/tukaani/xz/lzma/LZMADecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$1",
+        "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder",
+        "org/tukaani/xz/rangecoder/RangeDecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder.class",
+      "occurrence": 0,
+      "sha256": "bf17263935ffd3092e8b5dc8d6a9e06d6711dc31db5f5fa421963c589648f67e",
+      "name": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder$LiteralDecoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder$LiteralDecoder;)V",
+          "access": 2,
+          "code_sha256": "5090ddb20b47674b27d93984ec27db973f69d9d8511eaa1bf36aa0d286335f28",
+          "code_length": 11
+        },
+        {
+          "name": "decode",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8a71bf9705fae525572f20337e75dc17565d2e72471a582e4ac629d7158c7e49",
+          "code_length": 170,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder$LiteralDecoder;Lorg/tukaani/xz/lzma/LZMADecoder$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/lz/LZDecoder",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+        "org/tukaani/xz/lzma/LZMADecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$1",
+        "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeDecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder.class",
+      "occurrence": 0,
+      "sha256": "45816380d3feed0453f84d7145e9041aa8e36600be4da0bcbd59e8117aed0524",
+      "name": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "subdecoders",
+          "descriptor": "[Lorg/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder;II)V",
+          "access": 0,
+          "code_sha256": "cf31f244dcb860ac159a6645aa357809b6727db5f4fc11382d91d262aead3a4a",
+          "code_length": 60
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8475a66f7baf25783f4721eadc9eb46ff4243b04a8e91badcfaf22b53ded84c8",
+          "code_length": 27
+        },
+        {
+          "name": "decode",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "1a39354c93cef3d0506fa5a1e7636308e5577770cb8de0c5cf6b7c1c67331cb1",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/lz/LZDecoder",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMADecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$1",
+        "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder.class",
+      "occurrence": 0,
+      "sha256": "7e1f4aae3c291448f2b39fedb2fe082afb0e7f11dbf02dd35da7250b6563405e",
+      "name": "org/tukaani/xz/lzma/LZMADecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lz",
+          "descriptor": "Lorg/tukaani/xz/lz/LZDecoder;",
+          "access": 18
+        },
+        {
+          "name": "rc",
+          "descriptor": "Lorg/tukaani/xz/rangecoder/RangeDecoder;",
+          "access": 18
+        },
+        {
+          "name": "literalDecoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder$LiteralDecoder;",
+          "access": 18
+        },
+        {
+          "name": "matchLenDecoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder$LengthDecoder;",
+          "access": 18
+        },
+        {
+          "name": "repLenDecoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMADecoder$LengthDecoder;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lz/LZDecoder;Lorg/tukaani/xz/rangecoder/RangeDecoder;III)V",
+          "access": 1,
+          "code_sha256": "12fa03fe8b470096d3a7892aafbb404d490faae9e0fc3bfdb84259cad3a360e3",
+          "code_length": 62
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40ec3e3b297779b76d3657ac794d41a0c4b90e8107d4e3f4fa71960e5cd1bf3f",
+          "code_length": 26
+        },
+        {
+          "name": "endMarkerDetected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4693b337cf21cab57e986e6b096fe9a0bf80871a4a15cf13adbd8da164cde4e6",
+          "code_length": 16
+        },
+        {
+          "name": "decode",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5459a55eadd9ba1f75e63fd76f5a00828640db7cf0c1c7d387143682d8dd357b",
+          "code_length": 123,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeMatch",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "fdf0e510c983ec8579df547ce8a25c055edeeda204ee1e8a16d53c3a8dc2c1ed",
+          "code_length": 182,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeRepMatch",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "573712c1782ee81e0e40073e4b351a61546df871b050138f5fc68e5f05d62b51",
+          "code_length": 181,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder;)Lorg/tukaani/xz/lz/LZDecoder;",
+          "access": 4104,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMADecoder;)Lorg/tukaani/xz/rangecoder/RangeDecoder;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/lz/LZDecoder",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMADecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$1",
+        "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder",
+        "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeDecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$1.class",
+      "occurrence": 0,
+      "sha256": "6ad33d09a46f04f7811474032d750afa580009c063e7209b736d9f34a86ea948",
+      "name": "org/tukaani/xz/lzma/LZMAEncoder$1",
+      "major": 51,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$1"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder.class",
+      "occurrence": 0,
+      "sha256": "9f9b51d25de95297e51f97cd20a9e301cb600aba5bd5c6413a157a0279323047",
+      "name": "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRICE_UPDATE_INTERVAL",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "counters",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "prices",
+          "descriptor": "[[I",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMAEncoder;II)V",
+          "access": 0,
+          "code_sha256": "41c47be47bd25b1aaabce9165b3188db861e2471f3042aa04751922459da8612",
+          "code_length": 48
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "39ec16cad54e372a3821dde76a557fedcbac6d7a2eb55a78a832ebbd9cf70e57",
+          "code_length": 29
+        },
+        {
+          "name": "encode",
+          "descriptor": "(II)V",
+          "access": 0,
+          "code_sha256": "9069f1a4eb31c8b85f25ced0ae0ed94cbebd6cab5c90faf03dc64ce117de2bbb",
+          "code_length": 151,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getPrice",
+          "descriptor": "(II)I",
+          "access": 0,
+          "code_sha256": "b6449e8bf18d39e2e0cab840d5dc2592990746d92856040ef82b656487caae9d",
+          "code_length": 11
+        },
+        {
+          "name": "updatePrices",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "88556b6e26a1306bff8c72215527dc2d0788feb27258461701cfeba1f8da75df",
+          "code_length": 40
+        },
+        {
+          "name": "updatePrices",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "bb5d20a03782a65d9784a9d48082c345c9d4880994aa42f5348d0309e983fad3",
+          "code_length": 163
+        }
+      ],
+      "class_references": [
+        "[[I",
+        "java/io/IOException",
+        "java/lang/Math",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LengthCoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder.class",
+      "occurrence": 0,
+      "sha256": "13f8175993d7e5dee4c3b4cd0ed53cfc14b4ac64b6ec0e0f44a88dd14c41ed0d",
+      "name": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder;)V",
+          "access": 2,
+          "code_sha256": "5090ddb20b47674b27d93984ec27db973f69d9d8511eaa1bf36aa0d286335f28",
+          "code_length": 11
+        },
+        {
+          "name": "encode",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "89f4a6638e97405fea3ee4aa83aa8b64d72ef8ed2795bdb8a62a927ed2340b7a",
+          "code_length": 212,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getNormalPrice",
+          "descriptor": "(I)I",
+          "access": 0,
+          "code_sha256": "fa5bbf3e108a47d80cc9ec36707c4119f0995db60eec7b3aa989f6d80cd0e237",
+          "code_length": 47
+        },
+        {
+          "name": "getMatchedPrice",
+          "descriptor": "(II)I",
+          "access": 0,
+          "code_sha256": "595e5ebc620f2474ef9726028c32f323f0c37fac73644e8eec0e6d2a25e29006",
+          "code_length": 80
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder;Lorg/tukaani/xz/lzma/LZMAEncoder$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$1",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder.class",
+      "occurrence": 0,
+      "sha256": "8c77ee62b9d61f6b6ceb882ba061d8263b3d1869d18ceeb15be49520588883a0",
+      "name": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder",
+      "major": 51,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "subencoders",
+          "descriptor": "[Lorg/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder;",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMAEncoder;II)V",
+          "access": 0,
+          "code_sha256": "cf31f244dcb860ac159a6645aa357809b6727db5f4fc11382d91d262aead3a4a",
+          "code_length": 60
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8475a66f7baf25783f4721eadc9eb46ff4243b04a8e91badcfaf22b53ded84c8",
+          "code_length": 27
+        },
+        {
+          "name": "encodeInit",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "059f9de2c0e4d1eff88404c30ecb860dd1841a2e6a7ed722813b3103e9b0bbc6",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encode",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "916cf66769bdb51400016ba4596b065818013dc21cd842196c9d27a977f9aa4f",
+          "code_length": 76,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getPrice",
+          "descriptor": "(IIIILorg/tukaani/xz/lzma/State;)I",
+          "access": 0,
+          "code_sha256": "e3c6f6551c67ef90b79d503887198bb82b044b7616b0ae2e897977677e2220a1",
+          "code_length": 81
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bad19d570a7dd847a577814a23cb6dedb533c9c453bfa64c0946a82ab12ff86a",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMACoder$LiteralCoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$1",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder.class",
+      "occurrence": 0,
+      "sha256": "10d894be35e4bcd08980c2fedbc45609f92ebb28895916678b8b2211b7127645",
+      "name": "org/tukaani/xz/lzma/LZMAEncoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/tukaani/xz/lzma/LZMACoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MODE_FAST",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MODE_NORMAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LZMA2_UNCOMPRESSED_LIMIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LZMA2_COMPRESSED_LIMIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "DIST_PRICE_UPDATE_INTERVAL",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ALIGN_PRICE_UPDATE_INTERVAL",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "rc",
+          "descriptor": "Lorg/tukaani/xz/rangecoder/RangeEncoder;",
+          "access": 18
+        },
+        {
+          "name": "lz",
+          "descriptor": "Lorg/tukaani/xz/lz/LZEncoder;",
+          "access": 16
+        },
+        {
+          "name": "literalEncoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder;",
+          "access": 16
+        },
+        {
+          "name": "matchLenEncoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder$LengthEncoder;",
+          "access": 16
+        },
+        {
+          "name": "repLenEncoder",
+          "descriptor": "Lorg/tukaani/xz/lzma/LZMAEncoder$LengthEncoder;",
+          "access": 16
+        },
+        {
+          "name": "niceLen",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "distPriceCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "alignPriceCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "distSlotPricesSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "distSlotPrices",
+          "descriptor": "[[I",
+          "access": 18
+        },
+        {
+          "name": "fullDistPrices",
+          "descriptor": "[[I",
+          "access": 18
+        },
+        {
+          "name": "alignPrices",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "back",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "readAhead",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "uncompressedSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "getMemoryUsage",
+          "descriptor": "(IIII)I",
+          "access": 9,
+          "code_sha256": "9f47148ad665dced5b509d699418818d6d571fbd117809f5fa4ea444602a8663",
+          "code_length": 71
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "(Lorg/tukaani/xz/rangecoder/RangeEncoder;IIIIIIIIILorg/tukaani/xz/ArrayCache;)Lorg/tukaani/xz/lzma/LZMAEncoder;",
+          "access": 9,
+          "code_sha256": "91f2f34981dcb007a4cddbfa0030359fdb2ecfbb9b7fd37d2e4617aeac8ec1dc",
+          "code_length": 84
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "8be66d5f5e7b1763f83f2983716b29cf92ba929322bc02602ee1f17d8456eb45",
+          "code_length": 9
+        },
+        {
+          "name": "getDistSlot",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "56a20a94ba5ce897fdac7252d634fd3c974132d8600efd4f3749a80ba25d60de",
+          "code_length": 96
+        },
+        {
+          "name": "getNextSymbol",
+          "descriptor": "()I",
+          "access": 1024
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/rangecoder/RangeEncoder;Lorg/tukaani/xz/lz/LZEncoder;IIIII)V",
+          "access": 0,
+          "code_sha256": "d3a73fc0b7ad6347aa72e34fb2a4e06dc8e750078e3d5e600941e828b5936179",
+          "code_length": 145
+        },
+        {
+          "name": "getLZEncoder",
+          "descriptor": "()Lorg/tukaani/xz/lz/LZEncoder;",
+          "access": 1,
+          "code_sha256": "d4cb001bace8bb3a2b0160810962011a36016374bea88040df093a5ff37999c7",
+          "code_length": 5
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d0641355d2aa58954a0738a6066c832aec1a902c823acc494bbbc6c2bedf9835",
+          "code_length": 56
+        },
+        {
+          "name": "getUncompressedSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3adf2dd0139759a43be86db87f98fa9cfe299108a040cf8118890d0e170042fe",
+          "code_length": 5
+        },
+        {
+          "name": "resetUncompressedSize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f4c797d538015a0f1dc5ebd166a3ad3d9f943c45265502fa64c3567132e9e4ca",
+          "code_length": 6
+        },
+        {
+          "name": "encodeForLZMA1",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b55d12f2c90295d30da226e276f444031e22e8fadfafe4d2c6a3f7dc00430bcb",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeLZMA1EndMarker",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b899bd89b02804c171a596b8a682e5341b610ff5c78c0316e118582a1889c055",
+          "code_length": 66,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeForLZMA2",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d55d24ef8ffe44112278d1e4ec40e85b691df73ad71bd226e555d62ecbf041fa",
+          "code_length": 63
+        },
+        {
+          "name": "encodeInit",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "ee135d9a95e41bb90556adbe9c3d4f9ebc5fdfcf31c022e128b4e2af4f49cfa9",
+          "code_length": 134,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeSymbol",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "b9ab625213c4d8a5e025b12541fe5112ef6520b9b02ac940c630b00aed37bb56",
+          "code_length": 311,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeMatch",
+          "descriptor": "(III)V",
+          "access": 2,
+          "code_sha256": "f702c5164e98b236add9619ecc9eb7080246d9acbb0c6ab1922b09f50ffde562",
+          "code_length": 194,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeRepMatch",
+          "descriptor": "(III)V",
+          "access": 2,
+          "code_sha256": "75d12fa29ff208c59ff218ca2a6ee11db3d3d0236830c1ad9d714e2d2ca73d81",
+          "code_length": 231,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getMatches",
+          "descriptor": "()Lorg/tukaani/xz/lz/Matches;",
+          "access": 0,
+          "code_sha256": "2247e88509c18c060b244bac25cc237b3e629075744b134f7219da33e89ca669",
+          "code_length": 45
+        },
+        {
+          "name": "skip",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "7b2d61db1bf7e147808b265434a05cf29e96bf00ab9b56a8907cd46c4c78df75",
+          "code_length": 19
+        },
+        {
+          "name": "getAnyMatchPrice",
+          "descriptor": "(Lorg/tukaani/xz/lzma/State;I)I",
+          "access": 0,
+          "code_sha256": "47d3c6c5fa715699aafc054d23ccb2939e49f6e7cb2ab1b116408480d150168a",
+          "code_length": 16
+        },
+        {
+          "name": "getNormalMatchPrice",
+          "descriptor": "(ILorg/tukaani/xz/lzma/State;)I",
+          "access": 0,
+          "code_sha256": "21569241a5d00ae61cb960a82d16e38c71775b8f7f1fb62216a66f2218e18b4f",
+          "code_length": 16
+        },
+        {
+          "name": "getAnyRepPrice",
+          "descriptor": "(ILorg/tukaani/xz/lzma/State;)I",
+          "access": 0,
+          "code_sha256": "65317cf458adb9ae69deff418c4dd6066ee7a134ce462c5f4061912608911b5c",
+          "code_length": 16
+        },
+        {
+          "name": "getShortRepPrice",
+          "descriptor": "(ILorg/tukaani/xz/lzma/State;I)I",
+          "access": 0,
+          "code_sha256": "bb4e8308a228d235a99f12f882fb8434f1ea47c6d599091ecb8759e73af3be8b",
+          "code_length": 32
+        },
+        {
+          "name": "getLongRepPrice",
+          "descriptor": "(IILorg/tukaani/xz/lzma/State;I)I",
+          "access": 0,
+          "code_sha256": "01d3685329a97a1f523b122d32b119b133d439f8e7a6d6f62e100d5e6dfee6f7",
+          "code_length": 126
+        },
+        {
+          "name": "getLongRepAndLenPrice",
+          "descriptor": "(IILorg/tukaani/xz/lzma/State;I)I",
+          "access": 0,
+          "code_sha256": "046a3a7b72cbda61859557417ed537396523cc324b8184aec29084e7bd68bf1d",
+          "code_length": 44
+        },
+        {
+          "name": "getMatchAndLenPrice",
+          "descriptor": "(IIII)I",
+          "access": 0,
+          "code_sha256": "b6e9dc3e717635a862353c02773228c64cb834053b1717c8f0eee8b8fd805f23",
+          "code_length": 78
+        },
+        {
+          "name": "updateDistPrices",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "6540d7f6dd7f61567f1b48c0bcfb25ab0fdc370af1a5faac93794888e1e6ad55",
+          "code_length": 263
+        },
+        {
+          "name": "updateAlignPrices",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "2e455d33c36903379b27adf97826a874fbe150aef10d52a27d49b270be1ee36b",
+          "code_length": 35
+        },
+        {
+          "name": "updatePrices",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "015a93af301b8e7ab3904d7d87630de7f3a046e902a7a5418d3c908d3881d729",
+          "code_length": 37
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/tukaani/xz/lzma/LZMAEncoder;)Lorg/tukaani/xz/rangecoder/RangeEncoder;",
+          "access": 4104,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "245e173c63578a323bdd58cb7be19c131b4a5babefac0abf22e7006522f981a1",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[S",
+        "[[I",
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/IllegalArgumentException",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lz/Matches",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$1",
+        "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoderFast",
+        "org/tukaani/xz/lzma/LZMAEncoderNormal",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoderFast.class",
+      "occurrence": 0,
+      "sha256": "31ec15cf5e10fd8598f3d374d8a2867467a1ec7518b1715e5f74e00acb7b84bc",
+      "name": "org/tukaani/xz/lzma/LZMAEncoderFast",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/tukaani/xz/lzma/LZMAEncoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EXTRA_SIZE_BEFORE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "EXTRA_SIZE_AFTER",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "matches",
+          "descriptor": "Lorg/tukaani/xz/lz/Matches;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "getMemoryUsage",
+          "descriptor": "(III)I",
+          "access": 8,
+          "code_sha256": "b7246b87175e73e229df7afdb3dce8f5e6ca7dedd7c252cdbedaa3f976ffe20e",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/rangecoder/RangeEncoder;IIIIIIIILorg/tukaani/xz/ArrayCache;)V",
+          "access": 0,
+          "code_sha256": "5f664f20c2c79ec5b12f0be5ce197e0c6d28b57622138944badeb8474b3df6de",
+          "code_length": 44
+        },
+        {
+          "name": "changePair",
+          "descriptor": "(II)Z",
+          "access": 2,
+          "code_sha256": "45fe7e718ccfde3d46c81f8ec7b3ad23f569230feb0e9142c3d450dfe9cc40c3",
+          "code_length": 14
+        },
+        {
+          "name": "getNextSymbol",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "dc4e40f4a1f8cd75d6388e39ae649308468c1e20eed208c6073543c26b27b9f2",
+          "code_length": 607
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lz/Matches",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoderFast"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoderNormal.class",
+      "occurrence": 0,
+      "sha256": "3347240e2ef0438c2fca6e82c9184edf7fd2a4ad756cc814cf40865342645457",
+      "name": "org/tukaani/xz/lzma/LZMAEncoderNormal",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/tukaani/xz/lzma/LZMAEncoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OPTS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "EXTRA_SIZE_BEFORE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "EXTRA_SIZE_AFTER",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "opts",
+          "descriptor": "[Lorg/tukaani/xz/lzma/Optimum;",
+          "access": 18
+        },
+        {
+          "name": "optCur",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "optEnd",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "matches",
+          "descriptor": "Lorg/tukaani/xz/lz/Matches;",
+          "access": 2
+        },
+        {
+          "name": "repLens",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "nextState",
+          "descriptor": "Lorg/tukaani/xz/lzma/State;",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "getMemoryUsage",
+          "descriptor": "(III)I",
+          "access": 8,
+          "code_sha256": "3de0c31c269700ea3e58b39f4475749b974902ef1d7928910fafd83489baebba",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/rangecoder/RangeEncoder;IIIIIIIILorg/tukaani/xz/ArrayCache;)V",
+          "access": 0,
+          "code_sha256": "39e771cfad4151f3fa8745f071e4eef2d1e4488b597d89bfab79396f7b82e1c5",
+          "code_length": 110
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a99878fd4ca88421a1015f9d965a185658972c686c8eccdeaa149bbba86b3cff",
+          "code_length": 15
+        },
+        {
+          "name": "convertOpts",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "b7d29cb095a1b14f40d486b9d9ed9c362f6d7c81f64e4535abda192edef3bb98",
+          "code_length": 182
+        },
+        {
+          "name": "getNextSymbol",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "9fd3ddacf4f9ea0c84652e17361d2578654912431b000885aa96f42356a0ad76",
+          "code_length": 1106
+        },
+        {
+          "name": "updateOptStateAndReps",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f72e00bba346e2e2b7ae7f1bc720ff66b982cbc9191a984ec8b6085076450997",
+          "code_length": 633
+        },
+        {
+          "name": "calc1BytePrices",
+          "descriptor": "(IIII)V",
+          "access": 2,
+          "code_sha256": "953868dca78ae42175f30686d9f2bd2e85c0ff59fbcfd765eefc6ac4eabd3d22",
+          "code_length": 427
+        },
+        {
+          "name": "calcLongRepPrices",
+          "descriptor": "(IIII)I",
+          "access": 2,
+          "code_sha256": "9322e5cf558e06850b5b9ff69b8a6752381d90b54e435e64f61c03ae80bcee7d",
+          "code_length": 481
+        },
+        {
+          "name": "calcNormalMatchPrices",
+          "descriptor": "(IIIII)V",
+          "access": 2,
+          "code_sha256": "b6c7cdec57d16a6529a7a8683b26cc8956250c6985aec09f9b6d7516c7904ac3",
+          "code_length": 567
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a8a174f8c86190d0c0971dc91c8cf1f92d994ef32eb39fc6efcc84d4e452ce22",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Math",
+        "java/lang/System",
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/lz/LZEncoder",
+        "org/tukaani/xz/lz/Matches",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/LZMAEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder",
+        "org/tukaani/xz/lzma/LZMAEncoderNormal",
+        "org/tukaani/xz/lzma/Optimum",
+        "org/tukaani/xz/lzma/State",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/Optimum.class",
+      "occurrence": 0,
+      "sha256": "e53f8024e312d1c4c1df95f10d23d7645fcf9bc4333a9f472ea524002096a3d1",
+      "name": "org/tukaani/xz/lzma/Optimum",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INFINITY_PRICE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "state",
+          "descriptor": "Lorg/tukaani/xz/lzma/State;",
+          "access": 16
+        },
+        {
+          "name": "reps",
+          "descriptor": "[I",
+          "access": 16
+        },
+        {
+          "name": "price",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "optPrev",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "backPrev",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "prev1IsLiteral",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "hasPrev2",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "optPrev2",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "backPrev2",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d92250a200f358f17ed3c78c4b45948e1676120cc0c4176be352692386fabae3",
+          "code_length": 23
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "b8b76fdc19f60b8d6e42042b95fa380d47d61e24249ab6a663420a2654683bf4",
+          "code_length": 7
+        },
+        {
+          "name": "set1",
+          "descriptor": "(III)V",
+          "access": 0,
+          "code_sha256": "68d466950d7fb6a53f3dde9905d1fb0b7315d74f60fdb137a9bf3bac3b051401",
+          "code_length": 21
+        },
+        {
+          "name": "set2",
+          "descriptor": "(III)V",
+          "access": 0,
+          "code_sha256": "3ffdd595ccbae0805999380e7aa7111cd05e8d7ab87517a3f6f0f1d1d20eab23",
+          "code_length": 28
+        },
+        {
+          "name": "set3",
+          "descriptor": "(IIIII)V",
+          "access": 0,
+          "code_sha256": "2e70bd3ee5a16166fa824f64ca787098ca231a0a6bcb207abb1c9460b5d44190",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/LZMACoder",
+        "org/tukaani/xz/lzma/Optimum",
+        "org/tukaani/xz/lzma/State"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/State.class",
+      "occurrence": 0,
+      "sha256": "3852ad2d286e4c8e86efaf8ff5f85ae6ab5e9147f54421e1c060453d2bf51c45",
+      "name": "org/tukaani/xz/lzma/State",
+      "major": 51,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STATES",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LIT_STATES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LIT_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MATCH_LIT_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "REP_LIT_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SHORTREP_LIT_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MATCH_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "REP_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SHORTREP_LIT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LIT_MATCH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LIT_LONGREP",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LIT_SHORTREP",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NONLIT_MATCH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NONLIT_REP",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "state",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/tukaani/xz/lzma/State;)V",
+          "access": 0,
+          "code_sha256": "2c995dd57f02f514bdf11f50bce54e0370eaf43f389962f109610d06c346acdd",
+          "code_length": 13
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "c2bab0dc021a3e3234f3a6f683dc1010cddf2d5ba2ced5da38b161d5367fa610",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Lorg/tukaani/xz/lzma/State;)V",
+          "access": 0,
+          "code_sha256": "fc9ed1b582afc7b78f19d13eb9595155b33f41ffc3f73973c06272cb9b22c59a",
+          "code_length": 9
+        },
+        {
+          "name": "updateLiteral",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "40a2799b15891591a63e4ccd879e8908651431c861f71275645971bbb5a57e92",
+          "code_length": 50
+        },
+        {
+          "name": "updateMatch",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "5e6270a64211ad319c1b1d781d378587435af0227d21e9827ce19ab23cfd82ee",
+          "code_length": 21
+        },
+        {
+          "name": "updateLongRep",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "b3665ed7d81a3b98a43576708fdfe9a6faf823faf45f6e21943584743402d2e9",
+          "code_length": 21
+        },
+        {
+          "name": "updateShortRep",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "41a63183f08a4b2f2d83b0a5b4da960acd8bca054352903038e3c9a0bd074b90",
+          "code_length": 21
+        },
+        {
+          "name": "isLiteral",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "500662d7357647dc142617db0196723900e2fc24a5c89dfacd6375fbe3a399f1",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/lzma/State"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeCoder.class",
+      "occurrence": 0,
+      "sha256": "f1b2363adb2079073b523b4084afb54031001d7e543765c8beb91c1cf39d41f4",
+      "name": "org/tukaani/xz/rangecoder/RangeCoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SHIFT_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "TOP_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "BIT_MODEL_TOTAL_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "BIT_MODEL_TOTAL",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "PROB_INIT",
+          "descriptor": "S",
+          "access": 24
+        },
+        {
+          "name": "MOVE_BITS",
+          "descriptor": "I",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "initProbs",
+          "descriptor": "([S)V",
+          "access": 25,
+          "code_sha256": "e5a50e7fd300df1d6e4b6236dd42c86619976400f9883097e7b116311bbca1dc",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Arrays",
+        "org/tukaani/xz/rangecoder/RangeCoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoder.class",
+      "occurrence": 0,
+      "sha256": "1d74d1d94e77f82d1d746ddd9314ba2ac186433d62ac0077f717eb92895b1a43",
+      "name": "org/tukaani/xz/rangecoder/RangeDecoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/tukaani/xz/rangecoder/RangeCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "range",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "code",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "037eb763f90ac03a9cd24d367a01e3d339f93c7c29f96293852e1857d3aead99",
+          "code_length": 15
+        },
+        {
+          "name": "normalize",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeBit",
+          "descriptor": "([SI)I",
+          "access": 1,
+          "code_sha256": "de2916cf06c895cbc7883201f8350037f5f8e260feccdfdde43b2fcd16f8aa93",
+          "code_length": 96,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeBitTree",
+          "descriptor": "([S)I",
+          "access": 1,
+          "code_sha256": "d45866b721a668fa1b075fb84f70e6f668d7e1b4a45b73542b4a3bd17cf2f47a",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeReverseBitTree",
+          "descriptor": "([S)I",
+          "access": 1,
+          "code_sha256": "f6e2f97425b5e7b535128519e72ec1f1b047027682d6c498619bca5b74f84ca4",
+          "code_length": 43,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decodeDirectBits",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "72ee812f7266383e46d7be437a79c082a05c9a108e4c40ee2ec1431ef2779f18",
+          "code_length": 63,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/tukaani/xz/rangecoder/RangeCoder",
+        "org/tukaani/xz/rangecoder/RangeDecoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoderFromBuffer.class",
+      "occurrence": 0,
+      "sha256": "7548cfc236b1098588cab487d44b0a103289a52fd1dae74638548e8b4b3e34d5",
+      "name": "org/tukaani/xz/rangecoder/RangeDecoderFromBuffer",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/tukaani/xz/rangecoder/RangeDecoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INIT_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "4e605602ae781818310f01c07e68c0973679afeba7a62bb561df09807038aa6b",
+          "code_length": 26
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "0cf406b6cfff6911289e4d0dce2d86b766745b6526c123a6a6d34f4b5a3ea8bc",
+          "code_length": 9
+        },
+        {
+          "name": "prepareInputBuffer",
+          "descriptor": "(Ljava/io/DataInputStream;I)V",
+          "access": 1,
+          "code_sha256": "bd2810f253cf58e15e852634394399d2b4d322e170c1fe4e361222ab6e4ae0a3",
+          "code_length": 69,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isFinished",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "40c2fc14e9273bdc412e87c747fc7424b6ec8b5abbc96ffa3a2a1172538edb9c",
+          "code_length": 25
+        },
+        {
+          "name": "normalize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c726871268bab9507a42db96e8fd9708deda002262d02ccffef2ad5878de1652",
+          "code_length": 66,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataInputStream",
+        "java/io/IOException",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/CorruptedInputException",
+        "org/tukaani/xz/rangecoder/RangeCoder",
+        "org/tukaani/xz/rangecoder/RangeDecoder",
+        "org/tukaani/xz/rangecoder/RangeDecoderFromBuffer"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoderFromStream.class",
+      "occurrence": 0,
+      "sha256": "12a22c8222aa152f274e641681f009f2f149f73c7ade87170c3bb2ccf08e7e51",
+      "name": "org/tukaani/xz/rangecoder/RangeDecoderFromStream",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/tukaani/xz/rangecoder/RangeDecoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "inData",
+          "descriptor": "Ljava/io/DataInputStream;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "020b44e2979c6b16a8819df963eed4f8966f713e2adf0872a8c67e9d4a16ca9f",
+          "code_length": 51,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isFinished",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55df075519bc772f562d9c514ad1910181799eefe5276972546f9c0a04b6f248",
+          "code_length": 13
+        },
+        {
+          "name": "normalize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "db8f0aeb93b350320f35ce9f87d70bc5cb4a1d7926d44391430e380dcf4ce903",
+          "code_length": 41,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "org/tukaani/xz/CorruptedInputException",
+        "org/tukaani/xz/rangecoder/RangeCoder",
+        "org/tukaani/xz/rangecoder/RangeDecoder",
+        "org/tukaani/xz/rangecoder/RangeDecoderFromStream"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoder.class",
+      "occurrence": 0,
+      "sha256": "d8419eed71a755fc41f640dfa464e016311cc3e6a5a0fa28f7ee97847d00d097",
+      "name": "org/tukaani/xz/rangecoder/RangeEncoder",
+      "major": 51,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/tukaani/xz/rangecoder/RangeCoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MOVE_REDUCING_BITS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "BIT_PRICE_SHIFT_BITS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "prices",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "low",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "range",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cacheSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "cache",
+          "descriptor": "B",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0a572f0462180fa8bc0cb92643fd62c881a5a47ec0edd82b08748fa877b9edb4",
+          "code_length": 21
+        },
+        {
+          "name": "getPendingSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "07539ec455e4da68568441a82ca2d783e6417fa040e6c409bb3758ae4c2b3e82",
+          "code_length": 8
+        },
+        {
+          "name": "finish",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad41c540f361248e3e6e0a2fc3aa9d5ee86b29dd34b7fc89ff5910bface558fa",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(I)V",
+          "access": 1024,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "shiftLow",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d620cbfa8029829b8c5d2c7e7f0190d4a9c7c1d2d4f97cd2fd75fcedb9ead31c",
+          "code_length": 95,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "encodeBit",
+          "descriptor": "([SII)V",
+          "access": 1,
+          "code_sha256": "0136a08f0559f333ce923bb855da3a86e9313d2019467fca9469a6b4c76d4ea1",
+          "code_length": 109,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBitPrice",
+          "descriptor": "(II)I",
+          "access": 9,
+          "code_sha256": "a650425ae035bc04ef0fbc696429a4689e4082bdc286c0429303aa2a9dbae687",
+          "code_length": 38
+        },
+        {
+          "name": "encodeBitTree",
+          "descriptor": "([SI)V",
+          "access": 1,
+          "code_sha256": "381f628822d6b0a85c06c114dfcbb28d611f17e90150b74de5321debf41b32d1",
+          "code_length": 46,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBitTreePrice",
+          "descriptor": "([SI)I",
+          "access": 9,
+          "code_sha256": "18b66eb91ab9ad88778a85c1e965a5fb4102436dc7228a5bcc0d6f724bf336a1",
+          "code_length": 32
+        },
+        {
+          "name": "encodeReverseBitTree",
+          "descriptor": "([SI)V",
+          "access": 1,
+          "code_sha256": "cb8ccabb716a6967f73cf19f7fc588bcdf4189dab98bd60c833975f1e5d566cb",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getReverseBitTreePrice",
+          "descriptor": "([SI)I",
+          "access": 9,
+          "code_sha256": "f6f2c4b58604d8ee6406c63a26a77c5ed54941ab5b206d1a29682d358a8bcee5",
+          "code_length": 43
+        },
+        {
+          "name": "encodeDirectBits",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "36f297a6ccf776112e1af69f9781db0f8b532b6df7de67592034bbaa3c756498",
+          "code_length": 65,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getDirectBitsPrice",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "f97f3267c22cf10f7ff3a069388e00ea287d22e92e049a0d221d0216fc7feccc",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "33a20af0bcadfda927ae7ebf8cf0ef315152064b4af0df181cea92958b346c19",
+          "code_length": 95
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Error",
+        "org/tukaani/xz/rangecoder/RangeCoder",
+        "org/tukaani/xz/rangecoder/RangeEncoder"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoderToBuffer.class",
+      "occurrence": 0,
+      "sha256": "2ff1f2616fc92e2750c1e70d198bf0453207b80cb86cb0fe368c05937c9d0350",
+      "name": "org/tukaani/xz/rangecoder/RangeEncoderToBuffer",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/tukaani/xz/rangecoder/RangeEncoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "bufPos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "31c93d10b5d89a739266d46885de4c8bae6416fd237074326a97c7841cc86dea",
+          "code_length": 19
+        },
+        {
+          "name": "putArraysToCache",
+          "descriptor": "(Lorg/tukaani/xz/ArrayCache;)V",
+          "access": 1,
+          "code_sha256": "f627201ef322f3a8fe3d5f425c371bb6991579f989fb80ed77392b3146ac97c2",
+          "code_length": 9
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9b43d29d2b508a6e02493540fb180139480b48206b5a22cdd139fc0e549d8fb3",
+          "code_length": 10
+        },
+        {
+          "name": "getPendingSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f7942fc00d62d56ac80eda98a9f53924b1494c1a58bceaa7a7c3a5a54dd331aa",
+          "code_length": 15
+        },
+        {
+          "name": "finish",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f8a1c8ccbec0a14e294b1ecd47a4c296bd98343d987424d3c872baa39885de89",
+          "code_length": 22
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "b7bed0cde0500eb1ad269cafba8458ca68c0b10cd41355717951a1eec52db544",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "13172c0791c715d8ecfa193cb75f9e666bc3ac929bb7f35c49044bc4dce35c78",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Error",
+        "org/tukaani/xz/ArrayCache",
+        "org/tukaani/xz/rangecoder/RangeEncoder",
+        "org/tukaani/xz/rangecoder/RangeEncoderToBuffer"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoderToStream.class",
+      "occurrence": 0,
+      "sha256": "2c6573e0bee0340e76803bacc84964a59e962a7dbdb4d1ae766f5b489b172391",
+      "name": "org/tukaani/xz/rangecoder/RangeEncoderToStream",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/tukaani/xz/rangecoder/RangeEncoder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "out",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "07120852916fa6b321e4e7c184739e09f8f9db6710b4b0cf66ef0a9b91a4282d",
+          "code_length": 14
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "1f1c1b14ef4de5ca44deaed56399172bb0ea10c2f0b815994c5668334e4cd7da",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "org/tukaani/xz/rangecoder/RangeEncoder",
+        "org/tukaani/xz/rangecoder/RangeEncoderToStream"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/ARM.class",
+      "occurrence": 0,
+      "sha256": "4c8156fe11ac86e7b694ef90311c564679b3e66f8b98ee1288af3eab7c99d38f",
+      "name": "org/tukaani/xz/simple/ARM",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "a8d104b0fc10f9c04702bd232975412ac83526039d0d67e126cf6405e2538817",
+          "code_length": 18
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "4f360de080b91ba009505e04d419ea2abd9330550e272314e89683db5a0c48a3",
+          "code_length": 178
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/simple/ARM",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/ARMThumb.class",
+      "occurrence": 0,
+      "sha256": "ed19607bfac913349a7ff9c4d526bf7f6ea9368b98187f0e2b99e7e76759a1d5",
+      "name": "org/tukaani/xz/simple/ARMThumb",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "2c39e340df8578ebc7412e6384409104f171408688f04173536b6d5dd07b59a1",
+          "code_length": 17
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "41727544eafb5b7f35f5956b3da446e5c825271d111d7d20063b752ced1ed856",
+          "code_length": 235
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/simple/ARMThumb",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/IA64.class",
+      "occurrence": 0,
+      "sha256": "ed3411eb531370e8b1806b22c478bbe3d4b8499392a1140214d4b9fadc8e814a",
+      "name": "org/tukaani/xz/simple/IA64",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "BRANCH_TABLE",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "b9355bb422edac9c728013581df28f67ad760f2b5de25b3ab9ab4c3cd89ff6f8",
+          "code_length": 15
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "d2a31ca601fe3b4356e513a37bdb5060ee305b94f4acbb8f46a2145c7ebd93b6",
+          "code_length": 367
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "107ffe2e8c22c6baa3dd2546707605deafde101d336fe7ce515b312161571bd1",
+          "code_length": 166
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/Object",
+        "org/tukaani/xz/simple/IA64",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/PowerPC.class",
+      "occurrence": 0,
+      "sha256": "416c992e71f92f9cd06c8fe92c8470f98394730d3041170e7639b2bc04ce3314",
+      "name": "org/tukaani/xz/simple/PowerPC",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "b9355bb422edac9c728013581df28f67ad760f2b5de25b3ab9ab4c3cd89ff6f8",
+          "code_length": 15
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "5f69d08bb13806d7a94597c7bc603cc94a780cd7dca2f6aa1a05c4888d5bdf29",
+          "code_length": 213
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/simple/PowerPC",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/SPARC.class",
+      "occurrence": 0,
+      "sha256": "1a3a86bd3768ff28038ad6145a07279a8c92dac0c1f2a2e654e2c0034536bd7a",
+      "name": "org/tukaani/xz/simple/SPARC",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "b9355bb422edac9c728013581df28f67ad760f2b5de25b3ab9ab4c3cd89ff6f8",
+          "code_length": 15
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "60880b82bcaf196fec97012ff721702181f6a9cb8b631d4852c3c2bf9cd0ddae",
+          "code_length": 261
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/simple/SPARC",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/SimpleFilter.class",
+      "occurrence": 0,
+      "sha256": "7ffac74562205d0975ae6c870922b727df8af72bd33f7f85421f105874f87eeb",
+      "name": "org/tukaani/xz/simple/SimpleFilter",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/tukaani/xz/simple/SimpleFilter"
+      ]
+    },
+    {
+      "entry": "org/tukaani/xz/simple/X86.class",
+      "occurrence": 0,
+      "sha256": "aefecdad9b2f638cefa1c86e24d323f98ea0acbd31b20890fdf74af83f8215e3",
+      "name": "org/tukaani/xz/simple/X86",
+      "major": 51,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/tukaani/xz/simple/SimpleFilter"
+      ],
+      "fields": [
+        {
+          "name": "MASK_TO_ALLOWED_STATUS",
+          "descriptor": "[Z",
+          "access": 26
+        },
+        {
+          "name": "MASK_TO_BIT_NUMBER",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "isEncoder",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "prevMask",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "test86MSByte",
+          "descriptor": "(B)Z",
+          "access": 10,
+          "code_sha256": "b2e428f3706fecd27deb397ab513aecf1d7dfd883729f61d4dd98f2a44a3099a",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "6dcf4489bf0bb16b184750cd03c6d693d885019ece59b8770531ac633c799a50",
+          "code_length": 22
+        },
+        {
+          "name": "code",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "893bd2d7f162bd6b82dd6e70bafbf35e632ba61519584ac5e74066d750fd0f19",
+          "code_length": 429
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0f2d6cacac2902379308509b8788d8cdeaa64f5f10309ea25bc2f6ae2ff68e83",
+          "code_length": 83
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/Object",
+        "org/tukaani/xz/simple/SimpleFilter",
+        "org/tukaani/xz/simple/X86"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "f31a01a09e6d3ae36489134c1701f3fdce6874e716ed271f563ef67c9c6e3924",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

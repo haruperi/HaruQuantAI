@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EquityChartVolume/EquityChartVolume.jar",
+  "archive_sha256": "1d34a0504be82c10ba94347dacabbb34df98db8c2d02a99cdd8c8cd7d656b89b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Volume/EquityChartVolume.class",
+      "occurrence": 0,
+      "sha256": "270e3fb39f1ddf9733ffd314ff97e1f42014bc059e33b1b544ffdd848c2585ae",
+      "name": "com/strategyquant/plugin/EquityChart/impl/Volume/EquityChartVolume",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon"
+      ],
+      "fields": [
+        {
+          "name": "Auto",
+          "descriptor": "B",
+          "access": 10
+        },
+        {
+          "name": "Size",
+          "descriptor": "B",
+          "access": 10
+        },
+        {
+          "name": "Money",
+          "descriptor": "B",
+          "access": 10
+        },
+        {
+          "name": "Off",
+          "descriptor": "B",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "print",
+          "descriptor": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9b11782692a54def5dad2753b0ec26c9d5c333fb018dfe299ceeaf23e8305acf",
+          "code_length": 465,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/equitychart/EquityChart;Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)V"
+        },
+        {
+          "name": "getVolume",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/Order;B)D",
+          "access": 2,
+          "code_sha256": "728237ccac31701d4e4dac8db36ed38e91e3258c86ac91ce268207cfef6bd427",
+          "code_length": 47,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getVolumeType",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;B)B",
+          "access": 2,
+          "code_sha256": "769d1ce22dbdd21ac0a1ca5fff2458bf25cf95439b93221ba3f3102ecd22babe",
+          "code_length": 26
+        },
+        {
+          "name": "getInstrumentInfo",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/Order;)Lcom/strategyquant/datalib/InstrumentInfo;",
+          "access": 2,
+          "code_sha256": "6177ec026b9730d12e10f2d8fdad0bbaa4334b291cb9ba814431127bb9f48f6a",
+          "code_length": 75,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "07d9dd0dccbbc0c718303ae0819053271af9845723e800ab59e44f2df02620d3",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9c66ff86a4a81ddc5141095715baab0c7cda01b9176fd49ac7d7b4006a6b9fa9",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/EquityChart/impl/Volume/EquityChartVolume",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/equitychart/ChartDataset",
+        "com/strategyquant/tradinglib/equitychart/DomainAxisType",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/equitychart/SubChart",
+        "com/strategyquant/tradinglib/equitychart/SubChartDataset",
+        "com/strategyquant/tradinglib/equitychartnew/addons/IEquityChartAddon",
+        "com/strategyquant/tradinglib/results/SymbolInfo",
+        "com/strategyquant/tradinglib/results/SymbolsMap",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleAVLTreeMap",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleMap",
+        "it/unimi/dsi/fastutil/longs/Long2DoubleMap$Entry",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/lang/Byte",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Iterator",
+        "java/util/Map"
+      ]
+    }
+  ]
+}

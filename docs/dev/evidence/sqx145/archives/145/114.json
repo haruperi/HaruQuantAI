@@ -1,0 +1,35 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/tree-sitter-bash-0.23.3.jar",
+  "sha256": "b8a9b604722836699322ad9aaf124cf1d20336b421f1f38d54bd1662060830c8",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 6,
+  "duplicate_entries": [],
+  "classes": {
+    "org/treesitter/TreeSitterBash.class": "25232357f17dd1db8d18a183fd6cdf7ac05bb990f6bc04fa0831d6b975557c3c"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    "lib/aarch64-linux-gnu-tree-sitter-bash.so": "d968fb20b40a6eb2a06fdc14efcd200f1e1e2fcf3619e6958952e64ead689cc7",
+    "lib/aarch64-macos-tree-sitter-bash.dylib": "83e7b69888c6dcd6e11da67f51b40ce441c75c83fe72e9d82474f7547f6ee756",
+    "lib/x86_64-linux-gnu-tree-sitter-bash.so": "3eaf3b43606152ce10407b9f8a399c7dc22a8bc11e5fc5294362b06648e23bf8",
+    "lib/x86_64-macos-tree-sitter-bash.dylib": "908ce00e8a5fa9ed9a2d7aedc03957d4e6ce8ecf62d8087a3200c7c421ef7f7c",
+    "lib/x86_64-windows-tree-sitter-bash.dll": "a848e5d5b2a65ab5ab62c11477a349d5114d585d64003ad56df816d71bc29b38"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/treesitter/TreeSitterBash.class",
+      "occurrence": 0,
+      "sha256": "25232357f17dd1db8d18a183fd6cdf7ac05bb990f6bc04fa0831d6b975557c3c",
+      "member_shard": "docs/dev/evidence/sqx145/members/114/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/114/001.json",
+      "sha256": "907749ad88cf607c15d909d931c4d4cb15e24165ddddac7a183a3605733dd88c"
+    }
+  ]
+}

@@ -1,0 +1,729 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+  "archive_sha256": "64d2f79b52a571d08aa90f0e56071bbc5fe1bfee5b30865bab8f18b1822ba990",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1.class",
+      "occurrence": 0,
+      "sha256": "ed79060eab94c8d07b7808f35984e6c095d8cd58a58ea020bb42eefcee4181a7",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "698b4bbff28b9283e5cfcc5e527afbe2c78f48eccafc11d5007412d00dc1b76d",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1eee0486f128450ec20e326121877f011cbb8977423350747adc3cdb2fa5f4d9",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1",
+        "java/lang/Exception",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager.class",
+      "occurrence": 0,
+      "sha256": "fe24f23f20d8080e98a213ade09e6e49c54295c5211eeb587feb2dded8482959",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "STATE_DEFAULT",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "STATE_OVERWRITE",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "STATE_OVERWRITEALWAYS",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "STATE_SKIP",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "STATE_SKIPALWAYS",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "STATE_CANCEL",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "state",
+          "descriptor": "B",
+          "access": 74
+        },
+        {
+          "name": "waitingThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 10
+        },
+        {
+          "name": "confirmObj",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 10
+        },
+        {
+          "name": "dataToSend",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 10
+        },
+        {
+          "name": "notImportedMap",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "453e557c6548b35730a6cc77039ad677c34240c042947f27d4cde64a2c487b62",
+          "code_length": 5
+        },
+        {
+          "name": "install",
+          "descriptor": "([Ljava/lang/String;)Ljava/util/ArrayList;",
+          "access": 9,
+          "code_sha256": "c2816e1558d49c084e6264b26a5373f7866fb5388b2a5a379c2f41965b65d60f",
+          "code_length": 481,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([Ljava/lang/String;)Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "export",
+          "descriptor": "([Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "434bcaed57b58f46ee0337e91f4d9ad190cc457179bc798819b459df227c27b6",
+          "code_length": 169,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "overwrite",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "ebfaf23a68fd91e628f2e8c659d2fb039451e8d3006c149562fa2b78498ec76a",
+          "code_length": 5
+        },
+        {
+          "name": "overwriteAlways",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "e20db92a50fa8e83478b5be5ca7de564d42587f8e9441129f4974752d8199e14",
+          "code_length": 5
+        },
+        {
+          "name": "skip",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "749f1416dca3ce657b4fe10abcc61e665452aa2be77151b99dc6d31594872de7",
+          "code_length": 5
+        },
+        {
+          "name": "skipAlways",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "12a74e9b48010bb794e6e936d2cd765370dee259460cf1567ee892228a30138d",
+          "code_length": 5
+        },
+        {
+          "name": "cancelImport",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "2e42624f3ec04fb7652bd74900067be6872b1571a7bf098e8e599f29a20ec1ec",
+          "code_length": 5
+        },
+        {
+          "name": "writeToFile",
+          "descriptor": "(Ljava/io/File;Ljava/util/zip/ZipInputStream;)V",
+          "access": 10,
+          "code_sha256": "8712d2ae5fbc4897725cb4cdf69ccea9a5c8e1e3eb26c481398e44e7b1eb7af8",
+          "code_length": 167,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sendConfirmation",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "c25650ffee04e615ab26d02ac4d62dc711fad3affd1c766f1ac31e8e08112337",
+          "code_length": 30
+        },
+        {
+          "name": "waitForUserAction",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "c7c1fdd229cf7cf3ca31178259afdf8ba7f9b9bda8e9ee9e4ff901505db344ee",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()B",
+          "access": 4104,
+          "code_sha256": "78916e63881656034b266dc2433d198d703d8bb24734ba105d4e7c1b8e5244e8",
+          "code_length": 4
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(B)B",
+          "access": 4104,
+          "code_sha256": "ac2340923fa69137d394b36e70efb7dd4f789a3b01742028bbbce6fbd7ad0edf",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "564635d7631c59d3191e11ea042efef8e905fc56d92f5e9a64e4328daaeadc20",
+          "code_length": 53
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager$1",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/zip/ZipEntry",
+        "java/util/zip/ZipInputStream",
+        "java/util/zip/ZipOutputStream",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap.class",
+      "occurrence": 0,
+      "sha256": "a8c467b50e1d8a566e67b6385eb633601469a6f24a143cc0a7cebacd858e4c6f",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "KEY_MISSING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_CONTENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_INFO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_USERDATA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "userExtedDirPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "userLibsDirPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5e3be7ac40ccabbb159ac1a5b1c62211cd99e5672e34ebf427ef49e8b1239817",
+          "code_length": 50
+        },
+        {
+          "name": "generateTree",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "d8767ce5d5f8147f8fa1a477b567601ca358b0d9ff7dd21843e200f8ef343b58",
+          "code_length": 118,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;I)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "parseFolder",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/json/JSONArray;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "ab73090a058838d3bdf427a83d0ea2403e28bb14de95250e2ff0b104578b31b9",
+          "code_length": 38
+        },
+        {
+          "name": "prvParse",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;Lorg/json/JSONArray;ZLjava/lang/String;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "8747f152ac745eff90056ae4c0a394d3d0f58bddbf0329dd77149a1862360349",
+          "code_length": 409
+        },
+        {
+          "name": "checkFile",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "ddfb0dbbbfaf4f0421bf3a2cacd3c8aec6a2080bb0c41ace7a0efb083227dbf2",
+          "code_length": 72
+        },
+        {
+          "name": "containsFileByFilter",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "d0bd7e56c38eed6856ead275f0b892dcd7e2c88fdb21dfb96936270e53d9abc3",
+          "code_length": 88
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "65c75d5f8373def9052e6922b83b348f5e2e86a8081336d0078b92154c2fdefb",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/snippets/compile/SQStructure",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap",
+        "java/io/File",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/apache/commons/io/comparator/NameFileComparator",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportPlugin.class",
+      "occurrence": 0,
+      "sha256": "f2118236667a18b440cd89711e43a6b42a0e7ad22ca1ee09731f6943ca2604e8",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "connectionContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportPlugin",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet.class",
+      "occurrence": 0,
+      "sha256": "6444184acf21d342c255d74fa3730c2128cb2e788f4747631f4c93a3686d1798",
+      "name": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "fileMap",
+          "descriptor": "Lcom/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap;",
+          "access": 10
+        },
+        {
+          "name": "KEY_SUCCESS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_FILES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_COMPILATION_RESULT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_INDICATORS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEMPLATE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEMPLATES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TEXT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_MATCHES",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_ITEMS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_PROTECTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_DESCRIPTION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "KEY_DATA",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "4510d95735bae90952d7759d248516b62cfd55b0b1bee87363e071180ebc6998",
+          "code_length": 326,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c9525a10fad9a3a8c7a666340d5b1dc05b0992b3b06ce39f56f3a1c450e7c6d4",
+          "code_length": 113,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getFileMapInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap;",
+          "access": 42,
+          "code_sha256": "5922825f48e2ef138be3c8d9e826c91e7bb10b0779933e44f416383719caa19b",
+          "code_length": 20
+        },
+        {
+          "name": "onImport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "630ffbbc72e17fe43aa523ee64b69fa69dcee2b1e1e1dc3a61efa914b04f92fd",
+          "code_length": 222,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onExport",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d6cff3ba877404ccd142186ef1c817e6d6fe6bee86764ca5ab39f99ac72e464e",
+          "code_length": 110,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onOverwrite",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f3175326dced5c57a5d84f59f24b304d8cf950983996c8b3b8d1871f2d25abff",
+          "code_length": 32,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onOverwriteAlways",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a46f832e1e99043193ef81ed08e9fb7eaf0277c629e6f4980ab55792c3af0a8a",
+          "code_length": 32,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSkip",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2340e3c1fac7d16c078e973efdf9db3f07dfb0d6407e9bda872ae2e2fd7fc14b",
+          "code_length": 32,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSkipAlways",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "65355519d2ede341225dd92057ad9d2a37bc22b68175139ddf8eb8803722960f",
+          "code_length": 33,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCancel",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fc0a5f545483ea904278f293994690302632172909a8a39865afa7a3234a9f8c",
+          "code_length": 33,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ecad3f6fa662030ea6ef35ddb6c0c9191bb45d2ba0568f1f570fd933121dd67b",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionsFileMap",
+        "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

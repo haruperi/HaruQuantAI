@@ -1,0 +1,384 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+  "archive_sha256": "545ec37398014a9bec74760dd6f4b1886f5c1b30c7e2fb63c50d2e27df5a382b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin.class",
+      "occurrence": 0,
+      "sha256": "845a85304ce72f01a22ec00684cb4dd1ec033a88cea53bab335eb37e7ff3e2e8",
+      "name": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8e50b6bb007641620e9d2ca8c44b59496bb7379a97a1a445c81e82ea85a6e1f5",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "55b0456e7df8e1b3720e315712ef8eb01a9518963574dd02da2531f68168ec1b",
+          "code_length": 110
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a8a695af61d084ba598a7bccea253becd97139b2a9ee38480f8dc7bc959c129d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/ailib/chat/QProduct",
+        "com/strategyquant/ailib/chat/SQAITurns",
+        "com/strategyquant/ailib/model/SQAIModelFactory",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin",
+        "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "jakarta/servlet/MultipartConfigElement",
+        "jakarta/servlet/ServletRegistration",
+        "jakarta/servlet/ServletRegistration$Dynamic",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet.class",
+      "occurrence": 0,
+      "sha256": "ec89be66c541da3ce04f846a833bf53a0c7df760aa5725cb61147c48e487bb25",
+      "name": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "completionSlots",
+          "descriptor": "Ljava/util/concurrent/Semaphore;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "966d9af3aaa0c7c7d186e2be6c39caff2e52a0676e8a06ab220d9e689c87c9b5",
+          "code_length": 975,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleOpenStrategy",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "20b3b3cbb9671f80746cd52da758ae6b71f14cb9470acc00dd9c5d668f0a7999",
+          "code_length": 147,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleReportPdf",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5cb15325df48d55d56eccc2f1a96cb3613261beea9912dd4fc15db6f5c242d52",
+          "code_length": 102,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getConfigStatus",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7d00a21842b20e113490ba94483048422ccb62ec2b70167db2e7a09ea40f5ee0",
+          "code_length": 249,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "handleModelSelect",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4cf1ea48988e9cf109005bb76d0a14d342c141cf4b9e5684eebf81102e8eca42",
+          "code_length": 101,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "applyConfig",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b27707509398596f32085edea4ed8a2ab7e591a76eaba7a1a626289496112530",
+          "code_length": 61
+        },
+        {
+          "name": "handleReinit",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "de04e15fa23243554ab33f3c6ecfa2b80896ada497de60eb1c230cd469aec1bc",
+          "code_length": 45
+        },
+        {
+          "name": "handleChat",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "931951fcf7b10657b1d805b8e2e2d3400ff60607b53ce650fa9355c8bb3b5cfd",
+          "code_length": 819,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleComplete",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "98e412095de65795dd1b26e5873bf701c529a188b7ca20b07ae734fd0eadadbe",
+          "code_length": 275,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleTurnStatus",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "485b215120471351f67d7020066b166419ebf1a43f870ca43fd0d4d71a9c3008",
+          "code_length": 339,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleStop",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0931f712a5839eebb720a811779ddca12d748ff41a2424fc01c9b33af4cd08fd",
+          "code_length": 345,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleUiContext",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e2b0042e16f28c123292815d0d1a23a24a14d3e3f88f9678afb00b798a5ce52a",
+          "code_length": 119,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleAuditResult",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6427e6db64421caf5b202712a1b5a1ca1fd1536f2ad5d8cc85f989ee3ae536e0",
+          "code_length": 114,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleWorkspace",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "65eee9e33b0b4f989572441184d1ff5514b4f2c31920f20d75e6e5fc973282a3",
+          "code_length": 82,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleMemory",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a86e9add625f4d3f6f4a21c8fb7decd48a61259e9a247cab20dcc41992fd2bf9",
+          "code_length": 150,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "handleSkills",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d216ccc5f19b5aaa22aa32e7912fb62e92ac2d8284e9ede0e7559e83a7fff13b",
+          "code_length": 176,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "getHistory",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9bf2c91f1cd6170d94bcc78d70abe2aa7cea222e97e0d1ed65c4c43f130d8ce9",
+          "code_length": 153,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "clearHistory",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8986e777f9ad9d5ff614a82ec2d73aeeadc6da8468623953a16f1669033ac07b",
+          "code_length": 250,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "listSessions",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c55187c49d471a737d8200ae2d043787eebc50ce0949c80ab944617e4e588a96",
+          "code_length": 43
+        },
+        {
+          "name": "handleProjects",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "a939bf2b344673af84b65fc5d32b8d783345b2f817645a145b341c51446fdda7",
+          "code_length": 543,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "renameSession",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3068834f47e824b9cd5c1a767ca38af8d27aa6cca3326389a1cf139c032a06e6",
+          "code_length": 53,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "lambda$handleChat$0",
+          "descriptor": "(Lcom/strategyquant/ailib/chat/SQAITurns$Turn;)V",
+          "access": 4106,
+          "code_sha256": "6e602bb74061c7a36062edfcb366a200005d9656c335e391d6c1ed29170998ea",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1632896cdcdb0b73cbaacaeae9d4fa6881d0a33747d6169219e0f1a03f8cf5d2",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/ailib/agent/SQAIAgentLoop",
+        "com/strategyquant/ailib/agent/SQAIAgentLoop$StepSink",
+        "com/strategyquant/ailib/agent/SQAIHarness",
+        "com/strategyquant/ailib/agent/SQAIWakeup",
+        "com/strategyquant/ailib/chat/QProduct",
+        "com/strategyquant/ailib/chat/SQAIBackendUrls",
+        "com/strategyquant/ailib/chat/SQAIExtensionCommands",
+        "com/strategyquant/ailib/chat/SQAIHttp",
+        "com/strategyquant/ailib/chat/SQAIPathGrants",
+        "com/strategyquant/ailib/chat/SQAIProgressPublisher",
+        "com/strategyquant/ailib/chat/SQAIProjectStore",
+        "com/strategyquant/ailib/chat/SQAISessionStore",
+        "com/strategyquant/ailib/chat/SQAITerms",
+        "com/strategyquant/ailib/chat/SQAITurns",
+        "com/strategyquant/ailib/chat/SQAITurns$Turn",
+        "com/strategyquant/ailib/chat/SQAIUploads",
+        "com/strategyquant/ailib/extensions/AIExtensions",
+        "com/strategyquant/ailib/model/SQAIConfig",
+        "com/strategyquant/ailib/model/SQAIModelFactory",
+        "com/strategyquant/ailib/reports/AIReports",
+        "com/strategyquant/ailib/tools/MCPTools",
+        "com/strategyquant/ailib/ui/SQAIUiContext",
+        "com/strategyquant/ailib/ui/SQAIUiGate",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Files",
+        "java/nio/file/OpenOption",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Objects",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Semaphore",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,2232 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/image4j-0.7.2.jar",
+  "archive_sha256": "12904084d497fc054dbaebb27deab6f15265e779626616adcceb3fb52da0735b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/BMPConstants.class",
+      "occurrence": 0,
+      "sha256": "8a85332071f9db3f82d2e40265475c198c94b546c1a2131136442b040272dd39",
+      "name": "net/ifok/image/image4j/codec/bmp/BMPConstants",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FILE_HEADER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "BI_RGB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BI_RLE8",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BI_RLE4",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BI_BITFIELDS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BI_JPEG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BI_PNG",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/ifok/image/image4j/codec/bmp/BMPConstants"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/BMPDecoder.class",
+      "occurrence": 0,
+      "sha256": "4589d0ddab3ca37f9d62085709d2a5d0482f3e5c6130ca079f9a9c82d629587d",
+      "name": "net/ifok/image/image4j/codec/bmp/BMPDecoder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "img",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 2
+        },
+        {
+          "name": "infoHeader",
+          "descriptor": "Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "9b2201a4c73d90e39554e4a37cf04104af7e196ff76f166eb7b00d7fedc63720",
+          "code_length": 124,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBit",
+          "descriptor": "(II)I",
+          "access": 10,
+          "code_sha256": "10002ed6659ff0a4cbb103e64efe74e546d118c49e92727c2bf07d0e52b316ec",
+          "code_length": 9
+        },
+        {
+          "name": "getNibble",
+          "descriptor": "(II)I",
+          "access": 10,
+          "code_sha256": "f351377ae143ba69c03e7d5c2292972a44fa8a60dbda0b760b007d7f111d285a",
+          "code_length": 11
+        },
+        {
+          "name": "getInfoHeader",
+          "descriptor": "()Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 1,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "getBufferedImage",
+          "descriptor": "()Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "getColorTable",
+          "descriptor": "([Lnet/ifok/image/image4j/codec/bmp/ColorEntry;[B[B[B)V",
+          "access": 10,
+          "code_sha256": "695b30e464e097433265103a5306ac8585b2fc10f8f7a978cc99364283c59825",
+          "code_length": 53
+        },
+        {
+          "name": "readInfoHeader",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;)Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 9,
+          "code_sha256": "4e0aebd0dd0c7737e5278cf5b5d716872360ec8aae1d3e8e2a4fadcaf212ea49",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readInfoHeader",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;I)Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 9,
+          "code_sha256": "a8ed5e384c1d0a8263987210f25e73d69c2b5152f0e66b09020133ab66390e1b",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "61651e07f93ec6f293dbc0443a8192a81f5b2dcba4e54e32f9031ff50fc46aa2",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "ca0eec8e0f702d7623a386062635e87578633bee1dbfdab706d46db02f4c34ff",
+          "code_length": 172,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readColorTable",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;)[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;",
+          "access": 9,
+          "code_sha256": "8b1246d1d3b1cc69aa7fb6e9de1228d31e2abf734f28b288a9f941d734ed1b69",
+          "code_length": 41,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read1",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "e53e72e99412d4e187af8c74e643179360e04c9e9abb8f5aeeabbbf68e003fb0",
+          "code_length": 234,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read4",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "adff42ed45fca5cebf3186519f91f3e9cbef05c933806ad7001288db37b03c14",
+          "code_length": 223,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read8",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "f566c26bc58322ced886e31a90c174138097c8248323b08b24929fde2d76fbfe",
+          "code_length": 174,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read24",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "721aef9fdb1e20ea6b9ee06f15106f1cb0306c9440ecb8471122075ec1583705",
+          "code_length": 156,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read32",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianInputStream;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "63823b776a91b4128391c3d52d1eae94860f305f610f2778135c181adc477292",
+          "code_length": 136,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/File;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "fe8395e954100fff8fc413fa7c9e2ff4d793790934e6cfd9357e900ede25acdb",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "c7fc1694bb8e34a432ac1f0b473a363b48598910648b68705299bf32e45033b3",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readExt",
+          "descriptor": "(Ljava/io/File;)Lnet/ifok/image/image4j/codec/bmp/BMPImage;",
+          "access": 9,
+          "code_sha256": "e80d8220489f9ace524497fc7d9480705ee0fade3d409de2f1a53dd7ba3d7d67",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readExt",
+          "descriptor": "(Ljava/io/InputStream;)Lnet/ifok/image/image4j/codec/bmp/BMPImage;",
+          "access": 9,
+          "code_sha256": "34ce9a30cdfa6c67b36526aed6b814b3bc2b2f6729439cb759345d9184b915f9",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[I",
+        "[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/IndexColorModel",
+        "java/awt/image/WritableRaster",
+        "java/io/BufferedInputStream",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "net/ifok/image/image4j/codec/bmp/BMPDecoder",
+        "net/ifok/image/image4j/codec/bmp/BMPImage",
+        "net/ifok/image/image4j/codec/bmp/ColorEntry",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader",
+        "net/ifok/image/image4j/io/CountingInputStream",
+        "net/ifok/image/image4j/io/LittleEndianInputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/BMPEncoder.class",
+      "occurrence": 0,
+      "sha256": "80ae78ab55b6ed23716b219293e69c0e7ecb8434f497b474a4f74c5ba48f8683",
+      "name": "net/ifok/image/image4j/codec/bmp/BMPEncoder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/io/File;)V",
+          "access": 9,
+          "code_sha256": "54829d92fefb556b268fc4e33b5282eac9a5a04dc7cea3e41dcc1dca34309d40",
+          "code_length": 53,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "08410110572bcdeb795d5213cb8f9f35b24eadf184488305a9c415fe47460810",
+          "code_length": 338,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createInfoHeader",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 9,
+          "code_sha256": "5335a82081bde44a20e2f0ba93fb9dbdfe6ab2e6ad7c0283092172151c78ea0a",
+          "code_length": 82
+        },
+        {
+          "name": "writeFileHeader",
+          "descriptor": "(IILnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "0052886b1985ae7a8885e37bfa8ee33481fbe82209f83b60e202fcb911cfaa56",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeColorMap",
+          "descriptor": "(Ljava/awt/image/IndexColorModel;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "b57d06779d131137826078a9f0dbea34a08596cec940d6e2b987207488cb3f71",
+          "code_length": 79,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBytesPerLine1",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "9078a80dcf8a651490fc38f48b071c45f2ecbe21b9d8fe204e97b07d9af777a6",
+          "code_length": 32
+        },
+        {
+          "name": "getBytesPerLine4",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "2e85e9d2b6623acb57866cb38f3a3fa963ffb2623aded235c6d1d8bf4ad355f3",
+          "code_length": 20
+        },
+        {
+          "name": "getBytesPerLine8",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "abce523b430e7b141c0741be9d4098d46fa1797e8e3119aafe84ab9762e97ece",
+          "code_length": 18
+        },
+        {
+          "name": "getBytesPerLine24",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "6b51b611a0e9611917b560cb829a84c3aa7757deb96111fd1750a9415fae3ae9",
+          "code_length": 20
+        },
+        {
+          "name": "getBitmapSize",
+          "descriptor": "(III)I",
+          "access": 9,
+          "code_sha256": "2a8845e4a462132a70681e916a6daf9d78bff003fd4175d4759f91e154855551",
+          "code_length": 96
+        },
+        {
+          "name": "write1",
+          "descriptor": "(Ljava/awt/image/Raster;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "503c4e53650d2bf724e6e6c42698272765d73e9e010c20509e11fdbc6a87a8a4",
+          "code_length": 115,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write4",
+          "descriptor": "(Ljava/awt/image/Raster;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "f49999548ca7967cfc5b00cd8a0b85737dd3f8384231dd11d5d4dc72fffdcfad",
+          "code_length": 122,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write8",
+          "descriptor": "(Ljava/awt/image/Raster;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "24a1ff766d400440e26bc711c5c8d4b62a980c304b4527d03dcff8d240d1bfaf",
+          "code_length": 86,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write24",
+          "descriptor": "(Ljava/awt/image/Raster;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "ab19e89930bf95e52b952ab161a72f5cb475d833596b4d57b61fbecca1794bec",
+          "code_length": 122,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write32",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "4bdaa456cf2340ce23a01b9174dd6aaa1ee2e71bb13e0595096e81be8782805a",
+          "code_length": 112,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setBit",
+          "descriptor": "(BII)B",
+          "access": 10,
+          "code_sha256": "18235a3ed72e8eed672303fa0f5fddc64b926bb7c5ffbd9868c5ca27629ecff4",
+          "code_length": 31
+        },
+        {
+          "name": "setNibble",
+          "descriptor": "(BII)B",
+          "access": 10,
+          "code_sha256": "4b7f7a122e5e5326289d89d396e999ea051bc5ca7222ebc9165e53f4ca01d38a",
+          "code_length": 13
+        },
+        {
+          "name": "getColorMapSize",
+          "descriptor": "(S)I",
+          "access": 9,
+          "code_sha256": "8ee9a65e67ecf3edab5cd00e318ff27d177e579fb317295d789171a2ae139731",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/awt/image/IndexColorModel",
+        "java/awt/image/Raster",
+        "java/io/BufferedOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "net/ifok/image/image4j/codec/bmp/BMPConstants",
+        "net/ifok/image/image4j/codec/bmp/BMPEncoder",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader",
+        "net/ifok/image/image4j/io/LittleEndianOutputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/BMPImage.class",
+      "occurrence": 0,
+      "sha256": "2a488745f8e1205715d9a64fbb079d6f8918a8f444763768c5f91317bc38d86b",
+      "name": "net/ifok/image/image4j/codec/bmp/BMPImage",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "infoHeader",
+          "descriptor": "Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 4
+        },
+        {
+          "name": "image",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Lnet/ifok/image/image4j/codec/bmp/InfoHeader;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getInfoHeader",
+          "descriptor": "()Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setInfoHeader",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "getImage",
+          "descriptor": "()Ljava/awt/image/BufferedImage;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ccd55b6ba446de63a0dc271a981aa8aafa5c33b89b94d79a748e7ad06b87417e",
+          "code_length": 19
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4f77892357d7fdc629b0f1efc77083341e05c6631d5542be63139aecd30c9e5b",
+          "code_length": 19
+        },
+        {
+          "name": "getColourDepth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ae5016ad7f7b182c31a4511ecc8ae7b19c4828e6dcacf9ac268401b5c2a63566",
+          "code_length": 19
+        },
+        {
+          "name": "getColourCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95b3aaa7f58e1d53c8f507bce4bd72aebd2e440e1c6c87077164b8cf0a9fbc3b",
+          "code_length": 38
+        },
+        {
+          "name": "isIndexed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1a382c568206fa7aa03887a28d42814af984441ea9cd74c102fb3cba02ec70dc",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/ifok/image/image4j/codec/bmp/BMPImage",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/ColorEntry.class",
+      "occurrence": 0,
+      "sha256": "a5b7fe415d88984f688488693b038b30fcb63f0b62253ea4e3e26bfd1263ffad",
+      "name": "net/ifok/image/image4j/codec/bmp/ColorEntry",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bRed",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bGreen",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bBlue",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bReserved",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;)V",
+          "access": 1,
+          "code_sha256": "2647cf8a9b63a9bdc4e59f4c80ab243bc522fa9b6fbcb040b902a0307221419d",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f7a4ea80df5132b76d9a44cde5c8d34a78ef9f89147b8fab29dafa15d06daa37",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIII)V",
+          "access": 1,
+          "code_sha256": "95a624cc122721204abf1a07411ccf36fa3c0af0f1b7f10c115d38f2ab69e3a4",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "net/ifok/image/image4j/codec/bmp/ColorEntry",
+        "net/ifok/image/image4j/io/LittleEndianInputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/bmp/InfoHeader.class",
+      "occurrence": 0,
+      "sha256": "d28d8657fb7b9deec3001b3eca91b891de2279eeb81a962321e328ba29745243",
+      "name": "net/ifok/image/image4j/codec/bmp/InfoHeader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "iSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iWidth",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iHeight",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "sPlanes",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "sBitCount",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "iCompression",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iImageSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iXpixelsPerM",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iYpixelsPerM",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iColorsUsed",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iColorsImportant",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iNumColors",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;)V",
+          "access": 1,
+          "code_sha256": "52341a51721edf3a161a63b5d7ff67e536290beba8ace6f167b0532ee2535a64",
+          "code_length": 22,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;I)V",
+          "access": 1,
+          "code_sha256": "2831edf0e218eade02eb16ff122343ec7b9c2e480a258361c9f071e7daa72bd3",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;I)V",
+          "access": 4,
+          "code_sha256": "e5d1b2afe159d0903e5d5b09fdf6c8d04123c6ecaf0a0885cb6c2843740c2975",
+          "code_length": 102,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "887fc0e24450089af58f1a9fb488fe6eb449b96143d15de2982ea29d0377a130",
+          "code_length": 66
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;)V",
+          "access": 1,
+          "code_sha256": "ecd1fec5726e10b4de07f9960a0e174472745be2992c5837d050795c5277891b",
+          "code_length": 101
+        },
+        {
+          "name": "write",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 1,
+          "code_sha256": "ec6b54ddceece8281247947999ff17e093ca652e4084e3768263e5df0cc1d902",
+          "code_length": 89,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "net/ifok/image/image4j/codec/bmp/BMPConstants",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader",
+        "net/ifok/image/image4j/io/LittleEndianInputStream",
+        "net/ifok/image/image4j/io/LittleEndianOutputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/ICOConstants.class",
+      "occurrence": 0,
+      "sha256": "9a3066fa004cc97146c991039562fdb0523f2fd0c694c92ba70fa058a13ec2dc",
+      "name": "net/ifok/image/image4j/codec/ico/ICOConstants",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TYPE_ICON",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPE_CURSOR",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/ifok/image/image4j/codec/ico/ICOConstants"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/ICODecoder$1.class",
+      "occurrence": 0,
+      "sha256": "01ddf9c8a6754d10dcc5050be2c4906d645047f9e8db626a23b40c090f70d43d",
+      "name": "net/ifok/image/image4j/codec/ico/ICODecoder$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/ico/IconEntry;Lnet/ifok/image/image4j/codec/ico/IconEntry;)I",
+          "access": 1,
+          "code_sha256": "70947061ed62f495cd40a49249a44d278ae7ed769c1ec8df0a21602c8b809492",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "3d194ab7ea49e829ad898786d3577cc2c4e56603f3124bafb82337ca4e0700cf",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lnet/ifok/image/image4j/codec/ico/IconEntry;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Comparator",
+        "net/ifok/image/image4j/codec/ico/ICODecoder",
+        "net/ifok/image/image4j/codec/ico/ICODecoder$1",
+        "net/ifok/image/image4j/codec/ico/IconEntry"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/ICODecoder.class",
+      "occurrence": 0,
+      "sha256": "27804a5be7b0c67ca1f92640dd20603916f13621726fe33a867169179cd6b00b",
+      "name": "net/ifok/image/image4j/codec/ico/ICODecoder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "log",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 10
+        },
+        {
+          "name": "PNG_MAGIC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "PNG_MAGIC_LE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "PNG_MAGIC2",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "PNG_MAGIC2_LE",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/File;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "178d72ccef27b540890c67e853c126d5c38cc195c334ae0874d79ef96ca92507",
+          "code_length": 101,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/io/File;)Ljava/util/List<Ljava/awt/image/BufferedImage;>;"
+        },
+        {
+          "name": "readExt",
+          "descriptor": "(Ljava/io/File;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "53c16e8ca3b798845348122ad01270a7cb999591797a92bb7e28d9bb546baef2",
+          "code_length": 104,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/io/File;)Ljava/util/List<Lnet/ifok/image/image4j/codec/ico/ICOImage;>;"
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "3bc76bc66d1dd8474370e303ad7a664dd1cf5ca0dcaa5d8563a288c2f910fb78",
+          "code_length": 67,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/io/InputStream;)Ljava/util/List<Ljava/awt/image/BufferedImage;>;"
+        },
+        {
+          "name": "sortByFileOffset",
+          "descriptor": "([Lnet/ifok/image/image4j/codec/ico/IconEntry;)[Lnet/ifok/image/image4j/codec/ico/IconEntry;",
+          "access": 10,
+          "code_sha256": "721e149d3438e12a60c8f6ec66151d1a8aeebd36718e8fa101221c999554b953",
+          "code_length": 35
+        },
+        {
+          "name": "readExt",
+          "descriptor": "(Ljava/io/InputStream;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "a3a075f5065f96ee7d18e1c2b1eeaa4fec4f79862cf0b1d30a1324b24109a6c1",
+          "code_length": 1122,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/io/InputStream;)Ljava/util/List<Lnet/ifok/image/image4j/codec/ico/ICOImage;>;"
+        },
+        {
+          "name": "getPNGImageReader",
+          "descriptor": "()Ljavax/imageio/ImageReader;",
+          "access": 10,
+          "code_sha256": "227177037ef7c6e82ae6a549b4bc3d64a62970274ebcb8b0712b4e6db25e4836",
+          "code_length": 29
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "09ad69e9ac2acc15c192d47a0fc0248902751a5a16c3f726656712a7c8b18c63",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "[Lnet/ifok/image/image4j/codec/bmp/ColorEntry;",
+        "[Lnet/ifok/image/image4j/codec/ico/IconEntry;",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/WritableRaster",
+        "java/io/BufferedInputStream",
+        "java/io/ByteArrayInputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/EOFException",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "javax/imageio/ImageIO",
+        "javax/imageio/ImageReader",
+        "net/ifok/image/image4j/codec/bmp/BMPDecoder",
+        "net/ifok/image/image4j/codec/bmp/ColorEntry",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader",
+        "net/ifok/image/image4j/codec/ico/ICODecoder",
+        "net/ifok/image/image4j/codec/ico/ICODecoder$1",
+        "net/ifok/image/image4j/codec/ico/ICOImage",
+        "net/ifok/image/image4j/codec/ico/IconEntry",
+        "net/ifok/image/image4j/io/CountingInputStream",
+        "net/ifok/image/image4j/io/EndianUtils",
+        "net/ifok/image/image4j/io/LittleEndianInputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/ICOEncoder.class",
+      "occurrence": 0,
+      "sha256": "cb0f11257c129e3247b60084f5e42c2f996a3fe365c855bcc9628b07bf1e1369",
+      "name": "net/ifok/image/image4j/codec/ico/ICOEncoder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/io/File;)V",
+          "access": 9,
+          "code_sha256": "e9cfaa902d0113b006eff9f50a5206030a82cfa509f1e2fe4e626742dfb727f4",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "de2e3763365b5805b66b138cadfa3387fe96cc3794be7885d5bd76ef6847d8dc",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;Ljava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "d877e572a0b247a3259a1b504b86abfb03c1ef72aa18266feb63a1edead48d3c",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;Ljava/io/OutputStream;)V"
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;Ljava/io/File;)V",
+          "access": 9,
+          "code_sha256": "cedda7aaf4924a2fbe1d3631d3de621985716118084dbf6fbde3bbdd4692015c",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;Ljava/io/File;)V"
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;[ILjava/io/File;)V",
+          "access": 9,
+          "code_sha256": "a333a3d499ea6614e9abd65f4aa5605605cadf1c0e43371fa319001295fac94a",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;[ILjava/io/File;)V"
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;[I[ZLjava/io/File;)V",
+          "access": 9,
+          "code_sha256": "b3f9400f5cdb9b9fd66bc3606147c0228a7997e83c060b2e02ef7c043d97856d",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;[I[ZLjava/io/File;)V"
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;ILjava/io/File;)V",
+          "access": 9,
+          "code_sha256": "88af2e3a0e02634e3d262e8e79de52841c5ad0aef991d1f2ff80788780de5658",
+          "code_length": 58,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/awt/image/BufferedImage;ILjava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "fbae67680f1ec5e732d16fc941530e3862d728000f0905da58933c2de2bdf002",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;[ILjava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "ce0a5a6f25ab4a121e2e7dd25c42ef67816215600c14168d0fffb2f0f44247f9",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;[ILjava/io/OutputStream;)V"
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/util/List;[I[ZLjava/io/OutputStream;)V",
+          "access": 9,
+          "code_sha256": "98be171e4a2cf1cc1a44ae2c60eb78be9e98b5fc1f8c3db4e63a2a5f34d00a85",
+          "code_length": 414,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "(Ljava/util/List<Ljava/awt/image/BufferedImage;>;[I[ZLjava/io/OutputStream;)V"
+        },
+        {
+          "name": "writeFileHeader",
+          "descriptor": "(IILnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "8ef791e4d2e8cc0b34d07f1f0f8b1881f5f968b969da4d4800ab0eda00a98da5",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createIconEntry",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/bmp/InfoHeader;)Lnet/ifok/image/image4j/codec/ico/IconEntry;",
+          "access": 9,
+          "code_sha256": "4a19bf4589e2e38028bf80bd1f4376488de1c4098881724e2ffc1e1fde29f9f1",
+          "code_length": 156
+        },
+        {
+          "name": "writeAndBitmap",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 9,
+          "code_sha256": "c9b13cca215c56f0f76c6dca634e76d9ae084408ace51438e82ac44ab15489d9",
+          "code_length": 351,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setBit",
+          "descriptor": "(BII)B",
+          "access": 10,
+          "code_sha256": "4b69937663776d3b16d83c0b4e624d17b3d4aaef48dd4ccbd6c8ca9832e8aae8",
+          "code_length": 26
+        },
+        {
+          "name": "writeXorBitmap",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 10,
+          "code_sha256": "82edea0d750ba5ae55511a236b248f12f8c406ef641799450bfeb99e6adf9802",
+          "code_length": 106,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "convert",
+          "descriptor": "(Ljava/awt/image/BufferedImage;I)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "011d1e7eacd0407a4c9756e7a332326db5f5be34a8b970389832bfe51a1c5b12",
+          "code_length": 144
+        },
+        {
+          "name": "getPNGImageWriter",
+          "descriptor": "()Ljavax/imageio/ImageWriter;",
+          "access": 10,
+          "code_sha256": "51fc255869dfb6d72b65c57b4bf139d910354da1c73f4e139eccb4238078aa86",
+          "code_length": 29
+        },
+        {
+          "name": "encodePNG",
+          "descriptor": "(Ljavax/imageio/ImageWriter;Ljava/awt/image/BufferedImage;)[B",
+          "access": 10,
+          "code_sha256": "45a3e5548cd15863103cb82719681837403b0ff81d58271e6033a5fa68de1ebe",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[I",
+        "[Z",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/awt/image/IndexColorModel",
+        "java/awt/image/Raster",
+        "java/awt/image/WritableRaster",
+        "java/io/BufferedOutputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "javax/imageio/ImageIO",
+        "javax/imageio/ImageWriter",
+        "net/ifok/image/image4j/codec/bmp/BMPEncoder",
+        "net/ifok/image/image4j/codec/bmp/InfoHeader",
+        "net/ifok/image/image4j/codec/ico/ICOConstants",
+        "net/ifok/image/image4j/codec/ico/ICOEncoder",
+        "net/ifok/image/image4j/codec/ico/IconEntry",
+        "net/ifok/image/image4j/io/LittleEndianOutputStream",
+        "net/ifok/image/image4j/util/ConvertUtil"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/ICOImage.class",
+      "occurrence": 0,
+      "sha256": "f860de3495e2e3c99346180d480fd1ceb4a6d921ca492789356ffaa547afb19b",
+      "name": "net/ifok/image/image4j/codec/ico/ICOImage",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "net/ifok/image/image4j/codec/bmp/BMPImage",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "iconEntry",
+          "descriptor": "Lnet/ifok/image/image4j/codec/ico/IconEntry;",
+          "access": 4
+        },
+        {
+          "name": "pngCompressed",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "iconIndex",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Lnet/ifok/image/image4j/codec/bmp/InfoHeader;Lnet/ifok/image/image4j/codec/ico/IconEntry;)V",
+          "access": 1,
+          "code_sha256": "43b2c0582fa880d57ab10c1ae191b503c5c1e548f60d8fae80ba1e5c37a1c3d2",
+          "code_length": 22
+        },
+        {
+          "name": "getIconEntry",
+          "descriptor": "()Lnet/ifok/image/image4j/codec/ico/IconEntry;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "setIconEntry",
+          "descriptor": "(Lnet/ifok/image/image4j/codec/ico/IconEntry;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6
+        },
+        {
+          "name": "isPngCompressed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "setPngCompressed",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "94c64ef71e87fe8f787c358628a98bc1e295e68c5fab92a8b5b35ad8382476bc",
+          "code_length": 6
+        },
+        {
+          "name": "getInfoHeader",
+          "descriptor": "()Lnet/ifok/image/image4j/codec/bmp/InfoHeader;",
+          "access": 1,
+          "code_sha256": "1c063faa421a004010b02f8393dd715915382ef4fee2445a421a83ec841dad3f",
+          "code_length": 5
+        },
+        {
+          "name": "getIconIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "setIconIndex",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ffe0dd8353d5c4cf83655aa30381afe84b399c95445346c2334402a834f6a1ba",
+          "code_length": 6
+        },
+        {
+          "name": "getWidth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "60af1cba26bff3dc0ff7432b7d9ba8bfafdbc8b87321cbf41754521dbd3b73f5",
+          "code_length": 35
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "185da3897f531fe8ab4bac04649badb53290f59d38c73b50c8c70ecb78717470",
+          "code_length": 35
+        },
+        {
+          "name": "getColourDepth",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e6f7b6400494cc164c5d9d41fdd915a7dd4e16120e4eed2362df597aee349a6b",
+          "code_length": 19
+        },
+        {
+          "name": "getColourCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "0b3b46b2d60b6af0fef4ea11b2b712d553c215597b462dd7fb8918edd048bb5f",
+          "code_length": 38
+        },
+        {
+          "name": "isIndexed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "8fe82e65b50c617d5d83ced0c48f39f4756578dc8b3d3fe86868c675595d43ba",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "net/ifok/image/image4j/codec/bmp/BMPImage",
+        "net/ifok/image/image4j/codec/ico/ICOImage",
+        "net/ifok/image/image4j/codec/ico/IconEntry"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/codec/ico/IconEntry.class",
+      "occurrence": 0,
+      "sha256": "d1da19b3f109335454065abbf88cc84b73c92ddcce38bc20ca3b4f0f9d9fafa3",
+      "name": "net/ifok/image/image4j/codec/ico/IconEntry",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bWidth",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bHeight",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bColorCount",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "bReserved",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "sPlanes",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "sBitCount",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "iSizeInBytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "iFileOffset",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianInputStream;)V",
+          "access": 1,
+          "code_sha256": "9407bd9cf04d6032991afda6d184b1e1d4d60af2140ef4ffe549edfa0c41d4a2",
+          "code_length": 69,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1c3909485f0505bf6cf77e193fb9d5750fe461239153825afd6b4131ec18287c",
+          "code_length": 45
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e44e8834473c39bf08ecca0b12f40e9caa9ea2d9806824f6256293cec6fa3138",
+          "code_length": 88
+        },
+        {
+          "name": "write",
+          "descriptor": "(Lnet/ifok/image/image4j/io/LittleEndianOutputStream;)V",
+          "access": 1,
+          "code_sha256": "517aa976cb982cca3614d55a54a8940477c37054dfef6bce019e4883b2fcaf4e",
+          "code_length": 65,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "net/ifok/image/image4j/codec/ico/IconEntry",
+        "net/ifok/image/image4j/io/LittleEndianInputStream",
+        "net/ifok/image/image4j/io/LittleEndianOutputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/CountingDataInput.class",
+      "occurrence": 0,
+      "sha256": "4ffc1ca941cb08eff66e1f940340a4e56ca258c5d61bfe3f0fd104c2274f5a30",
+      "name": "net/ifok/image/image4j/io/CountingDataInput",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/DataInput",
+        "net/ifok/image/image4j/io/CountingInput"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/io/DataInput",
+        "java/lang/Object",
+        "net/ifok/image/image4j/io/CountingDataInput",
+        "net/ifok/image/image4j/io/CountingInput"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/CountingDataInputStream.class",
+      "occurrence": 0,
+      "sha256": "25e2b6b747fe8f2336353acec58c5e81bcf3df307345178c7a7f25922f7a9458",
+      "name": "net/ifok/image/image4j/io/CountingDataInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/DataInputStream",
+      "interfaces": [
+        "net/ifok/image/image4j/io/CountingDataInput"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "d8f146a9b9611ea29426f4e321c202ef8c33243a885c65c9aadf6a7669be3807",
+          "code_length": 13
+        },
+        {
+          "name": "getCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8168ac2c26314c844f8eb66a07103b34895dd11e7749469005e530342d46ed6b",
+          "code_length": 11
+        },
+        {
+          "name": "skip",
+          "descriptor": "(IZ)I",
+          "access": 1,
+          "code_sha256": "2ca811431fb9c8b3cfa7186e7f297e808e4b992a441b85497f11dbef4f876271",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a8247a788d125a86eee86d8e935e5efd7f30f5ac7b3f377212e2fb153c110d72",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "java/io/DataInputStream",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "net/ifok/image/image4j/io/CountingDataInput",
+        "net/ifok/image/image4j/io/CountingDataInputStream",
+        "net/ifok/image/image4j/io/CountingInputStream",
+        "net/ifok/image/image4j/io/IOUtils"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/CountingInput.class",
+      "occurrence": 0,
+      "sha256": "928e50e842799e395d98fd5719aa2bdc7eb58b2c2787a496e3b8148b35ee20ea",
+      "name": "net/ifok/image/image4j/io/CountingInput",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getCount",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/ifok/image/image4j/io/CountingInput"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/CountingInputStream.class",
+      "occurrence": 0,
+      "sha256": "9ce8c215992f67de9ff667ffd9eaaae0d092d015caf3e05d742f54eea4a7d772",
+      "name": "net/ifok/image/image4j/io/CountingInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea80f0b93e9a2092523d5e9b8646f92e4e452b7be726c01df45899922821c283",
+          "code_length": 22,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "c65415efd90bc6a9849a982d1ccfe5c1c3f6f59b86a3fe5ab0d5b570055bc8ce",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "net/ifok/image/image4j/io/CountingInputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/EndianUtils.class",
+      "occurrence": 0,
+      "sha256": "9554fda69deda68ce8417256a1fcf79561432aac3da3803ffa7595a6e5a7a883",
+      "name": "net/ifok/image/image4j/io/EndianUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "swapShort",
+          "descriptor": "(S)S",
+          "access": 9,
+          "code_sha256": "2423771d458d3c061fe0cb7bc3318d7578677c1a4a4304fa24801875255e6a1b",
+          "code_length": 18
+        },
+        {
+          "name": "swapInteger",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "974e5ba73a46c3cd557627f0ca94cc95bab2196a77170abc3e392288eeb6cc82",
+          "code_length": 33
+        },
+        {
+          "name": "swapLong",
+          "descriptor": "(J)J",
+          "access": 9,
+          "code_sha256": "a6ff35f288331a520ecbaedc19b9d808387b12c4a0bab2e7616b444b310745bd",
+          "code_length": 72
+        },
+        {
+          "name": "swapFloat",
+          "descriptor": "(F)F",
+          "access": 9,
+          "code_sha256": "872f62f5544563bcb00b1a06c480f0ae4f846e60dba09932fe739af28c2f785f",
+          "code_length": 15
+        },
+        {
+          "name": "swapDouble",
+          "descriptor": "(D)D",
+          "access": 9,
+          "code_sha256": "a60142a0948331c5cc3d0a4208a838d771cafe163d1f3b7d8f10bf072f75c3ad",
+          "code_length": 15
+        },
+        {
+          "name": "toHexString",
+          "descriptor": "(IZI)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c511cc5c8a5f799b524a71ae9d9aceeb4f6d3996ed9e6727c9c4901b2c5c93a9",
+          "code_length": 69
+        },
+        {
+          "name": "toCharString",
+          "descriptor": "(Ljava/lang/StringBuilder;IIC)Ljava/lang/StringBuilder;",
+          "access": 9,
+          "code_sha256": "dcb4a5c11337adc74b4b3aeff21720efbb65780a19f2983f42dd99238eaf5d09",
+          "code_length": 57
+        },
+        {
+          "name": "toInfoString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "d4f5227774cd0cec0f06275529b80bbfb87823dd2a2299e6c234b1df6c2a253c",
+          "code_length": 105
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "net/ifok/image/image4j/io/EndianUtils"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/IOUtils.class",
+      "occurrence": 0,
+      "sha256": "8fc4123789d40af9b1ac8e82186a33827fdc05988cec1e51b00bd8437f2fb31a",
+      "name": "net/ifok/image/image4j/io/IOUtils",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "skip",
+          "descriptor": "(Ljava/io/InputStream;IZ)I",
+          "access": 9,
+          "code_sha256": "563f344d946abaede9d0a8783851442ac9eda742aa3e7152bd1b014f39400179",
+          "code_length": 71,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/EOFException",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "net/ifok/image/image4j/io/IOUtils"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/LittleEndianInputStream.class",
+      "occurrence": 0,
+      "sha256": "8aa56cce86b95b7c205acdd3ef72bd1c0f8213ffec34216882910499de7c62aa",
+      "name": "net/ifok/image/image4j/io/LittleEndianInputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/DataInputStream",
+      "interfaces": [
+        "net/ifok/image/image4j/io/CountingDataInput"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/ifok/image/image4j/io/CountingInputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "327cd1b2e6dbac3969febcd4b3a87fce06a628aaece2d39fe88ae3f5c977bc93",
+          "code_length": 11
+        },
+        {
+          "name": "skip",
+          "descriptor": "(IZ)I",
+          "access": 1,
+          "code_sha256": "46984e508ad20cd8ec3b54667841a7524e287f2906c84a86c0aa24db8ab94b97",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readShortLE",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "ff053ebb9f4a779a0642c893f309d5e88811aa0128817bbd4463b25a590539f8",
+          "code_length": 38,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readIntLE",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3d76f524fe8e951feb1cbf73c0ff1b9700d1216e64018be1723496b2b8f83f66",
+          "code_length": 74,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFloatLE",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "56333082f800a8db83ae4bc86683a5fb7d2d45358278938b072bf3e17b638650",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readLongLE",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "79ea5c5b058a6e390db700af9c95b5faa21e72c07b67d04246ad2d291388d41c",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readDoubleLE",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "ee74c7bf54faa7ab162eed987771075c865f22d3d2edd4c943c8f73aa7925e38",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readUnsignedInt",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "480bd786d32674ab09a4ad6c1b6256bfe0ceee59a4315481cc4a036cb1c00b31",
+          "code_length": 49,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readUnsignedIntLE",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "fda53c424053e4cdc52ec3bf10a346871ff27d1640cded740ba6cf228e9b93f7",
+          "code_length": 49,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataInputStream",
+        "java/io/EOFException",
+        "java/io/IOException",
+        "java/lang/Double",
+        "java/lang/Float",
+        "net/ifok/image/image4j/io/CountingDataInput",
+        "net/ifok/image/image4j/io/CountingInputStream",
+        "net/ifok/image/image4j/io/IOUtils",
+        "net/ifok/image/image4j/io/LittleEndianInputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/LittleEndianOutputStream.class",
+      "occurrence": 0,
+      "sha256": "8b146133a06834ef83003b6fe8b88ca9d37970e8884d095e5e23f6bb28dc3bfe",
+      "name": "net/ifok/image/image4j/io/LittleEndianOutputStream",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/DataOutputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "writeShortLE",
+          "descriptor": "(S)V",
+          "access": 1,
+          "code_sha256": "6c2e2c4abcfd18d053abdb8bf71cf50af7fbc93dc49b6c6e7222c978de08be44",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeIntLE",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "57a3b7136513588caf183f227a91a862e314100b72115d5ee877eeab531851e5",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeFloatLE",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "848b9f5ce07562a8918771ec353212dab1ad7944a2fdedd8a397530ca904962c",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeLongLE",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "a6a91c5d05b560b2300b0521641f624314a713f1b197fb1d45f56c1306b184c8",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeDoubleLE",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "23666dd40a14add3559f79b1b0e35fa9d5f4493758b4ca4cac8e7bcc43ef9714",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeUnsignedInt",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "4c72f391d6e3437c9e9833f9ba7504506c27e16c1e8ddd40cad0283e406e1f77",
+          "code_length": 60,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeUnsignedIntLE",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "b02fea499c339aa8b8643cdbc8eecfc7068163324a52d0fc1033e393ab7bff67",
+          "code_length": 60,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "net/ifok/image/image4j/io/EndianUtils",
+        "net/ifok/image/image4j/io/LittleEndianOutputStream"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/io/LittleEndianRandomAccessFile.class",
+      "occurrence": 0,
+      "sha256": "9d583b486bfe2c21e4c0cf0e69ed3b5783616835aa24bf9a6c6e29a84135709d",
+      "name": "net/ifok/image/image4j/io/LittleEndianRandomAccessFile",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/RandomAccessFile",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ]
+        },
+        {
+          "name": "readShortLE",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "ce2603c5760cb021f9d471bf87ffc85be626f6f0f9455dbe029098157f8fd445",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readIntLE",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7e18d36a8af06d4bc909b76de7c2d7197b41a670895712ebbdc12cc0b0ff320b",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFloatLE",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "b8f5757d8f9e6211a1786a58f4ddde9855bbd566512f87d17db3c9a87339cdc8",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readLongLE",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "6031e2af3abcf8ac34ab0b59df30e799e71441b7b1dd8f5abd213945d953108a",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readDoubleLE",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "3ef8e16cea14089ba62bcfffe14a928564f597d7a60de268bd8a2925436a0a40",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeShortLE",
+          "descriptor": "(S)V",
+          "access": 1,
+          "code_sha256": "8ff595e5026ce741d6f39190dbc0346395ffec721070b018e0fbb2df230944c8",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeIntLE",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "949868fab70dea03fa89c7487d52b08b6235cd5984b3806f4a0271fa94046bc2",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeFloatLE",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "275a5bfc2d141cdf73028d4fb9c3d6300319fadaa3fcb8874e111d3bc78ee9d4",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeLongLE",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "48215cbb9cab1f8027025221810947006491825514ca83b51c7aab8fc75f2d89",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeDoubleLE",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "22bc5158072636ac6d0564114133fc1d6584b7c5cefa14ead78510c98ef8f5ce",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/io/RandomAccessFile",
+        "net/ifok/image/image4j/io/EndianUtils",
+        "net/ifok/image/image4j/io/LittleEndianRandomAccessFile"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/util/ConvertUtil.class",
+      "occurrence": 0,
+      "sha256": "7b0a619516e4bc7a95d7cbe20f50327a14fc3090a3e07f2c7e8ec99d3fab4129",
+      "name": "net/ifok/image/image4j/util/ConvertUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "convert1",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "650afce9ec37abbf0ab896ad21173962ad40103c923905a2d0c4d7e4ecabca06",
+          "code_length": 94
+        },
+        {
+          "name": "convert4",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "85759697e88039e4b2d5b59952ec2ed0740739fe2f773f2de3ca54b203eaab36",
+          "code_length": 102
+        },
+        {
+          "name": "convert4",
+          "descriptor": "(Ljava/awt/image/BufferedImage;[I)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "4211b6013d8d84285f7ebd92cb32e63a6fbdf87682a500babdc8b41b1d12158d",
+          "code_length": 69
+        },
+        {
+          "name": "convert8",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "b2821c8ea3ad20d6533c04748f9096c8c2c7d07d5b557f8e862f93cc4af07f0b",
+          "code_length": 50
+        },
+        {
+          "name": "convert24",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "c2fbc0c082a862ec629fd399373b9dcaf5486235fc5f902b07254d731bfb7444",
+          "code_length": 49
+        },
+        {
+          "name": "convert32",
+          "descriptor": "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "75761e4be29ed8847519df95ac9a9719b5f23df39dbbb5100e957c8ec6ee6597",
+          "code_length": 49
+        }
+      ],
+      "class_references": [
+        "java/awt/Transparency",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorConvertOp",
+        "java/awt/image/ColorModel",
+        "java/awt/image/DataBuffer",
+        "java/awt/image/IndexColorModel",
+        "java/lang/Object",
+        "net/ifok/image/image4j/util/ConvertUtil"
+      ]
+    },
+    {
+      "entry": "net/ifok/image/image4j/util/ImageUtil.class",
+      "occurrence": 0,
+      "sha256": "e33a5a537c6dcd6714c8db3834e5e578b0ac240b4797367a36116e0bfb6137f9",
+      "name": "net/ifok/image/image4j/util/ImageUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "scaleImage",
+          "descriptor": "(Ljava/awt/image/BufferedImage;II)Ljava/awt/image/BufferedImage;",
+          "access": 9,
+          "code_sha256": "fa468002322f2c38e5cccbb899490bb5c84b6e961da07b1e6278c6fcd3ff183d",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/awt/Graphics2D",
+        "java/awt/image/BufferedImage",
+        "java/lang/Object",
+        "net/ifok/image/image4j/util/ImageUtil"
+      ]
+    }
+  ]
+}

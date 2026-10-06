@@ -1,0 +1,1884 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/geronimo-json_1.0_spec-1.0-alpha-1.jar",
+  "archive_sha256": "9ad66832295ebfb21e168f29e9411924e13e233ee2ddc61b9a9b09a3f18dc183",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "javax/json/Json.class",
+      "occurrence": 0,
+      "sha256": "3f2213831b862e6bff355b52c0ea85bcd47a4b6b3d1b0d3d0a1f9e95155a0cc4",
+      "name": "javax/json/Json",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/stream/JsonParser;",
+          "access": 9,
+          "code_sha256": "ea7874db4b7242f1623a1656c1763ecac79d2fbd97956ad561e4033449c746f3",
+          "code_length": 8
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/stream/JsonParser;",
+          "access": 9,
+          "code_sha256": "7d0944b1f0a8602df2cacc332f24cffe12c50a12e48a5bdd129870443c802321",
+          "code_length": 8
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/stream/JsonGenerator;",
+          "access": 9,
+          "code_sha256": "8404ea0ddb5d60fcac91823b92ea8a7555e680817c8e7b2ddcf4a98c0ec7331f",
+          "code_length": 8
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/stream/JsonGenerator;",
+          "access": 9,
+          "code_sha256": "8740b88f827e7146ae59089a93f4a014e4bccd271b5ed361ccad6d6b123ac711",
+          "code_length": 8
+        },
+        {
+          "name": "createParserFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonParserFactory;",
+          "access": 9,
+          "code_sha256": "14be613d69956f77aff3bd7bcf83deda41122ba53b97d3466011f4f064b91862",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonParserFactory;"
+        },
+        {
+          "name": "createGeneratorFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonGeneratorFactory;",
+          "access": 9,
+          "code_sha256": "d9bdbd84f98a6fe2551c0d3d806e8207bcaeaf557ea6e08c7e1696a26aaa4d31",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonGeneratorFactory;"
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/JsonWriter;",
+          "access": 9,
+          "code_sha256": "726cd98bd6d31cd4cbdfce61d8728e7385329dcee1a41681ff84027e1772f0af",
+          "code_length": 8
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/JsonWriter;",
+          "access": 9,
+          "code_sha256": "759d7ae0ae7fb0096d005ba043894d0db8ae2190f3cea6001eef3ca030685f39",
+          "code_length": 8
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/JsonReader;",
+          "access": 9,
+          "code_sha256": "03252607dc214dc3f9e15c3a4314c714bde29323802825aef07cc1bbb34332e2",
+          "code_length": 8
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/JsonReader;",
+          "access": 9,
+          "code_sha256": "09b2ab44936f51ee0285a6bb61b823486f669957e8a5bf8b63fd669832e3a49f",
+          "code_length": 8
+        },
+        {
+          "name": "createReaderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonReaderFactory;",
+          "access": 9,
+          "code_sha256": "02f887eefa3027b7ed4766a10607019af47c1cfb8bc2a666b0723a0e16abad9a",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonReaderFactory;"
+        },
+        {
+          "name": "createWriterFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonWriterFactory;",
+          "access": 9,
+          "code_sha256": "34ee4d5fc3ff936c52020af32a5acd53abd02cc615d6536010fda93553ffd03f",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonWriterFactory;"
+        },
+        {
+          "name": "createArrayBuilder",
+          "descriptor": "()Ljavax/json/JsonArrayBuilder;",
+          "access": 9,
+          "code_sha256": "caabb7f8f0e1c6f04bcfa95cbf10dc7f4eb0cc8732e78d54f6c0b1c618581090",
+          "code_length": 7
+        },
+        {
+          "name": "createObjectBuilder",
+          "descriptor": "()Ljavax/json/JsonObjectBuilder;",
+          "access": 9,
+          "code_sha256": "ce5fa0307357b477f73b12ea66cfb1b886fa6c068db10eb0e68457affe5874b3",
+          "code_length": 7
+        },
+        {
+          "name": "createBuilderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonBuilderFactory;",
+          "access": 9,
+          "code_sha256": "5cced895431d1896a34f848e34a036f27cf4094a63fdf053b15d89e751bf0a5e",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonBuilderFactory;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/Json",
+        "javax/json/spi/JsonProvider"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonArray.class",
+      "occurrence": 0,
+      "sha256": "e72aa6ad17c01d5fd90a27eca10b67d86c6899645a8136e7f11735a3fb90f547",
+      "name": "javax/json/JsonArray",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonStructure",
+        "java/util/List"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getJsonObject",
+          "descriptor": "(I)Ljavax/json/JsonObject;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonArray",
+          "descriptor": "(I)Ljavax/json/JsonArray;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonNumber",
+          "descriptor": "(I)Ljavax/json/JsonNumber;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonString",
+          "descriptor": "(I)Ljavax/json/JsonString;",
+          "access": 1025
+        },
+        {
+          "name": "getValuesAs",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "<T::Ljavax/json/JsonValue;>(Ljava/lang/Class<TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "getString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getString",
+          "descriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(II)I",
+          "access": 1025
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(I)Z",
+          "access": 1025
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(IZ)Z",
+          "access": 1025
+        },
+        {
+          "name": "isNull",
+          "descriptor": "(I)Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/json/JsonStructure;Ljava/util/List<Ljavax/json/JsonValue;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/List",
+        "javax/json/JsonArray",
+        "javax/json/JsonStructure"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonArrayBuilder.class",
+      "occurrence": 0,
+      "sha256": "0ac828e957806d443d5a5903cb1419c90d2b316a41f74e2d5a3db5b71f4ad8a1",
+      "name": "javax/json/JsonArrayBuilder",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/json/JsonValue;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/math/BigDecimal;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/math/BigInteger;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(I)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(J)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(D)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Z)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "addNull",
+          "descriptor": "()Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/json/JsonObjectBuilder;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljavax/json/JsonArrayBuilder;)Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "build",
+          "descriptor": "()Ljavax/json/JsonArray;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonArrayBuilder"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonBuilderFactory.class",
+      "occurrence": 0,
+      "sha256": "a6f9866a61969fc924031da9feb70c832a4ab8c63ccde3a081249513fcc5f879",
+      "name": "javax/json/JsonBuilderFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createObjectBuilder",
+          "descriptor": "()Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "createArrayBuilder",
+          "descriptor": "()Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigInUse",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonBuilderFactory"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonException.class",
+      "occurrence": 0,
+      "sha256": "0193b03f899d0a4490d62c39e21726e616d3c58c0ee36e204852dc5c833b30ae",
+      "name": "javax/json/JsonException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "javax/json/JsonException"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonNumber.class",
+      "occurrence": 0,
+      "sha256": "d919af773eaf24ef4351ac344aa6209a38b805561dec398acfc46a3302afe3fb",
+      "name": "javax/json/JsonNumber",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isIntegral",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "intValueExact",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "longValueExact",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "bigIntegerValue",
+          "descriptor": "()Ljava/math/BigInteger;",
+          "access": 1025
+        },
+        {
+          "name": "bigIntegerValueExact",
+          "descriptor": "()Ljava/math/BigInteger;",
+          "access": 1025
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1025
+        },
+        {
+          "name": "bigDecimalValue",
+          "descriptor": "()Ljava/math/BigDecimal;",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonNumber",
+        "javax/json/JsonValue"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonObject.class",
+      "occurrence": 0,
+      "sha256": "ff076a3cc8134348843732ad6e559196bbcfebfbf53e7731de7e3a18fcd67b8b",
+      "name": "javax/json/JsonObject",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonStructure",
+        "java/util/Map"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getJsonArray",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonArray;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonObject",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonObject;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonNumber",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonNumber;",
+          "access": 1025
+        },
+        {
+          "name": "getJsonString",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonString;",
+          "access": 1025
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 1025
+        },
+        {
+          "name": "isNull",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljavax/json/JsonStructure;Ljava/util/Map<Ljava/lang/String;Ljavax/json/JsonValue;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Map",
+        "javax/json/JsonObject",
+        "javax/json/JsonStructure"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonObjectBuilder.class",
+      "occurrence": 0,
+      "sha256": "d81230cb3efd3b2840ec25d6574a1d76d1eeefb573f5658486d75184cc45b1b2",
+      "name": "javax/json/JsonObjectBuilder",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljavax/json/JsonValue;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigInteger;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigDecimal;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;I)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;J)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;D)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "addNull",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljavax/json/JsonObjectBuilder;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/String;Ljavax/json/JsonArrayBuilder;)Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "build",
+          "descriptor": "()Ljavax/json/JsonObject;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonObjectBuilder"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonReader.class",
+      "occurrence": 0,
+      "sha256": "1f8b8cb1cdfc60699e6264b682b785d788b098e35123e45d3e2d112a9ad1ffad",
+      "name": "javax/json/JsonReader",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "read",
+          "descriptor": "()Ljavax/json/JsonStructure;",
+          "access": 1025
+        },
+        {
+          "name": "readObject",
+          "descriptor": "()Ljavax/json/JsonObject;",
+          "access": 1025
+        },
+        {
+          "name": "readArray",
+          "descriptor": "()Ljavax/json/JsonArray;",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/lang/Object",
+        "javax/json/JsonReader"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonReaderFactory.class",
+      "occurrence": 0,
+      "sha256": "f1fe13c65aee37c7bd8c20119e54f792fd8bee427f4e5a286a9de30a13a96b63",
+      "name": "javax/json/JsonReaderFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/JsonReader;",
+          "access": 1025
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/JsonReader;",
+          "access": 1025
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljavax/json/JsonReader;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigInUse",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonReaderFactory"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonString.class",
+      "occurrence": 0,
+      "sha256": "a722e66f534e82429585b815fe2306914e877610a25a86e66002706470fee291",
+      "name": "javax/json/JsonString",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getChars",
+          "descriptor": "()Ljava/lang/CharSequence;",
+          "access": 1025
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1025
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonString",
+        "javax/json/JsonValue"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonStructure.class",
+      "occurrence": 0,
+      "sha256": "f358dc5ce66567fde3460399486a77fccf09b1f1467ea4d506515d89820b4014",
+      "name": "javax/json/JsonStructure",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonStructure",
+        "javax/json/JsonValue"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonValue$1.class",
+      "occurrence": 0,
+      "sha256": "b9a5b2bd27fb4553fbd2f7f127efc904c4b7a539e763913b5e01cf5ed13cb0b3",
+      "name": "javax/json/JsonValue$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getValueType",
+          "descriptor": "()Ljavax/json/JsonValue$ValueType;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f1b55b6b7b3b8faf7f47da7a92bfd2e694fcba4e4ef810b123ac32ece8e8f154",
+          "code_length": 38
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1b66e7913fc5af58ddc3dbb1721e9ed49bca587b1f3cfb2fb9e3edd5fb62d9c3",
+          "code_length": 7
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "javax/json/JsonValue",
+        "javax/json/JsonValue$1",
+        "javax/json/JsonValue$ValueType"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonValue$2.class",
+      "occurrence": 0,
+      "sha256": "95e6596974f027cca31b9664d49607eb40628d25c9d4b52b46830b5558ea7ac6",
+      "name": "javax/json/JsonValue$2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getValueType",
+          "descriptor": "()Ljavax/json/JsonValue$ValueType;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f1b55b6b7b3b8faf7f47da7a92bfd2e694fcba4e4ef810b123ac32ece8e8f154",
+          "code_length": 38
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1b66e7913fc5af58ddc3dbb1721e9ed49bca587b1f3cfb2fb9e3edd5fb62d9c3",
+          "code_length": 7
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "371c4abd8c21d6ba08bb65ad6188316ae3add9997d3dfb9c84e236582509cdd8",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Object",
+        "javax/json/JsonValue",
+        "javax/json/JsonValue$2",
+        "javax/json/JsonValue$ValueType"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonValue$3.class",
+      "occurrence": 0,
+      "sha256": "9798c06cbfb8e730ea9bfb974e49d329fb673552397913f37c1e664b84af55b6",
+      "name": "javax/json/JsonValue$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/json/JsonValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getValueType",
+          "descriptor": "()Ljavax/json/JsonValue$ValueType;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f1b55b6b7b3b8faf7f47da7a92bfd2e694fcba4e4ef810b123ac32ece8e8f154",
+          "code_length": 38
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1b66e7913fc5af58ddc3dbb1721e9ed49bca587b1f3cfb2fb9e3edd5fb62d9c3",
+          "code_length": 7
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "371c4abd8c21d6ba08bb65ad6188316ae3add9997d3dfb9c84e236582509cdd8",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Object",
+        "javax/json/JsonValue",
+        "javax/json/JsonValue$3",
+        "javax/json/JsonValue$ValueType"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonValue$ValueType.class",
+      "occurrence": 0,
+      "sha256": "34082c70069c095348233e71760d03272519f5ce8c3a8e9aa85603624d0c517a",
+      "name": "javax/json/JsonValue$ValueType",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ARRAY",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "OBJECT",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "STRING",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "NUMBER",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "TRUE",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "FALSE",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "NULL",
+          "descriptor": "Ljavax/json/JsonValue$ValueType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Ljavax/json/JsonValue$ValueType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Ljavax/json/JsonValue$ValueType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/JsonValue$ValueType;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ee1bb7c6814a186cd31ae2fcac38ba61171e408b2980b4afcc7fbdaceadc52ae",
+          "code_length": 144
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Ljavax/json/JsonValue$ValueType;>;",
+      "class_references": [
+        "[Ljavax/json/JsonValue$ValueType;",
+        "java/lang/Enum",
+        "javax/json/JsonValue",
+        "javax/json/JsonValue$ValueType"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonValue.class",
+      "occurrence": 0,
+      "sha256": "d1eb2a110bf9252689dc32b3db705b3da70fd0de1bc7b1302fbfe30b23e85e24",
+      "name": "javax/json/JsonValue",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NULL",
+          "descriptor": "Ljavax/json/JsonValue;",
+          "access": 25
+        },
+        {
+          "name": "TRUE",
+          "descriptor": "Ljavax/json/JsonValue;",
+          "access": 25
+        },
+        {
+          "name": "FALSE",
+          "descriptor": "Ljavax/json/JsonValue;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "getValueType",
+          "descriptor": "()Ljavax/json/JsonValue$ValueType;",
+          "access": 1025
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "df84c8488e1fb91c329952d07093774e5c3ae26809826ae36d4c81b189b1d5ca",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonValue",
+        "javax/json/JsonValue$1",
+        "javax/json/JsonValue$2",
+        "javax/json/JsonValue$3",
+        "javax/json/JsonValue$ValueType"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonWriter.class",
+      "occurrence": 0,
+      "sha256": "42abfa03c9abb036a4f091f4ea6ec7463343b296b48bfac4317c72bfbacdf0c3",
+      "name": "javax/json/JsonWriter",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "writeArray",
+          "descriptor": "(Ljavax/json/JsonArray;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljavax/json/JsonObject;)V",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljavax/json/JsonStructure;)V",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/lang/Object",
+        "javax/json/JsonWriter"
+      ]
+    },
+    {
+      "entry": "javax/json/JsonWriterFactory.class",
+      "occurrence": 0,
+      "sha256": "b6e568fa4bd1d2a76996bce18e95c9abb65187aaee231ffe4aa2dd410ce46614",
+      "name": "javax/json/JsonWriterFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/JsonWriter;",
+          "access": 1025
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/JsonWriter;",
+          "access": 1025
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/nio/charset/Charset;)Ljavax/json/JsonWriter;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigInUse",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/JsonWriterFactory"
+      ]
+    },
+    {
+      "entry": "javax/json/spi/JsonProvider$1.class",
+      "occurrence": 0,
+      "sha256": "79e19127d45c62459384b5b72d6779453118c97c96056829d3b695f3165db0d8",
+      "name": "javax/json/spi/JsonProvider$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 1,
+          "code_sha256": "7da9dd61ff61968819edb8f9bbfe2d440373f2a1cc610a357a981a82f44f2769",
+          "code_length": 4
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a23dbd02110184ffb76bf77bcade8e415f91c0551b7cc42d21a227c3e5beeda",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljavax/json/spi/JsonProvider;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "javax/json/spi/JsonProvider",
+        "javax/json/spi/JsonProvider$1"
+      ]
+    },
+    {
+      "entry": "javax/json/spi/JsonProvider.class",
+      "occurrence": 0,
+      "sha256": "4befbd6cd481b1331e65bd968a7b00a27106e3ddafea85169cc80a4e65da709d",
+      "name": "javax/json/spi/JsonProvider",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_PROVIDER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "provider",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 9,
+          "code_sha256": "976020c1d552d8272c3482fc8adeebd23a74244bd6f41590f24519e1161b18e3",
+          "code_length": 24
+        },
+        {
+          "name": "doLoadProvider",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 10,
+          "code_sha256": "9cf63c47f4c0161dea3f1ee50fa19712b123588d61f07a7c045fbcad66adcd92",
+          "code_length": 413,
+          "throws": [
+            "javax/json/JsonException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParserFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonParserFactory;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonParserFactory;"
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "createGeneratorFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonGeneratorFactory;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonGeneratorFactory;"
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/JsonReader;",
+          "access": 1025
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/JsonReader;",
+          "access": 1025
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/JsonWriter;",
+          "access": 1025
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/JsonWriter;",
+          "access": 1025
+        },
+        {
+          "name": "createWriterFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonWriterFactory;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonWriterFactory;"
+        },
+        {
+          "name": "createReaderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonReaderFactory;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonReaderFactory;"
+        },
+        {
+          "name": "createObjectBuilder",
+          "descriptor": "()Ljavax/json/JsonObjectBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "createArrayBuilder",
+          "descriptor": "()Ljavax/json/JsonArrayBuilder;",
+          "access": 1025
+        },
+        {
+          "name": "createBuilderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonBuilderFactory;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonBuilderFactory;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 4104,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4,
+          "throws": [
+            "javax/json/JsonException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/Method",
+        "java/net/URL",
+        "java/security/AccessController",
+        "java/util/ArrayList",
+        "java/util/Enumeration",
+        "java/util/Iterator",
+        "java/util/List",
+        "javax/json/JsonException",
+        "javax/json/spi/JsonProvider",
+        "javax/json/spi/JsonProvider$1"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonGenerationException.class",
+      "occurrence": 0,
+      "sha256": "348a4e56b601a6bc2bf83552677c3dab382a2a5f9ba398bbf3c3980db039ab2c",
+      "name": "javax/json/stream/JsonGenerationException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/json/JsonException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/json/JsonException",
+        "javax/json/stream/JsonGenerationException"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonGenerator.class",
+      "occurrence": 0,
+      "sha256": "e982346e1080861037927426e1a4f5b9019c1447a2b2188a5ec00be78abff7fb",
+      "name": "javax/json/stream/JsonGenerator",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Flushable",
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "PRETTY_PRINTING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "writeStartObject",
+          "descriptor": "()Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeStartObject",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeStartArray",
+          "descriptor": "()Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeStartArray",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;Ljavax/json/JsonValue;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigInteger;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigDecimal;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;I)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;J)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;D)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeNull",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeEnd",
+          "descriptor": "()Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljavax/json/JsonValue;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/math/BigDecimal;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/math/BigInteger;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(J)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(D)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "(Z)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "writeNull",
+          "descriptor": "()Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/io/Flushable",
+        "java/lang/Object",
+        "javax/json/stream/JsonGenerator"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonGeneratorFactory.class",
+      "occurrence": 0,
+      "sha256": "936b1ff37ab29eb7a9d36af98f2db6fbf55a87ab6508f0baa3b16e5402f9c0cd",
+      "name": "javax/json/stream/JsonGeneratorFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;Ljava/nio/charset/Charset;)Ljavax/json/stream/JsonGenerator;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigInUse",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/stream/JsonGeneratorFactory"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonLocation.class",
+      "occurrence": 0,
+      "sha256": "810d50d171765ce4b9ff9fcff06dab26724075d6e252c63874b8600955aebc34",
+      "name": "javax/json/stream/JsonLocation",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getLineNumber",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getColumnNumber",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getStreamOffset",
+          "descriptor": "()J",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/stream/JsonLocation"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonParser$Event.class",
+      "occurrence": 0,
+      "sha256": "01207e72603271a3d542bc674001c2fcd56668383fc72504561cdcb05a5e72da",
+      "name": "javax/json/stream/JsonParser$Event",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "START_ARRAY",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "START_OBJECT",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "KEY_NAME",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE_STRING",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE_NUMBER",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE_TRUE",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE_FALSE",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "VALUE_NULL",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "END_OBJECT",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "END_ARRAY",
+          "descriptor": "Ljavax/json/stream/JsonParser$Event;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Ljavax/json/stream/JsonParser$Event;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Ljavax/json/stream/JsonParser$Event;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Ljavax/json/stream/JsonParser$Event;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c89bb45d476c34129c590d05f53169dc4e09e4112f1b6cac914149f2e521965b",
+          "code_length": 207
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Ljavax/json/stream/JsonParser$Event;>;",
+      "class_references": [
+        "[Ljavax/json/stream/JsonParser$Event;",
+        "java/lang/Enum",
+        "javax/json/stream/JsonParser",
+        "javax/json/stream/JsonParser$Event"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonParser.class",
+      "occurrence": 0,
+      "sha256": "d09964b4e9f5b3676202cfaf7b6a098aacfc21f5f78e413cfa19e14e038068c2",
+      "name": "javax/json/stream/JsonParser",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljavax/json/stream/JsonParser$Event;",
+          "access": 1025
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "isIntegralNumber",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getLong",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getBigDecimal",
+          "descriptor": "()Ljava/math/BigDecimal;",
+          "access": 1025
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/json/stream/JsonLocation;",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/Closeable",
+        "java/lang/Object",
+        "javax/json/stream/JsonParser",
+        "javax/json/stream/JsonParser$Event"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonParserFactory.class",
+      "occurrence": 0,
+      "sha256": "2212a853f8c446d3a260f2bb8d26d6fee876ac26eb433b0c6bdbacff2a511635",
+      "name": "javax/json/stream/JsonParserFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljavax/json/JsonObject;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljavax/json/JsonArray;)Ljavax/json/stream/JsonParser;",
+          "access": 1025
+        },
+        {
+          "name": "getConfigInUse",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/json/stream/JsonParserFactory"
+      ]
+    },
+    {
+      "entry": "javax/json/stream/JsonParsingException.class",
+      "occurrence": 0,
+      "sha256": "8c3d3dec92eebc8c758890eacedf907b66a48625200840f32c605ea8421ee9da",
+      "name": "javax/json/stream/JsonParsingException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/json/JsonException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "location",
+          "descriptor": "Ljavax/json/stream/JsonLocation;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljavax/json/stream/JsonLocation;)V",
+          "access": 1,
+          "code_sha256": "cc8acab599fdd79263a144811a0504ac1222aebd56d044d11bcca35ac8e3f1da",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;Ljavax/json/stream/JsonLocation;)V",
+          "access": 1,
+          "code_sha256": "30744a6e687683d6bca583e180150f575a7632675da7e68b1fa38a8fe013aa1c",
+          "code_length": 12
+        },
+        {
+          "name": "getLocation",
+          "descriptor": "()Ljavax/json/stream/JsonLocation;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "javax/json/JsonException",
+        "javax/json/stream/JsonParsingException"
+      ]
+    }
+  ]
+}

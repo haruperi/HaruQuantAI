@@ -1,127 +1,37 @@
 # TaskFiltering.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/TaskFiltering/TaskFiltering.jar`.
-- SHA-256: `a8c0774c1fdec537b8b8de218f650b43622486a4df239593b73b25663217066d`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **1**; non-nested: **1**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskFiltering/TaskFiltering.jar`.
+- **SHA-256:** `16ce6f3e668b5fe9a8769ea65c7562286fb648946eb40819f2926f3f4089cb3e`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 1 raw entries; 1 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-PROJECT-TASK-FILTERING`, P13; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [276.json](../../dev/evidence/sqx145/archives/145/276.json).
 
-The `CustomProjects` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/276/001.json) — SHA-256 `df509129310cb17a2bbef342ba5abf31f66df6caa9884d68f6af29a761f311c7`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Task.impl.Filtering`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C33907e984744["FilteringTask"] {
-        -LOCK_FILTERINGTASK
-        -actionType
-        -conditionsType
-        +getType()
-        +getName()
-        +clone()
-        +start()
-    }
-    class Cf1cf5abc550f["Databank"]
-    class Ca2e8c082f5a2["Condition"]
-    class Ce44d386802cb["AbstractTask"]
-    Ce44d386802cb <|-- C33907e984744 : declared extends
-    C33907e984744 ..> Cf1cf5abc550f : field type
-    C33907e984744 ..> Ca2e8c082f5a2 : field type
+    class C0["FilteringTask"]
+    class E0["AbstractTask"]
+    E0 <|-- C0
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C33907e984744` | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` (this JAR) | this diagram |
-| `Cf1cf5abc550f` | [`com.strategyquant.tradinglib.Databank`](../Shared/SQTradingLib.md) | referenced external type |
-| `Ca2e8c082f5a2` | [`com.strategyquant.tradinglib.conditions.Condition`](../Shared/SQTradingLib.md) | referenced external type |
-| `Ce44d386802cb` | [`com.strategyquant.tradinglib.taskImpl.AbstractTask`](../Shared/SQTradingLib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.taskImpl.AbstractTask`](../Shared/SQTradingLib.md) | extends | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / class declaration: `public class com.strategyquant.plugin.Task.impl.Filtering.FilteringTask extends com.strategyquant.tradinglib.taskImpl.AbstractTask` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / field declaration: `private static final java.lang.String LOCK_FILTERINGTASK;`<br>`private java.lang.String dismissReason;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public java.lang.String getType();`<br>`public java.lang.String getName();`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`private java.lang.String checkConditions(com.strategyquant.tradinglib.ResultsGroup);`<br>`public java.lang.String getPluginFolderName();`<br>`public java.lang.String[] getSettings();`<br>`private java.lang.String actionTypeToText();` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | `java.util.ArrayList` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / field declaration: `private java.util.ArrayList<com.strategyquant.tradinglib.conditions.Condition> conditions;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.conditions.Condition`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / field declaration: `private java.util.ArrayList<com.strategyquant.tradinglib.conditions.Condition> conditions;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.Databank`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / field declaration: `private com.strategyquant.tradinglib.Databank databankSource;`<br>`private com.strategyquant.tradinglib.Databank databankTarget;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.Databank`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `protected com.strategyquant.tradinglib.Databank[] getUsedDatabanks();`<br>`protected com.strategyquant.tradinglib.Databank getOutputDatabank();` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.conditions.ConditionsChecker`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / field declaration: `private com.strategyquant.tradinglib.conditions.ConditionsChecker conditionsChecker;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask() throws java.lang.Exception;`<br>`public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public void start() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.project.ProgressEngine`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;`<br>`public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.taskImpl.ISQTask`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.ResultsGroup`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `private boolean conditionsPass(com.strategyquant.tradinglib.ResultsGroup);`<br>`private java.lang.String checkConditions(com.strategyquant.tradinglib.ResultsGroup);` |
-| `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` | [`com.strategyquant.tradinglib.project.ProjectGlobalLog`](../Shared/SQTradingLib.md) | type dependency | `com.strategyquant.plugin.Task.impl.Filtering.FilteringTask` / method signature: `public void logTaskFinished(com.strategyquant.tradinglib.project.ProjectGlobalLog);` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Task.impl.Filtering.FilteringTask</summary>
-
-```text
-public class com.strategyquant.plugin.Task.impl.Filtering.FilteringTask extends com.strategyquant.tradinglib.taskImpl.AbstractTask
-    private static final java.lang.String LOCK_FILTERINGTASK;
-    private int actionType;
-    private int conditionsType;
-    private java.util.ArrayList<com.strategyquant.tradinglib.conditions.Condition> conditions;
-    private com.strategyquant.tradinglib.Databank databankSource;
-    private com.strategyquant.tradinglib.Databank databankTarget;
-    private java.lang.String dismissReason;
-    private int totalResults;
-    private int totalPassed;
-    private int maxStrategies;
-    private com.strategyquant.tradinglib.conditions.ConditionsChecker conditionsChecker;
-    public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask() throws java.lang.Exception;
-    public com.strategyquant.plugin.Task.impl.Filtering.FilteringTask(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;
-    public java.lang.String getType();
-    public java.lang.String getName();
-    public com.strategyquant.tradinglib.taskImpl.ISQTask clone(java.lang.String, com.strategyquant.tradinglib.project.ProgressEngine) throws java.lang.Exception;
-    public void start() throws java.lang.Exception;
-    private void increaseGlobalStats(boolean);
-    private boolean conditionsPass(com.strategyquant.tradinglib.ResultsGroup);
-    private java.lang.String checkConditions(com.strategyquant.tradinglib.ResultsGroup);
-    protected int getRunningStatus();
-    public java.lang.String getPluginFolderName();
-    public int getPreferredPosition();
-    public java.lang.String[] getSettings();
-    protected com.strategyquant.tradinglib.Databank[] getUsedDatabanks();
-    protected com.strategyquant.tradinglib.Databank getOutputDatabank();
-    public void logTaskFinished(com.strategyquant.tradinglib.project.ProjectGlobalLog);
-    private java.lang.String actionTypeToText();
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Task/impl/Filtering/FilteringTask.class` | 0 | `12f4b4652360ef4a69dbe7b1c99303eaf70c611db03774fa8b7aed72837e23c3` | 11 | 17 |

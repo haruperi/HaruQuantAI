@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
+  "sha256": "df88cbdf4baae6ee27892d389cefd6349fee81962f12d21ff45b663094826a15",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1.class": "3469cd77e8c932b8e2477c64e837917b08b5b64002555d3a0c4fc3918f05a0ec",
+    "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin.class": "b913491d012397337013670990b0396289e33d18006b4d23b5ac83c5e255b13c",
+    "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPluginException.class": "8dd567d4f12cc5ea0f3c4dc607f5449c25a8949f634ada25f6d9637a08c2c8d0"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1.class",
+      "occurrence": 0,
+      "sha256": "3469cd77e8c932b8e2477c64e837917b08b5b64002555d3a0c4fc3918f05a0ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/125/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "b913491d012397337013670990b0396289e33d18006b4d23b5ac83c5e255b13c",
+      "member_shard": "docs/dev/evidence/sqx145/members/125/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPluginException.class",
+      "occurrence": 0,
+      "sha256": "8dd567d4f12cc5ea0f3c4dc607f5449c25a8949f634ada25f6d9637a08c2c8d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/125/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/125/001.json",
+      "sha256": "4c592cc4d6ed95feb007d62eed3c5a189c4c1979c9f2ca08e3e5f542aa0cc4c3"
+    }
+  ]
+}

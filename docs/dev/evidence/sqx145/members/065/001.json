@@ -1,0 +1,2644 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/json-20150729.jar",
+  "archive_sha256": "38c21b9c3d6d24919cd15d027d20afab0a019ac9205f7ed9083b32bdd42a2353",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/json/CDL.class",
+      "occurrence": 0,
+      "sha256": "c97d016f30f0a7c7033fabdf33bad340122132cf7ff54d4ed74ca19be520fd06",
+      "name": "org/json/CDL",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lorg/json/JSONTokener;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "4819026d8d0c664a72a9429184f664087969cfef0d3b0548066194090ecacd65",
+          "code_length": 162,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "rowToJSONArray",
+          "descriptor": "(Lorg/json/JSONTokener;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "d1547b2765b481e0e39d1f3326ebad89903e0960318324ee72b4481f177f57a5",
+          "code_length": 132,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "rowToJSONObject",
+          "descriptor": "(Lorg/json/JSONArray;Lorg/json/JSONTokener;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "1f2e00f7cb2093143366eaaff68652db90c1556e6836e7eed098fd961922563c",
+          "code_length": 19,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "rowToString",
+          "descriptor": "(Lorg/json/JSONArray;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "98ac0a8c29cd4c2cd3fa3a5f685f6377b588aeca923cc9ae9e2d55867eba4b76",
+          "code_length": 198
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "a9015a7e6478f1d853094b871b0bb014a72af0d211835d13552245e59a0e968a",
+          "code_length": 12,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Lorg/json/JSONTokener;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "4c48ad42f784a7755a7e2d9e40ddb8ffbb38902e7122f0862f17d14b644dad37",
+          "code_length": 9,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Lorg/json/JSONArray;Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "fd5f5d159f2714edfa8de02bb6db3458e620f30ade2c3c255dbfb4032a23d5af",
+          "code_length": 13,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Lorg/json/JSONArray;Lorg/json/JSONTokener;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "88b017d66ba8f77fab6cf79204750e1f773c9a28573f4ef37a24204459c40140",
+          "code_length": 54,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONArray;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c181bea72d6245fceba3d0a2c94c5ce1d454e1384b34bf4f6de6053e3dcac848",
+          "code_length": 47,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONArray;Lorg/json/JSONArray;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "5952750fb15a9a45ffd3909c6b068ba8fd7dc0119a7b757db444a075d8184d47",
+          "code_length": 68,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "org/json/CDL",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/Cookie.class",
+      "occurrence": 0,
+      "sha256": "971c83b065b6e97d4f74a82b6dd3fdb5429f40d2742a24c85b12c057cc4ad155",
+      "name": "org/json/Cookie",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "escape",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "768bf0a25f571a1bb7088784ee659a2b4174c238c87f507bd43153755f6351ba",
+          "code_length": 130
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "80feeaea70d76567488d3723e099de251b5fddb5002d71e1f4ee8abafdb9e4f7",
+          "code_length": 142,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "89ed4a20998a1e338f53d2c5a235a123fb69280c3a6a4d1dda29384bf2a5ad45",
+          "code_length": 151,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "unescape",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "494f6440072d28867834603126daa00e345934dca752dfc2820a8697c5c8ba35",
+          "code_length": 122
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/json/Cookie",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/CookieList.class",
+      "occurrence": 0,
+      "sha256": "ac13f473376cc56a29c704c45d290194ee750448da385a8161444877104c50c3",
+      "name": "org/json/CookieList",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "7b6420d18f2a2b86fa1da7335633dbd6a7fcfedade9dd15b8293d6a7612395e3",
+          "code_length": 66,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a82a3eeffd30d68f2c8c7c5f3655ca7efd67d2f666eed9dd08ef20f50a037e79",
+          "code_length": 98,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "org/json/Cookie",
+        "org/json/CookieList",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/HTTP.class",
+      "occurrence": 0,
+      "sha256": "f9815a8166eb57662df6dff8bab3d8c4ec49642ce7445974af96144de733c9be",
+      "name": "org/json/HTTP",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CRLF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "26367932fa10f2ad8e66f36f6b23400ce63c6d8e0b101b5ccde4b16f1e8318cf",
+          "code_length": 147,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "492b6c216ef29c6b799ab80f7a4d4795e2ab68b79743696d0946dfc26840fe2a",
+          "code_length": 297,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "org/json/HTTP",
+        "org/json/HTTPTokener",
+        "org/json/JSONException",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "org/json/HTTPTokener.class",
+      "occurrence": 0,
+      "sha256": "8e6202a6d338f56161083c20258f9f4148f0103f2741238b8bbadb5039f98d57",
+      "name": "org/json/HTTPTokener",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/json/JSONTokener",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "nextToken",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e639fb41ede59d57bb9233c5c0fe5b2281ae159c99fb425196453174933157ee",
+          "code_length": 101,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/StringBuilder",
+        "org/json/HTTPTokener",
+        "org/json/JSONException",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/JSONArray.class",
+      "occurrence": 0,
+      "sha256": "d55abdfd2ff9e55a98588356d0ffc50a5ac9c0cb2d3bc7c865a19bde9e0fc22f",
+      "name": "org/json/JSONArray",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "myArrayList",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/Object;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/json/JSONTokener;)V",
+          "access": 1,
+          "code_sha256": "08bc6f9706cb92888a4b531323f7d088e6fc3e0fe50c2812e77354d33a83fe03",
+          "code_length": 134,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7288ad5fadb430365e8cd96748b82f607b46dd3983366a8f9d04d6f1ad17a78f",
+          "code_length": 13,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;)V",
+          "access": 1,
+          "code_sha256": "04d014259658cb2223350ef502a45243614e9c65a65b3ca172ad468c75fdf9fa",
+          "code_length": 56,
+          "generic_signature": "(Ljava/util/Collection<Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c8038ada813e5dd6f4beac6aaf5ea9f2c8eb8a6c3bf3c24541b3ea710fffc884",
+          "code_length": 59,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "1a8210bedbf86e579eb6db95d90610860cd4815691f87295adabca471fd43dc1",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b9369a761ea6f869a2e163c78b51d4fa03bdd767c93a174fc2faab420d72b8bb",
+          "code_length": 44,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "9d04145307d43a5f451a5056fda392103ae1f243d61dbbb6145a3f0428498250",
+          "code_length": 100,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "8d62516787f92f1599727bb032781b8111d4065a72314fed29ff488c7ac518fb",
+          "code_length": 64,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getEnum",
+          "descriptor": "(Ljava/lang/Class;I)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "6224ebff46600199e4b406a9fca382cb5eea4bab76d825b1ba9ac34442c5db8d",
+          "code_length": 66,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;I)TE;"
+        },
+        {
+          "name": "getBigDecimal",
+          "descriptor": "(I)Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "85bf6689cf528c88b0bccc225d4ee52d0f8686d1efc2bc1884b2f2dc54da61a5",
+          "code_length": 51,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getBigInteger",
+          "descriptor": "(I)Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "7a948f1781252db3d527cddd1704a3bb2dfc8505a8bf2c32acbd5a4b26482ebe",
+          "code_length": 51,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "30db431848f55bac238e3555bd52e75528ee7e1f1a25bb9beab0c9fd0d84c288",
+          "code_length": 64,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getJSONArray",
+          "descriptor": "(I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "ed381bc74cc90aab611442349e34961b2025e2fc536f0e98d221b20a0b26f136",
+          "code_length": 50,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getJSONObject",
+          "descriptor": "(I)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "6b4ecbc5ceef8bf1809d4c39c159e113bad9113b3a48c445c7de5e78356270d8",
+          "code_length": 50,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "710b9dd623cb2164523dbfd60a2655d144aafcfce5b0f171b986fa2e2d25b6ee",
+          "code_length": 64,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "51cd9bac4acfa84372bad29bc8cd6ac422d8773a9e63010b0c701cbc56748fe9",
+          "code_length": 50,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "isNull",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "e6dd70e4406c53f685eed0c9fb14b5c12ecb9fd33b237e6669e83ab7139ef340",
+          "code_length": 12
+        },
+        {
+          "name": "join",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f43b5cd25a3727f802b5d98ac41f33d571f4de05f1fc6942d51bdc3612610adf",
+          "code_length": 61,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "length",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1dcf9724c4c6deb9c2dce48fe847662842aea2b3e0ac67bceb85f622a89703db",
+          "code_length": 8
+        },
+        {
+          "name": "opt",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e8cefb30723b8638486bf03c8b7532db972ba97c6d06f1db4e829b0df0d6ff2a",
+          "code_length": 25
+        },
+        {
+          "name": "optBoolean",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "6e1e7c9bec0eb42d23d17bddb6a968eac465ff8d39bae82ce2a4478c111d55bd",
+          "code_length": 7
+        },
+        {
+          "name": "optBoolean",
+          "descriptor": "(IZ)Z",
+          "access": 1,
+          "code_sha256": "5a39091179c68d1081ac1737bcffe7cae5179f6361d9513c7915c190b3bf1141",
+          "code_length": 9
+        },
+        {
+          "name": "optDouble",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "b9af4e77f9471c3bf154bab8f0a00bd722eb31f5ed3f5dbf0994ac2ddaa243d0",
+          "code_length": 9
+        },
+        {
+          "name": "optDouble",
+          "descriptor": "(ID)D",
+          "access": 1,
+          "code_sha256": "fb66a239252d9021c0a041ac5cdd0100458a8f248daccf4ffdbf74dcc2cb2680",
+          "code_length": 10
+        },
+        {
+          "name": "optInt",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "7335c233c6c1cb44b956832e19aef3e69f82d919b17450ba69966eb535603710",
+          "code_length": 7
+        },
+        {
+          "name": "optInt",
+          "descriptor": "(II)I",
+          "access": 1,
+          "code_sha256": "1c48ecf3656b0d1b1c1618b8e48e5bd79c4b5b48973570369a82285c55f4c300",
+          "code_length": 9
+        },
+        {
+          "name": "optEnum",
+          "descriptor": "(Ljava/lang/Class;I)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "78e71ba14822c6942b764990dfde644099b80f7238713eb029cfbd396c931764",
+          "code_length": 8,
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;I)TE;"
+        },
+        {
+          "name": "optEnum",
+          "descriptor": "(Ljava/lang/Class;ILjava/lang/Enum;)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "3a9e4bbd607c86a545d678053779727073d1831553024edc26513b33f6349c2d",
+          "code_length": 56,
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;ITE;)TE;"
+        },
+        {
+          "name": "optBigInteger",
+          "descriptor": "(ILjava/math/BigInteger;)Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "78ffce95cc85205b74acbe46fdcfd38410466b7a3b582d6820f50a2f39c4196a",
+          "code_length": 9
+        },
+        {
+          "name": "optBigDecimal",
+          "descriptor": "(ILjava/math/BigDecimal;)Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "dd8d6ef5be188af66d4315ce2e37841aeb80642028d964d86531ebf6bb2ab660",
+          "code_length": 9
+        },
+        {
+          "name": "optJSONArray",
+          "descriptor": "(I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "c67c431b7f093e5e9501d3c718614ec1863255e5d8d1328fa19008fdc208cbf5",
+          "code_length": 22
+        },
+        {
+          "name": "optJSONObject",
+          "descriptor": "(I)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "c377773ed5dce029df97c79d77b025d762ffb2b981ff34f2036c36b26b74a2cd",
+          "code_length": 22
+        },
+        {
+          "name": "optLong",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "336f6b7747da792c9ee00b8ede8fca7cfa875e5c4f1205dc7cdc4f7cc3a4ac98",
+          "code_length": 7
+        },
+        {
+          "name": "optLong",
+          "descriptor": "(IJ)J",
+          "access": 1,
+          "code_sha256": "f2efc70dc56d9925d129782fa27b5ed2fec1d9438d6abd278c69058bbdb5cc98",
+          "code_length": 10
+        },
+        {
+          "name": "optString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "27a3b8852bba079574f6f8685fe88ae9b712af13537971dc17ace34c4cbe86f9",
+          "code_length": 8
+        },
+        {
+          "name": "optString",
+          "descriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1f8f9a6e0e2a50563a01cea5743ce4671f8e4b47eca7d962a27b76cfc8935fe0",
+          "code_length": 25
+        },
+        {
+          "name": "put",
+          "descriptor": "(Z)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "5c795049ee23fdc2b1a63751f894bae1477390e9ef5264a34bf13a4b70016f74",
+          "code_length": 20
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/util/Collection;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "cdcba81c5d2ef20dfb572b86e8f86e0fec7eb06c5aacc6444253bc669769df09",
+          "code_length": 15,
+          "generic_signature": "(Ljava/util/Collection<Ljava/lang/Object;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(D)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "e7eb1643742fd6ea06749553b6e52547d8b9328afbf01643030f7ea5699a87e8",
+          "code_length": 21,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(I)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "0d8b00fa3dca3f815f947d1aa3b0eecdb8f8d95841b61e2e19764afdfc783fdf",
+          "code_length": 15
+        },
+        {
+          "name": "put",
+          "descriptor": "(J)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "3583bc7ec7139fa5040b8fd7ebe1378e98c3544afde0cdd4aa22159784ef6cda",
+          "code_length": 15
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/util/Map;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "c5a1afda7a4e3956728d584eb27701a476bf703f10cfd3ed78a2e2170ed4ee99",
+          "code_length": 15,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "52c355acc3e4f4fe72c4e3ab8ce25a039f32415732e3e9c2f4733a1178a285ff",
+          "code_length": 11
+        },
+        {
+          "name": "put",
+          "descriptor": "(IZ)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "18d1f059f3ba970b23d206c70da1936e3be292428e75637b30b152d0408c8f31",
+          "code_length": 21,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(ILjava/util/Collection;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "55815ec8579608449d3aeb7ec5de2d48be239e44acf4a7dc0d8848b5fa23d4b4",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "(ILjava/util/Collection<Ljava/lang/Object;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(ID)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "2de163bd51668d6ec69583813bc4b837d2d39606b96a4605eb2523e44388571e",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(II)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "540dc6918b081e936eef397acd730c7b514de19125e7bc864f233eaf5d88729d",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(IJ)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "d8e01c0a876b6594e5b366f7da849c290f61f5ad210336fb433d5737a366cfac",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(ILjava/util/Map;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "6851e94ec50a0c540f85fab70cb3e8ad8b847e6cabf1bebed4ee5236ec43eec4",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "(ILjava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lorg/json/JSONArray;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(ILjava/lang/Object;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "39990174957a103be1981f6191d86a74b9599a8039cb43d94a6853eaf8ddfceb",
+          "code_length": 88,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "remove",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3ae6b9778fd63f5f3bce1c05efde719bd1891d214e98186e84d8c33cd355d9c8",
+          "code_length": 25
+        },
+        {
+          "name": "similar",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8cfc21c3c9a59a59a1903107062039a1d2f85526e51aaa4ed5fb1206b8274aaf",
+          "code_length": 117
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Lorg/json/JSONArray;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "958763ca3bd657049929f57569179af628b0b5f8e475c50320b3d7f060c453c1",
+          "code_length": 61,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d42f971624b539b5d7c74fa0f5ffdf03c27e5a5947acc022732af448e2c5530",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ad65f74fdbf118fcd3e9fe347ff74b09e6228bc6066fafabdc53a82345ee2975",
+          "code_length": 35,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/Writer;)Ljava/io/Writer;",
+          "access": 1,
+          "code_sha256": "c78b45e624f928efa741b768def37d096225fc621ab37471cfad4486cf8aca58",
+          "code_length": 8,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/Writer;II)Ljava/io/Writer;",
+          "access": 0,
+          "code_sha256": "1e9427aa36d9a33dee8faf451b44c49cfea3a4787b990f96613c1173aa686a3b",
+          "code_length": 147,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/StringWriter",
+        "java/io/Writer",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Iterable",
+        "java/lang/Long",
+        "java/lang/NullPointerException",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/reflect/Array",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/JSONException.class",
+      "occurrence": 0,
+      "sha256": "5a65422db9837458667d6a3b4479e9b8a5c277eef54850594f6b9407400ab089",
+      "name": "org/json/JSONException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "cause",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "b8ebe9c2a5929d9bbc21e64992f381133715691b983fa2db307b57cf4a4a988f",
+          "code_length": 14
+        },
+        {
+          "name": "getCause",
+          "descriptor": "()Ljava/lang/Throwable;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "java/lang/Throwable",
+        "org/json/JSONException"
+      ]
+    },
+    {
+      "entry": "org/json/JSONML.class",
+      "occurrence": 0,
+      "sha256": "2651e9731bd3536ad9363f8952cda53166b4fd513ae4b4d15a6048040c504ebc",
+      "name": "org/json/JSONML",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Lorg/json/XMLTokener;ZLorg/json/JSONArray;)Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "a1de68e1ffa1879f1d1a6c76b83f0691a76f825c6d7682d9af91385f12a46f66",
+          "code_length": 773,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "521c59b523c5ec0aeb201daa86685f92c6d8d6a21a1946bee70cbe36eca230dc",
+          "code_length": 12,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Lorg/json/XMLTokener;)Lorg/json/JSONArray;",
+          "access": 9,
+          "code_sha256": "cad2d7b77db0444783dbb1917e74d3ff3014ee510606ee971e5e74a8b742dc1f",
+          "code_length": 10,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Lorg/json/XMLTokener;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "92d962d11bb05961ee96a66fb912a3cb5b309765413efa9d6c2990e5ee04f970",
+          "code_length": 10,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "49db29444dbec6353d6bc2689a5cff88e38b5192232e7374d5c7d0a3f0871081",
+          "code_length": 12,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONArray;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b008a880f13cb862a9b4b1628bf2c3e4295441d2c53ec165913943cadd1f19b1",
+          "code_length": 352,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8ad628484a663462bc2237699e690bbe85c4d8a6f4dfa3ea291a842cd2da8789",
+          "code_length": 354,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONML",
+        "org/json/JSONObject",
+        "org/json/XML",
+        "org/json/XMLTokener"
+      ]
+    },
+    {
+      "entry": "org/json/JSONObject$1.class",
+      "occurrence": 0,
+      "sha256": "03940249a07e07c1f7413e34dcaec4b294350d3b6f6b83b7a814c6071ed9e978",
+      "name": "org/json/JSONObject$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/json/JSONObject",
+        "org/json/JSONObject$1"
+      ]
+    },
+    {
+      "entry": "org/json/JSONObject$Null.class",
+      "occurrence": 0,
+      "sha256": "2e6bda684c377a9a6d20eeeb2257a4175223095a24ce008f0adcc2f794e665db",
+      "name": "org/json/JSONObject$Null",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 20,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ba1a3e78537e996c070db563edbe2ff3758e4939e026bfced109e4d93d34b37a",
+          "code_length": 15
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4915e5ac08e0f9018a3872cf000f27fda3e7661ef085c080718273cf246b8513",
+          "code_length": 3
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/json/JSONObject$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/json/JSONObject",
+        "org/json/JSONObject$1",
+        "org/json/JSONObject$Null"
+      ]
+    },
+    {
+      "entry": "org/json/JSONObject.class",
+      "occurrence": 0,
+      "sha256": "aa689272b058821b9c8d9dd52d03de72484876477f7efdf383626839ac16bd28",
+      "name": "org/json/JSONObject",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "NULL",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/json/JSONObject;[Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "67380b5033388bfc1ecdfb80dc1e667cee3377f0759614386e66e5ccc2a2c4c1",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/json/JSONTokener;)V",
+          "access": 1,
+          "code_sha256": "e2fdef9e86d37d3baf8e75b992c96e87b56d811ae644313875cb9bbf24722f1d",
+          "code_length": 165,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "3aa3a493c730a275bf0f39b0632192ddcdee48173059fb2b845b7dbebeb84845",
+          "code_length": 88,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6eadab52f2a214fcee2a6682b4960e81b6190157805d11770cb1e6ee41c5c6fd",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;[Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0db2b3e5719e9f4434951509598c52784f6dbd80dba84b6c8b7547a2c7af996a",
+          "code_length": 54
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "30bae02a542122cb0f1779b9edd5814ac5ad02683996e7ad49a159de7e21a153",
+          "code_length": 13,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Locale;)V",
+          "access": 1,
+          "code_sha256": "f8a87caf705a7e0826cae8e7b088d2497b093552979598173d8fa290bb43d4cd",
+          "code_length": 152,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "accumulate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "fb137b1db80450cd709fa5b710d0be13654cdd8aa1e28e6cdabd3ff749aa09c8",
+          "code_length": 87,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "append",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "0274682c32e546cc24e9181a1660a3b3a6440beaba49a15b0a32c812f4d1997d",
+          "code_length": 92,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "doubleToString",
+          "descriptor": "(D)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "af9dee7d1f26bacb78c688ad9a7cb863c19843f9a9c64c5e11ea874c59f2f98f",
+          "code_length": 96
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2c9e8388477bf60c4722097a3a4884b496e6c306523f896a353d4a7b53fd21df",
+          "code_length": 61,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getEnum",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "1253ed130fd8257a7b545c1145bfc32cd88345b6abe0fb991a4ed28731690e2b",
+          "code_length": 63,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;Ljava/lang/String;)TE;"
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "8e6644f752fdc05ad4df75234b4a1694be5deaef559f52fba50e98ca43a67f61",
+          "code_length": 103,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getBigInteger",
+          "descriptor": "(Ljava/lang/String;)Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "1c6486f660997e5e13572e28396aa1aa3bc913e3838863e0810c50b8f779f21a",
+          "code_length": 54,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getBigDecimal",
+          "descriptor": "(Ljava/lang/String;)Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "dcae2e31819349cde548f0120690e6e474251f2e2092b03a6f6b41ba5a8fe6b8",
+          "code_length": 54,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "541b10823a7de15e6adb5191284704a068d57db0eb9963a440ca2201bb09738f",
+          "code_length": 67,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1,
+          "code_sha256": "529170bf2b4e674cc3829304bfa76c237d43da2d0e766a0c7aeebc59d836d94d",
+          "code_length": 67,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getJSONArray",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "473895bffc3111ec0274ce207761f0ff2b34825c76f8cd6637b78e088404226f",
+          "code_length": 53,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "e379d665cb897c5671b139dca9d50461e048fdd1871e7fe34228d31ddd26e6f1",
+          "code_length": 53,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 1,
+          "code_sha256": "d9403fa87ff55838402c081fef205e594f54b5e25c6dbf85fdb91fb5bfc5be11",
+          "code_length": 67,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "getNames",
+          "descriptor": "(Lorg/json/JSONObject;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "3f1bcdea2e3a8835810f278de0c0ab5a8cefd60ad61b5ed9280c7f513b549da2",
+          "code_length": 54
+        },
+        {
+          "name": "getNames",
+          "descriptor": "(Ljava/lang/Object;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f051f8d0c36def3c4d3e04f58a38b7c1c23fc333bc9b0e605f7b967e4c65ccc6",
+          "code_length": 61
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "240d872c19b5b26a23e0653b88943bf7656bea90a0e4fd1c9b7fbc4f6ec42c6a",
+          "code_length": 53,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "has",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "84dd9c67f97539f3e0afe837670cb6d5cf25255cb0ef15e27ca3c4bc32eef802",
+          "code_length": 11
+        },
+        {
+          "name": "increment",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "0fbb1fff1f2502af5c725c07d468a4a2366f24fe2212a8129b7de1c1ddf1a41e",
+          "code_length": 210,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "isNull",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "aca790ef6908898fd2387fc98ace05b1c1a251c1b855f2e1ddf811816e9c50a7",
+          "code_length": 12
+        },
+        {
+          "name": "keys",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "6dcbabf3118dd4db6f359e41ccdbf3679081ab82b4199788e2b12313f447cd0b",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/String;>;"
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "06d21cdda20baa2bef0f2248b302479b0bd855301af05e60788e88f9c9cd9047",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "length",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3dfe1ee3d1dae042247bff601134866adca9c044f36573e288076564427b1070",
+          "code_length": 10
+        },
+        {
+          "name": "names",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "d919f60f3ceb3763f1551726866a8beb42d3b4590efca63b03b10d5afe7dc9ed",
+          "code_length": 49
+        },
+        {
+          "name": "numberToString",
+          "descriptor": "(Ljava/lang/Number;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "68e1cbf489edb7598af323ca2291e61adab45b09f400946dcb1fe3e504b78a48",
+          "code_length": 97,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "opt",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "63c3330dc876c750744ffcc8c0e2c9bdfba06a37daaf52553e31e51023dee196",
+          "code_length": 19
+        },
+        {
+          "name": "optEnum",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "a21e51081ffbf6916065ed79cf860aebae5b56c509e70e4d3a8d259b6c211eda",
+          "code_length": 8,
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;Ljava/lang/String;)TE;"
+        },
+        {
+          "name": "optEnum",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Enum;)Ljava/lang/Enum;",
+          "access": 1,
+          "code_sha256": "b64bc9e2aed230d558c8259a706a202ea3bf0db4fa2f4ce585393ee8261adc24",
+          "code_length": 56,
+          "generic_signature": "<E:Ljava/lang/Enum<TE;>;>(Ljava/lang/Class<TE;>;Ljava/lang/String;TE;)TE;"
+        },
+        {
+          "name": "optBoolean",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "a498f361eb206286ece06283488c2036abc34677ad3b5314785a3208942525c7",
+          "code_length": 7
+        },
+        {
+          "name": "optBoolean",
+          "descriptor": "(Ljava/lang/String;Z)Z",
+          "access": 1,
+          "code_sha256": "88d2bb088420fd5ad1e6072b16e68382bea598a676bd121979e44f75b069e63e",
+          "code_length": 9
+        },
+        {
+          "name": "optDouble",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "a8e45c38cf18920081b31a3ef2585da8eb2ca8f166a2f2d4f7d06e1a9ba31134",
+          "code_length": 9
+        },
+        {
+          "name": "optBigInteger",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigInteger;)Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "f950c4a3b15378b0cebe83659630ef499bcf249d5e69ed63e507ac3dd6d6d5e2",
+          "code_length": 9
+        },
+        {
+          "name": "optBigDecimal",
+          "descriptor": "(Ljava/lang/String;Ljava/math/BigDecimal;)Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "ca1f9ca2123ae34334f0c684d9f0db5fd60ddcbd7b18d32a9ecbb88647648e23",
+          "code_length": 9
+        },
+        {
+          "name": "optDouble",
+          "descriptor": "(Ljava/lang/String;D)D",
+          "access": 1,
+          "code_sha256": "62cab559645125cdfb8cf76cad2e2550d9ee64929c4ed9bf14a413727583bf8a",
+          "code_length": 10
+        },
+        {
+          "name": "optInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1,
+          "code_sha256": "a627fe745e6f8c88c82b3369bb6a77f7f5fe236939a55a97b1e61ddc0ebbe7b7",
+          "code_length": 7
+        },
+        {
+          "name": "optInt",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1,
+          "code_sha256": "087731cd286dce0b76425fb88d1c708ecd8870ac4a1083b21fd98a93f23e4c05",
+          "code_length": 9
+        },
+        {
+          "name": "optJSONArray",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "68a963eb4ad4fe1b31530c34af7e25193bd5d6516782dd9aafd83290cc90bf13",
+          "code_length": 22
+        },
+        {
+          "name": "optJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "7ef6e12bfbad06fd080e0bfa28e76f5f6605623e90274175aa13ada14e2ed6af",
+          "code_length": 22
+        },
+        {
+          "name": "optLong",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 1,
+          "code_sha256": "fdf68747fe5962d9d788ea724075170ce02fcad9e0f5cc9484b62ff458c92bf8",
+          "code_length": 7
+        },
+        {
+          "name": "optLong",
+          "descriptor": "(Ljava/lang/String;J)J",
+          "access": 1,
+          "code_sha256": "90370d9c63ebc7c6230c1f81a6314fc46e36811feefcd835be99a3baedfc69e7",
+          "code_length": 10
+        },
+        {
+          "name": "optString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "18e223b283103ef1ebd574e9ef88e858c7592014c806e65188534622eefa09a0",
+          "code_length": 8
+        },
+        {
+          "name": "optString",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "16f2827b16a1cc79248782fcac509960efc68e44024e62f871cf96d91a4266f0",
+          "code_length": 25
+        },
+        {
+          "name": "populateMap",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "3bfc2d1f87bb097395bfe89ef6936dd4e38887bc4034da385ff55feca7e6d006",
+          "code_length": 281
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Z)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "ab2e388b2f1d711779c212af66049f7b57d3068f8effa68f67d8e72f07025af0",
+          "code_length": 21,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Collection;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "36fc2d56091ec693c425e796a3b639cfa165ad62f7e1c072a258c32fb7618571",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Collection<Ljava/lang/Object;>;)Lorg/json/JSONObject;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;D)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "0f3bd56768814b874342af41afa2cbfa56a0072f82508c817ad52bf81d7a5b10",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;I)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "1f78abeef431a2b5914ec577e2ab998a12147ccb7bb179c83219f7c263d3987b",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;J)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "f298ee633aeaa1f26e53cd41a0e55885affec148751a16682c5acbc3cdbe0a3b",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "659d5f8327bda8bfb395552484c796888ce89282afb9180f2ab362a9dc90190e",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Lorg/json/JSONObject;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "b1320f6aa778f1dc59df371a36ee5041dcf5ae6753436d16b950c8aab931d00e",
+          "code_length": 45,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "putOnce",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "12b413e7d6e1ccae1048195f7e95ccb192c279124d7b3d86e9c7c22c6bd55c64",
+          "code_length": 57,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "putOpt",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "8bdccd30d8818893041e4baa58949e156ec6597d1cb49f434da1e5348d510ebf",
+          "code_length": 17,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "quote",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "cfb2fb25870d098ed01b848e7725509433bf9121edb8e20c386b703d10316c6c",
+          "code_length": 39
+        },
+        {
+          "name": "quote",
+          "descriptor": "(Ljava/lang/String;Ljava/io/Writer;)Ljava/io/Writer;",
+          "access": 9,
+          "code_sha256": "3ad4d75bd1d94b657aa7646c94d371e06f0e3492daf57c99b027b8775afeaece",
+          "code_length": 295,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2ffe39c5388b75b26c6f45ca873c493c69b77517c0862adf79952b2fc01dc13b",
+          "code_length": 11
+        },
+        {
+          "name": "similar",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e138aa6133ef469e0e2af50229fa48d20fe439b331d7698fd036813df0762986",
+          "code_length": 144
+        },
+        {
+          "name": "stringToValue",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "cbe599fac577fc3aab18499b63aa5756fd46a4f44d0f1b8d7ab2cd6cb430dd89",
+          "code_length": 174
+        },
+        {
+          "name": "testValidity",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "a154349537dd20ae18278de5f8c9baad5e5aafe3d44440e7650947ef4d61660c",
+          "code_length": 79,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toJSONArray",
+          "descriptor": "(Lorg/json/JSONArray;)Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "01f2ff06f2348f01fde06bea30ea65c477b33ff835f9b69c835552008f67e867",
+          "code_length": 53,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a0cd9b93e9786da7f5d96dd91f17a65c6e06b09bf2921b420351b072fe33088d",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e1e25e55cff266542780f4891de28597fa680f3e5a9b36ea0fb3b8b9b1bb1710",
+          "code_length": 35,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "valueToString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "659a6c7bf2bba6f2d165b41b0371f8fb8790383cf654ab0a0e03917794956a15",
+          "code_length": 203,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "65e8eb01ab033f8dc2d5cdceb1878b9406c68e84941208a77c1e704515b583f5",
+          "code_length": 246
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/Writer;)Ljava/io/Writer;",
+          "access": 1,
+          "code_sha256": "c163117c19d1e6aba4209a25cf4ad00714bd7efcc909d1f7696d6b905120d730",
+          "code_length": 8,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "writeValue",
+          "descriptor": "(Ljava/io/Writer;Ljava/lang/Object;II)Ljava/io/Writer;",
+          "access": 24,
+          "code_sha256": "f3f952e05fa61a2ab630f0cd2a23dc6680238b34aab22fe7575b9e6f0ff2331c",
+          "code_length": 265,
+          "throws": [
+            "org/json/JSONException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "indent",
+          "descriptor": "(Ljava/io/Writer;I)V",
+          "access": 24,
+          "code_sha256": "7f42837ba62b4da92d293ab6e73381a019f6cb4893ec8fd53a58f74a0f1b34c7",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/io/Writer;II)Ljava/io/Writer;",
+          "access": 0,
+          "code_sha256": "4480a949d61217618795c58f47cfbc0133cde24e7a0fc142f80aa7c220ad716a",
+          "code_length": 229,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f5faaf0a908cb0ae7403f91afa8a915b7341faa90e967ef84014edc335db10c7",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "[Ljava/lang/reflect/Field;",
+        "[Ljava/lang/reflect/Method;",
+        "java/io/IOException",
+        "java/io/StringWriter",
+        "java/io/Writer",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NullPointerException",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/Package",
+        "java/lang/RuntimeException",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/Field",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Modifier",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/util/Collection",
+        "java/util/Enumeration",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/ResourceBundle",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONObject$1",
+        "org/json/JSONObject$Null",
+        "org/json/JSONString",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/JSONString.class",
+      "occurrence": 0,
+      "sha256": "2bf18f8028554a8dc09bf53caa4902350ddbb8ed1b4b29c65dcd3983ba6c15b8",
+      "name": "org/json/JSONString",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "toJSONString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/json/JSONString"
+      ]
+    },
+    {
+      "entry": "org/json/JSONStringer.class",
+      "occurrence": 0,
+      "sha256": "042868b2a3cfe66577cc838f1f38b6c496e4c9acbf90089a84a36ce0776ad30a",
+      "name": "org/json/JSONStringer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/json/JSONWriter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8db09a69980431ac5b5da3dc42f3627a69e4d704ca976448be0d8bae9867f08b",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/io/StringWriter",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/json/JSONStringer",
+        "org/json/JSONWriter"
+      ]
+    },
+    {
+      "entry": "org/json/JSONTokener.class",
+      "occurrence": 0,
+      "sha256": "2ed657345c1e9c5ae47cddb9e47e354b4d1173b5e4a465efe189fb69fef29faf",
+      "name": "org/json/JSONTokener",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "character",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "eof",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "line",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "previous",
+          "descriptor": "C",
+          "access": 2
+        },
+        {
+          "name": "reader",
+          "descriptor": "Ljava/io/Reader;",
+          "access": 2
+        },
+        {
+          "name": "usePrevious",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/Reader;)V",
+          "access": 1,
+          "code_sha256": "7e2669b2709d7564e22be952497c64e288364fce8efefd32eac2ab9f859e9c1a",
+          "code_length": 58
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "271229d22a12ad032d1c6e37cb94d99a3b5453fc7f8986c0949b5f9c096c238f",
+          "code_length": 13,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4921f04a77996b771706bba5c94799b9d316a905e8a3647ec5a94f6d049c10fd",
+          "code_length": 13
+        },
+        {
+          "name": "back",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a15a3d03ef5a6d422a2af5569fc452d510d4ac51a4a6c05a513110809eec8b32",
+          "code_length": 57,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "dehexchar",
+          "descriptor": "(C)I",
+          "access": 9,
+          "code_sha256": "70f66d293333d7523bdcfc7fcf6b9587fec352089dcd8d662de41cc377755e26",
+          "code_length": 53
+        },
+        {
+          "name": "end",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7c2b399a4963a414496eb6c2206875ccd1ea6ee8f8219a0c381231ce588458fb",
+          "code_length": 20
+        },
+        {
+          "name": "more",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fb1a5b3c2b6640f2ccfbd6fa5ce9cae0b503fe83a72f55ccea940763389f19ff",
+          "code_length": 20,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "()C",
+          "access": 1,
+          "code_sha256": "e38f6f33174212c4799771f3ad5804edddd62b49b43005cdb28f971e3a451518",
+          "code_length": 144,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "(C)C",
+          "access": 1,
+          "code_sha256": "6183f6141ccd8dc945ce05873813a053b79e234d4953f8b30faf70fc7b2f2f01",
+          "code_length": 50,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0647900aa3fdf3d67dbab573f4c5185c0a4552edd5b89f12e89195b69d373b1c",
+          "code_length": 54,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextClean",
+          "descriptor": "()C",
+          "access": 1,
+          "code_sha256": "238647ffb5dead06ecae8d3de07c5bae99e5443085ed6e8ac51fc4e96573333b",
+          "code_length": 20,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextString",
+          "descriptor": "(C)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "18b595ffe6ab9a6dcd793929f0cb45f38e149fbda1eb372e0dac72928dcfa865",
+          "code_length": 264,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextTo",
+          "descriptor": "(C)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c2d8ca161dce998182f94dca37429989ff6fb215a57d29debb1c0afc1305ba13",
+          "code_length": 59,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextTo",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c8d15c2502955905db2c9278d16e752582c0d4dfb82db8e96070e5c56d99e718",
+          "code_length": 62,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0ff6be2d74a5f77baeaad7c98532572c4732e8697ce59357611fc362aea25b8e",
+          "code_length": 150,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "skipTo",
+          "descriptor": "(C)C",
+          "access": 1,
+          "code_sha256": "3385fefe80f2b0afe615c5d5e9e3f56e84fe8c8e2b507ce2f9b447254b87cfe6",
+          "code_length": 85,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "syntaxError",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONException;",
+          "access": 1,
+          "code_sha256": "7a6200033d040d4c11fdf7889c54a0b1c31aeb8b53716f9ddd2545daddbd5610",
+          "code_length": 29
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1b71583d484c7c0e19203e3688c73b1efafa6a925af6c4956d95f9e5325bbf92",
+          "code_length": 52
+        }
+      ],
+      "class_references": [
+        "[C",
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/Reader",
+        "java/io/StringReader",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONTokener"
+      ]
+    },
+    {
+      "entry": "org/json/JSONWriter.class",
+      "occurrence": 0,
+      "sha256": "55a1175ca0013a926ebd6ff63b3f227db322efc9495a608faaccbfcb02364741",
+      "name": "org/json/JSONWriter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "maxdepth",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "comma",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "mode",
+          "descriptor": "C",
+          "access": 4
+        },
+        {
+          "name": "stack",
+          "descriptor": "[Lorg/json/JSONObject;",
+          "access": 18
+        },
+        {
+          "name": "top",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "writer",
+          "descriptor": "Ljava/io/Writer;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/Writer;)V",
+          "access": 1,
+          "code_sha256": "c57c9f210c039e9a9069c90d52a7faf5893bad765b400e0123fb94270b8206d3",
+          "code_length": 36
+        },
+        {
+          "name": "append",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONWriter;",
+          "access": 2,
+          "code_sha256": "2e3cb589e3015b2e7f3c42608d917ae2658ef6b9b323330d62d47ea35253ac1f",
+          "code_length": 110,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "array",
+          "descriptor": "()Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "92de430ce9c364c7977d42a07741dca2fda90e24557a6471d510502b796b2736",
+          "code_length": 56,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "end",
+          "descriptor": "(CC)Lorg/json/JSONWriter;",
+          "access": 2,
+          "code_sha256": "3692ecb6b66d7b923b0dd7be2c41a9587348bc1961ed3151a89472f34bec777b",
+          "code_length": 62,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "endArray",
+          "descriptor": "()Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "448989192c687d1f8e5619bb43700e9cf46f8fa2987b617ce3de3862da9b04ab",
+          "code_length": 9,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "endObject",
+          "descriptor": "()Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "ffa35bf690e8e1c3c264de95cfae0df6620575aab9dda721d7291915164eab3b",
+          "code_length": 9,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "key",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "0ec82367fa8bba504f784040c595d3ff809be35966c90d5bd0e8ed2ac90496a7",
+          "code_length": 111,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "object",
+          "descriptor": "()Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "f43f69cd152b8d48e1caf0395047e128a4d8793a091f43b796cb429d4925852c",
+          "code_length": 68,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "pop",
+          "descriptor": "(C)V",
+          "access": 2,
+          "code_sha256": "44f50b2ddf672801229f88a82eb84acec113b99727139d221ba42b613e3c63c5",
+          "code_length": 102,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "push",
+          "descriptor": "(Lorg/json/JSONObject;)V",
+          "access": 2,
+          "code_sha256": "2a83f52cdbdef01d22fd9f53d00433ba4967b7154168544137543a4f9e8aec64",
+          "code_length": 56,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "value",
+          "descriptor": "(Z)Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "c651cc90f4545d26887b31211c6fb7db3c74e425c033d3570ccac2018bc78250",
+          "code_length": 16,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "value",
+          "descriptor": "(D)Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "21d7c4e8b4d86a336a7fd61aff97da0cb97d99fc6a727bcb0bdf8aedf283d84d",
+          "code_length": 13,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "value",
+          "descriptor": "(J)Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "f8b4ff4374d10e892c374e3a9d4b2257c8804618db6d151ea6f2012faab5f7e9",
+          "code_length": 9,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "value",
+          "descriptor": "(Ljava/lang/Object;)Lorg/json/JSONWriter;",
+          "access": 1,
+          "code_sha256": "1b45011be016c58ac67b246839267520bcf8b2d33899d9c2a5bc22f711eab8bf",
+          "code_length": 9,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/Writer",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/JSONWriter"
+      ]
+    },
+    {
+      "entry": "org/json/Property.class",
+      "occurrence": 0,
+      "sha256": "f0ce9854eb9cf796c24f01efa792e4405aa2b2a33fd6ba9378be87b410001629",
+      "name": "org/json/Property",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/util/Properties;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "7f83e20cd952202860659625b1b8ec661cdd7f39c5596b18e54304f6a4d120c3",
+          "code_length": 59,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toProperties",
+          "descriptor": "(Lorg/json/JSONObject;)Ljava/util/Properties;",
+          "access": 9,
+          "code_sha256": "f6745c7d514a73b99e2f7899f9ccd6457e30480bf48a7d3de96c30ab9ab025d1",
+          "code_length": 52,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Enumeration",
+        "java/util/Iterator",
+        "java/util/Properties",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/Property"
+      ]
+    },
+    {
+      "entry": "org/json/XML.class",
+      "occurrence": 0,
+      "sha256": "3435a9715a9a89205b01c0c069c6bcfa675ede0e000e45623bed17f3c10ef780",
+      "name": "org/json/XML",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "AMP",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "APOS",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "BANG",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "EQ",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "GT",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "LT",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "QUEST",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "QUOT",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        },
+        {
+          "name": "SLASH",
+          "descriptor": "Ljava/lang/Character;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "escape",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "9e16fc057b480248c149f8a1c01f05fbefdd8817760fdb5f02a040f16364249b",
+          "code_length": 152
+        },
+        {
+          "name": "noSpace",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "19eedb50ea1b3fee2d4e5273261001dcbbcb818f4c56069472a3b3d01f2cc01e",
+          "code_length": 76,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Lorg/json/XMLTokener;Lorg/json/JSONObject;Ljava/lang/String;)Z",
+          "access": 10,
+          "code_sha256": "195695f03c3c41edb47252f4a7158abb3951ad1416998fd01c58e1ae396f906b",
+          "code_length": 660,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "stringToValue",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "e38dfdc2afd026c943fbb783a6b06757faac9f1ff541c0e9ab39eee853501940",
+          "code_length": 117
+        },
+        {
+          "name": "toJSONObject",
+          "descriptor": "(Ljava/lang/String;)Lorg/json/JSONObject;",
+          "access": 9,
+          "code_sha256": "a8821790ede563f0646552b457208ed2ab3191107f7f62876a0b22b859a329fa",
+          "code_length": 45,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7192802eec4a78e0c4fe68e0d013f27ed76f79a8d50e6c0a0372ec51b0f8f41f",
+          "code_length": 6,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "406799712fc6335a61c07b5e33b53ec94dc1067c873aa4b751a1ab232a5cec45",
+          "code_length": 609,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "127a7ff57bf67b0c1724e8f7873cd65413fc7d1d5257cfe4a78981f9029d12f5",
+          "code_length": 73
+        }
+      ],
+      "class_references": [
+        "java/lang/Boolean",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "org/json/JSONArray",
+        "org/json/JSONException",
+        "org/json/JSONObject",
+        "org/json/XML",
+        "org/json/XMLTokener"
+      ]
+    },
+    {
+      "entry": "org/json/XMLTokener.class",
+      "occurrence": 0,
+      "sha256": "b87fba960312ff54e68a788c24947a6b3cf438ac6b89dc1a76a4074e20e0db82",
+      "name": "org/json/XMLTokener",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/json/JSONTokener",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "entity",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 25,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Character;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "nextCDATA",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "868a56e359d0a1dc66c27ff87a594873e9ce0c55ed6e3160a8ecb50e2532d7c2",
+          "code_length": 88,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextContent",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "12f7f77864c0665dc921f8b961a52ce56353d59e184b1677548fdeb1d767e7b3",
+          "code_length": 91,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextEntity",
+          "descriptor": "(C)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d27f27a70a2aaeb826c7fd2afeb83f8ec0bbf1041e9111c629df8406cf093f05",
+          "code_length": 122,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextMeta",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "52cb6bf989b3cc2d44fcda656faaa10c3e52c89ffb37f5da12451f8a1927725a",
+          "code_length": 263,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "nextToken",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f2c48828ed51169d125a45266d0f499cda60a4482289d208a6028afba7aaca21",
+          "code_length": 348,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "skipPast",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "dac69b96428e0fcfb1ff176ed2eb32787491cb68b1307bbe18ad9f9024260893",
+          "code_length": 149,
+          "throws": [
+            "org/json/JSONException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "74361a8129ab9569d7963c81ac0b2024330f624281bacd409887e7f30ac88f73",
+          "code_length": 73
+        }
+      ],
+      "class_references": [
+        "[C",
+        "java/lang/Boolean",
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "org/json/JSONException",
+        "org/json/JSONTokener",
+        "org/json/XML",
+        "org/json/XMLTokener"
+      ]
+    }
+  ]
+}

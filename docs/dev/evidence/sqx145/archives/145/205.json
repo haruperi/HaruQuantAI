@@ -1,0 +1,108 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+  "sha256": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d",
+  "class_count": 12,
+  "unique_class_entries": 12,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfilePlugin.class": "23d3bf9c8a83984b2a2ebadea7d63ad6b8bb01b26ecd3b07b12a3827978fcee3",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet.class": "09792daa1bd284c93a31d0dbe88168da1548ae060d11a65b370dbb21a2031b49",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart.class": "d72098007c64ad1c5fc606728b3084af665028a36324b60effbedf554fac7b52",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1.class": "617639c27154e5a6e451f264568376a8e826b7c2aff9dfd8d5785fe82049b0b3",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group.class": "fac0e6e17f610c68cabc345abd9e0b219b7c0279ddd75a6c3a9c3ca8a5d18906",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart.class": "1161c627a524c70324324a1957e0c0b484f3422412d1b9d8f9ff6d42b1241fd9",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart.class": "8872cbd60e6470f3e3bc0f7eaa64f556abec75919f69d00d402a11b386e70c23",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness.class": "b3649ebd9f9def3e34cbd306b0514e661cd14aed82b5fa3492a999e6460c7edc",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults.class": "0fa787cd803a255e00d7e20b6825d3cc1b0c2b4a9cea7458e490494b66174540",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport.class": "36acd06f6edb151e1fd64c3ade638edaf1ec5c08f0209899a0bd152ebe9f652e",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews.class": "8a9f8e78ae444c52cdc31ebbe7a8d2570473989643a0a41706c89b0c8fee7a83",
+    "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager.class": "710bfc57d843baf8e4250330a3ddccdd55a5e059e2e35b73614b4976a1258635"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfilePlugin.class",
+      "occurrence": 0,
+      "sha256": "23d3bf9c8a83984b2a2ebadea7d63ad6b8bb01b26ecd3b07b12a3827978fcee3",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet.class",
+      "occurrence": 0,
+      "sha256": "09792daa1bd284c93a31d0dbe88168da1548ae060d11a65b370dbb21a2031b49",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization2DChart.class",
+      "occurrence": 0,
+      "sha256": "d72098007c64ad1c5fc606728b3084af665028a36324b60effbedf554fac7b52",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$1.class",
+      "occurrence": 0,
+      "sha256": "617639c27154e5a6e451f264568376a8e826b7c2aff9dfd8d5785fe82049b0b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart$Group.class",
+      "occurrence": 0,
+      "sha256": "fac0e6e17f610c68cabc345abd9e0b219b7c0279ddd75a6c3a9c3ca8a5d18906",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/Optimization3DChart.class",
+      "occurrence": 0,
+      "sha256": "1161c627a524c70324324a1957e0c0b484f3422412d1b9d8f9ff6d42b1241fd9",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/charts/OptimizationScatterChart.class",
+      "occurrence": 0,
+      "sha256": "8872cbd60e6470f3e3bc0f7eaa64f556abec75919f69d00d402a11b386e70c23",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptComparatorByFitness.class",
+      "occurrence": 0,
+      "sha256": "b3649ebd9f9def3e34cbd306b0514e661cd14aed82b5fa3492a999e6460c7edc",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResults.class",
+      "occurrence": 0,
+      "sha256": "0fa787cd803a255e00d7e20b6825d3cc1b0c2b4a9cea7458e490494b66174540",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsExport.class",
+      "occurrence": 0,
+      "sha256": "36acd06f6edb151e1fd64c3ade638edaf1ec5c08f0209899a0bd152ebe9f652e",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViews.class",
+      "occurrence": 0,
+      "sha256": "8a9f8e78ae444c52cdc31ebbe7a8d2570473989643a0a41706c89b0c8fee7a83",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager.class",
+      "occurrence": 0,
+      "sha256": "710bfc57d843baf8e4250330a3ddccdd55a5e059e2e35b73614b4976a1258635",
+      "member_shard": "docs/dev/evidence/sqx145/members/205/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/205/001.json",
+      "sha256": "bc778aef860356d7db1b7a9ac52b45067a052808f6d2d45c5a37c540029710da"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
+  "sha256": "0117bc047a4a69c16530c78b263df70f607d19bef32dcca40fda647f0e886caf",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator.class": "2fa8e4d7723a1183e2d2bc797d41b21a5f1714a56b43e1cf2a05a0c87e05cbb6",
+    "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet.class": "98844c63bd1edf661c6c59f633aa534530c9980379d6eaec7245962aaf1b19a0",
+    "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin.class": "273c1c34143909ca3fda3d2e2126f8a19b5a826418131ae7e29dbc421af305cf",
+    "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings.class": "7d0d0cff3fe2bff1fd62e8aa413cab2c12fc8a535626c92a0199929fb74901aa"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator.class",
+      "occurrence": 0,
+      "sha256": "2fa8e4d7723a1183e2d2bc797d41b21a5f1714a56b43e1cf2a05a0c87e05cbb6",
+      "member_shard": "docs/dev/evidence/sqx145/members/235/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet.class",
+      "occurrence": 0,
+      "sha256": "98844c63bd1edf661c6c59f633aa534530c9980379d6eaec7245962aaf1b19a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/235/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "273c1c34143909ca3fda3d2e2126f8a19b5a826418131ae7e29dbc421af305cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/235/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings.class",
+      "occurrence": 0,
+      "sha256": "7d0d0cff3fe2bff1fd62e8aa413cab2c12fc8a535626c92a0199929fb74901aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/235/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/235/001.json",
+      "sha256": "2f6cc58c6b8b365867352cad0668490696c0cb9919c169152d210dcaa5c70a33"
+    }
+  ]
+}

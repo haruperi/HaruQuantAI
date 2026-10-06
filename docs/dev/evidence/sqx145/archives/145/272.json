@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskClearDatabanks/TaskClearDatabanks.jar",
+  "sha256": "3b1927921286adac455ac77748534af0299f8bc1f928b32e4b817bed700657f2",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/ClearDatabanks/ClearDatabanksTask.class": "4479ef774cf0e6538c8d223f1f4ae208839107a2c335ddf82026949838235fbc"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/ClearDatabanks/ClearDatabanksTask.class",
+      "occurrence": 0,
+      "sha256": "4479ef774cf0e6538c8d223f1f4ae208839107a2c335ddf82026949838235fbc",
+      "member_shard": "docs/dev/evidence/sqx145/members/272/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/272/001.json",
+      "sha256": "378594e2a5fe6a74e297734f76c8c9f0e5a4f2f6844f0e4c677fa587294b62fc"
+    }
+  ]
+}

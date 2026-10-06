@@ -1,0 +1,168 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-email-1.4.jar",
+  "sha256": "685de61b5987602a7170b1c64969d966ab0616e5aff170b78c4c109638662151",
+  "class_count": 20,
+  "unique_class_entries": 20,
+  "resource_count": 6,
+  "duplicate_entries": [],
+  "classes": {
+    "org/apache/commons/mail/resolver/DataSourceCompositeResolver.class": "be0cc823204808e59d1f4d18a5c4039fd0e94b71f3011eb1b27916a5e01c86c7",
+    "org/apache/commons/mail/resolver/DataSourceFileResolver.class": "2d08a0125beb064f9cb8ce7a8d54f0414f61357be3ef622d331b1e3332171ad9",
+    "org/apache/commons/mail/resolver/DataSourceClassPathResolver.class": "db78883ebf6fcbe6a668cd7b4ec533a2e6436edc4a2c5808ad362aba6ce3a045",
+    "org/apache/commons/mail/resolver/DataSourceUrlResolver.class": "1b68128b87b916414edb8402b88b621c256bb7b304ead38775157015f7403296",
+    "org/apache/commons/mail/resolver/DataSourceBaseResolver.class": "8f4f2f2246f4caf3f385aa21b5643ee3e4633a2ad80c25f49488e74a9e5a265c",
+    "org/apache/commons/mail/ByteArrayDataSource.class": "5572dd6b7239b8fdc8f72aa89c16186a60d19431dbec6cef98a8e929980547ec",
+    "org/apache/commons/mail/DefaultAuthenticator.class": "6a268b056363d5a96aaaefcdc3969db34300ed3664afd61348e347d94f42f9db",
+    "org/apache/commons/mail/util/MimeMessageUtils.class": "3cc39a075d214aa0c13a952307363d9ae1e59a0532e0c07242b672a62beab49e",
+    "org/apache/commons/mail/util/MimeMessageParser.class": "49b2e7ae1bf2bb8569a493b48c4eb182d00fb8355eb9e7f4f2b407e06863d97f",
+    "org/apache/commons/mail/SimpleEmail.class": "9aea5fb97a43c7df6ec3fce819ff022d3742d7a960ad9ad41a8d74be35e6e917",
+    "org/apache/commons/mail/MultiPartEmail.class": "ca1e9891ad1e2d74948efa12b02c74bec0140e95b8133488dc26c3677f09f972",
+    "org/apache/commons/mail/DataSourceResolver.class": "b02e08c3331ce8ddc70b1da6808d28aaa0602532c7dee04c674031a9a27e4b4a",
+    "org/apache/commons/mail/Email.class": "ad0eefc9c5def018687d4fc34af934a9f95521487da5dc0b338999c3dee3834e",
+    "org/apache/commons/mail/EmailUtils.class": "0ec63f57b86afaa700462549c6ef4c73a1a20db2f5eb20400dd1756dc4fef26e",
+    "org/apache/commons/mail/ImageHtmlEmail.class": "3eab6b35740fbf711e91a0637d6d4fe09c90878167b82b4feac07284377b5740",
+    "org/apache/commons/mail/EmailConstants.class": "9ec09311aba9b7d73ecf06decdb66af4235d41e823039fb34c6c805969a3e4ad",
+    "org/apache/commons/mail/EmailException.class": "38755283cc9b4d5637cf1bc6b52c7543aa4b87f77c34cfd181401a27905d33b1",
+    "org/apache/commons/mail/EmailAttachment.class": "143404d1fe06814456a054390559771d5ea53af5601e9f31d9c76c3181e087f3",
+    "org/apache/commons/mail/HtmlEmail$InlineImage.class": "0b62d146727e116052dccb13a594e12ea3905339daa8ccef12684ae3026b7659",
+    "org/apache/commons/mail/HtmlEmail.class": "5d95869f44549cdfc160577667a118c93b93e686d12f084cc5cf70324778b105"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "e40540de644ad2431ad6a372c6cb39c76976bac5f2ce644577ef8b648c9eff07",
+    "META-INF/mime.types": "c047eeea98704dde018d7ae348d4faf89a819fa40bf7e4431a2d604eb493b2c7",
+    "META-INF/NOTICE.txt": "7033e7759d6931c510c48bb463888eb9f2686d4428f686d184122b496930dd73",
+    "META-INF/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "META-INF/maven/org.apache.commons/commons-email/pom.xml": "9e69974dabe29089761b824a267940ee45c710d24de683fe9a1d8c45459eda86",
+    "META-INF/maven/org.apache.commons/commons-email/pom.properties": "69e065068276f3db382f05e7fc02341ee82748c6c814d6deee232ab53902540f"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceCompositeResolver.class",
+      "occurrence": 0,
+      "sha256": "be0cc823204808e59d1f4d18a5c4039fd0e94b71f3011eb1b27916a5e01c86c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceFileResolver.class",
+      "occurrence": 0,
+      "sha256": "2d08a0125beb064f9cb8ce7a8d54f0414f61357be3ef622d331b1e3332171ad9",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceClassPathResolver.class",
+      "occurrence": 0,
+      "sha256": "db78883ebf6fcbe6a668cd7b4ec533a2e6436edc4a2c5808ad362aba6ce3a045",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceUrlResolver.class",
+      "occurrence": 0,
+      "sha256": "1b68128b87b916414edb8402b88b621c256bb7b304ead38775157015f7403296",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceBaseResolver.class",
+      "occurrence": 0,
+      "sha256": "8f4f2f2246f4caf3f385aa21b5643ee3e4633a2ad80c25f49488e74a9e5a265c",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/ByteArrayDataSource.class",
+      "occurrence": 0,
+      "sha256": "5572dd6b7239b8fdc8f72aa89c16186a60d19431dbec6cef98a8e929980547ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/DefaultAuthenticator.class",
+      "occurrence": 0,
+      "sha256": "6a268b056363d5a96aaaefcdc3969db34300ed3664afd61348e347d94f42f9db",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/util/MimeMessageUtils.class",
+      "occurrence": 0,
+      "sha256": "3cc39a075d214aa0c13a952307363d9ae1e59a0532e0c07242b672a62beab49e",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/util/MimeMessageParser.class",
+      "occurrence": 0,
+      "sha256": "49b2e7ae1bf2bb8569a493b48c4eb182d00fb8355eb9e7f4f2b407e06863d97f",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/SimpleEmail.class",
+      "occurrence": 0,
+      "sha256": "9aea5fb97a43c7df6ec3fce819ff022d3742d7a960ad9ad41a8d74be35e6e917",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/MultiPartEmail.class",
+      "occurrence": 0,
+      "sha256": "ca1e9891ad1e2d74948efa12b02c74bec0140e95b8133488dc26c3677f09f972",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/DataSourceResolver.class",
+      "occurrence": 0,
+      "sha256": "b02e08c3331ce8ddc70b1da6808d28aaa0602532c7dee04c674031a9a27e4b4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/Email.class",
+      "occurrence": 0,
+      "sha256": "ad0eefc9c5def018687d4fc34af934a9f95521487da5dc0b338999c3dee3834e",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailUtils.class",
+      "occurrence": 0,
+      "sha256": "0ec63f57b86afaa700462549c6ef4c73a1a20db2f5eb20400dd1756dc4fef26e",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/ImageHtmlEmail.class",
+      "occurrence": 0,
+      "sha256": "3eab6b35740fbf711e91a0637d6d4fe09c90878167b82b4feac07284377b5740",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailConstants.class",
+      "occurrence": 0,
+      "sha256": "9ec09311aba9b7d73ecf06decdb66af4235d41e823039fb34c6c805969a3e4ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailException.class",
+      "occurrence": 0,
+      "sha256": "38755283cc9b4d5637cf1bc6b52c7543aa4b87f77c34cfd181401a27905d33b1",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailAttachment.class",
+      "occurrence": 0,
+      "sha256": "143404d1fe06814456a054390559771d5ea53af5601e9f31d9c76c3181e087f3",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/HtmlEmail$InlineImage.class",
+      "occurrence": 0,
+      "sha256": "0b62d146727e116052dccb13a594e12ea3905339daa8ccef12684ae3026b7659",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    },
+    {
+      "entry": "org/apache/commons/mail/HtmlEmail.class",
+      "occurrence": 0,
+      "sha256": "5d95869f44549cdfc160577667a118c93b93e686d12f084cc5cf70324778b105",
+      "member_shard": "docs/dev/evidence/sqx145/members/018/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/018/001.json",
+      "sha256": "15376afc0e081da5b2de22696cbb51fc7e5ef9bc3d2584e6af511e35e3508017"
+    }
+  ]
+}

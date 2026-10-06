@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
+  "archive_sha256": "0117bc047a4a69c16530c78b263df70f607d19bef32dcca40fda647f0e886caf",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator.class",
+      "occurrence": 0,
+      "sha256": "2fa8e4d7723a1183e2d2bc797d41b21a5f1714a56b43e1cf2a05a0c87e05cbb6",
+      "name": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "NO_VALUE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "strategyNumber",
+          "descriptor": "I",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "processStrategy",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 9,
+          "code_sha256": "52ef6f9d739f528c01ed26f8710f840f7a9c52e7f80b3288f8971d86e62a93dd",
+          "code_length": 1631,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Ljava/util/HashMap;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "5809a531add51255c40feb5153cbb3d9857a1aba4498097ac11840c2d15bc788",
+          "code_length": 122,
+          "generic_signature": "(Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNumber",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "dcce34e42a504c0e79a462eb76790bc51c402dc4347de7f2083da6c5785d55e2",
+          "code_length": 61
+        },
+        {
+          "name": "getStrategyId",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "1fc40c47a62ee2882446c83c71ba6144fdd6e8046853031a97989da8378fa2a2",
+          "code_length": 153
+        },
+        {
+          "name": "isUsed",
+          "descriptor": "(Lorg/jdom2/Element;)Z",
+          "access": 10,
+          "code_sha256": "cf46b6ff0fe52a35b887789aca92a528f4e303329614d748c957b8b968d2e131",
+          "code_length": 18
+        },
+        {
+          "name": "getTimeRangeHour",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "351ae16e0cbe15602c8b96bf18c94c44d360136787e1bc595c78623496159cb9",
+          "code_length": 35
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2ca3cb94176f75779e82374a6077b4dfa1365e20fbd129c2a8eff250c011eb7f",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet.class",
+      "occurrence": 0,
+      "sha256": "98844c63bd1edf661c6c59f633aa534530c9980379d6eaec7245962aaf1b19a0",
+      "name": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "lockName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c63329a17c0d26d63ad36eaa8a93964cb33942256292ccfb64055c80a11e1b34",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRename",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f1b2fcb12b46345a4bc532949bc2541db7e44c42213fc74e9318908725d8704b",
+          "code_length": 323,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "75a3ecab61427e17ea75208982faf0ba4a03579ba2b9f47ffd309c209ab2724a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolGenerator",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "273c1c34143909ca3fda3d2e2126f8a19b5a826418131ae7e29dbc421af305cf",
+      "name": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServlet",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolServletPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings.class",
+      "occurrence": 0,
+      "sha256": "7d0d0cff3fe2bff1fd62e8aa413cab2c12fc8a535626c92a0199929fb74901aa",
+      "name": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "configFilePath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "SN_Markets",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "SN_TimeFrames",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "SN_OrderTypes",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "SN_Indicators",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "MN_Markets",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "MN_TimeFrames",
+          "descriptor": "Ljava/util/LinkedHashMap;",
+          "access": 9,
+          "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "load",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "58bcd3188991a34056c16d746d33b05b5deb9711b45e6ae91437a95700d5333d",
+          "code_length": 118
+        },
+        {
+          "name": "loadValues",
+          "descriptor": "(Lorg/jdom2/Element;Ljava/lang/String;Ljava/util/HashMap;)V",
+          "access": 10,
+          "code_sha256": "a5f9e85be33d659ffebd0b23f7c1025db3f132a37ba3dd3040c352bdce25e05c",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lorg/jdom2/Element;Ljava/lang/String;Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "35c7b8fe119b95866db861aa7ad8fe5953c76215c7fcf5c72fbd1eeb86dc1a2f",
+          "code_length": 93
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

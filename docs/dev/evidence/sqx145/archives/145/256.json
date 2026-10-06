@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+  "sha256": "24c1973db874306ab3b8fa40ae1c64dde32ae7c2de0f22f51536f13ca655b148",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin.class": "d400ca353bc23b2b1501a8c15425bce585a723fb79c7ac50a2c0ba1dcd14edf5",
+    "com/strategyquant/plugin/Settings/impl/Notification/NotificationServlet.class": "a0b5f6adbef2b8fe0042c5a6cd23322d5a53e7e68f5155c816dc806fd5b4d7d0",
+    "com/strategyquant/plugin/Settings/impl/Notification/NotificationTypes.class": "467c91c7c2bb2cd8c22543dd13be2e300581efce02352f4c9eff8e0df1109a52"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin.class",
+      "occurrence": 0,
+      "sha256": "d400ca353bc23b2b1501a8c15425bce585a723fb79c7ac50a2c0ba1dcd14edf5",
+      "member_shard": "docs/dev/evidence/sqx145/members/256/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Notification/NotificationServlet.class",
+      "occurrence": 0,
+      "sha256": "a0b5f6adbef2b8fe0042c5a6cd23322d5a53e7e68f5155c816dc806fd5b4d7d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/256/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Notification/NotificationTypes.class",
+      "occurrence": 0,
+      "sha256": "467c91c7c2bb2cd8c22543dd13be2e300581efce02352f4c9eff8e0df1109a52",
+      "member_shard": "docs/dev/evidence/sqx145/members/256/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/256/001.json",
+      "sha256": "8f032929e28644e9e4a515dd76ed4676bfc4fb71d53af498aef5aea1ba5ae42d"
+    }
+  ]
+}

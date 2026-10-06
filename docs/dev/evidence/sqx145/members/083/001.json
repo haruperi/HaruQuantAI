@@ -1,0 +1,2858 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/objenesis-2.5.1.jar",
+  "archive_sha256": "b043f03e466752f7f03e2326a3b13a49b7c649f8f2a2dc87715827e24f73d9c6",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/objenesis/instantiator/basic/AccessibleInstantiator.class",
+      "occurrence": 0,
+      "sha256": "0f8a80552ce2ecdb3661448291beea5499c872073b93475aa1528e029e72245c",
+      "name": "org/objenesis/instantiator/basic/AccessibleInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/instantiator/basic/ConstructorInstantiator",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "a5bcf8987d9168b879f6fca190776475c5c665ac773ab169de2ae73da724c0be",
+          "code_length": 21,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/objenesis/instantiator/basic/ConstructorInstantiator<TT;>;",
+      "class_references": [
+        "java/lang/reflect/Constructor",
+        "org/objenesis/instantiator/basic/AccessibleInstantiator",
+        "org/objenesis/instantiator/basic/ConstructorInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils$1.class",
+      "occurrence": 0,
+      "sha256": "3c65ac2b648abe708eadda34518fae75fcde4ce73db025f9003f7f5cd1fb392a",
+      "name": "org/objenesis/instantiator/basic/ClassDefinitionUtils$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/security/ProtectionDomain;",
+          "access": 1,
+          "code_sha256": "d519b5ac8610a3dbccebd72a37ed5f6ad7c7c3f24e9610b6851f01bd730cf2fe",
+          "code_length": 6
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "17217c6b850261a41f6fc6f0f65b178af92d6382393313c4dd7732ab214b347f",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/security/ProtectionDomain;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils$1"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils$2.class",
+      "occurrence": 0,
+      "sha256": "6e1c2fc33d048166525cc82434648ac0835ec9880a96c0d13841a096e2ffadde",
+      "name": "org/objenesis/instantiator/basic/ClassDefinitionUtils$2",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ed2afb09f1b1fd09acd671333fb27618f482c9bd10a81818af73d0ea0d36d728",
+          "code_length": 79
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/lang/Object;>;",
+      "class_references": [
+        "[B",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Integer",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/Method",
+        "java/security/PrivilegedAction",
+        "java/security/ProtectionDomain",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils$2"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ClassDefinitionUtils.class",
+      "occurrence": 0,
+      "sha256": "62d0e26002acc1fec3819928825c499e19708ab1d3cbac92074b501bee22edbf",
+      "name": "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OPS_aload_0",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OPS_invokespecial",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OPS_return",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OPS_new",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OPS_dup",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "OPS_areturn",
+          "descriptor": "B",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Utf8",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Integer",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Float",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Long",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Double",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Class",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_String",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Fieldref",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_Methodref",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_InterfaceMethodref",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_NameAndType",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_MethodHandle",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_MethodType",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONSTANT_InvokeDynamic",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_PUBLIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_FINAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_SUPER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_INTERFACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_ABSTRACT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_SYNTHETIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_ANNOTATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ACC_ENUM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAGIC",
+          "descriptor": "[B",
+          "access": 25
+        },
+        {
+          "name": "VERSION",
+          "descriptor": "[B",
+          "access": 25
+        },
+        {
+          "name": "DEFINE_CLASS",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 10
+        },
+        {
+          "name": "PROTECTION_DOMAIN",
+          "descriptor": "Ljava/security/ProtectionDomain;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "defineClass",
+          "descriptor": "(Ljava/lang/String;[BLjava/lang/ClassLoader;)Ljava/lang/Class;",
+          "access": 9,
+          "code_sha256": "f36a7cfa56dbe3b7fdce87aca33cb01ec5bfafd0ba57f355fb9dafedc44e5dc0",
+          "code_length": 65,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;[BLjava/lang/ClassLoader;)Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "readClass",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 9,
+          "code_sha256": "6ce3f318b430937b5dcab317d919b4e048c4c827a8cb2d5f5695126c9c5a8031",
+          "code_length": 77,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeClass",
+          "descriptor": "(Ljava/lang/String;[B)V",
+          "access": 9,
+          "code_sha256": "0f36d50928abe049ef1d64bf42152e503f5d7fe705539637c6d60b67fa87220a",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "classNameToInternalClassName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f8675e09768c82bc4a8fc21c2876641a09c989bf28e73ca01aab3429e98bbd2d",
+          "code_length": 9
+        },
+        {
+          "name": "classNameToResource",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2ea963d659ab39c8e87cfd114047eac46f5386f5abffa7f8c7990774999d7505",
+          "code_length": 23
+        },
+        {
+          "name": "getExistingClass",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 9,
+          "code_sha256": "072f1cf3eb443d66ac440ec341cbcacdab94d76396d95de14b8614802e5cc44b",
+          "code_length": 10,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;",
+          "access": 4104,
+          "code_sha256": "6a18ab24c3eff68e5d1001c59ffb54970834ff0f00ea6c52f95bb694d2fc1970",
+          "code_length": 6
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8f140561caa812630404b029e9282c72f7f0a6eb17fa567ca65f0a5c99bc5295",
+          "code_length": 77
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedOutputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/reflect/Method",
+        "java/security/AccessController",
+        "java/security/ProtectionDomain",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils$1",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils$2"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "6cf980c189fb1e24dbb2e9f863d82ff02e141bc7a01424c253971bcff03e1ad6",
+      "name": "org/objenesis/instantiator/gcj/GCJSerializationInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "superType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 2,
+          "generic_signature": "Ljava/lang/Class<-TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "dc21222e21cab0b9ab2218a9c3a39d2237e2023e59e87fa6f95f29aa86140098",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d21bfc797865214568d960cbf09362ffa624b1a8156a208ba577839658517401",
+          "code_length": 45,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/objenesis/instantiator/gcj/GCJInstantiatorBase<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/SerializationInstantiatorHelper",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+        "org/objenesis/instantiator/gcj/GCJSerializationInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/ObjenesisSerializer.class",
+      "occurrence": 0,
+      "sha256": "78b2f7de0b3d1df31a63a716a569330ea4e17eea961bc6ddb91ae80e2504296d",
+      "name": "org/objenesis/ObjenesisSerializer",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/ObjenesisBase",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "9adc66ff8837f3d70dd2d0c79523001707d68ed7e3d9d9a2804cbd6aff5be54a",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "org/objenesis/ObjenesisBase",
+        "org/objenesis/ObjenesisSerializer",
+        "org/objenesis/strategy/SerializingInstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ConstructorInstantiator.class",
+      "occurrence": 0,
+      "sha256": "ec2465a06db588e9f8c26b95c762023f6b1a4016956ac283a46656be2246cf23",
+      "name": "org/objenesis/instantiator/basic/ConstructorInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "constructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 4,
+          "generic_signature": "Ljava/lang/reflect/Constructor<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "024a780c3cef7d28dc6849d6497a4249b212b60ea9fce22e8df74046f35c7941",
+          "code_length": 30,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "bd273e73a692407950b134ec37f220ff191c614dbd53f2892850f88c35f241e8",
+          "code_length": 22,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Object;",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/reflect/Constructor",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/ConstructorInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream.class",
+      "occurrence": 0,
+      "sha256": "46620d9a817878b938cf6dffaf277d0e1f593f0d468686c9249c2258821db988",
+      "name": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pointer",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "sequence",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "NEXT",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "buffers",
+          "descriptor": "[[B",
+          "access": 2
+        },
+        {
+          "name": "FIRST_DATA",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "HEADER",
+          "descriptor": "[B",
+          "access": 10
+        },
+        {
+          "name": "REPEATING_DATA",
+          "descriptor": "[B",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "4d2c0daaae2e0eb5b70c7101746cf0906b361b81232090a75bbed400c68d73cb",
+          "code_length": 113
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "e8f56b8054b2f2fc1bbb1593c2a9a710520f387c5f147a6656ad965d05cfc3ec",
+          "code_length": 163,
+          "generic_signature": "(Ljava/lang/Class<*>;)V"
+        },
+        {
+          "name": "advanceBuffer",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a8b4893be6937620055d013d9ed02f949c5b4b5f761c049ec41969b1194b4556",
+          "code_length": 31
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "af6c9ced12fae818d658c2875dfa71574699dfde7972fd547d0f1fb74eeff5e9",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "available",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a31f0834d138bdc0a30a0023056e4977ee04c0efa0e58d4f6e67fa546e07b4df",
+          "code_length": 3,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "1c8103d76c41efe70371826561b1987de6cd4da036459735db9fd0e6d4a23664",
+          "code_length": 101,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0032e1535292dcab92a647d71d55a5dec95ca048cfc6a25065a4cb195fc0540a",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/ByteArrayOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/ObjectStreamClass",
+        "java/io/ObjectStreamConstants",
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/ObjectInstantiator.class",
+      "occurrence": 0,
+      "sha256": "cf802a3dc1696d0d1fedcfff2bf0f5d99b4f6a437c3af9c3164e20378ed9289d",
+      "name": "org/objenesis/instantiator/ObjectInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e44dbb47f49ecc0e4cd5c0373cb7f16de35854e3fcd2d0749eab5d7d37837466",
+      "name": "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "unsafe",
+          "descriptor": "Lsun/misc/Unsafe;",
+          "access": 10
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "41de488551d7ca15be9da3415d601d0bcc8f9590a3c6b066edfab7fcc6a203fa",
+          "code_length": 66,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6249a608e7538895f2b4be35709a7fb43f6309c8f28476e2d0abd1c2bee0d291",
+          "code_length": 28,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/NoSuchFieldException",
+        "java/lang/Object",
+        "java/lang/reflect/Field",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator",
+        "sun/misc/Unsafe"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/InstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "ea3e2cd9285283a83d30619c6f60d7217d4dcbb80adb129f8acb15d5c7f13fcc",
+      "name": "org/objenesis/strategy/InstantiatorStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/strategy/InstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android18Instantiator.class",
+      "occurrence": 0,
+      "sha256": "0ccdc30da0fd26c31a217ac323cd4d7bb262fc5f8814a677fd1275123b56f9c4",
+      "name": "org/objenesis/instantiator/android/Android18Instantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        },
+        {
+          "name": "objectConstructorId",
+          "descriptor": "Ljava/lang/Long;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "fdadf47c4e4bea56773e658145c06af3a6681c75d2773b817d4cd48c39576b70",
+          "code_length": 24,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "47b9a3d55b5ab2ece4a95a004152712abe4480ad750e574c6fb2e40a591e24c2",
+          "code_length": 44,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getNewInstanceMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "bf463a56ec69bdd8515d6d6e444d5da8ed2ec80a460affdf3775f46aba0ba494",
+          "code_length": 50
+        },
+        {
+          "name": "findConstructorIdForJavaLangObjectConstructor",
+          "descriptor": "()Ljava/lang/Long;",
+          "access": 10,
+          "code_sha256": "e8a8c29302824a8cbe91aa630d60a703f75e0298506884d794e79da2796debc2",
+          "code_length": 80
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/Long",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/android/Android18Instantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator.class",
+      "occurrence": 0,
+      "sha256": "5f00e1ff74b433a788a561cfd2492ca9b58270260c3ca582ae83d6e8404c8f86",
+      "name": "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 10
+        },
+        {
+          "name": "objStreamClass",
+          "descriptor": "Ljava/io/ObjectStreamClass;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "cb8ba37da355699ba81f0d65bfee52c4c71759f361009a8aadd8f5b43eac9eb1",
+          "code_length": 51
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "f0a151d94ea1b6ea578b5fb3a1d923b1efca09a897b17949da95294e906f6a30",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "85f25a785e6d12f00a2b48966bf0ba058294de4365d1debaebe99ff1509591db",
+          "code_length": 25,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/perc/PercSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "631503ada814e68d3393619125b4cbf00fcc9776555bf1eb11f54c3d4fccb5a6",
+      "name": "org/objenesis/instantiator/perc/PercSerializationInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "typeArgs",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "fc81eab5d3008805f94553ef2009431bbe63e8e7066439464e61599a231896bb",
+          "code_length": 211,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4589e4b3ec9bd48cac907a5f341d5cca19d7852e9a92d350962c24847885ced3",
+          "code_length": 33,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectInputStream",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/perc/PercSerializationInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/ObjenesisException.class",
+      "occurrence": 0,
+      "sha256": "39de71b23a1f9ce933d6c9dcc40c7ea567d87c77c395eee6defd92fa581ccbf0",
+      "name": "org/objenesis/ObjenesisException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/objenesis/ObjenesisException"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/SingleInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "369f7ccae6b4d7f430aebcb978f34d126da9ff8690ec00c9be70044192cf05da",
+      "name": "org/objenesis/strategy/SingleInstantiatorStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/strategy/InstantiatorStrategy"
+      ],
+      "fields": [
+        {
+          "name": "constructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 2,
+          "generic_signature": "Ljava/lang/reflect/Constructor<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "ef64c5a5546f287c20637a08418b9adf29c18bfe19600865504f843acded27bb",
+          "code_length": 35,
+          "generic_signature": "<T::Lorg/objenesis/instantiator/ObjectInstantiator<*>;>(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1,
+          "code_sha256": "2e430f4039e1e954590a66f998c64c6bc8de62e8979da700669ed2a77ddf27c2",
+          "code_length": 49,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/strategy/InstantiatorStrategy",
+        "org/objenesis/strategy/SingleInstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/annotations/Instantiator.class",
+      "occurrence": 0,
+      "sha256": "74368d0439c3ea40a13e51e92a3374b15bc81c6c65f050d7dd2e331633ba7003",
+      "name": "org/objenesis/instantiator/annotations/Instantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/objenesis/instantiator/annotations/Instantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/FailingInstantiator.class",
+      "occurrence": 0,
+      "sha256": "ce69ac664e828a654f9b0f6d36a38d78154b999f9764b52906ac042a12097a43",
+      "name": "org/objenesis/instantiator/basic/FailingInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f2fefb525e3663ffa348cd132a8f79aeaddc630c89435cc4ad40d663f1f2033c",
+          "code_length": 10,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/FailingInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ProxyingInstantiator.class",
+      "occurrence": 0,
+      "sha256": "fd658da636547d3c6d1aed48a6be640d5d3c1ff02719efd8ca066160f550edfd",
+      "name": "org/objenesis/instantiator/basic/ProxyingInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "INDEX_CLASS_THIS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_CLASS_SUPERCLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CONSTRUCTOR_NAME",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CONSTRUCTOR_DESC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CODE_ATTRIBUTE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_SUPERCLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "CONSTANT_POOL_COUNT",
+          "descriptor": "I",
+          "access": 10
+        },
+        {
+          "name": "CODE",
+          "descriptor": "[B",
+          "access": 26
+        },
+        {
+          "name": "CODE_ATTRIBUTE_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SUFFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTOR_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTOR_DESC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "newType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "62222d47b939e8a5a02a3385d3424e9bafcce521bf118cc3fa8e8be1737a463b",
+          "code_length": 59,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5728469ab940f8282cdf9f5f833d0985fb8e9a7b92f87697bca8fbdf163e8e1f",
+          "code_length": 28,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "writeExtendingClass",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)[B",
+          "access": 10,
+          "code_sha256": "9f5d7c6785b1234d21f05881709e4bbd7c963daff5b3dbec7a2c1cd9a45acc05",
+          "code_length": 398,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)[B"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4ec603f652f16a8ebfccb2c54e0cae0c168ca91b0812d187e486350ee133d33b",
+          "code_length": 32
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ByteArrayOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+        "org/objenesis/instantiator/basic/ProxyingInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/Objenesis.class",
+      "occurrence": 0,
+      "sha256": "734aa7eaf10e5e9e46d63b882455d281b4369d8efb57c29f8393a3fe9fdf9180",
+      "name": "org/objenesis/Objenesis",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "getInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/Objenesis"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/PlatformDescription.class",
+      "occurrence": 0,
+      "sha256": "9e25ea579edee5dca42f4dface12a88b9952b8990156cc847dad660a3bcf7535",
+      "name": "org/objenesis/strategy/PlatformDescription",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "JROCKIT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "GNU",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "HOTSPOT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SUN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "OPENJDK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PERC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DALVIK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SPECIFICATION_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "VM_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "VM_INFO",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "VENDOR_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "VENDOR",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "JVM_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ANDROID_VERSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "IS_ANDROID_OPENJDK",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "GAE_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "describePlatform",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7ad7c63dc33de972028820821ba43a6e89bc8f45c411ed4e3748e7a48cc64ae8",
+          "code_length": 133
+        },
+        {
+          "name": "isThisJVM",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "8e29c4893da3e4c6724e58246817c9a3ee52c0936e504e9e05144c9cbad06c86",
+          "code_length": 8
+        },
+        {
+          "name": "isAndroidOpenJDK",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "00d5438fcb1bf5a6abdc94c74ada6e7cbbcc71127d34a79b3471a809a38621a9",
+          "code_length": 4
+        },
+        {
+          "name": "getIsAndroidOpenJDK",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "8e1d9c5c64f59401734d62d7eaac155bb7d401776d6347c942b65f955c04d819",
+          "code_length": 36
+        },
+        {
+          "name": "isGoogleAppEngine",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "452fa88e942816c55e305512eff1091971d4cb2c2a4d5bd3f1c70d977a35b235",
+          "code_length": 12
+        },
+        {
+          "name": "getGaeRuntimeVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "91515274fe1db6d3f4495814a5ebaedf86b8bac3473365d0b1450a7cafabe377",
+          "code_length": 6
+        },
+        {
+          "name": "getAndroidVersion",
+          "descriptor": "()I",
+          "access": 10,
+          "code_sha256": "1a0ad44294171adb23b569fb33ea805c8959c8f29350e49074fb3f972b343ccf",
+          "code_length": 14
+        },
+        {
+          "name": "getAndroidVersion0",
+          "descriptor": "()I",
+          "access": 10,
+          "code_sha256": "bf1f433dd60660f7b9a0e341821744c50e74e6accd3d2519a9811d7a967a8c37",
+          "code_length": 62
+        },
+        {
+          "name": "getOldAndroidVersion",
+          "descriptor": "(Ljava/lang/Class;)I",
+          "access": 10,
+          "code_sha256": "a1c4fb79ac90974ae3980e51f45012824ed01c4037b79a4c6607c4f94964d7b4",
+          "code_length": 47,
+          "generic_signature": "(Ljava/lang/Class<*>;)I"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "adf01cc6d2f66ca4914f79e6a2283a9d3092ab1e8aee21245b26a5d73568543c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "59dd37fe8497901920a4ed168ede3c01b1e8b8b64e9e72c86b788d70e9c63b65",
+          "code_length": 67
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/Integer",
+        "java/lang/NoSuchFieldException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/reflect/Field",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/strategy/PlatformDescription"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/StdInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "ffdbf2875a6cda3e89cb1606ae9f14bd1898d5bcfd074491a0ec06f622d652a5",
+      "name": "org/objenesis/strategy/StdInstantiatorStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/strategy/BaseInstantiatorStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "newInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1,
+          "code_sha256": "ac7ecf5bc2700ed5ca4dd72ebbc559885ab866091dda86df7d00d6da396cd924",
+          "code_length": 184,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Class",
+        "org/objenesis/instantiator/android/Android10Instantiator",
+        "org/objenesis/instantiator/android/Android17Instantiator",
+        "org/objenesis/instantiator/android/Android18Instantiator",
+        "org/objenesis/instantiator/basic/AccessibleInstantiator",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator",
+        "org/objenesis/instantiator/gcj/GCJInstantiator",
+        "org/objenesis/instantiator/perc/PercInstantiator",
+        "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator",
+        "org/objenesis/instantiator/sun/UnsafeFactoryInstantiator",
+        "org/objenesis/strategy/BaseInstantiatorStrategy",
+        "org/objenesis/strategy/PlatformDescription",
+        "org/objenesis/strategy/StdInstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/AndroidSerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "43679bd990bcddf72b7636a0431442a8975cb9696a14f5b36d413de469b1624d",
+      "name": "org/objenesis/instantiator/android/AndroidSerializationInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "objectStreamClass",
+          "descriptor": "Ljava/io/ObjectStreamClass;",
+          "access": 18
+        },
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "7f72e7bd30a4756c9d00844f1616e1e38b940b8e67876c363c4b6960ff817015",
+          "code_length": 92,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "09c61a2862a70f374a1178cc6b4460f865a9ed07ae84df62c45e3cff697fbd9a",
+          "code_length": 60,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getNewInstanceMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "e8448020505c80e67ed6a9ff5abb068497985c52a6428a928d4aa7222905519a",
+          "code_length": 44
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/android/AndroidSerializationInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/NewInstanceInstantiator.class",
+      "occurrence": 0,
+      "sha256": "a9722f125c5391c1850132b1ef714dd9766afe3a400133379e2b6167b9dada41",
+      "name": "org/objenesis/instantiator/basic/NewInstanceInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "677870e0dbca9beaaa213697e4068a14231a3801c1e3fc14716ee3934a131055",
+          "code_length": 18,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/NewInstanceInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream.class",
+      "occurrence": 0,
+      "sha256": "7832d3734f1651ca597da5b444222d1248a7a0bf6903c3ddf95ed4aad29e196f",
+      "name": "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/ObjectInputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactoryHelper.class",
+      "occurrence": 0,
+      "sha256": "653a9427491f61311c76775b6eecd2c1077bd3202628c5b715a1aa573b541a48",
+      "name": "org/objenesis/instantiator/sun/SunReflectionFactoryHelper",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newConstructorForSerialization",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/reflect/Constructor;)Ljava/lang/reflect/Constructor;",
+          "access": 9,
+          "code_sha256": "a8eae1697bd5a316974b4b9bf309cb71706e7f652977ba648c7a8c9b6ff58e24",
+          "code_length": 73,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;Ljava/lang/reflect/Constructor<*>;)Ljava/lang/reflect/Constructor<TT;>;"
+        },
+        {
+          "name": "getReflectionFactoryClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 10,
+          "code_sha256": "028da6ac9967bee9853d02ad32a59f2e69c7ae04692386ad098c0f71ed740ba4",
+          "code_length": 16,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "createReflectionFactory",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "87f429aa020de382129a7b746cd6d4068707f859125a278129a869d24ee3e52d",
+          "code_length": 61,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "getNewConstructorForSerializationMethod",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "e04a1f8c1223da6e171b5cd8ea95cd00eb463b2d0885108241c3f76eb9c2d4e3",
+          "code_length": 31,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/reflect/Method;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/sun/SunReflectionFactoryHelper"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator.class",
+      "occurrence": 0,
+      "sha256": "7ec4ab547baa6aadd434a8e18430b2bc6486eb4c7c9e228eaba1bda81140c35e",
+      "name": "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "mungedConstructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/reflect/Constructor<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "eca0bc19094d0f64749609893bf18281e18231a189544b24f04e3dbb59bcc58e",
+          "code_length": 75,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "780bb2750b7b55d2f9d3cd927461b033144bcc546a7fe6ed58feeaf3b1a4f517",
+          "code_length": 22,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Object;",
+        "java/io/NotSerializableException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/SerializationInstantiatorHelper",
+        "org/objenesis/instantiator/sun/SunReflectionFactoryHelper",
+        "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/BaseInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "2c19f1196b62f064409ab12b66e7099011349014bac4c4e21119a1a28a32c116",
+      "name": "org/objenesis/strategy/BaseInstantiatorStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/strategy/InstantiatorStrategy"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/strategy/BaseInstantiatorStrategy",
+        "org/objenesis/strategy/InstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android17Instantiator.class",
+      "occurrence": 0,
+      "sha256": "fae6b70b35557fab8f2efcde69c5ec560a213ab0dcf4f1779df3250dfae6979c",
+      "name": "org/objenesis/instantiator/android/Android17Instantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        },
+        {
+          "name": "objectConstructorId",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "fdadf47c4e4bea56773e658145c06af3a6681c75d2773b817d4cd48c39576b70",
+          "code_length": 24,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "47b9a3d55b5ab2ece4a95a004152712abe4480ad750e574c6fb2e40a591e24c2",
+          "code_length": 44,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getNewInstanceMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "bf463a56ec69bdd8515d6d6e444d5da8ed2ec80a460affdf3775f46aba0ba494",
+          "code_length": 50
+        },
+        {
+          "name": "findConstructorIdForJavaLangObjectConstructor",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 10,
+          "code_sha256": "e8a8c29302824a8cbe91aa630d60a703f75e0298506884d794e79da2796debc2",
+          "code_length": 80
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/Integer",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/android/Android17Instantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/NullInstantiator.class",
+      "occurrence": 0,
+      "sha256": "f184d4d9a36202c2f8617a74e4893e378a9876571dcab5989b002f4bbf308ace",
+      "name": "org/objenesis/instantiator/basic/NullInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/NullInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiatorBase.class",
+      "occurrence": 0,
+      "sha256": "996edf45e0f1f99a38189a665188577ddb71f1f8c1e2ebee67c6d98fe7b124f1",
+      "name": "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "newObjectMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 8
+        },
+        {
+          "name": "dummyStream",
+          "descriptor": "Ljava/io/ObjectInputStream;",
+          "access": 8
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 20,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "8ed2949adca7daf89e1257eb090edb4f83f6ab76616918955c021c072b6f77c4",
+          "code_length": 81
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "404d55770afc005d917659862d28fd06b44f473d4fc729560fb3999e8da24da4",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "11017ce3def949e0f5e87ba852d79a998806ecf8ed4d5a5a7856c78ccbe82a3c",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/lang/Class",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase$DummyStream"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e6f36d19335cf29822b73285b704b87d56f60e5090b4babf49d2d33cd642de90",
+      "name": "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "mungedConstructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/reflect/Constructor<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "d828b7bebe0c4f7daed28a3bbde210c7c51920239cd089c51244dccbd20b6a20",
+          "code_length": 26,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50e2e76801ded7674b2620ed4e5ec96ce7c92d66d62ec53fb0d611884f50f667",
+          "code_length": 22,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getJavaLangObjectConstructor",
+          "descriptor": "()Ljava/lang/reflect/Constructor;",
+          "access": 10,
+          "code_sha256": "b75454155d39f39eb0909be947484c694a8fbe5ba38e1ece7ff9cf3a3739f1d1",
+          "code_length": 20,
+          "generic_signature": "()Ljava/lang/reflect/Constructor<Ljava/lang/Object;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/Object;",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/reflect/Constructor",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/sun/SunReflectionFactoryHelper",
+        "org/objenesis/instantiator/sun/SunReflectionFactoryInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/ObjenesisStd.class",
+      "occurrence": 0,
+      "sha256": "aaf8432fdad5b4845c22767d920e5dc49d1c9926e78c369d791a64410aa0a55d",
+      "name": "org/objenesis/ObjenesisStd",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/ObjenesisBase",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "9adc66ff8837f3d70dd2d0c79523001707d68ed7e3d9d9a2804cbd6aff5be54a",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "org/objenesis/ObjenesisBase",
+        "org/objenesis/ObjenesisStd",
+        "org/objenesis/strategy/StdInstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/android/Android10Instantiator.class",
+      "occurrence": 0,
+      "sha256": "28174d32a3e47a3f19b4c5309b4aef8adf2bbabc715a47b94a3b0c2736426b6d",
+      "name": "org/objenesis/instantiator/android/Android10Instantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TT;>;"
+        },
+        {
+          "name": "newStaticMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "015b8ae8aa4bea41cf2a3ed07f0d698fa3cbbc8c06c3b15ea51ae485012faf15",
+          "code_length": 17,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0cd8d10930b5885ef527bed845f76fdcca1e93682dcf1c3dc6387a32577d2ea3",
+          "code_length": 42,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getNewStaticMethod",
+          "descriptor": "()Ljava/lang/reflect/Method;",
+          "access": 10,
+          "code_sha256": "aa96e9c46f89ecf568da0c261bbf7d9ed819682b9802e20e7da10927168421c7",
+          "code_length": 49
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectInputStream",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/android/Android10Instantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/gcj/GCJInstantiator.class",
+      "occurrence": 0,
+      "sha256": "17074af8ae092a0b8b426a1f7448af11dc116a35c370728a2441195ed13cc1c4",
+      "name": "org/objenesis/instantiator/gcj/GCJInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/instantiator/gcj/GCJInstantiatorBase",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "adaa478a16aecdc7b62b66235e0681136a961186b5f0f189b951f156df577236",
+          "code_length": 63,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/objenesis/instantiator/gcj/GCJInstantiatorBase<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalAccessException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/gcj/GCJInstantiator",
+        "org/objenesis/instantiator/gcj/GCJInstantiatorBase"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/sun/MagicInstantiator.class",
+      "occurrence": 0,
+      "sha256": "c3db960f32338bad7f6c184ab3942902f582ab80f136f344c3691625d75158de",
+      "name": "org/objenesis/instantiator/sun/MagicInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "INDEX_CLASS_THIS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_CLASS_SUPERCLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CONSTRUCTOR_NAME",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CONSTRUCTOR_DESC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_CODE_ATTRIBUTE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_INSTANTIATOR_CLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_SUPERCLASS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_CLASS_INTERFACE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_INTERFACE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_NEWINSTANCE_NAME",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_NEWINSTANCE_DESC",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_METHODREF_OBJECT_CONSTRUCTOR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_CLASS_OBJECT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_OBJECT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_NAMEANDTYPE_DEFAULT_CONSTRUCTOR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_CLASS_TYPE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "INDEX_UTF8_TYPE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "CONSTANT_POOL_COUNT",
+          "descriptor": "I",
+          "access": 10
+        },
+        {
+          "name": "CONSTRUCTOR_CODE",
+          "descriptor": "[B",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTOR_CODE_ATTRIBUTE_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NEWINSTANCE_CODE",
+          "descriptor": "[B",
+          "access": 26
+        },
+        {
+          "name": "NEWINSTANCE_CODE_ATTRIBUTE_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTOR_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "CONSTRUCTOR_DESC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "instantiator",
+          "descriptor": "Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 2,
+          "generic_signature": "Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "4aa77732c4d9e81cc0915606057bbe9c59c9e3724d234fc46f87a9219a6590e2",
+          "code_length": 14,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "getInstantiator",
+          "descriptor": "()Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        },
+        {
+          "name": "newInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 2,
+          "code_sha256": "631758ee73f6475906ab41ec771eb0e911b98e9523d1991ca37ea23222ebdad5",
+          "code_length": 124,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        },
+        {
+          "name": "writeExtendingClass",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)[B",
+          "access": 2,
+          "code_sha256": "78c74d6bf686045be534c5dfdd2e7adb431d56f022c3d0eda9dcaea87ba7ebfc",
+          "code_length": 627,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)[B"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "477704c99b6679096f03dbd1017097ced650ec35b91c314cff914348699f9225",
+          "code_length": 10,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b7d80ec3a04023cf506147897d9aa45257178d82629a0578bd4ecf51902c1629",
+          "code_length": 103
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ByteArrayOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/ClassDefinitionUtils",
+        "org/objenesis/instantiator/sun/MagicInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/strategy/SerializingInstantiatorStrategy.class",
+      "occurrence": 0,
+      "sha256": "e10f05710c10e12934ded4581ad6f8ac868c51fc3c499145478130727e1c8c3e",
+      "name": "org/objenesis/strategy/SerializingInstantiatorStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/objenesis/strategy/BaseInstantiatorStrategy",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "newInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1,
+          "code_sha256": "98a54f835bf7073e1e61c1827d27e743d8b99f1dd6080a70b41667af06eb16ac",
+          "code_length": 190,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/io/NotSerializableException",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/android/AndroidSerializationInstantiator",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator",
+        "org/objenesis/instantiator/basic/ObjectStreamClassInstantiator",
+        "org/objenesis/instantiator/gcj/GCJSerializationInstantiator",
+        "org/objenesis/instantiator/perc/PercSerializationInstantiator",
+        "org/objenesis/instantiator/sun/SunReflectionFactorySerializationInstantiator",
+        "org/objenesis/strategy/BaseInstantiatorStrategy",
+        "org/objenesis/strategy/PlatformDescription",
+        "org/objenesis/strategy/SerializingInstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/annotations/Typology.class",
+      "occurrence": 0,
+      "sha256": "847a10da073b9846c15c3c728ea4cc337526f8bb2f09cdb70a09807df8873853",
+      "name": "org/objenesis/instantiator/annotations/Typology",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "STANDARD",
+          "descriptor": "Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 16409
+        },
+        {
+          "name": "SERIALIZATION",
+          "descriptor": "Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 16409
+        },
+        {
+          "name": "NOT_COMPLIANT",
+          "descriptor": "Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 16409
+        },
+        {
+          "name": "UNKNOWN",
+          "descriptor": "Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/objenesis/instantiator/annotations/Typology;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/objenesis/instantiator/annotations/Typology;>;",
+      "class_references": [
+        "[Lorg/objenesis/instantiator/annotations/Typology;",
+        "java/lang/Enum",
+        "org/objenesis/instantiator/annotations/Typology"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator.class",
+      "occurrence": 0,
+      "sha256": "e24a03ca6085b83b837d9ee5bc5a6ddc33e80ab4d461e9f58df7a925cd96514d",
+      "name": "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "inputStream",
+          "descriptor": "Ljava/io/ObjectInputStream;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "a13b37f1e760e12f1a69177e17f3186de865b092d1fcf2d1d5d8d53c718a7ff3",
+          "code_length": 101,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "286f756e706635dc7f91703fbb7bccbee5b2bb3cbb17571b2116a8e82ec7fadb",
+          "code_length": 49,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/io/NotSerializableException",
+        "java/io/ObjectInputStream",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Error",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator",
+        "org/objenesis/instantiator/basic/ObjectInputStreamInstantiator$MockStream"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/perc/PercInstantiator.class",
+      "occurrence": 0,
+      "sha256": "c4ea68c190c6735b124e62d8b84d3dbe8441094531631b0494bc4d1664651fd2",
+      "name": "org/objenesis/instantiator/perc/PercInstantiator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/instantiator/ObjectInstantiator"
+      ],
+      "fields": [
+        {
+          "name": "newInstanceMethod",
+          "descriptor": "Ljava/lang/reflect/Method;",
+          "access": 18
+        },
+        {
+          "name": "typeArgs",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 1,
+          "code_sha256": "9448aae78e625bebe9bd7c9493dd9d9280e9965b32e8003452b6ca9be0d47bb2",
+          "code_length": 87,
+          "generic_signature": "(Ljava/lang/Class<TT;>;)V"
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c66a312e8991e509fd2d492a7c23fece73a845a682696ac85180f2c3f4c55af4",
+          "code_length": 23,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;",
+      "class_references": [
+        "java/io/ObjectInputStream",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/reflect/Method",
+        "org/objenesis/ObjenesisException",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/instantiator/perc/PercInstantiator"
+      ]
+    },
+    {
+      "entry": "org/objenesis/instantiator/SerializationInstantiatorHelper.class",
+      "occurrence": 0,
+      "sha256": "5675505c63b287117409443372ec88f04da2f3e3d355cea3f143d525bd4ed2d5",
+      "name": "org/objenesis/instantiator/SerializationInstantiatorHelper",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getNonSerializableSuperClass",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 9,
+          "code_sha256": "bb998443fa8148b8c3006ff2ff61e1f01aaf494b252d6209801f694c029a75f5",
+          "code_length": 32,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Ljava/lang/Class<-TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/Object",
+        "org/objenesis/instantiator/SerializationInstantiatorHelper"
+      ]
+    },
+    {
+      "entry": "org/objenesis/ObjenesisBase.class",
+      "occurrence": 0,
+      "sha256": "3ad4c7d80a5ee79f9ee7dc38ae68da674b9acd54225788405ea5e1a742398721",
+      "name": "org/objenesis/ObjenesisBase",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/objenesis/Objenesis"
+      ],
+      "fields": [
+        {
+          "name": "strategy",
+          "descriptor": "Lorg/objenesis/strategy/InstantiatorStrategy;",
+          "access": 20
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 4,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Ljava/lang/String;Lorg/objenesis/instantiator/ObjectInstantiator<*>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/objenesis/strategy/InstantiatorStrategy;)V",
+          "access": 1,
+          "code_sha256": "a572b843a556f0f3eeef3463c6940e4a5d2b6cffa6b13d4a70d26580227bd7f7",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/objenesis/strategy/InstantiatorStrategy;Z)V",
+          "access": 1,
+          "code_sha256": "f095c9db2025f3275120ac2414131c4e4474419786afe50289b021da80f08a71",
+          "code_length": 43
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1185482f903e3349649f588a1d03ed7b418caf3ce106b72958f6d92ce54f400c",
+          "code_length": 61
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d3655bb754b7d70e5e9c564d38fc51df4386e16cfcd9df0c1c5478ab044aa895",
+          "code_length": 11,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "getInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 1,
+          "code_sha256": "2e7d947e0f7c37bd1e0dfe8504f4d584ff1f10ed286076923f4fd51f4431dccf",
+          "code_length": 89,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/ConcurrentHashMap",
+        "org/objenesis/Objenesis",
+        "org/objenesis/ObjenesisBase",
+        "org/objenesis/instantiator/ObjectInstantiator",
+        "org/objenesis/strategy/InstantiatorStrategy"
+      ]
+    },
+    {
+      "entry": "org/objenesis/ObjenesisHelper.class",
+      "occurrence": 0,
+      "sha256": "26cfe73cb9833cc03ec00bc0d8a435bb27faf3b3d5b11ae70107348462532d8d",
+      "name": "org/objenesis/ObjenesisHelper",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OBJENESIS_STD",
+          "descriptor": "Lorg/objenesis/Objenesis;",
+          "access": 26
+        },
+        {
+          "name": "OBJENESIS_SERIALIZER",
+          "descriptor": "Lorg/objenesis/Objenesis;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "19c466835bd8b1d6a0f27add9400cf5a2b16e84247c975f97bae1be7fd0cb3f4",
+          "code_length": 10,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "newSerializableInstance",
+          "descriptor": "(Ljava/lang/Class;)Ljava/io/Serializable;",
+          "access": 9,
+          "code_sha256": "5b45c4ff7b96a91d3a26ed710ef9905a568fd77c07cd7375cc9598fc4a57a15f",
+          "code_length": 13,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "getInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 9,
+          "code_sha256": "3805430b66dc780ae39721c21deb59e99da447b00104327a7c9832b72479ef59",
+          "code_length": 10,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        },
+        {
+          "name": "getSerializableObjectInstantiatorOf",
+          "descriptor": "(Ljava/lang/Class;)Lorg/objenesis/instantiator/ObjectInstantiator;",
+          "access": 9,
+          "code_sha256": "4afe42d3a0e479f542fe5ad3f98744d66ede25b4dd79c5e807bc00ca21c1b33e",
+          "code_length": 10,
+          "generic_signature": "<T::Ljava/io/Serializable;>(Ljava/lang/Class<TT;>;)Lorg/objenesis/instantiator/ObjectInstantiator<TT;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "40ec4e2539ac670a380586591e2fb1554e182514f103f3f21bb280597aa46568",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "org/objenesis/Objenesis",
+        "org/objenesis/ObjenesisHelper",
+        "org/objenesis/ObjenesisSerializer",
+        "org/objenesis/ObjenesisStd"
+      ]
+    }
+  ]
+}

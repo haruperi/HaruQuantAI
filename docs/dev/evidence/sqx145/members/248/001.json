@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsData/SettingsData.jar",
+  "archive_sha256": "94a9bfd2150182df7abdce887f87121cc44ba4421c2725e247fd9588418f42da",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Data/DataSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "ab319f277bebb80f5473787b57a5d6aebe02c09e9e6437456c610ed0015c9653",
+      "name": "com/strategyquant/plugin/Settings/impl/Data/DataSettingsPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;)V",
+          "access": 2,
+          "code_sha256": "dba4aeea8ee79eae66edc4c8e5aa100214df5be9062597587391db3be4ab6553",
+          "code_length": 356
+        },
+        {
+          "name": "fixChart",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "1c537880dcffe80390eda64df7e5a45be582f0a76b16c3ae743792e8fc550d70",
+          "code_length": 574
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "9d2b8a2340c02dae7178c7dac327e6225c7ab291f4f4adf7c4b0c9eec9b28097",
+          "code_length": 373
+        },
+        {
+          "name": "checkSetup",
+          "descriptor": "(Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;Lorg/jdom2/Element;I)V",
+          "access": 2,
+          "code_sha256": "4e6b0ef18bd5fefd9cc38bd464d09d4d2051ead8c69d8401432ad1e54537a43d",
+          "code_length": 489
+        },
+        {
+          "name": "checkCommissionSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Z",
+          "access": 2,
+          "code_sha256": "26f313bcdddf00e19d76c40a72c95e721f613429257206d6a04a4b130f296ed4",
+          "code_length": 91
+        },
+        {
+          "name": "checkChart",
+          "descriptor": "(Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;Lorg/jdom2/Element;IILjava/lang/String;Ljava/lang/String;Lorg/jdom2/Element;)I",
+          "access": 2,
+          "code_sha256": "cd8066ae24b646a8d2cf3c15f2e8070c81a7df86f3a7fc7dd9eca0eb8975ec83",
+          "code_length": 224
+        },
+        {
+          "name": "checkDate",
+          "descriptor": "(Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;Ljava/lang/String;Ljava/lang/String;I)J",
+          "access": 2,
+          "code_sha256": "75c8a3741792ce01660c36f69fdf04ba31b1a2dc251c5e9bd26c506d5c79a742",
+          "code_length": 107
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0ca38c7be0a1481246cacd1788ffabe730354c52b3565d1115821560e7edbb4c",
+          "code_length": 5
+        },
+        {
+          "name": "getBacktestLabel",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "697be5f82210ea91ae249ca272a9a7023a05398a2f371259aa79652fdb76c26f",
+          "code_length": 29
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "845767e6ab7cb2d1bf5f1f589bdc366c073e5c3110c8c6336e425b8053a31d50",
+          "code_length": 3
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "548238c5dcbfc406186a888dce2744b766cb8e7a610424fb94f68005d1ab1239",
+          "code_length": 1529,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getInstrumentInfo",
+          "descriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "073fec621ba0552c58171f17c7d68526eaacdbe637a165309fbc72022f8e4c84",
+          "code_length": 42
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6467fdfa33c3d2d5b7fdb160f6c527eec4736e60cf88ab31bd60ddbf4af81d67",
+          "code_length": 6
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a492d0b1d2028fea490d537d173d03282903379abfe813299bbea14900128a39",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Settings/impl/Data/DataSettingsPlugin",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/SwapMethod",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "it/unimi/dsi/fastutil/ints/IntOpenHashSet",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/text/ParseException",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

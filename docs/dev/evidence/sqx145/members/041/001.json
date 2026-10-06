@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/j2objc-annotations-1.1.jar",
+  "archive_sha256": "2994a7eb78f2710bd3d3bfb639b2c94e219cedac0d4d084d516e78c16dddecf6",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/google/j2objc/annotations/AutoreleasePool.class",
+      "occurrence": 0,
+      "sha256": "33379f0e255f7302a49e1074ce99f437e670ea48f9c6bc013bd1440101e70a3d",
+      "name": "com/google/j2objc/annotations/AutoreleasePool",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/AutoreleasePool",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/J2ObjCIncompatible.class",
+      "occurrence": 0,
+      "sha256": "863ab293db2ab6329bcacb944f517c6137e3492e7856813b354b1da4587465f6",
+      "name": "com/google/j2objc/annotations/J2ObjCIncompatible",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/J2ObjCIncompatible",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/LoopTranslation$LoopStyle.class",
+      "occurrence": 0,
+      "sha256": "af9d32914400cc41e194cd7b6ee6abd77687bc03518846bd0d9d891ed5c17677",
+      "name": "com/google/j2objc/annotations/LoopTranslation$LoopStyle",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "JAVA_ITERATOR",
+          "descriptor": "Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 16409
+        },
+        {
+          "name": "FAST_ENUMERATION",
+          "descriptor": "Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;>;",
+      "class_references": [
+        "[Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+        "com/google/j2objc/annotations/LoopTranslation",
+        "com/google/j2objc/annotations/LoopTranslation$LoopStyle",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/LoopTranslation.class",
+      "occurrence": 0,
+      "sha256": "fe90372da3440dbf5f1354d5f8cc96022a4d6c9328b1f95d2682b06cf2ef38c5",
+      "name": "com/google/j2objc/annotations/LoopTranslation",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Lcom/google/j2objc/annotations/LoopTranslation$LoopStyle;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/j2objc/annotations/LoopTranslation",
+        "com/google/j2objc/annotations/LoopTranslation$LoopStyle",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ObjectiveCName.class",
+      "occurrence": 0,
+      "sha256": "b5c1d062542a7a9b085a318d3950f14060cf8178b00635b37d43ca18362543af",
+      "name": "com/google/j2objc/annotations/ObjectiveCName",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/j2objc/annotations/ObjectiveCName",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/Property.class",
+      "occurrence": 0,
+      "sha256": "3859b3ebb40a663278b3d12e1adbbdb8b8c5e3f9ea0f3dc18c3172223ac1c4b2",
+      "name": "com/google/j2objc/annotations/Property",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/j2objc/annotations/Property",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ReflectionSupport$Level.class",
+      "occurrence": 0,
+      "sha256": "db43f12f488b4527a3b46da1a114d93b454f19995d7460087259ce7c0eaa8361",
+      "name": "com/google/j2objc/annotations/ReflectionSupport$Level",
+      "major": 49,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NATIVE_ONLY",
+          "descriptor": "Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 16409
+        },
+        {
+          "name": "FULL",
+          "descriptor": "Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c56fd5c719f582057a1b2e14c58c0b7f5bd56a0f9824242b87d5f9110c9c4a",
+          "code_length": 46
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/google/j2objc/annotations/ReflectionSupport$Level;>;",
+      "class_references": [
+        "[Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+        "com/google/j2objc/annotations/ReflectionSupport",
+        "com/google/j2objc/annotations/ReflectionSupport$Level",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/ReflectionSupport.class",
+      "occurrence": 0,
+      "sha256": "956c68d3241d486d60d8d2167ff6af5070f8edbc136ff128c81958c93635a2dc",
+      "name": "com/google/j2objc/annotations/ReflectionSupport",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Lcom/google/j2objc/annotations/ReflectionSupport$Level;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/google/j2objc/annotations/ReflectionSupport",
+        "com/google/j2objc/annotations/ReflectionSupport$Level",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/RetainedLocalRef.class",
+      "occurrence": 0,
+      "sha256": "b437b24085cd09c3cab228cf2beab9c6cfce241102dd5941c784aac09c8ad268",
+      "name": "com/google/j2objc/annotations/RetainedLocalRef",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/RetainedLocalRef",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/RetainedWith.class",
+      "occurrence": 0,
+      "sha256": "f0e2b0e3f44a46bf581e91d68f3462eb8cc7afbfad0068e71ce6b6e725699958",
+      "name": "com/google/j2objc/annotations/RetainedWith",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/RetainedWith",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/Weak.class",
+      "occurrence": 0,
+      "sha256": "cd3d3bb49f656a760273c70b8085c7ec48f28113bd2f8040459641274783b2a9",
+      "name": "com/google/j2objc/annotations/Weak",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/Weak",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    },
+    {
+      "entry": "com/google/j2objc/annotations/WeakOuter.class",
+      "occurrence": 0,
+      "sha256": "06a79cd9d52453cf853b5bd9ff7dafbaaa7d184971ac242f69e143caf0d14307",
+      "name": "com/google/j2objc/annotations/WeakOuter",
+      "major": 49,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/google/j2objc/annotations/WeakOuter",
+        "java/lang/Object",
+        "java/lang/annotation/Annotation"
+      ]
+    }
+  ]
+}

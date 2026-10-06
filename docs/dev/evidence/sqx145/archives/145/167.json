@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerConnections/DataManagerConnections.jar",
+  "sha256": "4272999e7250c713361be4ccce7f02ba7040478a6b1c608e31f9e7b4f965e713",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender.class": "99c92568933dee2653113fc0aff04eeae7f5c18f68d12e7ce68314e1df7e1fc5",
+    "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet.class": "c6b97fcb23750184c14cfa8a1a56abe95fb4e63c7d5674806ff535b37411cda6",
+    "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServletPlugin.class": "e03cbdce91c816ac8aba96946af8e380e1e04c634140d50e2b20f6acf6964b34"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionInfoSender.class",
+      "occurrence": 0,
+      "sha256": "99c92568933dee2653113fc0aff04eeae7f5c18f68d12e7ce68314e1df7e1fc5",
+      "member_shard": "docs/dev/evidence/sqx145/members/167/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServlet.class",
+      "occurrence": 0,
+      "sha256": "c6b97fcb23750184c14cfa8a1a56abe95fb4e63c7d5674806ff535b37411cda6",
+      "member_shard": "docs/dev/evidence/sqx145/members/167/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Connections/ConnectionServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "e03cbdce91c816ac8aba96946af8e380e1e04c634140d50e2b20f6acf6964b34",
+      "member_shard": "docs/dev/evidence/sqx145/members/167/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/167/001.json",
+      "sha256": "63c5655cd2fe985f5204f0a0615f0bb51006809f448bad590632259facd33494"
+    }
+  ]
+}

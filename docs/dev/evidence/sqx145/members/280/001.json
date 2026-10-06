@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskManagerProjects/TaskManagerProjects.jar",
+  "archive_sha256": "f63173a05008c4ec13ffafd8cb7d21cdf5d7fc24acb6c1191c80b8d0eb3896d5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsPlugin.class",
+      "occurrence": 0,
+      "sha256": "2bc72229c16724be19c6b572e601764aaf3851735a0b161e22c4ddc3b1a120c0",
+      "name": "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/pluginlib/ISQPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "0f9019e539602bc94c9d1323d9abb0b8ecfb53a6bded055197312e486e00862a",
+          "code_length": 53
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d1f0f460f050dc2f3ab4e51bf0b057c7445cedce18c0b932572686ae654ddcf",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f8f5537626be1d455046e8ad9c875856c714beba5bdacb26b49743a08c1f3586",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "196a396bbad265353c6d412eec7e7d9cfe8993847ca1962582a44f8eced2bef2",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "539e717f3eabb2b00da962429350f621ddba6e030a6633427d8630e364300a95",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsPlugin",
+        "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsServlet",
+        "com/strategyquant/pluginlib/ISQPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsServlet.class",
+      "occurrence": 0,
+      "sha256": "4fe21b8fffb3d3b7221a6a7240198327d300eb01a45ee40641558c43db389684",
+      "name": "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "FORBIDDEN_PROJECT_NAME_CHARS",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 26
+        },
+        {
+          "name": "RESERVED_PROJECT_NAME",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 26
+        },
+        {
+          "name": "projectNameComparator",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/ProjectNameComparator;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "66190a052b401b9f7abdb0c39ac09222b518128f9aab6775fe9928e7f61f5221",
+          "code_length": 652,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onListProjects",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8bc25fe221bad5e1627366299a83481ef0c94c48421e59216aa4b5774baa5fd5",
+          "code_length": 113,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onCreateProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5fea2d8be4b0d80bf3a16f9198f04772c23c55a11dd3ca207227447779b83f9d",
+          "code_length": 114,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onOpenProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b0bcc7828a2fa7a5bc54df6c972fa9173aa5a12b1c7759cc067fd97aeddbce5c",
+          "code_length": 429,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onValidateProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "396a52e10d422a4a05fe77ec461a1db76832e08b92d9f95e5182fc3fedcd8d89",
+          "code_length": 245,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSaveProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "4458d293577ac955fac2bd75b863daf6ee7c8e6817e53ed3990ff2ebac8aadb3",
+          "code_length": 130,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8347b8ed09defee1541c49de816798b22cb28c7f90750553cf057747394eb6fb",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRenameProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1e2b7b6097c77cdf79abd2b9c683c777a49ad0f6928e5e6bee9628613987c630",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCloneProject",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7bb2b81b3b6d26e92671ad1b28f001d5ee0fd92597e3def521f6541b8142ebb5",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "normalizeProjectName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "828a1aef17bf643a7cb165693e0d3760dfe738fef3a19996ec75c7a3a0d4d473",
+          "code_length": 13
+        },
+        {
+          "name": "validateProjectName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "9436230807866bc3dd700a879a3282380abe87f2050fd86efc010c4722294f20",
+          "code_length": 173,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAddTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6ac89de805107a54ff501d23f7b0af489440183f759ba1379b378e2200ed3e19",
+          "code_length": 224,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRemoveTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "3e0e63de3372fd5ec072e8a76635986a3c1d624ce05429fd33aafd4e795e0d6b",
+          "code_length": 133,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetAvailableTasks",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7567ed2da49797899a883887ca5078e79c391518772dcf1583dc60136a48b4ca",
+          "code_length": 137,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onMoveTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "618bd423eae9b841ade9a97eef6cd9916bacc2920d66295f695e9dccdb9a8dbf",
+          "code_length": 172,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onRenameTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "e01d3a1cdb0a539ab4f76a3a7520933f7054409971656c440d0259655409442c",
+          "code_length": 140,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCloneTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "7a1cf673f8be89201b038b10ab5d353f91d542acddcc2e48cedf14b668ebee00",
+          "code_length": 212,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onActivateTask",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c426b6dd4632f47cd1927ea4ac03f3725780a422077fcef15bb86f8d66a53c63",
+          "code_length": 127,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "tryUpdateProjectConfig",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/SQProject;Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "5371cfb107e58ee2340ac0a26014307eb48633bbf9fb1816abb4f07ee7c1e0ce",
+          "code_length": 48,
+          "generic_signature": "(Lcom/strategyquant/tradinglib/project/SQProject;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onModifySymbolsList",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c6f57917fe0a4ebeb8e3be8659a70444af3c33226172bf16cdfefc52a2e1d0c9",
+          "code_length": 268,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onModifySymbols",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ba391cd78027d828941b32ef2641eba03b01f65468f3196e7f3f0620d8b03cf2",
+          "code_length": 693,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "updateSessions",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 2,
+          "code_sha256": "bd6c0f2b24afd142af7bf1aaee1aed29fd37fee6c2c2fef1c0ab8255b94ec01c",
+          "code_length": 378
+        },
+        {
+          "name": "resolveMarketOpenSessionForSymbol",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d2b4cd11aba2d09279f897b6dea5168f79fc2b818eb9c8a1e7caf4eb068d6a75",
+          "code_length": 259
+        },
+        {
+          "name": "parseSymbols",
+          "descriptor": "(Lorg/jdom2/Element;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "e49fb27495ca08c26ad62a946c36af188b2a8e2648a60f07fc99d00ef99994b3",
+          "code_length": 282,
+          "generic_signature": "(Lorg/jdom2/Element;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "updateSpreadInCrossCheckRetestHigherPrecision",
+          "descriptor": "(Lorg/jdom2/Element;D)V",
+          "access": 2,
+          "code_sha256": "f14e8b7126af0156b30301fae40314807edd560769f6d90ae20141701b0eb13f",
+          "code_length": 113,
+          "throws": [
+            "org/jdom2/JDOMException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "modifySymbols",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/jdom2/Element;Lorg/json/JSONArray;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "f5fc947a9e323f5a9eca9b7868fde5a23df8b015a7db8852b5c68ad9e6262fc8",
+          "code_length": 806,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lorg/jdom2/Element;Lorg/jdom2/Element;Lorg/json/JSONArray;Ljava/util/List<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5948068112b2349846e4c43fc4056066da96c2d2d9f18e2d99db9116807fb87e",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/instrument/InstrumentManager",
+        "com/strategyquant/datalib/session/Session",
+        "com/strategyquant/datalib/session/SessionManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/TaskManager/impl/Projects/TMProjectsServlet",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/file/SQFileManager",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectFileValidator",
+        "com/strategyquant/tradinglib/project/ProjectNameComparator",
+        "com/strategyquant/tradinglib/project/ProjectResources",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Character",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/jdom2/Element",
+        "org/jdom2/JDOMException",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

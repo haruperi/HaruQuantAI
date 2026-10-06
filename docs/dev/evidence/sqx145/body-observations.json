@@ -1,0 +1,498 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review_state": "unreviewed",
+  "observations": [
+    {
+      "topic": "data.cot.nonfinite_fallback",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "The helper returns zero for NaN and otherwise returns the input, including infinities.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+          "location": "CustomDataServlet.notNaN; offsets 0\u201312",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "4339edcc665b0b9b540cfc2802c8ef207a8e3180931a314c70a7d0ebccdae316"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "data",
+        "feature_id": "FEAT-DATA-DATA-MANAGER-CUSTOM-DATA",
+        "proposed_owner_readme": "app/workspace/DataManager/DataManagerCustomData/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Exercise NaN, signed infinities and finite values; separately decide the target fail-closed conflict.",
+        "expected_observation": "The helper returns zero for NaN and otherwise returns the input, including infinities.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "data.cot.sync_null_failure",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "A null result from CotManager.sync takes an exception path.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+          "location": "CustomDataServlet.onUpdateCot; offsets 58\u201388",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "4339edcc665b0b9b540cfc2802c8ef207a8e3180931a314c70a7d0ebccdae316"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "data",
+        "feature_id": "FEAT-DATA-SOURCE-COT",
+        "proposed_owner_readme": "app/plugins/data_source/COT/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Observe null, empty and nonempty sync outcomes in an approved isolated donor protocol; core provider bodies are absent.",
+        "expected_observation": "A null result from CotManager.sync takes an exception path.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "data.cot.csv_export_failure",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "CSV export exceptions are logged and execution continues to indicator creation.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+          "location": "CustomDataServlet.onUpdateCot; offsets 89\u2013171",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "4339edcc665b0b9b540cfc2802c8ef207a8e3180931a314c70a7d0ebccdae316"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "data",
+        "feature_id": "FEAT-DATA-SOURCE-COT",
+        "proposed_owner_readme": "app/plugins/data_source/COT/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inject an export failure in an isolated fixture; verify explicit error and retained indicator creation path.",
+        "expected_observation": "CSV export exceptions are logged and execution continues to indicator creation.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "data.ninjatrader.overwrite_default",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "Overwrite is false unless the supplied first overwrite value equals true ignoring case.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
+          "location": "SessionsServlet.onImportNinjaTraderTemplates; offsets 38\u201376",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "3873aeab1b04f6beafaae0d1f99ae5ddf962651861cf0777e3aeb08d4414c4e3"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "data",
+        "feature_id": "FEAT-DATA-DATA-MANAGER-SESSIONS",
+        "proposed_owner_readme": "app/workspace/DataManager/DataManagerSessions/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Verify missing/empty/true/TRUE/false inputs against the narrow hasParam and parsing contract.",
+        "expected_observation": "Overwrite is false unless the supplied first overwrite value equals true ignoring case.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "data.ninjatrader.duplicate_skip",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "An existing session name is skipped when overwrite is false.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
+          "location": "SessionsServlet.onImportNinjaTraderTemplates; offsets 220\u2013259",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "3873aeab1b04f6beafaae0d1f99ae5ddf962651861cf0777e3aeb08d4414c4e3"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "data",
+        "feature_id": "FEAT-DATA-DATA-MANAGER-SESSIONS",
+        "proposed_owner_readme": "app/workspace/DataManager/DataManagerSessions/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Import a duplicate temporary session under both overwrite modes; preserve holiday-loss and per-file failure reporting.",
+        "expected_observation": "An existing session name is skipped when overwrite is false.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "product.marketplace.checksum_failure",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "Checksum verification throws for a missing expected digest or a case-insensitive mismatch.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "location": "MarketplaceManager.verifyChecksum; offsets 7\u201341",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "ba60e1e5c65eca7809dc9bc43c16e64c88280e41e434a90246176b5fcfef747c"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "workspace",
+        "feature_id": "FEAT-PRODUCT-APP-MARKETPLACE",
+        "proposed_owner_readme": "app/workspace/Marketplace/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Verify valid/mismatched/missing digests on a temporary file; no network or extension installation implied.",
+        "expected_observation": "Checksum verification throws for a missing expected digest or a case-insensitive mismatch.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "product.marketplace.entry_normalization",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "Entry-name normalization replaces backslashes and removes a leading user/ prefix.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "location": "MarketplaceManager.normalizeEntryName; offsets 0\u201331",
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "ba60e1e5c65eca7809dc9bc43c16e64c88280e41e434a90246176b5fcfef747c"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "workspace",
+        "feature_id": "FEAT-PRODUCT-APP-MARKETPLACE",
+        "proposed_owner_readme": "app/workspace/Marketplace/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Test prefixed/unprefixed names; independently inspect full extraction containment. Normalization alone does not prove traversal safety.",
+        "expected_observation": "Entry-name normalization replaces backslashes and removes a leading user/ prefix.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "authoring.ninjatrader.on_tick_rejection",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "The template stops rendering when a rule has everyTick equal to true.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/extend/Code/NinjaTrader/Main.tpl",
+          "location": "rule validation; lines 71\u201372",
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "19a278dcdf60e5efe50d7b1685bedd92ae42b419f1c5e0d1166c00c891b73ef8"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "strategy",
+        "feature_id": "FEAT-AUTHORING-NINJATRADER-EXPORT",
+        "proposed_owner_readme": "app/plugins/authoring/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Render minimal on-tick and bar-based fixtures in an approved isolated template protocol; expect explicit rejection for on-tick.",
+        "expected_observation": "The template stops rendering when a rule has everyTick equal to true.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "indicator.volume_profile.engine_filter",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "The generic VolumeProfile block engine list excludes NT.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Indicators/VolumeProfile/VolumeProfile.java",
+          "location": "ForEngine annotation",
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "083020b8726f679b133cc4ce44b7ae5f4736bc2bba716916f4d78c99e4f32d63"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "indicator",
+        "feature_id": "FEAT-INDICATOR-PROFILE-BLOCKS",
+        "proposed_owner_readme": "app/plugins/indicators/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Compare registration and generator availability for every retained profile output/session; do not generalize to specific signals.",
+        "expected_observation": "The generic VolumeProfile block engine list excludes NT.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    },
+    {
+      "topic": "indicator.cot.momentum_formula",
+      "classification": "observed",
+      "confidence": "high",
+      "statement": "The block subtracts the older mapped field value from the current one using chart timestamps separated by Lookback.",
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "root": "SQX_145_REFERENCE_ROOT",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Indicators/COT/COTMomentum.java",
+          "location": "OnBlockEvaluate",
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "accessed_at": "2026-10-06",
+          "sha256": "13a5fb63d57104049f53f51547023bad5af49a3930a9fc92a0f677729c46bc45"
+        }
+      ],
+      "limitations": [
+        "Selected body/annotation inspection only; core, provider, registration and runtime semantics remain independently unverified."
+      ],
+      "proposed_mapping": {
+        "domain": "indicator",
+        "feature_id": "FEAT-INDICATOR-COT-BLOCKS",
+        "proposed_owner_readme": "app/plugins/indicators/README.md",
+        "registration_status": "proposed",
+        "requirement_ids": [],
+        "decision_ids": [],
+        "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping."
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Use independent time-mapped vectors with nonzero shift; unresolved map/release semantics block numerical qualification.",
+        "expected_observation": "The block subtracts the older mapped field value from the current one using chart timestamps separated by Lookback.",
+        "actual_observation": null,
+        "executed_at": null,
+        "kind": "runtime"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true
+      },
+      "provenance": {
+        "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
+        "created_at": "2026-10-06T19:04:15.848666+00:00",
+        "review_state": "unreviewed"
+      }
+    }
+  ]
+}

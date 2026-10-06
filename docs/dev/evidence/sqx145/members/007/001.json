@@ -1,0 +1,5261 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/artemis-commons-1.5.0.jar",
+  "archive_sha256": "9134161c80f5972dece8f7c933075ee33cf557a42e2d24bed7f9f2d1cc249a00",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQAddressExistsException.class",
+      "occurrence": 0,
+      "sha256": "15d6fc4c2709b2be3f5c0c0821f22fb0ba605f3459a0ff9ea4cfdaeda7e71448",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQAddressExistsException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAddressExistsException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQAddressFullException.class",
+      "occurrence": 0,
+      "sha256": "acdba3be02be13735d34ea57f2910695eafc44f8d78dda1aa1b4fa20ba79932e",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQAddressFullException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "afa17606db85be925b36e8ef10df2339e1bb1c82ca08741a5d1513d59423974d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "61f1b119b820e91210bce2ca3fa53b3389d0200d5e69bbf9b3129a1d9287ceba",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAddressFullException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQAlreadyReplicatingException.class",
+      "occurrence": 0,
+      "sha256": "1f93e4010215bd34e0f00e76daba6199c8b57c6cb7ec1a2f3a8386f232d01f44",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQAlreadyReplicatingException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAlreadyReplicatingException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQBuffer.class",
+      "occurrence": 0,
+      "sha256": "b03da853f253164473e8a8ed9c8ef5c21260beba86f7450bce47602d06afcd16",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQBuffer",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/DataInput"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "byteBuf",
+          "descriptor": "()Lio/netty/buffer/ByteBuf;",
+          "access": 1025
+        },
+        {
+          "name": "capacity",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readerIndex",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readerIndex",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "writerIndex",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "writerIndex",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "setIndex",
+          "descriptor": "(II)V",
+          "access": 1025
+        },
+        {
+          "name": "readableBytes",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "writableBytes",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readable",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "writable",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "markReaderIndex",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "resetReaderIndex",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "markWriterIndex",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "resetWriterIndex",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "discardReadBytes",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(I)B",
+          "access": 1025
+        },
+        {
+          "name": "getUnsignedByte",
+          "descriptor": "(I)S",
+          "access": 1025
+        },
+        {
+          "name": "getShort",
+          "descriptor": "(I)S",
+          "access": 1025
+        },
+        {
+          "name": "getUnsignedShort",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "getUnsignedInt",
+          "descriptor": "(I)J",
+          "access": 1025
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(I)J",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(I[B)V",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(I[BII)V",
+          "access": 1025
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILjava/nio/ByteBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "getChar",
+          "descriptor": "(I)C",
+          "access": 1025
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "(I)F",
+          "access": 1025
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(I)D",
+          "access": 1025
+        },
+        {
+          "name": "setByte",
+          "descriptor": "(IB)V",
+          "access": 1025
+        },
+        {
+          "name": "setShort",
+          "descriptor": "(IS)V",
+          "access": 1025
+        },
+        {
+          "name": "setInt",
+          "descriptor": "(II)V",
+          "access": 1025
+        },
+        {
+          "name": "setLong",
+          "descriptor": "(IJ)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(I[B)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(I[BII)V",
+          "access": 1025
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILjava/nio/ByteBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "setChar",
+          "descriptor": "(IC)V",
+          "access": 1025
+        },
+        {
+          "name": "setFloat",
+          "descriptor": "(IF)V",
+          "access": 1025
+        },
+        {
+          "name": "setDouble",
+          "descriptor": "(ID)V",
+          "access": 1025
+        },
+        {
+          "name": "readByte",
+          "descriptor": "()B",
+          "access": 1025
+        },
+        {
+          "name": "readUnsignedByte",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readShort",
+          "descriptor": "()S",
+          "access": 1025
+        },
+        {
+          "name": "readUnsignedShort",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readInt",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "readUnsignedInt",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "readLong",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "readChar",
+          "descriptor": "()C",
+          "access": 1025
+        },
+        {
+          "name": "readFloat",
+          "descriptor": "()F",
+          "access": 1025
+        },
+        {
+          "name": "readDouble",
+          "descriptor": "()D",
+          "access": 1025
+        },
+        {
+          "name": "readBoolean",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "readNullableSimpleString",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1025
+        },
+        {
+          "name": "readNullableString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "readSimpleString",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1025
+        },
+        {
+          "name": "readString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "readUTF",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "readSlice",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([B)V",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([BII)V",
+          "access": 1025
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Ljava/nio/ByteBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "skipBytes",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(B)V",
+          "access": 1025
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "(S)V",
+          "access": 1025
+        },
+        {
+          "name": "writeInt",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "writeLong",
+          "descriptor": "(J)V",
+          "access": 1025
+        },
+        {
+          "name": "writeChar",
+          "descriptor": "(C)V",
+          "access": 1025
+        },
+        {
+          "name": "writeFloat",
+          "descriptor": "(F)V",
+          "access": 1025
+        },
+        {
+          "name": "writeDouble",
+          "descriptor": "(D)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBoolean",
+          "descriptor": "(Z)V",
+          "access": 1025
+        },
+        {
+          "name": "writeNullableSimpleString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeNullableString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeSimpleString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeUTF",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([B)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([BII)V",
+          "access": 1025
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Ljava/nio/ByteBuffer;)V",
+          "access": 1025
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "copy",
+          "descriptor": "(II)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "slice",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "slice",
+          "descriptor": "(II)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "duplicate",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "toByteBuffer",
+          "descriptor": "()Ljava/nio/ByteBuffer;",
+          "access": 1025
+        },
+        {
+          "name": "toByteBuffer",
+          "descriptor": "(II)Ljava/nio/ByteBuffer;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/DataInput",
+        "java/lang/Object",
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffer"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQBuffers.class",
+      "occurrence": 0,
+      "sha256": "243c60993df241c35adf7973a478344fc66624a011d6b003f87a092c0b6e2d66",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQBuffers",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "dynamicBuffer",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 9,
+          "code_sha256": "bdfae7f38b8f2d0fda5450386d0529fd19e9d316f8543bc8953d5eb40264a2ea",
+          "code_length": 12
+        },
+        {
+          "name": "dynamicBuffer",
+          "descriptor": "([B)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 9,
+          "code_sha256": "e486dd17d7f6fa1107ed193c8fafded383660571e870a8c262f9c3ee411b4437",
+          "code_length": 15
+        },
+        {
+          "name": "wrappedBuffer",
+          "descriptor": "(Ljava/nio/ByteBuffer;)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 9,
+          "code_sha256": "03db92cca770fa6bfbe39a8c684878097aa045d013f3b70f33da43d079855f8b",
+          "code_length": 20
+        },
+        {
+          "name": "wrappedBuffer",
+          "descriptor": "([B)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 9,
+          "code_sha256": "c605c28e455a04c31a7734c63a87ef902d1fc3f32929a53b6b53e20a8dfae7bf",
+          "code_length": 12
+        },
+        {
+          "name": "fixedBuffer",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 9,
+          "code_sha256": "7607bd889b63fecbc93875cacec044a6a7546f77004b2c14b67854c1dd12b6b3",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "8896539f287b998e729c647434c756c34343aac77b5f723ad14b251137b4f61b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/netty/buffer/Unpooled",
+        "java/lang/Object",
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffer",
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffers",
+        "org/apache/activemq/artemis/core/buffers/impl/ChannelBufferWrapper"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQClusterSecurityException.class",
+      "occurrence": 0,
+      "sha256": "77460646b79cbbe09b33609ac475c7c3b5b1685a585cc65c136295de9c583162",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQClusterSecurityException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQClusterSecurityException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQConnectionTimedOutException.class",
+      "occurrence": 0,
+      "sha256": "ec6168876ebbaa98b3b16041b9e7237c2d4c35a14d31c2b3ee425eaf98cfd09b",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQConnectionTimedOutException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQConnectionTimedOutException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQDisconnectedException.class",
+      "occurrence": 0,
+      "sha256": "71e9ffe01fd4e388767610ef3650650ab9561b0448dfc3e6f7c7138f3e02b74d",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQDisconnectedException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDisconnectedException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQDuplicateIdException.class",
+      "occurrence": 0,
+      "sha256": "7b79aa9188d03ade4d8f3e096d92bbb998e953f3997036ea04c5f5b0c694552d",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQDuplicateIdException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDuplicateIdException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQDuplicateMetaDataException.class",
+      "occurrence": 0,
+      "sha256": "9c65de21534dcad5a5f77b789c4fd297c18f58ee9de2dd96fad08c5cc0f5d152",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQDuplicateMetaDataException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDuplicateMetaDataException",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQException.class",
+      "occurrence": 0,
+      "sha256": "fba4688ff4760266467417cf0ee24d501aabc132d96c79c86ea006b2032d03eb",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "type",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "40cdbcf9a81bc2a9778f2b521170c3d9a387785017d68688181ae61bb7f893c2",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7ea6f9b4bf4ed5f8b952b2b25a830ecbb67c24ec539cf547aa3d49360653e798",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;)V",
+          "access": 1,
+          "code_sha256": "ad3f4e363de0205d61b33f52bd002d91c89481bfec05b6843c85f31d97b00502",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;)V",
+          "access": 1,
+          "code_sha256": "bf84a7c05cf2dcf522082377850762703d2885517fe800ab04ec116673704682",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a646f3e9bc8706f0ee6f7a520079c4fa415e4c8de869ca803492a61fa2056563",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "216f8edeb102d1cef45484b9c4ef04cff44d3bb7bec2112c14159128ab267897",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;)V",
+          "access": 1,
+          "code_sha256": "2c0919b65a16ff8667f841be1070b3fab955e399c56a010fd452abd0aef9c046",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c196c05e7abd3f14f773456c7a6e731083d6ab8575888ffe76c4b655f48241b7",
+          "code_length": 12
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "52628d8c9044921d72e8ed8647b12503c8b330d053635cfa021a52dfb971e9fe",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1.class",
+      "occurrence": 0,
+      "sha256": "fee12e0b05d19cf93833cc15dd2e924f4967174c4b08c5aab408a262032c387c",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQInternalErrorException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$10.class",
+      "occurrence": 0,
+      "sha256": "1687cb281fb79970a2faba661b77662286ed9427fb6321264208222f6e7909a3",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$10",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$10",
+        "org/apache/activemq/artemis/api/core/ActiveMQObjectClosedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$11.class",
+      "occurrence": 0,
+      "sha256": "e0723db9608c54789d4d90ce9260ce52822a7ff7bb9c6115cb3417082912a806",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$11",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$11",
+        "org/apache/activemq/artemis/api/core/ActiveMQInvalidFilterExpressionException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$12.class",
+      "occurrence": 0,
+      "sha256": "9b4b369b0847c30233311b4e9c677d7e230a3bcfac47be09d558e0669b73398a",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$12",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$12",
+        "org/apache/activemq/artemis/api/core/ActiveMQIllegalStateException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$13.class",
+      "occurrence": 0,
+      "sha256": "f0ce3b610b14a04c208290f92f268974a33a377551dc4657243a74e402d9e150",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$13",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$13",
+        "org/apache/activemq/artemis/api/core/ActiveMQSecurityException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$14.class",
+      "occurrence": 0,
+      "sha256": "fd2aeb6c532ab10a6bb07d5d6c4237a3b96d19521bdf14f9384c3c289145482a",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$14",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAddressExistsException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$14"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$15.class",
+      "occurrence": 0,
+      "sha256": "787dd01960c84f9893fae8dcb53608c81af2beb5d3f61f82fddeab1a6b32cb59",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$15",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$15",
+        "org/apache/activemq/artemis/api/core/ActiveMQIncompatibleClientServerException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$16.class",
+      "occurrence": 0,
+      "sha256": "bbd5913bc07acd91e8305f0ae03f54fbf023cb82b2f72f2ee1f2c9869672e2c8",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$16",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$16",
+        "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$17.class",
+      "occurrence": 0,
+      "sha256": "125f8a7c7d83a63cde2d8a7c2ac3359330b1710f61e0ad982d7c00dd7c24a3b2",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$17",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$17",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionRolledBackException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$18.class",
+      "occurrence": 0,
+      "sha256": "c7236d97ed177bc3e60b8c797dc5de9b1eae438956b4c278b1a3dbd7a636ec36",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$18",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$18",
+        "org/apache/activemq/artemis/api/core/ActiveMQSessionCreationException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$19.class",
+      "occurrence": 0,
+      "sha256": "f0ff1523b38c2dc3e14c3b23e8fa81363ac838f53c0b74a09b9db7bbf307a681",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$19",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDuplicateIdException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$19"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$2.class",
+      "occurrence": 0,
+      "sha256": "e2e892a8c73237842eb8fc9acaf98833b87df5238ea9a57f17f26cba7ce7e2a2",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$2",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$2",
+        "org/apache/activemq/artemis/api/core/ActiveMQUnsupportedPacketException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$20.class",
+      "occurrence": 0,
+      "sha256": "7deb94d73b8617668f2c3b2843800433a15ca76d94c86ffa060dbbe77d184df5",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$20",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDuplicateMetaDataException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$20"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$21.class",
+      "occurrence": 0,
+      "sha256": "8c25c426ff96d1ee66254a5e488616dbff6f71839dff87fb9010c85ad0a947d0",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$21",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$21",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionOutcomeUnknownException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$22.class",
+      "occurrence": 0,
+      "sha256": "d927f9c647945588aa57f3b3adbec73081903f6944774287352b3386dc5a8ac6",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$22",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAlreadyReplicatingException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$22"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$23.class",
+      "occurrence": 0,
+      "sha256": "192fbf4397dacdf619b52bd4810d73621a92a9fb8c43821cd0cc09f749104f8d",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$23",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$23",
+        "org/apache/activemq/artemis/api/core/ActiveMQInterceptorRejectedPacketException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$24.class",
+      "occurrence": 0,
+      "sha256": "22a06e80c094fe13151b04e88c1c98c2a893cb7ee5ce1225d8535a4eae397969",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$24",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$24",
+        "org/apache/activemq/artemis/api/core/ActiveMQInvalidTransientQueueUseException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$25.class",
+      "occurrence": 0,
+      "sha256": "11bcd0dce5813ed3ac6378d58f8f802cde5849702c7f2e97d635390858c0657b",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$25",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$25",
+        "org/apache/activemq/artemis/api/core/ActiveMQRemoteDisconnectException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$26.class",
+      "occurrence": 0,
+      "sha256": "36635d6cbfd2b0f8d2a8951678f0a30ee41be1072f5aa97fb7f3ed30ad2a9412",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$26",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$26",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionTimeoutException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$27.class",
+      "occurrence": 0,
+      "sha256": "20641accc14c8ce490ef37bf8111bd5c81c1f31944c20104f56079cd18bc57de",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$27",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQAddressFullException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$27"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$28.class",
+      "occurrence": 0,
+      "sha256": "224f00657c5c97a9d1383a006ee6d88b0042aae7e947cb97d1ccd76e26f00ac3",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$28",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$28",
+        "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageInterruptedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$29.class",
+      "occurrence": 0,
+      "sha256": "2c260d329570060a3620977c242f4ec08ab90bfbc7759c3db4eaf7c199688fd9",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$29",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQClusterSecurityException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$29"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$3.class",
+      "occurrence": 0,
+      "sha256": "aa6f0b3c32868adfe1cb0bb258c3eb8f11dbdcec6d621e78648eaa4d7638c96b",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$3",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$3",
+        "org/apache/activemq/artemis/api/core/ActiveMQNotConnectedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$4.class",
+      "occurrence": 0,
+      "sha256": "b8ef9c0c2afe6d7afb525fded87d790648b4b9d22d0e779a4ebc1a171535f053",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$4",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQConnectionTimedOutException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$4"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$5.class",
+      "occurrence": 0,
+      "sha256": "014409443892c362717e9fffafa3ee37a32afe50f8c2dab7e65b93d494614537",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$5",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQDisconnectedException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$5"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$6.class",
+      "occurrence": 0,
+      "sha256": "07aa0fa05e2bcb2ef7da7eb523e28bebbfb80b75cfea19262912b158a00f983c",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$6",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$6",
+        "org/apache/activemq/artemis/api/core/ActiveMQUnBlockedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$7.class",
+      "occurrence": 0,
+      "sha256": "4ac43572cd41b477756f1436c6c01ed5cd89e6fc4bd85025cdcd0595fc1b7cf0",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$7",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$7",
+        "org/apache/activemq/artemis/api/core/ActiveMQIOErrorException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$8.class",
+      "occurrence": 0,
+      "sha256": "4a25d1110dda05c387646e5664fbea3ca720e8ec342820d21ee0b7d89626be27",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$8",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$8",
+        "org/apache/activemq/artemis/api/core/ActiveMQNonExistentQueueException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$9.class",
+      "occurrence": 0,
+      "sha256": "b3f630fe6478c1724642f15edb8cd09f2c10a897a15dd250ba250fe5b67162f1",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$9",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 0,
+          "code_sha256": "1fa1a4b96f6dbc0b51e2624ace4cf74f69994f774360878b480399df1164b595",
+          "code_length": 9
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$9",
+        "org/apache/activemq/artemis/api/core/ActiveMQQueueExistsException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType.class",
+      "occurrence": 0,
+      "sha256": "9b9299b10fb0594cbb67abbdd9d82e48eb6328ad337c67a4308212d811a61672",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+      "major": 52,
+      "minor": 0,
+      "access": 16417,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INTERNAL_ERROR",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "UNSUPPORTED_PACKET",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NOT_CONNECTED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "CONNECTION_TIMEDOUT",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "DISCONNECTED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "UNBLOCKED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "IO_ERROR",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "QUEUE_DOES_NOT_EXIST",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "QUEUE_EXISTS",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "OBJECT_CLOSED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "INVALID_FILTER_EXPRESSION",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "ILLEGAL_STATE",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "SECURITY_EXCEPTION",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "ADDRESS_EXISTS",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "INCOMPATIBLE_CLIENT_SERVER_VERSIONS",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "LARGE_MESSAGE_ERROR_BODY",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "TRANSACTION_ROLLED_BACK",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "SESSION_CREATION_REJECTED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "DUPLICATE_ID_REJECTED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "DUPLICATE_METADATA",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "TRANSACTION_OUTCOME_UNKNOWN",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "ALREADY_REPLICATING",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "INTERCEPTOR_REJECTED_PACKET",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "INVALID_TRANSIENT_QUEUE_USE",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "REMOTE_DISCONNECT",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "TRANSACTION_TIMEOUT",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "GENERIC_EXCEPTION",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_INTERNAL",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_INVALID_BUFFER",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_NOT_ALIGNED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_CANT_INITIALIZE_AIO",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_CANT_RELEASE_AIO",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_CANT_OPEN_CLOSE_FILE",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_CANT_ALLOCATE_QUEUE",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_PREALLOCATE_FILE",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NATIVE_ERROR_ALLOCATE_MEMORY",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "ADDRESS_FULL",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "LARGE_MESSAGE_INTERRUPTED",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "CLUSTER_SECURITY_EXCEPTION",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "NOT_IMPLEMTNED_EXCEPTION",
+          "descriptor": "Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 16409
+        },
+        {
+          "name": "TYPE_MAP",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/Integer;Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;>;"
+        },
+        {
+          "name": "code",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 9,
+          "code_sha256": "ee1866a70f59c89c65ebb175c0e649373698f0f1206ff8ba84cdedd681931231",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 2,
+          "code_sha256": "f4f87bcd7a0221b7fa06f29f2ea004913b477aa78070e561a696ce56c5ae36b9",
+          "code_length": 12,
+          "generic_signature": "(I)V"
+        },
+        {
+          "name": "getCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "createException",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 1,
+          "code_sha256": "6701cff81ce5b0f068bc6a49289519f739fe8946ab28e6b88eb04310084e0a9d",
+          "code_length": 31
+        },
+        {
+          "name": "createException",
+          "descriptor": "(ILjava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQException;",
+          "access": 9,
+          "code_sha256": "7196e152107168e8c139e55e8a7f1a4a0726f9ba00d53ed135fc8219bc2c1d5e",
+          "code_length": 9
+        },
+        {
+          "name": "getType",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+          "access": 9,
+          "code_sha256": "aa33e4a8b8399191ca5fe9b31a620a641f42b8f875bcd53a8b56c61e120a0d27",
+          "code_length": 26
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IILorg/apache/activemq/artemis/api/core/ActiveMQExceptionType$1;)V",
+          "access": 4096,
+          "code_sha256": "83786eb5a8e38312b7bec32208e0fb19aef1f4427aeb80b5d2dc3d3f301164ab",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d526738e47bb43b02c818e17ceb87b92af98900b86a885edd3037502462f644f",
+          "code_length": 984
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;>;",
+      "class_references": [
+        "[Lorg/apache/activemq/artemis/api/core/ActiveMQExceptionType;",
+        "java/lang/Enum",
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/util/Collections",
+        "java/util/EnumSet",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$1",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$10",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$11",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$12",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$13",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$14",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$15",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$16",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$17",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$18",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$19",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$2",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$20",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$21",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$22",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$23",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$24",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$25",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$26",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$27",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$28",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$29",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$3",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$4",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$5",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$6",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$7",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$8",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType$9"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQIllegalStateException.class",
+      "occurrence": 0,
+      "sha256": "bd6dbbec6b01c43969d42f19ac887c0e9eaffca725e36a95b602693d1e33e4e9",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQIllegalStateException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQIllegalStateException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQIncompatibleClientServerException.class",
+      "occurrence": 0,
+      "sha256": "05fa1c188a63a479447ae7988cd0bad0c8e2352efcf255a40faf53bab3abd111",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQIncompatibleClientServerException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQIncompatibleClientServerException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQInterceptorRejectedPacketException.class",
+      "occurrence": 0,
+      "sha256": "30c991cad1ff98793167c1bc8e3ac59443be20cf8a05aac225a794c254867a48",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQInterceptorRejectedPacketException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQInterceptorRejectedPacketException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQInternalErrorException.class",
+      "occurrence": 0,
+      "sha256": "8e698e1df52aa1bcbf0419f0f9976093275437c83f8313561e30e318bacdd6d1",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQInternalErrorException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "3490dcf016a3f586788a282cb461b249f4451721953e2da5b43b4a684bf92537",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "3490dcf016a3f586788a282cb461b249f4451721953e2da5b43b4a684bf92537",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQInternalErrorException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQInterruptedException.class",
+      "occurrence": 0,
+      "sha256": "f351672b94a5f5c5c5a871676078d6c8b149d49f818a58176b3246401b5de4fc",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQInterruptedException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/apache/activemq/artemis/api/core/ActiveMQInterruptedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQInvalidFilterExpressionException.class",
+      "occurrence": 0,
+      "sha256": "02ef856b7bd1f400b5766f644415b2572faeacecec7d471f1a204d9530468d0f",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQInvalidFilterExpressionException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQInvalidFilterExpressionException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQInvalidTransientQueueUseException.class",
+      "occurrence": 0,
+      "sha256": "0dbed0b8688e1b48808defa86f1ba943ea4bfe324c93dd0ed940064ec60274f5",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQInvalidTransientQueueUseException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQInvalidTransientQueueUseException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQIOErrorException.class",
+      "occurrence": 0,
+      "sha256": "edd834df0b393ded8eae8548359d29ececf6f7f56c46edf2b464ba091dd27b92",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQIOErrorException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "3490dcf016a3f586788a282cb461b249f4451721953e2da5b43b4a684bf92537",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQIOErrorException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageException.class",
+      "occurrence": 0,
+      "sha256": "761d9891083593424e8887ea07f53a13392ea178787cf90de1912134d94fe7d1",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageInterruptedException.class",
+      "occurrence": 0,
+      "sha256": "b97f95510d2df37e2f117346fc51798204e4f20eb78752b53e7dc487e6e6bc5d",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageInterruptedException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "afa17606db85be925b36e8ef10df2339e1bb1c82ca08741a5d1513d59423974d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "61f1b119b820e91210bce2ca3fa53b3389d0200d5e69bbf9b3129a1d9287ceba",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQLargeMessageInterruptedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQNativeIOError.class",
+      "occurrence": 0,
+      "sha256": "d8d8a61dcd47b73e8f12cf62aa60df67c237e414231c0c62ec8314c426fc9ee4",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQNativeIOError",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "3490dcf016a3f586788a282cb461b249f4451721953e2da5b43b4a684bf92537",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQNativeIOError"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQNonExistentQueueException.class",
+      "occurrence": 0,
+      "sha256": "0aa026762df67ac3efbb0b64aaef54c4f2896bb971a60624c0756b0cd0ae5d11",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQNonExistentQueueException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQNonExistentQueueException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQNotConnectedException.class",
+      "occurrence": 0,
+      "sha256": "59df0651bc85c06705b6cfc5a922f4fda2823a816cef6f715fa1ae259f6f164d",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQNotConnectedException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "afa17606db85be925b36e8ef10df2339e1bb1c82ca08741a5d1513d59423974d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "61f1b119b820e91210bce2ca3fa53b3389d0200d5e69bbf9b3129a1d9287ceba",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQNotConnectedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQObjectClosedException.class",
+      "occurrence": 0,
+      "sha256": "fce395e87ed0ad3371739698d8a316d247a95a77dcf1b3e3f110b74704f2453f",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQObjectClosedException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQObjectClosedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQPropertyConversionException.class",
+      "occurrence": 0,
+      "sha256": "2a96b4a7d9efca0d26ef7dc8f285e4d925dd0ac4eb7373f5a9ddd0372957f191",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQPropertyConversionException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/apache/activemq/artemis/api/core/ActiveMQPropertyConversionException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQQueueExistsException.class",
+      "occurrence": 0,
+      "sha256": "0fd43c63cd50c8374e291672d7f0a92bc3e51c343d7566b919d35d13b15f0276",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQQueueExistsException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQQueueExistsException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQRemoteDisconnectException.class",
+      "occurrence": 0,
+      "sha256": "449f38dc3923fe93a08441cca529abe65f44ba9b87cda823d58fae72d9c19dc5",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQRemoteDisconnectException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQRemoteDisconnectException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQSecurityException.class",
+      "occurrence": 0,
+      "sha256": "600994379517c2e12af1e2b0b2a3d3b174ff722cd3d8f62a059ee05c1fa4648c",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQSecurityException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQSecurityException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQSessionCreationException.class",
+      "occurrence": 0,
+      "sha256": "48ecf073637f2dd243e39816f7129b9a26fbf584ddb923a3eda01080e4eb17e6",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQSessionCreationException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQSessionCreationException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQTransactionOutcomeUnknownException.class",
+      "occurrence": 0,
+      "sha256": "d942447eb593ebc6afe965bac0546ab1f5dac1f15b7b08c05c54592684b12b35",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQTransactionOutcomeUnknownException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionOutcomeUnknownException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQTransactionRolledBackException.class",
+      "occurrence": 0,
+      "sha256": "334c867cf2d8880d7a00e7e8d444f7bf9d1aad302add6e23eff14a85df437f49",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQTransactionRolledBackException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionRolledBackException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQTransactionTimeoutException.class",
+      "occurrence": 0,
+      "sha256": "2149f130e4e8505401f872f4fee567ef1fe389b9166ce692d6244f9094b6c697",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQTransactionTimeoutException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQTransactionTimeoutException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQUnBlockedException.class",
+      "occurrence": 0,
+      "sha256": "28e6fec5e8c98949a6a9119b34cad660b6a1e2bf23a5d300f1eb5f82e0bdc1ef",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQUnBlockedException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQUnBlockedException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/ActiveMQUnsupportedPacketException.class",
+      "occurrence": 0,
+      "sha256": "78ea19ca975255e002ffeaad7bd5e0704b6c0ebb9fce29261d87906d1a44369b",
+      "name": "org/apache/activemq/artemis/api/core/ActiveMQUnsupportedPacketException",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/activemq/artemis/api/core/ActiveMQException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c45455595f606f00a875c5f949a923f45d5f361a61caab1618229a920621b72d",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "org/apache/activemq/artemis/api/core/ActiveMQException",
+        "org/apache/activemq/artemis/api/core/ActiveMQExceptionType",
+        "org/apache/activemq/artemis/api/core/ActiveMQUnsupportedPacketException"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/Pair.class",
+      "occurrence": 0,
+      "sha256": "f97bc5a62047abf4a322c3ba7793d5ada5540c7d225e5b789b3baedb4a105e6d",
+      "name": "org/apache/activemq/artemis/api/core/Pair",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "a",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TA;"
+        },
+        {
+          "name": "b",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TB;"
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "da9067625392b7470f98ad32a728020648c8db880c1f40d584e6c68d846bc96d",
+          "code_length": 20,
+          "generic_signature": "(TA;TB;)V"
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f079ed5b68e44c19564b084fbf1688336127fdf4cda7ef7a13b4b42b3544a3fb",
+          "code_length": 76
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "62f5df53ed9b7621b7150e997c1375ba99768dd1524723516e6ee72d3cb5ebde",
+          "code_length": 89
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6b36d6c5422195e21c6561ff9f920e88317a4d5eea9e25e2c93c25e1fc2ed382",
+          "code_length": 40
+        },
+        {
+          "name": "setA",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "71153bdca069034de5bd918a7eb3bce67f1e9eb7166f1e4e35a4fa787608827c",
+          "code_length": 11,
+          "generic_signature": "(TA;)V"
+        },
+        {
+          "name": "getA",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "generic_signature": "()TA;"
+        },
+        {
+          "name": "setB",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "89856b7b3000f2567972cd6343e33060e85497661548836260a5444af91507ce",
+          "code_length": 11,
+          "generic_signature": "(TB;)V"
+        },
+        {
+          "name": "getB",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()TB;"
+        }
+      ],
+      "generic_signature": "<A:Ljava/lang/Object;B:Ljava/lang/Object;>Ljava/lang/Object;Ljava/io/Serializable;",
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/activemq/artemis/api/core/Pair"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/api/core/SimpleString.class",
+      "occurrence": 0,
+      "sha256": "bc7ab21eeb0e8a1ca76f0e32aff2d858da7dc46108ab462ae4e59ccb591ed747",
+      "name": "org/apache/activemq/artemis/api/core/SimpleString",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/CharSequence",
+        "java/io/Serializable",
+        "java/lang/Comparable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "data",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 130
+        },
+        {
+          "name": "str",
+          "descriptor": "Ljava/lang/String;",
+          "access": 130
+        }
+      ],
+      "methods": [
+        {
+          "name": "toSimpleString",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 9,
+          "code_sha256": "ce983122a7e226066ec78e0363a7b217f1a9b255ecab870c7efa482b9d1b8ea2",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "aa5db2de828caeecf8c30e5e57b824a965695c9f2d18e08e106351c555c3e697",
+          "code_length": 92
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "5463e96dc38ef1c7a67234507ccc439a0e5bc235bf6f2e27db06c141f25d5644",
+          "code_length": 10
+        },
+        {
+          "name": "length",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b806420824417ff60d0dfb260fc8996a463ce8b565b7537ede48c07cdb9e1fd0",
+          "code_length": 8
+        },
+        {
+          "name": "charAt",
+          "descriptor": "(I)C",
+          "access": 1,
+          "code_sha256": "d68e2641c7c268257f0f0f0f657ca80065d86fcb95b8e92ba6274eda6e85b175",
+          "code_length": 54
+        },
+        {
+          "name": "subSequence",
+          "descriptor": "(II)Ljava/lang/CharSequence;",
+          "access": 1,
+          "code_sha256": "0e65044c209d6bd8cbd340696cf33b839b334cc916b5668ab38d675717b3d1c2",
+          "code_length": 68
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)I",
+          "access": 1,
+          "code_sha256": "b269ac7daa7bf0f07e77d3609023ef55c674066cc0c1b310beaaaeb89c4a7fb1",
+          "code_length": 12
+        },
+        {
+          "name": "getData",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "startsWith",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)Z",
+          "access": 1,
+          "code_sha256": "bc694f62986d6a9f59ac4fb80ccc154d71204c8f556a1652117b276ace3bc808",
+          "code_length": 47
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "25f24dbf0e6ddc85fce9162a1afba35f180e4cda80d902f093e30bf7cb13114a",
+          "code_length": 95
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "47295999a03dc743bfb5c42d0f32e635f839140bd40e0c0095cdc4b4e22cb223",
+          "code_length": 72
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8c186335731a559e02c46ee711908e8be0f4e5baf9328465fc0a89939c474971",
+          "code_length": 57
+        },
+        {
+          "name": "split",
+          "descriptor": "(C)[Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "7f543a0287d6b2dc1e5d35757d612f8cd284023fcce0fa75b3ea8bcda7e4bf28",
+          "code_length": 205
+        },
+        {
+          "name": "contains",
+          "descriptor": "(C)Z",
+          "access": 1,
+          "code_sha256": "acbb91b965fbff8d4d21bf8e8765707b8ca9ffa8655f06549a3405f8d7237e5f",
+          "code_length": 64
+        },
+        {
+          "name": "concat",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "33312ae142e8f116685b18beae3a95ec3d84cf22a7c80e3f5ea3bc362314e9cf",
+          "code_length": 13
+        },
+        {
+          "name": "concat",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "4d8c45e1c902d4187dd1130d083c3536831822f1697e489f5463f8af8b9eef14",
+          "code_length": 57
+        },
+        {
+          "name": "concat",
+          "descriptor": "(C)Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "cdd9ddefc9aea03607b61b834edca61f5630858a6b4c447bcfa0cd2dbb6c2b36",
+          "code_length": 65
+        },
+        {
+          "name": "sizeof",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b6ce1d383f930eac71561fad2fa27757759f11d91c54baf7991650a2cbe19105",
+          "code_length": 8
+        },
+        {
+          "name": "sizeofString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)I",
+          "access": 9,
+          "code_sha256": "d94c5bdb976121e910ca2f19d7693d1e040dcd28a70a126a072a40730fa8168b",
+          "code_length": 5
+        },
+        {
+          "name": "sizeofNullableString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)I",
+          "access": 9,
+          "code_sha256": "e9d0442c2b83ad7dfac0689bfdbbc30c22fc3e4bee9105309be3abe21e6b7576",
+          "code_length": 13
+        },
+        {
+          "name": "getChars",
+          "descriptor": "(II[CI)V",
+          "access": 1,
+          "code_sha256": "ecb6a50bcb0dae348e5eafbb01b8fdd003099cc61446f84a23575e114e61ef66",
+          "code_length": 118
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "b1d27953d9cd50b41bf1e4b4931008c7995197a56496f5cffede4865e4da5845",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/CharSequence;Ljava/io/Serializable;Ljava/lang/Comparable<Lorg/apache/activemq/artemis/api/core/SimpleString;>;",
+      "class_references": [
+        "[B",
+        "[C",
+        "[Lorg/apache/activemq/artemis/api/core/SimpleString;",
+        "java/io/Serializable",
+        "java/lang/CharSequence",
+        "java/lang/Comparable",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringIndexOutOfBoundsException",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/apache/activemq/artemis/api/core/SimpleString",
+        "org/apache/activemq/artemis/utils/DataConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/ArtemisConstants.class",
+      "occurrence": 0,
+      "sha256": "a2222e7a89188a132ea4e1d5854f0ad3a6a992df7a0a943c84fb114d80463d75",
+      "name": "org/apache/activemq/artemis/ArtemisConstants",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_JOURNAL_BUFFER_SIZE_AIO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_JOURNAL_BUFFER_TIMEOUT_AIO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_JOURNAL_BUFFER_TIMEOUT_NIO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_JOURNAL_BUFFER_SIZE_NIO",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/ArtemisConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/core/buffers/impl/ChannelBufferWrapper.class",
+      "occurrence": 0,
+      "sha256": "8375224a7c4dbe7cc790cbbd4e5eeeba6181dab7e765fa879078915e1deb1c20",
+      "name": "org/apache/activemq/artemis/core/buffers/impl/ChannelBufferWrapper",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffer"
+      ],
+      "fields": [
+        {
+          "name": "buffer",
+          "descriptor": "Lio/netty/buffer/ByteBuf;",
+          "access": 4
+        },
+        {
+          "name": "releasable",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "unwrap",
+          "descriptor": "(Lio/netty/buffer/ByteBuf;)Lio/netty/buffer/ByteBuf;",
+          "access": 9,
+          "code_sha256": "6721f80ec307eedb8aeb2bea2e63c48571305f70825647a5d6ad7287409acf6a",
+          "code_length": 21
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/netty/buffer/ByteBuf;)V",
+          "access": 1,
+          "code_sha256": "eacfe298ddb7fb97c41f6aa05773510a0405899388f51ab9f1c87a8d24d9b3a8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/netty/buffer/ByteBuf;Z)V",
+          "access": 1,
+          "code_sha256": "5d1d02a308af2345e7e4b80571ee9a3a247ede0b78436b15ead8de6c6596c68a",
+          "code_length": 30
+        },
+        {
+          "name": "readBoolean",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f69e3a4290171f64389785ca153e2a43c5f0f551433ee117e3138db8dff97e12",
+          "code_length": 13
+        },
+        {
+          "name": "readNullableSimpleString",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "d85d79b5097e527152067d5fc6ac2b3fe2d498b0f73963b9aebf5f762da5012d",
+          "code_length": 19
+        },
+        {
+          "name": "readNullableString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a28c95cd2adb5f4f4347e562e48cd833807c3be13b6c206380ac6d4402e8a4a4",
+          "code_length": 19
+        },
+        {
+          "name": "readSimpleString",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 1,
+          "code_sha256": "a498d5be8c777f7dabfb08d1c670ecb66ebed2fa7ea334952d9268f6e7fc594d",
+          "code_length": 5
+        },
+        {
+          "name": "readSimpleStringInternal",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/SimpleString;",
+          "access": 2,
+          "code_sha256": "2a19d9777fe3af697a31401d67003dcca23624566642e31a0456543be88b3f19",
+          "code_length": 30
+        },
+        {
+          "name": "readString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e774645a741e7b548d652c0e3e4202890637532cefda704d5f18638f73181142",
+          "code_length": 5
+        },
+        {
+          "name": "readStringInternal",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "101361fd4ba4ca6a600bdf7b1b22a7fd568aeaa2a001ad069772b10e5b8252f0",
+          "code_length": 71
+        },
+        {
+          "name": "readUTF",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19518d8157856555a9555af08aeef54e4db9b747017114c7ef9a06aaa581dfbb",
+          "code_length": 5
+        },
+        {
+          "name": "writeBoolean",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "111c5ebee36a65e31d0b1f9df7a6a75e89fcdf5ac05fd948ab005b874366abcd",
+          "code_length": 19
+        },
+        {
+          "name": "writeNullableSimpleString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)V",
+          "access": 1,
+          "code_sha256": "631e5c13fa72d51fa8b06268a55634f46c4b56cf3dff741ef22fcf31334af9f0",
+          "code_length": 31
+        },
+        {
+          "name": "writeNullableString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "64098240e853e9b01c5f55a1550b48a9f16218b23b1b14bc98bd1194b64e49a1",
+          "code_length": 31
+        },
+        {
+          "name": "writeSimpleString",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)V",
+          "access": 1,
+          "code_sha256": "e66ac069e87aeb2a0ce702cbd952d586a6a185d7b39855b81b15ecbea1f23377",
+          "code_length": 6
+        },
+        {
+          "name": "writeSimpleStringInternal",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/SimpleString;)V",
+          "access": 2,
+          "code_sha256": "d92c400556c2c1499cc70cbecd0548b03ad803054654ebfdbd75b4cc8c7e4957",
+          "code_length": 25
+        },
+        {
+          "name": "writeString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4fc6c445c716564d03b9285f30808bde10044f62791beeac53c1cf64f5d4ede2",
+          "code_length": 6
+        },
+        {
+          "name": "writeStringInternal",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "3220269de9d08a4efa8ba4843b7529d6ef016b043fbf6d968c19c063fb8ca9b9",
+          "code_length": 81
+        },
+        {
+          "name": "writeUTF",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "92e3bcf6a06e3a262e0f92251612f7aa4a7ac21fc6399a9289b083053ed19196",
+          "code_length": 6
+        },
+        {
+          "name": "capacity",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ba864fd953098fb225bcd90f88cbcfd938331b7cbd926236c2e0b29f07d8abdc",
+          "code_length": 8
+        },
+        {
+          "name": "byteBuf",
+          "descriptor": "()Lio/netty/buffer/ByteBuf;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b85679d93bc1d3cccad87a21965875f082b89a30b5d5b3e539fd98ade18d6631",
+          "code_length": 9
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "55652de604162e2e84707a054d5c12d00357bfcfade96183bc53445ac13b398b",
+          "code_length": 19
+        },
+        {
+          "name": "copy",
+          "descriptor": "(II)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "6a1a3a15c99bef0de71e95915eb80e58fb73c2dbad014427e53ca892b12ce739",
+          "code_length": 21
+        },
+        {
+          "name": "discardReadBytes",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1b1c5d42497e7e0b26f0ef33c7a50cf209f6fc2a67847787035356d688a6bff3",
+          "code_length": 9
+        },
+        {
+          "name": "duplicate",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "eab18df821c39d7df0b730f2f200e7939db2c5bc9b1fbdce71893d76b39888b9",
+          "code_length": 19
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(I)B",
+          "access": 1,
+          "code_sha256": "5bea3f6e4b87d8c02099932207bb52834feb3769a569ec0ccef4df5a13a0e906",
+          "code_length": 9
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(I[BII)V",
+          "access": 1,
+          "code_sha256": "ecdb0b86ec0b797a1058e824d1aa372aa088830133d2dfdf57303c7e199ad121",
+          "code_length": 14
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "f57033fca10e6dd603b072ed0b6a5b3e35871665200ea9ad6f73edc014c1dfd6",
+          "code_length": 11
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILjava/nio/ByteBuffer;)V",
+          "access": 1,
+          "code_sha256": "75ab8c9c08675d1129672d6d46d0a3d1c042a139d7ba24f00fafa7b9aa63f095",
+          "code_length": 11
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1,
+          "code_sha256": "20d25577e699a95d10ea6e64e03a0e7eaab7f9537fb3e75b55faf46e97648207",
+          "code_length": 19
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1,
+          "code_sha256": "a2ca2fc8a91a34468c17fb68690f803a42934f7b1bd9faf08a2956fb134993e6",
+          "code_length": 17
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1,
+          "code_sha256": "7f757e9ee17c67476862a412b1430e4e975914bdda8681ace9941592631bfced",
+          "code_length": 16
+        },
+        {
+          "name": "getChar",
+          "descriptor": "(I)C",
+          "access": 1,
+          "code_sha256": "a44a69fc6434c2a90cb87276429a548cc9657476c406cbc52c42aefbdf3296e2",
+          "code_length": 10
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(I)D",
+          "access": 1,
+          "code_sha256": "0cd76413274e22811d11261e9ce93762686ff0ed7c7c79cda7a9aae8580f15cd",
+          "code_length": 12
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "(I)F",
+          "access": 1,
+          "code_sha256": "227421a25ecc3cf6fb5fe763f8efc8761f0f5ae72e675669ed128a3bbe3e7ac9",
+          "code_length": 12
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "af9d68e876b1315035f6740dca3749982daa971c373c26adb3fbaa11302c6e5d",
+          "code_length": 9
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "5f1c285483991610e0cb2bdb5f1bcbb5f952ce532a0de5096baf39e9cb6b8eef",
+          "code_length": 9
+        },
+        {
+          "name": "getShort",
+          "descriptor": "(I)S",
+          "access": 1,
+          "code_sha256": "b14e6de3039898ecd40df29bda06eb519f1d1ddb47f6e3f726db2a3663766600",
+          "code_length": 9
+        },
+        {
+          "name": "getUnsignedByte",
+          "descriptor": "(I)S",
+          "access": 1,
+          "code_sha256": "0978dc71376c97c90e2f26c1b31887423cb0e7ad994fe572450a4adbca4d5131",
+          "code_length": 9
+        },
+        {
+          "name": "getUnsignedInt",
+          "descriptor": "(I)J",
+          "access": 1,
+          "code_sha256": "8132f745ac11b0ff275b6e66be4b9ad1b939db3a6df80e7bad4224044fc61970",
+          "code_length": 9
+        },
+        {
+          "name": "getUnsignedShort",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "4aec82c04b741e955c694c905cc438c37bb75daa927c922f57562c6da578233b",
+          "code_length": 9
+        },
+        {
+          "name": "markReaderIndex",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c39875b00d1b7d27827f5e0a7962ef9b581a917b0985ac1e48a170325028ed8b",
+          "code_length": 9
+        },
+        {
+          "name": "markWriterIndex",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8397ac447a4cd057cc9bcd9483fed7f4928add49aa0da582be1e18c7b457046b",
+          "code_length": 9
+        },
+        {
+          "name": "readable",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "05603f6670238a83e68ca909935649097e6c7821860d7e1b33f003569693ec1e",
+          "code_length": 8
+        },
+        {
+          "name": "readableBytes",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17906011f2e3e20128c6ee0ca1696b4db63cdc36ba274bb4b12681826c5f160f",
+          "code_length": 8
+        },
+        {
+          "name": "readByte",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "35750818042467c031cbbbd3fc8acc48fc96da29c8123568af5afc4f4cb43c3f",
+          "code_length": 8
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "b6de47b2bd3fc1b530ac0db6c4bb6133ba80115b80a076e7b9b3a473832c8cbd",
+          "code_length": 12
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "849d1e678ab0d61e14471dd1ee115f811f8f05a118d1765be3cb6336855aca55",
+          "code_length": 10
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Ljava/nio/ByteBuffer;)V",
+          "access": 1,
+          "code_sha256": "1de5bc9448d921e684e8b8ebde0f946741706e4a49cebd892de1bf36acd346f3",
+          "code_length": 10
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1,
+          "code_sha256": "14f6a0fa28585cb74388e700352a8a50982767722bc5692d17aae08398e46f1c",
+          "code_length": 17
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1,
+          "code_sha256": "288a467f42ccdecd99f7f991d801083cfe269af976a2dccf2ef1893ec47cbe87",
+          "code_length": 16
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1,
+          "code_sha256": "bad2919f31f17d70e5b5e35f745973420d91d0790f5bc49ec5709b8daf0bb11a",
+          "code_length": 15
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "a56242469dfcd162b60d80c7180636676eff15555a8ca0d695107868cb315d4d",
+          "code_length": 20
+        },
+        {
+          "name": "readChar",
+          "descriptor": "()C",
+          "access": 1,
+          "code_sha256": "388b23a7932085f328835e1aa1fc20604cba698266b56799778e3c5258835051",
+          "code_length": 9
+        },
+        {
+          "name": "readDouble",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "86e654bc07e36280fa0fa01a374e4d551c4fd6984fa3a36c13b863a3840d62f3",
+          "code_length": 11
+        },
+        {
+          "name": "readerIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2929c9999b1ca07dee96ffc7497fa90a86594a634e76fde8f1ceb10ac0d02e5d",
+          "code_length": 8
+        },
+        {
+          "name": "readerIndex",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b3bf4db99ee85aa49ebd1eb3b32afe974291dfbc229d7b093030012aef4e43f4",
+          "code_length": 10
+        },
+        {
+          "name": "readFloat",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "20bba3b52c5efa84758907732eafab126ef9d74d7b0e75cb16dee7d90f562b14",
+          "code_length": 11
+        },
+        {
+          "name": "readInt",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c9046678a796f00f56412b986763f1afc67c3d2753b14e44c97e261551005184",
+          "code_length": 8
+        },
+        {
+          "name": "readLong",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "0021a6f2e14091b7c8070676e2c637c5177c9f30435393ad3b10e43d7d3f88dc",
+          "code_length": 8
+        },
+        {
+          "name": "readShort",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "08ed4a9662613b2820235374a4daee115f0365f67d6c39d7f56c506c126ee382",
+          "code_length": 8
+        },
+        {
+          "name": "readSlice",
+          "descriptor": "(I)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "ce90b591cd2e52594b95c05b2bd316d7066d16cba820986d9313dce5193e64fd",
+          "code_length": 20
+        },
+        {
+          "name": "readUnsignedByte",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c3f617ddbcb74fbfeca1734d2c74787094424173fcbf812a469135f0f712fbf",
+          "code_length": 8
+        },
+        {
+          "name": "readUnsignedInt",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "d720dae19a39ebe4d5e1126903957255dd87fbd488f10c76840fddb754edde16",
+          "code_length": 8
+        },
+        {
+          "name": "readUnsignedShort",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b1ed2a9807991f93c93c629a4257b7d0a30b03ed4f3b751b979d61b8a80f1d5c",
+          "code_length": 8
+        },
+        {
+          "name": "resetReaderIndex",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "397334367bc4b28cd9533a8d3d2058026175cf7f243e15e4147943f0f436332b",
+          "code_length": 9
+        },
+        {
+          "name": "resetWriterIndex",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7e9c634b9877e9f1619325a32082cd1ec323b8246928cac205726c0649490dc4",
+          "code_length": 9
+        },
+        {
+          "name": "setByte",
+          "descriptor": "(IB)V",
+          "access": 1,
+          "code_sha256": "bda3f877b5c6bb899f11640cd661d7a2b4899990d9dafee451b2a421b0556a83",
+          "code_length": 11
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(I[BII)V",
+          "access": 1,
+          "code_sha256": "d8a8d7e5be65fe47a5bd8713e65289fb88cf5c1baa25ee42942191b93564b0f7",
+          "code_length": 14
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(I[B)V",
+          "access": 1,
+          "code_sha256": "0554f8aa34150ce7f40d2beb9ef142244261cdf5e5c1ec8328de866413bd7aed",
+          "code_length": 11
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILjava/nio/ByteBuffer;)V",
+          "access": 1,
+          "code_sha256": "82f31842e740c0e89622c7e1277570347209b8b13c1a36e16a5242ffac7c5437",
+          "code_length": 11
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1,
+          "code_sha256": "f5467c04eb5e84fceb33151bc6ad3d1affdeca491da8195649d8cf29a114558e",
+          "code_length": 19
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1,
+          "code_sha256": "1d28625f4bb48a8dcc8f2770af4aed364aeb3ecab7e69de9b72f59a423b1e0d2",
+          "code_length": 17
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(ILorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 1,
+          "code_sha256": "22a200bf76d80d3e7ae1eefef592d0c2470467950e515a7652214c1d7182f6f7",
+          "code_length": 16
+        },
+        {
+          "name": "setChar",
+          "descriptor": "(IC)V",
+          "access": 1,
+          "code_sha256": "d2e97ef03593ddc5c7f1596126acd8d3b6843fe17fa9c73c16761dc53ce4c1b6",
+          "code_length": 12
+        },
+        {
+          "name": "setDouble",
+          "descriptor": "(ID)V",
+          "access": 1,
+          "code_sha256": "0da2337fb2ecd20b71add525e2d58128e591ef12b77eb5d734c344bbadff8330",
+          "code_length": 14
+        },
+        {
+          "name": "setFloat",
+          "descriptor": "(IF)V",
+          "access": 1,
+          "code_sha256": "048db57df95455d66f5fddc868e4d539ddb79df10cb3d94462d2d4ccf6ab5b47",
+          "code_length": 14
+        },
+        {
+          "name": "setIndex",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "37083c98c377da86ef5bea4a8ca469f4e12b3fe09f74e8e5a6cd6ef6915b4d81",
+          "code_length": 11
+        },
+        {
+          "name": "setInt",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "43aeb6d57741541c40f5a46a5cc015b439692da14bd569fc9e4ec2d5149d7069",
+          "code_length": 11
+        },
+        {
+          "name": "setLong",
+          "descriptor": "(IJ)V",
+          "access": 1,
+          "code_sha256": "fc16d878376d806d821afef129346e048cf989d8a44f45c1ce5d1d23bfe4cb9d",
+          "code_length": 11
+        },
+        {
+          "name": "setShort",
+          "descriptor": "(IS)V",
+          "access": 1,
+          "code_sha256": "f6f02c3fa6375740a79f51a83e102fbc265ef30bfeda8921dfc800cfc3d67f77",
+          "code_length": 11
+        },
+        {
+          "name": "skipBytes",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "638fddad72ccc176e16734fdbc867cf55ea47fb264e841cca2ddbfb75a858eb5",
+          "code_length": 11
+        },
+        {
+          "name": "slice",
+          "descriptor": "()Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "3b34a488d03c4a5e3865d4464f3f58e9120a1b0ff8ff5f9c805fa9d3136258d3",
+          "code_length": 19
+        },
+        {
+          "name": "slice",
+          "descriptor": "(II)Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;",
+          "access": 1,
+          "code_sha256": "f3e4714dc155887beba14b87d724777f716309a4e4b2facf6dd4540e3cfb6e59",
+          "code_length": 21
+        },
+        {
+          "name": "toByteBuffer",
+          "descriptor": "()Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "code_sha256": "e52ceed2462e3a337b4b919b388d7148e46362c76734b586843926a2d9cbea41",
+          "code_length": 8
+        },
+        {
+          "name": "toByteBuffer",
+          "descriptor": "(II)Ljava/nio/ByteBuffer;",
+          "access": 1,
+          "code_sha256": "ac91b0dcd5ccc7fdb38f5b413267ac31da1f6596e241110afb3927890652767c",
+          "code_length": 10
+        },
+        {
+          "name": "writable",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "77d786b27c38f8c31c9d242e3f48a4c915377deba714860ed205c877197145df",
+          "code_length": 8
+        },
+        {
+          "name": "writableBytes",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8c5eb9d194d65a85bb171fb3e136675e8394b80bb18b506ed7746fe9be45a256",
+          "code_length": 8
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(B)V",
+          "access": 1,
+          "code_sha256": "49d9dc5369310f7812f0eb2ccbe0ca21019fd94d4e17609d11df28d23da9b4ec",
+          "code_length": 10
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "0651f870a0d96411dd6a122c6e3096bce90fb59dc20e0305e6cc3e3cd8e1ac1f",
+          "code_length": 12
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "e8e85097215cfb91d17dc55dd8c187b0538bbe15ba88ee6d717e4ccaab067f6f",
+          "code_length": 10
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Ljava/nio/ByteBuffer;)V",
+          "access": 1,
+          "code_sha256": "b9cfde3198ad7e7a009462192a150707da66f296e236fa958229e14551aee4a5",
+          "code_length": 10
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;II)V",
+          "access": 1,
+          "code_sha256": "bc18c79d012ac81c2b3bf3ee352537ae4db8f95a522ab4d4f9be2c5be61ff103",
+          "code_length": 17
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;I)V",
+          "access": 1,
+          "code_sha256": "7f833b448bfdb8866c093126773f6345693f6d9eea366d08d578778546fe4b29",
+          "code_length": 16
+        },
+        {
+          "name": "writeChar",
+          "descriptor": "(C)V",
+          "access": 1,
+          "code_sha256": "37b1585a89f329625cf042284acd0d3dee4fa09d5fb64cd865e867259e39bd5d",
+          "code_length": 11
+        },
+        {
+          "name": "writeDouble",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "19ace4050e0580dc1dd9852606d868318efa74e11d4a1d432bfe369dbed54525",
+          "code_length": 13
+        },
+        {
+          "name": "writeFloat",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "5fba0552398a4cc151fecfb569bb959b20b70310ed67b2c196186d5cab117922",
+          "code_length": 13
+        },
+        {
+          "name": "writeInt",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7dd6d2511e9b83058bde396a07b3507eb963f09b93f501719bbf673efb7fb2de",
+          "code_length": 10
+        },
+        {
+          "name": "writeLong",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "5c5b83eca11695f82ccbf1d0358cc20c81e02dc47e48dce91c1d6e37898b6ffb",
+          "code_length": 10
+        },
+        {
+          "name": "writerIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9fe560bc946c97682f2b03dda09f920107edc4b4c4b7fd37bb57c8746cae8caf",
+          "code_length": 8
+        },
+        {
+          "name": "writerIndex",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b393adbd35ed9d090e31e51525f560ce997677d2b2cc7751118ccdda1a82835f",
+          "code_length": 10
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "(S)V",
+          "access": 1,
+          "code_sha256": "b795cf77d82b71052398a310986df94526db95eede459728ed2e914469bf5fed",
+          "code_length": 10
+        },
+        {
+          "name": "readFully",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "939d27425ad656232f90795cbf0f48575c33328442efcf2b8bcdd328a9bee52d",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readFully",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "46ef7ad9f41dca04afd7109f5552dd836f468c6d4608f92edd722ffd8905fcda",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readLine",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a609614511871c66e86090fad2bca8eb0d80f37f2f1f2fa8df1852d9b65a2cb4",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[C",
+        "io/netty/buffer/ByteBuf",
+        "io/netty/buffer/Unpooled",
+        "java/io/IOException",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffer",
+        "org/apache/activemq/artemis/api/core/SimpleString",
+        "org/apache/activemq/artemis/core/buffers/impl/ChannelBufferWrapper",
+        "org/apache/activemq/artemis/utils/ByteUtil",
+        "org/apache/activemq/artemis/utils/DataConstants",
+        "org/apache/activemq/artemis/utils/UTF8Util"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/core/server/ActiveMQComponent.class",
+      "occurrence": 0,
+      "sha256": "a839ae8d2a04b6b4359822056a3cbf3dc6bcb92f784412639c2ee27dfca08c19",
+      "name": "org/apache/activemq/artemis/core/server/ActiveMQComponent",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isStarted",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/apache/activemq/artemis/core/server/ActiveMQComponent"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$1.class",
+      "occurrence": 0,
+      "sha256": "a75bd30f3c8926696b84b7bd894f9659f6e9b0f5cfe396a8e84692a1a7d2e6dc",
+      "name": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7fc15cba22178d1b2596bc5a93ab92fcfd56e09215fb8303637907750d0669d7",
+          "code_length": 105
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/System",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$1",
+        "org/jboss/logging/Logger"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$2.class",
+      "occurrence": 0,
+      "sha256": "68486d2e2a48c6a34bc11dab59339cf4bc336afcaed093cec74e362ee326f8d4",
+      "name": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "095efbc1a1e91e2c44bd5344fa1af508d4af198dc51cb86a06d33b49c56e47e7",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/Executor",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$2"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent.class",
+      "occurrence": 0,
+      "sha256": "d03e108b44943e1e7e6cc6e1580134ea80877a72e7a9ecb9958a171b674545b3",
+      "name": "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/core/server/ActiveMQComponent",
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/jboss/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "scheduledExecutorService",
+          "descriptor": "Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 18
+        },
+        {
+          "name": "period",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "millisecondsPeriod",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "timeUnit",
+          "descriptor": "Ljava/util/concurrent/TimeUnit;",
+          "access": 2
+        },
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/Executor;",
+          "access": 18
+        },
+        {
+          "name": "future",
+          "descriptor": "Ljava/util/concurrent/ScheduledFuture;",
+          "access": 2
+        },
+        {
+          "name": "onDemand",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "lastTime",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "delayed",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 18
+        },
+        {
+          "name": "runForExecutor",
+          "descriptor": "Ljava/lang/Runnable;",
+          "access": 16
+        },
+        {
+          "name": "runForScheduler",
+          "descriptor": "Ljava/lang/Runnable;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ScheduledExecutorService;Ljava/util/concurrent/Executor;JLjava/util/concurrent/TimeUnit;Z)V",
+          "access": 1,
+          "code_sha256": "6c20ef3ffc42560d00a204c525caa6101a9d89924372676c01a14b7c4d888566",
+          "code_length": 90
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "76a35109341a4dc989310141701d3174a63f80e87660a53b6887b873df8da19e",
+          "code_length": 92
+        },
+        {
+          "name": "delay",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2862b7ada088392f1e076ebf0107f0aea15b79652f240a731e935db300cea5",
+          "code_length": 58
+        },
+        {
+          "name": "getPeriod",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "a82c4044502b27e8e3f227a0c685d868680fd354e2008587d874f40677477efa",
+          "code_length": 5
+        },
+        {
+          "name": "setPeriod",
+          "descriptor": "(J)Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;",
+          "access": 33,
+          "code_sha256": "1b9ed8927f753c2290b8c052c5fc0e90568fec3d666111fdc8c9fae24b5c26f0",
+          "code_length": 11
+        },
+        {
+          "name": "getTimeUnit",
+          "descriptor": "()Ljava/util/concurrent/TimeUnit;",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "setTimeUnit",
+          "descriptor": "(Ljava/util/concurrent/TimeUnit;)Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;",
+          "access": 33,
+          "code_sha256": "c4465db844fee0ca5cfc847463cb9f98abbef2d59423ade052e5eafe1901b784",
+          "code_length": 11
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "dc5bf6942ab868ac720f4e9044d36daedfc5ebe7f8a3f7cb17e8ce748877f40b",
+          "code_length": 25
+        },
+        {
+          "name": "isStarted",
+          "descriptor": "()Z",
+          "access": 33,
+          "code_sha256": "098a031d2b1495931367ae776e5d8322d127d42f77eeb8c22a75e717e8ec8dc5",
+          "code_length": 13
+        },
+        {
+          "name": "restartIfNeeded",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "60930ce74afec5d7c098e35abf48346b65beda2adeb5764674e6dc8e1f144aa8",
+          "code_length": 16
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)Z",
+          "access": 4104,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 4104,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)J",
+          "access": 4104,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "()Lorg/jboss/logging/Logger;",
+          "access": 4104,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/server/ActiveMQScheduledComponent;)Ljava/util/concurrent/Executor;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9f30a42fa542bea4955035fa0fad8f01d42048c9ab4d7f4f69543a72b21cc934",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/concurrent/Executor",
+        "java/util/concurrent/ScheduledExecutorService",
+        "java/util/concurrent/ScheduledFuture",
+        "java/util/concurrent/TimeUnit",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "org/apache/activemq/artemis/core/server/ActiveMQComponent",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$1",
+        "org/apache/activemq/artemis/core/server/ActiveMQScheduledComponent$2",
+        "org/jboss/logging/Logger"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/logs/ActiveMQUtilBundle.class",
+      "occurrence": 0,
+      "sha256": "7fbf052a48df4dda01b7d55040c371d88e6278d3113ac73451c511eeaa1c41d5",
+      "name": "org/apache/activemq/artemis/logs/ActiveMQUtilBundle",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BUNDLE",
+          "descriptor": "Lorg/apache/activemq/artemis/logs/ActiveMQUtilBundle;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "invalidProperty",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQIllegalStateException;",
+          "access": 1025
+        },
+        {
+          "name": "invalidType",
+          "descriptor": "(Ljava/lang/Byte;)Ljava/lang/IllegalStateException;",
+          "access": 1025
+        },
+        {
+          "name": "stringTooLong",
+          "descriptor": "(Ljava/lang/Integer;)Ljava/lang/IllegalStateException;",
+          "access": 1025
+        },
+        {
+          "name": "errorCreatingCodec",
+          "descriptor": "(Ljava/lang/Exception;Ljava/lang/String;)Ljava/lang/IllegalArgumentException;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5951759df9c7f60edb003049c7ce2a7626564aef5f2302009387b5bfa62fe464",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilBundle",
+        "org/jboss/logging/Messages",
+        "org/jboss/logging/annotations/Message",
+        "org/jboss/logging/annotations/Message$Format"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/logs/ActiveMQUtilBundle_$bundle.class",
+      "occurrence": 0,
+      "sha256": "6efcf005735ecddfea74c88db0bccee24e26fbfcd1bb5f724167284dbcade70d",
+      "name": "org/apache/activemq/artemis/logs/ActiveMQUtilBundle_$bundle",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/logs/ActiveMQUtilBundle",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/apache/activemq/artemis/logs/ActiveMQUtilBundle_$bundle;",
+          "access": 25
+        },
+        {
+          "name": "invalidProperty",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "invalidType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "stringTooLong",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "errorCreatingCodec",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "invalidProperty$str",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c9cdc1d4e77197d79563e1ed9ee90789a892e4d5f35b7c42afe23ed087b4f220",
+          "code_length": 3
+        },
+        {
+          "name": "invalidProperty",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/activemq/artemis/api/core/ActiveMQIllegalStateException;",
+          "access": 17,
+          "code_sha256": "ca03ffa394f595606e76589507a84979a64fc9c11a13489febaa24832df1b674",
+          "code_length": 44
+        },
+        {
+          "name": "invalidType$str",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "6b10489192f3e926b805eb8f2c43e2f2095247895ed04fc68bd872b8ee0ba681",
+          "code_length": 3
+        },
+        {
+          "name": "invalidType",
+          "descriptor": "(Ljava/lang/Byte;)Ljava/lang/IllegalStateException;",
+          "access": 17,
+          "code_sha256": "4e17cf0858d60228ebc60fcfbe77558d2916d1df01747b9230db1b90efecc4a5",
+          "code_length": 44
+        },
+        {
+          "name": "stringTooLong$str",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "ca7826018a20739057f06b0bdd8ec8e2ed6c39f35af1e53f88d410ec55c99fb0",
+          "code_length": 3
+        },
+        {
+          "name": "stringTooLong",
+          "descriptor": "(Ljava/lang/Integer;)Ljava/lang/IllegalStateException;",
+          "access": 17,
+          "code_sha256": "3a1545271cf8777ed0ccecd7eec3dc92b09b59bdb55463137e47d2788a881bce",
+          "code_length": 44
+        },
+        {
+          "name": "errorCreatingCodec$str",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "6bb5e3db34b58b5a1199d1587f26728031e570b466b40e4d20782ba8e96d1f50",
+          "code_length": 3
+        },
+        {
+          "name": "errorCreatingCodec",
+          "descriptor": "(Ljava/lang/Exception;Ljava/lang/String;)Ljava/lang/IllegalArgumentException;",
+          "access": 17,
+          "code_sha256": "ad4b7d1ea3681a06381d297c4cea487915ebcbda0194b6578c053138a37f237b",
+          "code_length": 48
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cef3a3ec725fb46e3e9c8b79c4c053ce26b6b7802249eafe6bc8dd51554dc072",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/StackTraceElement;",
+        "java/io/Serializable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/text/MessageFormat",
+        "java/util/Arrays",
+        "org/apache/activemq/artemis/api/core/ActiveMQIllegalStateException",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilBundle",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilBundle_$bundle"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/logs/ActiveMQUtilLogger.class",
+      "occurrence": 0,
+      "sha256": "ade5c7fa1308b42b30620d48bc7bc6ddc3bc52f313eca09014acda08346a5cd2",
+      "name": "org/apache/activemq/artemis/logs/ActiveMQUtilLogger",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jboss/logging/BasicLogger"
+      ],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/apache/activemq/artemis/logs/ActiveMQUtilLogger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "missingPrivsForClassloader",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2cff784e5af20dc31a12b7e51dc410f0723ce263718e46cc783d791fc2b93f46",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Package",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilLogger",
+        "org/jboss/logging/BasicLogger",
+        "org/jboss/logging/Logger",
+        "org/jboss/logging/Logger$Level",
+        "org/jboss/logging/annotations/Message",
+        "org/jboss/logging/annotations/Message$Format"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/logs/ActiveMQUtilLogger_$logger.class",
+      "occurrence": 0,
+      "sha256": "3e4ea8d693de707c5720a7e5ce98985e050485b1bc0981a396685545f3c68dbb",
+      "name": "org/apache/activemq/artemis/logs/ActiveMQUtilLogger_$logger",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jboss/logging/DelegatingBasicLogger",
+      "interfaces": [
+        "org/apache/activemq/artemis/logs/ActiveMQUtilLogger",
+        "org/jboss/logging/BasicLogger",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "FQCN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "missingPrivsForClassloader",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jboss/logging/Logger;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "missingPrivsForClassloader",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "653fa188277d1fe5902bb5d233ec570743ef3d065ccc9a25f805cecc07bbf780",
+          "code_length": 23
+        },
+        {
+          "name": "missingPrivsForClassloader$str",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "50991e44dcc39e2388447149a2e0cecebd22a9c65188d6fe5bcc883a4921fe8a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Object",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilLogger",
+        "org/apache/activemq/artemis/logs/ActiveMQUtilLogger_$logger",
+        "org/jboss/logging/BasicLogger",
+        "org/jboss/logging/DelegatingBasicLogger",
+        "org/jboss/logging/Logger",
+        "org/jboss/logging/Logger$Level"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/logs/AssertionLoggerHandler.class",
+      "occurrence": 0,
+      "sha256": "f2013f0057ef9db4a403e7b0d3411ca887213f1be253434d5ad7dfb3fecb30ff",
+      "name": "org/apache/activemq/artemis/logs/AssertionLoggerHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jboss/logmanager/ExtHandler",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "messages",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jboss/logmanager/ExtLogRecord;>;"
+        },
+        {
+          "name": "capture",
+          "descriptor": "Z",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/SecurityException"
+          ]
+        },
+        {
+          "name": "doPublish",
+          "descriptor": "(Lorg/jboss/logmanager/ExtLogRecord;)V",
+          "access": 4,
+          "code_sha256": "224c4f4d13f363dcff220643bec784ce766fca1fb2b5f5f33a0e0bdf15d5db71",
+          "code_length": 21
+        },
+        {
+          "name": "hasLevel",
+          "descriptor": "(Ljava/util/logging/Level;)Z",
+          "access": 9,
+          "code_sha256": "2a673d3b04ab59215dd9aa8bc0ed36d93d70365c232063c08160914560e1c728",
+          "code_length": 51
+        },
+        {
+          "name": "findText",
+          "descriptor": "(J[Ljava/lang/String;)Z",
+          "access": 137,
+          "code_sha256": "5e12215e674992f1fbbf5404e56c34d3787123168790560700507c1adf54b508",
+          "code_length": 25
+        },
+        {
+          "name": "findText",
+          "descriptor": "([Ljava/lang/String;)Z",
+          "access": 137,
+          "code_sha256": "a275fb545296fcbba76daeab5bab3223eebd2a1464bbafd8974f7829ba45faec",
+          "code_length": 149
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 25,
+          "code_sha256": "a0f92d2cb76d1c8197256197a51c36d22ec8ff1477bd495ceb6a5c43e09d8aeb",
+          "code_length": 9
+        },
+        {
+          "name": "startCapture",
+          "descriptor": "()V",
+          "access": 25,
+          "code_sha256": "ebf376f328cfdfaf7a96f6b475f3275cfe22cb5fdb06b613d3c95f8bea423779",
+          "code_length": 8
+        },
+        {
+          "name": "stopCapture",
+          "descriptor": "()V",
+          "access": 25,
+          "code_sha256": "f2305552c2b990bbb23fffa2f50fbee5a22a05ff0c9b3017a6e4abb9c0cac18b",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b5f298724d3c06df03dea9cbaa8fb5aa7d888976fc9597e8016f845fc3a277de",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/logging/Level",
+        "org/apache/activemq/artemis/logs/AssertionLoggerHandler",
+        "org/jboss/logmanager/ExtHandler",
+        "org/jboss/logmanager/ExtLogRecord"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$1.class",
+      "occurrence": 0,
+      "sha256": "286249f338b85ac4f4031e43d45878b3a06a41477e4c080a826064bb892a5349",
+      "name": "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/ActiveMQThreadFactory",
+        "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$ThreadCreateAction.class",
+      "occurrence": 0,
+      "sha256": "4b8dfaff53d1d58f72fe458fca92e4467fb0578b6d3c02ee15e7024669752a9c",
+      "name": "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$ThreadCreateAction",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "target",
+          "descriptor": "Ljava/lang/Runnable;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/ActiveMQThreadFactory;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ActiveMQThreadFactory;Ljava/lang/Runnable;)V",
+          "access": 2,
+          "code_sha256": "22faaa953198e11e141635d2243377c710375042bd6ea94b985e83c07f3f0b6f",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "67231c17750fb72042eff053ced2ca0f1f104db2eba390627477204660cc844a",
+          "code_length": 12
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "495d99a50c7dffd00228c709f22f1804da54eb358843e8b3ed7f88df9eb0ec6f",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ActiveMQThreadFactory;Ljava/lang/Runnable;Lorg/apache/activemq/artemis/utils/ActiveMQThreadFactory$1;)V",
+          "access": 4096,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/lang/Thread;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/activemq/artemis/utils/ActiveMQThreadFactory",
+        "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$1",
+        "org/apache/activemq/artemis/utils/ActiveMQThreadFactory$ThreadCreateAction"
+      ]
+    }
+  ]
+}

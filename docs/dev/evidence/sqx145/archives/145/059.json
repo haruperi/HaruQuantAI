@@ -1,0 +1,931 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-5.13.0.jar",
+  "sha256": "66d4f819a062a51a1d5627bffc23fac55d1677f0e0a1feba144aabdd670a64bb",
+  "class_count": 125,
+  "unique_class_entries": 125,
+  "resource_count": 30,
+  "duplicate_entries": [],
+  "classes": {
+    "com/sun/jna/AltCallingConvention.class": "e993a7528904e00251c71a6f716cbe91579d8410363c0ef971b51f2cbd1d049c",
+    "com/sun/jna/Callback$UncaughtExceptionHandler.class": "7ac90409c502dfb61cf7c079aa2f6d0548c745cf888778fbf4230cc68e8e98ec",
+    "com/sun/jna/Callback.class": "d711e26545d9da4762b0c0acfb80155114ed652b879cf6e953d403103bbce043",
+    "com/sun/jna/CallbackParameterContext.class": "4a333a49236e31f8769a1db81f84faebe19c9c911011e34985fe04b29387e7a2",
+    "com/sun/jna/CallbackProxy.class": "8beb020ef5807a611c5f0db7caa708a1861bb6c3042cf160d325bfdd7ed7b89b",
+    "com/sun/jna/CallbackReference$AttachOptions.class": "6d18a7f6b091c9fb013f6a8608e433053384f550dbe1dcfd5a8b83e52e55d2a3",
+    "com/sun/jna/CallbackReference$CallbackReferenceDisposer.class": "85b8b9b0b255c212cea252faed8f85675e5cd8f204f01648ec9803cf80110652",
+    "com/sun/jna/CallbackReference$DefaultCallbackProxy.class": "eb30820611908018b379c934be6c61fdbf04b4725a961afef9e8bd3f65188ad0",
+    "com/sun/jna/CallbackReference$NativeFunctionHandler.class": "6d74704dc46ea34ab440fc0ef1203d0f87f8ed5585031e0043c0cced42c901c2",
+    "com/sun/jna/CallbackReference.class": "238626f5a52ac2e27c8d46743211b76a9b9890dea7134e53eba0974eb2324a32",
+    "com/sun/jna/CallbackResultContext.class": "fccc1d8810194b39bdf71a072823c07aa44c86d83b8e97a862aae2bb1852cd08",
+    "com/sun/jna/CallbackThreadInitializer.class": "9513ffb97d38926bc4ea50e60a2696dd3e698d4a090cc5f8165d838390a849d5",
+    "com/sun/jna/DefaultTypeMapper$Entry.class": "e139b98c8c62a821f5e55542b517549b0a344e6f46ade755d5b51ddbec225500",
+    "com/sun/jna/DefaultTypeMapper.class": "9225ebd32cb7c3b04ed78ebef3a9f103cff792907d29200df0e600d437d0f41b",
+    "com/sun/jna/ELFAnalyser$1.class": "cc97253b5741962174d82358000bdbab4f723299151c5d434f1d8bc6a9ee4f16",
+    "com/sun/jna/ELFAnalyser$ArmAeabiAttributesTag$ParameterType.class": "853754393c19297c3cacabd65a514c2ad28a5a0f24ee88c12bfb45da38d9a1ee",
+    "com/sun/jna/ELFAnalyser$ArmAeabiAttributesTag.class": "14d81cea2e617fdc50e16afa47d59c2f6395e155502717bb81d65aa727e1c5c6",
+    "com/sun/jna/ELFAnalyser$ELFSectionHeaderEntry.class": "95951b35be10add5eb49b4fc99178c2d90034a1f5584314a99fc5f3054db4208",
+    "com/sun/jna/ELFAnalyser$ELFSectionHeaders.class": "ed2bdb98ce26259d6c8de8139539da80f506019063088081bca7a4b8e0134128",
+    "com/sun/jna/ELFAnalyser.class": "440e007326e1ab8d9bc555c11cdc18cb0713867f1f7ccd0429fc4693b8175225",
+    "com/sun/jna/FromNativeContext.class": "08f92e873935f7eeeac13cba76709c1eee52a48e9e2c04a093e2ecd9066f28db",
+    "com/sun/jna/FromNativeConverter.class": "0a585545bca99bd2f213624204cced97ddf20725ca756173c053676d35ab48e7",
+    "com/sun/jna/Function$NativeMappedArray.class": "6d8709d9973d94603bc779003604fe5e9c5a1e69a82bce5430667f3e83f4c910",
+    "com/sun/jna/Function$PointerArray.class": "5e3a579a36a0eb732483d9556e56d182d7d5578b28385297b9cdcb2e19fab367",
+    "com/sun/jna/Function$PostCallRead.class": "ce4a5c85e64d9f48c0a727c33345d0bd21daf560166ff59889e27e4bae8265fa",
+    "com/sun/jna/Function.class": "dec6aa3358ef23c3b5793aae939d6d8d50ae75747201da2565439a1f1f625d56",
+    "com/sun/jna/FunctionMapper.class": "7bb511543f22eb0cacfc32e9f4feb39414862da19ba4cb821a13c7c185a90498",
+    "com/sun/jna/FunctionParameterContext.class": "64365cd093ab157251c2e5b7934ff4c362240e90b1fe37d21e3504ecdc9ece9f",
+    "com/sun/jna/FunctionResultContext.class": "ba4cd94d676a28fd021a36fec8e034b5741833662d1fdbe28548b0953bdd72a8",
+    "com/sun/jna/IntegerType.class": "9419da5687d607669b0dd064082d5073f808536db16f450354dc666abe24f5d9",
+    "com/sun/jna/InvocationMapper.class": "b9d5ae7caae5f55f03c80c5ec5519c568f239efa32d06f5b2122e40b80056d02",
+    "com/sun/jna/JNIEnv.class": "1aa2349d3483835ceeaf4c32a7041828f5de6b2fd2984145b59e1f2f6be0452a",
+    "com/sun/jna/Klass.class": "4a2029bd9f97c1d7bd2fc8cc2764f6f444641e9b35fbf1938a57980294b763fe",
+    "com/sun/jna/LastErrorException.class": "7c6e6246d4700af04221a8681ef93f850e1ca85009dac15169f6e15e42e13d7b",
+    "com/sun/jna/Library$Handler$FunctionInfo.class": "ff4b4009b1e943b1e98407fd9e370f9338a35668550a2281afba20957adcb5de",
+    "com/sun/jna/Library$Handler.class": "c43416aa047492b7df22280070f6d1271211d2ea8ffc7337c04064d663e374d2",
+    "com/sun/jna/Library.class": "c68ba441334a4c3a228b26eb164b7831f30b8da1d9799078ef6a6ee2797cbce9",
+    "com/sun/jna/Memory$MemoryDisposer.class": "0f0f3459f244f1a3e644aebcd77d592588e1f5f7ae4adfc81f683a608fb803a4",
+    "com/sun/jna/Memory$SharedMemory.class": "53f248d3733a67dde19474e41a4ae4ee52ac18460360837b18c076ff7f8986c7",
+    "com/sun/jna/Memory.class": "fa5960f8fd5a073eb2b1b876aa703f74ef982d767d82b1c45b0f7971dd18947c",
+    "com/sun/jna/MethodParameterContext.class": "e1a8399c6f05c96bcb8a0760196e98c438d5b1b8a7e9f40eb8cf01ff23ceb3b0",
+    "com/sun/jna/MethodResultContext.class": "41e0dfe3ef1c228fb4aa96e12b6f093dedfef848354832b8dcd944a467ed4797",
+    "com/sun/jna/Native$1.class": "8ea4f4dc4a40a97b8eac4432569b3ac7fe7734c34991d7ad75b028e587591776",
+    "com/sun/jna/Native$2.class": "8be67dbdb96826fc61fc9f07f05b009d619ebbd75ffa9a0b78d585b0d4b419d7",
+    "com/sun/jna/Native$3.class": "db1793d2a69bde21977419c79ad93c3dd1ff98e95de810a2f0eb9a56717b1cce",
+    "com/sun/jna/Native$4.class": "a9b5738bd857ccd12ac242601899a051c70b11e523c975d140371006a8979211",
+    "com/sun/jna/Native$5.class": "a5f2f88080b8fd820bb940af510792125129d9b29777341af4c9cbe8ce1f6d10",
+    "com/sun/jna/Native$6.class": "dcb6fd339c87611272e6c8084053e1fcb14ccb68e3c7c282d81ec887d0dc80fc",
+    "com/sun/jna/Native$7.class": "496e17423de7eca9202dd032bd85116ea6d91f2f3dcf359b944bf660f8a683ce",
+    "com/sun/jna/Native$AWT.class": "eac9607b74d97fe3bee8da179a18e7c5e274db1e623b3f00d845e8378ba3cb9f",
+    "com/sun/jna/Native$Buffers.class": "d82f6e9d668c79d02064a9972e38f7a66f3d7ba3d9c27e13a6ec62cbc2005253",
+    "com/sun/jna/Native$ffi_callback.class": "ff114a0d65a1c63de46c26edae8d27d2110f48e33f4179ac8dfea9e3d933cedf",
+    "com/sun/jna/Native.class": "6f56c0d3abda1fa760cca289170372d1c79acaa50b71ee5a05bb1c72f8427835",
+    "com/sun/jna/NativeLibrary$1.class": "6bb10f4fffd966828526fd8a980bc01cc81e5b97a24f37b21674a441ad8e7e5f",
+    "com/sun/jna/NativeLibrary$2.class": "6bf050fad9c29f5faec93cc8e86672d17a5b199165eedfe1a364904d77d5ca20",
+    "com/sun/jna/NativeLibrary$3.class": "41facc71fd42ba2eeaab82cbc7295848b7f5c30907001adaae0f96e938060322",
+    "com/sun/jna/NativeLibrary$NativeLibraryDisposer.class": "be9c9e1ca0fbd1c6a688adc9829aac87658bd435c2b3e142b2db2baf397d4b38",
+    "com/sun/jna/NativeLibrary.class": "ef46a20938e35e57478090eae2bbd85a952cc2fcf29d8a755f18140b3e965c96",
+    "com/sun/jna/NativeLong.class": "3486c03fc33896d9ae239883a6db7d5cedb0cb9cf007bc24c6c4a2e3bd67c7a3",
+    "com/sun/jna/NativeMapped.class": "cce0fdee9074ff6a0910cdf4105dba004c5c92387aae418eb0a07489d6cc5e32",
+    "com/sun/jna/NativeMappedConverter.class": "8dd9ef7bb1ad6ab6ec5d484c83f041cd2218546fa433cd7539ba814298e025ba",
+    "com/sun/jna/NativeString$StringMemory.class": "9471c4124e99b2fcf32912a70e5328ffbc19f128a6c8a844649b54658e09f964",
+    "com/sun/jna/NativeString.class": "c66781c4099671d796880fe3f41a2ec3d8b5d21b68805eb9b692c609ebdde515",
+    "com/sun/jna/Platform.class": "9555fe580c1b48d9bb9c0a17459a148ac6e99a445b45a61c4e798ba983600cfa",
+    "com/sun/jna/Pointer$1.class": "b58ade536217ae853f144afebcc5fc030eb066608a0ff2be9767e46e1c5aaf66",
+    "com/sun/jna/Pointer$Opaque.class": "cede48705622781489a110dab0493d6255dfcc1616620912c852fb30c8993a48",
+    "com/sun/jna/Pointer.class": "4d2e9186fb11f19f42448c049563251af6b38802262f827d7471cad0fa433237",
+    "com/sun/jna/PointerType.class": "451714d4bf2f5681283830eef9105c4b74585be1818349ed0f07e83072ac8e00",
+    "com/sun/jna/StringArray.class": "2484c36f5985ee280b1955acb5e0f4681b6604b0d39a20ba66541b73efc18519",
+    "com/sun/jna/Structure$1.class": "07453629ab3c64f1c5b5de08fb50b40831be8c65e22522e183dd8a8c6e37ea77",
+    "com/sun/jna/Structure$2.class": "09bb8050f6dbc4e4d859e430ca477d2c11181d98d339e1c0265d32dc901845d8",
+    "com/sun/jna/Structure$3.class": "90fc8b761e4c09baddbdf08451584635a7dfbadd990619a7d9e511fa635c1106",
+    "com/sun/jna/Structure$AutoAllocated.class": "df5e97a9264e1ae9a0cff634ec0d91700b34809e387aea99ceec599ea3cfa3a7",
+    "com/sun/jna/Structure$ByReference.class": "4037c961635e7c4e070c04dde31cd8dbca3b2304aa3805938fe246b9ebf615c9",
+    "com/sun/jna/Structure$ByValue.class": "bab1b90e6fc5454e03f563094132e51abd99d12c7ca91c9acae274524243051a",
+    "com/sun/jna/Structure$FFIType$FFITypes.class": "60c673ae407593e0167450635928d0a7b54622f10ef91622cde3333326e9bc98",
+    "com/sun/jna/Structure$FFIType$size_t.class": "c9effb7d7834ca311cec69910a301c81a376af09ac06c96963a7a51e7140aa4a",
+    "com/sun/jna/Structure$FFIType.class": "cf555c72f884d9938f9f726bffda7b64fddfbc4afc6da5ff515adf5e632784e9",
+    "com/sun/jna/Structure$FieldOrder.class": "aa81967a04f7255aa47f960aae30d050f7ae2cf4c13de350c375b5c9a94d9882",
+    "com/sun/jna/Structure$LayoutInfo.class": "82c224d7e4d658c25085e8c5e4ab0fbbfb3968f2da5d0d6466a25489b2e691c2",
+    "com/sun/jna/Structure$NativeStringTracking.class": "580115f23b41dd4b35a716d3c90cbde9b646aef846c8e8429b1dca8b138a5475",
+    "com/sun/jna/Structure$StructField.class": "c00696e71919655190426a5acf4760074137e3416c51a1190a02b7acd4ad0698",
+    "com/sun/jna/Structure$StructureSet.class": "a6aedfc899bfc10bf5bc79c5cec88e04b0731a7842aba23c55a159f012b7c6bd",
+    "com/sun/jna/Structure.class": "4da3aa59f120eb33adbd7ce3afe5869642c4fc0046acbb663831970105c1a776",
+    "com/sun/jna/StructureReadContext.class": "56e7424bb8d5e705194e55f55a7132e1c7bd38a0b113fe25282d5119982b499e",
+    "com/sun/jna/StructureWriteContext.class": "ed1a01c97b2dfa4d916cf87d07604c8b6710f13c60d88aa0fadfc35264e7aad9",
+    "com/sun/jna/SymbolProvider.class": "d43082a6f35bad50edabdf866dabb70a1e8db6937e6ea1711c4fa96d7a029119",
+    "com/sun/jna/ToNativeContext.class": "05356962422d75a8573f5c8521ffd9cc66be5c60f2b21aaca5a86d815e2db1c4",
+    "com/sun/jna/ToNativeConverter.class": "a5a0669c5de2fba230a80c2e7f02886b9a4971ce26a7095bb317c2905b7a8cf4",
+    "com/sun/jna/TypeConverter.class": "00aefb906cebc0b73c5c740937bba93410d1c0fb991ae71adea2944369c262f0",
+    "com/sun/jna/TypeMapper.class": "beff707ba4d95c9d090139d4b4c392eccb8d2c6c4ee2a01743acd5d7bb8af4e3",
+    "com/sun/jna/Union.class": "e91eb93990a653a9b7e7010721d742030f208e334b1ae6d7ad79013f206022fc",
+    "com/sun/jna/VarArgsChecker$1.class": "edfc7a13ea9e83101d1d245e3ffad45c992450dd445111e512a3670f59d022a5",
+    "com/sun/jna/VarArgsChecker$NoVarArgsChecker.class": "586c9d829d912ef0bc5fa1258a3924c38fecdc7a22ac184b72b530e4a5e3f960",
+    "com/sun/jna/VarArgsChecker$RealVarArgsChecker.class": "c6386fb4c98cb366cf1eab89690c3d1ac492217583a7f0da5dcbd8e493bc2d1d",
+    "com/sun/jna/VarArgsChecker.class": "669133cd72d22678fa882e14f80be0837213176c117eef25d9b7c8733f5b6c6d",
+    "com/sun/jna/Version.class": "c2fc1fdb0f31b1f04f9e3ce73a8242bcf2a146975b548e47759bddb8d8805972",
+    "com/sun/jna/WString.class": "693f8a7f66c7c35041647e2e845c52080726d02ae2b316278f03ba754acc8c55",
+    "com/sun/jna/WeakMemoryHolder.class": "681b6a4fc56be93c52ac00d9435726ffa0deb95c1902b5476234deeed86446ec",
+    "com/sun/jna/internal/Cleaner$1.class": "1d13bcabfea2fe212cc8b36fb38849cb2efb33dac8633c836f63e8660e911a37",
+    "com/sun/jna/internal/Cleaner$Cleanable.class": "23b483fd6cbce8f8607e82368e78e4b9584c0de40a417ef7b6dd465689bccac7",
+    "com/sun/jna/internal/Cleaner$CleanerRef.class": "69f5710ee864b9651f79bdedcdb42603c44cf7bdd3f101d4f375bf74fdeb64b9",
+    "com/sun/jna/internal/Cleaner.class": "9db94aed5c9a19f6a2707e4a32799446c715cc05bf39ed43f2c541fe1022b3e2",
+    "com/sun/jna/internal/ReflectionUtils.class": "ff065ce3562a22e4325a2bccc4b4bcadc89a5d59e5384a1741910e5a13dbdb32",
+    "com/sun/jna/ptr/ByReference.class": "47755a2cc62594389091c1fea719dd7ae1ea11b5b39b47b75a1a18d4b26e499c",
+    "com/sun/jna/ptr/ByteByReference.class": "af128dc1a66ea3a11920724757d2db882e141ec58d286a66a9e564cdb79af13f",
+    "com/sun/jna/ptr/DoubleByReference.class": "ba0c1ae96f1e6e06ec1cc8f7b346a5dac62fa634ee690cf0765b7422e1c7319b",
+    "com/sun/jna/ptr/FloatByReference.class": "6061afd286a3a2104461ba3985d64864a4501dfd05ed2bef93cd6b99ffcaa26a",
+    "com/sun/jna/ptr/IntByReference.class": "df3209204c5326e95161665d8f6079fb66ae7521ebc40dcfec7258a5855d6a15",
+    "com/sun/jna/ptr/LongByReference.class": "4e3f105ad77d11cc09d643940a7da3960c833b59059015b3ded598ce891f71c6",
+    "com/sun/jna/ptr/NativeLongByReference.class": "64b04c8a61402640a3a603e2cc8d1763192fa3af3e6723df47263d32bedc62e0",
+    "com/sun/jna/ptr/PointerByReference.class": "abd5c16dbaa3c36187b9cfeae6cc9115e21dadb419fc75980febbbfc720726cf",
+    "com/sun/jna/ptr/ShortByReference.class": "70efa8d3967f0e7b2e500cd0ca2d8662fdebf46bf9195d35fc54332525cbfe4e",
+    "com/sun/jna/win32/DLLCallback.class": "fdfa3d005a6da4e0e612b9a08e0e5ec212d72046dadf286efb15dda2eda68a1a",
+    "com/sun/jna/win32/StdCall.class": "09f9e5b48e873fb8ff2f94df9408b17cb622267fafec695e6157f04703c916a8",
+    "com/sun/jna/win32/StdCallFunctionMapper.class": "a2b46b65ae656fc91a96fa8475a51759cae89fee0235f617821d10f9952315a4",
+    "com/sun/jna/win32/StdCallLibrary$StdCallCallback.class": "c7ecf35b90ff2bff9ddd9afd6660128594902c2a1fbbcf64dad5271a77d2ede4",
+    "com/sun/jna/win32/StdCallLibrary.class": "01ac9f72ff9d85e9479d9239f4ebac09fc02605a4b712a913a0479a21e71c327",
+    "com/sun/jna/win32/W32APIFunctionMapper.class": "3b441237775866a1c73d47d30a0c0cc83bf60c46b0c6f92eb7f7ad0ce757542c",
+    "com/sun/jna/win32/W32APIOptions$1.class": "d07349b3ac6cbea902ab8252aacce61bec4427d3d24f085d936da4941bbcc52c",
+    "com/sun/jna/win32/W32APIOptions$2.class": "34ddd0775cab1a46dcbd4c9564140954e052b00a9f31917583f8eb91c3674a50",
+    "com/sun/jna/win32/W32APIOptions.class": "d0214d61ab5004507409133ffe3eea023b1216c256a6c10f5a6051bddb01167b",
+    "com/sun/jna/win32/W32APITypeMapper$1.class": "77f1427aa274de0b4fe124e433859460169ed69454a440fe754c5b48926f516f",
+    "com/sun/jna/win32/W32APITypeMapper$2.class": "94ca25d8e9904139fa557a6394ab79d0587c2007ae38bf00f5bdda5348dfc8d2",
+    "com/sun/jna/win32/W32APITypeMapper.class": "11754844a930bf98be971e3012309e80e10a928d4c7d1545d9efcc22fee686ba"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "479b5770438908641d36c66baf941fdd8e4217b24f5d34a4eba5e3f8d6f97fce",
+    "com/sun/jna/win32-x86/jnidispatch.dll": "1b06cba48eea2ad4881bc88a2749e40500dbc87c1a2149290eb61d473a64e4c1",
+    "com/sun/jna/aix-ppc/libjnidispatch.a": "610ec1a4af9761f85991d8f44ba1458f17202a68a86cc5400943fb9aad69aae2",
+    "com/sun/jna/aix-ppc64/libjnidispatch.a": "7b4edaedcacbeb2439ef43bcee365ad1e6a989156085d6ba764c8a939e7a5fb3",
+    "com/sun/jna/darwin-x86-64/libjnidispatch.jnilib": "592b5a09d047bcf302e503174f4e2b2978556b24c7b7069d17f6d30f59e8bd17",
+    "com/sun/jna/darwin-aarch64/libjnidispatch.jnilib": "32223f6ad4d1b3c5651bac44bf83e07207bf995987c6c6d6f839436ed75cf6ea",
+    "com/sun/jna/linux-x86/libjnidispatch.so": "91211a72a4babf0d1598c69ba49e7254fb6e1d106edfcb5c414e8d9b35b64394",
+    "com/sun/jna/linux-x86-64/libjnidispatch.so": "5f5b5f7a43bf5d669b9339876efd999756c887dc85406deb2d8a8ef935045b0f",
+    "com/sun/jna/linux-arm/libjnidispatch.so": "60c9b98aae984da350dfc1b9ce7e868b3cf2a5adf4fbf85a756afa70602ba135",
+    "com/sun/jna/linux-armel/libjnidispatch.so": "565319135f31ee227f19ddca48a831abd225e2e7a4f6f2e6fc3880cf753385b7",
+    "com/sun/jna/linux-aarch64/libjnidispatch.so": "0d0a0e6ae88416651b53f711101d3f8bb8fb59d5efe8173ab4924c1151443c69",
+    "com/sun/jna/linux-ppc/libjnidispatch.so": "10aa8adc5522bf215ba6d236400dad5ad2238d6f0da0b1c4595a4de6c163c200",
+    "com/sun/jna/linux-ppc64le/libjnidispatch.so": "d12e08b83318e202eaefb54958b31543c894eda6673f361022e21474d62b686b",
+    "com/sun/jna/linux-mips64el/libjnidispatch.so": "404c12ac3cb56c4f50e7c9df95279cdc7e728c657fb8cb8ed6943c43240c175a",
+    "com/sun/jna/linux-loongarch64/libjnidispatch.so": "3566b95e0f307fd25d18a461587c644e112db0ad9ca2d9e2da05527782f48728",
+    "com/sun/jna/linux-s390x/libjnidispatch.so": "941a30fbce7e3c96c3946f083d47f8064320c3785305b755fdbbbc865daffcdf",
+    "com/sun/jna/linux-riscv64/libjnidispatch.so": "dfe7b9491c2ebc39e0f54a921b219a1cdb6ff4f88c1f727b7e9d642fc512f55c",
+    "com/sun/jna/sunos-x86/libjnidispatch.so": "d1e83636af7ecfc426badff53bf2c1e15ff2c341bdfccb06e566a907e5c2366b",
+    "com/sun/jna/sunos-x86-64/libjnidispatch.so": "6daf568a88fc44f7fd97c814ba7e2e6ce2290aafd7585055efc0d8bcabe0f099",
+    "com/sun/jna/sunos-sparc/libjnidispatch.so": "c44df08b9c9406c0314bf24273cd29b1d29f38987d40c27d1ebe6dadabf87569",
+    "com/sun/jna/sunos-sparcv9/libjnidispatch.so": "1cd8d358b5647bdbef37146ccb34345e9450eea918f6b4775ca038897432e926",
+    "com/sun/jna/freebsd-x86/libjnidispatch.so": "431b48290cc2df7c4348e7549506dadab2ba68268f5c4b52273826f4f74a6d36",
+    "com/sun/jna/freebsd-x86-64/libjnidispatch.so": "bd4290041f792c54b1f6f4e19b3fa890450b8ca0173513cbed63171bd34dc865",
+    "com/sun/jna/openbsd-x86/libjnidispatch.so": "d69ea4c6b162ce696cfeaefbd7c186b2d8f33bc6dcf6229e1557abce94516c00",
+    "com/sun/jna/openbsd-x86-64/libjnidispatch.so": "538e6326e1a337abea3cbb35dc83f167696cf79b030ad22c07b76dd11128e20a",
+    "com/sun/jna/win32-x86-64/jnidispatch.dll": "13b2cac3f50368ab97fa2e3b0d0d2cb612f68449d5bbd6de187fc85ee4469d03",
+    "com/sun/jna/win32-aarch64/jnidispatch.dll": "29fe4c6371b0b1685909c5b5f69d4976244006f81a2ffc9342a8948bbd8fa8a0",
+    "META-INF/AL2.0": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+    "META-INF/LGPL2.1": "eea173a556abac0370461e57e12aab266894ea6be3874c2be05fd87871f75449",
+    "META-INF/LICENSE": "521bb271ac56e0e29a1b1b688b94af17d00d378fc8e63478d8c8b2a7c4a229d0"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/sun/jna/AltCallingConvention.class",
+      "occurrence": 0,
+      "sha256": "e993a7528904e00251c71a6f716cbe91579d8410363c0ef971b51f2cbd1d049c",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Callback$UncaughtExceptionHandler.class",
+      "occurrence": 0,
+      "sha256": "7ac90409c502dfb61cf7c079aa2f6d0548c745cf888778fbf4230cc68e8e98ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Callback.class",
+      "occurrence": 0,
+      "sha256": "d711e26545d9da4762b0c0acfb80155114ed652b879cf6e953d403103bbce043",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackParameterContext.class",
+      "occurrence": 0,
+      "sha256": "4a333a49236e31f8769a1db81f84faebe19c9c911011e34985fe04b29387e7a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackProxy.class",
+      "occurrence": 0,
+      "sha256": "8beb020ef5807a611c5f0db7caa708a1861bb6c3042cf160d325bfdd7ed7b89b",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackReference$AttachOptions.class",
+      "occurrence": 0,
+      "sha256": "6d18a7f6b091c9fb013f6a8608e433053384f550dbe1dcfd5a8b83e52e55d2a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackReference$CallbackReferenceDisposer.class",
+      "occurrence": 0,
+      "sha256": "85b8b9b0b255c212cea252faed8f85675e5cd8f204f01648ec9803cf80110652",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackReference$DefaultCallbackProxy.class",
+      "occurrence": 0,
+      "sha256": "eb30820611908018b379c934be6c61fdbf04b4725a961afef9e8bd3f65188ad0",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackReference$NativeFunctionHandler.class",
+      "occurrence": 0,
+      "sha256": "6d74704dc46ea34ab440fc0ef1203d0f87f8ed5585031e0043c0cced42c901c2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackReference.class",
+      "occurrence": 0,
+      "sha256": "238626f5a52ac2e27c8d46743211b76a9b9890dea7134e53eba0974eb2324a32",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackResultContext.class",
+      "occurrence": 0,
+      "sha256": "fccc1d8810194b39bdf71a072823c07aa44c86d83b8e97a862aae2bb1852cd08",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/CallbackThreadInitializer.class",
+      "occurrence": 0,
+      "sha256": "9513ffb97d38926bc4ea50e60a2696dd3e698d4a090cc5f8165d838390a849d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/DefaultTypeMapper$Entry.class",
+      "occurrence": 0,
+      "sha256": "e139b98c8c62a821f5e55542b517549b0a344e6f46ade755d5b51ddbec225500",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/DefaultTypeMapper.class",
+      "occurrence": 0,
+      "sha256": "9225ebd32cb7c3b04ed78ebef3a9f103cff792907d29200df0e600d437d0f41b",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser$1.class",
+      "occurrence": 0,
+      "sha256": "cc97253b5741962174d82358000bdbab4f723299151c5d434f1d8bc6a9ee4f16",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser$ArmAeabiAttributesTag$ParameterType.class",
+      "occurrence": 0,
+      "sha256": "853754393c19297c3cacabd65a514c2ad28a5a0f24ee88c12bfb45da38d9a1ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser$ArmAeabiAttributesTag.class",
+      "occurrence": 0,
+      "sha256": "14d81cea2e617fdc50e16afa47d59c2f6395e155502717bb81d65aa727e1c5c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser$ELFSectionHeaderEntry.class",
+      "occurrence": 0,
+      "sha256": "95951b35be10add5eb49b4fc99178c2d90034a1f5584314a99fc5f3054db4208",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser$ELFSectionHeaders.class",
+      "occurrence": 0,
+      "sha256": "ed2bdb98ce26259d6c8de8139539da80f506019063088081bca7a4b8e0134128",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/ELFAnalyser.class",
+      "occurrence": 0,
+      "sha256": "440e007326e1ab8d9bc555c11cdc18cb0713867f1f7ccd0429fc4693b8175225",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/FromNativeContext.class",
+      "occurrence": 0,
+      "sha256": "08f92e873935f7eeeac13cba76709c1eee52a48e9e2c04a093e2ecd9066f28db",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/FromNativeConverter.class",
+      "occurrence": 0,
+      "sha256": "0a585545bca99bd2f213624204cced97ddf20725ca756173c053676d35ab48e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Function$NativeMappedArray.class",
+      "occurrence": 0,
+      "sha256": "6d8709d9973d94603bc779003604fe5e9c5a1e69a82bce5430667f3e83f4c910",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Function$PointerArray.class",
+      "occurrence": 0,
+      "sha256": "5e3a579a36a0eb732483d9556e56d182d7d5578b28385297b9cdcb2e19fab367",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Function$PostCallRead.class",
+      "occurrence": 0,
+      "sha256": "ce4a5c85e64d9f48c0a727c33345d0bd21daf560166ff59889e27e4bae8265fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Function.class",
+      "occurrence": 0,
+      "sha256": "dec6aa3358ef23c3b5793aae939d6d8d50ae75747201da2565439a1f1f625d56",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/FunctionMapper.class",
+      "occurrence": 0,
+      "sha256": "7bb511543f22eb0cacfc32e9f4feb39414862da19ba4cb821a13c7c185a90498",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/FunctionParameterContext.class",
+      "occurrence": 0,
+      "sha256": "64365cd093ab157251c2e5b7934ff4c362240e90b1fe37d21e3504ecdc9ece9f",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/FunctionResultContext.class",
+      "occurrence": 0,
+      "sha256": "ba4cd94d676a28fd021a36fec8e034b5741833662d1fdbe28548b0953bdd72a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/IntegerType.class",
+      "occurrence": 0,
+      "sha256": "9419da5687d607669b0dd064082d5073f808536db16f450354dc666abe24f5d9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/InvocationMapper.class",
+      "occurrence": 0,
+      "sha256": "b9d5ae7caae5f55f03c80c5ec5519c568f239efa32d06f5b2122e40b80056d02",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/JNIEnv.class",
+      "occurrence": 0,
+      "sha256": "1aa2349d3483835ceeaf4c32a7041828f5de6b2fd2984145b59e1f2f6be0452a",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Klass.class",
+      "occurrence": 0,
+      "sha256": "4a2029bd9f97c1d7bd2fc8cc2764f6f444641e9b35fbf1938a57980294b763fe",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/LastErrorException.class",
+      "occurrence": 0,
+      "sha256": "7c6e6246d4700af04221a8681ef93f850e1ca85009dac15169f6e15e42e13d7b",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Library$Handler$FunctionInfo.class",
+      "occurrence": 0,
+      "sha256": "ff4b4009b1e943b1e98407fd9e370f9338a35668550a2281afba20957adcb5de",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Library$Handler.class",
+      "occurrence": 0,
+      "sha256": "c43416aa047492b7df22280070f6d1271211d2ea8ffc7337c04064d663e374d2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Library.class",
+      "occurrence": 0,
+      "sha256": "c68ba441334a4c3a228b26eb164b7831f30b8da1d9799078ef6a6ee2797cbce9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Memory$MemoryDisposer.class",
+      "occurrence": 0,
+      "sha256": "0f0f3459f244f1a3e644aebcd77d592588e1f5f7ae4adfc81f683a608fb803a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Memory$SharedMemory.class",
+      "occurrence": 0,
+      "sha256": "53f248d3733a67dde19474e41a4ae4ee52ac18460360837b18c076ff7f8986c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Memory.class",
+      "occurrence": 0,
+      "sha256": "fa5960f8fd5a073eb2b1b876aa703f74ef982d767d82b1c45b0f7971dd18947c",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/MethodParameterContext.class",
+      "occurrence": 0,
+      "sha256": "e1a8399c6f05c96bcb8a0760196e98c438d5b1b8a7e9f40eb8cf01ff23ceb3b0",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/MethodResultContext.class",
+      "occurrence": 0,
+      "sha256": "41e0dfe3ef1c228fb4aa96e12b6f093dedfef848354832b8dcd944a467ed4797",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$1.class",
+      "occurrence": 0,
+      "sha256": "8ea4f4dc4a40a97b8eac4432569b3ac7fe7734c34991d7ad75b028e587591776",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$2.class",
+      "occurrence": 0,
+      "sha256": "8be67dbdb96826fc61fc9f07f05b009d619ebbd75ffa9a0b78d585b0d4b419d7",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$3.class",
+      "occurrence": 0,
+      "sha256": "db1793d2a69bde21977419c79ad93c3dd1ff98e95de810a2f0eb9a56717b1cce",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$4.class",
+      "occurrence": 0,
+      "sha256": "a9b5738bd857ccd12ac242601899a051c70b11e523c975d140371006a8979211",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$5.class",
+      "occurrence": 0,
+      "sha256": "a5f2f88080b8fd820bb940af510792125129d9b29777341af4c9cbe8ce1f6d10",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$6.class",
+      "occurrence": 0,
+      "sha256": "dcb6fd339c87611272e6c8084053e1fcb14ccb68e3c7c282d81ec887d0dc80fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$7.class",
+      "occurrence": 0,
+      "sha256": "496e17423de7eca9202dd032bd85116ea6d91f2f3dcf359b944bf660f8a683ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$AWT.class",
+      "occurrence": 0,
+      "sha256": "eac9607b74d97fe3bee8da179a18e7c5e274db1e623b3f00d845e8378ba3cb9f",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$Buffers.class",
+      "occurrence": 0,
+      "sha256": "d82f6e9d668c79d02064a9972e38f7a66f3d7ba3d9c27e13a6ec62cbc2005253",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native$ffi_callback.class",
+      "occurrence": 0,
+      "sha256": "ff114a0d65a1c63de46c26edae8d27d2110f48e33f4179ac8dfea9e3d933cedf",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Native.class",
+      "occurrence": 0,
+      "sha256": "6f56c0d3abda1fa760cca289170372d1c79acaa50b71ee5a05bb1c72f8427835",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLibrary$1.class",
+      "occurrence": 0,
+      "sha256": "6bb10f4fffd966828526fd8a980bc01cc81e5b97a24f37b21674a441ad8e7e5f",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLibrary$2.class",
+      "occurrence": 0,
+      "sha256": "6bf050fad9c29f5faec93cc8e86672d17a5b199165eedfe1a364904d77d5ca20",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLibrary$3.class",
+      "occurrence": 0,
+      "sha256": "41facc71fd42ba2eeaab82cbc7295848b7f5c30907001adaae0f96e938060322",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLibrary$NativeLibraryDisposer.class",
+      "occurrence": 0,
+      "sha256": "be9c9e1ca0fbd1c6a688adc9829aac87658bd435c2b3e142b2db2baf397d4b38",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLibrary.class",
+      "occurrence": 0,
+      "sha256": "ef46a20938e35e57478090eae2bbd85a952cc2fcf29d8a755f18140b3e965c96",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeLong.class",
+      "occurrence": 0,
+      "sha256": "3486c03fc33896d9ae239883a6db7d5cedb0cb9cf007bc24c6c4a2e3bd67c7a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeMapped.class",
+      "occurrence": 0,
+      "sha256": "cce0fdee9074ff6a0910cdf4105dba004c5c92387aae418eb0a07489d6cc5e32",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeMappedConverter.class",
+      "occurrence": 0,
+      "sha256": "8dd9ef7bb1ad6ab6ec5d484c83f041cd2218546fa433cd7539ba814298e025ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeString$StringMemory.class",
+      "occurrence": 0,
+      "sha256": "9471c4124e99b2fcf32912a70e5328ffbc19f128a6c8a844649b54658e09f964",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/NativeString.class",
+      "occurrence": 0,
+      "sha256": "c66781c4099671d796880fe3f41a2ec3d8b5d21b68805eb9b692c609ebdde515",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Platform.class",
+      "occurrence": 0,
+      "sha256": "9555fe580c1b48d9bb9c0a17459a148ac6e99a445b45a61c4e798ba983600cfa",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Pointer$1.class",
+      "occurrence": 0,
+      "sha256": "b58ade536217ae853f144afebcc5fc030eb066608a0ff2be9767e46e1c5aaf66",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Pointer$Opaque.class",
+      "occurrence": 0,
+      "sha256": "cede48705622781489a110dab0493d6255dfcc1616620912c852fb30c8993a48",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Pointer.class",
+      "occurrence": 0,
+      "sha256": "4d2e9186fb11f19f42448c049563251af6b38802262f827d7471cad0fa433237",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/PointerType.class",
+      "occurrence": 0,
+      "sha256": "451714d4bf2f5681283830eef9105c4b74585be1818349ed0f07e83072ac8e00",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/StringArray.class",
+      "occurrence": 0,
+      "sha256": "2484c36f5985ee280b1955acb5e0f4681b6604b0d39a20ba66541b73efc18519",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$1.class",
+      "occurrence": 0,
+      "sha256": "07453629ab3c64f1c5b5de08fb50b40831be8c65e22522e183dd8a8c6e37ea77",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$2.class",
+      "occurrence": 0,
+      "sha256": "09bb8050f6dbc4e4d859e430ca477d2c11181d98d339e1c0265d32dc901845d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$3.class",
+      "occurrence": 0,
+      "sha256": "90fc8b761e4c09baddbdf08451584635a7dfbadd990619a7d9e511fa635c1106",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$AutoAllocated.class",
+      "occurrence": 0,
+      "sha256": "df5e97a9264e1ae9a0cff634ec0d91700b34809e387aea99ceec599ea3cfa3a7",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$ByReference.class",
+      "occurrence": 0,
+      "sha256": "4037c961635e7c4e070c04dde31cd8dbca3b2304aa3805938fe246b9ebf615c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$ByValue.class",
+      "occurrence": 0,
+      "sha256": "bab1b90e6fc5454e03f563094132e51abd99d12c7ca91c9acae274524243051a",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$FFIType$FFITypes.class",
+      "occurrence": 0,
+      "sha256": "60c673ae407593e0167450635928d0a7b54622f10ef91622cde3333326e9bc98",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$FFIType$size_t.class",
+      "occurrence": 0,
+      "sha256": "c9effb7d7834ca311cec69910a301c81a376af09ac06c96963a7a51e7140aa4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$FFIType.class",
+      "occurrence": 0,
+      "sha256": "cf555c72f884d9938f9f726bffda7b64fddfbc4afc6da5ff515adf5e632784e9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$FieldOrder.class",
+      "occurrence": 0,
+      "sha256": "aa81967a04f7255aa47f960aae30d050f7ae2cf4c13de350c375b5c9a94d9882",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$LayoutInfo.class",
+      "occurrence": 0,
+      "sha256": "82c224d7e4d658c25085e8c5e4ab0fbbfb3968f2da5d0d6466a25489b2e691c2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/001.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$NativeStringTracking.class",
+      "occurrence": 0,
+      "sha256": "580115f23b41dd4b35a716d3c90cbde9b646aef846c8e8429b1dca8b138a5475",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$StructField.class",
+      "occurrence": 0,
+      "sha256": "c00696e71919655190426a5acf4760074137e3416c51a1190a02b7acd4ad0698",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure$StructureSet.class",
+      "occurrence": 0,
+      "sha256": "a6aedfc899bfc10bf5bc79c5cec88e04b0731a7842aba23c55a159f012b7c6bd",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/Structure.class",
+      "occurrence": 0,
+      "sha256": "4da3aa59f120eb33adbd7ce3afe5869642c4fc0046acbb663831970105c1a776",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/StructureReadContext.class",
+      "occurrence": 0,
+      "sha256": "56e7424bb8d5e705194e55f55a7132e1c7bd38a0b113fe25282d5119982b499e",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/StructureWriteContext.class",
+      "occurrence": 0,
+      "sha256": "ed1a01c97b2dfa4d916cf87d07604c8b6710f13c60d88aa0fadfc35264e7aad9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/SymbolProvider.class",
+      "occurrence": 0,
+      "sha256": "d43082a6f35bad50edabdf866dabb70a1e8db6937e6ea1711c4fa96d7a029119",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ToNativeContext.class",
+      "occurrence": 0,
+      "sha256": "05356962422d75a8573f5c8521ffd9cc66be5c60f2b21aaca5a86d815e2db1c4",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ToNativeConverter.class",
+      "occurrence": 0,
+      "sha256": "a5a0669c5de2fba230a80c2e7f02886b9a4971ce26a7095bb317c2905b7a8cf4",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/TypeConverter.class",
+      "occurrence": 0,
+      "sha256": "00aefb906cebc0b73c5c740937bba93410d1c0fb991ae71adea2944369c262f0",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/TypeMapper.class",
+      "occurrence": 0,
+      "sha256": "beff707ba4d95c9d090139d4b4c392eccb8d2c6c4ee2a01743acd5d7bb8af4e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/Union.class",
+      "occurrence": 0,
+      "sha256": "e91eb93990a653a9b7e7010721d742030f208e334b1ae6d7ad79013f206022fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/VarArgsChecker$1.class",
+      "occurrence": 0,
+      "sha256": "edfc7a13ea9e83101d1d245e3ffad45c992450dd445111e512a3670f59d022a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/VarArgsChecker$NoVarArgsChecker.class",
+      "occurrence": 0,
+      "sha256": "586c9d829d912ef0bc5fa1258a3924c38fecdc7a22ac184b72b530e4a5e3f960",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/VarArgsChecker$RealVarArgsChecker.class",
+      "occurrence": 0,
+      "sha256": "c6386fb4c98cb366cf1eab89690c3d1ac492217583a7f0da5dcbd8e493bc2d1d",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/VarArgsChecker.class",
+      "occurrence": 0,
+      "sha256": "669133cd72d22678fa882e14f80be0837213176c117eef25d9b7c8733f5b6c6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/Version.class",
+      "occurrence": 0,
+      "sha256": "c2fc1fdb0f31b1f04f9e3ce73a8242bcf2a146975b548e47759bddb8d8805972",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/WString.class",
+      "occurrence": 0,
+      "sha256": "693f8a7f66c7c35041647e2e845c52080726d02ae2b316278f03ba754acc8c55",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/WeakMemoryHolder.class",
+      "occurrence": 0,
+      "sha256": "681b6a4fc56be93c52ac00d9435726ffa0deb95c1902b5476234deeed86446ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/internal/Cleaner$1.class",
+      "occurrence": 0,
+      "sha256": "1d13bcabfea2fe212cc8b36fb38849cb2efb33dac8633c836f63e8660e911a37",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/internal/Cleaner$Cleanable.class",
+      "occurrence": 0,
+      "sha256": "23b483fd6cbce8f8607e82368e78e4b9584c0de40a417ef7b6dd465689bccac7",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/internal/Cleaner$CleanerRef.class",
+      "occurrence": 0,
+      "sha256": "69f5710ee864b9651f79bdedcdb42603c44cf7bdd3f101d4f375bf74fdeb64b9",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/internal/Cleaner.class",
+      "occurrence": 0,
+      "sha256": "9db94aed5c9a19f6a2707e4a32799446c715cc05bf39ed43f2c541fe1022b3e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/internal/ReflectionUtils.class",
+      "occurrence": 0,
+      "sha256": "ff065ce3562a22e4325a2bccc4b4bcadc89a5d59e5384a1741910e5a13dbdb32",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/ByReference.class",
+      "occurrence": 0,
+      "sha256": "47755a2cc62594389091c1fea719dd7ae1ea11b5b39b47b75a1a18d4b26e499c",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/ByteByReference.class",
+      "occurrence": 0,
+      "sha256": "af128dc1a66ea3a11920724757d2db882e141ec58d286a66a9e564cdb79af13f",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/DoubleByReference.class",
+      "occurrence": 0,
+      "sha256": "ba0c1ae96f1e6e06ec1cc8f7b346a5dac62fa634ee690cf0765b7422e1c7319b",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/FloatByReference.class",
+      "occurrence": 0,
+      "sha256": "6061afd286a3a2104461ba3985d64864a4501dfd05ed2bef93cd6b99ffcaa26a",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/IntByReference.class",
+      "occurrence": 0,
+      "sha256": "df3209204c5326e95161665d8f6079fb66ae7521ebc40dcfec7258a5855d6a15",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/LongByReference.class",
+      "occurrence": 0,
+      "sha256": "4e3f105ad77d11cc09d643940a7da3960c833b59059015b3ded598ce891f71c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/NativeLongByReference.class",
+      "occurrence": 0,
+      "sha256": "64b04c8a61402640a3a603e2cc8d1763192fa3af3e6723df47263d32bedc62e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/PointerByReference.class",
+      "occurrence": 0,
+      "sha256": "abd5c16dbaa3c36187b9cfeae6cc9115e21dadb419fc75980febbbfc720726cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/ptr/ShortByReference.class",
+      "occurrence": 0,
+      "sha256": "70efa8d3967f0e7b2e500cd0ca2d8662fdebf46bf9195d35fc54332525cbfe4e",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/DLLCallback.class",
+      "occurrence": 0,
+      "sha256": "fdfa3d005a6da4e0e612b9a08e0e5ec212d72046dadf286efb15dda2eda68a1a",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/StdCall.class",
+      "occurrence": 0,
+      "sha256": "09f9e5b48e873fb8ff2f94df9408b17cb622267fafec695e6157f04703c916a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/StdCallFunctionMapper.class",
+      "occurrence": 0,
+      "sha256": "a2b46b65ae656fc91a96fa8475a51759cae89fee0235f617821d10f9952315a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/StdCallLibrary$StdCallCallback.class",
+      "occurrence": 0,
+      "sha256": "c7ecf35b90ff2bff9ddd9afd6660128594902c2a1fbbcf64dad5271a77d2ede4",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/StdCallLibrary.class",
+      "occurrence": 0,
+      "sha256": "01ac9f72ff9d85e9479d9239f4ebac09fc02605a4b712a913a0479a21e71c327",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APIFunctionMapper.class",
+      "occurrence": 0,
+      "sha256": "3b441237775866a1c73d47d30a0c0cc83bf60c46b0c6f92eb7f7ad0ce757542c",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APIOptions$1.class",
+      "occurrence": 0,
+      "sha256": "d07349b3ac6cbea902ab8252aacce61bec4427d3d24f085d936da4941bbcc52c",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APIOptions$2.class",
+      "occurrence": 0,
+      "sha256": "34ddd0775cab1a46dcbd4c9564140954e052b00a9f31917583f8eb91c3674a50",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APIOptions.class",
+      "occurrence": 0,
+      "sha256": "d0214d61ab5004507409133ffe3eea023b1216c256a6c10f5a6051bddb01167b",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APITypeMapper$1.class",
+      "occurrence": 0,
+      "sha256": "77f1427aa274de0b4fe124e433859460169ed69454a440fe754c5b48926f516f",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APITypeMapper$2.class",
+      "occurrence": 0,
+      "sha256": "94ca25d8e9904139fa557a6394ab79d0587c2007ae38bf00f5bdda5348dfc8d2",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    },
+    {
+      "entry": "com/sun/jna/win32/W32APITypeMapper.class",
+      "occurrence": 0,
+      "sha256": "11754844a930bf98be971e3012309e80e10a928d4c7d1545d9efcc22fee686ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/059/002.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/059/001.json",
+      "sha256": "aed287f279fd8d2056d089354427a9af25d167545c803538e17297fff88113ec"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/059/002.json",
+      "sha256": "9ab0ba7d9d50f9ad18268ce3727a4ccfc0a64ff405d9a91e55177b6e924980c7"
+    }
+  ]
+}

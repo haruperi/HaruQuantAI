@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+  "archive_sha256": "188e5c2312faf36246d0c7d71a2312a9a51f21c2049bec9cd30b98fedec07e24",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet.class",
+      "occurrence": 0,
+      "sha256": "c2681809ab6b6321efa4ec8f3a9303ecbb89716d14397e3d18d3681214103500",
+      "name": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lcom/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet;",
+          "access": 10
+        },
+        {
+          "name": "getAllResponse",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "69aa4e64253db9724f37e8db4fc25f49ce6490131124af6acd2f0b4f321f28fa",
+          "code_length": 14
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lcom/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet;",
+          "access": 9,
+          "code_sha256": "fc16f656815240177c1bda87f71429a9065d7f20b8753f70b0a6fe7f8731fdac",
+          "code_length": 4
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "2b9eee195d96955b8d50385ac5aca27821cdb609b5ece0d2ca02c50c24863024",
+          "code_length": 120,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bf65f72265ac1cf0d6c16c571e4216c39a6edf487ac8e97d8194160b8b737e7b",
+          "code_length": 6575
+        },
+        {
+          "name": "onListCommissionMethods",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "683042cf39858c5870b0c466acff6f4e4d820d4b4179aa2d584ea66b6a488d57",
+          "code_length": 83
+        },
+        {
+          "name": "getCommissionMethodsJSON",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "3878c7278857d5d8129fc926fdf4279a52625bab3533cba92a3c3627555e8eab",
+          "code_length": 130
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "53337044dda0d055d67d93894fedc7e6449ba09251aa2161ef70a04eefd76a49",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/customData/CustomDataTypes",
+        "com/strategyquant/datalib/data/imports/Separators",
+        "com/strategyquant/datalib/timezone/Timezone",
+        "com/strategyquant/datalib/timezone/Timezones",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/lib/whitelabel/AbstractBroker",
+        "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/DatabankSyncTypes",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/GCTypes",
+        "com/strategyquant/tradinglib/MemoryCleaner",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/PortfolioInitialBalanceTypes",
+        "com/strategyquant/tradinglib/ResultTypes",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SwapTypes",
+        "com/strategyquant/tradinglib/TripleSwapOptions",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/atm/ATMMoveSL2BETypes",
+        "com/strategyquant/tradinglib/atm/ATMTypes",
+        "com/strategyquant/tradinglib/atm/exits/ATMExitLevels",
+        "com/strategyquant/tradinglib/atm/sizes/ATMSizes",
+        "com/strategyquant/tradinglib/commissions/CommissionsMethodsList",
+        "com/strategyquant/tradinglib/correlation/CorrelationPeriodTypes",
+        "com/strategyquant/tradinglib/correlation/CorrelationTypes",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckMethod",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/crosscheck/WalkForwardCrossCheckMethod",
+        "com/strategyquant/tradinglib/data/DataRanges",
+        "com/strategyquant/tradinglib/databank/DatabankChange",
+        "com/strategyquant/tradinglib/databank/DatabankColumnTypes",
+        "com/strategyquant/tradinglib/equitychart/EquityChart",
+        "com/strategyquant/tradinglib/exception/StrategyProblem",
+        "com/strategyquant/tradinglib/optimization/OptimizationConst",
+        "com/strategyquant/tradinglib/performance/Performance",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "com/strategyquant/tradinglib/project/ProjectConditionField",
+        "com/strategyquant/tradinglib/project/ProjectConditions",
+        "com/strategyquant/tradinglib/project/ProjectResources",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "com/strategyquant/tradinglib/project/websocket/channels/ProjectChannels",
+        "com/strategyquant/tradinglib/propertygrid/ParametersTableItemProperties",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/SimpleStrategyTypes",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "com/strategyquant/tradinglib/task/settings/buildmode/GenerationTypes",
+        "com/strategyquant/tradinglib/task/settings/buildmode/StopConditionTypes",
+        "com/strategyquant/tradinglib/task/settings/buildtype/ImproveTypes",
+        "com/strategyquant/tradinglib/task/settings/buildtype/StrategyArchitectures",
+        "com/strategyquant/tradinglib/task/settings/buildtype/StrategyDirections",
+        "com/strategyquant/tradinglib/task/settings/buildtype/StrategyTypes",
+        "com/strategyquant/tradinglib/task/settings/partstoimprove/ImproveActionTypes",
+        "com/strategyquant/tradinglib/tasks/HelpTexts",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "2fb754dc48192de6f8cd61f16d8602587665f33fd249dd284558803df97f4795",
+      "name": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServletPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "connectionContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5e69ab3f9352140ea715ac7b95f1861ae92aa86d8e57a325be073f6c7eee2181",
+          "code_length": 56
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet",
+        "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServletPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    }
+  ]
+}

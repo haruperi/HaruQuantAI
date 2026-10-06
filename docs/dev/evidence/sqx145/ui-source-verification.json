@@ -1,0 +1,2211 @@
+{
+  "reference_cohort": "145-dev1",
+  "captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "source_maps": 77,
+  "sources": [
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/acceptedStatsPopup.html",
+      "sha256": "4bccc809f34137db9aef6622c4a72729a125250663849fe4f1ff71dfd566fe92"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
+      "sha256": "aa649441f22ffb064ebc44ecb9177a960b781ec9bbaa7ccc4a965623d543ff2b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanel.js",
+      "sha256": "5a04835ecdb765a3ff691c74abb99326b2662732644f1c22d03370f4fcb311fe"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanelCtrl.js",
+      "sha256": "0264271cda4a5c2153d810a3d2a13928b980a3ac28717c6679e918b7635b2589"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/fitnessEvolution/fitnessEvolution.html",
+      "sha256": "03bb930fb4cbe9d611498a5f06055468b352b1ed8acf3459d9798c1d541b95f5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionCtrl.js",
+      "sha256": "ee4c540b419dd3bb29ace9795a85bc2ea4727cdf175d85af05bc552f1bde7401"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js",
+      "sha256": "3769c9bb7d2e7bff865bf3009bf122e14998a92d0131b1183f648eb13dc23eb8"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/directives/fitnessEvolution/module.js",
+      "sha256": "9232b12121e4f0e0d312baf6dc60950787a9afb2218f8bf298fe64cd496a2dd7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/dismissalStatsPopup.html",
+      "sha256": "d140a851b12010fbb567977d61edcb28f1fee04936121ed5b9459f106d819a89"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/durationStatsPopup.html",
+      "sha256": "67f36a5f1ed7c7a787496d6a8ec79bd86d69c77d4d17bc3e2ee68dfc57a7d4d7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/engine.html",
+      "sha256": "6f506b69ebd3b04893871abba400b3beed4ce307fcc2b35975105a0e82d2f62b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/EngineCtrl.js",
+      "sha256": "956d7344c57fe821b6dc82a5364c5fb227a88c777d356ed585769f5da11b3206"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.css",
+      "sha256": "b8610fd0c4a6b348236d554657cedfc406b59df5fbac5912bed08d23f04e03d2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.db",
+      "sha256": "2d8530811b8c20daabd98a4a70beafbd63d6ed7239f1eec9b7a5228152755ece"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.jar",
+      "sha256": "41c3a4e9037ddde57eefcafb911db5d3fb9626d76c7adead17217bceaa7fdeeb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/EngineService.js",
+      "sha256": "a2fdd9974b394353def53450ef43c21594c44b6d574aa38b7ca55666887e2b69"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/module.js",
+      "sha256": "ca0cc0e86f78d3da20da992684f591a187162b3f9581065fb264210fe67ac473"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/projectConfigHelpPopup.html",
+      "sha256": "7ea0b28d1c52f9f35c9b0172d65b0731c22661befe60cc4cd0b8ef3bd958fc2d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/textLogPopup.html",
+      "sha256": "15bbfeb274a1b29dc49a92bc271d954a152e7eb0fbd49e9e89244dce5d65c469"
+    },
+    {
+      "source_map": "ui/app/plugins/project/EnginePanel/source-map.json",
+      "artifact_locator": "internal/plugins/EnginePanel/visualLogPopup.html",
+      "sha256": "d3a0bf32dee083f7e04af60d7863f909e70576fca87f4da2853942ae0d30a96b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/module.js",
+      "sha256": "18600fc4627b12bfcab4a01cb5208ac5a3a91ce08da7c95ffae32f7ad379313e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/RankingCtrl.js",
+      "sha256": "78b63a957951209309d644eaa6ff15d7bb259a281788ad896c20d1a82bc7480b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/RankingService.js",
+      "sha256": "de375a0e6d46c400e46ed46af59cbe2dd8a62292e04617ee6b35334e35e19fb4"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/SettingsRankings.jar",
+      "sha256": "abbe6504b602945607a4f412bf247fe5710481d7726056398957ac6f5886da06"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/styles.css",
+      "sha256": "ec44e30d0b43628e5d0cc9f89c9bd12594f7e51e453ae43ef506743bbdd98a28"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/WFDefaultConditions.xml",
+      "sha256": "097c5642d34409c2747449b9bf02425fedb833b8ecad367bc3856e4ad368a887"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/FitnessFunction/fitnessFunction.html",
+      "sha256": "e47802772738ae5b0578fd809518a9126893dac38197f7d1cab59247116bfb25"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/FitnessFunction/FitnessFunction.js",
+      "sha256": "306041bebf5296ff7c47b2e95fd0f70d1923f79037448ea2c17a317732a739ff"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionCtrl.js",
+      "sha256": "0612bc62c03291733ed96e1574b2de8dbf3742b745b63a6046aa4941750ce17e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js",
+      "sha256": "8613dcb7df574484d17e2f8851e0b453b79deede2eca3d4cb5b6a0f43949c109"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/views/autoDismissalPopup.html",
+      "sha256": "ed024f2b949baaf99c57a4571a61d8563405c78825e6d05f3765cd2b739b96e0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/views/fitPortfolioCorrelationPopup.html",
+      "sha256": "1f6379dc00d58006fc16d8f38761edafee5343f7aef61868242bcbe891f164b1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsRankings/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsRankings/views/ranking.html",
+      "sha256": "42f3827d9bab1bfae0c0f9f6471c551dcd74778561f5a976221a460fab15fccb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/databankViews.html",
+      "sha256": "61ced83556d9e6c51e24f6e534b3420f8a559b5bf80c7920613f1f1a4de9ca5c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/DatabankViewsCtrl.js",
+      "sha256": "266afbf7a9bbbc0ba4663bf5a5c65d7f17a53e8ebb43d272e0366c64f4d8d799"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/DatabankViewsService.js",
+      "sha256": "96c0f1b1e2bf6d88b814755aa09c634f8c26212db39b1b87b3fddb0c520109be"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/module.js",
+      "sha256": "ccdc3ea846558cb9796da3f5996cc58cb8fc274c0a4674067d6eecad1972a693"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
+      "sha256": "9417855649b74f0f06bd6756e06094edc6672442de5f49db062c9ec849cc56e1"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankViews/styles.css",
+      "sha256": "035db719484fc5e27d886b3860661086ac34302b0b33af8bc200868078563680"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsPanel/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsPanel/module.js",
+      "sha256": "cee3fdc2b7e5b839f1f359be085eef9a6d95a3093720a5c82d73aa61f33f96ca"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsPanel/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsPanel/settings.html",
+      "sha256": "1afe8c546fb4a36809aa600b66316d710bfa4715a0ad2f0194dfc513173ca83c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsPanel/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsPanel/SettingsPanelCtrl.js",
+      "sha256": "377d7a5186f0ef94751c617d75996d5a52b02b36fdc961902d36600383296dbb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsPanel/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsPanel/styles.css",
+      "sha256": "b7b81d3132115c37d8331f1455bc881558e264b27d76144293f25ec70757aad0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/benchmark/benchmark.html",
+      "sha256": "bd3770d9eec01918c74ec81f72fc68d6e106dc18f2df555ce503b5656cd28e3c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/benchmark/Benchmark.js",
+      "sha256": "cb19019a9b15770f5693c0aee1d7f812d2ba89e1c9828a20769e234508b3c860"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/benchmark/BenchmarkCtrl.js",
+      "sha256": "e92548b4227c6bf42c2c31808a69b48fb1126558c7588f690c2eec114aa4a21f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/equityChart.html",
+      "sha256": "77ea2179fa1dee4650e5eee9714f35cb7e0226c92f694fc1ba167fa7f582d55d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/EquityChartCtrl.js",
+      "sha256": "ea6b7afd24bc34debfbe50b3169f8ca8db1b5a31f6061d811dc907135744ef00"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/EquityChartService.js",
+      "sha256": "609d84f4dfff0ef32c7f5e1d91efc6372a4eceba4207c6ba2aa68575e5479129"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/module.js",
+      "sha256": "ffe97b108de8349cb31c62f27cde9c37f3299e0bf86e6199d7ee4b816920e166"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+      "sha256": "070932946751314323159f9a5a84d499b1b66924907a093d582f0ce9a7812c54"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsEquityChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsEquityChart/styles.css",
+      "sha256": "bcc20159b57b5c49fb9fbdf274bccfda9885a491411d059a9b2977a5c5859dd4"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/module.js",
+      "sha256": "22c51cd05617791a2d4021c9fd87ecfcb857183c9532a3d7ab4484287a651d66"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/optimizationProfile.html",
+      "sha256": "e1282ea33c9cdfe061b5dfa63fac5cbb284db721815f770d3bd27c4e4634c839"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/OptimizationProfileCtrl.js",
+      "sha256": "e89b51a199c41d406b3a1006597b809fb71045ab682193f40546e4d9e9bb90f3"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js",
+      "sha256": "c5367f15d9e8b88b4165b3a367e46b9489187d83e1c3299ad6d7e3916632012e"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/optimProfileLevelsPopup.html",
+      "sha256": "66a1635dae5139e4c2c67f3a81dba94b71f1ca230ddd8d1705df8d7fa2110470"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+      "sha256": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/styles.css",
+      "sha256": "884fd27ed580152b44b5b9ce6a670bdc7bcacf431ebfdadf13d8fd96d1b7d276"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/directives/manageviews/manageviews.html",
+      "sha256": "8e6ff2e6c1208d3db6e1e6504357e57972ad171296abf16232078ddcdca27489"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViews.js",
+      "sha256": "eb1edb025b5aa2ab91f79ab9569557d19fec1b55f27cf3673e93d8751509652b"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js",
+      "sha256": "084b19861cb1a36dbdc41c56c2ae259142b4cf089b47c17b61c724f4e5cffaaf"
+    },
+    {
+      "source_map": "ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOptimizationProfile/directives/manageviews/OptManageViewsCtrl.js",
+      "sha256": "3a07b7658501f999a14ad35e9ee7ee95cc82156b2a1bf6f8f26e616d45c4715f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/add/addPopup.html",
+      "sha256": "42467b674866a7bb4a80032512c7b38a9f5475c37e707f406ef0577d5c9da16e"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/add/addPopupCtrl.js",
+      "sha256": "373e93a6216069dea94222788bab912ea8c986f473487bd6e89e27fcec2b1cb1"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/add/module.js",
+      "sha256": "e3f335c3c7803612255b9ebce8d5460ee1b036bb0fa181bf5809000b330728a6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+      "sha256": "4a9d64a03e668d1563a14e179c041721779a83b440c7ada56097fb9d28f54a3d"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/download/downloadPopup.html",
+      "sha256": "59622cdd568741e872cba60b5330777f50dcf87480e30e205f851534b32f8cfc"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js",
+      "sha256": "884b51e60f81a8949368cf8c89dfd172d6f34ef9ef694a832e3efdfa7bc207aa"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/download/module.js",
+      "sha256": "a39c798454550ec0355479868e6f5ea571fc6cceb0800d517f7c440722d0c3bd"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/module.js",
+      "sha256": "059f6941ee79eac6313d806f4b56c6f7abc8658e17cb61cf5b3cd0979f864659"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/style.css",
+      "sha256": "ab660287fa1674e60cc985452d3b238ec80bdbf856101037eefd905a35840d48"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Yahoo/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceYahoo/YahooService.js",
+      "sha256": "de0fd9c9249366d43cdac0f1b30f7f3fb5ea851880c805ef4422106c43822e00"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/module.js",
+      "sha256": "9dc24ebad17c17bbaeebd8f5c966babc5e169c9bbd7ec444d0508c54a11d541e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/portfolioCorrelation.html",
+      "sha256": "eefe6e8527500b88f18218bec6cec06fcbe51869f7025a36324c95bdb4989268"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.js",
+      "sha256": "7511555afe3938b6e43d3764a745bce2f3f992dcbc77230120fca0cc8a056bac"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js",
+      "sha256": "a880b2359ef575656a52045c46f0f0a43297142c10d240c6f72a02916711a0b3"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+      "sha256": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/styles.css",
+      "sha256": "ff57ec7a0286e9030f213ad6976c0acd837e39cafbc30b8e624f655eed506bc2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/correlationMatrix.html",
+      "sha256": "5853013bd2564a687d1e3df4b55d11e170d385186b7a886be3bcf0f4a50257ac"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/CorrelationMatrixCtrl.js",
+      "sha256": "e59bbe0912820e9a0e857cfacb359147b6e610cf3900144bc21ddbad2dede324"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/correlationMatrixDetailPopup.html",
+      "sha256": "51a0cf360d634aa5d7401c821061da6e65fced8042624b55fca9c2b54a6b7fc2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/overlappingTrades.html",
+      "sha256": "b670b4c98880d00645a5e12b775dd0eac854271316e396404c8c0a60eac654b3"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/OverlappingTradesCtrl.js",
+      "sha256": "414dfa0728876c5b18954112e588833c4545648a040fba63b7c16cbb4c1480fa"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/overlappingTradesDetailPopup.html",
+      "sha256": "0b5fb7f27f10ac39248fdde7f2ca8576ab2fc910cd8d228234b68dff931af457"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/module.js",
+      "sha256": "863167e2f1fc122112bf8644f81c975b187ebb0fd3c055aa91969e734a1f7d3a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/overview.html",
+      "sha256": "efe47507dacf476015d221fef5f8bc05b24251026478894dd530fe20c6f6d951"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/ResultsOverview.jar",
+      "sha256": "d728475561b669238963858dd91145cbc03ca0e4a4955445ce73f6a4c42c80aa"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
+      "sha256": "339dd052800cfc1360946d7253ffe3b91b12cf3591c395474cf607e9eb23e245"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/ResultsOverviewService.js",
+      "sha256": "4005b8500953022925728607aab7d2cd4c81f68fbf7463b68c85b7d8fa4552cc"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/styles.css",
+      "sha256": "f9b204adc3a1e8d408e2979bcf626d70f51d1ef8616463f5f19280436322b0aa"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/awshareddefault_template.htm",
+      "sha256": "1b1f9e449fcb9c94ef3fe1fa7799a608781093438951d4511d0bddd3688b92d1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/sqdefault_screenshot_portfolio.jpg",
+      "sha256": "39500c62559b9211b88ead8cdc3300a2b1b3d07c13a4b8c44416f46fcdab3f3f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/sqdefault_screenshot.jpg",
+      "sha256": "b8d3f88166971b9b80620a608e89aa7cfca6b86c12604b396e708fb6c0a736e3"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/sqdefault_template.htm",
+      "sha256": "512cb8ada40d4af62df2585ebb9ae928e6bacaf6b243fe07b86b02f4a49ebe8a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/ts_screenshot.jpg",
+      "sha256": "0a1c0399609fde4b14f732e1bfb79d98174aa952bf91bb3220a6b71ed23cf6bc"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsOverview/templates/ts_template.htm",
+      "sha256": "361b7dc9971a0380840c69afa07ac72650a626b42a9ce1550bce9743968512e2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/module.js",
+      "sha256": "d2e49f941a0ba2e2acbd6933e39cb0df0ac45049b77c2d0f9b41a6445f7876c8"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/OptionsCtrl.js",
+      "sha256": "27e9b8ff7a7f4b19c8d779cbfacebb08b3877dedc54df9f1d71d2e05cb32cd61"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/OptionsService.js",
+      "sha256": "e69c2de56709f3bd36c411466fe70a14a4dc9f66ca678aa8d81ba312190dc437"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/SettingsOptions.jar",
+      "sha256": "8d661d85eeff6aa112ef97e59b909716a7d20be8192aafa19fc3a68416dc36a2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/styles.css",
+      "sha256": "15ce34709d1e9251c7958d10409501f5b6bc6bb3e3bfa2b0bc51e0315a25dd05"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsOptions/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsOptions/views/options.html",
+      "sha256": "76cf54749aa87407bd51776bed215317240ca185a77fafef047a3d3badd7bd7a"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/module.js",
+      "sha256": "155949ed38bee983fbf99d7ee78190bd1030afbe8fd0d90b737e890aacf25817"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/chart.html",
+      "sha256": "21a7f3fe3dc811ac9cbe6fb2cba419146a22d3b691740ddf824772ed47cc18eb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/module.js",
+      "sha256": "481060a330d1645a3a120dd7af4ed90f9401d1c63f9b2495e809d5e9542761c9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/ResultsChart.jar",
+      "sha256": "e7806d3052e6f1d1df42c1237e7a28f443f42d66c44a526893de285635bde1e2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/ResultsChartCtrl.js",
+      "sha256": "48e61630ddda0c4acad049bd84cc23b1a129667825319a9ca05476284487c13d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/ResultsChartService.js",
+      "sha256": "9cbdc9b316eeb57d8f827e63c84b14dc52b283d4f363bd7d97eb58dc0b02dd20"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsChart/styles.css",
+      "sha256": "5d08694574735210ab4de15a4eafd081bf8592f68d5f0b644eceaaae0d3052fb"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/add/addPopup.html",
+      "sha256": "6e2625866e46e3cda2f1cbef113a44a817ff911f1fbf50af0b7f5fe17c89190c"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/add/DataSourceFilesAddCtrl.js",
+      "sha256": "085d4236c1fd0a399519e6f20def601ceb895aa4636f64447ff156b81097a8c7"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/add/module.js",
+      "sha256": "94e7367d726bec3bc5a415b9fd4ebfefdd8303c08289175d6a386477e5e1fb57"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/appImport/appImportPopup.html",
+      "sha256": "46438134290851cbf1142c1b3ca27ca22834f5a403cf5dd2d88b9a0d0e11a638"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/appImport/DataSourceFilesAppImportCtrl.js",
+      "sha256": "4b1533b21fa2804852af4ab33707797bb3655b65526156ed48f4951aaa5ceb28"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/appImport/module.js",
+      "sha256": "befa6f4824bad5bf4bd6eefd2c50ec38abf96d311baba9bf266cb96d7130d8b6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+      "sha256": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFilesService.js",
+      "sha256": "7fba6126706980d4c8fdde630dbe05b3f0d79f2a7a4861f7c8e49a85b8d6ed24"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/import/DataSourceFilesImportCtrl.js",
+      "sha256": "1b19b4a75b52ccb37f145e7546cf0a2689164ebd3edd8c51838127bab5b8ce73"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/import/importPopup.html",
+      "sha256": "01b9871a2c7ce0b0a3c915b8e6f4039fa2504b9876edd8cfa8e35dff5f2cece8"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/import/module.js",
+      "sha256": "a7531f0e9d4c6d871af3a267b70580a97a5fba405e27a19e5268cfc0cb9c57c6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/import/newFormatPopup.html",
+      "sha256": "b55466d8e2b5ea431726a507ba94eacf7255a6e27db4b90318a7c06d099ce173"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/massImport/DataSourceFilesMassImportCtrl.js",
+      "sha256": "1ec3086dcc4b90f632b2e472917b40ae6665fd8ce5fd0c795b3dfc0dbc5fdd9d"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/massImport/massImportPopup.html",
+      "sha256": "2e78db9c22f728b0c83755fc45d3753d3cb7938de1e32063cb63f78aa6ddc6c4"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/massImport/module.js",
+      "sha256": "68a31ffba1bebe740e16ac16664bb95d1b95152b9787efae0be51fe03a420c63"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/module.js",
+      "sha256": "14a19094f4d10464ee5d493433bf09a2f20d819d13e95df0b74a90d1417ff432"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/FileImport/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceFiles/styles.css",
+      "sha256": "091530480960d55f1cb542da994f9530d404ccd021a9374ddb99ce4eec0669b9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsNotes/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsNotes/module.js",
+      "sha256": "e085cbb663c5665b3f0c8a285bb102ef69b28ecabec3a8609736c3f7357edfb7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsNotes/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsNotes/notes.html",
+      "sha256": "36dea55dc058116ec3ca43475a94d4a38779df8e8478547b9e67287708a40fed"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsNotes/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsNotes/NotesCtrl.js",
+      "sha256": "f1ebcb5d66b5281d5655b4859a781b121ef8544ed956e1c0adfb2570ca652bc2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsNotes/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsNotes/SettingsNotes.jar",
+      "sha256": "a64003858bd5eb317304a28a2f1ecaf7ea83064526f4d334a582020117c4bbd9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsNotes/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsNotes/styles.css",
+      "sha256": "3d9c02fde8c5221b77c509ebc28d4ca8a7ce058f763dd1bf594a5098fbd5a13d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/module.js",
+      "sha256": "da34b45a9763b296b38bc6a8090068d5d8e1fbb983b3aa73ea46d5f5362c4891"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+      "sha256": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/styles.css",
+      "sha256": "9a950c324de112ca59cbee39af5a030bf2b3a6cc8f1041f48996123b43494da1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/tradelistViews.html",
+      "sha256": "73e3bfac95c3921cca371c3966850a8ec177ce0fbb2ebe60b2f1ccfb60b7ffe5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/TradelistViewsCtrl.js",
+      "sha256": "9aafcb8403bc0f0f911f3039a21f376f34dcffec7668545d8e08e7b8838baf96"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradelistViews/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradelistViews/TradelistViewsService.js",
+      "sha256": "8c3164cdccce3c46aaca4b0d3b952ecbb588b8a2d55169db1a51556f877653a3"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/setNote/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/setNote/module.js",
+      "sha256": "1f47cec0fdd857f5b0ee9b16e0b89ec1a54edc87e0b22ac7b1dc402cee7a2677"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/setNote/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/setNote/setNote.html",
+      "sha256": "edaa4f42eddf89a80430b0e31e84b443a2ef51b7d521984ecef437098437ac48"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/setNote/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/setNote/SetNoteCtrl.js",
+      "sha256": "4ea71c6423c03009ae816da28d6cd94efbc209021ed9db2da615c0a35ba7ddca"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/setNote/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/setNote/SetNotePopupCtrl.js",
+      "sha256": "fddd0e7a9246597d0a781ca1fda2264d75ee5a79449c3422f7d93aaabadde19c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/setNote/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/setNote/styles.css",
+      "sha256": "8ee2de1294901dab7c2229afb6d1d352d2ea9a638928236e43bb73466c42d6e4"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
+      "sha256": "b3a965b9aed288cf77ff6c30c6a7a60719bae6593e65e415a8b8ac59691e9ea1"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/DataSourceTDService.js",
+      "sha256": "fbe4fe0e2ae84ac542d767d058f83653ed13c2d3df29abe3701480b9b5b776f3"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js",
+      "sha256": "ddde119b713cf5e36aeab0f5143c876dd3d5ed63ba7acf1dc079a80982da3b43"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/import/importPopup.html",
+      "sha256": "5a68195af0a4e22d91c93ab21afa2a1186652a2555045626a55ed7fc0ab08f2e"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/import/module.js",
+      "sha256": "8b976728bb71e0e9c725896824eec1ac8c2ce128113686f68e2aad57b23587b3"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/module.js",
+      "sha256": "b5df93099451aea5944d40d7670109f1ee348d515abeb3e6bf3b9ac6937b89e4"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/TickDownloader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceTD/styles.css",
+      "sha256": "33116d97b761eb912df2c3fd2b3dca002905c85f495c4c10927528f51f4de9b7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeList/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeList/module.js",
+      "sha256": "6f47dff564102c76582f68401f84ab5e04232dd25e602176c5c7e27a7ed2b0e0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeList/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+      "sha256": "e59bc5ef621f7b03c02ae1f096b16056db67fe4ac50f8ad553a7b554d59006b5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeList/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradelistCtrl.js",
+      "sha256": "3621ba2d665293b765b52fa576c4346f369353c457987447e49f317b9f1e23dc"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeList/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeList/style.css",
+      "sha256": "871db3650336f028cc2492e33292cc0e77a857956cc99bfec39c75257de26576"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeList/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeList/tradeList.html",
+      "sha256": "30656e284670f19dfbe7ae4f77cc16d828bcd4fb5ef011ad9979b1d0a7ccb146"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/select/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/select/DatabankSelectService.js",
+      "sha256": "f6b08a786488ecc7958c3fb10e89950243b5138254f19725e10f894bad5de7f7"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/select/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/select/module.js",
+      "sha256": "fe66bcd49b73a85554cca84acf5bb1ae2b86aeb3de7a4a98eb20b6538c508aa1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/module.js",
+      "sha256": "b616c2cf58e999433a9ea220b672a45d390969ea8a1da7a4c75f84b9492b68d7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/MoneyManagementCtrl.js",
+      "sha256": "13613eb9727264e2d215533be10e72c386c54d954fe3730d368695d22584f95d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/MoneyManagementService.js",
+      "sha256": "74cd297e26201ae53328cc6a3ef85844a683795ff46a59f0c6f8c6059ecf0aa0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
+      "sha256": "7798ced63fad323cb8591dcc4f0075a610147b27ccc9522a202e990e4ba8f57d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/styles.css",
+      "sha256": "34af2d5eff0fa1d81ea2f18fe8a8fdaa3a19d60177b2d93c10eaeab21292b356"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsMoneyManagement/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsMoneyManagement/views/moneyManagement.html",
+      "sha256": "9c1642ef5677efd5e1a26c663c07d7866fd6552be2e950b9f8088f3f38a92bdc"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/select/passed/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/select/passed/module.js",
+      "sha256": "c5d5ca1fa1234f8764de45404d1c032894c80ff6403037fa5298e4dc184c4b55"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+      "sha256": "0e9a2fcba6c8457afbf3412a09c50572f207d04290e96469cefa9858f33aaf64"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js",
+      "sha256": "622373e8864360f3fb3b78b4458bd70e4925ef80fe8aa6ae9c7b1ecdbc4027a6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js",
+      "sha256": "fa8e2a2b192d6bbb197e38bc6f877d5266ac756028ecac833af6336c02225e0c"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/import/importPopup.html",
+      "sha256": "68a3b4e1c8715711e8e217f71026464e0283fed09ada9e32792c24fc3d9857e1"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/import/module.js",
+      "sha256": "87679901e632c6b29aeb60afe1a42a0df022fa91944e8df4d654afa3334e3555"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/module.js",
+      "sha256": "a3d82ded3f568ec62b46a78a335bb0afefac571900231a27317105c26ae00644"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/MetaTrader/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceMt5Api/styles.css",
+      "sha256": "dd3e0fb5b20de72985be1316dfddc605632a01fb9b0d62bec85f74cfd6ded098"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/select/failed/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/select/failed/module.js",
+      "sha256": "953d7ac920d04e6efe765bcd0bd05720ddfdcb9153a517e1260636d134f570cf"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/ComplexitiesService.js",
+      "sha256": "e1977eb87121ed1047db8e929c84ec683b8a79666359d7d95d0f79bfefd2a884"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/DataCtrl.js",
+      "sha256": "f79eb17dc1f9d1ed37761b2b82eff1078ae002c8efc074e57c7a9630ee0fa596"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/DataService.js",
+      "sha256": "a171dd2f380e07c8613de0bb0c9f5b006f628b9cb7182447f1363c8a3697122c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/module.js",
+      "sha256": "82769ac81c049f692a0e58b561dc87ce7e3dbf5216cc92fbb9b0714aad8f823a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/SettingsData.jar",
+      "sha256": "94a9bfd2150182df7abdce887f87121cc44ba4421c2725e247fd9588418f42da"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/styles.css",
+      "sha256": "9215613d208a38278670f000a21d6d2c8d1400569e8ecff099366f7d485a2be5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsData/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsData/views/data.html",
+      "sha256": "95a2c3f5eb1c7290c98c333cb272341430f6a3a657b151675018fb0ca2b3df5f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.js",
+      "sha256": "c83584f72b7356e726857f0b171803316b9d3ec371ec6a55ed2354556cdf14fe"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/directives/tradeAnalysisPanel.html",
+      "sha256": "385751fc9ba27460d8fd89fc327a8aba8cacf374b3f3ebca4d7e1a985bfca9dd"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanel.js",
+      "sha256": "a39e23ce63fc43495828ec87a34f3a725aa70c56718a25285c4ae4f28c0bf6b8"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanelCtrl.js",
+      "sha256": "14defd72a4f534eea36d8dc536f10fba69c237dc7c9f53273aab58953e49a1d1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/module.js",
+      "sha256": "93b78ea569a5e4c77e1d4ddbc822966dcdb1d60b628d6fd43546fb214e197806"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+      "sha256": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js",
+      "sha256": "f41dd2661c0bfb889a82710b0b0e08131304303384c4b1ff151e25656a114780"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/styles/TradeAnalysis.css",
+      "sha256": "e3d118441c8f9ee216caf015893a811c7bbe70881fda3e1a8cef6845a1bc946c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsTradeAnalysis/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsTradeAnalysis/views/tradeAnalysis.html",
+      "sha256": "b1dda0978a28159c469fec868c7247184d56d7874a4b0e5283eb2419ae339547"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/split/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/split/module.js",
+      "sha256": "4231d9ca8baf203da72380369f5f0e09e9f72a4c192a97f0c52a2224e132a52e"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/module.js",
+      "sha256": "1741df1150625cf8f884c94b2933fc4702537c9df4984f5645db8049092613de"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/runCa/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/runCa/module.js",
+      "sha256": "d2ad9d19b69e698e8b339f5effbe46ca215f92fdb9192186d90a7be9512222bb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/runCa/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/runCa/runCa.html",
+      "sha256": "ece61cae760249b9208cf29ec537189e0a2dec6cc421dcb99ff2ffb5c58fba95"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/runCa/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/runCa/RunCaCtrl.js",
+      "sha256": "143bc54f1ca8408af5aebd82d11653c22df22ee2716f9a9e5bddca40455b8247"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/runCa/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/runCa/RunCaPopupCtrl.js",
+      "sha256": "635305d8401a9bd41c18ba06de369f9412e3e8f2a8ff27af209f78a606ce80b4"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/runCa/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/runCa/styles.css",
+      "sha256": "6de57baefae132ad64aa6a66a0c1a365f4f8dbee290848b18d72b8da8b7e4f81"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/add/addPopup.html",
+      "sha256": "d1e3dd9da2f35f25ec97db669504214189499d2acb9be7741a532b79135b1f96"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/add/addPopupCtrl.js",
+      "sha256": "12d54b2f377ffda66a658b5838e64dbfb396164ec4ee88fdac3a364d7a366539"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/add/module.js",
+      "sha256": "c8922ddf1e18a07fa6940c524fe218e74676b017d7ef6bc28a5fa5074aee1f95"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/add/selectInstrumentsPopup.html",
+      "sha256": "85792926db77b20b8e0ce3f8c214bbe0224024f16610d4a806e5294747e11316"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/add/styles.css",
+      "sha256": "601af657bfaf64712b71b5b4448ca00d126b60aff9fb10f167416d611a6dbd02"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+      "sha256": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/disclaimer/cdnDisclaimerPopup.html",
+      "sha256": "5e1f091fd73c15a24ed99c46567a6213f0534279273edc83a11c6959982a9a2d"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/disclaimer/disclaimerPopup.html",
+      "sha256": "3b08efc1e2040e5d4cbda4bac835c4dc7e36b6ada1582b8510b5edf0edfd389f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/disclaimer/dukascopyDataDisclaimerCtrl.js",
+      "sha256": "4f85e66ad8d788c6128c1053a03394c3ff5efa71e626d06e9d042f6568ac5446"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/disclaimer/module.js",
+      "sha256": "367e578ffe51926d195e234c7555ba96d43d335cbbdfd5f1f13fde28a66dc33e"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/dukascopy.csv",
+      "sha256": "461c3fe3dfceca2b6f25639b8e351efe5593864b715f95493ac5cd3f0aa7c553"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/dukascopy.ico",
+      "sha256": "e1383dac63867d7ee9072ebe36272bbd8608b5d981a20792af4eb2d40c2da4f0"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/DukascopyService.js",
+      "sha256": "3372da5e88ae790cbc9a69e0dc3e767351f9786c6280dd860606450b66cf29e3"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/import/cdnDisclaimerPopup.html",
+      "sha256": "d941e35379df7c179ee14f7b1e59d7e1739bdc91e14e9020b1c9c0645cf152d6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/import/importPopup.html",
+      "sha256": "551bc9d52840650f84055cb8db62db5a2fbbc6dc01134a1f727c30e904e2293a"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/import/importPopupCtrl.js",
+      "sha256": "77836f1c295b414a5b151f0d12c92e4c467f61dc24caf1620c5f08ea30115dbc"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/import/module.js",
+      "sha256": "12c53aee3adef15c9f58143b6ae0c3e4376d4f682b1c414a10806945eb61416e"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/module.js",
+      "sha256": "f1a424cfe5dd97189497b35e2ce4ab4b5b27a990e24fce997681dca665aeeb04"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Dukascopy/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDukascopy/style.css",
+      "sha256": "f281eb16bb1e9b094d847ab6e1b2acbc81ddec30f6ee76517daa6920891037e3"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/module.js",
+      "sha256": "fd5ef7d1ce14bd9e9ed121ac607e7b8bf38b9346950979c87bb0546b6a3b18ca"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
+      "sha256": "2b2ffee19ff286f637a317db951feb515d473e4ede01057b83ea8db705c8876f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/strategyconfig.html",
+      "sha256": "c4f30d713adccea2598b9cc85b9e1de3ac342e784fea9d7146934de0b9388032"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/StrategyConfigCtrl.js",
+      "sha256": "de902dd0b0116c8c0a1fcf1f96e029b112c9608b2f45ff8d6d85a6202b22538a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/StrategyConfigService.js",
+      "sha256": "942961e2cd401cd2f15d3086070a2432fe9b94cc00f1d2c25de9ad7063d8fe7d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStrategyConfig/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStrategyConfig/styles.css",
+      "sha256": "4b31a7a20d2e93a0c35f5b656663f20bf1efd00c327ff631f9203a50cd03793d"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/loadBtnCtrl.js",
+      "sha256": "65594abaf3d35b29c3a26150a09f2a5fe0915e8c724a1b718ad20c25b022bc60"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/loadPopup.html",
+      "sha256": "1f4122b28b711b6d60efd5144ad0273e933b16bd49556c32b30a52299cc0bf01"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/LoadPopupCtrl.js",
+      "sha256": "4423fabd5bd5bbde22fd7627683f942e643e4bd4ca12f3932e2b225895e7713b"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/LoadService.js",
+      "sha256": "7aa27a134929575e7b5701e474e45ec7706813413d86a2d0273f1d696603dccb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/module.js",
+      "sha256": "05e02ec58436cf2545fa64edab889d003b7a1318d355ea949e5a3de3ff080a5a"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/load/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/load/styles.css",
+      "sha256": "cdf4cf238d7aaa464f42f67995d8ab52c1a54d69e1850d20213822d29fa128d4"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crossCheckAcceptanceSettings.html",
+      "sha256": "265ca5f5320f4b042371bee09c5c1f079833b4cb331358991d8684d4676e263e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsCtrl.js",
+      "sha256": "b75f3eb754188a59abd49646cefdcaf4fa230f5bda39dad6126b66ea0ae7221b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js",
+      "sha256": "44397526015f4f73553e553831471c517dfe7601fa5bd6f2963217dfb93268e9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crossChecks.html",
+      "sha256": "c466b2ddb8714c32b43415a401a2121e7d1154c6f85ae774cc76a9c50ffc352a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/CrossChecksCtrl.js",
+      "sha256": "1782a6aa5017f015f76facd65799ce5bef2e4953ceb46d594bbe4b581bdde6f0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crossCheckSettingsDialog.html",
+      "sha256": "3b5837682f7d3202eae1c462ce413453e28532cfba2840e0f27a0483f94595c2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/CrossChecksService.js",
+      "sha256": "5e0e09b82e19fe7a2b276c99b81e1e2790349beae1c84f1306d1e0aee759f6ff"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/module.js",
+      "sha256": "279b70e8c34c3ea2281633ccfedabfd09965777178c194df0692f7d3fc3eaf6b"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+      "sha256": "12ed3ab90da9476cdd55e57d00d67ef8f913a0af4963abe3a54070c03dc3515e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/styles.css",
+      "sha256": "6ea394d9cb563e7e4e751af8ff4125a22bee785b484223a671480dc3c2c512e3"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crosscheck/crossCheck.html",
+      "sha256": "34e1f317c6019bef66797e070fd8063f36dd507a3c5f9759794dada26f541542"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crosscheck/CrossCheck.js",
+      "sha256": "54ebb9f3415fd57550699c1c3a72513d8b794bb84ca1954d2a6ae63f6ebd5dcd"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crosscheck/CrossCheckCtrl.js",
+      "sha256": "3cb6232dd6891f419b6c7f68275e9bff0958a346fb55cce245865e626ab58972"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsCrossChecks/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsCrossChecks/crosscheck/styles.css",
+      "sha256": "9d9b866a2c023caebb9db762b18b3cf605759a5172e06bab80758810233ffe87"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/addPopup.html",
+      "sha256": "46d41a861717b0eb8ac55a5ff3ae7844edef21bac22ae9e9cd42ede0cf0774d1"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/dataUsageConditionsPopup.html",
+      "sha256": "b81004e7873a152fde4b9307d23fb96046a258736896868ded853d1a0c84b22d"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/module.js",
+      "sha256": "532a250efd438fcac579c63408cbc9f17da2e303cb98031f3d12ba0a33580aa4"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js",
+      "sha256": "e714b749161a83b5df629b7a3a7f43d839038a22e08dd2800a13218fdbd4dd3d"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+      "sha256": "872584251e604ec4d6dc7a8837a5a674fc30daef5251891090d1fb0b85365e53"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/module.js",
+      "sha256": "aa32ce84a9098f9eed88edecebcffdc27b1c96de3bad1489ad10e08ccb6d4f73"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/SQEquityDataService.js",
+      "sha256": "cd8ed00a37ac26769a00e486a2b217f1428f3ac1d090e350bd9e03c984a20ddf"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/styles.css",
+      "sha256": "6ae1b6eb53a2c5ea5c1a4a5f90002343d8351438a2850c92b8fef2cdba285e9f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/update/module.js",
+      "sha256": "080022812aa9e3a362411aca4da3d6fd39cd63e167c6d6d64d5ea73959f63695"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/update/SQEquityDataUpdateCtrl.js",
+      "sha256": "77889f0d4d6cb7e98938773aaf89a1482b0c323160955c96e53cdedf4e223b05"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Equity/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQEquityData/update/updatePopup.html",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/addPopup.html",
+      "sha256": "6e4bd827757e8aa071844ceec0a79b6101c487930a0d0b7f93cff592f399553f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/dataUsageConditionsPopup.html",
+      "sha256": "f7cc30ef8e71763ae33c95115c1f7a75972c55b0bd6cd09086d5a6455a1de43f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/module.js",
+      "sha256": "e67002407eb2052342b9070e904387356aba60f6ebfae7ff3cfaab782d51d76a"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/SQFuturesDataAddCtrl.js",
+      "sha256": "000487443f65345c3beb8fb373765e47e5fe620c06f546c3b2dfa10a0e075a0a"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+      "sha256": "ae170dfb47e1a0b7bacebb47b8575ac7a33976d613784c84a96abf5507a38a3f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/module.js",
+      "sha256": "469a527ff342a057b28d316bc975734426dbf6941658bd35f6706adaad2bf310"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js",
+      "sha256": "ee0742483b776ea5f333d859ff88ac271a1964eee423930c66ae8b75ba109d75"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/styles.css",
+      "sha256": "3845e9742c200336282f366f60e1d516464d1c8f4a40591d299eb8999c6dadf2"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/update/module.js",
+      "sha256": "987dc572f4f0af84dc2667f819bc882ff1ba28f0cb9e513daa98b5f20f9524ea"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/update/SQFuturesDataUpdateCtrl.js",
+      "sha256": "6ecc975ec189cfa38629d5863a2bc455c183867a8f2308d1993e97a4efd332d4"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/SQData/Futures/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceSQFuturesData/update/updatePopup.html",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/moveToPM/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/moveToPM/module.js",
+      "sha256": "8e801ea0a4274a7e4e3abe873aff4d12c4b897704c5240323e3f8eda2ff70b8f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectSettings/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectSettings/module.js",
+      "sha256": "f86dd97766d3b6c0bd61ccfd08e0e6b9850d25b5df6ffba08f66b29e5d86c8e8"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectSettings/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectSettings/SettingsCtrl.js",
+      "sha256": "58b656d3427baf90647f1346fbdc936c767f6606844c08b6306d9183efd8529d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectSettings/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectSettings/SettingsService.js",
+      "sha256": "d9ebf5df72e911056ec1d9ea6b255a0aec4d4485a4b659888624ab5651f6e420"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectSettings/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectSettings/styles.css",
+      "sha256": "df64f057b4d9a92d6cf2f49bb24e6ee853ff7168f3dfdae49bcced9e061a56d9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectSettings/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectSettings/views/settings.html",
+      "sha256": "71536692ecdd30e9fed5705f025469f72012ba861e4781a2088b2374f6bf1716"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/module.js",
+      "sha256": "bc85b38a9465163a043b933f1f42bdb59712734768026c531c87e33f469569f7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/module.js",
+      "sha256": "05a5c8a26ae8e307f5e1afa2844e225fd7205872d92fb3f0768051a90df6861a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/ResultsStockpicker.jar",
+      "sha256": "a9843a8f740d52f657db40d2df28255e65c5dcb8577ba4f410002e29e84f55b5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/stockpicker.html",
+      "sha256": "1bfda81373120ff3fcfc5c8c4ed7159a88424d35d5d46b288017d301b0999410"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/StockpickerCtrl.js",
+      "sha256": "97729a5858c438920f9d3d30bc57e0774a2f335707d4c8889a0067429c862c9f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/StockpickerService.js",
+      "sha256": "cf707e463271d3c1cc937cae5a35adf45da2c079426568b9cc009202c68b9f70"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsStockpicker/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsStockpicker/styles.css",
+      "sha256": "6c374922068ce7668df399c86bef2ec034c5751e9fe1024e30927000893f7610"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/delete/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/delete/module.js",
+      "sha256": "fc6257806c4d55c27e8a4a5f3cca2e6b427835792b4da60b0751e60dbae6a308"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/moveToPC/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/moveToPC/module.js",
+      "sha256": "1122f64534f3bb01493d212b31d84664c85f78c1a51811db77f65b7d6065ff99"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editStrategy/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/EditStrategyCtrl.js",
+      "sha256": "6bc0bbff02bff18a9b6393c3ede44803cb9dbe30d2ca634b06622f9fa2e941e2"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editStrategy/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/module.js",
+      "sha256": "26baa15ee746a6f0ce64bc5825ad54403db9755d9f49fb14f21f21e920e47987"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectResults/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectResults/module.js",
+      "sha256": "7072f092e100b952e0f890552e145179793f726b437afe91b00f3aa4e537234c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectResults/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectResults/newCustomPluginModal.html",
+      "sha256": "cad3fa81634142c93719e88e9694dce18ee8d0610050afc5d6f279fda84b1b14"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectResults/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectResults/results.html",
+      "sha256": "0119886e9484e1b19165eb9c365fa75d5128e8b4073f98be4e6148a83a434e08"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectResults/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectResults/ResultsCtrl.js",
+      "sha256": "b78a17cbffffa7483ec45ee39a70beca714ebf43821e28b888522489c45f0758"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ProjectResults/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectResults/styles.css",
+      "sha256": "e056ad1b7134efe18229780002dc0db5675b48ff5ef88a7f4eb4fb0a335f75e6"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/clearAll/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/clearAll/module.js",
+      "sha256": "a4c6de075042db19a79a349cbbf57f260c3a6d2ad46d5d550a71050d37f1d366"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/addNewExitPopup.html",
+      "sha256": "4d70be970791b9928e5c1dedb3dd405f0b36cdbef534428dc4246bf3288d6ae0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/advancedTM.html",
+      "sha256": "8630945107f2154c768c82e1048c1b176eeae1df51ca7c4e3cca62877de579b7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/AdvancedTMCtrl.js",
+      "sha256": "63d5caea9ece232638a6eda7c21dc09e13730042c9a8836a762d8213901d6fea"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/AdvancedTMService.js",
+      "sha256": "1780a60293a3b043a081c3b54f5f7926c588198eb843f1f37c4e584da11c8922"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/module.js",
+      "sha256": "5e872e34f232b518579cf1877a6cde5e01886a7aa514cad4cd9e778374b15b19"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
+      "sha256": "4a62d88b22f87eeeded005cd121990f373b30fc125a8fe608b1e8ae95b11e30f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/SettingsAdvancedTM/source-map.json",
+      "artifact_locator": "internal/plugins/SettingsAdvancedTM/styles.css",
+      "sha256": "3ce7c636dae6360f162a6cdd08b33883a08a0ea9be642403b4930fda40f18603"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewList/spOverviewList.html",
+      "sha256": "12299bc0c2919a0d07283882b43b1f6318ba9b99828d0aeb22112a8e84bf423e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewList.js",
+      "sha256": "6be5ae0bcb4031e3ab7fa7e2769081df55ec978f0faede7ac1dcf37490adfa27"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewListCtrl.js",
+      "sha256": "5b40cfda56c2bc3dd675e81cacd303bef4b20392aed8bff049c83151c033bdb0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewStats/spOverviewStats.html",
+      "sha256": "51c7fcb1d196b884cf5f886b803d22d9533a6dc7e565f472a7aa0198ef121fba"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStats.js",
+      "sha256": "be6a01e6d9d1ba3ffe9b9747ec4ebdf53e9fbe07891d705e7db58fedc683b5ad"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStatsCtrl.js",
+      "sha256": "fdd4cf547d3c9c70b5ae0bb2c234a5a3fcd3586215dd713d44d544f1ab37e48e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/spOverviewTopChart.html",
+      "sha256": "761e54a4f4509d5ca60d82f93a9d7d744957c6e86bde3921250a366948c0b0df"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChart.js",
+      "sha256": "670a027b7b18422ba63e8346b571987da34d8d6462849695f1a6bf1de79354b0"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChartCtrl.js",
+      "sha256": "22c19e17a072aa98051a6213e31f6abed81685dbf42049465303d29ade80e1bf"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/spOverviewTreeMap.html",
+      "sha256": "1bcf0bb17a9d836ca743f622494dd9eaea8e169b9b7151c3b6bd94746a9ecea1"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMap.js",
+      "sha256": "e6ad3b37041bfb922d33d4937d938a21bb1171bd8be16cef7df5b8ec6210a05e"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMapCtrl.js",
+      "sha256": "3511e917ee2123503aceaa99a1b2a527bafcb66de4041ebe7596dc7c20ba004f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/module.js",
+      "sha256": "469280bfa0c2841111121317b76e22749243a66348d2afecd2160e58d36a5d00"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
+      "sha256": "73a05e6d594be525c4068892f3fdea77929b2740dba3338c4e212360e98067a9"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/spOverview.html",
+      "sha256": "c0c19a8cc8c72a76241d91d48f9acc2129797efe8c0517c5a3771d2d78087a41"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/SPOverviewCtrl.js",
+      "sha256": "60ddc0a2b1460ecf18310a942e9ec53343d2250b2b3c8f6ca174fac7c477bff6"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/SPOverviewService.js",
+      "sha256": "768dc4abe97bf9544dec40a42f379ed0965f63c657d9501744d4cabcc101270d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSPOverview/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSPOverview/styles.css",
+      "sha256": "1687c16f55fd8a2a3b4729eb0ffe6ea30fcf249fb97dc842648fe278772f9a23"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/mergeWF/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/mergeWF/module.js",
+      "sha256": "a18d8dbae10d65d29b076fe198993d6afdcdef7c5cb170c3abfe3e59d68a8e92"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/manageviews/manageviews.html",
+      "sha256": "eed819f7d57ebe4842affd8ef9549c64321826ab66b105378bf2b2f3b690587d"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViews.js",
+      "sha256": "501ca7c510fc36bab86d696f41b378790a4932820a7c3d1fb2b444e499ecc7a2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsCtrlRt.js",
+      "sha256": "dea5d746e7cd5cb87615dc57208011d8a56f840b3f041c54408cec60e86f2610"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js",
+      "sha256": "43130befcb48521bc700a58b253044693eb84dafc7f8bfd8979596b6d166d8c4"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/robustnessAnalysis.html",
+      "sha256": "6f0e6883d72c297f9c56d2acc63bd1798cef3ebf716ae4a4857731e4fce6f3d4"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysis.js",
+      "sha256": "54942675c5ba43c12097a2245309a686dee20deacabc00963bec192630903749"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/directives/robustnessAnalysis/RobustnessAnalysisCtrl.js",
+      "sha256": "a6a6780290a0dddd4e9317d2a6f1ac2b5c3f10f03c598f960d2b44b61598473a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/module.js",
+      "sha256": "90095b878fde5e467d8f271b27778dedd8f062498197c6c6757afb288d42d6b7"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+      "sha256": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/robustnessTests.html",
+      "sha256": "53230fa4af6ccf36a7776410cc8d6a37259b6e4a6046355656e5c793f790c191"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/RobustnessTestsResultsCtrl.js",
+      "sha256": "ea4c5f97fc47f5e7b85ff1a617baa1f3f6a981dc53fb76f89ff1d8c39c61aaea"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/services/RTService.js",
+      "sha256": "5e3878f41cc5202682885dda4b74a02e1738355861c92415301ae08eb8d44fde"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsRobustnessTests/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsRobustnessTests/styles/rt.css",
+      "sha256": "0efe3a695da548a4494558d5da850da5f48b68eb77bc774c3da09229701aebf5"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/customIndicatorsPopup.html",
+      "sha256": "5b89387c5ed85cc50f19be41664ab5bedddb2615057a4c7b078feed8d9175bcb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/module.js",
+      "sha256": "a9e366e7092b9aa32b819f11c212e1fc20de7c757611042ad6fd5a7244fa0a87"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+      "sha256": "3e7fcf22b7a4c6e0b38875853ceefb14592837cd8f82ce71a43715aeaaa406e6"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/sourceCode.html",
+      "sha256": "9e435fc725377d2af51da638a199d866ecab54ca8137e97e0a9e99ebe808406f"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/SourceCodeCtrl.js",
+      "sha256": "f74ef59b80ac13862bef12a88f46f0d0549e91855d907f7c30791ab2b7695f24"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/SourceCodeService.js",
+      "sha256": "7699e6695011b747d6379862f4a25d9d255bcf98d758e211d8403bad0baea95a"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/styles.css",
+      "sha256": "b0c6002af15ff5b3d4ce52258065bd93f55742fa9a1483ee47a5a95246c134fb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsSourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsSourceCode/terminalConfigPopup.html",
+      "sha256": "a5fc6847fa6fd0b56f4c847489bb705bc51c54ec022439c5294c56c7015aae15"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersCtrl.js",
+      "sha256": "3df2f7d970cf9ffb04a65ea326d06902eba079100795460873a59b0a88c9c678"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersPopup.html",
+      "sha256": "70c1e75c7ad20bbf209f72ed7b21837a41e8a6ec72c570731fe39d2412a4cf3f"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersService.js",
+      "sha256": "0669ae9d50be84adf299e7bc28d328bee15fd0e53f887a60a4b5c21ecdbe6082"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParamsPopupCtrl.js",
+      "sha256": "b97625c5ab1d6ee199be8f7e45a7579ed66ccfc2794a057f20411a73157835d2"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/module.js",
+      "sha256": "396890e4cf6faaef4fceae61876762a98e06eaf28e234012412aa963092553fb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/edit/editParameters/styles.css",
+      "sha256": "8fcfdd2bd4c2585509711ada136d5eef386a88d9afff40ee5a67ff76304c877c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankFilterByCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankFilterByCorrelation/DatabankFilterByCorrelation.jar",
+      "sha256": "1fa17e5b51d414ec37aeee2e22480adb3f1d6f147ecade700806a0c787159918"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankFilterByCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.html",
+      "sha256": "2b0c81fbbb5d873e028478da586c2d4a625ec2e9408610e5d4ee35bb765e5ea2"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankFilterByCorrelation/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankFilterByCorrelation/module.js",
+      "sha256": "087af14a8c5fbb7207ee79bfe4b7c3dfe71f3c7a4f809a5bbaa0383ee32d46ab"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/merge/mergeStrategiesPopup.html",
+      "sha256": "4acb7efcfbee434b50e32ac962c18a0837e0bc2325e4d55fbeafbda4099244ef"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/merge/MergeStrategiesPopupCtrl.js",
+      "sha256": "bd10bdd46f4f0d70b1ad40d0f62ad6cbcfc4aa0b69c804859b7aace3b902ca9c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/merge/module.js",
+      "sha256": "2eb9e0c95583005e27c184daff06cafbda32c7708cf7185cbe664a4ab5bda8b3"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/portfolio/merge/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/portfolio/merge/styles.css",
+      "sha256": "9003b57b2e049e632a61340aeb10592ee71851eb41b5e581619abfb5ab044d55"
+    },
+    {
+      "source_map": "ui/app/workspace/AIAssistant/source-map.json",
+      "artifact_locator": "internal/web/SQAI/chat/assets/index-DbWeULv9.js",
+      "sha256": "cb29e935f851919fd5d6285653d55cce6ce67f447b2f492c87314cf133497ae3"
+    },
+    {
+      "source_map": "ui/app/workspace/AIAssistant/source-map.json",
+      "artifact_locator": "internal/web/SQAI/chat/assets/index-BfdqFDsP.css",
+      "sha256": "9a1abe6d2ae3be4204c4c26482eb31feccdcd9f296f370eea4ddb9caa6ff7cc8"
+    },
+    {
+      "source_map": "ui/app/workspace/AIAssistant/source-map.json",
+      "artifact_locator": "internal/web/SQAI/features/sqx/en.json",
+      "sha256": "52f621f98bbaa6a644bc3c0cded96e77748bd3cb4d1972b1e0b6f9a0acdd44f6"
+    },
+    {
+      "source_map": "ui/app/workspace/AIAssistant/source-map.json",
+      "artifact_locator": "internal/web/SQAI/workspace-panel.js",
+      "sha256": "198ee217481a066ae659f3bb45b68aea3fc0888432c3d56bcfbc867c2f2ea849"
+    },
+    {
+      "source_map": "ui/app/workspace/AIAssistant/source-map.json",
+      "artifact_locator": "internal/web/SQAI/ai-guide.html",
+      "sha256": "161389dd85de7c5ef5ab77077dc0ca1e37dadd8c5d3dd60958cc77fa5eeb4b09"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/DatabankRename.jar",
+      "sha256": "599ccf09cfdbdd4eb4e56c8aef81b2a6dfebe73743a0106e92abde7c77a1dffa"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
+      "sha256": "d42c498a9d97ee354665217c6e4af8c7ac4627e2aed1ade253d0410fbf69947d"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
+      "sha256": "ef45edc82083a3231e53b807356b224b4a33d7e72cab9c0357381c70d7381471"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/ui/databankRenamePopup.html",
+      "sha256": "8b16064b51c4992ea817d5a3cd13ccbaa8fb34dd08cf3080f161bec7a45c60e0"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/ui/DatabankRenamePopupCtrl.js",
+      "sha256": "019fe0e227b798c01cf80e5e3bb3250eca0d3cc94aaac77fc1ea02ec9f702c46"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/ui/module.js",
+      "sha256": "273b6be8162c15bdff860a4d7be7c37f56a7dd62d9220bd0f4cfb259fdccfee1"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/ui/styles.css",
+      "sha256": "0514964dfd427c0454acf81ee28a826a32fa100de92066adf9d9c1db5647b851"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/DatabankCtrl.js",
+      "sha256": "37f15dc877ee70f4ba35619848249e1ad2c9485838b7979c04909cf3981e936f"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+      "sha256": "c7c40d363324330c06a2bf8fed2819f3da614dfab18548064850a863f195b07d"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/DatabankService.js",
+      "sha256": "0689b0ce2d26978ea01ca1a7e4141d86627b2e5cc7fbfdabeb4d1e8ded0fc980"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/module.js",
+      "sha256": "ed1f594eec659542e13b1ed8a5ceb1efe9ad290d8c48e5214e23511af39f41cc"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/styles.css",
+      "sha256": "ac3e4bb48ffadded697e9c6f15d204c08d74d1ed2084cd0f106bc7d95f82c0df"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/views/databank.html",
+      "sha256": "19303986314999f45ccdf6ca0a0d4e361046433ecf896d46fef6613d69f5dff5"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ProjectDatabanks/source-map.json",
+      "artifact_locator": "internal/plugins/ProjectDatabanks/views/databanks.html",
+      "sha256": "e7c6ddc628fdf8f8a33a4b7a86710051b538cf584d580958ac0f52a1438a0706"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/CompareStrategiesCtrl.js",
+      "sha256": "23ad79aba6b083ce862bfca6fa9216c72c2185b3bd9f6dbc4cc4c660941560ca"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/compareStrategiesPopup.html",
+      "sha256": "15914c416b392d6f3150f544e4c2f59789d6af582192f508ce22c01d5e2a1cbb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/CompareStrategiesPopupCtrl.js",
+      "sha256": "c3dffce0a17037fba476a305b7e0c29049fee4f575cd941fcc21c015471ca568"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/CompareStrategiesService.js",
+      "sha256": "f9b2ba3566e0f00f860cdf1032e4c3edc38ca80896f9eea010d699fd39618524"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/module.js",
+      "sha256": "6bd18c72c7b14a97c27884a6497ddc867d937ef1f39f53e26e7092683ff78f67"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/tools/compareStrategies/styles.css",
+      "sha256": "9f0c9edc9776ff63a22aa429a7dd364f62971bf4e275327475b599866152651c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/newDatabank/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/newDatabank/module.js",
+      "sha256": "636a6f510331fe97d11a370e5d2b165cb6c26c30fe26a51ea51de1171e296247"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/newDatabank/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/newDatabank/newDatabankPopup.html",
+      "sha256": "4ecacc0be2a21952243c8cab95216a73756656326b62c19da328fd097b93466a"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/newDatabank/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/newDatabank/NewDatabankPopupCtrl.js",
+      "sha256": "bb84467ccfe6fe50bde2644c874b6df067b8b0c8ea25ddd148cb1e2483987cf5"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/DatabankActionsService.js",
+      "sha256": "a5850d4602a1a68e7d067ac94906ed4581d2eebd32b197e8aeb4200851cd4a9a"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/module.js",
+      "sha256": "92692fcdcbb5b017b538485ab2f825edafb18259c32f3869b547cbffa06216bf"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+      "sha256": "b14b83a58c5191fb5a4b7d9b79ec0c81ae70b31263f07d12a19ea559aec8181f"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/sync/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/sync/DatabankSyncService.js",
+      "sha256": "9b7afa644bfe80bf7af5b6742a14f5f1bbbe44ab914103019f3f0e1e17f59b0c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/sync/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/sync/module.js",
+      "sha256": "339ef5ba4884890f0256df9518a14e8df03648023c064c3b1d61bbbe0a29ad4b"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/sync/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/sync/styles.css",
+      "sha256": "24e3e73eb66876e7d030f997b3c6e13cbe020a6923059c7c3e8117994a4a03af"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsProfileChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsProfileChart/module.js",
+      "sha256": "a1696b0017b514c2ff9aa86fb95b9c3c2735463532917dfc6650027e1aa89584"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsProfileChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsProfileChart/profileChart.html",
+      "sha256": "b577ce7cc0218b555528e79b73fc457ce03f46bb6911ebb3368faf9d57d059eb"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsProfileChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsProfileChart/ProfileChartCtrl.js",
+      "sha256": "c18aa712cdee8db7994e08f1088b7c5b357af7f58180959c5a4f4f389aa8396c"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsProfileChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsProfileChart/ProfileChartService.js",
+      "sha256": "daedc263e3f5addb592754b1090766fe09de82404cc4a034e0657ed907b21bf2"
+    },
+    {
+      "source_map": "ui/app/plugins/project/ResultsProfileChart/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
+      "sha256": "e68533b22cc2d8d670723f4ffd023cfe2099a44e75abb81ae8e209350ddd9b0f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/add/addPopup.html",
+      "sha256": "3f3d72365fc50f96c5624601cd78d05d285c1b4afd65fc31cd168ae1cb56d146"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js",
+      "sha256": "caf98a78a6b80245dea7750372c44adbeba1bfaf6a2e4b5aef3e4bfec0d459ce"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/add/module.js",
+      "sha256": "08328ebed54b4f739785d71df786814a74258751edcbca5282c83b5c4404e989"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/add/selectInstrumentsPopup.html",
+      "sha256": "ca2e2980f0661bddf741a95cd4c2f20cd20d27893c6d02cd5d0660086f17c17b"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/add/styles.css",
+      "sha256": "875409cd20a6c96db951d4525fc61ea20ae8756d54fb719b2b172e46d1815e1e"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/darwinex.csv",
+      "sha256": "5b1070ab91026d637cf6b1402862d99694914700ccba381b252cf488f567f657"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/DarwinexService.js",
+      "sha256": "46a8b9fc88d922295513c623aac0892ac6c013b3c7589733c0ee7555374ed86b"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+      "sha256": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerCtrl.js",
+      "sha256": "d51d2ebb32408024314ed529a88b6b6e9c912b07cb5892c74aca41c0203832c9"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerPopup.html",
+      "sha256": "99b7c139734e306aa06b4b129281449033a249f9959297375703cbbf5ad84a0a"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/disclaimer/module.js",
+      "sha256": "ec4aa85f163167a429a7afe81b17de8273e26f932f967daf6dcf1f555c8a0ddd"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/download/downloadPopup.html",
+      "sha256": "d760c6d337d7a94c257a295f7b0a5d1faa7dd4afc69f742234177248c947ac5f"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/download/downloadPopupCtrl.js",
+      "sha256": "eeaead19f1fcb10db9f8da287b88684ccfd60d847892d0eb782df898362c8d37"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/download/module.js",
+      "sha256": "919da9e0fec42a576e594b29b14c902e884bce07b52a5a9f008f9fe72535a5a6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/import/importPopup.html",
+      "sha256": "b34e199acbec8f82bbf71f70bd81a99e3067a2f32dae29dd4330a5c5ce1cff73"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/import/importPopupCtrl.js",
+      "sha256": "85cbc106bceef863484bb04124473231ed68d50d6362c2f7c6d8be8d2990d739"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/import/module.js",
+      "sha256": "2b1f1f0c3ea4049e96bd3d57f8432ed66eefef71e7af61a17919c0833f638afc"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/module.js",
+      "sha256": "59d46e6c87ab646bf9dd0aa73824dcbac8c228568f7543330e455eca70ea87e0"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Darwinex/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceDarwinex/style.css",
+      "sha256": "de8756c27491170c3baaa83f37e909a028591176566e3a2a9b1d61554ec2d629"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/refresh/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/refresh/module.js",
+      "sha256": "2dde2c8134ba1a0fa68e63dc322b27024ee18d499f914f5fbdfe81906f2f1d2b"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/refresh/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/refresh/styles.css",
+      "sha256": "89a59063f231a79e10e42182a60b24b4a181dbb2b5f13aed0aa002ac50060b84"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/exportCSV/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/exportCSV/CSVExportService.js",
+      "sha256": "652da4a80d855541f7fe00ab3793e89eae27a3deaefc8c094e920322325a3135"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/exportCSV/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/exportCSV/module.js",
+      "sha256": "626ec055a62d2a2ee62208b4cc69ee7d3b3e160f75b85e39a736c622679b0134"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/exportStrategyTrades/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/exportStrategyTrades/module.js",
+      "sha256": "b23874cac71dfa8c177be605fafd7624c47cd0f23985d9d1fd1ed56791450bea"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/module.js",
+      "sha256": "8bfe9cff6dd6a7c5232b75d703f87354b8c28b9667cc7e78ea58d7a339bad52e"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/saveBtnPopupCtrl.js",
+      "sha256": "3ce6d272225df37aea671cb369de369d133e5228ba75b3d537d6c1af3f70ad40"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/SaveButtonService.js",
+      "sha256": "793c1df967f2de8463875eb63134f7ef756eadb1fd5cf73737b1c45ede75fb25"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/savePopup.html",
+      "sha256": "5bdaf92a5e2f72f4c3b63728696593448008b0f0647a2c55c85a4b30d60cc932"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/styles.css",
+      "sha256": "e52968f1af177dcfa31b0dd829b0cfb4552b8e28b3a05ce07be00b9d8f617b76"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/exportHTML/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/exportHTML/module.js",
+      "sha256": "9b80375c3b238c14353e95cc27817172b1658fb3944a68abd6d8d9f7898e6e1c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/saveToSQ3/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/saveToSQ3/module.js",
+      "sha256": "02e0a764308c064c2e4cc4d94ab3ab1d014156db07f32c29dfda463c0deaaa15"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/add/addPopup.html",
+      "sha256": "4946ed60839c36829979c092a6c803d53b0bab2f49fa6e48595d47aa7c792459"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/add/addPopupCtrl.js",
+      "sha256": "1ed297ab2db713b8a27ee38ba76ea86c54684a540032056ef518524f92911ba7"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/add/module.js",
+      "sha256": "86052adaacddf5363075f8bef6e80dd6abc5f46aec67cf2ff3d4baab5ea22b55"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+      "sha256": "0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCryptoService.js",
+      "sha256": "892bc3056387c9a5054d808d520f552598e2cf417387198fe244a5faab15ca9c"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/import/importPopup.html",
+      "sha256": "bd5c495bba7a1a9dd97f844bdc257dd6c079509b93f829c56ff2caa65cce37b6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/import/importPopupCtrl.js",
+      "sha256": "53f73f662e3389f524d19d00d110f014c28eadad9a3d1fc5f809115242e716e6"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/import/module.js",
+      "sha256": "3971c8a011b75479650db5630e5ee048dca76dc8604a9bd031cb6301ad409660"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/module.js",
+      "sha256": "68af8f12eaac29c194d3a1376f36af076ff5df43b1cea3de36be69c6bfbf599c"
+    },
+    {
+      "source_map": "ui/app/plugins/data_source/Crypto/source-map.json",
+      "artifact_locator": "internal/plugins/DataSourceCrypto/style.css",
+      "sha256": "f9bd61c4abf8b7e413657f50859b32b45a6522a38e56d1070a9de9ba6f474596"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/retest/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/retest/module.js",
+      "sha256": "62e5763396a29b3762ce95daab8442b20ca12c92d56df63f4f3d91e44506562a"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/retest/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
+      "sha256": "c501343fd80654cf28c348955ad8aa5017bb6cc158ea1807385e9d0d6f3d8b5c"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/retest/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/retest/RetestDialogCtrl.js",
+      "sha256": "d907aba8e21941967e9a0939a971fe795c045ad3e5d0699efbcfca28b429db48"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/exportPDF/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/exportPDF/module.js",
+      "sha256": "55cfc1955dd2e9eb6be0d6f7e5b9c1bf5abd5b5e98458aa601246c5b3b42fcf0"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/module.js",
+      "sha256": "ca5685463a5b8135915ac37962ed6213daa2c5d38ff3b5c0a20b8483fb7912f9"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/saveToSQ4/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/saveToSQ4/module.js",
+      "sha256": "c2f8cd6e4bdcbe7afa4b2266912a14007eac5d5ef2ec6ad520de0c8acf4eee70"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/jforex/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/jforex/module.js",
+      "sha256": "a4ec6b9868bbd3b55b4e2c92a15a8831e26807848a9f41749ebb3205743e35bb"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/mc/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/mc/module.js",
+      "sha256": "f0ce59a40f1ac23757085de086d10ec00210be01377128fac0fa6bb2faee85c2"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/mt4/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/mt4/module.js",
+      "sha256": "0f5b2d72e1ab595ca0b850252908dc6ccfe5a76c92b9ed9bb82b896de5a128ea"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/mt5/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/mt5/module.js",
+      "sha256": "c9b064ad421f9520cf3f8725aedf05eb642b95cbc1f7585bfbf350a2b8889ef5"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/pseudoCode/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode/module.js",
+      "sha256": "84dd5104f3754182fbf85712d08844620afbebc8d3b5f8a26f2d6645c6f3a22d"
+    },
+    {
+      "source_map": "ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/xmlStrategy/source-map.json",
+      "artifact_locator": "internal/plugins/ResultsDatabankActions/save/sourceCode/xmlStrategy/module.js",
+      "sha256": "c1fc3d2f6b41964391e30c376632891512373fa665b8c86815ee5a6e6b998cfc"
+    }
+  ],
+  "absent_development_metadata": [
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/.classpath",
+      "disposition": "Absent development-only metadata; removed excluded source, no target behavior impact."
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/.gitignore",
+      "disposition": "Absent development-only metadata; removed excluded source, no target behavior impact."
+    },
+    {
+      "source_map": "ui/app/plugins/databank/DatabankRename/source-map.json",
+      "artifact_locator": "internal/plugins/DatabankRename/.project",
+      "disposition": "Absent development-only metadata; removed excluded source, no target behavior impact."
+    }
+  ],
+  "changed_hashes": 417,
+  "limitation": "Static source identities only; changed hashes do not establish changed behavior or frontend equivalence."
+}

@@ -1,0 +1,717 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jPowerShell-3.0.jar",
+  "archive_sha256": "706451f6a1ff22cf477957bb280593d81d1a975263c3ff2ba1bab15b749a6168",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/profesorfalken/jpowershell/OSDetector.class",
+      "occurrence": 0,
+      "sha256": "74626c26922f4d11ea69ccdba6eaf242dd7b4713769b761a30fdb0709a6ac2ef",
+      "name": "com/profesorfalken/jpowershell/OSDetector",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "OS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isWindows",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "1459546edf6740133e397adc8ad3cd3af96f8469989def6629107f125c3af1f9",
+          "code_length": 9
+        },
+        {
+          "name": "isMac",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "2331e9c25674079dfdb78a6284a6c3a8ce77d894d2a22b25bd15c3d551d3198a",
+          "code_length": 9
+        },
+        {
+          "name": "isUnix",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "dbde04652ad52e0252a11074bc4ed3f94da8fc7bdee06a73d38d9983f6434067",
+          "code_length": 39
+        },
+        {
+          "name": "isSolaris",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "2a139e5a65b72db62b0900710bb4c64cb4f66cab3e2f7cb460d216395785f795",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9936d8f4ca70ef3be6f353296fc2b79a0d6ef160707000a665615891bb0170a3",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/OSDetector",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShell.class",
+      "occurrence": 0,
+      "sha256": "146c5708448936c1a8f837c0b4e2bd99048b2b758216349059a7bdeb7c478e21",
+      "name": "com/profesorfalken/jpowershell/PowerShell",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "p",
+          "descriptor": "Ljava/lang/Process;",
+          "access": 2
+        },
+        {
+          "name": "pid",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "commandWriter",
+          "descriptor": "Ljava/io/PrintWriter;",
+          "access": 2
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "threadpool",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 2
+        },
+        {
+          "name": "DEFAULT_WIN_EXECUTABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_LINUX_EXECUTABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "waitPause",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxWait",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "scriptMode",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "END_SCRIPT_STRING",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9a3644cf86b4b4f6264082aecaead4b3d2da991080fe956b4c13ab369e50917c",
+          "code_length": 28
+        },
+        {
+          "name": "configuration",
+          "descriptor": "(Ljava/util/Map;)Lcom/profesorfalken/jpowershell/PowerShell;",
+          "access": 1,
+          "code_sha256": "ad155304ee25874b06bfd34ad5f6745aec9ff1e44634c151bad6d9f70a7e758f",
+          "code_length": 112,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Lcom/profesorfalken/jpowershell/PowerShell;"
+        },
+        {
+          "name": "openSession",
+          "descriptor": "()Lcom/profesorfalken/jpowershell/PowerShell;",
+          "access": 9,
+          "code_sha256": "1cc7e1e52b674b516630b94b6536fd9c0e7e77837f07c88c9574eb7b6eec194b",
+          "code_length": 5,
+          "throws": [
+            "com/profesorfalken/jpowershell/PowerShellNotAvailableException"
+          ]
+        },
+        {
+          "name": "openSession",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShell;",
+          "access": 9,
+          "code_sha256": "e73f4b45c6d80feaa9bdc8509400e82ca652f4ac17016ca72015388f1b5c1587",
+          "code_length": 42,
+          "throws": [
+            "com/profesorfalken/jpowershell/PowerShellNotAvailableException"
+          ]
+        },
+        {
+          "name": "initalize",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShell;",
+          "access": 2,
+          "code_sha256": "e846709c8bfaca4e53302cf4d5492d02ff0a53ab74d05b50cf6f1b6f00ab913b",
+          "code_length": 290,
+          "throws": [
+            "com/profesorfalken/jpowershell/PowerShellNotAvailableException"
+          ]
+        },
+        {
+          "name": "executeCommand",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 1,
+          "code_sha256": "41e8d02ac4e7caa0681b92105b55f8f83d27a0b3827cc5d3ab13df510fabc4dd",
+          "code_length": 161
+        },
+        {
+          "name": "executeSingleCommand",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 9,
+          "code_sha256": "f2dc7625ed47a9205c69cd087d0ec445d60fbdd56ab8d5f8976ccfd87a58939c",
+          "code_length": 108
+        },
+        {
+          "name": "executeCommandAndChain",
+          "descriptor": "(Ljava/lang/String;[Lcom/profesorfalken/jpowershell/PowerShellResponseHandler;)Lcom/profesorfalken/jpowershell/PowerShell;",
+          "access": 129,
+          "code_sha256": "eec61407412e810dc7cacab15d70daa4bc976956a47626c76816122419fe9109",
+          "code_length": 21
+        },
+        {
+          "name": "handleResponse",
+          "descriptor": "(Lcom/profesorfalken/jpowershell/PowerShellResponseHandler;Lcom/profesorfalken/jpowershell/PowerShellResponse;)V",
+          "access": 2,
+          "code_sha256": "694e03f7b417d4dffe2852ae9457d3a5f2b3ec5989b1e0b19fb3a602b89680fb",
+          "code_length": 24
+        },
+        {
+          "name": "isLastCommandInError",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c1dd95b889454e40b643e7c6fe5713c57f4b52bcee99ef1810a93371089b3e33",
+          "code_length": 24
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 1,
+          "code_sha256": "b8fd6f978ee0844aa6a0a103d208ae553f1e39873715b813c25622785b86f3c0",
+          "code_length": 8
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 1,
+          "code_sha256": "ececdd0818817ce22d3e2d2489e4976d1fb9a780692d6d02f43bfad151c545fd",
+          "code_length": 77
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/io/BufferedReader;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 1,
+          "code_sha256": "30ed49915058d3ff3c49bc2ff6196af23deec2c3092883142998c9b5be71db08",
+          "code_length": 8
+        },
+        {
+          "name": "executeScript",
+          "descriptor": "(Ljava/io/BufferedReader;Ljava/lang/String;)Lcom/profesorfalken/jpowershell/PowerShellResponse;",
+          "access": 1,
+          "code_sha256": "fd1d73ca097bc71ebe27f873d9b149ff57333d0e825a8d16b48cca184f2d768e",
+          "code_length": 85
+        },
+        {
+          "name": "createWriteTempFile",
+          "descriptor": "(Ljava/io/BufferedReader;)Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "8438ef5826ef7d3bc6759775645acbe1e4a0c756fa3b41d9263a8c00c71e9b61",
+          "code_length": 232
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f0ea3c4de6b2b015a14040680c67c5788fe6e66f9a7476f1c3c2ad2b78a5edcf",
+          "code_length": 445
+        },
+        {
+          "name": "closeAndWait",
+          "descriptor": "(Ljava/util/concurrent/Future;)Z",
+          "access": 2,
+          "code_sha256": "1508b4be5e3b5419e273d66a45f5b025683fa12ddfcde83ee983e855f6a4292e",
+          "code_length": 52,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "(Ljava/util/concurrent/Future<Ljava/lang/String;>;)Z"
+        },
+        {
+          "name": "checkState",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "6c7c95474e163a5a673d825cf0380e3df5ec4647a033e929724a1cc1b0892f38",
+          "code_length": 18
+        },
+        {
+          "name": "lambda$close$0",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4098,
+          "code_sha256": "c7a8e8938325252f3e50c59b439035367b208bf5c349d383bb459921dcb9b8b9",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c6a239fbdf11d1ca7a17f715e9dad0624cff64fab3ad2f0bb9181fd8e81ae2b8",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/OSDetector",
+        "com/profesorfalken/jpowershell/PowerShell",
+        "com/profesorfalken/jpowershell/PowerShellCodepage",
+        "com/profesorfalken/jpowershell/PowerShellCommandProcessor",
+        "com/profesorfalken/jpowershell/PowerShellConfig",
+        "com/profesorfalken/jpowershell/PowerShellNotAvailableException",
+        "com/profesorfalken/jpowershell/PowerShellResponse",
+        "com/profesorfalken/jpowershell/PowerShellResponseHandler",
+        "java/io/BufferedOutputStream",
+        "java/io/BufferedReader",
+        "java/io/BufferedWriter",
+        "java/io/File",
+        "java/io/FileNotFoundException",
+        "java/io/FileReader",
+        "java/io/FileWriter",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStreamWriter",
+        "java/io/PrintWriter",
+        "java/lang/AutoCloseable",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/Process",
+        "java/lang/ProcessBuilder",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/charset/Charset",
+        "java/util/Date",
+        "java/util/Map",
+        "java/util/Properties",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "java/util/concurrent/TimeUnit",
+        "java/util/concurrent/TimeoutException",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellCodepage.class",
+      "occurrence": 0,
+      "sha256": "256806f68ad766401bb50afcc077b1e14c359724a9a0d8d5ce5d98b5fe2ae56e",
+      "name": "com/profesorfalken/jpowershell/PowerShellCodepage",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "codePages",
+          "descriptor": "Ljava/util/Map;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getCodePageNameByIdetifier",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "ad5e52fb3cb1c6be380ce7a1166e0b5251441bc3f340923eea96064e42402b1d",
+          "code_length": 13
+        },
+        {
+          "name": "getIdentifierByCodePageName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f10630471b1ab206f3f3d47f0269c42ac3fbcbba274a18d807b1c052132972f6",
+          "code_length": 75
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ffb0509c7426c2d9e03b2d7dc33b8db8056351e96d39d7f3ff8520b5aae7fc5b",
+          "code_length": 2041
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShellCodepage",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellCommandProcessor.class",
+      "occurrence": 0,
+      "sha256": "8ba5a958875311b4d32d7b21dae9d40e59381ad1a0291be15fac800eb87c9402",
+      "name": "com/profesorfalken/jpowershell/PowerShellCommandProcessor",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "CRLF",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "reader",
+          "descriptor": "Ljava/io/BufferedReader;",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "scriptMode",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "waitPause",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/io/InputStream;IZ)V",
+          "access": 1,
+          "code_sha256": "0d757570ec98d0e2e539148a5510b4395df1f712fdccadcbdfba5c34de88045b",
+          "code_length": 40
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5c8b57f991a860c36962801767285ed64b1a5b318c8089c985e3d2a43224d324",
+          "code_length": 58,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "readData",
+          "descriptor": "(Ljava/lang/StringBuilder;)V",
+          "access": 2,
+          "code_sha256": "3215e9653303aa9561cff1a9c901a0a85b91d314be90154a513ebba2f279a73d",
+          "code_length": 92,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "startReading",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "b54932c2e04e702af5ead85237874cbc92d6d5e2853983c961b69a9b143413b4",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "canContinueReading",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "c7061735b56eb18e11e29168fe417fd23bd5068596086f91267882d36166ccd1",
+          "code_length": 42,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3c113358064f968376ab2c8164735835a6133e9d40ff915eed954f93f9693263",
+          "code_length": 6
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "102ecf72d2a1a6be13f43bc8fcc4eb6ecfed16d0ee6e8011f98e7fa3087c1469",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/concurrent/Callable<Ljava/lang/String;>;",
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShell",
+        "com/profesorfalken/jpowershell/PowerShellCommandProcessor",
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/util/concurrent/Callable",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellConfig.class",
+      "occurrence": 0,
+      "sha256": "2e685b5078a9a19520b0c95bb6858a6800f1ada84112f132fc62b3372420e916",
+      "name": "com/profesorfalken/jpowershell/PowerShellConfig",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CONFIG_FILENAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "config",
+          "descriptor": "Ljava/util/Properties;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getConfig",
+          "descriptor": "()Ljava/util/Properties;",
+          "access": 9,
+          "code_sha256": "d4f267558c723ac7fb09f31a96e8fbfabd18e64902f9b6ac26a5fc174a5996bd",
+          "code_length": 57
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShell",
+        "com/profesorfalken/jpowershell/PowerShellConfig",
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/util/Properties",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellNotAvailableException.class",
+      "occurrence": 0,
+      "sha256": "e38ef8d301c9f9a0fc332c50c0f566aa14980a80c970329f4aa16c9524f171d1",
+      "name": "com/profesorfalken/jpowershell/PowerShellNotAvailableException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 0,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShellNotAvailableException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellResponse.class",
+      "occurrence": 0,
+      "sha256": "427f5ea41281707daff5dabd8f9fed586c01e82fe6f0f19e18919a50748b4ca1",
+      "name": "com/profesorfalken/jpowershell/PowerShellResponse",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "error",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "commandOutput",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "timeout",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLjava/lang/String;Z)V",
+          "access": 0,
+          "code_sha256": "2b30de33c186dab7965c50dd066c589304ad5a905f53ed2b6115c6490127bd46",
+          "code_length": 20
+        },
+        {
+          "name": "isError",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getCommandOutput",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "isTimeout",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShellResponse",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellResponseHandler.class",
+      "occurrence": 0,
+      "sha256": "e61b1e643e830ade477a860d55691b3565a927857354833ffbdde12a0cd454ec",
+      "name": "com/profesorfalken/jpowershell/PowerShellResponseHandler",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "handle",
+          "descriptor": "(Lcom/profesorfalken/jpowershell/PowerShellResponse;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/profesorfalken/jpowershell/PowerShellResponseHandler",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

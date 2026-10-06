@@ -1,8 +1,7 @@
 # P09 — Builder: generation, genetic search, improvement and ranking
 
-- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; SHA-256 `9abec0aa2faf6bd78b39e80c2dcfb7dfcae62ae412d9b56a77904de6a7b5a54c`.
+- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; current-only source inventory `docs/dev/evidence/p00-inventory.json`.
 - **Dependencies:** P05,P06,P07,P08.
-- **Scope:** 12 JAR feature tasks, 2 resource tasks, one phase integration task.
 - **State:** proposed checklists; all execution, registrations and target contracts require task-level approval.
 - **File labels:** existing paths are Modify; absent paths are Create; later shared edits name their earlier proposed owner.
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
@@ -10,6 +9,11 @@
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 - **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
 - **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
+
+
+
+- **Donor baseline:** SQX145 Dev 1 only; all source fingerprints and member seeds use `SQX_145_REFERENCE_ROOT`. Missing bodies remain prerequisites.
+- **Scope:** 15 tasks; current archive allocations and resource/integration tasks only.
 
 # 9.1 FEAT-BUILDER-COMMONS-MATH3-3-6-1 - commons-math3-3.6.1.jar
 
@@ -20,12 +24,12 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar`; 1301 class declarations; SHA-256 `1e56d7b058d28b65abd256b8458e3885b674c1d588fa43cd7d1cbb9c7ef2b308`.
-- **Inspected reference:** No dedicated docs/sqx coverage; expand archive inspection; roadmap allocation `FEAT-BUILDER-COMMONS-MATH3-3-6-1`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar`; 1301 raw class entries; SHA-256 `1e56d7b058d28b65abd256b8458e3885b674c1d588fa43cd7d1cbb9c7ef2b308`.
+- **Inspected reference:** [commons-math3-3.6.1.md](../../sqx/Libraries/commons-math3-3.6.1.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar" org.apache.commons.math3.Field`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/plugins/generation/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Math, random generators and evolutionary search; audit numerical policy before adaptation; downstream P06,P10–P12,P15.
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-math3-3.6.1.jar" org.apache.commons.math3.Field`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
 - **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Builder through the phase integration gate; do not invent a library screen or direct plugin route.
@@ -50,20 +54,23 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Qualify numerical/random/genetic operators against inspected behavior; verify seed behavior, distributions, selection operators and tolerance bounds.
-- [ ] **Step 4:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-CONTRACT` → `org.apache.commons.math3.Field`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-GET-ZERO` → `org.apache.commons.math3.Field.getZero`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-GET-ONE` → `org.apache.commons.math3.Field.getOne`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire qualified adapters to consumers; release resources on failure/shutdown.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+- [ ] **Step 6:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
+
+- [ ] **Step 7:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-CONTRACT` → `org.apache.commons.math3.Field`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 8:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-GET-ZERO` → `org.apache.commons.math3.Field.getZero()Ljava/lang/Object;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-COMMONS-MATH3-3-6-1-FIELD-GET-ONE` → `org.apache.commons.math3.Field.getOne()Ljava/lang/Object;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_commons_math3_3_6_1.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
 
-# 9.2 FEAT-BUILDER-UNCOMMONS-MATHS - uncommons-maths.jar
+
+# 9.2 FEAT-BUILDER-UNCOMMONS-MATHS - uncommons-maths-1.2.2a.jar
 
 ## 1. Objective
 
@@ -72,12 +79,12 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/libs/uncommons-maths.jar`; 35 class declarations; SHA-256 `b013f2741f7f6a4ea21be0bb511f54503bac321659b6878bafab5d14db0e11f3`.
-- **Inspected reference:** No dedicated docs/sqx coverage; expand archive inspection; roadmap allocation `FEAT-BUILDER-UNCOMMONS-MATHS`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/libs/uncommons-maths-1.2.2a.jar`; 42 raw class entries; SHA-256 `eebe98f2f9d8cb5d2a030a1c3e52cfbb3ee0ff5b6a721a45e62092e3bbf83c5c`.
+- **Inspected reference:** [uncommons-maths-1.2.2a.md](../../sqx/Libraries/uncommons-maths-1.2.2a.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/libs/uncommons-maths-1.2.2a.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/libs/uncommons-maths-1.2.2a.jar" org.uncommons.maths.Maths`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/plugins/generation/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Math, random generators and evolutionary search; audit numerical policy before adaptation; downstream P06,P10–P12,P15.
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/uncommons-maths.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/uncommons-maths.jar" org.uncommons.maths.Maths`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
 - **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Builder through the phase integration gate; do not invent a library screen or direct plugin route.
@@ -102,20 +109,23 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Qualify numerical/random/genetic operators against inspected behavior; verify seed behavior, distributions, selection operators and tolerance bounds.
-- [ ] **Step 4:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-CONTRACT` → `org.uncommons.maths.Maths`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-FACTORIAL` → `org.uncommons.maths.Maths.factorial`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-BIG-FACTORIAL` → `org.uncommons.maths.Maths.bigFactorial`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire qualified adapters to consumers; release resources on failure/shutdown.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+- [ ] **Step 6:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
+
+- [ ] **Step 7:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-CONTRACT` → `org.uncommons.maths.Maths`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 8:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-FACTORIAL` → `org.uncommons.maths.Maths.factorial(I)J`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-UNCOMMONS-MATHS-MATHS-BIG-FACTORIAL` → `org.uncommons.maths.Maths.bigFactorial(I)Ljava/math/BigInteger;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_uncommons_maths.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
 
-# 9.3 FEAT-BUILDER-WATCHMAKER-FRAMEWORK - watchmaker-framework.jar
+
+# 9.3 FEAT-BUILDER-WATCHMAKER-FRAMEWORK - watchmaker-framework-0.7.1.jar
 
 ## 1. Objective
 
@@ -124,12 +134,12 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/libs/watchmaker-framework.jar`; 74 class declarations; SHA-256 `3408409623497b46fd70eb6acab62824c9961f3db36b2f79286514f078aff07e`.
-- **Inspected reference:** No dedicated docs/sqx coverage; expand archive inspection; roadmap allocation `FEAT-BUILDER-WATCHMAKER-FRAMEWORK`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/libs/watchmaker-framework-0.7.1.jar`; 74 raw class entries; SHA-256 `f4d1ac73aa475bc403b6a6e8d5bce37f4d69a215e2deaa65ecc57d2e13368fb8`.
+- **Inspected reference:** [watchmaker-framework-0.7.1.md](../../sqx/Libraries/watchmaker-framework-0.7.1.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/libs/watchmaker-framework-0.7.1.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/libs/watchmaker-framework-0.7.1.jar" org.uncommons.util.concurrent.ConfigurableThreadFactory`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/plugins/generation/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Math, random generators and evolutionary search; audit numerical policy before adaptation; downstream P06,P10–P12,P15.
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/watchmaker-framework.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/watchmaker-framework.jar" org.uncommons.util.concurrent.ConfigurableThreadFactory`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
 - **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Builder through the phase integration gate; do not invent a library screen or direct plugin route.
@@ -154,17 +164,20 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Qualify numerical/random/genetic operators against inspected behavior; verify seed behavior, distributions, selection operators and tolerance bounds.
-- [ ] **Step 4:** `FR-BUILDER-WATCHMAKER-FRAMEWORK-CONFIGURABLE-THREAD-FACTORY-CONTRACT` → `org.uncommons.util.concurrent.ConfigurableThreadFactory`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-WATCHMAKER-FRAMEWORK-CONFIGURABLE-THREAD-FACTORY-NEW-THREAD` → `org.uncommons.util.concurrent.ConfigurableThreadFactory.newThread`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire qualified adapters to consumers; release resources on failure/shutdown.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+- [ ] **Step 6:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
+
+- [ ] **Step 7:** `FR-BUILDER-WATCHMAKER-FRAMEWORK-CONFIGURABLE-THREAD-FACTORY-CONTRACT` → `org.uncommons.util.concurrent.ConfigurableThreadFactory`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 8:** `FR-BUILDER-WATCHMAKER-FRAMEWORK-CONFIGURABLE-THREAD-FACTORY-NEW-THREAD` → `org.uncommons.util.concurrent.ConfigurableThreadFactory.newThread(Ljava/lang/Runnable;)Ljava/lang/Thread;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_watchmaker_framework.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
+
 
 # 9.4 FEAT-BUILDER-APP-BUILDER - AppBuilder.jar
 
@@ -175,15 +188,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar`; 1 class declarations; SHA-256 `43e6ae1fcdc978c8c25b7fec1940c1c903fd3d711d08e3afa5b4d206c8000d4b`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Builder/AppBuilder.md`; roadmap allocation `FEAT-BUILDER-APP-BUILDER`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar`; 1 raw class entries; SHA-256 `69c29c561d0d82d4f8841e9fa94fac0ec9a0f6797b8c9e209f9985318c04ac0f`.
+- **Inspected reference:** [AppBuilder.md](../../sqx/Builder/AppBuilder.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar" com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Workspace/product registration and backend composition; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/AppBuilder.jar" com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -221,14 +234,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Mount the Builder workspace against real backend capabilities; verify discovery, workspace readiness, job/resource ownership and unmount cleanup.
-- [ ] **Step 4:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-CONTRACT` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-GET-PREFERRED-POSITION` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin.getPreferredPosition`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-INIT-PLUGIN` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin.initPlugin`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-CONTRACT` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-GET-NAME` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin.getName()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-APP-BUILDER-BUILDER-APP-PLUGIN-GET-PRODUCT` → `com.strategyquant.plugin.App.impl.Builder.BuilderAppPlugin.getProduct()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -236,6 +251,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-app-builder.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-APP-BUILDER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.5 FEAT-BUILDER-DASHBOARD-RESULTS - DashboardResults.jar
 
@@ -246,15 +262,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar`; 2 class declarations; SHA-256 `1025b2652a1da807b8e1c707c9001d9200167c6adb02a52e0106b59c0ef3fd88`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Results/DashboardResults.md`; roadmap allocation `FEAT-BUILDER-DASHBOARD-RESULTS`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar`; 2 raw class entries; SHA-256 `b2d127ddb067181677a79498cc6fb77f14b43397fe4b044d0626fb8f636ddde0`.
+- **Inspected reference:** [DashboardResults.md](../../sqx/Results/DashboardResults.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar" com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build progress/result projections; emit actual run state; downstream P10–P15.
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResults.jar" com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DashboardResults`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResultsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResultsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/directives/ResultPanelCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResultsService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/DashboardResultsCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardResults/directives/ResultPanelCtrl.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -290,13 +306,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Deliver the consumed DashboardResults capability in workspace/Builder; verify fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries.
-- [ ] **Step 4:** `FR-BUILDER-DASHBOARD-RESULTS-DASHBOARD-RESULTS-SERVLET-CONTRACT` → `com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-DASHBOARD-RESULTS-DASHBOARD-RESULTS-SERVLET-EXECUTE` → `com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-DASHBOARD-RESULTS-DASHBOARD-RESULTS-SERVLET-CONTRACT` → `com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-DASHBOARD-RESULTS-DASHBOARD-RESULTS-SERVLET-EXECUTE` → `com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-DASHBOARD-RESULTS-DASHBOARD-RESULTS-SERVLET-ON-PRINT` → `com.strategyquant.plugin.Dashboard.impl.Results.DashboardResultsServlet.onPrint(Ljava/util/Map;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -304,6 +323,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-dashboard-results.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-DASHBOARD-RESULTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.6 FEAT-BUILDER-ENGINE-PANEL - EnginePanel.jar
 
@@ -314,15 +334,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar`; 4 class declarations; SHA-256 `e10c17face0f953e75b3e36bdbc23c81941592665b0c7329eb9494bb1f2f45e1`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/GridControl/EnginePanel.md`; roadmap allocation `FEAT-BUILDER-ENGINE-PANEL`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar`; 4 raw class entries; SHA-256 `41c3a4e9037ddde57eefcafb911db5d3fb9626d76c7adead17217bceaa7fdeeb`.
+- **Inspected reference:** [EnginePanel.md](../../sqx/GridControl/EnginePanel.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar" com.strategyquant.plugin.Engine.impl.Panel.EngineServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build progress/result projections; emit actual run state; downstream P10–P15.
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar" com.strategyquant.plugin.Engine.impl.Panel.EngineServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js`.
 - **Existing UI connection:** Builder; exact retained source-map `ui/app/plugins/project/EnginePanel/source-map.json`. Target `ui/app/plugins/project/EnginePanel/EngineCtrl.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -366,13 +386,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Deliver the consumed EnginePanel capability in workspace/Builder; verify fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries.
-- [ ] **Step 4:** `FR-BUILDER-ENGINE-PANEL-ENGINE-SERVLET-CONTRACT` → `com.strategyquant.plugin.Engine.impl.Panel.EngineServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-ENGINE-PANEL-ENGINE-SERVLET-EXECUTE` → `com.strategyquant.plugin.Engine.impl.Panel.EngineServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-ENGINE-PANEL-ENGINE-SERVLET-CONTRACT` → `com.strategyquant.plugin.Engine.impl.Panel.EngineServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-ENGINE-PANEL-ENGINE-SERVLET-EXECUTE` → `com.strategyquant.plugin.Engine.impl.Panel.EngineServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-ENGINE-PANEL-ENGINE-SERVLET-ON-GET-FITNESS-EVOLUTION-STATS` → `com.strategyquant.plugin.Engine.impl.Panel.EngineServlet.onGetFitnessEvolutionStats(Ljava/util/Map;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -380,6 +403,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-engine-panel.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-ENGINE-PANEL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.7 FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT - FitnessMethodStrategyResult.jar
 
@@ -390,15 +414,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar`; 4 class declarations; SHA-256 `d873f8b2800a34cf815706a98f8951fc80981406e9fccf95a0ebc671c0ee023e`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Shared/FitnessMethodStrategyResult.md`; roadmap allocation `FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar`; 4 raw class entries; SHA-256 `d2d109daf04075fe48e02fa888f53f938710744f1ab628fb7f011ea747cb0b0f`.
+- **Inspected reference:** [FitnessMethodStrategyResult.md](../../sqx/Shared/FitnessMethodStrategyResult.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar" com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Strategy fitness and build command adapter; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar" com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/fitnessMethodStrategyResult.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/fitnessMethodStrategyResult.html`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -434,13 +458,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Compute the named fitness objective from qualified result inputs; verify objective direction, ties, missing metrics and nonfinite scores.
-- [ ] **Step 4:** `FR-BUILDER-FITNESS-METHOD-STRATEGY-RESULT-FITNESS-METHOD-STRATEGY-RESULT-SERVLET-CONTRACT` → `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-FITNESS-METHOD-STRATEGY-RESULT-FITNESS-METHOD-STRATEGY-RESULT-SERVLET-EXECUTE` → `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-FITNESS-METHOD-STRATEGY-RESULT-FITNESS-METHOD-STRATEGY-RESULT-SERVLET-CONTRACT` → `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-FITNESS-METHOD-STRATEGY-RESULT-FITNESS-METHOD-STRATEGY-RESULT-SERVLET-EXECUTE` → `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-FITNESS-METHOD-STRATEGY-RESULT-FITNESS-METHOD-STRATEGY-RESULT-SERVLET-ON-LIST` → `com.strategyquant.plugin.FitnessMethod.impl.StrategyResult.FitnessMethodStrategyResultServlet.onList()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -448,6 +475,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-fitness-method-strategy-result.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.8 FEAT-BUILDER-SERVLET-BUILDER - ServletBuilder.jar
 
@@ -458,15 +486,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar`; 2 class declarations; SHA-256 `f5abf10d91cc265fefc4a4ec89ca43e70800bc100d9f51b9855faea621c49e82`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Builder/ServletBuilder.md`; roadmap allocation `FEAT-BUILDER-SERVLET-BUILDER`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar`; 2 raw class entries; SHA-256 `75b59bfe39e275e8531ada6365a6b16faf5add62688e237a71433e27eddd6b03`.
+- **Inspected reference:** [ServletBuilder.md](../../sqx/Builder/ServletBuilder.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar" com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Strategy fitness and build command adapter; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/ServletBuilder/ServletBuilder.jar" com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletBuilder`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/ServletBuilder`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -502,13 +530,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Configure and execute build generation/improvement against owned jobs; verify block constraints, preserved strategy parts, stop rules and repeatability.
-- [ ] **Step 4:** `FR-BUILDER-SERVLET-BUILDER-BUILDER-SERVLET-CONTRACT` → `com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-SERVLET-BUILDER-BUILDER-SERVLET-EXECUTE` → `com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-SERVLET-BUILDER-BUILDER-SERVLET-CONTRACT` → `com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-SERVLET-BUILDER-BUILDER-SERVLET-EXECUTE` → `com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-SERVLET-BUILDER-BUILDER-SERVLET-ON-GET-BUILD-TEMPLATE` → `com.strategyquant.plugin.Servlet.impl.Builder.BuilderServlet.onGetBuildTemplate(Ljava/util/Map;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -516,6 +547,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-servlet-builder.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-SERVLET-BUILDER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.9 FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE - SettingsPartsToImprove.jar
 
@@ -526,15 +558,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar`; 1 class declarations; SHA-256 `31de31b3ea68df6a2c9313d4c1e25469087c8ac0b178da947a03f4a21460636d`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Shared/SettingsPartsToImprove.md`; roadmap allocation `FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar`; 1 raw class entries; SHA-256 `7b34d7fb9d20b96ae581200d4f6e950f71ea22bd35fe8448b40f6a876095d6d5`.
+- **Inspected reference:** [SettingsPartsToImprove.md](../../sqx/Shared/SettingsPartsToImprove.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar" com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build/improve/search configuration and task execution; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar" com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/views/partsToImprove.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/views/partsToImprove.html`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -572,14 +604,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Configure and execute build generation/improvement against owned jobs; verify block constraints, preserved strategy parts, stop rules and repeatability.
-- [ ] **Step 4:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-CONTRACT` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-GET-PREFERRED-POSITION` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin.getPreferredPosition`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-INIT-PLUGIN` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin.initPlugin`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-CONTRACT` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-GET-PRODUCT` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin.getProduct()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-SETTINGS-PARTS-TO-IMPROVE-PARTS-TO-IMPROVE-SETTINGS-PLUGIN-GET-PREFERRED-POSITION` → `com.strategyquant.plugin.Settings.impl.PartsToImprove.PartsToImproveSettingsPlugin.getPreferredPosition()I`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -587,6 +621,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-settings-parts-to-improve.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.10 FEAT-BUILDER-SETTINGS-RANKINGS - SettingsRankings.jar
 
@@ -597,15 +632,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar`; 2 class declarations; SHA-256 `66c06308f8a352bfd31f1e95643b51df017f80827c0beb4e0d7fb4f02bb592db`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Shared/SettingsRankings.md`; roadmap allocation `FEAT-BUILDER-SETTINGS-RANKINGS`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar`; 2 raw class entries; SHA-256 `abbe6504b602945607a4f412bf247fe5710481d7726056398957ac6f5886da06`.
+- **Inspected reference:** [SettingsRankings.md](../../sqx/Shared/SettingsRankings.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar" com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build/improve/search configuration and task execution; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/SettingsRankings.jar" com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingCtrl.js`.
 - **Existing UI connection:** Builder; exact retained source-map `ui/app/plugins/project/SettingsRankings/source-map.json`. Target `ui/app/plugins/project/SettingsRankings/RankingCtrl.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -651,14 +686,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Implement validated Rankings settings and lossless configuration round trips; verify observed defaults, dependency validation, unknown fields, update conflicts and reload.
-- [ ] **Step 4:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-CONTRACT` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-EXECUTE` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-GET-FITNESS-METHODS` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet.getFitnessMethods`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-CONTRACT` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-EXECUTE` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-SETTINGS-RANKINGS-SETTINGS-RANKINGS-SERVLET-GET-FITNESS-METHODS` → `com.strategyquant.plugin.Settings.impl.Rankings.SettingsRankingsServlet.getFitnessMethods()Lorg/json/JSONArray;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -666,6 +703,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-settings-rankings.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-SETTINGS-RANKINGS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.11 FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD - SettingsWhatToBuild.jar
 
@@ -676,15 +714,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar`; 2 class declarations; SHA-256 `a186a61db5e20a129a2845d3a3e079c391013fa530d2f507b44dd95f6b6f0f51`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Shared/SettingsWhatToBuild.md`; roadmap allocation `FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar`; 2 raw class entries; SHA-256 `b836d5729770602d51b99f1b73edeaaa370518e003fc45bd54fcc4cfd8217518`.
+- **Inspected reference:** [SettingsWhatToBuild.md](../../sqx/Shared/SettingsWhatToBuild.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar" com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build/improve/search configuration and task execution; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar" com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/WhatToBuildService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/conditionsAndPeriods/ConditionsAndPeriodsService.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/WhatToBuildService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/conditionsAndPeriods/ConditionsAndPeriodsService.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -722,13 +760,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Configure and execute build generation/improvement against owned jobs; verify block constraints, preserved strategy parts, stop rules and repeatability.
-- [ ] **Step 4:** `FR-BUILDER-SETTINGS-WHAT-TO-BUILD-WHAT-TO-BUILD-SERVLET-CONTRACT` → `com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-SETTINGS-WHAT-TO-BUILD-WHAT-TO-BUILD-SERVLET-EXECUTE` → `com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet.execute`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-SETTINGS-WHAT-TO-BUILD-WHAT-TO-BUILD-SERVLET-CONTRACT` → `com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-SETTINGS-WHAT-TO-BUILD-WHAT-TO-BUILD-SERVLET-EXECUTE` → `com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet.execute(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-SETTINGS-WHAT-TO-BUILD-WHAT-TO-BUILD-SERVLET-ON-LIST-FILES` → `com.strategyquant.plugin.Settings.impl.WhatToBuild.WhatToBuildServlet.onListFiles()Ljava/lang/String;`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -736,6 +777,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-settings-what-to-build.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.12 FEAT-BUILDER-TASK-BUILD - TaskBuild.jar
 
@@ -746,15 +788,15 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar`; 11 class declarations; SHA-256 `e5d2f688ef7820d3e46d2de9bd2e0d6bdcf93b39df74532573d0957eca1a3f70`.
-- **Inspected reference:** `HARUQUANTAI_ROOT/docs/sqx/Builder/TaskBuild.md`; roadmap allocation `FEAT-BUILDER-TASK-BUILD`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar`; 11 raw class entries; SHA-256 `38d7920fafa619f5521a5d147f2f57d2bc265f251aae02d6076bd972c49643d4`.
+- **Inspected reference:** [TaskBuild.md](../../sqx/Builder/TaskBuild.md); full class/member metadata is linked there.
+- **Research commands:** `jar tf "$SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar"`; `javap -c -p -classpath "$SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar" com.strategyquant.plugin.Task.impl.Build.BuildTask`. Inspect actual consumed bodies and callers before translation.
+- **Gap:** current declarations seed proposed FRs; defaults, algorithm bodies, consumption and runtime outcomes require independent validation. No source fallback.
 - **Owner:** `app/workspace/Builder/README.md`; proposed IDs require registry reconciliation.
 - **Consumed role:** Build/improve/search configuration and task execution; downstream .
-- **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar" com.strategyquant.plugin.Task.impl.Build.BuildTask`.
-- **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/indicatorsCalibration/IndicatorsCalibrationPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/simpleSettings/SimpleBuildSettingsCtrl.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/indicatorsCalibration/IndicatorsCalibrationPopupCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/TaskBuild/simpleSettings/SimpleBuildSettingsCtrl.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -792,14 +834,16 @@
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
 - [ ] **Step 2:** Specify defaults/I/O/errors, classify evidence and approve contracts before coding.
 - [ ] **Step 3:** Configure and execute build generation/improvement against owned jobs; verify block constraints, preserved strategy parts, stop rules and repeatability.
-- [ ] **Step 4:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-CONTRACT` → `com.strategyquant.plugin.Task.impl.Build.BuildTask`: Define typed state, lifecycle and errors.
-- [ ] **Step 5:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-BEFORE-START` → `com.strategyquant.plugin.Task.impl.Build.BuildTask.beforeStart`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 6:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-SET-DATABANK-FILTER` → `com.strategyquant.plugin.Task.impl.Build.BuildTask.setDatabankFilter`: Specify/test inputs, defaults, outputs, side effects and errors.
-- [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
-- [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
+- [ ] **Step 4:** Wire owned routes/events/discovery; expose unavailable states.
+- [ ] **Step 5:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
-- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
-- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- [ ] **Step 6:** Connect retained UI: Ratify the feature-owned wire contract; bind actual strategy/settings submission, build job controls, progress and persisted candidates to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 7:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
+
+- [ ] **Step 8:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-CONTRACT` → `com.strategyquant.plugin.Task.impl.Build.BuildTask`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 9:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-INIT-PARAMS` → `com.strategyquant.plugin.Task.impl.Build.BuildTask.initParams()V`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
+- [ ] **Step 10:** `FR-BUILDER-TASK-BUILD-BUILD-TASK-BEFORE-START` → `com.strategyquant.plugin.Task.impl.Build.BuildTask.beforeStart()Z`: confirm current consumed behavior, specify defaults/I/O/errors and independently test its accepted contract.
 
 ## 5. Verification & Testing
 
@@ -807,6 +851,7 @@
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-builder-task-build.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-BUILDER-TASK-BUILD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 9.13 FEAT-UI-DASHBOARD-PANEL - DashboardPanel resource contribution
 
@@ -817,12 +862,12 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel`; narrow source: `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/module.js`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel`; narrow source: `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel/module.js`.
 - **FR:** `FR-UI-DASHBOARD-PANEL-RESOURCE-WORKFLOW`; proposed owning README `app/workspace/Builder/README.md`.
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/DashboardCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/dashboard.html`; `SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/module.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel/DashboardCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel/dashboard.html`; `SQX_145_REFERENCE_ROOT/internal/plugins/DashboardPanel/module.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -868,6 +913,7 @@
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-dashboard-panel.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-UI-DASHBOARD-PANEL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
+
 # 9.14 FEAT-UI-SETTINGS-GENETIC-OPTIONS - SettingsGeneticOptions resource contribution
 
 ## 1. Objective
@@ -877,12 +923,12 @@
 
 ## 2. Research and donors
 
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`; narrow source: `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/module.js`.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`; narrow source: `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/module.js`.
 - **FR:** `FR-UI-SETTINGS-GENETIC-OPTIONS-RESOURCE-WORKFLOW`; proposed owning README `app/workspace/Builder/README.md`.
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`; `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/views/geneticOptions.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`; `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/views/geneticOptions.html`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -928,6 +974,7 @@
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-settings-genetic-options.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-builder-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise Builder for FEAT-UI-SETTINGS-GENETIC-OPTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
+
 # 9.15 P09 integration — Generate and improve executable strategies with real build progress and ranking
 
 ## 1. Objective
@@ -944,7 +991,7 @@
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_REFERENCE_ROOT/internal/web/BUILDER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/BUILDER`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/BUILDER/layout/LayoutCtrl.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`; `SQX_145_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js`.
 - **Existing UI connection:** Builder; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/builderClient.ts`; wire actual strategy/settings submission, build job controls, progress and persisted candidates.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 

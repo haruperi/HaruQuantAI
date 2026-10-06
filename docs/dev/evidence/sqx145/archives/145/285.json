@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskSaveToFiles/TaskSaveToFiles.jar",
+  "sha256": "3ee328b7c850f82783a49835a81add1023f162c3660b8bb6678cebcc675046f9",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/SaveToFiles/SaveToFiles.class": "4606995f954eb67066daf70e3123deac69c6aeeb830b31722b549b7d35de9047"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/SaveToFiles/SaveToFiles.class",
+      "occurrence": 0,
+      "sha256": "4606995f954eb67066daf70e3123deac69c6aeeb830b31722b549b7d35de9047",
+      "member_shard": "docs/dev/evidence/sqx145/members/285/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/285/001.json",
+      "sha256": "b9dddc08bfdb0b444f47f69ee9c37b0ba9f1d29ffbc145682956cc0e206a7a91"
+    }
+  ]
+}

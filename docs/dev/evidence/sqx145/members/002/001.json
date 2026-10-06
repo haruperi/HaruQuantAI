@@ -1,0 +1,4876 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/affinity-3.23.3.jar",
+  "archive_sha256": "969e4b4ad761e34f3c5d59fe173bba08623bbf4e9002bc567665626886f01928",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "net/openhft/affinity/Affinity.class",
+      "occurrence": 0,
+      "sha256": "620962bd2d0c8e36da8dd0c538011562dda96ae7517b6c88d9f6ad52f9385fd2",
+      "name": "net/openhft/affinity/Affinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 24
+        },
+        {
+          "name": "AFFINITY_IMPL",
+          "descriptor": "Lnet/openhft/affinity/IAffinity;",
+          "access": 26
+        },
+        {
+          "name": "JNAAvailable",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 10
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/Affinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/Affinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/Affinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinityImpl",
+          "descriptor": "()Lnet/openhft/affinity/IAffinity;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "isWindowsJNAAffinityUsable",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "4c8716762cd96d8e4b81b7af0f1f13224063326153df46750b3e72644d268cfe",
+          "code_length": 31
+        },
+        {
+          "name": "isPosixJNAAffinityUsable",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "7f2c678061543a457da04f444d1d56f2a9d380f650aafb52eec5f5398df67418",
+          "code_length": 31
+        },
+        {
+          "name": "isLinuxJNAAffinityUsable",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "9402dcc91addcbff3e368edbe20f73ca7c3ef428b80f0fcc93e442d31152ab89",
+          "code_length": 31
+        },
+        {
+          "name": "isMacJNAAffinityUsable",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "919a5022928d838969f3fa7a30e029cb91ea21b1b4ed5a629339a604b44dd6c2",
+          "code_length": 20
+        },
+        {
+          "name": "isSolarisJNAAffinityUsable",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "f7d5c716f572467863d141a0fd82b3bc791459e0c3cc64ffeffa97c93f4cf798",
+          "code_length": 20
+        },
+        {
+          "name": "logThrowable",
+          "descriptor": "(Ljava/lang/Throwable;Ljava/lang/String;)V",
+          "access": 10,
+          "code_sha256": "ea20a6a88648b3e00810d82896035a873e82e451c530e37476476ec70a5c5edb",
+          "code_length": 46
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 9,
+          "code_sha256": "334e00042e9ecb914622ed63c2a59858e06e199be7d0d1fb2600580a0f46ffe8",
+          "code_length": 9
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 9,
+          "code_sha256": "972f0162b945f3a13d3b3b6953119bfa36a89e2f8fa6e2663f65d62a64a8475c",
+          "code_length": 10
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(I)V",
+          "access": 9,
+          "code_sha256": "265665f2f18bd36cf809df9954c3d2a90a0c8745b8e122530d50f2c787ccf23f",
+          "code_length": 24
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "74361f92950caf72ad18db4e9ee4c045d0389cc28d4b9981472310371fda2f14",
+          "code_length": 9
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "dd25348236bae88df27c9754a789c1b2c8893cc3fbbc7de01fe514722b14b085",
+          "code_length": 9
+        },
+        {
+          "name": "setThreadId",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "12078cf07f69ac3d9d06d36da7c6c6940247d496bfd4084bc36047bdb45d6156",
+          "code_length": 60
+        },
+        {
+          "name": "isJNAAvailable",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "5589e0e8529bf16151dd1f717d5ee4bf0c3d0dc9c67744f44fd34c006080ebed",
+          "code_length": 37
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "453991afdaccb59073be8a1c650182d515c6f8987d77e66082c73db10d5b4cef",
+          "code_length": 4
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "763834ca82b7a2e7133ab28c922f63928fec51decdd0dae4c5be302811612135",
+          "code_length": 4
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(Z)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "3e9f93eb1f07d2cf6f2cb717a06e0fc1fa18923d8bff0dcf747e6979f40e7420",
+          "code_length": 5
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "(Z)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "b8ea48252bd3940788f9a11450ea6afb3704fe6e5764dc70ea7a2e266b5d6730",
+          "code_length": 5
+        },
+        {
+          "name": "resetToBaseAffinity",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "6496ce083c995dbe4f770eb75707ac04479aac2233f40e1479fc6a7fc8468fc4",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2deaec6b0bcc1abbe43ac0f736b97561a6a795e22a06eda5c6b38a2e8f3d492b",
+          "code_length": 227
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/Affinity;>;",
+      "class_references": [
+        "[Lnet/openhft/affinity/Affinity;",
+        "java/io/PrintWriter",
+        "java/io/StringWriter",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/Field",
+        "java/util/BitSet",
+        "net/openhft/affinity/Affinity",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/LinuxJNAAffinity",
+        "net/openhft/affinity/impl/NullAffinity",
+        "net/openhft/affinity/impl/OSXJNAAffinity",
+        "net/openhft/affinity/impl/PosixJNAAffinity",
+        "net/openhft/affinity/impl/SolarisJNAAffinity",
+        "net/openhft/affinity/impl/WindowsJNAAffinity",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityLock$Warnings.class",
+      "occurrence": 0,
+      "sha256": "cf513c4240e53f826adcbcc9e718fe4024776b8928b8551a1dc05563376641a6",
+      "name": "net/openhft/affinity/AffinityLock$Warnings",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "warmNoReservedCPUs",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "64ed8daea9694a9f7055d4cb1dee548482e1c080fbc66415d41129df87d0725e",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/BitSet",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityLock$Warnings",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityLock.class",
+      "occurrence": 0,
+      "sha256": "93d558bef407113dd1f1199fd9d88c798d5a93605c03dfd4af960ef9ca533589",
+      "name": "net/openhft/affinity/AffinityLock",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "AFFINITY_RESERVED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROCESSORS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "BASE_AFFINITY",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 25
+        },
+        {
+          "name": "RESERVED_AFFINITY",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 25
+        },
+        {
+          "name": "ANY_CPU",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_INVENTORY",
+          "descriptor": "Lnet/openhft/affinity/LockInventory;",
+          "access": 26
+        },
+        {
+          "name": "cpuId",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "base",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "reservable",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "lockInventory",
+          "descriptor": "Lnet/openhft/affinity/LockInventory;",
+          "access": 18
+        },
+        {
+          "name": "bound",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "assignedThread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 0
+        },
+        {
+          "name": "boundHere",
+          "descriptor": "Ljava/lang/Throwable;",
+          "access": 0
+        },
+        {
+          "name": "resetAffinity",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IZZLnet/openhft/affinity/LockInventory;)V",
+          "access": 0,
+          "code_sha256": "89d21a3dbbcd36d3141b7e1357df8cfebd9fd75c124deb28bbfedf56a42655cc",
+          "code_length": 36
+        },
+        {
+          "name": "cpuLayout",
+          "descriptor": "(Lnet/openhft/affinity/CpuLayout;)V",
+          "access": 9,
+          "code_sha256": "9912cc6fe4e360f9cb0383f399512d04abe97ee1c89cd1bdbdd796cafb1c950f",
+          "code_length": 8
+        },
+        {
+          "name": "cpuLayout",
+          "descriptor": "()Lnet/openhft/affinity/CpuLayout;",
+          "access": 9,
+          "code_sha256": "994c696a9f58b1761a97ef8dbe31ea7c18e750d78814f796e8fe09faf9dae89c",
+          "code_length": 7
+        },
+        {
+          "name": "getReservedAffinity0",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 10,
+          "code_sha256": "edfee80898cfe80804ed13404f46c8ac673895fd92191460e85e77d350b31a8e",
+          "code_length": 150
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "a7b8b042e571aeded87784436ae7552f92f3d063c3bdd263682875d553dc55c9",
+          "code_length": 5
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "e6fc8fa646cc3b6a5e20f1679f9566a1a32ac32200076c4e45e234f2ade4bca2",
+          "code_length": 5
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(Z)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "a8a2a091baf7ded024286c3cc9a0e8de7e7e7e483d5940af032acda7fc3e8f76",
+          "code_length": 16
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(I)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "52006a007a895f1d78c8eb11b242b0c186219df3bc60e896cd47e4064885de99",
+          "code_length": 16
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "([I)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "c215a50fd4aa6060ca5142a9be3f449bae62137a635fa408c775daa78a5c8585",
+          "code_length": 91
+        },
+        {
+          "name": "acquireLockLastMinus",
+          "descriptor": "(I)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "0bf5ca6d7b9492a4a51f4489c91531c9ddb25b4da24444e42cd4c37ef2383c8b",
+          "code_length": 20
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "b5ddd53262074e155049873634eb0f66fcadd85bd662fac76a7702e50df0b8cd",
+          "code_length": 311
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "(Z)Lnet/openhft/affinity/AffinityLock;",
+          "access": 9,
+          "code_sha256": "4d6182db5d82d15d541d68204f2f4dd3ae19f6fa91d1e274c0c4f5e706668ba5",
+          "code_length": 16
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(ZI[Lnet/openhft/affinity/AffinityStrategy;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 138,
+          "code_sha256": "31977c4973d377e409171cf0ffb76d66a1984491baa1a7611a8e57fa6383b7bd",
+          "code_length": 13
+        },
+        {
+          "name": "tryAcquireLock",
+          "descriptor": "(ZI)Lnet/openhft/affinity/AffinityLock;",
+          "access": 10,
+          "code_sha256": "335f59f214052029b7acc81cc30fe8512ed39e8e028dbed9e8ee4250a344a0ed",
+          "code_length": 9
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "(ZI[Lnet/openhft/affinity/AffinityStrategy;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 138,
+          "code_sha256": "b23b6cde3f57de4b5f601a1b41bd00d79956d95785441f25128170de8d83e03f",
+          "code_length": 13
+        },
+        {
+          "name": "dumpLocks",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "d753e2886ffcce8a601bbcae4bf192645b7feef66153d47b92653982d28b92b8",
+          "code_length": 7
+        },
+        {
+          "name": "areAssertionsEnabled",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "39b76ad4188c77dd01e170192f8bc59f223db6def4bdf163915c425c7daef00c",
+          "code_length": 24
+        },
+        {
+          "name": "resetAffinity",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "resetAffinity",
+          "descriptor": "(Z)Lnet/openhft/affinity/AffinityLock;",
+          "access": 1,
+          "code_sha256": "8c4873a8d7a160b1e35ae315fbf52abf7edd6937a2766632d371fb9809bfa964",
+          "code_length": 7
+        },
+        {
+          "name": "assignCurrentThread",
+          "descriptor": "(ZZ)V",
+          "access": 16,
+          "code_sha256": "4716650bc812102389984761d27541092ad8b89a8545709c028d79e25bf731cd",
+          "code_length": 17
+        },
+        {
+          "name": "bind",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2322450b5a4d5e4ff03a4f7b642e67d290a5b673ac7d188522de68c726974eb7",
+          "code_length": 6
+        },
+        {
+          "name": "bind",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "bdd55953fa47f9e5537d7fb5eccc219938e93f2a91a826d8714ddffd34129276",
+          "code_length": 191
+        },
+        {
+          "name": "canReserve",
+          "descriptor": "(Z)Z",
+          "access": 16,
+          "code_sha256": "e0d33a781229b62c4f35ea17fcb75da412407edf2eba91b91944b973acdf5c51",
+          "code_length": 60
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "([Lnet/openhft/affinity/AffinityStrategy;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 129,
+          "code_sha256": "ca4c1c2c53a21ae7df9267393d5e0c76be26fb2b0fc2288604ab90280a3fc1e9",
+          "code_length": 10
+        },
+        {
+          "name": "release",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2224832d600c7871a9f054074fdfb35958d925a06338b4160f9e592d252986a4",
+          "code_length": 28
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1ff0273801083d6cd16fd6bb4549aa02bfcecb456f182cafa3db55aa8f64a27a",
+          "code_length": 5
+        },
+        {
+          "name": "finalize",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "e2904b98756cf109f684acbbfc354d9efb5bf90e4525bf63522d79d8589c33c6",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Throwable"
+          ]
+        },
+        {
+          "name": "cpuId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "isAllocated",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "fedd5bc6a23adbd26bba74eed80e4c25d9a76e36dfb08ffc1a8d4e094f35f3e8",
+          "code_length": 13
+        },
+        {
+          "name": "isBound",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a26ca847ed86a36142d26defda6f11d2b7d438d541b91700fc1d53ba529bdf3b",
+          "code_length": 88
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5af168b0144d2e7c2f44935a9508b4c257090a7c337533c1a716291d99c890be",
+          "code_length": 117
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[J",
+        "java/io/Closeable",
+        "java/io/File",
+        "java/io/PrintStream",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Arrays",
+        "java/util/BitSet",
+        "java/util/List",
+        "java/util/stream/IntStream",
+        "java/util/stream/Stream",
+        "net/openhft/affinity/Affinity",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityLock$Warnings",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategy",
+        "net/openhft/affinity/CpuLayout",
+        "net/openhft/affinity/LockCheck",
+        "net/openhft/affinity/LockInventory",
+        "net/openhft/affinity/impl/NoCpuLayout",
+        "net/openhft/affinity/impl/VanillaCpuLayout",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies$1.class",
+      "occurrence": 0,
+      "sha256": "86b5772b632a851241083e44754344fc781a00efcd3cde909cbc60d691fb6004",
+      "name": "net/openhft/affinity/AffinityStrategies$1",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "net/openhft/affinity/AffinityStrategies",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies$2.class",
+      "occurrence": 0,
+      "sha256": "fbe4d7276ca2055f5e1d5558f095a9d586068c62a2f1a39bab4f2e7bae0818e9",
+      "name": "net/openhft/affinity/AffinityStrategies$2",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "net/openhft/affinity/AffinityStrategies",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "d5eed4c65937c384d37e23c551b857a99c6a98591663915b9748777a0dcca0f9",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1",
+        "net/openhft/affinity/AffinityStrategies$2",
+        "net/openhft/affinity/CpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies$3.class",
+      "occurrence": 0,
+      "sha256": "34fe3cff60cf12fb1a3a30428e9fff9a8b4124796ee43fab71278f7a37308766",
+      "name": "net/openhft/affinity/AffinityStrategies$3",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "net/openhft/affinity/AffinityStrategies",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "64fad10ffd8f9256b47644521ec1507e206668ba88c2108466db9d948fa26063",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1",
+        "net/openhft/affinity/AffinityStrategies$3",
+        "net/openhft/affinity/CpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies$4.class",
+      "occurrence": 0,
+      "sha256": "67fdde634cb8d907c59e54d20264dd883d0e3c127e17909387641f5fced9949a",
+      "name": "net/openhft/affinity/AffinityStrategies$4",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "net/openhft/affinity/AffinityStrategies",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "4a6a178b136ab70330c4f0cb3aa417dcfa14479f410c598ef7d5f1fd5fe708c9",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1",
+        "net/openhft/affinity/AffinityStrategies$4",
+        "net/openhft/affinity/CpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies$5.class",
+      "occurrence": 0,
+      "sha256": "62ccd59b714595889c2f3e4219cbb344337819afc1c1f78974660b83115182a2",
+      "name": "net/openhft/affinity/AffinityStrategies$5",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "net/openhft/affinity/AffinityStrategies",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1,
+          "code_sha256": "22f82cacf968090f717ed817b2ca3647ed635e8174fb6457a603dc053fc3c215",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1",
+        "net/openhft/affinity/AffinityStrategies$5",
+        "net/openhft/affinity/CpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategies.class",
+      "occurrence": 0,
+      "sha256": "6c02b5abdb52ba345423e9670dd2c1498c772d2c0894a5fc2cceac94d204c462",
+      "name": "net/openhft/affinity/AffinityStrategies",
+      "major": 52,
+      "minor": 0,
+      "access": 17441,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/AffinityStrategy"
+      ],
+      "fields": [
+        {
+          "name": "ANY",
+          "descriptor": "Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 16409
+        },
+        {
+          "name": "SAME_CORE",
+          "descriptor": "Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 16409
+        },
+        {
+          "name": "SAME_SOCKET",
+          "descriptor": "Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 16409
+        },
+        {
+          "name": "DIFFERENT_CORE",
+          "descriptor": "Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 16409
+        },
+        {
+          "name": "DIFFERENT_SOCKET",
+          "descriptor": "Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/AffinityStrategies;",
+          "access": 9,
+          "code_sha256": "ee1866a70f59c89c65ebb175c0e649373698f0f1206ff8ba84cdedd681931231",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "f107cbc34af6cef575e81fe54b19b44e0fafe22f200c1eefbf7cfecd09a33050",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILnet/openhft/affinity/AffinityStrategies$1;)V",
+          "access": 4096,
+          "code_sha256": "6f2f4a08b450faed0343ea558f222260e434fbd83ba79df8b86d1d750cf8e9a4",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e65019e98d3d776859b84c6bef463ab4202e607270f51f87a8c44b15f0fc6fdd",
+          "code_length": 103
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/AffinityStrategies;>;Lnet/openhft/affinity/AffinityStrategy;",
+      "class_references": [
+        "[Lnet/openhft/affinity/AffinityStrategies;",
+        "java/lang/Enum",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategies$1",
+        "net/openhft/affinity/AffinityStrategies$2",
+        "net/openhft/affinity/AffinityStrategies$3",
+        "net/openhft/affinity/AffinityStrategies$4",
+        "net/openhft/affinity/AffinityStrategies$5",
+        "net/openhft/affinity/AffinityStrategy"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityStrategy.class",
+      "occurrence": 0,
+      "sha256": "9db2db3815ac708c999b13fdd72003068ec1c4d2f4af0af2568e6cac9ff5fa88",
+      "name": "net/openhft/affinity/AffinityStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "matches",
+          "descriptor": "(II)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/AffinityStrategy"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinitySupport.class",
+      "occurrence": 0,
+      "sha256": "d8612c4ca57540bd699121473e7f577b2100296da346d713de8f94af37c2ce78",
+      "name": "net/openhft/affinity/AffinitySupport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "616679ff1eea9287e3808f6be2a29fa6c428b24c8fdee7f2369434f74f859523",
+          "code_length": 4
+        },
+        {
+          "name": "setThreadId",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "f63de5697e06fdf19cfec67567e918bac969a5b9ecdc124039d8ff4297cb9781",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/Affinity",
+        "net/openhft/affinity/AffinitySupport"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityThreadFactory$1.class",
+      "occurrence": 0,
+      "sha256": "67b85fd24cdab34ddf47dc59e3ff61d7ea5eac67d317bc527a7a3236e023636c",
+      "name": "net/openhft/affinity/AffinityThreadFactory$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$r",
+          "descriptor": "Ljava/lang/Runnable;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/openhft/affinity/AffinityThreadFactory;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/openhft/affinity/AffinityThreadFactory;Ljava/lang/Runnable;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8e78933f99694bef374198c23fd993e92686cf5c8cc6708e217d2c36b74a8407",
+          "code_length": 91
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Throwable",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityThreadFactory",
+        "net/openhft/affinity/AffinityThreadFactory$1"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/AffinityThreadFactory.class",
+      "occurrence": 0,
+      "sha256": "ca1856b75d24466b7ef889bc735233df1145dd3bafb131375584689079596968",
+      "name": "net/openhft/affinity/AffinityThreadFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ThreadFactory"
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "daemon",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "strategies",
+          "descriptor": "[Lnet/openhft/affinity/AffinityStrategy;",
+          "access": 18
+        },
+        {
+          "name": "lastAffinityLock",
+          "descriptor": "Lnet/openhft/affinity/AffinityLock;",
+          "access": 2
+        },
+        {
+          "name": "id",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;[Lnet/openhft/affinity/AffinityStrategy;)V",
+          "access": 129,
+          "code_sha256": "8abe78c8bd40c5e9d15f422edc9da9e291d874b39e34c98d6cd3be9e43a2d36f",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Z[Lnet/openhft/affinity/AffinityStrategy;)V",
+          "access": 129,
+          "code_sha256": "4301d914a6de76a31efa807cd6a33427946ae840e19c6aad5d028823a4a055ac",
+          "code_length": 48
+        },
+        {
+          "name": "newThread",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "access": 33,
+          "code_sha256": "89d6af1ea949c41208b76c78af34bae95f76849463a4e92284ebdccf376129bc",
+          "code_length": 83
+        },
+        {
+          "name": "acquireLockBasedOnLast",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 34,
+          "code_sha256": "2f77903219d3103824d835f459bca02ea0b0553c218bcf9383074f240f9df3f2",
+          "code_length": 44
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lnet/openhft/affinity/AffinityThreadFactory;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 4104,
+          "code_sha256": "2f1c0f85c9071d5903cf3a9c2cecfeae30db8b8c480fa1d9d2afb2aabb3f2ead",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Lnet/openhft/affinity/AffinityStrategy;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/util/concurrent/ThreadFactory",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategies",
+        "net/openhft/affinity/AffinityStrategy",
+        "net/openhft/affinity/AffinityThreadFactory",
+        "net/openhft/affinity/AffinityThreadFactory$1"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/BootClassPath$1.class",
+      "occurrence": 0,
+      "sha256": "963adc817fc7476b71f34ded899613261e95b7b8330d18c1db5dd6b317ed43e9",
+      "name": "net/openhft/affinity/BootClassPath$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/nio/file/SimpleFileVisitor",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$dirResources",
+          "descriptor": "Ljava/util/Set;",
+          "access": 4112
+        },
+        {
+          "name": "val$path",
+          "descriptor": "Ljava/nio/file/Path;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/nio/file/Path;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "visitFile",
+          "descriptor": "(Ljava/nio/file/Path;Ljava/nio/file/attribute/BasicFileAttributes;)Ljava/nio/file/FileVisitResult;",
+          "access": 1,
+          "code_sha256": "59f5459f3d7bb1733001e759a0c52163c24d621da147a3602293e28eb1ef28fb",
+          "code_length": 51,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "visitFile",
+          "descriptor": "(Ljava/lang/Object;Ljava/nio/file/attribute/BasicFileAttributes;)Ljava/nio/file/FileVisitResult;",
+          "access": 4161,
+          "code_sha256": "83d8a482ce9b893dcef38cda00b7afdae1672119a69ebfac0bb8cbeb3b79979a",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/nio/file/SimpleFileVisitor<Ljava/nio/file/Path;>;",
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/String",
+        "java/nio/file/Path",
+        "java/nio/file/SimpleFileVisitor",
+        "java/util/Set",
+        "net/openhft/affinity/BootClassPath",
+        "net/openhft/affinity/BootClassPath$1"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/BootClassPath.class",
+      "occurrence": 0,
+      "sha256": "b855c0bd6e6578fd829e04851771b307752bc94af6847bcfff7446d57b111800",
+      "name": "net/openhft/affinity/BootClassPath",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/BootClassPath;",
+          "access": 16409
+        },
+        {
+          "name": "bootClassPathResources",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/BootClassPath;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/BootClassPath;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/BootClassPath;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "dd7b88694cced059adfb2d129459b3933705eb3c6cc27b1b7eba7d83d7a48487",
+          "code_length": 17,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getResourcesOnBootClasspath",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "36e93705cbd82a0064adecafd849e241901923abe4a265d9e7d404048b2c48d5",
+          "code_length": 107,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "findResources",
+          "descriptor": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "865921868620b5662434ecc27c2619dac65f0a2b97c12149d9eb7ab4dc29adcc",
+          "code_length": 38,
+          "generic_signature": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "findResourcesInJar",
+          "descriptor": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "66e57aa1ee3570c1bed43263f6338625bd560b1406176852d8085f3c9ecb0dc1",
+          "code_length": 177,
+          "generic_signature": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "findResourcesInDirectory",
+          "descriptor": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set;",
+          "access": 10,
+          "code_sha256": "2ab8dfb6cb1fe5d913abc55bd161bfa4e2379ca4ea35b5e0c4a060928e1d8d30",
+          "code_length": 54,
+          "generic_signature": "(Ljava/nio/file/Path;Lorg/slf4j/Logger;)Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "has",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 17,
+          "code_sha256": "423d3be29397230a24881c404468b1e7cba12b89bd20313912f996ab8770f8d0",
+          "code_length": 25
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9295b8a61a27482d96d9ce9c18e14f37fadf5df3e83d4e95769e5ad6dbf3c48b",
+          "code_length": 27
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/BootClassPath;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Lnet/openhft/affinity/BootClassPath;",
+        "java/io/IOException",
+        "java/lang/Enum",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/nio/file/Files",
+        "java/nio/file/LinkOption",
+        "java/nio/file/Path",
+        "java/nio/file/Paths",
+        "java/util/Collections",
+        "java/util/Enumeration",
+        "java/util/HashSet",
+        "java/util/Set",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "net/openhft/affinity/BootClassPath",
+        "net/openhft/affinity/BootClassPath$1",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/CpuLayout.class",
+      "occurrence": 0,
+      "sha256": "4cd426a6bd299c356c956bc7e6fdbf718a6b39d85be17b48f2800160df48162f",
+      "name": "net/openhft/affinity/CpuLayout",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "cpus",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "sockets",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "coresPerSocket",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "threadsPerCore",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "socketId",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "coreId",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "threadId",
+          "descriptor": "(I)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/CpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/IAffinity.class",
+      "occurrence": 0,
+      "sha256": "a150cafe1e988a0a653e67118485eee8f21915e97820943b99cfb9d470979bfa",
+      "name": "net/openhft/affinity/IAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1025
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1025
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/IAffinity"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/LockCheck.class",
+      "occurrence": 0,
+      "sha256": "6a6c56df6df2728fa33cdfed8c9bf8582c04c11f997eb7bdac6d5af37a0704b5",
+      "name": "net/openhft/affinity/LockCheck",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "OS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "IS_LINUX",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "EMPTY_PID",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "lockChecker",
+          "descriptor": "Lnet/openhft/affinity/lockchecker/LockChecker;",
+          "access": 26
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/LockCheck;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/LockCheck;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/LockCheck;",
+          "access": 9,
+          "code_sha256": "ee1866a70f59c89c65ebb175c0e649373698f0f1206ff8ba84cdedd681931231",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "f107cbc34af6cef575e81fe54b19b44e0fafe22f200c1eefbf7cfecd09a33050",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getPID",
+          "descriptor": "()J",
+          "access": 9,
+          "code_sha256": "0760eb37840f21dbf48501b272ecd71a6ce9b1afb1d8cadb29027537e80373c2",
+          "code_length": 21
+        },
+        {
+          "name": "canOSSupportOperation",
+          "descriptor": "()Z",
+          "access": 8,
+          "code_sha256": "82c205dec97e01860611ca1b61b9ce1140661a0de40f25e1280566dbdfef0e28",
+          "code_length": 4
+        },
+        {
+          "name": "isCpuFree",
+          "descriptor": "(I)Z",
+          "access": 9,
+          "code_sha256": "f60e6d279e17cd46ed428658cae83ce8510d8bf74596f069f0cce9a8d17c8fed",
+          "code_length": 13
+        },
+        {
+          "name": "replacePid",
+          "descriptor": "(IJ)Z",
+          "access": 8,
+          "code_sha256": "1b9f43671a17df6b88148f50d764be33b8e1621431a7cd2657fbfe890b5d1161",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isProcessRunning",
+          "descriptor": "(J)Z",
+          "access": 9,
+          "code_sha256": "f6fb3391cf661110baa447c7abb6d980b9a74cb880ee46db5e81a4f41708d85c",
+          "code_length": 46
+        },
+        {
+          "name": "storePid",
+          "descriptor": "(JI)Z",
+          "access": 42,
+          "code_sha256": "7e0af26d7368a3b3d4dc0cbaa80682f22b86155d1bd1740686f00478294387f3",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "isLockFree",
+          "descriptor": "(I)Z",
+          "access": 42,
+          "code_sha256": "c21e9a79dfe7fcb0d2024c3c8653176dc406853b4edfa8767d454cad5d8671f8",
+          "code_length": 10
+        },
+        {
+          "name": "getProcessForCpu",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "fd68d2e88a302202ff82e8ff9cf0fbaefc4940b2c48bf2256b26c1c6788bd3b9",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "updateCpu",
+          "descriptor": "(I)Z",
+          "access": 8,
+          "code_sha256": "d711aa33f6410898285034686387f3306ea14b1be32896ed314b9363ea834631",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "releaseLock",
+          "descriptor": "(I)V",
+          "access": 9,
+          "code_sha256": "59f3ca5cfb2f9221f2e2dd09a024e846ac04943bf809dc197180a53d5a99712a",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e06273061ce6ca61b4f59b815c0ea697ace75bdf01f8d329f153f51c032b3c34",
+          "code_length": 44
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/LockCheck;>;",
+      "class_references": [
+        "[Lnet/openhft/affinity/LockCheck;",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Enum",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/management/ManagementFactory",
+        "java/lang/management/RuntimeMXBean",
+        "net/openhft/affinity/LockCheck",
+        "net/openhft/affinity/lockchecker/FileLockBasedLockChecker",
+        "net/openhft/affinity/lockchecker/LockChecker",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/LockInventory.class",
+      "occurrence": 0,
+      "sha256": "f10bc42c6aeaceea1c848f50b41fc71f63004e2eb8b16e6712bb88fe20493b42",
+      "name": "net/openhft/affinity/LockInventory",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "physicalCoreLocks",
+          "descriptor": "Ljava/util/NavigableMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/NavigableMap<Ljava/lang/Integer;[Lnet/openhft/affinity/AffinityLock;>;"
+        },
+        {
+          "name": "cpuLayout",
+          "descriptor": "Lnet/openhft/affinity/CpuLayout;",
+          "access": 2
+        },
+        {
+          "name": "logicalCoreLocks",
+          "descriptor": "[Lnet/openhft/affinity/AffinityLock;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/openhft/affinity/CpuLayout;)V",
+          "access": 1,
+          "code_sha256": "9d541c3b4468454e5c24674e1210457dfa25866f757c0e60ca122fab76c4f42f",
+          "code_length": 21
+        },
+        {
+          "name": "dumpLocks",
+          "descriptor": "([Lnet/openhft/affinity/AffinityLock;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "c3b2f542d56c6338dc23e4774546e7f2d34a2245a83f897a5a281f980c1cbcd4",
+          "code_length": 58
+        },
+        {
+          "name": "anyStrategyMatches",
+          "descriptor": "(II[Lnet/openhft/affinity/AffinityStrategy;)Z",
+          "access": 10,
+          "code_sha256": "55cb353584824dd16658d6c529dce8dcf711650f7e59df1087d0b9892df20457",
+          "code_length": 44
+        },
+        {
+          "name": "isAnyCpu",
+          "descriptor": "(I)Z",
+          "access": 10,
+          "code_sha256": "6b4c99063e9230c59795211516411edea01323bdd4731cb56b4912482e1fadaa",
+          "code_length": 11
+        },
+        {
+          "name": "updateLockForCurrentThread",
+          "descriptor": "(ZLnet/openhft/affinity/AffinityLock;Z)Z",
+          "access": 10,
+          "code_sha256": "d61c4a84946220b288d79fcadb27c94c862ffe1ad67170429fc9f0b73b562063",
+          "code_length": 38,
+          "throws": [
+            "java/nio/channels/ClosedByInterruptException"
+          ]
+        },
+        {
+          "name": "getCpuLayout",
+          "descriptor": "()Lnet/openhft/affinity/CpuLayout;",
+          "access": 49,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Lnet/openhft/affinity/CpuLayout;)V",
+          "access": 49,
+          "code_sha256": "f904324af0afc325d3eec9ddd6b25b9b9e2a6445d9d1d1bd72423417c4f3b10b",
+          "code_length": 185
+        },
+        {
+          "name": "acquireLock",
+          "descriptor": "(ZI[Lnet/openhft/affinity/AffinityStrategy;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 177,
+          "code_sha256": "bd6de286827fbf6b627834c50b8d69ba7aceaddae066b5a377f7477c1276c5c5",
+          "code_length": 263
+        },
+        {
+          "name": "tryAcquireLock",
+          "descriptor": "(ZI)Lnet/openhft/affinity/AffinityLock;",
+          "access": 49,
+          "code_sha256": "380357229730bcf2b29bb7832eed7bd8a96c9cab5a11a88db18b940fba8a6abe",
+          "code_length": 83
+        },
+        {
+          "name": "acquireCore",
+          "descriptor": "(ZI[Lnet/openhft/affinity/AffinityStrategy;)Lnet/openhft/affinity/AffinityLock;",
+          "access": 177,
+          "code_sha256": "0709f0809243b4a7fe24cc7786411c3292e1cf5bcfbf2ea6f2b43d3b1f2a6616",
+          "code_length": 193
+        },
+        {
+          "name": "bindWholeCore",
+          "descriptor": "(I)V",
+          "access": 49,
+          "code_sha256": "0979b39b954782fb94c1627228eeb99fdfe2a8d92de832def4b04a89126c3f0e",
+          "code_length": 254
+        },
+        {
+          "name": "release",
+          "descriptor": "(Z)V",
+          "access": 49,
+          "code_sha256": "375b1ee55a3584940d77b29373348eee0874cb1b05d224f822258cb7f948053e",
+          "code_length": 90
+        },
+        {
+          "name": "dumpLocks",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 49,
+          "code_sha256": "bff79c0c7934dcce2a02e913a76d40ff9d0e9a1555859f3d5355bdb82965d4bc",
+          "code_length": 8
+        },
+        {
+          "name": "newLock",
+          "descriptor": "(IZZ)Lnet/openhft/affinity/AffinityLock;",
+          "access": 4,
+          "code_sha256": "079ddbd8befba0d44c72a07d772ddaa28138aa332ffe0cdf29ad6b2329a2b41d",
+          "code_length": 12
+        },
+        {
+          "name": "reset",
+          "descriptor": "(Lnet/openhft/affinity/CpuLayout;)V",
+          "access": 2,
+          "code_sha256": "001d1b8e8bc6e1e71d097db5d73382078e7d0c0b2123b5810b09dc494aa1c317",
+          "code_length": 28
+        },
+        {
+          "name": "toPhysicalCore",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "183af0bea9ca13303f4796c90461098317b85bd2945279b2bf944fc8d68c4785",
+          "code_length": 32
+        },
+        {
+          "name": "releaseAffinityLock",
+          "descriptor": "(Ljava/lang/Thread;Lnet/openhft/affinity/AffinityLock;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "ecea3883601d629a613fad31d9f1ad2dab46141c66a32baa20143870efcc0c32",
+          "code_length": 40
+        },
+        {
+          "name": "noLock",
+          "descriptor": "()Lnet/openhft/affinity/AffinityLock;",
+          "access": 1,
+          "code_sha256": "8b24bc11b3dc3cded51c3e36221d3af99b40a7726a16776470b44b474719f05e",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a73845cef1416d2874b0484120ad025f260a98c0fd027eb75347d2df5ad05776",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Lnet/openhft/affinity/AffinityLock;",
+        "[Lnet/openhft/affinity/AffinityStrategy;",
+        "java/io/IOException",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/nio/channels/ClosedByInterruptException",
+        "java/util/BitSet",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/NavigableMap",
+        "java/util/TreeMap",
+        "net/openhft/affinity/Affinity",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/AffinityStrategy",
+        "net/openhft/affinity/CpuLayout",
+        "net/openhft/affinity/LockCheck",
+        "net/openhft/affinity/LockInventory",
+        "net/openhft/affinity/impl/NullAffinity",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/MicroJitterSampler.class",
+      "occurrence": 0,
+      "sha256": "4d00b7dbffb4c945aa288c1786606c35c903766acb8f06845b9afb08516a15e8",
+      "name": "net/openhft/affinity/MicroJitterSampler",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DELAY",
+          "descriptor": "[J",
+          "access": 26
+        },
+        {
+          "name": "UTIL",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "BUSYWAIT",
+          "descriptor": "Z",
+          "access": 26
+        },
+        {
+          "name": "CPU",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "count",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "totalTime",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "20e87f81678460dad3e9427dbac8365ab8d1ce6231e3d6b49af85f74e978ce52",
+          "code_length": 20
+        },
+        {
+          "name": "pause",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "2462addcaef152c3b575ba12b749adb42b5a5b6c639721991eefa1cf7fc34150",
+          "code_length": 33,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 137,
+          "code_sha256": "3dacdf6fddc5f3b55cef810502e381ac68e1627af120fb34adb6aec856dfcffc",
+          "code_length": 36,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "once",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "931d7ab2eea90b99e373b8b46bce1fca5f4a0b6d7c71ab5a06cd4f5ead1867ce",
+          "code_length": 67,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5ba21ffa50e23389f91c40c286a10e03dfd741eba7da6124d685e189719257af",
+          "code_length": 145
+        },
+        {
+          "name": "asString",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "2b75e192a8f303efcc36f3a9d5e2183c9e261bf38752063bec344bce0ecea3ba",
+          "code_length": 122
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "7bbcf023464cf47e9578ea33fd2d76b766d2b1f7fad142de1817691150e82863",
+          "code_length": 29
+        },
+        {
+          "name": "sample",
+          "descriptor": "(J)V",
+          "access": 0,
+          "code_sha256": "21d5a94a22bc070705a092dcdf84f4f94abdb0586ac8c2e2af02ed0a533cbb28",
+          "code_length": 99
+        },
+        {
+          "name": "print",
+          "descriptor": "(Ljava/io/PrintStream;)V",
+          "access": 0,
+          "code_sha256": "80b6e3f5dee1d383bed922f967f2c42d6d35c42b47262a996c37a46ef54bcc92",
+          "code_length": 125
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b32e070e7719f4e9268d45264e672658754bc39df2b3f88f43ef6c3aac58d3a7",
+          "code_length": 220
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/InterruptedException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/MicroJitterSampler"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/LinuxHelper$CLibrary.class",
+      "occurrence": 0,
+      "sha256": "ded82e24fbb0cbcc45458e60d43b9f3b297b566e4791a92075333fb0966b8aec",
+      "name": "net/openhft/affinity/impl/LinuxHelper$CLibrary",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/LinuxHelper$CLibrary;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "sched_setaffinity",
+          "descriptor": "(IILnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "sched_getaffinity",
+          "descriptor": "(IILnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "getpid",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "sched_getcpu",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "uname",
+          "descriptor": "(Lnet/openhft/affinity/impl/LinuxHelper$utsname;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "syscall",
+          "descriptor": "(I[Ljava/lang/Object;)I",
+          "access": 1153,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "142184129a320db55b2425d9ec9b5eff721c88f0662068936ef35c37106977f8",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "java/lang/Object",
+        "net/openhft/affinity/impl/LinuxHelper",
+        "net/openhft/affinity/impl/LinuxHelper$CLibrary",
+        "net/openhft/affinity/impl/LinuxHelper$cpu_set_t",
+        "net/openhft/affinity/impl/LinuxHelper$utsname"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/LinuxHelper$cpu_set_t.class",
+      "occurrence": 0,
+      "sha256": "b2a817096b6f331b314f0137ee0d323bdaaf83a400812b128ecc4e73baf4b798",
+      "name": "net/openhft/affinity/impl/LinuxHelper$cpu_set_t",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "__CPU_SETSIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "__NCPUBITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SIZE_OF_CPU_SET_T",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "FIELD_ORDER",
+          "descriptor": "Ljava/util/List;",
+          "access": 8,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "__bits",
+          "descriptor": "[Lcom/sun/jna/NativeLong;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5472073418c4ac8c470af7fc742b04ff113f887283b71903440b8878e31f70cf",
+          "code_length": 50
+        },
+        {
+          "name": "__CPU_ZERO",
+          "descriptor": "(Lnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)V",
+          "access": 9,
+          "code_sha256": "51779072f7be1bed8483eaee9880b3e206394ac9834abc1bc1660c7b51138fdc",
+          "code_length": 33
+        },
+        {
+          "name": "__CPUELT",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "f55d6c24c19dfd3de7fabb6c448c8a9d9db735d4eb305a29efc963a65d6ada32",
+          "code_length": 6
+        },
+        {
+          "name": "__CPUMASK",
+          "descriptor": "(I)J",
+          "access": 9,
+          "code_sha256": "417e34c90e7c60dfcda3975858dbbb0761c9aae040797dcf75116b9b21116468",
+          "code_length": 8
+        },
+        {
+          "name": "__CPU_SET",
+          "descriptor": "(ILnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)V",
+          "access": 9,
+          "code_sha256": "6979048b2ef29fe7f38eeeb5ac6bde408203f9224e509ddbc0a43e1d059a9716",
+          "code_length": 30
+        },
+        {
+          "name": "__CPU_CLR",
+          "descriptor": "(ILnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)V",
+          "access": 9,
+          "code_sha256": "68b2ee4f1cdec934dcfc1883f6b2b2c7a10534f5f13c5fb4e089a6188f1585c7",
+          "code_length": 34
+        },
+        {
+          "name": "__CPU_ISSET",
+          "descriptor": "(ILnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;)Z",
+          "access": 9,
+          "code_sha256": "58983a297abc2c30adbcccb04986975876cbfa2c80f89856f647068a01c424f0",
+          "code_length": 28
+        },
+        {
+          "name": "getFieldOrder",
+          "descriptor": "()Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "fc16f656815240177c1bda87f71429a9065d7f20b8753f70b0a6fe7f8731fdac",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "66d740e85692a739432a02a540f47c57d58ba95f3ffddfe64624f9f4b111a3e7",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/NativeLong;",
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/Structure",
+        "java/util/Collections",
+        "net/openhft/affinity/impl/LinuxHelper",
+        "net/openhft/affinity/impl/LinuxHelper$cpu_set_t"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/LinuxHelper$utsname.class",
+      "occurrence": 0,
+      "sha256": "ef6888c50b6109b713fb6763a4d270a87786738da61480238e03e8a678bfe8fd",
+      "name": "net/openhft/affinity/impl/LinuxHelper$utsname",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_UTSNAME_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FIELD_ORDER",
+          "descriptor": "Ljava/util/List;",
+          "access": 8,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "sysname",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "nodename",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "release",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "version",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "machine",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "domainname",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "653143f4677abedb0a8db9cfec1ea1e827f053c5a155d34c428ac453e9f5f4cc",
+          "code_length": 53
+        },
+        {
+          "name": "length",
+          "descriptor": "([B)I",
+          "access": 8,
+          "code_sha256": "260553464b7002a3df784f9a7a26c1d01eb5c457176fe2a2d9f52af2510ac818",
+          "code_length": 24
+        },
+        {
+          "name": "getFieldOrder",
+          "descriptor": "()Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "45a06422c86010a811f47b38cb3404ea45d753d5f95179c0705034e633c7f747",
+          "code_length": 4
+        },
+        {
+          "name": "getSysname",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cc47bd35225a8c4912c589618c58ab7c0825576bca9f3b1edc58db4e142976e7",
+          "code_length": 20
+        },
+        {
+          "name": "getNodename",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f9462b6b647545a5057cf117558d896aee6db905391a328f9073bc7fdff90221",
+          "code_length": 20
+        },
+        {
+          "name": "getRelease",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e73593984cf570c207066e256488aff35299f3f99cedc5a49f1795696ef891ab",
+          "code_length": 20
+        },
+        {
+          "name": "getRealeaseVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "06077518b828efd32abbca0018fdb21b7eec1dfd449be972e52cfac26c59917b",
+          "code_length": 55
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6681a417a250b2d003c17a2f0ce385c60770fe9d43dca27f72598f45e8db2290",
+          "code_length": 20
+        },
+        {
+          "name": "getMachine",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "42ccc66e207354fd26108e0e20af1be20840fdfd31a19e9a64488403cb2bb48c",
+          "code_length": 20
+        },
+        {
+          "name": "getDomainname",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cf221af3e18fa13b494b0ec1ed8062b73c7255de22c7bc8707af3393e52946ad",
+          "code_length": 20
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c1aa221b2db98a4463d9a453e0945e707fb7de572392f60268d4f3852e9b6540",
+          "code_length": 54
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2d02385848152ace90d9fc8dbfe14ed9945506d87b98f396ba52a8c9bdac92cd",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "java/lang/Character",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "net/openhft/affinity/impl/LinuxHelper",
+        "net/openhft/affinity/impl/LinuxHelper$utsname"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/LinuxHelper.class",
+      "occurrence": 0,
+      "sha256": "6e6b30f3ece5a541cdb870372516885d54695e028655829ec7348e92fcbdddf6",
+      "name": "net/openhft/affinity/impl/LinuxHelper",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LIBRARY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "UNKNOWN",
+          "descriptor": "Lnet/openhft/affinity/impl/VersionHelper;",
+          "access": 26
+        },
+        {
+          "name": "VERSION_2_6",
+          "descriptor": "Lnet/openhft/affinity/impl/VersionHelper;",
+          "access": 26
+        },
+        {
+          "name": "version",
+          "descriptor": "Lnet/openhft/affinity/impl/VersionHelper;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "sched_getaffinity",
+          "descriptor": "()Lnet/openhft/affinity/impl/LinuxHelper$cpu_set_t;",
+          "access": 9,
+          "code_sha256": "554d7e6abae93269eb29f7a995628992df5713cd8a4763cd4ad335d270dec41d",
+          "code_length": 130
+        },
+        {
+          "name": "sched_setaffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 9,
+          "code_sha256": "64f8a617d96843fdef0618761782fe7094ec4aa219e2495a41749d6fad9715c6",
+          "code_length": 6
+        },
+        {
+          "name": "sched_setaffinity",
+          "descriptor": "(ILjava/util/BitSet;)V",
+          "access": 9,
+          "code_sha256": "324b1d75aa147bce3534af10a5dc98dac46d17ded1386413ecc31957ed216be5",
+          "code_length": 272
+        },
+        {
+          "name": "sched_getcpu",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "d0da2ca346d7c8fc816350bb08ca5049034434df8279464097257e9f92c183a0",
+          "code_length": 295
+        },
+        {
+          "name": "getpid",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "481659695ddc7051b5934f58c7460b0eedbcbdd05bd74f3fa13328e025ef0aa7",
+          "code_length": 78
+        },
+        {
+          "name": "syscall",
+          "descriptor": "(I[Ljava/lang/Object;)I",
+          "access": 137,
+          "code_sha256": "5299ea314523db4acd2d3c6d20e4329510c7d8298e838a3fc4917fc989885b4b",
+          "code_length": 80
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9a580ff1e94e70f4f2bc68eac1fc767cf20a9121e50fca60e760c29a916df3b5",
+          "code_length": 72
+        }
+      ],
+      "class_references": [
+        "[J",
+        "[Ljava/lang/Object;",
+        "com/sun/jna/Function",
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Native",
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/Platform",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/UnsatisfiedLinkError",
+        "java/util/BitSet",
+        "net/openhft/affinity/impl/LinuxHelper",
+        "net/openhft/affinity/impl/LinuxHelper$CLibrary",
+        "net/openhft/affinity/impl/LinuxHelper$cpu_set_t",
+        "net/openhft/affinity/impl/LinuxHelper$utsname",
+        "net/openhft/affinity/impl/Utilities",
+        "net/openhft/affinity/impl/VersionHelper"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/LinuxJNAAffinity.class",
+      "occurrence": 0,
+      "sha256": "7648fdbf368c4c4b33973aa4e24d13a030f43eba9ccc5ca0f36fc993d93b4b71",
+      "name": "net/openhft/affinity/impl/LinuxJNAAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/LinuxJNAAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOADED",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "PROCESS_ID",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SYS_gettid",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NO_ARGS",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "OS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "IS_LINUX",
+          "descriptor": "Z",
+          "access": 26
+        },
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/LinuxJNAAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/LinuxJNAAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/LinuxJNAAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "2d3a2fc14f7e859cc0d51c0b2ad5ff673e3e4cefec1e02b43301bb45ad07facc",
+          "code_length": 18,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "29473eeb8ba760e3772c16d950aa2f8ca17454e954fcc9f497208915ccfc9854",
+          "code_length": 97
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "c761b472c2c254e1550b8c55162fc66ec082d8ba43e65cb14ae70b508778fa22",
+          "code_length": 5
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "76d0d93076891f8b473ab1c50bcac898e2b6d63dd4b63895992eedbd3684e72f",
+          "code_length": 4
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7b0b0e10e8b181539385baeb43573d5f4f7c02a202ed119ebd46bf762c2b7cf5",
+          "code_length": 4
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1b38e4f15cacf41e649c81d4eac133e5f2959de3f73dbc38ce3c03d27dbf688b",
+          "code_length": 41
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b7ea20bd9a6b433ef7dbbdd08c3949c05a72c09b193270a275fa24c90fd04418",
+          "code_length": 144
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/LinuxJNAAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[Lcom/sun/jna/NativeLong;",
+        "[Lnet/openhft/affinity/impl/LinuxJNAAffinity;",
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/Platform",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/LinkageError",
+        "java/lang/Long",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/ThreadLocal",
+        "java/lang/Throwable",
+        "java/lang/UnsatisfiedLinkError",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/LinuxHelper",
+        "net/openhft/affinity/impl/LinuxHelper$cpu_set_t",
+        "net/openhft/affinity/impl/LinuxJNAAffinity",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/NoCpuLayout.class",
+      "occurrence": 0,
+      "sha256": "b346237fac35e884a2858f168259ce78cd7200dfba4d8a27221a9f1f2e20eb71",
+      "name": "net/openhft/affinity/impl/NoCpuLayout",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/openhft/affinity/CpuLayout"
+      ],
+      "fields": [
+        {
+          "name": "cpus",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "sockets",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "coresPerSocket",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "threadsPerCore",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "cpus",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "socketId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "coreId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "bddc352a97e0af2e2267d80a1c7c27e2265e5306a3ca194598448c0a3cbb8fc5",
+          "code_length": 2
+        },
+        {
+          "name": "threadId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/CpuLayout",
+        "net/openhft/affinity/impl/NoCpuLayout"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/NullAffinity.class",
+      "occurrence": 0,
+      "sha256": "3997ed676949da4eec7a6a15e173c06f99d8d277f740c1008835e11246d13e67",
+      "name": "net/openhft/affinity/impl/NullAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/NullAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/NullAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/NullAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/NullAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "4f79f1dd76fc0c32c0ab50f901ab68a16202c332f2d43d95571db35a1847eed5",
+          "code_length": 8
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "5c59604505936ad745967a547ffa5b82e13b8f5658d2e40db1808307f5614586",
+          "code_length": 15
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea3444f7b732d2379c3e81ad7a08e24c072cb9468be2734659ffef7ecaec49ed",
+          "code_length": 2
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d37a8cdedc53a1495b094a00b2eb330e5fffbcf134f59623832c297010a4dd27",
+          "code_length": 21
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1f90cf3183212540ea60e62c46d73db9cff7b7eb6c7caf12f7cca901cc915b0e",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc16f51eaf103c1695abea6075f33ee48eec36baa1b7bc9a6be1e58f17e8c18a",
+          "code_length": 35
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/NullAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[Lnet/openhft/affinity/impl/NullAffinity;",
+        "java/lang/Enum",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/UnsupportedOperationException",
+        "java/lang/management/ManagementFactory",
+        "java/lang/management/RuntimeMXBean",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/NullAffinity",
+        "net/openhft/affinity/impl/Utilities",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/OSXJNAAffinity$CLibrary.class",
+      "occurrence": 0,
+      "sha256": "0ebc0d048d66b241077980f8bcb888a6cc649bff1c76ea40ae824b34ba40f7ef",
+      "name": "net/openhft/affinity/impl/OSXJNAAffinity$CLibrary",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/OSXJNAAffinity$CLibrary;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "pthread_self",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "java/lang/Object",
+        "net/openhft/affinity/impl/OSXJNAAffinity",
+        "net/openhft/affinity/impl/OSXJNAAffinity$CLibrary"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/OSXJNAAffinity.class",
+      "occurrence": 0,
+      "sha256": "e12bd4eb9828af5487062668b6785fd4f49554d951709495ee0c2b0257294014",
+      "name": "net/openhft/affinity/impl/OSXJNAAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/OSXJNAAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/OSXJNAAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/OSXJNAAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/OSXJNAAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "2d3a2fc14f7e859cc0d51c0b2ad5ff673e3e4cefec1e02b43301bb45ad07facc",
+          "code_length": 18,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "6d20e02400a0644448a65e12f72955b2b0169ebcc207a103c97fe61525928791",
+          "code_length": 8
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "b484420b965292d8e39ae303d738bfb4bf0fc907df9352277b59db34b12f0a14",
+          "code_length": 15
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea3444f7b732d2379c3e81ad7a08e24c072cb9468be2734659ffef7ecaec49ed",
+          "code_length": 2
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "24aa8f16f8b3b99d54117fd39b68ba07b1f436e5d9726c4fda60a0a30a802e72",
+          "code_length": 21
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a44cd3b6053e01a59804801aa5b2a866767a6ebc2ce9772a955281c61047ec46",
+          "code_length": 51
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ebe01f71716924f049299e2319f7a60c1269249c228944b1b01a4a3535477f00",
+          "code_length": 35
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/OSXJNAAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[Lnet/openhft/affinity/impl/OSXJNAAffinity;",
+        "java/lang/Enum",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/ThreadLocal",
+        "java/lang/management/ManagementFactory",
+        "java/lang/management/RuntimeMXBean",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/OSXJNAAffinity",
+        "net/openhft/affinity/impl/OSXJNAAffinity$CLibrary",
+        "net/openhft/affinity/impl/Utilities",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/PosixJNAAffinity$CLibrary.class",
+      "occurrence": 0,
+      "sha256": "6b39c3ead701050865dca46ab6bef606869528d4ea2129ae2921f523f5aeccb9",
+      "name": "net/openhft/affinity/impl/PosixJNAAffinity$CLibrary",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/PosixJNAAffinity$CLibrary;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "sched_setaffinity",
+          "descriptor": "(IILcom/sun/jna/PointerType;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "sched_getaffinity",
+          "descriptor": "(IILcom/sun/jna/PointerType;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "sched_getcpu",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "getcpu",
+          "descriptor": "(Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/PointerType;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "getpid",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "syscall",
+          "descriptor": "(I[Ljava/lang/Object;)I",
+          "access": 1153,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8e0a298a5a39a810e9b19fd45fd10dab6f767407c78af9d5310c76db0c9c0a0e",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "java/lang/Object",
+        "net/openhft/affinity/impl/PosixJNAAffinity",
+        "net/openhft/affinity/impl/PosixJNAAffinity$CLibrary"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/PosixJNAAffinity.class",
+      "occurrence": 0,
+      "sha256": "9111790f1e8ba615c03599ac56b6a8bfe79b3181e664d995c2f6922cba14aca8",
+      "name": "net/openhft/affinity/impl/PosixJNAAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/PosixJNAAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOADED",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LIBRARY_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "PROCESS_ID",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SYS_gettid",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "NO_ARGS",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/PosixJNAAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/PosixJNAAffinity;",
+          "access": 9,
+          "code_sha256": "0057054e627960a43d5d167bcb6c9152bceb9c670205de46714160dd1ebb4fac",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/PosixJNAAffinity;",
+          "access": 9,
+          "code_sha256": "ee1866a70f59c89c65ebb175c0e649373698f0f1206ff8ba84cdedd681931231",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "368b7198abbc162c15a90c9cc9ca1dcdceccbab88e9a9325ea61a1beb204e136",
+          "code_length": 18,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "57368f8038c70ad6824a8df395289d398f14d5df6f550c4c80204c70d342880c",
+          "code_length": 334
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "33ed5e85bc4f760c5f1d74b998c69b86a0d88f2483538b04f236818749ff8d92",
+          "code_length": 375
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ef2db21aceb29ff36bc1177f8a6f26bdc30a3095e3ba9553f29e377755e8c985",
+          "code_length": 192
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d8d2b4b74819ebae16a1c2c1c020bda5aa97648ee79249a41152b1d0802abef7",
+          "code_length": 4
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7bfc0ecc5b7e340caf581839bb009b79fe58dbdc20e10255e3ebff63af2acb43",
+          "code_length": 54
+        },
+        {
+          "name": "access$000",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b6881f1b0a54bbcba41695d78e8d3586f1120df371e8832a8ef22fd56803eddc",
+          "code_length": 125
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/PosixJNAAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[B",
+        "[Lnet/openhft/affinity/impl/PosixJNAAffinity;",
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Platform",
+        "com/sun/jna/ptr/IntByReference",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/ThreadLocal",
+        "java/lang/UnsatisfiedLinkError",
+        "java/nio/ByteBuffer",
+        "java/util/Arrays",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/PosixJNAAffinity",
+        "net/openhft/affinity/impl/PosixJNAAffinity$CLibrary",
+        "net/openhft/affinity/impl/Utilities",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/SolarisJNAAffinity$CLibrary.class",
+      "occurrence": 0,
+      "sha256": "2c86dac77c53696f4ed03ecf49bee2ccb9bd3844eaa4256ef6d888bcb1da574b",
+      "name": "net/openhft/affinity/impl/SolarisJNAAffinity$CLibrary",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/SolarisJNAAffinity$CLibrary;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "pthread_self",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "java/lang/Object",
+        "net/openhft/affinity/impl/SolarisJNAAffinity",
+        "net/openhft/affinity/impl/SolarisJNAAffinity$CLibrary"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/SolarisJNAAffinity.class",
+      "occurrence": 0,
+      "sha256": "dfbc01c9c8dc704489f03e18faa90ed45819d1f9ccb853481c17aa7d03e73282",
+      "name": "net/openhft/affinity/impl/SolarisJNAAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/SolarisJNAAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/SolarisJNAAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/SolarisJNAAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/SolarisJNAAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "2d3a2fc14f7e859cc0d51c0b2ad5ff673e3e4cefec1e02b43301bb45ad07facc",
+          "code_length": 18,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "6d20e02400a0644448a65e12f72955b2b0169ebcc207a103c97fe61525928791",
+          "code_length": 8
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "b484420b965292d8e39ae303d738bfb4bf0fc907df9352277b59db34b12f0a14",
+          "code_length": 15
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea3444f7b732d2379c3e81ad7a08e24c072cb9468be2734659ffef7ecaec49ed",
+          "code_length": 2
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "24aa8f16f8b3b99d54117fd39b68ba07b1f436e5d9726c4fda60a0a30a802e72",
+          "code_length": 21
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a44cd3b6053e01a59804801aa5b2a866767a6ebc2ce9772a955281c61047ec46",
+          "code_length": 51
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ebe01f71716924f049299e2319f7a60c1269249c228944b1b01a4a3535477f00",
+          "code_length": 35
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/SolarisJNAAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[Lnet/openhft/affinity/impl/SolarisJNAAffinity;",
+        "java/lang/Enum",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/ThreadLocal",
+        "java/lang/management/ManagementFactory",
+        "java/lang/management/RuntimeMXBean",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/SolarisJNAAffinity",
+        "net/openhft/affinity/impl/SolarisJNAAffinity$CLibrary",
+        "net/openhft/affinity/impl/Utilities",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/Utilities.class",
+      "occurrence": 0,
+      "sha256": "c256c45d29691744f5f76207747f2755d522d54c52ee4f6ba602651876eb69f2",
+      "name": "net/openhft/affinity/impl/Utilities",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ISLINUX",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "IS64BIT",
+          "descriptor": "Z",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "toHexString",
+          "descriptor": "(Ljava/util/BitSet;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "85ab73871fcf4c97da099ec054bbbb14424fe988e51eab757d96b6297aba6463",
+          "code_length": 81
+        },
+        {
+          "name": "toBinaryString",
+          "descriptor": "(Ljava/util/BitSet;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "39f5ac7d9ce0336d7fc68c463ed1776e9916be6a661152e6b94306b53eb2deb0",
+          "code_length": 81
+        },
+        {
+          "name": "is64Bit",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "6d40cba66c1665d6339c62d2af971866f6f86b40cd342f46a5991f704652dd79",
+          "code_length": 4
+        },
+        {
+          "name": "is64Bit0",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "0e97792f3805ab87027685899ebca70d2de190fd0ad2f26345da98762d27849e",
+          "code_length": 59
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "853d9fab7d37766642a0f3f47111e22d80885a38cfca7ccf35e5911ed526470f",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "[J",
+        "java/io/ByteArrayOutputStream",
+        "java/io/PrintWriter",
+        "java/lang/InstantiationError",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/nio/charset/StandardCharsets",
+        "java/util/BitSet",
+        "net/openhft/affinity/impl/Utilities"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/VanillaCpuLayout$CpuInfo.class",
+      "occurrence": 0,
+      "sha256": "be197171562c055d49d23ac16f5f5900fa38293afa3e9bb24649c3ac266d752f",
+      "name": "net/openhft/affinity/impl/VanillaCpuLayout$CpuInfo",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "socketId",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "coreId",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "threadId",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(III)V",
+          "access": 0,
+          "code_sha256": "ab7f2cebb5191e4f7621fe3cf991fe6156d03435b2044f094e0806eddb53120c",
+          "code_length": 20
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4bd549f2f897a5e3f6885eb18becbcf42b8d43545edf928fde8bda0af29cdf7c",
+          "code_length": 52
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "11915e3d73b0c25d9782efd8886d05b908628e15d1918d29e296980eeeb109a9",
+          "code_length": 72
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fc302dfeb386e5791ee44540853f305fbabb64c0180e59596c344e144bf153b8",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "net/openhft/affinity/impl/VanillaCpuLayout",
+        "net/openhft/affinity/impl/VanillaCpuLayout$CpuInfo"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/VanillaCpuLayout.class",
+      "occurrence": 0,
+      "sha256": "5ecc5c7c204851c80dd42269c7975cb9970e9aa1f557886e8878e8a137fd3861",
+      "name": "net/openhft/affinity/impl/VanillaCpuLayout",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/openhft/affinity/CpuLayout"
+      ],
+      "fields": [
+        {
+          "name": "MAX_CPUS_SUPPORTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "cpuDetails",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lnet/openhft/affinity/impl/VanillaCpuLayout$CpuInfo;>;"
+        },
+        {
+          "name": "sockets",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "coresPerSocket",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "threadsPerCore",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "d588c6264adffb0c8e3095171b585270c01f319e53bee444f1a686b08069a431",
+          "code_length": 312,
+          "generic_signature": "(Ljava/util/List<Lnet/openhft/affinity/impl/VanillaCpuLayout$CpuInfo;>;)V"
+        },
+        {
+          "name": "fromProperties",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "57ff8b176a170c93a23131ef76729d9ff4c47edaed7b70105f503a03b46c5b24",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "fromProperties",
+          "descriptor": "(Ljava/io/InputStream;)Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "3d8b8a52b1fddbf1bdcfe0279d305c15c200b82c941d9a9cc725cadf450bcd39",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "fromProperties",
+          "descriptor": "(Ljava/util/Properties;)Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "f727346d08f9c7ec95403af01c9019bcc7f3e2043f7604c682594bb82cb0f7c1",
+          "code_length": 113
+        },
+        {
+          "name": "fromCpuInfo",
+          "descriptor": "()Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "a1da7efc1b5708e6c6780a0820d5dfa028731ed9d35d557ffd7660c71bc2e923",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "fromCpuInfo",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "bfc5bfad6c595bddf3a21cfba6ffc568b2fd76b1c0d849e5a305431057c9ad87",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "openFile",
+          "descriptor": "(Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 10,
+          "code_sha256": "6579adbc164a7566f3b728b68db1dd3a5c91c5a04ec5d48a6e26b9a663773848",
+          "code_length": 29,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ]
+        },
+        {
+          "name": "fromCpuInfo",
+          "descriptor": "(Ljava/io/InputStream;)Lnet/openhft/affinity/impl/VanillaCpuLayout;",
+          "access": 9,
+          "code_sha256": "da06151142aa7bc254eb6232f38709d6b445cc9fcf745d570f8cdd7aa20406e7",
+          "code_length": 274,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "cpus",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "694cd9293eef798172d41519e7b102dffdd51c129cd32f07ed3ecc3ee5d847e6",
+          "code_length": 10
+        },
+        {
+          "name": "sockets",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f71c0e37ea3da5d4fd1a485105c71cfe89cdd2a717078a1b00ea19e11626bf1b",
+          "code_length": 5
+        },
+        {
+          "name": "coresPerSocket",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e88f57acb743f9814252b0b6da76241e43852e726e8114d0947084449c5d49e9",
+          "code_length": 5
+        },
+        {
+          "name": "threadsPerCore",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "86dcc05b641d58d58678ff6c5df64c6848ed07c0959278c629d5fe43f719ccc7",
+          "code_length": 5
+        },
+        {
+          "name": "socketId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "75c4b27cc7738e37773ada5f5d72fc05927d8bfff6ecbdad8a4fa82b8dad2a95",
+          "code_length": 17
+        },
+        {
+          "name": "coreId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "baf903242b881840dd6457ad1b63b6f4725cb74869cd4da0681af9a715575a81",
+          "code_length": 17
+        },
+        {
+          "name": "threadId",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "e027434f0f7e5de57085f877bea9ee3f7af323754b20828ce4d5c85039729180",
+          "code_length": 17
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c7a7384e1ee352daab110e3f46d67393bf25009da4e9f5999f3f97a1637d1c7f",
+          "code_length": 72
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8cfda552ef42968762c2a20bb092eda469b85855bffcedffa8f9c9d469fc644f",
+          "code_length": 82
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "326f3091fe6fff7dc4c2b32d50b55fe8d621577f707af0db3ff780e591358275",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/BufferedReader",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/lang/ClassLoader",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Properties",
+        "java/util/SortedSet",
+        "java/util/TreeSet",
+        "net/openhft/affinity/CpuLayout",
+        "net/openhft/affinity/impl/VanillaCpuLayout",
+        "net/openhft/affinity/impl/VanillaCpuLayout$CpuInfo",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/VersionHelper.class",
+      "occurrence": 0,
+      "sha256": "4f72034ebd57e96b173065605e2b87f114ba8f65f3e89ae763a0074b9df66fce",
+      "name": "net/openhft/affinity/impl/VersionHelper",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DELIM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "major",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "minor",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "release",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(III)V",
+          "access": 1,
+          "code_sha256": "ab7f2cebb5191e4f7621fe3cf991fe6156d03435b2044f094e0806eddb53120c",
+          "code_length": 20
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "af2a0952dbeb8a598f773a87571f386330ce7a6712c09daf0cee73b8763ac263",
+          "code_length": 105
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fa3e1f275147cad731d12e548e4e86d2144f77dc7087c95beaed61d38fd260fb",
+          "code_length": 42
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "9c1d466eecc70537698a10256acef49f37ac56095a0b47b9befc4a5d83144de9",
+          "code_length": 57
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "daf81e07837b38010043fdff380fa749272d336961060f2759683123c814d4e4",
+          "code_length": 21
+        },
+        {
+          "name": "majorMinorEquals",
+          "descriptor": "(Lnet/openhft/affinity/impl/VersionHelper;)Z",
+          "access": 1,
+          "code_sha256": "18d24f8cde229d9eb9a61224ff756576466bc625c34179d097af79b67c0445cd",
+          "code_length": 32
+        },
+        {
+          "name": "isSameOrNewer",
+          "descriptor": "(Lnet/openhft/affinity/impl/VersionHelper;)Z",
+          "access": 1,
+          "code_sha256": "c8ac57c488f2afc822325e0a53c22ed5181c9d5767606155df2d159a35edbd75",
+          "code_length": 65
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "net/openhft/affinity/impl/VersionHelper"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/WindowsJNAAffinity$CLibrary.class",
+      "occurrence": 0,
+      "sha256": "7fb4bbe74534b8e15e3e9a5a2dfac836db573c42e667700e80c6379a44ebb725",
+      "name": "net/openhft/affinity/impl/WindowsJNAAffinity$CLibrary",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/WindowsJNAAffinity$CLibrary;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "GetProcessAffinityMask",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/PointerType;Lcom/sun/jna/PointerType;)I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "SetThreadAffinityMask",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$DWORD;)V",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "GetCurrentThread",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "com/sun/jna/LastErrorException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "java/lang/Object",
+        "net/openhft/affinity/impl/WindowsJNAAffinity",
+        "net/openhft/affinity/impl/WindowsJNAAffinity$CLibrary"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/impl/WindowsJNAAffinity.class",
+      "occurrence": 0,
+      "sha256": "6c9f2ff19d2b10fbf5c174a1ad3f95bc88cec1d393bfd38fe16c9fdf7477dbba",
+      "name": "net/openhft/affinity/impl/WindowsJNAAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/affinity/impl/WindowsJNAAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOADED",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "currentAffinity",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/util/BitSet;>;"
+        },
+        {
+          "name": "THREAD_ID",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/affinity/impl/WindowsJNAAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/affinity/impl/WindowsJNAAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/affinity/impl/WindowsJNAAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "2d3a2fc14f7e859cc0d51c0b2ad5ff673e3e4cefec1e02b43301bb45ad07facc",
+          "code_length": 18,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "61f02850e8b875c63edc0a07bf6c0927beb2a60bf4d987a395cab462cbb4ec17",
+          "code_length": 37
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "231e820d11d21b4390308a5ff4d890d8e9e90136a0f0c8ad7a28f660e32f1a25",
+          "code_length": 226
+        },
+        {
+          "name": "getAffinity0",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 2,
+          "code_sha256": "53995e73dbffba77e4aa40b886dd5d8240303175cd63e80c93d20850cd656415",
+          "code_length": 126
+        },
+        {
+          "name": "handle",
+          "descriptor": "(I)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 2,
+          "code_sha256": "a4313dbabf6b1d01a9c8f1bf46bc247d5ec3c4e203b929498bf86d442f88a0e8",
+          "code_length": 17
+        },
+        {
+          "name": "getTid",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6db0ed70e6df4a42e3fe84f2677555617e68b23ab5430fbab494d054e536ef40",
+          "code_length": 43
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea3444f7b732d2379c3e81ad7a08e24c072cb9468be2734659ffef7ecaec49ed",
+          "code_length": 2
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "def7c9e52fe6bafaa37d62523b855e0562f4db3d11b768fff89c6b0a1c1967e1",
+          "code_length": 9
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4b6329001ef8e264da4b71950e6dabb533f5c20d128d0f60ffcff5c002558f55",
+          "code_length": 40
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "03d283d014a581a16387a9eb4f6cdc6e1085696eacb7a5a75c0b573645922229",
+          "code_length": 75
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/affinity/impl/WindowsJNAAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[J",
+        "[Lnet/openhft/affinity/impl/WindowsJNAAffinity;",
+        "com/sun/jna/LastErrorException",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/ptr/LongByReference",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/lang/ThreadLocal",
+        "java/lang/UnsatisfiedLinkError",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "net/openhft/affinity/impl/WindowsJNAAffinity",
+        "net/openhft/affinity/impl/WindowsJNAAffinity$CLibrary",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/lockchecker/FileLockBasedLockChecker$ConcurrentLockFileDeletionException.class",
+      "occurrence": 0,
+      "sha256": "ab88df989bed42a13bb9fbbbddd43857d55d199be5777a65745ecf760830656a",
+      "name": "net/openhft/affinity/lockchecker/FileLockBasedLockChecker$ConcurrentLockFileDeletionException",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lnet/openhft/affinity/lockchecker/FileLockBasedLockChecker;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lnet/openhft/affinity/lockchecker/FileLockBasedLockChecker;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "net/openhft/affinity/lockchecker/FileLockBasedLockChecker",
+        "net/openhft/affinity/lockchecker/FileLockBasedLockChecker$ConcurrentLockFileDeletionException"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/lockchecker/FileLockBasedLockChecker.class",
+      "occurrence": 0,
+      "sha256": "81ec98b98048bc64231b56af3d5b0927ff9a68c4b4f213f72c783bdb2b8e13f5",
+      "name": "net/openhft/affinity/lockchecker/FileLockBasedLockChecker",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/openhft/affinity/lockchecker/LockChecker"
+      ],
+      "fields": [
+        {
+          "name": "MAX_LOCK_RETRIES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "dfTL",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/text/SimpleDateFormat;>;"
+        },
+        {
+          "name": "LOCK_FILE_ATTRIBUTES",
+          "descriptor": "Ljava/nio/file/attribute/FileAttribute;",
+          "access": 26,
+          "generic_signature": "Ljava/nio/file/attribute/FileAttribute<Ljava/util/Set<Ljava/nio/file/attribute/PosixFilePermission;>;>;"
+        },
+        {
+          "name": "LOCK_FILE_OPEN_OPTIONS",
+          "descriptor": "Ljava/util/Set;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Set<Ljava/nio/file/OpenOption;>;"
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "instance",
+          "descriptor": "Lnet/openhft/affinity/lockchecker/FileLockBasedLockChecker;",
+          "access": 26
+        },
+        {
+          "name": "locks",
+          "descriptor": "[Lnet/openhft/affinity/lockchecker/LockReference;",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "09932fe312fdeca6187929869dc6abee46f65cfb66a7cc3ae473a88483c88335",
+          "code_length": 15
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lnet/openhft/affinity/lockchecker/LockChecker;",
+          "access": 9,
+          "code_sha256": "5f68107637f46ea355ce889725fce8ae59bf62377222d99f4e9456a8a7970043",
+          "code_length": 4
+        },
+        {
+          "name": "isLockFree",
+          "descriptor": "(I)Z",
+          "access": 33,
+          "code_sha256": "96ae43ba391affdb52d5c47d447d601328d38d6921a2c1a7b6e3a9f0d6e61fb3",
+          "code_length": 397
+        },
+        {
+          "name": "obtainLock",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 33,
+          "code_sha256": "eefe170e9fca09c954fd315be4a26cfc4a3e4077bfc799ad5190ad5d2d7e61eb",
+          "code_length": 74,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "tryAcquireLockOnFile",
+          "descriptor": "(ILjava/lang/String;)Lnet/openhft/affinity/lockchecker/LockReference;",
+          "access": 2,
+          "code_sha256": "ec9bde8ddf628f52d24d250d150f8cb5a60bb5f6513c3971a0202f13cac78f0a",
+          "code_length": 130,
+          "throws": [
+            "java/io/IOException",
+            "net/openhft/affinity/lockchecker/FileLockBasedLockChecker$ConcurrentLockFileDeletionException"
+          ]
+        },
+        {
+          "name": "writeMetaInfoToFile",
+          "descriptor": "(Ljava/nio/channels/FileChannel;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "b7ca32440198ec8da70a161e82ace6bbcfc3051592bab09a7771e9745784cc36",
+          "code_length": 64,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "releaseLock",
+          "descriptor": "(I)Z",
+          "access": 33,
+          "code_sha256": "ede04972c9c876ac0679071c83e4f7e24017e447d365fc534ad8867aa71d6192",
+          "code_length": 92
+        },
+        {
+          "name": "closeQuietly",
+          "descriptor": "([Ljava/lang/AutoCloseable;)V",
+          "access": 130,
+          "code_sha256": "58f1df69edaf710c27e7437c014d84366183ba668fbaf65d6fd0fbf4e392f2e3",
+          "code_length": 80
+        },
+        {
+          "name": "getMetaInfo",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1ae3ca0a90650f561530f1ac9a2b7360828bd590dc875ce7a0bcf108c3c5ab7b",
+          "code_length": 149,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readMetaInfoFromLockFileChannel",
+          "descriptor": "(Ljava/io/File;Ljava/nio/channels/FileChannel;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5743030e19dbb092c7928395bf97b5474f922587b7175f8ec0e5b50d0939ff2f",
+          "code_length": 79,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toFile",
+          "descriptor": "(I)Ljava/io/File;",
+          "access": 4,
+          "code_sha256": "689cb2c99a0c9eada559511f95070d467ffa452818326519d8c7fdbeb06e8411",
+          "code_length": 54
+        },
+        {
+          "name": "tmpDir",
+          "descriptor": "()Ljava/io/File;",
+          "access": 2,
+          "code_sha256": "623c0d2c72bbffdf3c3ca9f948e111387130cdd3c8632ca1543d559a24ff5a15",
+          "code_length": 27
+        },
+        {
+          "name": "lambda$static$0",
+          "descriptor": "()Ljava/text/SimpleDateFormat;",
+          "access": 4106,
+          "code_sha256": "3b91104e799e56b4693750cc90b8759be0e4e3ca087ee37f0e002fa5f15d4c1b",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "eb63c158ca61b48ad2bd0dfe778fa7be5f244d85e0b533bfb28a6167a1e64c34",
+          "code_length": 98
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Ljava/lang/AutoCloseable;",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/AssertionError",
+        "java/lang/AutoCloseable",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/ThreadLocal",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/nio/ByteBuffer",
+        "java/nio/channels/FileChannel",
+        "java/nio/channels/FileLock",
+        "java/nio/channels/OverlappingFileLockException",
+        "java/nio/file/NoSuchFileException",
+        "java/nio/file/OpenOption",
+        "java/nio/file/StandardOpenOption",
+        "java/nio/file/attribute/FileAttribute",
+        "java/nio/file/attribute/PosixFilePermissions",
+        "java/text/SimpleDateFormat",
+        "java/util/Arrays",
+        "java/util/Date",
+        "java/util/HashSet",
+        "net/openhft/affinity/impl/VanillaCpuLayout",
+        "net/openhft/affinity/lockchecker/FileLockBasedLockChecker",
+        "net/openhft/affinity/lockchecker/FileLockBasedLockChecker$ConcurrentLockFileDeletionException",
+        "net/openhft/affinity/lockchecker/LockChecker",
+        "net/openhft/affinity/lockchecker/LockReference",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/lockchecker/LockChecker.class",
+      "occurrence": 0,
+      "sha256": "60234ec3aa9b691c55719d03cc3823f8d934f324e37337494d894ff5ab8cf41c",
+      "name": "net/openhft/affinity/lockchecker/LockChecker",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isLockFree",
+          "descriptor": "(I)Z",
+          "access": 1025
+        },
+        {
+          "name": "obtainLock",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "releaseLock",
+          "descriptor": "(I)Z",
+          "access": 1025
+        },
+        {
+          "name": "getMetaInfo",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "net/openhft/affinity/lockchecker/LockChecker"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/lockchecker/LockReference.class",
+      "occurrence": 0,
+      "sha256": "62918357c9aa05273168d4fc1f3df3c563addf9ac53de55abf97d44ccedaeae5",
+      "name": "net/openhft/affinity/lockchecker/LockReference",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "channel",
+          "descriptor": "Ljava/nio/channels/FileChannel;",
+          "access": 20
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/nio/channels/FileLock;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/nio/channels/FileChannel;Ljava/nio/channels/FileLock;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getChannel",
+          "descriptor": "()Ljava/nio/channels/FileChannel;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/affinity/lockchecker/LockReference"
+      ]
+    },
+    {
+      "entry": "net/openhft/affinity/main/AffinityTestMain.class",
+      "occurrence": 0,
+      "sha256": "3722537df558299b0732d67c456d30d3fcd4b6f29a40a9e69615c1d67a383b1a",
+      "name": "net/openhft/affinity/main/AffinityTestMain",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "5fa0a59e50e5f7d24bd52242e50be211c600de02b8e6167b6178b9cd8e888acd",
+          "code_length": 49
+        },
+        {
+          "name": "acquireAndDoWork",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "3be700d900c72a73e6c5fe013f5513c2a64f7dbc182c6f0e3906060544a6b4e6",
+          "code_length": 18
+        },
+        {
+          "name": "lambda$acquireAndDoWork$0",
+          "descriptor": "()V",
+          "access": 4106,
+          "code_sha256": "41c95490cda1ab44d77d0e12a4c042b6d9ad887a83b7efb259419443446bd7fd",
+          "code_length": 201
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/Integer",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/text/SimpleDateFormat",
+        "java/util/Date",
+        "net/openhft/affinity/Affinity",
+        "net/openhft/affinity/AffinityLock",
+        "net/openhft/affinity/CpuLayout",
+        "net/openhft/affinity/main/AffinityTestMain"
+      ]
+    },
+    {
+      "entry": "net/openhft/ticker/ITicker.class",
+      "occurrence": 0,
+      "sha256": "16d42dae40115e911a012c350a2e1e80e889dd9db7a5a01bcdc8427d653360a8",
+      "name": "net/openhft/ticker/ITicker",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "nanoTime",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "ticks",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "toNanos",
+          "descriptor": "(J)J",
+          "access": 1025
+        },
+        {
+          "name": "toMicros",
+          "descriptor": "(D)D",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/openhft/ticker/ITicker"
+      ]
+    },
+    {
+      "entry": "net/openhft/ticker/Ticker.class",
+      "occurrence": 0,
+      "sha256": "b5038bbe88042082b99d3cff8032cc291a5eb6061896aee1d463754a45c1eefd",
+      "name": "net/openhft/ticker/Ticker",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/ticker/ITicker;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "ticks",
+          "descriptor": "()J",
+          "access": 9,
+          "code_sha256": "6c41673a83940acd78aa52dfbf2edb700573074e40a16f54160b2080b773fcbb",
+          "code_length": 9
+        },
+        {
+          "name": "nanoTime",
+          "descriptor": "()J",
+          "access": 9,
+          "code_sha256": "b1e44f434c4c2f0589bdf8694b92b67799d28355a14826ff7ecb013231b923d6",
+          "code_length": 7
+        },
+        {
+          "name": "toNanos",
+          "descriptor": "(J)J",
+          "access": 9,
+          "code_sha256": "4e7f2ac94641210572ad38ce43aea5b0dca08e9e56c44664753a59fabcff81c8",
+          "code_length": 10
+        },
+        {
+          "name": "toMicros",
+          "descriptor": "(J)D",
+          "access": 9,
+          "code_sha256": "76148e635dd17a74f7b7e1b845a15ddcf8eea0ffdf5ee5dca76fe7670d4bfa23",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e1dab681d960ca1b94021950dde974a1e4e109779192e3a8040ce93d9b393502",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "java/lang/InstantiationError",
+        "java/lang/Object",
+        "net/openhft/ticker/ITicker",
+        "net/openhft/ticker/Ticker",
+        "net/openhft/ticker/impl/JNIClock",
+        "net/openhft/ticker/impl/SystemClock"
+      ]
+    },
+    {
+      "entry": "net/openhft/ticker/impl/JNIClock.class",
+      "occurrence": 0,
+      "sha256": "3dd2253c667938cb227f5ec7ef3351faa0d80d3e0a8c392469a978a4305a74b9",
+      "name": "net/openhft/ticker/impl/JNIClock",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/ticker/ITicker"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/ticker/impl/JNIClock;",
+          "access": 16409
+        },
+        {
+          "name": "LOADED",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "FACTOR_BITS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "START",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "RDTSC_FACTOR",
+          "descriptor": "J",
+          "access": 10
+        },
+        {
+          "name": "RDTSC_MICRO_FACTOR",
+          "descriptor": "D",
+          "access": 10
+        },
+        {
+          "name": "CPU_FREQUENCY",
+          "descriptor": "J",
+          "access": 10
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/ticker/impl/JNIClock;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/ticker/impl/JNIClock;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/ticker/impl/JNIClock;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "tscToNano",
+          "descriptor": "(J)J",
+          "access": 8,
+          "code_sha256": "7912ba26c540340b4f5dc401bd9538daca6d0c77319aa8dba764903a9b9809d1",
+          "code_length": 9
+        },
+        {
+          "name": "estimateFrequency",
+          "descriptor": "(I)V",
+          "access": 10,
+          "code_sha256": "f7ae54c54bf88292bd48a2c07f07c08afd97e05c77cdc7ca37672fb25ded769e",
+          "code_length": 110
+        },
+        {
+          "name": "rdtsc0",
+          "descriptor": "()J",
+          "access": 264
+        },
+        {
+          "name": "nanoTime",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c358f028f00eda4373630534d87022367dd3c80fdef0d0d17baf819497330de6",
+          "code_length": 11
+        },
+        {
+          "name": "ticks",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "a811ad50b747fa8b52af460ef2316f61f2b58b5682a595f0d5776245cbc11592",
+          "code_length": 4
+        },
+        {
+          "name": "toNanos",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "413411e3434da036a3e7580106552248b1a6b305a92d046e01f4261755bcbc94",
+          "code_length": 5
+        },
+        {
+          "name": "toMicros",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "d6d571fdff90016e2a9b4e4e1e3cbaec166fcb5a949fc79fa905cd6eca50eaed",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7ac860fd45eda40c3848b7250d61462838296e34eb6e81ce4f560f1b536af9d4",
+          "code_length": 166
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/ticker/impl/JNIClock;>;Lnet/openhft/ticker/ITicker;",
+      "class_references": [
+        "[Lnet/openhft/ticker/impl/JNIClock;",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/UnsatisfiedLinkError",
+        "java/util/logging/Logger",
+        "net/openhft/ticker/ITicker",
+        "net/openhft/ticker/impl/JNIClock",
+        "software/chronicle/enterprise/internals/impl/NativeAffinity"
+      ]
+    },
+    {
+      "entry": "net/openhft/ticker/impl/SystemClock.class",
+      "occurrence": 0,
+      "sha256": "c03810e1e8459b4c12d7bd8da904a7ecc840c8c5868e09ca06efe1f638fe0ae5",
+      "name": "net/openhft/ticker/impl/SystemClock",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/ticker/ITicker"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lnet/openhft/ticker/impl/SystemClock;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/openhft/ticker/impl/SystemClock;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/openhft/ticker/impl/SystemClock;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/openhft/ticker/impl/SystemClock;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "nanoTime",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "d735492cb9e250776049c89a81e5976789a95664de37193893b3756e5335f625",
+          "code_length": 4
+        },
+        {
+          "name": "ticks",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "617dcb862b1201439a4127f7dd93c4049f175a348e5a62afd6c3081d5a8bc936",
+          "code_length": 5
+        },
+        {
+          "name": "toNanos",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "000fc914e6517e06eed8d953b7dc97c9d38ab7c3609ed445917dc55647dd488e",
+          "code_length": 2
+        },
+        {
+          "name": "toMicros",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "6bb30b9297b445c4d25ed30674e7fd4b4788198d4b88424d81ec5f3020a4f39e",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e1c862f1a2bf2a1da0c3d4ee138c15b6e1a0718fdae4262a830d258271f3a035",
+          "code_length": 27
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/openhft/ticker/impl/SystemClock;>;Lnet/openhft/ticker/ITicker;",
+      "class_references": [
+        "[Lnet/openhft/ticker/impl/SystemClock;",
+        "java/lang/Enum",
+        "java/lang/System",
+        "net/openhft/ticker/ITicker",
+        "net/openhft/ticker/impl/SystemClock"
+      ]
+    },
+    {
+      "entry": "software/chronicle/enterprise/internals/impl/NativeAffinity.class",
+      "occurrence": 0,
+      "sha256": "18ef1c9b011b0ab436e3f6299b0e4a7aa39b1c7253317b780d72d54d12760d2f",
+      "name": "software/chronicle/enterprise/internals/impl/NativeAffinity",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "net/openhft/affinity/IAffinity"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;",
+          "access": 16409
+        },
+        {
+          "name": "LOADED",
+          "descriptor": "Z",
+          "access": 25
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getAffinity0",
+          "descriptor": "()[B",
+          "access": 266
+        },
+        {
+          "name": "setAffinity0",
+          "descriptor": "([B)V",
+          "access": 266
+        },
+        {
+          "name": "getCpu0",
+          "descriptor": "()I",
+          "access": 266
+        },
+        {
+          "name": "getProcessId0",
+          "descriptor": "()I",
+          "access": 266
+        },
+        {
+          "name": "getThreadId0",
+          "descriptor": "()I",
+          "access": 266
+        },
+        {
+          "name": "rdtsc0",
+          "descriptor": "()J",
+          "access": 266
+        },
+        {
+          "name": "loadAffinityNativeLibrary",
+          "descriptor": "()Z",
+          "access": 10,
+          "code_sha256": "a4a841d60ba2f29c0fbc6e9375acf1b7f48f57ca622345b3d683fbf21b8f4c59",
+          "code_length": 10
+        },
+        {
+          "name": "getAffinity",
+          "descriptor": "()Ljava/util/BitSet;",
+          "access": 1,
+          "code_sha256": "e06b77c1295f49d43d66b9b0b499ed209652acf9c039d02ce61eb75cdf4453aa",
+          "code_length": 15
+        },
+        {
+          "name": "setAffinity",
+          "descriptor": "(Ljava/util/BitSet;)V",
+          "access": 1,
+          "code_sha256": "4a472d343c8ed2856251d642ab45ae25c85c07a733d2106104527c843349fa10",
+          "code_length": 8
+        },
+        {
+          "name": "getCpu",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a4263f4c473b1b225b512966bb3267c98153e3c69ac8670949b19016f3370798",
+          "code_length": 4
+        },
+        {
+          "name": "getProcessId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e999a97acb8be13b6186be1ab4020e1813c89f3a277b3d1ba50eb26edc8303b5",
+          "code_length": 4
+        },
+        {
+          "name": "getThreadId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "67cc1f08e4a564e7503f0058d379269a7dd073d5c2355b4a178663e7cf9864cf",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e4b6adab49f3ba1b3baab906c768b181ff441d87ecb6003d4685abd594e28de2",
+          "code_length": 33
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;>;Lnet/openhft/affinity/IAffinity;",
+      "class_references": [
+        "[B",
+        "[Lsoftware/chronicle/enterprise/internals/impl/NativeAffinity;",
+        "java/lang/Enum",
+        "java/lang/System",
+        "java/lang/UnsatisfiedLinkError",
+        "java/util/BitSet",
+        "net/openhft/affinity/IAffinity",
+        "software/chronicle/enterprise/internals/impl/NativeAffinity"
+      ]
+    }
+  ]
+}

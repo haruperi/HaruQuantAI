@@ -1,0 +1,4312 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/freemarker-2.3.28.jar",
+  "archive_sha256": "de92d103d3a86c2287307218ff50dc1c941de283f7b9e1fb23e93fc7220838bf",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "freemarker/core/BodyInstruction.class",
+      "occurrence": 0,
+      "sha256": "ac3507053fc98af2a5b18228906b461eb32f378fcd28dfae042710319ff77e91",
+      "name": "freemarker/core/BodyInstruction",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/core/TemplateElement",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bodyParameters",
+          "descriptor": "Ljava/util/List;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "5a9721c3e786506fec6881816be1c4f77163a607d1d7a38631870d41cc931594",
+          "code_length": 10
+        },
+        {
+          "name": "getBodyParameters",
+          "descriptor": "()Ljava/util/List;",
+          "access": 0,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Lfreemarker/core/Environment;)[Lfreemarker/core/TemplateElement;",
+          "access": 0,
+          "code_sha256": "16dc98c9c3a7184276bf80b91d8531fc1ccb2e5f95e087a81e7c77977a4fda84",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException",
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "dump",
+          "descriptor": "(Z)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "b6cabfa34c87fce4067db51d6954eeb0c0337420a73c27dec6f708685f0a3229",
+          "code_length": 100
+        },
+        {
+          "name": "getNodeTypeSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "74df402478ec2f9d2a653db8b0238cfaf8e2cdc86b0f3dab63b365b2c2c31d18",
+          "code_length": 3
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "4292dba04b4111d40b1d26f2c36a2ce08c5209b4026e2a3162b8751abf702435",
+          "code_length": 21
+        },
+        {
+          "name": "getParameterValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "242159e7634dcf055547869e81a133d938a5b362e2477e0b57cd635137eba980",
+          "code_length": 16
+        },
+        {
+          "name": "getParameterRole",
+          "descriptor": "(I)Lfreemarker/core/ParameterRole;",
+          "access": 0,
+          "code_sha256": "8fa08a3f3e469506c91f1d0b1bdbfe984c457f0bc4db0c136e0c43c236b1daf9",
+          "code_length": 9
+        },
+        {
+          "name": "checkIndex",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "3c26375d0f77420bbfc99a420466f28c3a6aaac8b96d0f75272b8138248c93c2",
+          "code_length": 29
+        },
+        {
+          "name": "isShownInStackTrace",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isNestedBlockRepeater",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/core/BodyInstruction;)Ljava/util/List;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BodyInstruction",
+        "freemarker/core/BodyInstruction$Context",
+        "freemarker/core/Environment",
+        "freemarker/core/Expression",
+        "freemarker/core/ParameterRole",
+        "freemarker/core/TemplateElement",
+        "freemarker/template/TemplateException",
+        "java/io/IOException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/StringBuilder",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BooleanExpression.class",
+      "occurrence": 0,
+      "sha256": "b6601658a2e086bf35ac76b60ab58d34890cfaf130201bf3ee5282da886a0eeb",
+      "name": "freemarker/core/BooleanExpression",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/Expression",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "b1702edef366046b7251583ec1137d2f1ebd2a55b89c0bc41d494146e590dc36",
+          "code_length": 18,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BooleanExpression",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BooleanLiteral.class",
+      "occurrence": 0,
+      "sha256": "5a51789fa16d2f983110164f3ca9bb993d42f9cac07a84582af0003ea26d657a",
+      "name": "freemarker/core/BooleanLiteral",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/core/Expression",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "getTemplateModel",
+          "descriptor": "(Z)Lfreemarker/template/TemplateBooleanModel;",
+          "access": 8,
+          "code_sha256": "8d71252ae5708115c1d26c9078a9a60c0cdea055e4b9815d08c65ba4d7c0ee90",
+          "code_length": 14
+        },
+        {
+          "name": "evalToBoolean",
+          "descriptor": "(Lfreemarker/core/Environment;)Z",
+          "access": 0,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getCanonicalForm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "818864403ba9e9bc2d5ff460a28643381b65f003cee5887808655b3b4a34f6ed",
+          "code_length": 15
+        },
+        {
+          "name": "getNodeTypeSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "818864403ba9e9bc2d5ff460a28643381b65f003cee5887808655b3b4a34f6ed",
+          "code_length": 15
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "a0d5d66aaa1d442c1aeccebf4f642d9aba0e7751fef4bc810672dbaf362c0e5b",
+          "code_length": 17
+        },
+        {
+          "name": "isLiteral",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "deepCloneWithIdentifierReplaced_inner",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Expression;Lfreemarker/core/Expression$ReplacemenetState;)Lfreemarker/core/Expression;",
+          "access": 4,
+          "code_sha256": "bf913b096e863fdf04f270f9246788c03194d5b79b6b0bd2524c74e5a13ae1a8",
+          "code_length": 12
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getParameterValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "579aff21d71c536c8241396461da6ad7eb7fdce5da5eb9ecc16329288877cae0",
+          "code_length": 8
+        },
+        {
+          "name": "getParameterRole",
+          "descriptor": "(I)Lfreemarker/core/ParameterRole;",
+          "access": 0,
+          "code_sha256": "579aff21d71c536c8241396461da6ad7eb7fdce5da5eb9ecc16329288877cae0",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BooleanLiteral",
+        "freemarker/core/Expression",
+        "freemarker/core/Expression$ReplacemenetState",
+        "freemarker/core/MiscUtil",
+        "freemarker/template/TemplateBooleanModel",
+        "java/lang/IndexOutOfBoundsException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BoundedRangeModel.class",
+      "occurrence": 0,
+      "sha256": "0605632a37ed595776cfb2e64e37230e5771ff6ae737fd00cad9a409607a63d1",
+      "name": "freemarker/core/BoundedRangeModel",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/core/RangeModel",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "step",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "rightAdaptive",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "affectedByStringSlicingBug",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IIZZ)V",
+          "access": 0,
+          "code_sha256": "289598d6ce8ae4d23f01d5aac33393f11478ad315e926db94a316b7cae336d70",
+          "code_length": 51
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getStep",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "isRightUnbounded",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "isRightAdaptive",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "isAffactedByStringSlicingBug",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BoundedRangeModel",
+        "freemarker/core/RangeModel",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BreakInstruction.class",
+      "occurrence": 0,
+      "sha256": "c3779441098adef63219f60cae85d841a3af3acc4e001df50613e52d5218848f",
+      "name": "freemarker/core/BreakInstruction",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "freemarker/core/TemplateElement",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "accept",
+          "descriptor": "(Lfreemarker/core/Environment;)[Lfreemarker/core/TemplateElement;",
+          "access": 0,
+          "code_sha256": "9e75f54546df6ddfd92b1f482f29b97287c6edc093055a63f0e87f3c300fc792",
+          "code_length": 4
+        },
+        {
+          "name": "dump",
+          "descriptor": "(Z)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "041e751d64689124ec1d27e9ca5284b20e961f7be6bab0a569cf5ab70170f9c0",
+          "code_length": 39
+        },
+        {
+          "name": "getNodeTypeSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "83e424e5d40b4d8d14d99d90e3986a9021a55f073b843c457573f68aa101ce74",
+          "code_length": 3
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getParameterValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "579aff21d71c536c8241396461da6ad7eb7fdce5da5eb9ecc16329288877cae0",
+          "code_length": 8
+        },
+        {
+          "name": "getParameterRole",
+          "descriptor": "(I)Lfreemarker/core/ParameterRole;",
+          "access": 0,
+          "code_sha256": "579aff21d71c536c8241396461da6ad7eb7fdce5da5eb9ecc16329288877cae0",
+          "code_length": 8
+        },
+        {
+          "name": "isNestedBlockRepeater",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BreakInstruction",
+        "freemarker/core/BreakOrContinueException",
+        "freemarker/core/TemplateElement",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BreakOrContinueException.class",
+      "occurrence": 0,
+      "sha256": "bbc2e8f11ffda98aca48e70c79f092e4af38e2cb18b5769557a8ce68317312e3",
+      "name": "freemarker/core/BreakOrContinueException",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/FlowControlException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BREAK_INSTANCE",
+          "descriptor": "Lfreemarker/core/BreakOrContinueException;",
+          "access": 24
+        },
+        {
+          "name": "CONTINUE_INSTANCE",
+          "descriptor": "Lfreemarker/core/BreakOrContinueException;",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fdb53ce5c2c14c7d04da1accef31141a72b701ec5ec1d6781516c9c2f4a073e5",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BreakOrContinueException",
+        "freemarker/core/FlowControlException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BugException.class",
+      "occurrence": 0,
+      "sha256": "942de1c27722c66587d2859fc21a7810123e32bd0f34edffb6969ad6e42a8d14",
+      "name": "freemarker/core/BugException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "COMMON_MESSAGE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "154f622e17d7dc8ae7133ae9b2de0f7dccab0dc4e1ad9b6b1df06aef81c7ef79",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "5ff1be8dd2f3183e86bda8b69251957462578757a4034589276e423732c04d39",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "74f1e8de6e2b637b1bde0a16222e2940e5253990646caa5418cdbda18e990524",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "d2a81ce5f95927ec70a10b1312c53baea32da8a6efee2d8a4f344b3f809c238e",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "8dc1d23aca9edd312959e614933be4b586693c26bbf097fae2baa23a27dd909e",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BugException",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltIn.class",
+      "occurrence": 0,
+      "sha256": "024ad29313be8227ed1b8c0ea5fcd3e5d62e9157067bd776ef2fbc5bbcbeefde",
+      "name": "freemarker/core/BuiltIn",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/Expression",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [
+        {
+          "name": "target",
+          "descriptor": "Lfreemarker/core/Expression;",
+          "access": 4
+        },
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "CAMEL_CASE_NAMES",
+          "descriptor": "Ljava/util/Set;",
+          "access": 24,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "SNAKE_CASE_NAMES",
+          "descriptor": "Ljava/util/Set;",
+          "access": 24,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "NUMBER_OF_BIS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "BUILT_INS_BY_NAME",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 24,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lfreemarker/core/BuiltIn;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "putBI",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/BuiltIn;)V",
+          "access": 10,
+          "code_sha256": "fdcccfe2c34ecb00523a6460058dc3b7adaeb6a3657f8560332fddd5b9aa131e",
+          "code_length": 30
+        },
+        {
+          "name": "putBI",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lfreemarker/core/BuiltIn;)V",
+          "access": 10,
+          "code_sha256": "bd135eddaaab708e8ec92bf61b2bf049c7d15ac1ea3b1217a56ecd82885c92b0",
+          "code_length": 39
+        },
+        {
+          "name": "newBuiltIn",
+          "descriptor": "(ILfreemarker/core/Expression;Lfreemarker/core/Token;Lfreemarker/core/FMParserTokenManager;)Lfreemarker/core/BuiltIn;",
+          "access": 8,
+          "code_sha256": "307c38e387e483aecd55f5efddf19c6ae82f8634041b49c04ea7bc85059cd849",
+          "code_length": 347,
+          "throws": [
+            "freemarker/core/ParseException"
+          ]
+        },
+        {
+          "name": "getCanonicalForm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cdbc853c47244c12943255efe34aa0e95bd682a797107c88d6bb565d19ebd937",
+          "code_length": 33
+        },
+        {
+          "name": "getNodeTypeSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "0b63bdea1c8af7dc3282582cb809ac24b608482396f6229ecf32d5e6c4c13dae",
+          "code_length": 23
+        },
+        {
+          "name": "isLiteral",
+          "descriptor": "()Z",
+          "access": 0,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "checkMethodArgCount",
+          "descriptor": "(Ljava/util/List;I)V",
+          "access": 20,
+          "code_sha256": "4f389dad656dda1480530cc32cfbd48d25c9ea0c5350b0776cbd226487c9114c",
+          "code_length": 12,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "checkMethodArgCount",
+          "descriptor": "(II)V",
+          "access": 20,
+          "code_sha256": "2b7d9fe5e4477c1cddb2d5c71a4ea0da9d09a26054e030bd3744f1f5d5bfaa5f",
+          "code_length": 34,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "checkMethodArgCount",
+          "descriptor": "(Ljava/util/List;II)V",
+          "access": 20,
+          "code_sha256": "996c5109adf026fe96266a3e9248a63fe7b6d69ca59a8065e85738a2b984bc03",
+          "code_length": 13,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "checkMethodArgCount",
+          "descriptor": "(III)V",
+          "access": 20,
+          "code_sha256": "8555791b5b72baede8dde113945d760f1651d77abade273aaffb0767f57283fb",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getOptStringMethodArg",
+          "descriptor": "(Ljava/util/List;I)Ljava/lang/String;",
+          "access": 20,
+          "code_sha256": "700cd5b6e4937f1d1fd71034fa2c75b8fc089fb8a17f288bfd42d722df976165",
+          "code_length": 21,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getStringMethodArg",
+          "descriptor": "(Ljava/util/List;I)Ljava/lang/String;",
+          "access": 20,
+          "code_sha256": "4f7bd2068efb47c83a9884bbab2353cc0eb5c6f7478a21b8a95ce39e21f7d630",
+          "code_length": 56,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getNumberMethodArg",
+          "descriptor": "(Ljava/util/List;I)Ljava/lang/Number;",
+          "access": 20,
+          "code_sha256": "100b7396c3a497967b83dc5dffd8df293afaa75cfdaa3b3a8703512b7561d271",
+          "code_length": 55,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "newMethodArgInvalidValueException",
+          "descriptor": "(I[Ljava/lang/Object;)Lfreemarker/template/TemplateModelException;",
+          "access": 20,
+          "code_sha256": "7b5f27360291b06837f62023a4c63d1792925f606bb215a111ac2ef22a358a4b",
+          "code_length": 28
+        },
+        {
+          "name": "newMethodArgsInvalidValueException",
+          "descriptor": "([Ljava/lang/Object;)Lfreemarker/template/TemplateModelException;",
+          "access": 20,
+          "code_sha256": "4b9aba99ffc02e3da4713793edb22f71df563093da2155ed5ff304e9304210dd",
+          "code_length": 27
+        },
+        {
+          "name": "deepCloneWithIdentifierReplaced_inner",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Expression;Lfreemarker/core/Expression$ReplacemenetState;)Lfreemarker/core/Expression;",
+          "access": 4,
+          "code_sha256": "85ef65c1721d8426de93de34fbfb94bfae53d73351914ba87c90a143d8304015",
+          "code_length": 57
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getParameterValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "29058c24b9f74153ae9d960a635d9b71ea3c402460d37697de68208984104630",
+          "code_length": 46
+        },
+        {
+          "name": "getParameterRole",
+          "descriptor": "(I)Lfreemarker/core/ParameterRole;",
+          "access": 0,
+          "code_sha256": "3bb2131423eacbb01c5d5b7287bb302a54032d6b91717af17a4c4586e97641bf",
+          "code_length": 44
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2e0bc6cc472def3424b69dd3237b2242d86b4e8fad2e88ab4f8ca9e542386017",
+          "code_length": 2569
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$dateType_if_unknownBI",
+        "freemarker/core/BuiltInsForDates$iso_BI",
+        "freemarker/core/BuiltInsForDates$iso_utc_or_local_BI",
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+        "freemarker/core/BuiltInsForExistenceHandling$existsBI",
+        "freemarker/core/BuiltInsForExistenceHandling$has_contentBI",
+        "freemarker/core/BuiltInsForExistenceHandling$if_existsBI",
+        "freemarker/core/BuiltInsForHashes",
+        "freemarker/core/BuiltInsForHashes$keysBI",
+        "freemarker/core/BuiltInsForHashes$valuesBI",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$counterBI",
+        "freemarker/core/BuiltInsForLoopVariables$has_nextBI",
+        "freemarker/core/BuiltInsForLoopVariables$indexBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_even_itemBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_firstBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_lastBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_odd_itemBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_parityBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_parity_capBI",
+        "freemarker/core/BuiltInsForMarkupOutputs",
+        "freemarker/core/BuiltInsForMarkupOutputs$markup_stringBI",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$apiBI",
+        "freemarker/core/BuiltInsForMultipleTypes$cBI",
+        "freemarker/core/BuiltInsForMultipleTypes$dateBI",
+        "freemarker/core/BuiltInsForMultipleTypes$has_apiBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_booleanBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_collectionBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_collection_exBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_dateLikeBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_dateOfTypeBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_directiveBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_enumerableBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_hashBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_hash_exBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_indexableBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_macroBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_markup_outputBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_methodBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_nodeBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_numberBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_sequenceBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_stringBI",
+        "freemarker/core/BuiltInsForMultipleTypes$is_transformBI",
+        "freemarker/core/BuiltInsForMultipleTypes$namespaceBI",
+        "freemarker/core/BuiltInsForMultipleTypes$sizeBI",
+        "freemarker/core/BuiltInsForMultipleTypes$stringBI",
+        "freemarker/core/BuiltInsForNodes",
+        "freemarker/core/BuiltInsForNodes$ancestorsBI",
+        "freemarker/core/BuiltInsForNodes$childrenBI",
+        "freemarker/core/BuiltInsForNodes$nextSiblingBI",
+        "freemarker/core/BuiltInsForNodes$node_nameBI",
+        "freemarker/core/BuiltInsForNodes$node_namespaceBI",
+        "freemarker/core/BuiltInsForNodes$node_typeBI",
+        "freemarker/core/BuiltInsForNodes$parentBI",
+        "freemarker/core/BuiltInsForNodes$previousSiblingBI",
+        "freemarker/core/BuiltInsForNodes$rootBI",
+        "freemarker/core/BuiltInsForNumbers",
+        "freemarker/core/BuiltInsForNumbers$absBI",
+        "freemarker/core/BuiltInsForNumbers$byteBI",
+        "freemarker/core/BuiltInsForNumbers$ceilingBI",
+        "freemarker/core/BuiltInsForNumbers$doubleBI",
+        "freemarker/core/BuiltInsForNumbers$floatBI",
+        "freemarker/core/BuiltInsForNumbers$floorBI",
+        "freemarker/core/BuiltInsForNumbers$intBI",
+        "freemarker/core/BuiltInsForNumbers$is_infiniteBI",
+        "freemarker/core/BuiltInsForNumbers$is_nanBI",
+        "freemarker/core/BuiltInsForNumbers$longBI",
+        "freemarker/core/BuiltInsForNumbers$lower_abcBI",
+        "freemarker/core/BuiltInsForNumbers$number_to_dateBI",
+        "freemarker/core/BuiltInsForNumbers$roundBI",
+        "freemarker/core/BuiltInsForNumbers$shortBI",
+        "freemarker/core/BuiltInsForNumbers$upper_abcBI",
+        "freemarker/core/BuiltInsForOutputFormatRelated",
+        "freemarker/core/BuiltInsForOutputFormatRelated$escBI",
+        "freemarker/core/BuiltInsForOutputFormatRelated$no_escBI",
+        "freemarker/core/BuiltInsForSequences",
+        "freemarker/core/BuiltInsForSequences$chunkBI",
+        "freemarker/core/BuiltInsForSequences$firstBI",
+        "freemarker/core/BuiltInsForSequences$joinBI",
+        "freemarker/core/BuiltInsForSequences$lastBI",
+        "freemarker/core/BuiltInsForSequences$maxBI",
+        "freemarker/core/BuiltInsForSequences$minBI",
+        "freemarker/core/BuiltInsForSequences$reverseBI",
+        "freemarker/core/BuiltInsForSequences$seq_containsBI",
+        "freemarker/core/BuiltInsForSequences$seq_index_ofBI",
+        "freemarker/core/BuiltInsForSequences$sequenceBI",
+        "freemarker/core/BuiltInsForSequences$sortBI",
+        "freemarker/core/BuiltInsForSequences$sort_byBI",
+        "freemarker/core/BuiltInsForStringsBasic",
+        "freemarker/core/BuiltInsForStringsBasic$cap_firstBI",
+        "freemarker/core/BuiltInsForStringsBasic$capitalizeBI",
+        "freemarker/core/BuiltInsForStringsBasic$chop_linebreakBI",
+        "freemarker/core/BuiltInsForStringsBasic$containsBI",
+        "freemarker/core/BuiltInsForStringsBasic$ends_withBI",
+        "freemarker/core/BuiltInsForStringsBasic$ensure_ends_withBI",
+        "freemarker/core/BuiltInsForStringsBasic$ensure_starts_withBI",
+        "freemarker/core/BuiltInsForStringsBasic$index_ofBI",
+        "freemarker/core/BuiltInsForStringsBasic$keep_afterBI",
+        "freemarker/core/BuiltInsForStringsBasic$keep_after_lastBI",
+        "freemarker/core/BuiltInsForStringsBasic$keep_beforeBI",
+        "freemarker/core/BuiltInsForStringsBasic$keep_before_lastBI",
+        "freemarker/core/BuiltInsForStringsBasic$lengthBI",
+        "freemarker/core/BuiltInsForStringsBasic$lower_caseBI",
+        "freemarker/core/BuiltInsForStringsBasic$padBI",
+        "freemarker/core/BuiltInsForStringsBasic$remove_beginningBI",
+        "freemarker/core/BuiltInsForStringsBasic$remove_endingBI",
+        "freemarker/core/BuiltInsForStringsBasic$split_BI",
+        "freemarker/core/BuiltInsForStringsBasic$starts_withBI",
+        "freemarker/core/BuiltInsForStringsBasic$substringBI",
+        "freemarker/core/BuiltInsForStringsBasic$trimBI",
+        "freemarker/core/BuiltInsForStringsBasic$uncap_firstBI",
+        "freemarker/core/BuiltInsForStringsBasic$upper_caseBI",
+        "freemarker/core/BuiltInsForStringsBasic$word_listBI",
+        "freemarker/core/BuiltInsForStringsEncoding",
+        "freemarker/core/BuiltInsForStringsEncoding$htmlBI",
+        "freemarker/core/BuiltInsForStringsEncoding$j_stringBI",
+        "freemarker/core/BuiltInsForStringsEncoding$js_stringBI",
+        "freemarker/core/BuiltInsForStringsEncoding$json_stringBI",
+        "freemarker/core/BuiltInsForStringsEncoding$rtfBI",
+        "freemarker/core/BuiltInsForStringsEncoding$urlBI",
+        "freemarker/core/BuiltInsForStringsEncoding$urlPathBI",
+        "freemarker/core/BuiltInsForStringsEncoding$xhtmlBI",
+        "freemarker/core/BuiltInsForStringsEncoding$xmlBI",
+        "freemarker/core/BuiltInsForStringsMisc",
+        "freemarker/core/BuiltInsForStringsMisc$absolute_template_nameBI",
+        "freemarker/core/BuiltInsForStringsMisc$booleanBI",
+        "freemarker/core/BuiltInsForStringsMisc$evalBI",
+        "freemarker/core/BuiltInsForStringsMisc$numberBI",
+        "freemarker/core/BuiltInsForStringsRegexp",
+        "freemarker/core/BuiltInsForStringsRegexp$groupsBI",
+        "freemarker/core/BuiltInsForStringsRegexp$matchesBI",
+        "freemarker/core/BuiltInsForStringsRegexp$replace_reBI",
+        "freemarker/core/BuiltInsWithParseTimeParameters",
+        "freemarker/core/BuiltInsWithParseTimeParameters$switch_BI",
+        "freemarker/core/BuiltInsWithParseTimeParameters$then_BI",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/Expression",
+        "freemarker/core/Expression$ReplacemenetState",
+        "freemarker/core/FMParserTokenManager",
+        "freemarker/core/ICIChainMember",
+        "freemarker/core/Interpret",
+        "freemarker/core/NewBI",
+        "freemarker/core/ParameterRole",
+        "freemarker/core/ParseException",
+        "freemarker/core/Token",
+        "freemarker/core/_CoreStringUtils",
+        "freemarker/core/_MessageUtil",
+        "freemarker/template/Configuration",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNumberModel",
+        "freemarker/template/TemplateScalarModel",
+        "freemarker/template/utility/DateUtil",
+        "freemarker/template/utility/StringUtil",
+        "java/lang/AssertionError",
+        "java/lang/Boolean",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/InternalError",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/TreeSet"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInBannedWhenAutoEscaping.class",
+      "occurrence": 0,
+      "sha256": "0cf41c5978b562055f1a04dfe07a5862bc929be8f9d2ff6c3303847d72a6e503",
+      "name": "freemarker/core/BuiltInBannedWhenAutoEscaping",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/SpecialBuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInBannedWhenAutoEscaping",
+        "freemarker/core/SpecialBuiltIn"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForDate.class",
+      "occurrence": 0,
+      "sha256": "67abbd25dd8444d5fc60ca60e66ed6904b8129a4a1773079f537b3ac3db87525",
+      "name": "freemarker/core/BuiltInForDate",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "e7d1f07c8c9709372609c040e3770de7efda66d69e0832c0f871e0dd1e89896d",
+          "code_length": 51,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/util/Date;ILfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1028,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "newNonDateException",
+          "descriptor": "(Lfreemarker/core/Environment;Lfreemarker/template/TemplateModel;Lfreemarker/core/Expression;)Lfreemarker/template/TemplateException;",
+          "access": 8,
+          "code_sha256": "9ac9b9da7aa307a51ce23427b931dbdda25ddf6a9146ad71c5696e8dfaa91437",
+          "code_length": 28,
+          "throws": [
+            "freemarker/core/InvalidReferenceException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForDate",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/Expression",
+        "freemarker/core/InvalidReferenceException",
+        "freemarker/core/NonDateException",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForHashEx.class",
+      "occurrence": 0,
+      "sha256": "fb3be98a079d3cea109dcfaebc352a840d7cdcb278d319957bf90943449c5d84",
+      "name": "freemarker/core/BuiltInForHashEx",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "8814129465916c6371e1e9d109b97dc2cdb8149f5a28beb6d92814f5df9ebbe6",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateHashModelEx;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "freemarker/core/InvalidReferenceException"
+          ]
+        },
+        {
+          "name": "newNullPropertyException",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/template/TemplateModel;Lfreemarker/core/Environment;)Lfreemarker/core/InvalidReferenceException;",
+          "access": 4,
+          "code_sha256": "d9004ec6e5b14d01e3fd507331573bec4d23c349da6edfc01da297f57ab67df2",
+          "code_length": 68
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForHashEx",
+        "freemarker/core/Environment",
+        "freemarker/core/Expression",
+        "freemarker/core/InvalidReferenceException",
+        "freemarker/core/NonExtendedHashException",
+        "freemarker/core/_ErrorDescriptionBuilder",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateHashModelEx",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Class",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForLegacyEscaping.class",
+      "occurrence": 0,
+      "sha256": "c0436d7edf2e47c962762c48f636a1ff4edaa182e49bf7ea965e5fd43a810589",
+      "name": "freemarker/core/BuiltInForLegacyEscaping",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltInBannedWhenAutoEscaping",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "a0a081a76c77c9bcaf4112f0f050c8bf6e43ae7ffa5e542f08e22756eaadb7b3",
+          "code_length": 77,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInBannedWhenAutoEscaping",
+        "freemarker/core/BuiltInForLegacyEscaping",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/Expression",
+        "freemarker/core/MarkupOutputFormat",
+        "freemarker/core/NonStringException",
+        "freemarker/core/TemplateMarkupOutputModel",
+        "freemarker/template/TemplateException",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForLoopVariable.class",
+      "occurrence": 0,
+      "sha256": "8adf30cc748feb190d472bad98e28888ab8802a4168dc41710871cdf5c6aca2b",
+      "name": "freemarker/core/BuiltInForLoopVariable",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/SpecialBuiltIn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "loopVarName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "bindToLoopVariable",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "b9fde8c09ad765a95e61b45a520407194b2f4a21b91be703c299c88cbe3f46fd",
+          "code_length": 58,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/core/SpecialBuiltIn",
+        "freemarker/core/_DelayedJQuote",
+        "freemarker/core/_MiscTemplateException",
+        "freemarker/template/TemplateException",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForMarkupOutput.class",
+      "occurrence": 0,
+      "sha256": "a385d237360ecdbe841ad061ccbc2adc5c3dd7a868b328c402534accbcaec308",
+      "name": "freemarker/core/BuiltInForMarkupOutput",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "6a706048cddc526c0f27ebf0410aeb6f6e188f773af563b9adec4a2a6a8deb86",
+          "code_length": 39,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/TemplateMarkupOutputModel;)Lfreemarker/template/TemplateModel;",
+          "access": 1028,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForMarkupOutput",
+        "freemarker/core/Expression",
+        "freemarker/core/NonMarkupOutputException",
+        "freemarker/core/TemplateMarkupOutputModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForNode.class",
+      "occurrence": 0,
+      "sha256": "c47d238d598e2a2b76514c7c7223c11bbe22ed84764644726ddd8c2c77b2a2db",
+      "name": "freemarker/core/BuiltInForNode",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "8814129465916c6371e1e9d109b97dc2cdb8149f5a28beb6d92814f5df9ebbe6",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateNodeModel;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForNode",
+        "freemarker/core/Expression",
+        "freemarker/core/NonNodeException",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNodeModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForNodeEx.class",
+      "occurrence": 0,
+      "sha256": "d95ee57667ee934a1ad4c504dca862fd8cc7792f0db094d70e8b16615a37344d",
+      "name": "freemarker/core/BuiltInForNodeEx",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "8814129465916c6371e1e9d109b97dc2cdb8149f5a28beb6d92814f5df9ebbe6",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateNodeModelEx;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getCanonicalForm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "8b10a0e55dc3dec01f99142d8f19013c096aa8ca5d4e88c6a3bb20e92fd79666",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForNodeEx",
+        "freemarker/core/Expression",
+        "freemarker/core/NonExtendedNodeException",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNodeModelEx"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForNumber.class",
+      "occurrence": 0,
+      "sha256": "0dec186c8d2b4e20bfa0fdb0b5ed64cc707df1e90d7e6be9a0bfe7d5c8685577",
+      "name": "freemarker/core/BuiltInForNumber",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "b10a7494e15587cb379e4fd604328da2cc386710ac1b8a3780173779d2a04572",
+          "code_length": 24,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/lang/Number;Lfreemarker/template/TemplateModel;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForNumber",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForSequence.class",
+      "occurrence": 0,
+      "sha256": "f17808c1585f0037f746beb578666719ce0b9e72bed7b5b786cf676652bb982b",
+      "name": "freemarker/core/BuiltInForSequence",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "6a706048cddc526c0f27ebf0410aeb6f6e188f773af563b9adec4a2a6a8deb86",
+          "code_length": 39,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateSequenceModel;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForSequence",
+        "freemarker/core/Expression",
+        "freemarker/core/NonSequenceException",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateSequenceModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInForString.class",
+      "occurrence": 0,
+      "sha256": "e4870c5f49de61eb5b429a0ea62867a6e8eca3b9daeaaa1c729d06975ccce605",
+      "name": "freemarker/core/BuiltInForString",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "0b5f81b886ac8e93ac2ed039a45028ad6b90c612e0fe1ebbe1267ea9c0256eca",
+          "code_length": 14,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 1024,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "getTargetString",
+          "descriptor": "(Lfreemarker/core/Expression;Lfreemarker/core/Environment;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "41a8a25429cec42292e1b8210264639e1f3bc4c601ebabc7ece4395c994cef11",
+          "code_length": 6,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForString",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInWithParseTimeParameters.class",
+      "occurrence": 0,
+      "sha256": "ae496a980d433830c4ffcfc4ce85be3fc47fcb44ffc24b7e86550abe2a598f0c",
+      "name": "freemarker/core/BuiltInWithParseTimeParameters",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/SpecialBuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "bindToParameters",
+          "descriptor": "(Ljava/util/List;Lfreemarker/core/Token;Lfreemarker/core/Token;)V",
+          "access": 1024,
+          "throws": [
+            "freemarker/core/ParseException"
+          ]
+        },
+        {
+          "name": "getCanonicalForm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "01c86dda0e5858ead6dcb0550f32fac02fdd2b2be09f89bcd82870b6e05fd473",
+          "code_length": 98
+        },
+        {
+          "name": "getNodeTypeSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "f9dad7972fbbf95c8c980a104629843d72d62af647dbeb1910bc4397c3610661",
+          "code_length": 23
+        },
+        {
+          "name": "getParameterCount",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "8c029398be450f8187b8f5e4325c7fe8a4610a8be03198cb642929895aae6d2a",
+          "code_length": 10
+        },
+        {
+          "name": "getParameterValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "172bed862a886d5e6f521d19ecdc4cfc7894f3f3f6aee0387fded8a7ac98025e",
+          "code_length": 26
+        },
+        {
+          "name": "getParameterRole",
+          "descriptor": "(I)Lfreemarker/core/ParameterRole;",
+          "access": 0,
+          "code_sha256": "d764f60500cc130b7ba4d2742f56f8c21d24315a4195b2706e31887fc3866980",
+          "code_length": 38
+        },
+        {
+          "name": "newArgumentCountException",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Token;Lfreemarker/core/Token;)Lfreemarker/core/ParseException;",
+          "access": 4,
+          "code_sha256": "9e6649ee234d1b369848882b3b12da809beda2b1b55dcc9db5d73c037ee0d880",
+          "code_length": 64
+        },
+        {
+          "name": "deepCloneWithIdentifierReplaced_inner",
+          "descriptor": "(Ljava/lang/String;Lfreemarker/core/Expression;Lfreemarker/core/Expression$ReplacemenetState;)Lfreemarker/core/Expression;",
+          "access": 4,
+          "code_sha256": "08cd2fd0aff59a51219c48254530feb062e736fbee42fbe14f6773f858ca9777",
+          "code_length": 21
+        },
+        {
+          "name": "getArgumentsAsList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1028
+        },
+        {
+          "name": "getArgumentsCount",
+          "descriptor": "()I",
+          "access": 1028
+        },
+        {
+          "name": "getArgumentParameterValue",
+          "descriptor": "(I)Lfreemarker/core/Expression;",
+          "access": 1028
+        },
+        {
+          "name": "cloneArguments",
+          "descriptor": "(Lfreemarker/core/Expression;Ljava/lang/String;Lfreemarker/core/Expression;Lfreemarker/core/Expression$ReplacemenetState;)V",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInWithParseTimeParameters",
+        "freemarker/core/Expression",
+        "freemarker/core/Expression$ReplacemenetState",
+        "freemarker/core/ParameterRole",
+        "freemarker/core/ParseException",
+        "freemarker/core/SpecialBuiltIn",
+        "freemarker/core/Token",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/StringBuilder",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates$AbstractISOBI.class",
+      "occurrence": 0,
+      "sha256": "dcc00d5fe822c8c9591f5843ed3dbca0f1d4cca62a8709ccceca632b00f5d4e5",
+      "name": "freemarker/core/BuiltInsForDates$AbstractISOBI",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltInForDate",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "showOffset",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 20
+        },
+        {
+          "name": "accuracy",
+          "descriptor": "I",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Boolean;I)V",
+          "access": 4,
+          "code_sha256": "0d93a6f5dcd67a59aaa1abbbec5fe8afe956043aa0a5cd1ce924722a8eaa9ad4",
+          "code_length": 15
+        },
+        {
+          "name": "checkDateTypeNotUnknown",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "b475c050dd9a75e1cb69ea05bc6158f54f9465b27e946ba5b2bc0755e7e8672e",
+          "code_length": 53,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "shouldShowOffset",
+          "descriptor": "(Ljava/util/Date;ILfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "99b759a3a04f22c9d5ed233043fc54621d34c7a8b89093248ece48aa591dd0fb",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForDate",
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$AbstractISOBI",
+        "freemarker/core/_ErrorDescriptionBuilder",
+        "freemarker/core/_MessageUtil",
+        "freemarker/core/_MiscTemplateException",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/_TemplateAPI",
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/sql/Time"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates$dateType_if_unknownBI.class",
+      "occurrence": 0,
+      "sha256": "ea041acd7217b9d3a7770dd55bf051c2fa9ccaf60ab2b54e10375a3af5017b2d",
+      "name": "freemarker/core/BuiltInsForDates$dateType_if_unknownBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dateType",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "3c6936b3e623a3bcd3cfab88bb6ebc55b43f6e413050f28584655d0c321df356",
+          "code_length": 66,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/util/Date;ILfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInForDate",
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$dateType_if_unknownBI",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/Expression",
+        "freemarker/template/SimpleDate",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates$iso_BI$Result.class",
+      "occurrence": 0,
+      "sha256": "beb1adbeaad8b033533cd74d4650fd5d7d49619122c5f7c0aedb6595853b9329",
+      "name": "freemarker/core/BuiltInsForDates$iso_BI$Result",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx"
+      ],
+      "fields": [
+        {
+          "name": "date",
+          "descriptor": "Ljava/util/Date;",
+          "access": 18
+        },
+        {
+          "name": "dateType",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "env",
+          "descriptor": "Lfreemarker/core/Environment;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/core/BuiltInsForDates$iso_BI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/core/BuiltInsForDates$iso_BI;Ljava/util/Date;ILfreemarker/core/Environment;)V",
+          "access": 0,
+          "code_sha256": "75158ca2fc6c9380a3a9d059096b7a549d46f11dbadc614c2c7291e4f153f291",
+          "code_length": 26
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "33dd797eaeda6f7ea58a55172e28740b377684284c974cf439719771af13c8c0",
+          "code_length": 240,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$iso_BI",
+        "freemarker/core/BuiltInsForDates$iso_BI$Result",
+        "freemarker/core/Environment",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/_DelayedJQuote",
+        "freemarker/core/_MessageUtil",
+        "freemarker/core/_TemplateModelException",
+        "freemarker/template/AdapterTemplateModel",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateScalarModel",
+        "freemarker/template/utility/DateUtil",
+        "freemarker/template/utility/DateUtil$DateToISO8601CalendarFactory",
+        "freemarker/template/utility/UnrecognizedTimeZoneException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/List",
+        "java/util/TimeZone"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates$iso_BI.class",
+      "occurrence": 0,
+      "sha256": "e4c167f5c8c1bb712b00ece415a44137a5429f09bc7bd073d89fb499c8b4d90b",
+      "name": "freemarker/core/BuiltInsForDates$iso_BI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForDates$AbstractISOBI",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Boolean;I)V",
+          "access": 0,
+          "code_sha256": "6f2f4a08b450faed0343ea558f222260e434fbd83ba79df8b86d1d750cf8e9a4",
+          "code_length": 7
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/util/Date;ILfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "8089b39d365bfe6e45d6dd218000c6f920038be70a11031032ed7a5f48eb3006",
+          "code_length": 17,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$AbstractISOBI",
+        "freemarker/core/BuiltInsForDates$iso_BI",
+        "freemarker/core/BuiltInsForDates$iso_BI$Result",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates$iso_utc_or_local_BI.class",
+      "occurrence": 0,
+      "sha256": "404e391a7ad73f460b74aedd9bb1a9115a222b90ad53aa4e927357792f6695ba",
+      "name": "freemarker/core/BuiltInsForDates$iso_utc_or_local_BI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForDates$AbstractISOBI",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "useUTC",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Boolean;IZ)V",
+          "access": 0,
+          "code_sha256": "1e231238db21a0fbd6f1844d103a55ba095827181731ed970323ff37b9613732",
+          "code_length": 12
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Ljava/util/Date;ILfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "69d13ae924c3b8e87defde619e96d4cf1b5daea6973e1d12253bf3630fe9cfd4",
+          "code_length": 87,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$AbstractISOBI",
+        "freemarker/core/BuiltInsForDates$iso_utc_or_local_BI",
+        "freemarker/core/Environment",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/utility/DateUtil",
+        "freemarker/template/utility/DateUtil$DateToISO8601CalendarFactory",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForDates.class",
+      "occurrence": 0,
+      "sha256": "8cc5a8aa73bdd2016b10c08d749646dde6ea07886f0e36d0fdde31b28c6f674a",
+      "name": "freemarker/core/BuiltInsForDates",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForDates",
+        "freemarker/core/BuiltInsForDates$AbstractISOBI",
+        "freemarker/core/BuiltInsForDates$dateType_if_unknownBI",
+        "freemarker/core/BuiltInsForDates$iso_BI",
+        "freemarker/core/BuiltInsForDates$iso_utc_or_local_BI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$1.class",
+      "occurrence": 0,
+      "sha256": "0321fdc4bf88307328247372980827469bcddb055daef1f2f08fe3cabcd37113",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn.class",
+      "occurrence": 0,
+      "sha256": "794bb229dca5efd21f713a179a7f026dde909f9b8d14839d712f43ab7bf12f32",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "evalMaybeNonexistentTarget",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "6a5b05ab6b8d73b93c80db95efc48fad9eb82fde0168c891f5b7e4a1455a481c",
+          "code_length": 72,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/core/BuiltInsForExistenceHandling$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/Environment",
+        "freemarker/core/Expression",
+        "freemarker/core/InvalidReferenceException",
+        "freemarker/core/ParentheticalExpression",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$defaultBI$1.class",
+      "occurrence": 0,
+      "sha256": "3ddef367ea517026ca301d057ea3f2f7af8c43fa733f28f0c0175ae0bd3f87b4",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$defaultBI$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "24e414c4557c4f7ce3bf3d7076e3652ed9cb11023fb7c1ebbb209dd05b4ee3ed",
+          "code_length": 56,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI$1",
+        "freemarker/core/_MessageUtil",
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateModel",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$defaultBI$ConstantMethod.class",
+      "occurrence": 0,
+      "sha256": "fa50c6c12ac1cf61ab828326e31ccbf28aa6d45481255e8a0ab37aa92ca00c93",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$defaultBI$ConstantMethod",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx"
+      ],
+      "fields": [
+        {
+          "name": "constant",
+          "descriptor": "Lfreemarker/template/TemplateModel;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/template/TemplateModel;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI$ConstantMethod",
+        "freemarker/template/TemplateMethodModelEx",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$defaultBI.class",
+      "occurrence": 0,
+      "sha256": "573ead56db47d8ffd0f4206deb96200e144be83c578b6eb3fe3467189597b78e",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FIRST_NON_NULL_METHOD",
+          "descriptor": "Lfreemarker/template/TemplateMethodModelEx;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "42138426244954d377a831fedaec4782aea58e656df5537c6ad652b8c01942c0",
+          "code_length": 25,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e962e89112817f5c4e01d0b43ee08c5ff12def3c3c40b5217d73733db8e52671",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI$1",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI$ConstantMethod",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$existsBI.class",
+      "occurrence": 0,
+      "sha256": "814b0535e059b023562d95f34008aa7c942998fad6eadbf6abee8f097ea82169",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$existsBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "652d334b01787cb841d1c2515a346298378483d41ef8ee530538a90fc597a4dd",
+          "code_length": 18,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "evalToBoolean",
+          "descriptor": "(Lfreemarker/core/Environment;)Z",
+          "access": 0,
+          "code_sha256": "628a5e766f2bdf57fab3eff715bfbefabb61310134d2ff0472ab775a28a05215",
+          "code_length": 17,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling$existsBI",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$has_contentBI.class",
+      "occurrence": 0,
+      "sha256": "9953091677e0418c0cda34d8227db0b588fa919993dd8961b4eba0e84065fc03",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$has_contentBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bf844bec51ad08a72916289cdb1f84b74005b8428e7f8b88ec19779d3174027d",
+          "code_length": 21,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "evalToBoolean",
+          "descriptor": "(Lfreemarker/core/Environment;)Z",
+          "access": 0,
+          "code_sha256": "6747485ded57b483a0d3d1d6b4193fe9c9274e94dd974873af80aeaffe8b9851",
+          "code_length": 17,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling$has_contentBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling$if_existsBI.class",
+      "occurrence": 0,
+      "sha256": "89318401073cedcc7a47068cde9ab2a38735b035486cf72556609728b82c2e8c",
+      "name": "freemarker/core/BuiltInsForExistenceHandling$if_existsBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "77d0c9ce0cf08546479d206a283da3ad2d47af1e457507232110b8b48eb1e421",
+          "code_length": 18,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling$if_existsBI",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForExistenceHandling.class",
+      "occurrence": 0,
+      "sha256": "778a07708b4c08bae5cb377dfb51684787e8dc0050c21028859373a38f9643c9",
+      "name": "freemarker/core/BuiltInsForExistenceHandling",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForExistenceHandling",
+        "freemarker/core/BuiltInsForExistenceHandling$1",
+        "freemarker/core/BuiltInsForExistenceHandling$ExistenceBuiltIn",
+        "freemarker/core/BuiltInsForExistenceHandling$defaultBI",
+        "freemarker/core/BuiltInsForExistenceHandling$existsBI",
+        "freemarker/core/BuiltInsForExistenceHandling$has_contentBI",
+        "freemarker/core/BuiltInsForExistenceHandling$if_existsBI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForHashes$keysBI.class",
+      "occurrence": 0,
+      "sha256": "694782ee5b7a9cf023bc437c4693c21aafb17fcc7f8d7d7bb413d85c1d593cb3",
+      "name": "freemarker/core/BuiltInsForHashes$keysBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForHashEx",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateHashModelEx;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "4b38696e0d27be9b79557f044eb0e3cf35f37ea1b0144115129ebf082f546ce9",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "freemarker/core/InvalidReferenceException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForHashEx",
+        "freemarker/core/BuiltInsForHashes",
+        "freemarker/core/BuiltInsForHashes$keysBI",
+        "freemarker/core/CollectionAndSequence",
+        "freemarker/core/InvalidReferenceException",
+        "freemarker/template/TemplateHashModelEx",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateSequenceModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForHashes$valuesBI.class",
+      "occurrence": 0,
+      "sha256": "63b5df0653b7a29265e46dc54770fb529086facee8784ae6a9cb29f03bf407c8",
+      "name": "freemarker/core/BuiltInsForHashes$valuesBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForHashEx",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/template/TemplateHashModelEx;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "4b38696e0d27be9b79557f044eb0e3cf35f37ea1b0144115129ebf082f546ce9",
+          "code_length": 40,
+          "throws": [
+            "freemarker/template/TemplateModelException",
+            "freemarker/core/InvalidReferenceException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForHashEx",
+        "freemarker/core/BuiltInsForHashes",
+        "freemarker/core/BuiltInsForHashes$valuesBI",
+        "freemarker/core/CollectionAndSequence",
+        "freemarker/core/InvalidReferenceException",
+        "freemarker/template/TemplateHashModelEx",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateSequenceModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForHashes.class",
+      "occurrence": 0,
+      "sha256": "c94f0c9b9f527ffc55b04fc9b9752072bbd9ca3e23e1fcb764268623544ff3e7",
+      "name": "freemarker/core/BuiltInsForHashes",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForHashes",
+        "freemarker/core/BuiltInsForHashes$keysBI",
+        "freemarker/core/BuiltInsForHashes$valuesBI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$1.class",
+      "occurrence": 0,
+      "sha256": "70a6bab8b7b318ce6b3b3a0b56fd7f4683988c3bfeae34d6a35ee92d1f8d852c",
+      "name": "freemarker/core/BuiltInsForLoopVariables$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable.class",
+      "occurrence": 0,
+      "sha256": "b6a5f889beb923e44111e660c8362f04d754d10bac83527ef6db99bb32e5af4b",
+      "name": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 16,
+          "code_sha256": "74bd39dc1fe408ba190efd563a46747e0ca8a6c6a008ebc22448ed0c10cb5f41",
+          "code_length": 19,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 1028
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$counterBI.class",
+      "occurrence": 0,
+      "sha256": "6aa6a646017833d04d186cc55d3310b246eebff7303b1530249eafc7e4096241",
+      "name": "freemarker/core/BuiltInsForLoopVariables$counterBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "d84620867caeb3163c6d1561f07fe24f4169911dee87624b849b6c4639bf5856",
+          "code_length": 14,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$counterBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/SimpleNumber",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$has_nextBI.class",
+      "occurrence": 0,
+      "sha256": "7c605a9cf5267163e7280230e9119899734186db2e713f8e2db9ad0cdbc0a524",
+      "name": "freemarker/core/BuiltInsForLoopVariables$has_nextBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "8c4d0b43fa1926ed1f8bd1907cae725a1e634982bb06b307ff78bfcbaa083e7a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$has_nextBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$indexBI.class",
+      "occurrence": 0,
+      "sha256": "9b68ed243c8af3a8b634c86e222dae944c9530b2308cdbbccc97f36ad47b421a",
+      "name": "freemarker/core/BuiltInsForLoopVariables$indexBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "289ebdf2322432b17588a7193b399f8ca00e3427ad70f64abee92d9f40b4f6b5",
+          "code_length": 12,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$indexBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/SimpleNumber",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$is_even_itemBI.class",
+      "occurrence": 0,
+      "sha256": "c5a8c26d7075dd689cd8a67047d0e24cb5b84835491e44354e311c67ab7ea273",
+      "name": "freemarker/core/BuiltInsForLoopVariables$is_even_itemBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "9a5ae572b5f777b07ae3f3584ada1a6aea9feac103e89bdb48b25dd69dce4636",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$is_even_itemBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$is_firstBI.class",
+      "occurrence": 0,
+      "sha256": "2215bee636eb951721719f3e2d2afa1d9855e32bb8419543977e69c41cab5904",
+      "name": "freemarker/core/BuiltInsForLoopVariables$is_firstBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "f5c72a01206ef4d9ead2ec503c1e32445eba488c6e87891894931cee902e3acc",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$is_firstBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$is_lastBI.class",
+      "occurrence": 0,
+      "sha256": "b812476b69da313328ea8e381ecb48245f936f2a8305b4bcbf6ff4c0a04a02e6",
+      "name": "freemarker/core/BuiltInsForLoopVariables$is_lastBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "f5c72a01206ef4d9ead2ec503c1e32445eba488c6e87891894931cee902e3acc",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$is_lastBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$is_odd_itemBI.class",
+      "occurrence": 0,
+      "sha256": "cf23906f94233ee529c70873ce953498e1f3f82d20b46de570e2d9efbb110953",
+      "name": "freemarker/core/BuiltInsForLoopVariables$is_odd_itemBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateBooleanResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Z",
+          "access": 4,
+          "code_sha256": "d34a91fd934dadf76eb56c8391edbcabbc1f7a0264ffe8236f033f05b25a9d33",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$is_odd_itemBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$item_cycleBI$BIMethod.class",
+      "occurrence": 0,
+      "sha256": "298c8247e25309aac58442a5fe0f2a1043c446d2013f2fe59e74a4bedf356ea0",
+      "name": "freemarker/core/BuiltInsForLoopVariables$item_cycleBI$BIMethod",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateMethodModelEx"
+      ],
+      "fields": [
+        {
+          "name": "iterCtx",
+          "descriptor": "Lfreemarker/core/IteratorBlock$IterationContext;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/core/BuiltInsForLoopVariables$item_cycleBI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/core/BuiltInsForLoopVariables$item_cycleBI;Lfreemarker/core/IteratorBlock$IterationContext;)V",
+          "access": 2,
+          "code_sha256": "22faaa953198e11e141635d2243377c710375042bd6ea94b985e83c07f3f0b6f",
+          "code_length": 15
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d559d6beb00b77391eb982514c813c8f93c561fe669a5dac94b96a8e1d598c7e",
+          "code_length": 32,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/core/BuiltInsForLoopVariables$item_cycleBI;Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/BuiltInsForLoopVariables$1;)V",
+          "access": 4096,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$1",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI$BIMethod",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/TemplateMethodModelEx",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$item_cycleBI.class",
+      "occurrence": 0,
+      "sha256": "583e32c793900fb9732a72a8a86c28058762847aa066465cb50f804505283f04",
+      "name": "freemarker/core/BuiltInsForLoopVariables$item_cycleBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "6de87f876264671f8082548091b477c75523e2f4c50f20b399cf5744a293e1ba",
+          "code_length": 11,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$1",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI$BIMethod",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$item_parityBI.class",
+      "occurrence": 0,
+      "sha256": "71449afc64e2485a7c0c924b2140f92ce8d449f59b78ad8ab542e29f042939fa",
+      "name": "freemarker/core/BuiltInsForLoopVariables$item_parityBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ODD",
+          "descriptor": "Lfreemarker/template/SimpleScalar;",
+          "access": 26
+        },
+        {
+          "name": "EVEN",
+          "descriptor": "Lfreemarker/template/SimpleScalar;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "9f108e4fdd5a903cd583ad99290f4437800d74d688defa0842465e5fb9555eee",
+          "code_length": 19,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5e122ef254c1d94f68e676530447ad3e8bbac3b89b7e6a368201ecb9a935b8b9",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$item_parityBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables$item_parity_capBI.class",
+      "occurrence": 0,
+      "sha256": "f00c82e10a5376a399e43bdb3d8f2ffd3b29b779b5c63e7e1495e2b811b24bbb",
+      "name": "freemarker/core/BuiltInsForLoopVariables$item_parity_capBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForLoopVariable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ODD",
+          "descriptor": "Lfreemarker/template/SimpleScalar;",
+          "access": 26
+        },
+        {
+          "name": "EVEN",
+          "descriptor": "Lfreemarker/template/SimpleScalar;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/IteratorBlock$IterationContext;Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "9f108e4fdd5a903cd583ad99290f4437800d74d688defa0842465e5fb9555eee",
+          "code_length": 19,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5e122ef254c1d94f68e676530447ad3e8bbac3b89b7e6a368201ecb9a935b8b9",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$item_parity_capBI",
+        "freemarker/core/IteratorBlock",
+        "freemarker/core/IteratorBlock$IterationContext",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForLoopVariables.class",
+      "occurrence": 0,
+      "sha256": "763a9ccdce6b9b13fc035c7b225a95b1c35f846837eac5a91ab9e10e17374421",
+      "name": "freemarker/core/BuiltInsForLoopVariables",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForLoopVariables",
+        "freemarker/core/BuiltInsForLoopVariables$1",
+        "freemarker/core/BuiltInsForLoopVariables$BooleanBuiltInForLoopVariable",
+        "freemarker/core/BuiltInsForLoopVariables$counterBI",
+        "freemarker/core/BuiltInsForLoopVariables$has_nextBI",
+        "freemarker/core/BuiltInsForLoopVariables$indexBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_even_itemBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_firstBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_lastBI",
+        "freemarker/core/BuiltInsForLoopVariables$is_odd_itemBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_cycleBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_parityBI",
+        "freemarker/core/BuiltInsForLoopVariables$item_parity_capBI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMarkupOutputs$markup_stringBI.class",
+      "occurrence": 0,
+      "sha256": "677bc10a7baba4eb7917fc9b67c9eb9df4b5a523f4d5a861a46a9205293c7232",
+      "name": "freemarker/core/BuiltInsForMarkupOutputs$markup_stringBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInForMarkupOutput",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "calculateResult",
+          "descriptor": "(Lfreemarker/core/TemplateMarkupOutputModel;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "e0144e4da9bacd0e44e6c50f48e9e042f2bc15083518b8014e92a547b6ecdedb",
+          "code_length": 18,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInForMarkupOutput",
+        "freemarker/core/BuiltInsForMarkupOutputs",
+        "freemarker/core/BuiltInsForMarkupOutputs$markup_stringBI",
+        "freemarker/core/MarkupOutputFormat",
+        "freemarker/core/TemplateMarkupOutputModel",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateModelException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMarkupOutputs.class",
+      "occurrence": 0,
+      "sha256": "18064e65bc75b5814d87759c0790044d561002d59e5455c65fc70556f8b064b6",
+      "name": "freemarker/core/BuiltInsForMarkupOutputs",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForMarkupOutputs",
+        "freemarker/core/BuiltInsForMarkupOutputs$markup_stringBI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI.class",
+      "occurrence": 0,
+      "sha256": "2e13acbde4a0ea7f67369a46cb525c2b1f73ca4a26f1dbaae1f3f80aa95049d4",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+      "major": 49,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "9a4ff2909b10e129e318ae0e132016260ca7e5c0f75bb6def4aa8c9f596362d2",
+          "code_length": 87,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "formatNumber",
+          "descriptor": "(Lfreemarker/core/Environment;Lfreemarker/template/TemplateModel;)Lfreemarker/template/TemplateModel;",
+          "access": 1028,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+        "freemarker/core/Expression",
+        "freemarker/core/MiscUtil",
+        "freemarker/core/UnexpectedTypeException",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNumberModel",
+        "java/lang/Class"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$apiBI.class",
+      "occurrence": 0,
+      "sha256": "6e2f6650b4c05b5e26405d172ebb698a1ad0ef490ff0c812f78f7b2e428260a6",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$apiBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "3b0cec9e15bc31d7abf06b840647961d6e3355278e21c08ecdcdf7034c24691a",
+          "code_length": 84,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/APINotSupportedTemplateException",
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$apiBI",
+        "freemarker/core/Configurable",
+        "freemarker/core/Environment",
+        "freemarker/core/Expression",
+        "freemarker/core/_MiscTemplateException",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelWithAPISupport",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$cBI$BIBeforeICE2d3d21.class",
+      "occurrence": 0,
+      "sha256": "975c50967eaefc33aa1a50ed679cbad844016105725a78f7bbcfc5311dfd755d",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$cBI$BIBeforeICE2d3d21",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "formatNumber",
+          "descriptor": "(Lfreemarker/core/Environment;Lfreemarker/template/TemplateModel;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "3975dcb95083edfd37786ac72112934339a094620d2c7e92e57f820f640fde23",
+          "code_length": 54,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+        "freemarker/core/BuiltInsForMultipleTypes$cBI",
+        "freemarker/core/BuiltInsForMultipleTypes$cBI$BIBeforeICE2d3d21",
+        "freemarker/core/Environment",
+        "freemarker/core/EvalUtil",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNumberModel",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/text/NumberFormat"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$cBI.class",
+      "occurrence": 0,
+      "sha256": "dd51f5576528d67f3b5070d2939e893e7b9b7f122bbd55a91fc7ea299f6b399a",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$cBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+      "interfaces": [
+        "freemarker/core/ICIChainMember"
+      ],
+      "fields": [
+        {
+          "name": "prevICIObj",
+          "descriptor": "Lfreemarker/core/BuiltInsForMultipleTypes$cBI$BIBeforeICE2d3d21;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "6983ddfac5b7aec7e7fa8afc6228a1ff9c3a161b63fd0a4186ad234fc3eb29ba",
+          "code_length": 87,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "formatNumber",
+          "descriptor": "(Lfreemarker/core/Environment;Lfreemarker/template/TemplateModel;)Lfreemarker/template/TemplateModel;",
+          "access": 4,
+          "code_sha256": "81b2e1e33e1c9b548ac0c1fb5e3e95a4e1af6bfe06f7a66a4afb68a3a68e400d",
+          "code_length": 193,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getMinimumICIVersion",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "945bd10166e2e66ec7fec69f13e0cd2b992a8ee96a6c8ad4d2be404ab9e07733",
+          "code_length": 4
+        },
+        {
+          "name": "getPreviousICIChainMember",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$AbstractCBI",
+        "freemarker/core/BuiltInsForMultipleTypes$cBI",
+        "freemarker/core/BuiltInsForMultipleTypes$cBI$BIBeforeICE2d3d21",
+        "freemarker/core/Environment",
+        "freemarker/core/EvalUtil",
+        "freemarker/core/Expression",
+        "freemarker/core/ICIChainMember",
+        "freemarker/core/MiscUtil",
+        "freemarker/core/UnexpectedTypeException",
+        "freemarker/template/SimpleScalar",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelException",
+        "freemarker/template/TemplateNumberModel",
+        "freemarker/template/_TemplateAPI",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/text/NumberFormat"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$dateBI$DateParser.class",
+      "occurrence": 0,
+      "sha256": "51ae1259ff84f3e8332f0a8ac8516f297696bde7c583d29b798d99ab3cf7e357",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$dateBI$DateParser",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateMethodModel",
+        "freemarker/template/TemplateHashModel"
+      ],
+      "fields": [
+        {
+          "name": "text",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "env",
+          "descriptor": "Lfreemarker/core/Environment;",
+          "access": 18
+        },
+        {
+          "name": "defaultFormat",
+          "descriptor": "Lfreemarker/core/TemplateDateFormat;",
+          "access": 18
+        },
+        {
+          "name": "cachedValue",
+          "descriptor": "Lfreemarker/template/TemplateDateModel;",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lfreemarker/core/BuiltInsForMultipleTypes$dateBI;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lfreemarker/core/BuiltInsForMultipleTypes$dateBI;Ljava/lang/String;Lfreemarker/core/Environment;)V",
+          "access": 0,
+          "code_sha256": "1bf17dbc85a8d8defe226c5c5761085ef2ce6999644e967310239e8ab24c95c5",
+          "code_length": 39,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "exec",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1fc0fec3ad9d861d98d1b4e8c176f2c43cf595e2981cb45bc16cb826275c30b2",
+          "code_length": 41,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lfreemarker/template/TemplateModel;",
+          "access": 1,
+          "code_sha256": "989d7c36f2c1e14b3276b4c2508daf5905ec22c81eccea1412d54b236060ec90",
+          "code_length": 51,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "toTemplateDateModel",
+          "descriptor": "(Ljava/lang/Object;)Lfreemarker/template/TemplateDateModel;",
+          "access": 2,
+          "code_sha256": "d20825198beccf95371b8f7fcc676e23f23f9d21016f91a8247d4eb91b4582f0",
+          "code_length": 59,
+          "throws": [
+            "freemarker/core/_TemplateModelException"
+          ]
+        },
+        {
+          "name": "getAsDateModel",
+          "descriptor": "()Lfreemarker/template/TemplateDateModel;",
+          "access": 2,
+          "code_sha256": "24fdf36d71e93a214877bdfce33a73fbbd5ed37be6d7987dac1087aa11e5fa42",
+          "code_length": 28,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getAsDate",
+          "descriptor": "()Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "581b1c8eb86923cf938be1ad8bc2d8dd2c0ff7e625d88b3dbdc3602d22761897",
+          "code_length": 10,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        },
+        {
+          "name": "getDateType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ecd6bcc84817d0bf90733aeae756c5b40999016f65ee2941060d8299f87e1cc1",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Lfreemarker/core/TemplateDateFormat;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "8db41eade1f672801a614f676d84760896c60321588f0e22c579e63272502fda",
+          "code_length": 117,
+          "throws": [
+            "freemarker/template/TemplateModelException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$dateBI",
+        "freemarker/core/BuiltInsForMultipleTypes$dateBI$DateParser",
+        "freemarker/core/Environment",
+        "freemarker/core/TemplateDateFormat",
+        "freemarker/core/TemplateValueFormatException",
+        "freemarker/core/_CoreAPI",
+        "freemarker/core/_DelayedJQuote",
+        "freemarker/core/_TemplateModelException",
+        "freemarker/template/SimpleDate",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateHashModel",
+        "freemarker/template/TemplateMethodModel",
+        "freemarker/template/TemplateModelException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Date",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$dateBI.class",
+      "occurrence": 0,
+      "sha256": "9391b3ae47f87fced038581c913c3b52e72cecbb9636a8e7934547d8458d7cc9",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$dateBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dateType",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "b95cdd8f2ed3d431bb686c58b9b593d6ddea2422b084d685179ca4785e570702",
+          "code_length": 10
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "f6ef907a0d630edb0bba7a13d3289f009e21c24de391e004d6102f20ba411732",
+          "code_length": 140,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lfreemarker/core/BuiltInsForMultipleTypes$dateBI;)I",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$dateBI",
+        "freemarker/core/BuiltInsForMultipleTypes$dateBI$DateParser",
+        "freemarker/core/Expression",
+        "freemarker/core/_MiscTemplateException",
+        "freemarker/template/SimpleDate",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException",
+        "java/lang/Object",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$has_apiBI.class",
+      "occurrence": 0,
+      "sha256": "7d82be904edc8cd10fcfd5f3c86f6daae05048107ba5cf382914541d8301d26a",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$has_apiBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$has_apiBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateModelWithAPISupport"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_booleanBI.class",
+      "occurrence": 0,
+      "sha256": "d3c2946fcafd3240abedcd49d0f0c847b313567cc805de586a04e6f6405e144f",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_booleanBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_booleanBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_collectionBI.class",
+      "occurrence": 0,
+      "sha256": "65eb8604cf4ce8f12555288153e967a64bcb88d7a00351e113be4a1967121f85",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_collectionBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_collectionBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_collection_exBI.class",
+      "occurrence": 0,
+      "sha256": "9faf7bd8c81125b4ca350dc7740c1ac6c8083b914dd2130ad1ce415dd7084101",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_collection_exBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_collection_exBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateCollectionModelEx",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_dateLikeBI.class",
+      "occurrence": 0,
+      "sha256": "40e88bbd3c159a9abdb07def7aa7f494bc0cd34a967d3ac68b2f39332016e78a",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_dateLikeBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_dateLikeBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_dateOfTypeBI.class",
+      "occurrence": 0,
+      "sha256": "54b20915037dc078da740675d34496e1b108f8b93ee72ea395189a78c3f7b5b8",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_dateOfTypeBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dateType",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "b46df6063514d17a08c66edbbbdc09601b69380ebd7d85aeb26d9fdef6b258f6",
+          "code_length": 51,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_dateOfTypeBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateDateModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_directiveBI.class",
+      "occurrence": 0,
+      "sha256": "97398e69e257c8d8bec5e2904f22fc8525e3f810e9ee4fcc0b45e411c5db06fb",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_directiveBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "5e6c7cf79404119f1a2db408440678d760377e3b081efb950588b6f265244eb3",
+          "code_length": 49,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_directiveBI",
+        "freemarker/core/Expression",
+        "freemarker/core/Macro",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateDirectiveModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateTransformModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_enumerableBI.class",
+      "occurrence": 0,
+      "sha256": "43d5b3a132a6d2dac1f0e559feb1cd343cd0251e9a3769eac58e14777cc2f88b",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_enumerableBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "31b4a40c0162dfdc7ef2c44aa11b05ce17713a3fb56bbbdfc446295f041cd3b2",
+          "code_length": 66,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_enumerableBI",
+        "freemarker/core/Expression",
+        "freemarker/ext/beans/OverloadedMethodsModel",
+        "freemarker/ext/beans/SimpleMethodModel",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateCollectionModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateSequenceModel",
+        "freemarker/template/_TemplateAPI"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_hashBI.class",
+      "occurrence": 0,
+      "sha256": "b623ba97e31d40e39c8bb47e41fcc858c5386f7e7b0a9ae50f326ea3756022ed",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_hashBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_hashBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateHashModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_hash_exBI.class",
+      "occurrence": 0,
+      "sha256": "bee99eede043d92e0db8ee3e4558806cce17e0c2928ee381d0ceb1a38b801ae1",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_hash_exBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_hash_exBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateHashModelEx"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_indexableBI.class",
+      "occurrence": 0,
+      "sha256": "b2be70139a0b6d47a8fbe6d0465adfdd175c857cb3c8761ea307f80921581729",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_indexableBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_indexableBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateSequenceModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_macroBI.class",
+      "occurrence": 0,
+      "sha256": "ac527bf03b5d9008dc5228e163d3b83b6daa305fb41fc011e522fece6f510299",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_macroBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_macroBI",
+        "freemarker/core/Expression",
+        "freemarker/core/Macro",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_markup_outputBI.class",
+      "occurrence": 0,
+      "sha256": "71a978529df7e0c13c3d675159a0dbf8798139af390ddbb24168a5464bd3fd11",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_markup_outputBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_markup_outputBI",
+        "freemarker/core/Expression",
+        "freemarker/core/TemplateMarkupOutputModel",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_methodBI.class",
+      "occurrence": 0,
+      "sha256": "bd7eacd64a5a3df651fd62cdca218bd9369ec65c4d15a4962339efcce5920cd1",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_methodBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_methodBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateMethodModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_nodeBI.class",
+      "occurrence": 0,
+      "sha256": "f6ec0c22d808b8e6fc05e87e458b2b9e8aac4e8b87401137c26396967590c517",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_nodeBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_nodeBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateNodeModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_numberBI.class",
+      "occurrence": 0,
+      "sha256": "3a2bd3b689df432b2a3be0552f8899a9dea1c6b0e3fcba8588782ee231119ef4",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_numberBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_numberBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateNumberModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_sequenceBI.class",
+      "occurrence": 0,
+      "sha256": "2a8c170afda45e8a3a9636da996d6bceba7f814bdf37e8e02368ab0998945cb6",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_sequenceBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "1847f8dad8ec0fd7c8d92885fd6bad0c88ec925c8dd4ddd6029b263040cd6a6f",
+          "code_length": 56,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_sequenceBI",
+        "freemarker/core/Environment",
+        "freemarker/core/Expression",
+        "freemarker/ext/beans/OverloadedMethodsModel",
+        "freemarker/ext/beans/SimpleMethodModel",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateSequenceModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_stringBI.class",
+      "occurrence": 0,
+      "sha256": "63bd44741c1fdbe07388aa7651af780571f6ed1e33d6de526723e5b3ffa81cc5",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_stringBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_stringBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateScalarModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$is_transformBI.class",
+      "occurrence": 0,
+      "sha256": "8571b024ff553c17831d7d3b025369f540645fb44ffab7777b6ee57c33f4be8d",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$is_transformBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "bb664a16ac5cc3a3e4e2b826b789604cc6494d76575d21213d043592d508247e",
+          "code_length": 35,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$is_transformBI",
+        "freemarker/core/Expression",
+        "freemarker/template/TemplateBooleanModel",
+        "freemarker/template/TemplateException",
+        "freemarker/template/TemplateTransformModel"
+      ]
+    },
+    {
+      "entry": "freemarker/core/BuiltInsForMultipleTypes$namespaceBI.class",
+      "occurrence": 0,
+      "sha256": "b7207ede1785e4b07b7344022ddf75a65671badf47d36423fc260af9db5d690f",
+      "name": "freemarker/core/BuiltInsForMultipleTypes$namespaceBI",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "freemarker/core/BuiltIn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "_eval",
+          "descriptor": "(Lfreemarker/core/Environment;)Lfreemarker/template/TemplateModel;",
+          "access": 0,
+          "code_sha256": "c0ad6cf3fc61e3182010071511456b3a2dbfe1fa9424673d95dc84d3dc88e93f",
+          "code_length": 50,
+          "throws": [
+            "freemarker/template/TemplateException"
+          ]
+        }
+      ],
+      "class_references": [
+        "freemarker/core/BuiltIn",
+        "freemarker/core/BuiltInsForMultipleTypes",
+        "freemarker/core/BuiltInsForMultipleTypes$namespaceBI",
+        "freemarker/core/Environment",
+        "freemarker/core/Environment$Namespace",
+        "freemarker/core/Expression",
+        "freemarker/core/Macro",
+        "freemarker/core/UnexpectedTypeException",
+        "freemarker/template/TemplateException",
+        "java/lang/Class"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4814 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/caffeine-2.8.5.jar",
+  "archive_sha256": "814b15a9bf598e0fa854dd70ba9f6e03a413a97979de0c3f49317295e4352bc8",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSAR.class",
+      "occurrence": 0,
+      "sha256": "01f34dce9cc24652c695f3aceb997ef9fefb65270df419344748235e40355d37",
+      "name": "com/github/benmanes/caffeine/cache/WSMSAR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMSA",
+        "com/github/benmanes/caffeine/cache/WSMSAR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSAW.class",
+      "occurrence": 0,
+      "sha256": "640ce52e60f88c64d3b3520f9e3cd888e1adc60597480550031c6658ddd25f54",
+      "name": "com/github/benmanes/caffeine/cache/WSMSAW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f531ebd301e824c5c111ccdb070ddd30050cada9d8d562105be1fa4088f3c382",
+          "code_length": 27,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b35484b8a40c5516dfcb33418827f3e3bac2ad5cbed8601a5558a1d22a4b08fb",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMSA",
+        "com/github/benmanes/caffeine/cache/WSMSAW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSAWR.class",
+      "occurrence": 0,
+      "sha256": "070f2359c301ad1827935bc4adebde26bf65321b701a6c226f17a9bc001d0f72",
+      "name": "com/github/benmanes/caffeine/cache/WSMSAWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMSAW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMSAW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMSAW",
+        "com/github/benmanes/caffeine/cache/WSMSAWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSR.class",
+      "occurrence": 0,
+      "sha256": "accda92e914170f1986385e7f8767c083fbea73e9294b8b0b0741b3c98262903",
+      "name": "com/github/benmanes/caffeine/cache/WSMSR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "e3b1921b376370847d3addd2be21a49af0ca569704db81666429eadc879d9970",
+          "code_length": 24,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMS",
+        "com/github/benmanes/caffeine/cache/WSMSR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSW.class",
+      "occurrence": 0,
+      "sha256": "d95037b18d45796a89c0469eb0856d7aa67c803c9f37e026ccfdd24cb289bfb9",
+      "name": "com/github/benmanes/caffeine/cache/WSMSW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f66d82502f2d08b4387051fefdd20b8b9fc8325ef0eccf43eb9a02e7b804de62",
+          "code_length": 64,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WSMS",
+        "com/github/benmanes/caffeine/cache/WSMSW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMSWR.class",
+      "occurrence": 0,
+      "sha256": "5c5c514193ebbb89b70f41280ec7bfe6226ce60be94df2409c084080ec62d827",
+      "name": "com/github/benmanes/caffeine/cache/WSMSWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMSW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMSW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMSW",
+        "com/github/benmanes/caffeine/cache/WSMSWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMW.class",
+      "occurrence": 0,
+      "sha256": "e9fa5c3dfc066724fdbcd44d49eda7f22f4aebd7d0794fb0b86d2036818f2e70",
+      "name": "com/github/benmanes/caffeine/cache/WSMW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "maximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "sketch",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "4b5d1ee266848327224648cc208f181cfe8a84af4fdd600cad467f385d31bfe2",
+          "code_length": 115,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "evicts",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "maximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c137a7409cea68f3a4fc803f80cad51ef910415d4e25a37c6d15731beec7ab19",
+          "code_length": 5
+        },
+        {
+          "name": "setMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "8372fd0dba7f7b032c60e75e1337783efa0f13598a83b458234ae0d44d5f09e7",
+          "code_length": 6
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "a80ed3a1d4e487d35dbfb69fc7f7c3cb22d0f8a7a214a01a021f95da1c793e75",
+          "code_length": 5
+        },
+        {
+          "name": "setWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "ac8ba534b7eb835e53a951e4964b44ed9536e43d30a226045a754472174b27ff",
+          "code_length": 6
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "99789ec859e924df8e9a9916590f446f66a39c5f7f3863c9815a28864cf0ec13",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "4d9a4351b7027b47d1eaa9b85aed09bf9a4a7b6f805f9b592d0ab6ceaaa8d539",
+          "code_length": 6
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "59d54286b9387ae5bad7f2e0826532471ad2bcf76a8cac89cf322dadcfdc4524",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2432d154adb6dd7ae986776bd0a1dfc434adef0ef2a1e15fdff613f8f11267dc",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c33801854236db923ce8be0e9eb0e4ef8c8583f973d588b6a3c1499b2ae6cfaa",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "779f1658cd403f836293cb082c915a60336031137b261f2ae10779503c8ed13b",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "4e448c872bcfcb1d7aba8d8204d837d103f6328b5ac3bdbcf25d04f5f300f593",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b27ace3e997e2ca4442823fc9d8587606962379eeecb98399dfb4e3866f0c11b",
+          "code_length": 6
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "f1b125d8d6abb1abab5136e9df34b25c2ea18da10f16db95c1df66f726441f47",
+          "code_length": 5
+        },
+        {
+          "name": "setStepSize",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "ecc21ef578a051714240e90ccb25cdc471a283e62ba9ef7c0fdedd0db1011f05",
+          "code_length": 6
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "0b046b7080487a43e664bdc96571c7c0012ae2447b4b3cd300bb803230461de2",
+          "code_length": 5
+        },
+        {
+          "name": "setAdjustment",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "36a7e07eef7f8a52e5a1e4c4ad4e9f653c114cb20ecd6c07065cbb0477e02697",
+          "code_length": 6
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "setHitsInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "4fd3a754857b45a01303a1ccfb8fb27feb675a7f7ee3a666ed4aa43c55f2a659",
+          "code_length": 6
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        },
+        {
+          "name": "setMissesInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "b948855dc24654a56a18c1014f4c6a4ed6ea2c4bd60735ce41525dbf6a4d6680",
+          "code_length": 6
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "862363ca95fdd4b74c0ca9e32239a78935abd1ca01f29cc70c315a38a7440275",
+          "code_length": 5
+        },
+        {
+          "name": "setPreviousSampleHitRate",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "5ba046d796fab6256d1c4803951469e9c3f0909bd98c2d15b8370c26a8b32738",
+          "code_length": 6
+        },
+        {
+          "name": "frequencySketch",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/AccessOrderDeque",
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/FrequencySketch",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/WS",
+        "com/github/benmanes/caffeine/cache/WSMW",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWA.class",
+      "occurrence": 0,
+      "sha256": "a25081b47fac2ac171ed34b7a11257ba11ac89e9ee4bf33f8e4cbff88fa59fd3",
+      "name": "com/github/benmanes/caffeine/cache/WSMWA",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "expiry",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "5aa9dd9c49db6e68d92af161448676c49f262e79f21ce324a8cf3561f526b2c5",
+          "code_length": 88,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "expiresVariable",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "fefb3b7c140a5a9c90588f0ff642838ba9ebeae73cd0cf419eaf8c2db5cbd5d0",
+          "code_length": 13
+        },
+        {
+          "name": "expiry",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 20,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccess",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "17f740515828dc054dd8ab608c7186c967a29f632f5c1fde29fe70bb12cfbd58",
+          "code_length": 13
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "342c0ddbb68a9acfcb778e325ec4c0805e26bae6449bd8df70cf6cb31607d371",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterAccessNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "6504477898e521bb3b53abbd0841510985cd0f21e1dcbbaae539855ef9240f99",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/TimerWheel",
+        "com/github/benmanes/caffeine/cache/WSMW",
+        "com/github/benmanes/caffeine/cache/WSMWA"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWAR.class",
+      "occurrence": 0,
+      "sha256": "b933c486f5e8091a0a3ba432d525fe8faa19c04792854daa86302f3112c7dd1b",
+      "name": "com/github/benmanes/caffeine/cache/WSMWAR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMWA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMWA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMWA",
+        "com/github/benmanes/caffeine/cache/WSMWAR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWAW.class",
+      "occurrence": 0,
+      "sha256": "35a8ac6fc4b8c097afc6b6d0ba2ff96e42a910b6400b4512997291299c1281e0",
+      "name": "com/github/benmanes/caffeine/cache/WSMWAW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMWA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f531ebd301e824c5c111ccdb070ddd30050cada9d8d562105be1fa4088f3c382",
+          "code_length": 27,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b35484b8a40c5516dfcb33418827f3e3bac2ad5cbed8601a5558a1d22a4b08fb",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMWA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMWA",
+        "com/github/benmanes/caffeine/cache/WSMWAW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWAWR.class",
+      "occurrence": 0,
+      "sha256": "9f8bde90587b6d8d677f564701dcbcb0b4ee18be2d5f8c1efd07dc9a64802fb3",
+      "name": "com/github/benmanes/caffeine/cache/WSMWAWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMWAW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMWAW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMWAW",
+        "com/github/benmanes/caffeine/cache/WSMWAWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWR.class",
+      "occurrence": 0,
+      "sha256": "361d4994adf636f4157117980476e728000f608a589f103eba81e45285196d9b",
+      "name": "com/github/benmanes/caffeine/cache/WSMWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "e3b1921b376370847d3addd2be21a49af0ca569704db81666429eadc879d9970",
+          "code_length": 24,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMW",
+        "com/github/benmanes/caffeine/cache/WSMWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWW.class",
+      "occurrence": 0,
+      "sha256": "bd4cc3f7523365d9f117f153c515c5e64464070d4eac2facd8abbb2d39638309",
+      "name": "com/github/benmanes/caffeine/cache/WSMWW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f66d82502f2d08b4387051fefdd20b8b9fc8325ef0eccf43eb9a02e7b804de62",
+          "code_length": 64,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WSMW",
+        "com/github/benmanes/caffeine/cache/WSMWW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSMWWR.class",
+      "occurrence": 0,
+      "sha256": "71edbd4eeb255f16d0213827a6a0257017ec99012d268d41f6a7ec568ed72a47",
+      "name": "com/github/benmanes/caffeine/cache/WSMWWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSMWW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSMWW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSMWW",
+        "com/github/benmanes/caffeine/cache/WSMWWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSR.class",
+      "occurrence": 0,
+      "sha256": "53b9a22687d40cc81c2bcef6f4892a3329e576c0f8011c46a5e5184951632ea2",
+      "name": "com/github/benmanes/caffeine/cache/WSR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "c6a2e07c6f68f360e2354db16a946864d78efd294b78697dffd269df724ebba5",
+          "code_length": 39,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 4,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/WS",
+        "com/github/benmanes/caffeine/cache/WSR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSS.class",
+      "occurrence": 0,
+      "sha256": "b8d1cd96a93ecda25ad7e30a3cb1505958da788732a4314fd8c1c833f901ca3d",
+      "name": "com/github/benmanes/caffeine/cache/WSS",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "statsCounter",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "25ff6a88a873e9d83b56c241fc394d33f88952a173f923996e1acc302ec09711",
+          "code_length": 24,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "isRecordingStats",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "statsTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "1cf0ed757dd5d62179bfe731948a3b17851ad046df8e049b08ab3809249d4c1a",
+          "code_length": 4
+        },
+        {
+          "name": "statsCounter",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+          "access": 17,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Ticker",
+        "com/github/benmanes/caffeine/cache/WS",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+        "java/util/function/Supplier"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSA.class",
+      "occurrence": 0,
+      "sha256": "e3df743a9026bf4483f321952a9ea2d0490e07f00de28863afaca4bce3cdb78c",
+      "name": "com/github/benmanes/caffeine/cache/WSSA",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiry",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "838d37dc9f697bb3f87f12be22e00f49246235252ce9734c2bad17a87bbde37d",
+          "code_length": 132,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresVariable",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "a79fa684f8e28325699a926b0407acf7aabca13d7763e371db46dbd2d1b8fa97",
+          "code_length": 13
+        },
+        {
+          "name": "expiry",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 20,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 20,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccess",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "63b9e0c3d0fb3d90523bd9ec884f856afb28de395d55a163a5d5d3c2b8f036a0",
+          "code_length": 13
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "1727b6b853ec82483086f9d4b7ec66d50fb76f92d9fb128f2fcf5945f54eb92e",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterAccessNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "05c5231de72d65d90ab0f8be11822d4b81d49ecaebcc680cafb06b7cbe8c9338",
+          "code_length": 6
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "b6c5333413de275b83a306f8cdb0edd20ab382691933972a56c5ec0d5d37d064",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/AccessOrderDeque",
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/TimerWheel",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/WSSA"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSAR.class",
+      "occurrence": 0,
+      "sha256": "8e404e75314105bbb247ee6ea7ece2eaf20af1947c775905162fb3a07c822129",
+      "name": "com/github/benmanes/caffeine/cache/WSSAR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSA",
+        "com/github/benmanes/caffeine/cache/WSSAR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSAW.class",
+      "occurrence": 0,
+      "sha256": "c020d64d762628e457d9ea456cbddd78a39e4701f574cd3b2bebeb8f14330b55",
+      "name": "com/github/benmanes/caffeine/cache/WSSAW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f531ebd301e824c5c111ccdb070ddd30050cada9d8d562105be1fa4088f3c382",
+          "code_length": 27,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b35484b8a40c5516dfcb33418827f3e3bac2ad5cbed8601a5558a1d22a4b08fb",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSA",
+        "com/github/benmanes/caffeine/cache/WSSAW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSAWR.class",
+      "occurrence": 0,
+      "sha256": "441584150e05eb8f564783a8c275c25accbcc99cdd9c9bf31087a02b9f1fa571",
+      "name": "com/github/benmanes/caffeine/cache/WSSAWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSAW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSAW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSAW",
+        "com/github/benmanes/caffeine/cache/WSSAWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMS.class",
+      "occurrence": 0,
+      "sha256": "61ac6e05b6acf6f73dc4a38f454801b587c682fdaefeef1c5107741146cb3d4b",
+      "name": "com/github/benmanes/caffeine/cache/WSSMS",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "maximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "sketch",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "4b5d1ee266848327224648cc208f181cfe8a84af4fdd600cad467f385d31bfe2",
+          "code_length": 115,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "evicts",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "maximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c137a7409cea68f3a4fc803f80cad51ef910415d4e25a37c6d15731beec7ab19",
+          "code_length": 5
+        },
+        {
+          "name": "setMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "8372fd0dba7f7b032c60e75e1337783efa0f13598a83b458234ae0d44d5f09e7",
+          "code_length": 6
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "a80ed3a1d4e487d35dbfb69fc7f7c3cb22d0f8a7a214a01a021f95da1c793e75",
+          "code_length": 5
+        },
+        {
+          "name": "setWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "ac8ba534b7eb835e53a951e4964b44ed9536e43d30a226045a754472174b27ff",
+          "code_length": 6
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "99789ec859e924df8e9a9916590f446f66a39c5f7f3863c9815a28864cf0ec13",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "4d9a4351b7027b47d1eaa9b85aed09bf9a4a7b6f805f9b592d0ab6ceaaa8d539",
+          "code_length": 6
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "59d54286b9387ae5bad7f2e0826532471ad2bcf76a8cac89cf322dadcfdc4524",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2432d154adb6dd7ae986776bd0a1dfc434adef0ef2a1e15fdff613f8f11267dc",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c33801854236db923ce8be0e9eb0e4ef8c8583f973d588b6a3c1499b2ae6cfaa",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "779f1658cd403f836293cb082c915a60336031137b261f2ae10779503c8ed13b",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "4e448c872bcfcb1d7aba8d8204d837d103f6328b5ac3bdbcf25d04f5f300f593",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b27ace3e997e2ca4442823fc9d8587606962379eeecb98399dfb4e3866f0c11b",
+          "code_length": 6
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "f1b125d8d6abb1abab5136e9df34b25c2ea18da10f16db95c1df66f726441f47",
+          "code_length": 5
+        },
+        {
+          "name": "setStepSize",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "ecc21ef578a051714240e90ccb25cdc471a283e62ba9ef7c0fdedd0db1011f05",
+          "code_length": 6
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "0b046b7080487a43e664bdc96571c7c0012ae2447b4b3cd300bb803230461de2",
+          "code_length": 5
+        },
+        {
+          "name": "setAdjustment",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "36a7e07eef7f8a52e5a1e4c4ad4e9f653c114cb20ecd6c07065cbb0477e02697",
+          "code_length": 6
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "setHitsInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "4fd3a754857b45a01303a1ccfb8fb27feb675a7f7ee3a666ed4aa43c55f2a659",
+          "code_length": 6
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        },
+        {
+          "name": "setMissesInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "b948855dc24654a56a18c1014f4c6a4ed6ea2c4bd60735ce41525dbf6a4d6680",
+          "code_length": 6
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "862363ca95fdd4b74c0ca9e32239a78935abd1ca01f29cc70c315a38a7440275",
+          "code_length": 5
+        },
+        {
+          "name": "setPreviousSampleHitRate",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "5ba046d796fab6256d1c4803951469e9c3f0909bd98c2d15b8370c26a8b32738",
+          "code_length": 6
+        },
+        {
+          "name": "frequencySketch",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/AccessOrderDeque",
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/FrequencySketch",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/WSSMS",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSA.class",
+      "occurrence": 0,
+      "sha256": "be8cb247003117cf45de5ecc37ac4ed6111ba4a9d20d86f39483b4cffd950462",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSA",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "expiry",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "5aa9dd9c49db6e68d92af161448676c49f262e79f21ce324a8cf3561f526b2c5",
+          "code_length": 88,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "expiresVariable",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "fefb3b7c140a5a9c90588f0ff642838ba9ebeae73cd0cf419eaf8c2db5cbd5d0",
+          "code_length": 13
+        },
+        {
+          "name": "expiry",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 20,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccess",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "17f740515828dc054dd8ab608c7186c967a29f632f5c1fde29fe70bb12cfbd58",
+          "code_length": 13
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "342c0ddbb68a9acfcb778e325ec4c0805e26bae6449bd8df70cf6cb31607d371",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterAccessNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "6504477898e521bb3b53abbd0841510985cd0f21e1dcbbaae539855ef9240f99",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/TimerWheel",
+        "com/github/benmanes/caffeine/cache/WSSMS",
+        "com/github/benmanes/caffeine/cache/WSSMSA"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSAR.class",
+      "occurrence": 0,
+      "sha256": "b21724301394382effd2f395c664c2cace99e79028aee1535e63400f2e4e0201",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSAR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMSA",
+        "com/github/benmanes/caffeine/cache/WSSMSAR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSAW.class",
+      "occurrence": 0,
+      "sha256": "5738d1c0b2d66d871711618e3b374695c3f7bd00adc5ff317009c0abbfdf6100",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSAW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMSA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f531ebd301e824c5c111ccdb070ddd30050cada9d8d562105be1fa4088f3c382",
+          "code_length": 27,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b35484b8a40c5516dfcb33418827f3e3bac2ad5cbed8601a5558a1d22a4b08fb",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMSA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMSA",
+        "com/github/benmanes/caffeine/cache/WSSMSAW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSAWR.class",
+      "occurrence": 0,
+      "sha256": "d154f0a090e9bdcf99936fe3dbfff59ec11aea4190e764e5180ffd60d301f11f",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSAWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMSAW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMSAW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMSAW",
+        "com/github/benmanes/caffeine/cache/WSSMSAWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSR.class",
+      "occurrence": 0,
+      "sha256": "b8cd5360bfdd615eb321184f59b01e71d8a19a1295ab018587d0388b7aef927f",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "e3b1921b376370847d3addd2be21a49af0ca569704db81666429eadc879d9970",
+          "code_length": 24,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMS",
+        "com/github/benmanes/caffeine/cache/WSSMSR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSW.class",
+      "occurrence": 0,
+      "sha256": "c10517d40264f00419952c6f77267a8b6f047eab201339911a2f94c958cd1fca",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f66d82502f2d08b4387051fefdd20b8b9fc8325ef0eccf43eb9a02e7b804de62",
+          "code_length": 64,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WSSMS",
+        "com/github/benmanes/caffeine/cache/WSSMSW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMSWR.class",
+      "occurrence": 0,
+      "sha256": "fda8584c4f06f84fddf74ba67dc4c18f8d7e88784c9746db0c0b473b83ebbb5d",
+      "name": "com/github/benmanes/caffeine/cache/WSSMSWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMSW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMSW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMSW",
+        "com/github/benmanes/caffeine/cache/WSSMSWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMW.class",
+      "occurrence": 0,
+      "sha256": "67f8fc0dd9bdd03a845bc0fed4a5c1ac52a8c1abb46d8e93427becfe7d3034f3",
+      "name": "com/github/benmanes/caffeine/cache/WSSMW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "maximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "D",
+          "access": 0
+        },
+        {
+          "name": "sketch",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "4b5d1ee266848327224648cc208f181cfe8a84af4fdd600cad467f385d31bfe2",
+          "code_length": 115,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "evicts",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "maximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c137a7409cea68f3a4fc803f80cad51ef910415d4e25a37c6d15731beec7ab19",
+          "code_length": 5
+        },
+        {
+          "name": "setMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "8372fd0dba7f7b032c60e75e1337783efa0f13598a83b458234ae0d44d5f09e7",
+          "code_length": 6
+        },
+        {
+          "name": "weightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "a80ed3a1d4e487d35dbfb69fc7f7c3cb22d0f8a7a214a01a021f95da1c793e75",
+          "code_length": 5
+        },
+        {
+          "name": "setWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "ac8ba534b7eb835e53a951e4964b44ed9536e43d30a226045a754472174b27ff",
+          "code_length": 6
+        },
+        {
+          "name": "windowMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "99789ec859e924df8e9a9916590f446f66a39c5f7f3863c9815a28864cf0ec13",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "4d9a4351b7027b47d1eaa9b85aed09bf9a4a7b6f805f9b592d0ab6ceaaa8d539",
+          "code_length": 6
+        },
+        {
+          "name": "windowWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "59d54286b9387ae5bad7f2e0826532471ad2bcf76a8cac89cf322dadcfdc4524",
+          "code_length": 5
+        },
+        {
+          "name": "setWindowWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2432d154adb6dd7ae986776bd0a1dfc434adef0ef2a1e15fdff613f8f11267dc",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedMaximum",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "c33801854236db923ce8be0e9eb0e4ef8c8583f973d588b6a3c1499b2ae6cfaa",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedMaximum",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "779f1658cd403f836293cb082c915a60336031137b261f2ae10779503c8ed13b",
+          "code_length": 6
+        },
+        {
+          "name": "mainProtectedWeightedSize",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "4e448c872bcfcb1d7aba8d8204d837d103f6328b5ac3bdbcf25d04f5f300f593",
+          "code_length": 5
+        },
+        {
+          "name": "setMainProtectedWeightedSize",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b27ace3e997e2ca4442823fc9d8587606962379eeecb98399dfb4e3866f0c11b",
+          "code_length": 6
+        },
+        {
+          "name": "stepSize",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "f1b125d8d6abb1abab5136e9df34b25c2ea18da10f16db95c1df66f726441f47",
+          "code_length": 5
+        },
+        {
+          "name": "setStepSize",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "ecc21ef578a051714240e90ccb25cdc471a283e62ba9ef7c0fdedd0db1011f05",
+          "code_length": 6
+        },
+        {
+          "name": "adjustment",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "0b046b7080487a43e664bdc96571c7c0012ae2447b4b3cd300bb803230461de2",
+          "code_length": 5
+        },
+        {
+          "name": "setAdjustment",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "36a7e07eef7f8a52e5a1e4c4ad4e9f653c114cb20ecd6c07065cbb0477e02697",
+          "code_length": 6
+        },
+        {
+          "name": "hitsInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "eb3b5e2ef3fac2e4f38cbdaac040eff5d8b0dcc8a0507d15ab53f4dd1c6f2015",
+          "code_length": 5
+        },
+        {
+          "name": "setHitsInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "4fd3a754857b45a01303a1ccfb8fb27feb675a7f7ee3a666ed4aa43c55f2a659",
+          "code_length": 6
+        },
+        {
+          "name": "missesInSample",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "b90a32cba17eefd3f962dcb179f0fbded57639f58a19ddf94bd568506730c7ea",
+          "code_length": 5
+        },
+        {
+          "name": "setMissesInSample",
+          "descriptor": "(I)V",
+          "access": 20,
+          "code_sha256": "b948855dc24654a56a18c1014f4c6a4ed6ea2c4bd60735ce41525dbf6a4d6680",
+          "code_length": 6
+        },
+        {
+          "name": "previousSampleHitRate",
+          "descriptor": "()D",
+          "access": 20,
+          "code_sha256": "862363ca95fdd4b74c0ca9e32239a78935abd1ca01f29cc70c315a38a7440275",
+          "code_length": 5
+        },
+        {
+          "name": "setPreviousSampleHitRate",
+          "descriptor": "(D)V",
+          "access": 20,
+          "code_sha256": "5ba046d796fab6256d1c4803951469e9c3f0909bd98c2d15b8370c26a8b32738",
+          "code_length": 6
+        },
+        {
+          "name": "frequencySketch",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/FrequencySketch<TK;>;"
+        },
+        {
+          "name": "accessOrderWindowDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "7dc9d88989496c3912711502894d8245cca5df71c3f56cc1e81eae29db9fcd1a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProbationDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "accessOrderProtectedDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque;",
+          "access": 20,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/AccessOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/AccessOrderDeque",
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/FrequencySketch",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/WSSMW",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWA.class",
+      "occurrence": 0,
+      "sha256": "6e56a1077168c084f2b8c58471af25bfc4412aa9a18528485bdf9f0ec265335c",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWA",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "expiry",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "5aa9dd9c49db6e68d92af161448676c49f262e79f21ce324a8cf3561f526b2c5",
+          "code_length": 88,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "expiresVariable",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "fefb3b7c140a5a9c90588f0ff642838ba9ebeae73cd0cf419eaf8c2db5cbd5d0",
+          "code_length": 13
+        },
+        {
+          "name": "expiry",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Expiry;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/Expiry<TK;TV;>;"
+        },
+        {
+          "name": "timerWheel",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/TimerWheel;",
+          "access": 20,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/TimerWheel<TK;TV;>;"
+        },
+        {
+          "name": "expiresAfterAccess",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "17f740515828dc054dd8ab608c7186c967a29f632f5c1fde29fe70bb12cfbd58",
+          "code_length": 13
+        },
+        {
+          "name": "expiresAfterAccessNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "342c0ddbb68a9acfcb778e325ec4c0805e26bae6449bd8df70cf6cb31607d371",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterAccessNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "6504477898e521bb3b53abbd0841510985cd0f21e1dcbbaae539855ef9240f99",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/TimerWheel",
+        "com/github/benmanes/caffeine/cache/WSSMW",
+        "com/github/benmanes/caffeine/cache/WSSMWA"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWAR.class",
+      "occurrence": 0,
+      "sha256": "911c60248c7e6ace297628ebb39b91dee4a59535153fca2bf031eb27b90ead83",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWAR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMWA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMWA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMWA",
+        "com/github/benmanes/caffeine/cache/WSSMWAR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWAW.class",
+      "occurrence": 0,
+      "sha256": "870d6ed1355260f97c512844e4ea10e8c7c69158abfe1c7a43e0e9da90409363",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWAW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMWA",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f531ebd301e824c5c111ccdb070ddd30050cada9d8d562105be1fa4088f3c382",
+          "code_length": 27,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "b35484b8a40c5516dfcb33418827f3e3bac2ad5cbed8601a5558a1d22a4b08fb",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMWA<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMWA",
+        "com/github/benmanes/caffeine/cache/WSSMWAW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWAWR.class",
+      "occurrence": 0,
+      "sha256": "98aa767c6e8170a44c4547839e68165de70b66104faf771eefb1c67e7437687d",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWAWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMWAW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMWAW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMWAW",
+        "com/github/benmanes/caffeine/cache/WSSMWAWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWR.class",
+      "occurrence": 0,
+      "sha256": "b272378cd1090c7465e6784db98b7ac74a148a7a8eedd63788cb6f362fde9fc4",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "e3b1921b376370847d3addd2be21a49af0ca569704db81666429eadc879d9970",
+          "code_length": 24,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMW",
+        "com/github/benmanes/caffeine/cache/WSSMWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWW.class",
+      "occurrence": 0,
+      "sha256": "ebcd1bf9fba2ff5ec67084a780e6a5a941aeca90e54481c287c9e998cb8794fb",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f66d82502f2d08b4387051fefdd20b8b9fc8325ef0eccf43eb9a02e7b804de62",
+          "code_length": 64,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WSSMW",
+        "com/github/benmanes/caffeine/cache/WSSMWW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSMWWR.class",
+      "occurrence": 0,
+      "sha256": "61f7990cb5cb05f6b5d2785f8c58d968f829c9a89df8bf1ae11a8cfaed9e188f",
+      "name": "com/github/benmanes/caffeine/cache/WSSMWWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSMWW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSMWW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSMWW",
+        "com/github/benmanes/caffeine/cache/WSSMWWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSR.class",
+      "occurrence": 0,
+      "sha256": "d8643a3fc0319fb27abcd54617437a650310821f52718befd994865c51c350c5",
+      "name": "com/github/benmanes/caffeine/cache/WSSR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "c6a2e07c6f68f360e2354db16a946864d78efd294b78697dffd269df724ebba5",
+          "code_length": 39,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "e4018a4911f2821714ec3c65231a3de17594f565df55d83df33e1052c75adb30",
+          "code_length": 6
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 4,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/WSSR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSW.class",
+      "occurrence": 0,
+      "sha256": "b4cf1077ec926406207837537f99f08e284d83b38a51b4f152ad0ccdf18d56ac",
+      "name": "com/github/benmanes/caffeine/cache/WSSW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WSS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f85733fb4d35a5255eb27a3304c2c5694157df2132270a7915e9f210ef4fa979",
+          "code_length": 79,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WSS",
+        "com/github/benmanes/caffeine/cache/WSSW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSSWR.class",
+      "occurrence": 0,
+      "sha256": "57cf6e4c8d6b1219b17dca125af24b380e5199199d29df3901550a82fa5f20a1",
+      "name": "com/github/benmanes/caffeine/cache/WSSWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSSW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSSW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSSW",
+        "com/github/benmanes/caffeine/cache/WSSWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSW.class",
+      "occurrence": 0,
+      "sha256": "e69a381d7cf435d1fd2c0f72476837d36e41d11d8d0527b36758e715ff53f5ac",
+      "name": "com/github/benmanes/caffeine/cache/WSW",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/github/benmanes/caffeine/cache/WS",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ticker",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 16
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 16,
+          "generic_signature": "Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "pacer",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "f85733fb4d35a5255eb27a3304c2c5694157df2132270a7915e9f210ef4fa979",
+          "code_length": 79,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "expirationTicker",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Ticker;",
+          "access": 17,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "writeOrderDeque",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque;",
+          "access": 20,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque<Lcom/github/benmanes/caffeine/cache/Node<TK;TV;>;>;"
+        },
+        {
+          "name": "expiresAfterWrite",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "expiresAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 20,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "setExpiresAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 20,
+          "code_sha256": "2d8b88ad8cd5dcf463671c686036858b098b2bdac5b63b28bfef93d8d158c707",
+          "code_length": 6
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue;",
+          "access": 20,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5,
+          "generic_signature": "()Lcom/github/benmanes/caffeine/cache/MpscGrowableArrayQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "buffersWrites",
+          "descriptor": "()Z",
+          "access": 20,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "pacer",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Pacer;",
+          "access": 17,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WS<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/BoundedLocalCache",
+        "com/github/benmanes/caffeine/cache/CacheLoader",
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/MpscGrowableArrayQueue",
+        "com/github/benmanes/caffeine/cache/Pacer",
+        "com/github/benmanes/caffeine/cache/Scheduler",
+        "com/github/benmanes/caffeine/cache/WS",
+        "com/github/benmanes/caffeine/cache/WSW",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WSWR.class",
+      "occurrence": 0,
+      "sha256": "86da69278edb46a8c6f89da4e8e80ad8f693b94179d0a146d89bf88e00034052",
+      "name": "com/github/benmanes/caffeine/cache/WSWR",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/WSW",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "J",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Caffeine;Lcom/github/benmanes/caffeine/cache/CacheLoader;Z)V",
+          "access": 0,
+          "code_sha256": "8191a3480cda7489bda3a5c376433d77139efba72f8ed273ed329eb39bb4d83d",
+          "code_length": 16,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/Caffeine<TK;TV;>;Lcom/github/benmanes/caffeine/cache/CacheLoader<-TK;TV;>;Z)V"
+        },
+        {
+          "name": "refreshAfterWrite",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "refreshAfterWriteNanos",
+          "descriptor": "()J",
+          "access": 4,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshAfterWriteNanos",
+          "descriptor": "(J)V",
+          "access": 4,
+          "code_sha256": "5ad78a5ad333e1b562df7c629ffc769e9a2dda5778276a74dd7a2abd62e9a630",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lcom/github/benmanes/caffeine/cache/WSW<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/Caffeine",
+        "com/github/benmanes/caffeine/cache/WSW",
+        "com/github/benmanes/caffeine/cache/WSWR"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/Weigher.class",
+      "occurrence": 0,
+      "sha256": "b2d76354f79115823561f678bb542aed02108b2674b48abb5c1558a3a5542909",
+      "name": "com/github/benmanes/caffeine/cache/Weigher",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "weigh",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 1025,
+          "generic_signature": "(TK;TV;)I"
+        },
+        {
+          "name": "singletonWeigher",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/Weigher;",
+          "access": 9,
+          "code_sha256": "6602b12c5390ab383ab865aaffd0d23b2ffd4c805f3e00683ee4ac164253a72e",
+          "code_length": 6,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>()Lcom/github/benmanes/caffeine/cache/Weigher<TK;TV;>;"
+        },
+        {
+          "name": "boundedWeigher",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/Weigher;)Lcom/github/benmanes/caffeine/cache/Weigher;",
+          "access": 9,
+          "code_sha256": "b6d8d2811609d5ad6163077aca9d9d8f920f04ceacff7af9b90c5e8e6edd3915",
+          "code_length": 9,
+          "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>(Lcom/github/benmanes/caffeine/cache/Weigher<TK;TV;>;)Lcom/github/benmanes/caffeine/cache/Weigher<TK;TV;>;"
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/BoundedWeigher",
+        "com/github/benmanes/caffeine/cache/SingletonWeigher",
+        "com/github/benmanes/caffeine/cache/Weigher",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder.class",
+      "occurrence": 0,
+      "sha256": "ff562272fde997a37eed66515dfbb6612f39546770add0644f93c5e8b5a2fdb8",
+      "name": "com/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getPreviousInWriteOrder",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "setPreviousInWriteOrder",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)V",
+          "access": 1025,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "getNextInWriteOrder",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "setNextInWriteOrder",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)V",
+          "access": 1025,
+          "generic_signature": "(TT;)V"
+        }
+      ],
+      "generic_signature": "<T::Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder<TT;>;>Ljava/lang/Object;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WriteOrderDeque.class",
+      "occurrence": 0,
+      "sha256": "9e307608be8859755263b96b912ae51cb1a430d9fb9c26b0238395e15233cd71",
+      "name": "com/github/benmanes/caffeine/cache/WriteOrderDeque",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "com/github/benmanes/caffeine/cache/AbstractLinkedDeque",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "776fe35a72f2176ea6c2196edecfc8aec54b2a87b4fdd1f43ba094b74b177a09",
+          "code_length": 24
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)Z",
+          "access": 0,
+          "code_sha256": "c443d53191bd160756afce44e176bccd79b1ac771f99d6398f0fd29763de2bee",
+          "code_length": 32,
+          "generic_signature": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder<*>;)Z"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "1b1bd0c89ed3b34944f793c7598a6f6de9ebc0531b8df31e4b5cd6d951a2b4f2",
+          "code_length": 24
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)Z",
+          "access": 1,
+          "code_sha256": "0db2938ea4385b63a57c44cf9b9bef612043002ab26592fa67a20e2b72ce1204",
+          "code_length": 17,
+          "generic_signature": "(TE;)Z"
+        },
+        {
+          "name": "getPrevious",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;",
+          "access": 1,
+          "code_sha256": "045b99aa4a97bd054622dca34595c754c04626d43a1d2ddcf7f1ba42d9be6837",
+          "code_length": 7,
+          "generic_signature": "(TE;)TE;"
+        },
+        {
+          "name": "setPrevious",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)V",
+          "access": 1,
+          "code_sha256": "a44ce5b2405a1d30d5f3cef5d7009d0a07f142cae143886182a05ab9ae6af6c7",
+          "code_length": 8,
+          "generic_signature": "(TE;TE;)V"
+        },
+        {
+          "name": "getNext",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;",
+          "access": 1,
+          "code_sha256": "49099db93794475fef9df3ad14737548d35fecb351a9c2e20e1884c2abe65577",
+          "code_length": 7,
+          "generic_signature": "(TE;)TE;"
+        },
+        {
+          "name": "setNext",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder;)V",
+          "access": 1,
+          "code_sha256": "df20e6486ba9033c5e40a76899fd8aeb443894a5f1db75a2edb97e98c1eca9b2",
+          "code_length": 8,
+          "generic_signature": "(TE;TE;)V"
+        },
+        {
+          "name": "setNext",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "8c45b5889ecc2e5d2e695e4fb7d505db01e179704f6228e43ad610639e26c6e0",
+          "code_length": 13
+        },
+        {
+          "name": "getNext",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "e865def2d6528e13290f3fb885d263afb65b55ee0872eea5c5f96491f087cd17",
+          "code_length": 9
+        },
+        {
+          "name": "setPrevious",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "6c45b0eca96043e9b8498d3b09d1d8f453e6ad61087ca8b1b1206be40e8205df",
+          "code_length": 13
+        },
+        {
+          "name": "getPrevious",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "77dc53d31782fcef8addacd2d1116927fe5e80363fad4a540ab4e0c46fbffe60",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<E::Lcom/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder<TE;>;>Lcom/github/benmanes/caffeine/cache/AbstractLinkedDeque<TE;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/AbstractLinkedDeque",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque",
+        "com/github/benmanes/caffeine/cache/WriteOrderDeque$WriteOrder"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/WriteThroughEntry.class",
+      "occurrence": 0,
+      "sha256": "63f0a181ddaec008f82c2ca7318bcd78a7d70f916692a69fc45ce1c8155b48e7",
+      "name": "com/github/benmanes/caffeine/cache/WriteThroughEntry",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/util/AbstractMap$SimpleEntry",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<TK;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ConcurrentMap;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "5ec84bd6dba370375d3be88d89f45ef279720b614d9977f0e6cf2a974af466c8",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/concurrent/ConcurrentMap<TK;TV;>;TK;TV;)V"
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9cb9e0d269a290b99e63835328acfa8d0daf0a5feeb8a3fdfba2724f309f9915",
+          "code_length": 21,
+          "generic_signature": "(TV;)TV;"
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 0,
+          "code_sha256": "8d05ff0af289c8721432f8781f77d25d559f0612d8481dd90133b2da4d62a841",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/util/AbstractMap$SimpleEntry<TK;TV;>;",
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/WriteThroughEntry",
+        "java/util/AbstractMap",
+        "java/util/AbstractMap$SimpleEntry",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Objects",
+        "java/util/concurrent/ConcurrentMap"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/stats/CacheStats.class",
+      "occurrence": 0,
+      "sha256": "bfeed2c63716e533747749deb984fe2845366c150392aa77db71b29b23ad3f60",
+      "name": "com/github/benmanes/caffeine/cache/stats/CacheStats",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY_STATS",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 26
+        },
+        {
+          "name": "hitCount",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "missCount",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "loadSuccessCount",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "loadFailureCount",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "totalLoadTime",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "evictionCount",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "evictionWeight",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJJJJJ)V",
+          "access": 1,
+          "code_sha256": "ee983b6c102114109d8d26a1a6a3abd5bec1a32da96bef000d1875aa90ae09f8",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(JJJJJJJ)V",
+          "access": 1,
+          "code_sha256": "fc0e5df6c42db15ec7afbc1ed5f9cf263645eb76e5ae6790ed614b6678026d5b",
+          "code_length": 100
+        },
+        {
+          "name": "empty",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 9,
+          "code_sha256": "dfb9aff16602b7340870ab7fc902b22294f662e441389a5a6c3b983791acee04",
+          "code_length": 4
+        },
+        {
+          "name": "requestCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "1229f50304f18ccc249c280fb4ddd2142c399edc104bd962991fb3592278157b",
+          "code_length": 12
+        },
+        {
+          "name": "hitCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "hitRate",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "f2ec2770989f972f39324c4d7c3f1c96f88bf7244f1499f3989c647520da96a8",
+          "code_length": 24
+        },
+        {
+          "name": "missCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "missRate",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "7699077d0bd6c01478de91e2d304d49ad2ddb914a011d68377e378b464abd1af",
+          "code_length": 24
+        },
+        {
+          "name": "loadCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ea250f1fbf17815396c6593f19e97bf2c1beb7afba92a203fabaf2f88cb5d6aa",
+          "code_length": 12
+        },
+        {
+          "name": "loadSuccessCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "dc4302e4afb670f8cd2a9c021af6209bfeb99ab4725cf5e06028230aade73f84",
+          "code_length": 5
+        },
+        {
+          "name": "loadFailureCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "loadFailureRate",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "f048c8abccdba429a2694e9477977e3b674cc742358da07fe6bc66c07f2cd580",
+          "code_length": 31
+        },
+        {
+          "name": "totalLoadTime",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "297da201021403b620439dd24bf3368088499bd2b6307926a0d465041feaaa95",
+          "code_length": 5
+        },
+        {
+          "name": "averageLoadPenalty",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "e83270625e84d2787fc92efe5f0056dd9536c65a58979193bec4e9a0b7c7e1c0",
+          "code_length": 31
+        },
+        {
+          "name": "evictionCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "2474113f7501d5e7cd5b9ebd0ab070a0d48b112ed2356fcc1bae4e93e27bac39",
+          "code_length": 5
+        },
+        {
+          "name": "evictionWeight",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "b1043b6b9e1b3a10141dca3c66a4866f67a509bdc0ff02b9f5bd5b1483dee736",
+          "code_length": 5
+        },
+        {
+          "name": "minus",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/stats/CacheStats;)Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1,
+          "code_sha256": "c30fd8e4c7e9e7e68b27694ed925e813a2d457ea0111c815854b2fc675615b9b",
+          "code_length": 113
+        },
+        {
+          "name": "plus",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/stats/CacheStats;)Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1,
+          "code_sha256": "20e266579fc6d0d5f644dc2b862b6341cc79de51ec255259c0cf0deeff37bc94",
+          "code_length": 85
+        },
+        {
+          "name": "saturatedSubtract",
+          "descriptor": "(JJ)J",
+          "access": 10,
+          "code_sha256": "e9a3d331f48da9dea8a478b975e3d40375927a171e6b1fd733fceddc75e98d3a",
+          "code_length": 51
+        },
+        {
+          "name": "saturatedAdd",
+          "descriptor": "(JJ)J",
+          "access": 10,
+          "code_sha256": "54fafb89aa83af2362d1a218f7bfe0e395e1052b959fa5d915f78a1f58c34a70",
+          "code_length": 51
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fec3f8ca39376ef715e7faa99756be3980ec2ac2ecab98117cc6abcf1d726fdc",
+          "code_length": 80
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3aa34a476afe458d0a0fe837d27d4fdc8f8a71bd97557edda161384fd7a2b046",
+          "code_length": 111
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a9294b0a2c78801487e60b74e1c32ff511c2764b9a21f63635934abd4c3e891d",
+          "code_length": 115
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8dbbdc19dc7c5a2c48b95c46443d878d764375c2ebf6dfeb3082f849c3333f62",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/stats/CacheStats",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/stats/ConcurrentStatsCounter.class",
+      "occurrence": 0,
+      "sha256": "39a763faf70d93073eb575a4b3ab72c518544c8ea654a1098e4f91318a2b1281",
+      "name": "com/github/benmanes/caffeine/cache/stats/ConcurrentStatsCounter",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter"
+      ],
+      "fields": [
+        {
+          "name": "hitCount",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "missCount",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "loadSuccessCount",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "loadFailureCount",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "totalLoadTime",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "evictionCount",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        },
+        {
+          "name": "evictionWeight",
+          "descriptor": "Ljava/util/concurrent/atomic/LongAdder;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "108e3965de75112f41e4369a6d2be49ff83c923568f4af96b693119e58f52ffb",
+          "code_length": 82
+        },
+        {
+          "name": "recordHits",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "aa82df82c8f58a887d65a90d432b0e847ec1dd46a5154a1635a2cf5c0d563fa8",
+          "code_length": 10
+        },
+        {
+          "name": "recordMisses",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "9c9ae6b93a71c29023318861a24d52ca67959236dc10520c4f8b97f36940ab8c",
+          "code_length": 10
+        },
+        {
+          "name": "recordLoadSuccess",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "94d230004b125fe8ae54287bbc27222f74f75de21c3e29deb0a30b502dc1c3a8",
+          "code_length": 16
+        },
+        {
+          "name": "recordLoadFailure",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "0a45a7fb368dcb2e4eada421774c85ce3f64c067e54fa4b421df3d93221c0b12",
+          "code_length": 16
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "66902267b83209085ba06b209c3aae9bc860ba310b76726fe1aefe51d269a106",
+          "code_length": 8
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "03b369fb5d42b0257378212986cabf5fb4f4b604418f46ff9a9079f3c848c7c4",
+          "code_length": 17
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(ILcom/github/benmanes/caffeine/cache/RemovalCause;)V",
+          "access": 1,
+          "code_sha256": "03b369fb5d42b0257378212986cabf5fb4f4b604418f46ff9a9079f3c848c7c4",
+          "code_length": 17
+        },
+        {
+          "name": "snapshot",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1,
+          "code_sha256": "a6ed0932ea72e3e83df61438208d66ca18af7ac1237852d67f4c9ce7409c858c",
+          "code_length": 78
+        },
+        {
+          "name": "negativeToMaxValue",
+          "descriptor": "(J)J",
+          "access": 10,
+          "code_sha256": "005f1514195acdf3b31f37e1d1b8f954b9276c1bc9d9e175abb683f7d2d1f543",
+          "code_length": 14
+        },
+        {
+          "name": "incrementBy",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;)V",
+          "access": 1,
+          "code_sha256": "340d9f69df6901d84cb82c2b27128c5aeef9f038bc20443d8335d5e8125f8dd2",
+          "code_length": 85
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a228ba13c88e1515edd2553e5def4c588e6daddfa373880321eee4ee7ad42b63",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/stats/CacheStats",
+        "com/github/benmanes/caffeine/cache/stats/ConcurrentStatsCounter",
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/concurrent/atomic/LongAdder"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/stats/DisabledStatsCounter.class",
+      "occurrence": 0,
+      "sha256": "d7dbf7d042966e01b1fe34ca9d87a03722a7598e6bb39783650a9f750e285708",
+      "name": "com/github/benmanes/caffeine/cache/stats/DisabledStatsCounter",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "recordHits",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "recordMisses",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "recordLoadSuccess",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "recordLoadFailure",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "snapshot",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "871015c37a230cb1039ad6d0296e3742f7c72c60a4ed1146539be9f0a3987d2e",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ffb3bb0a1f0f0e671afdb90cc3126ab7e7d4fad6995fe6d4e1b949465f9cb56b",
+          "code_length": 27
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;>;Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+      "class_references": [
+        "[Lcom/github/benmanes/caffeine/cache/stats/DisabledStatsCounter;",
+        "com/github/benmanes/caffeine/cache/stats/CacheStats",
+        "com/github/benmanes/caffeine/cache/stats/DisabledStatsCounter",
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/stats/GuardedStatsCounter.class",
+      "occurrence": 0,
+      "sha256": "1b001db932f6dc947d05fb2a2bb3198be0df12246747d550cce97a4d67a1d7a3",
+      "name": "com/github/benmanes/caffeine/cache/stats/GuardedStatsCounter",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 24
+        },
+        {
+          "name": "delegate",
+          "descriptor": "Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;)V",
+          "access": 0,
+          "code_sha256": "6715eb57b093ebdf889ff9e7f562921969bf984bff81557858010db14b07282f",
+          "code_length": 16
+        },
+        {
+          "name": "recordHits",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "0219fea25c8ceeeef4fc00b1c8df510c5a3a727ec4fabaa9dfedd04056292beb",
+          "code_length": 27
+        },
+        {
+          "name": "recordMisses",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "0655417b9c49545852413d93667f666e1255550c0edb2b135805d6adde3bb875",
+          "code_length": 27
+        },
+        {
+          "name": "recordLoadSuccess",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "a4851980aa0121b19b51d71fb6f351b6b522e9213a285862d6bd660fe7347168",
+          "code_length": 27
+        },
+        {
+          "name": "recordLoadFailure",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "d4c451783c1605bb4c2bad2bde64b28e180ba8f258a954dcc6c0b5394d156ad3",
+          "code_length": 27
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "06038ecd056ecc70e72b7131f34d488b2bc39c638367c28093a5b44f95f85698",
+          "code_length": 26
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6631ab94fd04a339eda45b79d1e8a2013e0fec2890c2a237edece8a6992e1d76",
+          "code_length": 27
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(ILcom/github/benmanes/caffeine/cache/RemovalCause;)V",
+          "access": 1,
+          "code_sha256": "82e1afd24991f7f39bfe9acbc62527bea591d7c3e95954b61e0c8a7a7afea696",
+          "code_length": 28
+        },
+        {
+          "name": "snapshot",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1,
+          "code_sha256": "947a265b43bbfa395ecaa890bc1c291f7f156757788c3c17e427ef5aa1f8c741",
+          "code_length": 27
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "08f0d2bda4d5cca0cf941392fde121c023557210cca789b41ef84194c6e0aea1",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8c3239b71aefd811afc6ce9419d017047a409f396295ae610c4aa7e33483712b",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/stats/CacheStats",
+        "com/github/benmanes/caffeine/cache/stats/GuardedStatsCounter",
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/Objects",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/github/benmanes/caffeine/cache/stats/StatsCounter.class",
+      "occurrence": 0,
+      "sha256": "fd0ad9931360468ef26fb3b0ec924a1dbecaa80397b37a30dd5d9c84e02dd351",
+      "name": "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "recordHits",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "recordMisses",
+          "descriptor": "(I)V",
+          "access": 1025
+        },
+        {
+          "name": "recordLoadSuccess",
+          "descriptor": "(J)V",
+          "access": 1025
+        },
+        {
+          "name": "recordLoadFailure",
+          "descriptor": "(J)V",
+          "access": 1025
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4de651e3f2ed496df563bbdc01dd1ed34c9aea3cb707dbf464ac4af24060c842",
+          "code_length": 7
+        },
+        {
+          "name": "recordEviction",
+          "descriptor": "(ILcom/github/benmanes/caffeine/cache/RemovalCause;)V",
+          "access": 1,
+          "code_sha256": "3a5e2b05dc453d9a9861318cfd8e9b1fb3ed072577a32c1b856dc55877dec7d7",
+          "code_length": 8
+        },
+        {
+          "name": "snapshot",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/CacheStats;",
+          "access": 1025
+        },
+        {
+          "name": "disabledStatsCounter",
+          "descriptor": "()Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+          "access": 9,
+          "code_sha256": "7dce45470ce11b005c4bd504408c0a8d8802f3d308124b41edb171ccc07c237c",
+          "code_length": 4
+        },
+        {
+          "name": "guardedStatsCounter",
+          "descriptor": "(Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;)Lcom/github/benmanes/caffeine/cache/stats/StatsCounter;",
+          "access": 9,
+          "code_sha256": "4769fc6821de3429f429add5998b56ec3418053f825f2916248cf65c1d948fed",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/github/benmanes/caffeine/cache/stats/DisabledStatsCounter",
+        "com/github/benmanes/caffeine/cache/stats/GuardedStatsCounter",
+        "com/github/benmanes/caffeine/cache/stats/StatsCounter",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

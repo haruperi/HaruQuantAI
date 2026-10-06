@@ -1,0 +1,722 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/kotlin-stdlib-2.2.21.jar",
+  "archive_sha256": "6558a3d233da56a20934b32159f9db5f86ed5816ef098f78a2c223dc6abb79dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$1.class",
+      "occurrence": 0,
+      "sha256": "ba74cdb195385e5471a9c5b68e0f5aacdbab85e9fe4d9b88e0c53cd8d66dc36c",
+      "name": "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/time/Clock"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8896539f287b998e729c647434c756c34343aac77b5f723ad14b251137b4f61b",
+          "code_length": 5
+        },
+        {
+          "name": "now",
+          "descriptor": "()Lkotlin/time/Instant;",
+          "access": 1,
+          "code_sha256": "34072758bcb63b53ae839dec5f088f39140479740dfb3b40832426948fca46da",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/time/Instant",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$1",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/time/Clock",
+        "kotlin/time/jdk8/InstantConversionsJDK8Kt"
+      ]
+    },
+    {
+      "entry": "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$2.class",
+      "occurrence": 0,
+      "sha256": "052910d4e5e7072654725c0ebe1cee3a18d38c0fe6b0f64e639122259d4b6fd9",
+      "name": "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$2",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/time/Clock"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "8896539f287b998e729c647434c756c34343aac77b5f723ad14b251137b4f61b",
+          "code_length": 5
+        },
+        {
+          "name": "now",
+          "descriptor": "()Lkotlin/time/Instant;",
+          "access": 1,
+          "code_sha256": "36df16ae9492fdd0b1126435fb311480cd56f37891abb7027e5459dd54ff3935",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$2",
+        "kotlin/time/Clock",
+        "kotlin/time/Instant",
+        "kotlin/time/Instant$Companion"
+      ]
+    },
+    {
+      "entry": "kotlin/internal/jdk8/JDK8PlatformImplementations.class",
+      "occurrence": 0,
+      "sha256": "41059e749be57518c9291660a2eff629a757e8a64061ec1bcb88335d41c86c27",
+      "name": "kotlin/internal/jdk8/JDK8PlatformImplementations",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "kotlin/internal/jdk7/JDK7PlatformImplementations",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "sdkIsNullOrAtLeast",
+          "descriptor": "(I)Z",
+          "access": 18,
+          "code_sha256": "64bb6413adf3b30f974d947c7d55477503bb5f9555b46547be973fd404ed07e7",
+          "code_length": 22
+        },
+        {
+          "name": "getMatchResultNamedGroup",
+          "descriptor": "(Ljava/util/regex/MatchResult;Ljava/lang/String;)Lkotlin/text/MatchGroup;",
+          "access": 1,
+          "code_sha256": "32e9df7014359d708be57c0c6b809c7df76f1d6124aa48e0232d0509390bdabe",
+          "code_length": 100
+        },
+        {
+          "name": "defaultPlatformRandom",
+          "descriptor": "()Lkotlin/random/Random;",
+          "access": 1,
+          "code_sha256": "6156aad10c48a31da778e6133c93f83e15cf35ce18f0e768250f0a69d7038f99",
+          "code_length": 27
+        },
+        {
+          "name": "getSystemClock",
+          "descriptor": "()Lkotlin/time/Clock;",
+          "access": 1,
+          "code_sha256": "66e7e8b256a59b63aa1603fdc84c6897f03c5266626824fb6760f117a66c3de8",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/UnsupportedOperationException",
+        "java/util/regex/Matcher",
+        "kotlin/internal/jdk7/JDK7PlatformImplementations",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations$ReflectSdkVersion",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$1",
+        "kotlin/internal/jdk8/JDK8PlatformImplementations$getSystemClock$2",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/random/Random",
+        "kotlin/random/jdk8/PlatformThreadLocalRandom",
+        "kotlin/ranges/IntRange",
+        "kotlin/text/MatchGroup",
+        "kotlin/time/Clock"
+      ]
+    },
+    {
+      "entry": "kotlin/jvm/jdk8/JvmRepeatableKt.class",
+      "occurrence": 0,
+      "sha256": "30d54a901318a96457ee6fad593e055b526a161267702f70bbdf3d3b051247ac",
+      "name": "kotlin/jvm/jdk8/JvmRepeatableKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "JvmRepeatable$annotations",
+          "descriptor": "()V",
+          "access": 4105,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "kotlin/jvm/jdk8/JvmRepeatableKt"
+      ]
+    },
+    {
+      "entry": "kotlin/jvm/optionals/OptionalsKt.class",
+      "occurrence": 0,
+      "sha256": "7b042616b9bb958365aeb0658c746fcef4dabc6f1f5d713ecf76aa82427d6a14",
+      "name": "kotlin/jvm/optionals/OptionalsKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getOrNull",
+          "descriptor": "(Ljava/util/Optional;)Ljava/lang/Object;",
+          "access": 25,
+          "code_sha256": "71b94d13524cb7c10c5d017708ac539a97d13db0b151f7692ca84c45d13424b0",
+          "code_length": 12,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<TT;>;)TT;"
+        },
+        {
+          "name": "getOrDefault",
+          "descriptor": "(Ljava/util/Optional;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 25,
+          "code_sha256": "05db14b09511d07ab914e53b49b5b1370367fccdb95f650405b7448ceb1b38ec",
+          "code_length": 22,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<+TT;>;TT;)TT;"
+        },
+        {
+          "name": "getOrElse",
+          "descriptor": "(Ljava/util/Optional;Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;",
+          "access": 25,
+          "code_sha256": "865621213cf0aa5b35d71347ff20a1b4d81c5f90c3b20e05b688e13c69a21db0",
+          "code_length": 35,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<+TT;>;Lkotlin/jvm/functions/Function0<+TT;>;)TT;"
+        },
+        {
+          "name": "toCollection",
+          "descriptor": "(Ljava/util/Optional;Ljava/util/Collection;)Ljava/util/Collection;",
+          "access": 25,
+          "code_sha256": "3d0ea6a7f8679674ae5d6d489cc8fe84bf46b0ce85a226b7c5b75f589fa273f6",
+          "code_length": 38,
+          "generic_signature": "<T:Ljava/lang/Object;C::Ljava/util/Collection<-TT;>;>(Ljava/util/Optional<TT;>;TC;)TC;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/util/Optional;)Ljava/util/List;",
+          "access": 25,
+          "code_sha256": "017ddb7fda9361d745f0fae1e618720bb36dde415780c8dbc4d6bd1aa6aa30af",
+          "code_length": 27,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<+TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "toSet",
+          "descriptor": "(Ljava/util/Optional;)Ljava/util/Set;",
+          "access": 25,
+          "code_sha256": "e53d1b9983e383bb3280f3208386b8f6c109ae07f53b2d20973a5edbe82efe6c",
+          "code_length": 27,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<+TT;>;)Ljava/util/Set<TT;>;"
+        },
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/Optional;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "af51a3ab646bd838613fe03abce9acd8dc9879bc9ae84ccadc2dae65eba4cfe6",
+          "code_length": 27,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Optional<+TT;>;)Lkotlin/sequences/Sequence<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/List",
+        "java/util/Optional",
+        "java/util/Set",
+        "kotlin/collections/CollectionsKt",
+        "kotlin/collections/SetsKt",
+        "kotlin/jvm/functions/Function0",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/jvm/optionals/OptionalsKt",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt"
+      ]
+    },
+    {
+      "entry": "kotlin/random/jdk8/PlatformThreadLocalRandom.class",
+      "occurrence": 0,
+      "sha256": "32fb8978ba88ad9bc2b0c570004aba3137fc783e83f82823c6ba8db867584e45",
+      "name": "kotlin/random/jdk8/PlatformThreadLocalRandom",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "kotlin/random/AbstractPlatformRandom",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "getImpl",
+          "descriptor": "()Ljava/util/Random;",
+          "access": 1,
+          "code_sha256": "ceb988093d695074b13fc2fc76ac0b98be8a7f244bf849a8f9fab244237d59fc",
+          "code_length": 13
+        },
+        {
+          "name": "nextInt",
+          "descriptor": "(II)I",
+          "access": 1,
+          "code_sha256": "36e3f0109b530bf5617f1a238063cf94c3f729834abff60bf2d311f73d9bba3f",
+          "code_length": 9
+        },
+        {
+          "name": "nextLong",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "93a95787d9015f93e15c2d1193749b4ae75362d16b1782712127dca9836ce82b",
+          "code_length": 8
+        },
+        {
+          "name": "nextLong",
+          "descriptor": "(JJ)J",
+          "access": 1,
+          "code_sha256": "5797742e513366d6ed64d28e979c449abe102f6750b76394ea6f4bd7769dde5a",
+          "code_length": 9
+        },
+        {
+          "name": "nextDouble",
+          "descriptor": "(D)D",
+          "access": 1,
+          "code_sha256": "06c8b3c2af6017689b2028b1a9ad10b0dbfc081512e10db34245fa0f9c5a0cc5",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/util/Random",
+        "java/util/concurrent/ThreadLocalRandom",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/random/AbstractPlatformRandom",
+        "kotlin/random/jdk8/PlatformThreadLocalRandom"
+      ]
+    },
+    {
+      "entry": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$1.class",
+      "occurrence": 0,
+      "sha256": "f0a2d8bf03fa460f8cd07d8317598c88c886332c5048590f790915cb513b18ad",
+      "name": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$1",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$this_asSequence$inlined",
+          "descriptor": "Ljava/util/stream/Stream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/stream/Stream;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "0dc194cc0105975ad70b2ee7cd736d97558d79d608f6fa4fea825bb7e8a0be70",
+          "code_length": 18,
+          "generic_signature": "()Ljava/util/Iterator<TT;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/stream/Stream",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/streams/jdk8/StreamsKt",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$1"
+      ]
+    },
+    {
+      "entry": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$2.class",
+      "occurrence": 0,
+      "sha256": "9ce578a879b6a691f7588b49c5a3c814ce3220aa2089919115ce24e13f510e5b",
+      "name": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$2",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$this_asSequence$inlined",
+          "descriptor": "Ljava/util/stream/IntStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/stream/IntStream;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "e8cae0600b70b4e8047b9065228f758705a318d7a26111078626ac3dd7a173a5",
+          "code_length": 21,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/Integer;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<Ljava/lang/Integer;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/stream/IntStream",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/streams/jdk8/StreamsKt",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$2"
+      ]
+    },
+    {
+      "entry": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$3.class",
+      "occurrence": 0,
+      "sha256": "7fdf8549c457ddc174c107efcaa9dae8e89647e40ce54c8d5a145da9ed16954c",
+      "name": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$3",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$this_asSequence$inlined",
+          "descriptor": "Ljava/util/stream/LongStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/stream/LongStream;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "e8cae0600b70b4e8047b9065228f758705a318d7a26111078626ac3dd7a173a5",
+          "code_length": 21,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/Long;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<Ljava/lang/Long;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/stream/LongStream",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/streams/jdk8/StreamsKt",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$3"
+      ]
+    },
+    {
+      "entry": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$4.class",
+      "occurrence": 0,
+      "sha256": "3d1a9e0efa5bff8dfc44ba8315ab27dbf45bd4a9f8fda3328e13c164dd39635a",
+      "name": "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$4",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "kotlin/sequences/Sequence"
+      ],
+      "fields": [
+        {
+          "name": "$this_asSequence$inlined",
+          "descriptor": "Ljava/util/stream/DoubleStream;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/stream/DoubleStream;)V",
+          "access": 1,
+          "code_sha256": "21c30a254c33af454c041bb0f6cff575e1e301ab3c4ca549ce881279acc1b469",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "e8cae0600b70b4e8047b9065228f758705a318d7a26111078626ac3dd7a173a5",
+          "code_length": 21,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/lang/Double;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lkotlin/sequences/Sequence<Ljava/lang/Double;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/stream/DoubleStream",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/sequences/SequencesKt__SequencesKt",
+        "kotlin/streams/jdk8/StreamsKt",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$4"
+      ]
+    },
+    {
+      "entry": "kotlin/streams/jdk8/StreamsKt.class",
+      "occurrence": 0,
+      "sha256": "f70ece13caf251b03aac6c08c219bc6486162b1825cdbcfe580ab5a260d3ed1b",
+      "name": "kotlin/streams/jdk8/StreamsKt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/stream/Stream;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "9f39a9677d43b164b97a7590a2b8451da0dfd52c56b1d3af913f073451bcab28",
+          "code_length": 18,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/stream/Stream<TT;>;)Lkotlin/sequences/Sequence<TT;>;"
+        },
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/stream/IntStream;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "b8009309272a1d4b03924ffdc4d2a2021518378d73dbf56782dd564011fc4796",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/stream/IntStream;)Lkotlin/sequences/Sequence<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/stream/LongStream;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "fe260b02c45aa565edfb9d959280a3bb4124ba63d9942c6db0dc501bf6afe422",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/stream/LongStream;)Lkotlin/sequences/Sequence<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "asSequence",
+          "descriptor": "(Ljava/util/stream/DoubleStream;)Lkotlin/sequences/Sequence;",
+          "access": 25,
+          "code_sha256": "04316e2596033da98a90f8c3e3e620bca15c54bb58fa7fb9dcef0cc9733da112",
+          "code_length": 18,
+          "generic_signature": "(Ljava/util/stream/DoubleStream;)Lkotlin/sequences/Sequence<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "asStream",
+          "descriptor": "(Lkotlin/sequences/Sequence;)Ljava/util/stream/Stream;",
+          "access": 25,
+          "code_sha256": "ab3501338bc596276c6cd5902efbc9f3e4eea95c4a5a88bb824e2f97f518671f",
+          "code_length": 25,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lkotlin/sequences/Sequence<+TT;>;)Ljava/util/stream/Stream<TT;>;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/util/stream/Stream;)Ljava/util/List;",
+          "access": 25,
+          "code_sha256": "3292a3b64fb8d41ae30d3328c26fc58ede38f6b05cfb68d1475c6ed427487c51",
+          "code_length": 25,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/stream/Stream<TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/util/stream/IntStream;)Ljava/util/List;",
+          "access": 25,
+          "code_sha256": "c32cbe078ffcc35e56d64dad86475de4a515be25170cc28515c096c433d42a8d",
+          "code_length": 22,
+          "generic_signature": "(Ljava/util/stream/IntStream;)Ljava/util/List<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/util/stream/LongStream;)Ljava/util/List;",
+          "access": 25,
+          "code_sha256": "3984b09e744d7f9396e2ac72ce7ea96027cf0d5d296b57677b1f44a384ab943c",
+          "code_length": 22,
+          "generic_signature": "(Ljava/util/stream/LongStream;)Ljava/util/List<Ljava/lang/Long;>;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/util/stream/DoubleStream;)Ljava/util/List;",
+          "access": 25,
+          "code_sha256": "672b5eb05e13171e987f53034e0f948e2d28f372c169b26a497a133589ed3ed6",
+          "code_length": 22,
+          "generic_signature": "(Ljava/util/stream/DoubleStream;)Ljava/util/List<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "asStream$lambda$0",
+          "descriptor": "(Lkotlin/sequences/Sequence;)Ljava/util/Spliterator;",
+          "access": 26,
+          "code_sha256": "a2cbe39b53a3f7e08694cdadb267f80871d695c1b8f91188d89566f16837b50e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/util/List",
+        "java/util/PrimitiveIterator",
+        "java/util/PrimitiveIterator$OfDouble",
+        "java/util/PrimitiveIterator$OfInt",
+        "java/util/PrimitiveIterator$OfLong",
+        "java/util/Spliterators",
+        "java/util/stream/Collectors",
+        "java/util/stream/DoubleStream",
+        "java/util/stream/IntStream",
+        "java/util/stream/LongStream",
+        "java/util/stream/Stream",
+        "java/util/stream/StreamSupport",
+        "kotlin/collections/ArraysKt",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/sequences/Sequence",
+        "kotlin/streams/jdk8/StreamsKt",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$1",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$2",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$3",
+        "kotlin/streams/jdk8/StreamsKt$asSequence$$inlined$Sequence$4"
+      ]
+    },
+    {
+      "entry": "kotlin/time/jdk8/DurationConversionsJDK8Kt.class",
+      "occurrence": 0,
+      "sha256": "b876013bb9a82456bdd33781314f5bca154946f991d7ce77d8f2f22a555df80e",
+      "name": "kotlin/time/jdk8/DurationConversionsJDK8Kt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "toKotlinDuration",
+          "descriptor": "(Ljava/time/Duration;)J",
+          "access": 26,
+          "code_sha256": "6443de1d216debd7930749f2f8c8ef8614dbd5305bd6b9da672c0f63fdac0a53",
+          "code_length": 30
+        },
+        {
+          "name": "toJavaDuration-LRDsOJo",
+          "descriptor": "(J)Ljava/time/Duration;",
+          "access": 26,
+          "code_sha256": "1f1184e4b066ad3dd3e8e0f646503518a7581be1a301fd60af800fbdb162877f",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/time/Duration",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/time/Duration",
+        "kotlin/time/DurationKt",
+        "kotlin/time/DurationUnit",
+        "kotlin/time/jdk8/DurationConversionsJDK8Kt"
+      ]
+    },
+    {
+      "entry": "kotlin/time/jdk8/InstantConversionsJDK8Kt.class",
+      "occurrence": 0,
+      "sha256": "b4fc1206bd43f1c4e46a0b797d9ef3e6a4cae2c7d036bef4d0bf4f4beb0f4a78",
+      "name": "kotlin/time/jdk8/InstantConversionsJDK8Kt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "toJavaInstant",
+          "descriptor": "(Lkotlin/time/Instant;)Ljava/time/Instant;",
+          "access": 25,
+          "code_sha256": "b2e93fba8030d6a06b102783b68423e1b7abd637cef4b874bda34faa09b0d26a",
+          "code_length": 25
+        },
+        {
+          "name": "toKotlinInstant",
+          "descriptor": "(Ljava/time/Instant;)Lkotlin/time/Instant;",
+          "access": 25,
+          "code_sha256": "05308fa193f6597ed936bb60b7215e4448975b584b1a19fd3148b3c6e44d72b2",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/time/Instant",
+        "kotlin/jvm/internal/Intrinsics",
+        "kotlin/time/Instant",
+        "kotlin/time/Instant$Companion",
+        "kotlin/time/jdk8/InstantConversionsJDK8Kt"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "8257d07ba70e75b72f3b59516eef78c2c97bb609901f67c561c773273d491a24",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "module-info"
+      ]
+    }
+  ]
+}

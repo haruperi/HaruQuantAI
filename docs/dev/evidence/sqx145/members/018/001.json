@@ -1,0 +1,3269 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-email-1.4.jar",
+  "archive_sha256": "685de61b5987602a7170b1c64969d966ab0616e5aff170b78c4c109638662151",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceCompositeResolver.class",
+      "occurrence": 0,
+      "sha256": "be0cc823204808e59d1f4d18a5c4039fd0e94b71f3011eb1b27916a5e01c86c7",
+      "name": "org/apache/commons/mail/resolver/DataSourceCompositeResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataSourceResolvers",
+          "descriptor": "[Lorg/apache/commons/mail/DataSourceResolver;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/mail/DataSourceResolver;)V",
+          "access": 1,
+          "code_sha256": "39deb93ba1e7ba24a2d997b2886a2e13ff96db596097c255245d7670d6fb0396",
+          "code_length": 26
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/apache/commons/mail/DataSourceResolver;Z)V",
+          "access": 1,
+          "code_sha256": "5c401c38b0fa904047d0f5d1a7c4d6d9033d95add64fbca603650364c89fbf21",
+          "code_length": 27
+        },
+        {
+          "name": "getDataSourceResolvers",
+          "descriptor": "()[Lorg/apache/commons/mail/DataSourceResolver;",
+          "access": 1,
+          "code_sha256": "faf379713c67c38e3530d3d72d61a91e9238490e020f42258b37532ce2d53dae",
+          "code_length": 26
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "3f6d50f04aa7e268fad89c11ab4e90665915f517a1e57050bb33b05e01a23d8e",
+          "code_length": 47,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "cf33c0693ddc7791c3182c1d63552c001c322d154c49a6eab659fc4f1bef48b8",
+          "code_length": 77,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "org/apache/commons/mail/DataSourceResolver",
+        "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+        "org/apache/commons/mail/resolver/DataSourceCompositeResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceFileResolver.class",
+      "occurrence": 0,
+      "sha256": "2d08a0125beb064f9cb8ce7a8d54f0414f61357be3ef622d331b1e3332171ad9",
+      "name": "org/apache/commons/mail/resolver/DataSourceFileResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "baseDir",
+          "descriptor": "Ljava/io/File;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "03e1796c1c48b616237b5cb9123f8d74bed83f91208973fcf1cb343b8ce94033",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "d8b2b339eaa957d4b64a4716d5a7d31d1159fa3e99a140c7c725268eb2c12433",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Z)V",
+          "access": 1,
+          "code_sha256": "62619eca3673f2fe9cc30ea2bfa00248c75a634b4efc0d9dd42ed076e960003c",
+          "code_length": 11
+        },
+        {
+          "name": "getBaseDir",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "7727ddd23643f879bffc4b73cf138ba9f2675b9904a6b8bed78ba72a26b6eab4",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "ab0c4d243ff2fac96414965e5d779bf01ccb56ab0262f571ec8ef3f96135d839",
+          "code_length": 115,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "javax/activation/FileDataSource",
+        "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+        "org/apache/commons/mail/resolver/DataSourceFileResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceClassPathResolver.class",
+      "occurrence": 0,
+      "sha256": "db78883ebf6fcbe6a668cd7b4ec533a2e6436edc4a2c5808ad362aba6ce3a045",
+      "name": "org/apache/commons/mail/resolver/DataSourceClassPathResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "classPathBase",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5e0d4205ced4989c41401212fd103592d0cad0178a1bf872c7890b8fd535425a",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "51b309b8ce7aa9d04643304301878a539b58481aab972c85a6a3cfc6b863c128",
+          "code_length": 41
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 1,
+          "code_sha256": "52d1aef1ee1cccfce25387bd1fb286e7c76cd4980a7f50579725d9dae7438266",
+          "code_length": 42
+        },
+        {
+          "name": "getClassPathBase",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "df7673ed924624bba558fbb81b7aa51356cf7b1e55e3c693b5d77565b0abd27f",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "7a7c139e1d137ed026c454cdcc589f5fd4afabec9c6a53b4474d37428a1b9a74",
+          "code_length": 130,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getResourceName",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "5a3a57315d8900ade1f26e83797caf9323490f7b4c2fd39d8fb168353b41fca4",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/net/URL",
+        "javax/activation/FileTypeMap",
+        "javax/mail/util/ByteArrayDataSource",
+        "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+        "org/apache/commons/mail/resolver/DataSourceClassPathResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceUrlResolver.class",
+      "occurrence": 0,
+      "sha256": "1b68128b87b916414edb8402b88b621c256bb7b304ead38775157015f7403296",
+      "name": "org/apache/commons/mail/resolver/DataSourceUrlResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "baseUrl",
+          "descriptor": "Ljava/net/URL;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;Z)V",
+          "access": 1,
+          "code_sha256": "81993e1f2ec9110073f939cd439208b495c4b3aa7bef5dc283685bc7c2958b95",
+          "code_length": 11
+        },
+        {
+          "name": "getBaseUrl",
+          "descriptor": "()Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "9011acd8c225cbb84caf15d9bb44e2bb95a5d110067ad3d434689d3f69b7fcf0",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "c5de474380944bc85db32b3e4fc9c2eebe02a0c9677e61f1a507a296d3e35b3e",
+          "code_length": 47,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createUrl",
+          "descriptor": "(Ljava/lang/String;)Ljava/net/URL;",
+          "access": 4,
+          "code_sha256": "480446be5a482b04e56ddeba2cd8601aa3225f998db448798cd7eab7dc1f0e54",
+          "code_length": 82,
+          "throws": [
+            "java/net/MalformedURLException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/net/MalformedURLException",
+        "java/net/URL",
+        "javax/activation/DataSource",
+        "javax/activation/URLDataSource",
+        "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+        "org/apache/commons/mail/resolver/DataSourceUrlResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/resolver/DataSourceBaseResolver.class",
+      "occurrence": 0,
+      "sha256": "8f4f2f2246f4caf3f385aa21b5643ee3e4633a2ad80c25f49488e74a9e5a265c",
+      "name": "org/apache/commons/mail/resolver/DataSourceBaseResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/mail/DataSourceResolver"
+      ],
+      "fields": [
+        {
+          "name": "lenient",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "isLenient",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "isCid",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "543bfe919978488b4ccef1787b427ba73cf1d48cc2e6e238ed291fe27b76b791",
+          "code_length": 7
+        },
+        {
+          "name": "isFileUrl",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "f513ec289efc6b345476fc69c80a092aeab75dd30bfe1559fe2b02000940e087",
+          "code_length": 7
+        },
+        {
+          "name": "isHttpUrl",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "1f2777758cb1925f01e09d9bc03025eda32a28351bba3dfc71e9cc54049d3f2f",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/mail/DataSourceResolver",
+        "org/apache/commons/mail/resolver/DataSourceBaseResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/ByteArrayDataSource.class",
+      "occurrence": 0,
+      "sha256": "5572dd6b7239b8fdc8f72aa89c16186a60d19431dbec6cef98a8e929980547ec",
+      "name": "org/apache/commons/mail/ByteArrayDataSource",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataSource"
+      ],
+      "fields": [
+        {
+          "name": "BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "baos",
+          "descriptor": "Ljava/io/ByteArrayOutputStream;",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([BLjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7777c0d7188340965b632c1854b347de5054ea171649c4e81148ec271347b02a",
+          "code_length": 56,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "24cb063b0f7b645b4d202f78986528a46e4a4237971e315d58bf4e1c90df535e",
+          "code_length": 21,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c5ab42f3873b1698bd8f3194e52f642446ba0e502ae7a454efb0bedc1d2c7c22",
+          "code_length": 101,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "byteArrayDataSource",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 2,
+          "code_sha256": "a43ab07ea146a9884ea39481c4aaa1b7a5b873005fadc4161a293c37003ead1d",
+          "code_length": 148,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "380a6a7ed8c78bc9d30f0bffcaf40b5a792222fe38573eeb070f8bebedc279c4",
+          "code_length": 17
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "a6f58c7873b2ea2cd4535a6c7edfb2f743883c36187d36b4fdcea0c2bef7a3a5",
+          "code_length": 32,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "03041f0ed74df8bbd3afc308aa97a97662d58a3db152d7c2793b5e22b9496f3d",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedInputStream",
+        "java/io/BufferedOutputStream",
+        "java/io/ByteArrayInputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "javax/activation/DataSource",
+        "org/apache/commons/mail/ByteArrayDataSource"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/DefaultAuthenticator.class",
+      "occurrence": 0,
+      "sha256": "6a268b056363d5a96aaaefcdc3969db34300ed3664afd61348e347d94f42f9db",
+      "name": "org/apache/commons/mail/DefaultAuthenticator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/mail/Authenticator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "authentication",
+          "descriptor": "Ljavax/mail/PasswordAuthentication;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9be0785917109e723ee444c9356ebd7391d1455ee74110e492174b9e25282fee",
+          "code_length": 18
+        },
+        {
+          "name": "getPasswordAuthentication",
+          "descriptor": "()Ljavax/mail/PasswordAuthentication;",
+          "access": 4,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "javax/mail/Authenticator",
+        "javax/mail/PasswordAuthentication",
+        "org/apache/commons/mail/DefaultAuthenticator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/util/MimeMessageUtils.class",
+      "occurrence": 0,
+      "sha256": "3cc39a075d214aa0c13a952307363d9ae1e59a0532e0c07242b672a62beab49e",
+      "name": "org/apache/commons/mail/util/MimeMessageUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createMimeMessage",
+          "descriptor": "(Ljavax/mail/Session;[B)Ljavax/mail/internet/MimeMessage;",
+          "access": 9,
+          "code_sha256": "7efc586c62bc531165197f6b8cbf715db538376aa4e5001701b30d94ffd8975d",
+          "code_length": 44,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createMimeMessage",
+          "descriptor": "(Ljavax/mail/Session;Ljava/io/File;)Ljavax/mail/internet/MimeMessage;",
+          "access": 9,
+          "code_sha256": "5e87e15328bdc769a5114fbd2a6af2951adb25e313778900b5eebd0907800438",
+          "code_length": 40,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createMimeMessage",
+          "descriptor": "(Ljavax/mail/Session;Ljava/io/InputStream;)Ljavax/mail/internet/MimeMessage;",
+          "access": 9,
+          "code_sha256": "c17f432829dffab39bd91e9775e2e6acabceea3ec96ba56a33156090eb10d3d9",
+          "code_length": 10,
+          "throws": [
+            "javax/mail/MessagingException"
+          ]
+        },
+        {
+          "name": "createMimeMessage",
+          "descriptor": "(Ljavax/mail/Session;Ljava/lang/String;)Ljavax/mail/internet/MimeMessage;",
+          "access": 9,
+          "code_sha256": "f937acb5bca1057afd7acfb036f4f89a95cb3ac588ecae9aeaa928cf088d2e22",
+          "code_length": 47,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeMimeMessage",
+          "descriptor": "(Ljavax/mail/internet/MimeMessage;Ljava/io/File;)V",
+          "access": 9,
+          "code_sha256": "914e2b4e1fee9a2b0f40ac5931aff950a20ab090c6cfd77539a76f402650dad8",
+          "code_length": 119,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/ByteArrayInputStream",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "javax/mail/MessagingException",
+        "javax/mail/internet/MimeMessage",
+        "org/apache/commons/mail/util/MimeMessageUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/util/MimeMessageParser.class",
+      "occurrence": 0,
+      "sha256": "49b2e7ae1bf2bb8569a493b48c4eb182d00fb8355eb9e7f4f2b407e06863d97f",
+      "name": "org/apache/commons/mail/util/MimeMessageParser",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "mimeMessage",
+          "descriptor": "Ljavax/mail/internet/MimeMessage;",
+          "access": 18
+        },
+        {
+          "name": "plainContent",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "htmlContent",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "attachmentList",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljavax/activation/DataSource;>;"
+        },
+        {
+          "name": "cidMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljavax/activation/DataSource;>;"
+        },
+        {
+          "name": "isMultiPart",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/mail/internet/MimeMessage;)V",
+          "access": 1,
+          "code_sha256": "de45d868d8b3e057886c71610fe6f9777783cd01967570ec4e896efb547fe298",
+          "code_length": 37
+        },
+        {
+          "name": "parse",
+          "descriptor": "()Lorg/apache/commons/mail/util/MimeMessageParser;",
+          "access": 1,
+          "code_sha256": "cc8b01b1322c22feebd318965bb2dac9a532d7db04effdeee95ceab63c3aa7da",
+          "code_length": 11,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getTo",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "60ad31e283189ac2a73696047643a56bc5c9e63436f6c33553b5d2e83adfcaba",
+          "code_length": 30,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/Address;>;"
+        },
+        {
+          "name": "getCc",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "a9fd9a33c1c1991354701a0908bdc5c4b607bf4d27b085972e75eaa3d538804a",
+          "code_length": 30,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/Address;>;"
+        },
+        {
+          "name": "getBcc",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "9194233c3b7130507b3665a9d5c3ada60ae8a5fb26320766f7171f27b49ea777",
+          "code_length": 30,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/Address;>;"
+        },
+        {
+          "name": "getFrom",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ea1d08089f68cd887e087d16ccee6ee5fcc556a342a5a74a9dc3d46a23897722",
+          "code_length": 29,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getReplyTo",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "15bfb7fffcebf1ab60eaee34b60002e809c87cb5cd93e1cabe655c83d7c60a43",
+          "code_length": 29,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSubject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dbc07b3c88a5388f13ef2ebf6d323b7b6309322de08d85b0b68332dc82fdaa80",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljavax/mail/Multipart;Ljavax/mail/internet/MimePart;)V",
+          "access": 4,
+          "code_sha256": "a9673ffd842f5ee4b39326f481be6fed8a2c5d9a26e28e5fc3c1ed0743144315",
+          "code_length": 207,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "stripContentId",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8cf8bea5f5d085b9029631b02aa95ac9561c7c85c39ee08bc8fc58b1eada339b",
+          "code_length": 18
+        },
+        {
+          "name": "isMimeType",
+          "descriptor": "(Ljavax/mail/internet/MimePart;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "ee8b729cb49a395c9d093520453e2d1e3b183af1f98419130436e222b2420cd2",
+          "code_length": 35,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createDataSource",
+          "descriptor": "(Ljavax/mail/Multipart;Ljavax/mail/internet/MimePart;)Ljavax/activation/DataSource;",
+          "access": 4,
+          "code_sha256": "fcb540f03126a295ea124cb53e19991d07215e01bc6c0f220272a18470396084",
+          "code_length": 71,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getMimeMessage",
+          "descriptor": "()Ljavax/mail/internet/MimeMessage;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "isMultipart",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getPlainContent",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d2aec6788db2b05a70890264c04f2cdb831396ab355947b95b7e2e0e5946927",
+          "code_length": 5
+        },
+        {
+          "name": "getAttachmentList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljavax/activation/DataSource;>;"
+        },
+        {
+          "name": "getContentIds",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "aca5f014cfda63aed197e8c2be8dc5f88e028794033721f4a048c8c3b484332f",
+          "code_length": 13,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getHtmlContent",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5
+        },
+        {
+          "name": "hasPlainContent",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "40910fd41508acf13b7145c4ffdbd39671d8a9e56be58231615f485014823d5c",
+          "code_length": 13
+        },
+        {
+          "name": "hasHtmlContent",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d7474e57cb22249ccf8a36ef5e358275a193d21aeb9fa4106b0612b61aac4448",
+          "code_length": 13
+        },
+        {
+          "name": "hasAttachments",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "693a2735d3c8eb6a7328f4a935756f9240f2b3943c3fc24c3a09d20a96e96937",
+          "code_length": 18
+        },
+        {
+          "name": "findAttachmentByName",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "055aba1aa3b8ddbe7fc95b30804874ffed81ec7883ac98d1292be9633302ec0f",
+          "code_length": 52
+        },
+        {
+          "name": "findAttachmentByCid",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "42c75625988a1971366d4bbfaaab8573d56a7b5675b9b9cfbe1e9b0f428aaecc",
+          "code_length": 16
+        },
+        {
+          "name": "getDataSourceName",
+          "descriptor": "(Ljavax/mail/Part;Ljavax/activation/DataSource;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "55c953eb50c76cdf386d81caba0ae9d104e39c11a718a7eda86a34767c0ce2e9",
+          "code_length": 48,
+          "throws": [
+            "javax/mail/MessagingException",
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "getContent",
+          "descriptor": "(Ljava/io/InputStream;)[B",
+          "access": 2,
+          "code_sha256": "e4309b02d4a3dfe10c5cdcf385a8a88d4cd3a2c27b02d2d32b39f1b4cc20d4e9",
+          "code_length": 68,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBaseMimeType",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d8fb3782cd67aad26058cd827559bad8bd06216a5186f200f289dec375f764bd",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedInputStream",
+        "java/io/BufferedOutputStream",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "javax/activation/DataHandler",
+        "javax/activation/DataSource",
+        "javax/mail/Message",
+        "javax/mail/Message$RecipientType",
+        "javax/mail/MessagingException",
+        "javax/mail/Multipart",
+        "javax/mail/Part",
+        "javax/mail/internet/ContentType",
+        "javax/mail/internet/InternetAddress",
+        "javax/mail/internet/MimeBodyPart",
+        "javax/mail/internet/MimeMessage",
+        "javax/mail/internet/MimePart",
+        "javax/mail/internet/MimeUtility",
+        "javax/mail/internet/ParseException",
+        "javax/mail/util/ByteArrayDataSource",
+        "org/apache/commons/mail/util/MimeMessageParser"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/SimpleEmail.class",
+      "occurrence": 0,
+      "sha256": "9aea5fb97a43c7df6ec3fce819ff022d3742d7a960ad9ad41a8d74be35e6e917",
+      "name": "org/apache/commons/mail/SimpleEmail",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/Email",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "ba336c8bed7a9af4cf1e4aee4d74f935076c315685b4fde347e5eabf41fe9efa",
+          "code_length": 26,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/mail/Email",
+        "org/apache/commons/mail/EmailException",
+        "org/apache/commons/mail/EmailUtils",
+        "org/apache/commons/mail/SimpleEmail"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/MultiPartEmail.class",
+      "occurrence": 0,
+      "sha256": "ca1e9891ad1e2d74948efa12b02c74bec0140e95b8133488dc26c3677f09f972",
+      "name": "org/apache/commons/mail/MultiPartEmail",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/Email",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "container",
+          "descriptor": "Ljavax/mail/internet/MimeMultipart;",
+          "access": 2
+        },
+        {
+          "name": "primaryBodyPart",
+          "descriptor": "Ljavax/mail/BodyPart;",
+          "access": 2
+        },
+        {
+          "name": "subType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "initialized",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "boolHasAttachments",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setSubType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "getSubType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "addPart",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "6c552c785c73e7dbd3ce0e30e77799bb5166d218b7391b225de1ea95ad731600",
+          "code_length": 36,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addPart",
+          "descriptor": "(Ljavax/mail/internet/MimeMultipart;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "d4e535801a1cd7311e4ab3dbe5077aa0fe9a14353a28c5eeaed0245989a7815f",
+          "code_length": 23,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addPart",
+          "descriptor": "(Ljavax/mail/internet/MimeMultipart;I)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "19d8f4f9ad06856ea4776e9ee6bea5d7ef97ebca9de682888dc606ad0d61b5a7",
+          "code_length": 36,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "b881a31d1e139d7da6d759646f76df4a8d0bb1d447281e74a059ddc7fa80fd4f",
+          "code_length": 39
+        },
+        {
+          "name": "setMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "1116d3d893bedfdc8b30eb31676e33246ef013654e920103808925bf60553b42",
+          "code_length": 76,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "buildMimeMessage",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1af24b054a9480b55a8552b5d9fad8c4dd361286cb9fcdba109fa6a1f2aea438",
+          "code_length": 57,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Ljava/io/File;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "1f6ce9d12af6b024d871af685bf82b9aea7aa74978f30549b63df75bd9663892",
+          "code_length": 100,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Lorg/apache/commons/mail/EmailAttachment;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "b5635275d1bca729dfcd389b228379c5403d033f148d84f75e3568cffce92372",
+          "code_length": 175,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "3afb1ff9415a00b49588e25dbd20df15c144eb04c647799c7230308097978f2e",
+          "code_length": 10,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "cb7cbf196ca13d82e7f9f277ef6bc6b622315c4e6945204809fdbbf3159e6bc7",
+          "code_length": 62,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Ljavax/activation/DataSource;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "5d2d3372b3b894217cfa13a1248ce4cfd8d981762fbc2f2020e787c25230009c",
+          "code_length": 68,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Ljavax/activation/DataSource;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/MultiPartEmail;",
+          "access": 1,
+          "code_sha256": "76b300333c1c9e840c24244ec5e6b80d02226ccc5980e59ad177f5ee4cd53b44",
+          "code_length": 98,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "getPrimaryBodyPart",
+          "descriptor": "()Ljavax/mail/BodyPart;",
+          "access": 4,
+          "code_sha256": "171611278146bf7ad5476df13bb30daddaca251fc60be70024a00089f18acefb",
+          "code_length": 43,
+          "throws": [
+            "javax/mail/MessagingException"
+          ]
+        },
+        {
+          "name": "getContainer",
+          "descriptor": "()Ljavax/mail/internet/MimeMultipart;",
+          "access": 4,
+          "code_sha256": "e57c2cd7a92fda530a50b8537546aec7a49846e7318b5ec350a3489d4484414f",
+          "code_length": 16
+        },
+        {
+          "name": "createBodyPart",
+          "descriptor": "()Ljavax/mail/BodyPart;",
+          "access": 4,
+          "code_sha256": "8cf12da52130e5f2cd87681182614eae936843fc16b23e2faf6bc7ebcaf65f93",
+          "code_length": 8
+        },
+        {
+          "name": "createMimeMultipart",
+          "descriptor": "()Ljavax/mail/internet/MimeMultipart;",
+          "access": 4,
+          "code_sha256": "e239cf98793637d1d4cd3f0c6b08704d8c8ebeabcad801cc8aa73728af0fd301",
+          "code_length": 8
+        },
+        {
+          "name": "isBoolHasAttachments",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "61968724d443eb74020a3786ea9fe96d9f4de72bd39c459cf9a9ee61a6f5f831",
+          "code_length": 5
+        },
+        {
+          "name": "setBoolHasAttachments",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "43b15d02a1951eada9b72f737996685d78586c1f21cbdc12515301344051f6cf",
+          "code_length": 6
+        },
+        {
+          "name": "isInitialized",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "2ad01858457e03a189abd6a15f4e3cd0779d9c0d9e5c686467387584975d81bb",
+          "code_length": 5
+        },
+        {
+          "name": "setInitialized",
+          "descriptor": "(Z)V",
+          "access": 4,
+          "code_sha256": "6cf6350477271f094d2f11b98e9e7873952cf51889d0d5626f0fc06d66ce08c1",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/IllegalStateException",
+        "java/lang/StringBuilder",
+        "java/net/URL",
+        "javax/activation/DataHandler",
+        "javax/activation/DataSource",
+        "javax/activation/FileDataSource",
+        "javax/activation/URLDataSource",
+        "javax/mail/BodyPart",
+        "javax/mail/MessagingException",
+        "javax/mail/internet/MimeBodyPart",
+        "javax/mail/internet/MimeMultipart",
+        "javax/mail/internet/MimePart",
+        "javax/mail/internet/MimeUtility",
+        "org/apache/commons/mail/Email",
+        "org/apache/commons/mail/EmailAttachment",
+        "org/apache/commons/mail/EmailException",
+        "org/apache/commons/mail/EmailUtils",
+        "org/apache/commons/mail/MultiPartEmail"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/DataSourceResolver.class",
+      "occurrence": 0,
+      "sha256": "b02e08c3331ce8ddc70b1da6808d28aaa0602532c7dee04c674031a9a27e4b4a",
+      "name": "org/apache/commons/mail/DataSourceResolver",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataSource;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "resolve",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/activation/DataSource;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "org/apache/commons/mail/DataSourceResolver"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/Email.class",
+      "occurrence": 0,
+      "sha256": "ad0eefc9c5def018687d4fc34af934a9f95521487da5dc0b338999c3dee3834e",
+      "name": "org/apache/commons/mail/Email",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SENDER_EMAIL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SENDER_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECEIVER_EMAIL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECEIVER_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EMAIL_SUBJECT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EMAIL_BODY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CONTENT_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ATTACHMENTS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FILE_SERVER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KOI8_R",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ISO_8859_1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "US_ASCII",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_DEBUG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_HOST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_PORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_FROM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_AUTH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_USER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_PASSWORD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_PROTOCOL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SMTP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEXT_HTML",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEXT_PLAIN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_TLS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_FALLBACK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_CLASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_PORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_CONNECTIONTIMEOUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_TIMEOUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "message",
+          "descriptor": "Ljavax/mail/internet/MimeMessage;",
+          "access": 4
+        },
+        {
+          "name": "charset",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "fromAddress",
+          "descriptor": "Ljavax/mail/internet/InternetAddress;",
+          "access": 4
+        },
+        {
+          "name": "subject",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "emailBody",
+          "descriptor": "Ljavax/mail/internet/MimeMultipart;",
+          "access": 4
+        },
+        {
+          "name": "content",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4
+        },
+        {
+          "name": "contentType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "debug",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "sentDate",
+          "descriptor": "Ljava/util/Date;",
+          "access": 4
+        },
+        {
+          "name": "authenticator",
+          "descriptor": "Ljavax/mail/Authenticator;",
+          "access": 4
+        },
+        {
+          "name": "hostName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "smtpPort",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "sslSmtpPort",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "toList",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "ccList",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "bccList",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "replyList",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "bounceAddress",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "headers",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "popBeforeSmtp",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "popHost",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "popUsername",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "popPassword",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "tls",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "ssl",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "socketTimeout",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "socketConnectionTimeout",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "startTlsEnabled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "startTlsRequired",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "sslOnConnect",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "sslCheckServerIdentity",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "sendPartial",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "session",
+          "descriptor": "Ljavax/mail/Session;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b00db325297a1067a7cd5213f06194f6c6e0384dcffdd650d0a0405bc83e9b9",
+          "code_length": 84
+        },
+        {
+          "name": "setDebug",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "0220ffd8cf41e8551e4050036b15f0adcd67e1d6cca105ce10802918a4831ecb",
+          "code_length": 6
+        },
+        {
+          "name": "setAuthentication",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "936ef092a79f902c760fd17478aeb05a3a684a8367006edb02f58d34919b8b1e",
+          "code_length": 14
+        },
+        {
+          "name": "setAuthenticator",
+          "descriptor": "(Ljavax/mail/Authenticator;)V",
+          "access": 1,
+          "code_sha256": "e7bd3d7dcc637464b3ee1cb064132ca5b3eca7c3bb17297d49f24a681141aae8",
+          "code_length": 6
+        },
+        {
+          "name": "setCharset",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "52797590a88198a0820676c04f1beb05d14a0d0456713fd54a1851ca2e719eda",
+          "code_length": 14
+        },
+        {
+          "name": "setContent",
+          "descriptor": "(Ljavax/mail/internet/MimeMultipart;)V",
+          "access": 1,
+          "code_sha256": "4ddcc71bcf70411f23b2045108358a74752b442a262efc232b1d8ec09adc9bd9",
+          "code_length": 6
+        },
+        {
+          "name": "setContent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "6557ecb1b05fb3ec0f0aa8b585cbe4b769e69806c2e98ddab9b62cf8e1c80f2b",
+          "code_length": 11
+        },
+        {
+          "name": "updateContentType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b8cb8f8292ce9ac9571fec445d9dac55b725bac1a78e1cfdf465dfed2990e0a6",
+          "code_length": 153
+        },
+        {
+          "name": "setHostName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "387a25d60ae2245ce3c743d35a646890872492ea5929387f7ec828e1c81e1c16",
+          "code_length": 10
+        },
+        {
+          "name": "setTLS",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "b525a47afd5cc8c44c9340e0e1a16f4891e345ee4106738153cd33bff9164710",
+          "code_length": 7
+        },
+        {
+          "name": "setStartTLSEnabled",
+          "descriptor": "(Z)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "7f21b02ea11f4ae705718f79944227435991ea288c0c8d7a7490a627b0e3c47a",
+          "code_length": 16
+        },
+        {
+          "name": "setStartTLSRequired",
+          "descriptor": "(Z)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "17279c8d12d4dba76150545f16e42f7432f65b86aa9d7645354167cc73426be6",
+          "code_length": 11
+        },
+        {
+          "name": "setSmtpPort",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d293f08f8fa1f6c268783704929c66b0f9a082f58616929ef1dc9f10bf344a9a",
+          "code_length": 50
+        },
+        {
+          "name": "setMailSession",
+          "descriptor": "(Ljavax/mail/Session;)V",
+          "access": 1,
+          "code_sha256": "8c49cb696cc108602fffa76e3c670c35c6ebbd5094123cbb0231a651e571f99d",
+          "code_length": 103
+        },
+        {
+          "name": "setMailSessionFromJNDI",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "57532399d681158eb1667bd6a73ba0d9467599d0386263a6a3b2d015d74d1859",
+          "code_length": 70,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "getMailSession",
+          "descriptor": "()Ljavax/mail/Session;",
+          "access": 1,
+          "code_sha256": "b2c745b39af1910f025fcc7fac48a8c45db1e551f07f3082fc3c33ce1a45f3d2",
+          "code_length": 357,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setFrom",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "c1947f6b9cc828e22767e04375e5635e08b8efeb5cfc0765c565d9f48dcbd0f1",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setFrom",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "00a2f2de389aa677d2b2c33968ce81485b595f63c44c612cd21814e5884054cc",
+          "code_length": 11,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setFrom",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "5f88bed26aa7e97ae1859cf5126867be740ed7f51a9efda8cf4681e445cad4a0",
+          "code_length": 13,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addTo",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "4ad03fc541d0c40c60a11e99d9ef733bd5b54fa6d0edcdfb99ab2c855bc5ba65",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addTo",
+          "descriptor": "([Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 129,
+          "code_sha256": "3d07e0e6c35503038fec962cd014e7c937899173e4523d679eeee39b2c455c04",
+          "code_length": 55,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addTo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "eff38a97293a324fca961808f330d4358d7e6b4dedf69b9ea077fa9c4bea895d",
+          "code_length": 11,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addTo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "78760ec7d108bb6530946b77d06563362432bc52f4b1717a0649358ee7d8e278",
+          "code_length": 19,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setTo",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "bb94b77865687c4cdf252e6c52c27909c20addc5c02e9cca937d77afa8bd24f5",
+          "code_length": 37,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Ljavax/mail/internet/InternetAddress;>;)Lorg/apache/commons/mail/Email;"
+        },
+        {
+          "name": "addCc",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "af233f1e1711ebb41b720dc2211ecb787b5a9d52073ed4382f0cea018f204833",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addCc",
+          "descriptor": "([Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 129,
+          "code_sha256": "b3288a6ddaec36b119f0383bebbb504a7aa82c66250385c087df1906061322c3",
+          "code_length": 55,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addCc",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "444fe00ce0fcdc16f8ddc6138ecd45b31d017d0bbe46e884c5f9d4e4b1f6c6aa",
+          "code_length": 11,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addCc",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "1aab3e85fe332a3f4542501d13e14a3d762c77194b7c77c604a3d738793ec1f1",
+          "code_length": 19,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setCc",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "9ca362f4f11491838854f5f3181cc14e19728fa9577598755fb52b1fedfcd2ee",
+          "code_length": 37,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Ljavax/mail/internet/InternetAddress;>;)Lorg/apache/commons/mail/Email;"
+        },
+        {
+          "name": "addBcc",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "ca8e6f1964182edf1b9b2d87c8eafd25dc8a7da5ecd3a2d16c738ed9c152d89a",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addBcc",
+          "descriptor": "([Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 129,
+          "code_sha256": "ee50359f2a93c8ec394808f9a25012f78a2e58bc29d76454150fc3730ae5b4f6",
+          "code_length": 55,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addBcc",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "b29b43ebbf731c36288b4f5599817d8101831090937805e492f81cf60c6197bb",
+          "code_length": 11,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addBcc",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "515f6ab0e19eaa82d5355f9a70cb738bb0f6089de3e44de9bce2c640bb57cff5",
+          "code_length": 19,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setBcc",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "e37f7221c457bd5502f1bfe2b88f9bc2c95baabeb90383dcd2611b646dde5314",
+          "code_length": 37,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Ljavax/mail/internet/InternetAddress;>;)Lorg/apache/commons/mail/Email;"
+        },
+        {
+          "name": "addReplyTo",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "3e62c6970aeffd550dc2732c7f7a60161f9475b9ca7f84af7fe5361cfc4f3356",
+          "code_length": 7,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addReplyTo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "46c5202f08192968389c11c9a0b8312d3a4e84f8e67d8879feb3df7bdf047b1e",
+          "code_length": 11,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "addReplyTo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "47b2bf8bc4579524af0e5037b28b74e1557c5ec7fd91f93c549ba7fc141e3084",
+          "code_length": 19,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setReplyTo",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "5e603830c93183b1f3e22ad95d9f19a91a342e52d4d003e25c481220b0bd84c8",
+          "code_length": 37,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ],
+          "generic_signature": "(Ljava/util/Collection<Ljavax/mail/internet/InternetAddress;>;)Lorg/apache/commons/mail/Email;"
+        },
+        {
+          "name": "setHeaders",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "c4142dec0dfb40aba23404b0256960aed7308281e7b8dc463e7e3ac1e1fbad74",
+          "code_length": 66,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "addHeader",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a9105da7bed1088895e749b7f504fcdcf3ea32a2a13463c12287da8f6ff52daa",
+          "code_length": 47
+        },
+        {
+          "name": "setSubject",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "d50c33fe08e0e9989555dd9f4e544933900ee16fdc1f9bd5b62e1d18e451d4c3",
+          "code_length": 7
+        },
+        {
+          "name": "getBounceAddress",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e3deda5cef25a6112ff77d92d10cc8a9ae177ba0bb4873d79e856a856d7aa07f",
+          "code_length": 5
+        },
+        {
+          "name": "setBounceAddress",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "f377bf4f3227f9158a1695b2980a7648e5e6369887bed9a16d7ffa5f9ff779cf",
+          "code_length": 11
+        },
+        {
+          "name": "setMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1025,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "buildMimeMessage",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70474b85cd171fd587ae750e6733140c215a7e22025af94618dccbfe3cf404d0",
+          "code_length": 577,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "sendMimeMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "238a6905cea7b8c21126744ff104b280ffd4a77d12c1a81b89fbb0bf0636a00b",
+          "code_length": 70,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "getMimeMessage",
+          "descriptor": "()Ljavax/mail/internet/MimeMessage;",
+          "access": 1,
+          "code_sha256": "deb414685267a14982d24df340683858798c00e7e5de82493f8cc2cb825a1683",
+          "code_length": 5
+        },
+        {
+          "name": "send",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d2d2723d8410e45be74ca22fb4c9123a429a70c08c591a224dd72627c2ecb468",
+          "code_length": 9,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setSentDate",
+          "descriptor": "(Ljava/util/Date;)V",
+          "access": 1,
+          "code_sha256": "81b34c7a32904c3ca95a0e25efd89e6e4ca2a0ca4fddb38dfdc2f09ad0297fd5",
+          "code_length": 20
+        },
+        {
+          "name": "getSentDate",
+          "descriptor": "()Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "dc2aa116a7a9b52096a09ecdd90d2cc562aa9305f663a9dc9dd315d7d73ce1e0",
+          "code_length": 30
+        },
+        {
+          "name": "getSubject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2f269f55f804247fc945f2047f59a423e862583d273fa977cabc949fcf62ff2e",
+          "code_length": 5
+        },
+        {
+          "name": "getFromAddress",
+          "descriptor": "()Ljavax/mail/internet/InternetAddress;",
+          "access": 1,
+          "code_sha256": "f056842a1f1c5254aa7bd72c082911ddebd5dcc2e03498f9d05099f89f9ac250",
+          "code_length": 5
+        },
+        {
+          "name": "getHostName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a13cc8aaf8bcdb48f793ab65f652bff3d29a3337bc80d6e8748b8db582488d7c",
+          "code_length": 34
+        },
+        {
+          "name": "getSmtpPort",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "138090d5a3f2cb66bcf6971106b1e68750919b98cc5574c9752f46eef3626471",
+          "code_length": 34
+        },
+        {
+          "name": "isStartTLSRequired",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "730827424807d5ede8363bd8570adc430da69217fdb960f555254bb1629468af",
+          "code_length": 5
+        },
+        {
+          "name": "isStartTLSEnabled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "dc3d02e4d8b324118158497bb275b70f8905d11e19493fbaac44ce1d20b0a699",
+          "code_length": 20
+        },
+        {
+          "name": "isTLS",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "30b444520de64b7ffb8f1248ac27e68f38ff04ed7cf4e9889bdf3f07f9b0cfe4",
+          "code_length": 5
+        },
+        {
+          "name": "toInternetAddressArray",
+          "descriptor": "(Ljava/util/List;)[Ljavax/mail/internet/InternetAddress;",
+          "access": 4,
+          "code_sha256": "16eb5423a2fe230c04182115c12eae1f5e99b89ee603d7603b2dc75573be9477",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;)[Ljavax/mail/internet/InternetAddress;"
+        },
+        {
+          "name": "setPopBeforeSmtp",
+          "descriptor": "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "487042a10b58e2839ad9163b6b21aa45acb85cf976a7643713541cac0227dd09",
+          "code_length": 22
+        },
+        {
+          "name": "isSSL",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e680c4beb82ea9510649bba163185a881c884b7a01633221c33e358ee49febd3",
+          "code_length": 5
+        },
+        {
+          "name": "isSSLOnConnect",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c1367bfe0746e863f9c55b80cb2ceaf16cfc49cc0b5ab5add0372fdb1a4b8f02",
+          "code_length": 20
+        },
+        {
+          "name": "setSSL",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c1a73accfef074b25f30a1419726e09175fd7ec04126d01674807be256fa05ff",
+          "code_length": 7
+        },
+        {
+          "name": "setSSLOnConnect",
+          "descriptor": "(Z)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "140d1f6db897d8f1a093cadf7a65e1be729bd8ef856eba250bb3658b3ac4067b",
+          "code_length": 16
+        },
+        {
+          "name": "isSSLCheckServerIdentity",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d15b4c79e898e16c122803128443e6c1c5195afcbf1e8d20f6dd6245e92a1a80",
+          "code_length": 5
+        },
+        {
+          "name": "setSSLCheckServerIdentity",
+          "descriptor": "(Z)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "ccd7ea914d6a9da2151d6a2c2a0559c0565d1f829145c2dfb9e04af599baddb5",
+          "code_length": 11
+        },
+        {
+          "name": "getSslSmtpPort",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b46af514c30eacae1d673bda33a90ff45cd9d494fc8a754ad1f56767ab423503",
+          "code_length": 34
+        },
+        {
+          "name": "setSslSmtpPort",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "98e6a23e70a91a5bb6e10c68ffca75ca1fbc8cf26dba7767d32b8573cd75aa9b",
+          "code_length": 10
+        },
+        {
+          "name": "isSendPartial",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "081699723889a7ec864fb2ea33e38a8fbd684bf2b517411a30b0aa08f53439e9",
+          "code_length": 5
+        },
+        {
+          "name": "setSendPartial",
+          "descriptor": "(Z)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "b76736263c856fa13e737e41dbcabe54611fc645af5e23f8a8c120941ba34bee",
+          "code_length": 11
+        },
+        {
+          "name": "getToAddresses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "getCcAddresses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "getBccAddresses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "getReplyToAddresses",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljavax/mail/internet/InternetAddress;>;"
+        },
+        {
+          "name": "getSocketConnectionTimeout",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "86dcc05b641d58d58678ff6c5df64c6848ed07c0959278c629d5fe43f719ccc7",
+          "code_length": 5
+        },
+        {
+          "name": "setSocketConnectionTimeout",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7e394c9a635088e3fa623b5d8af9e0fb8ec9185ae7a0c1dbad137f3f744a7411",
+          "code_length": 10
+        },
+        {
+          "name": "getSocketTimeout",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e88f57acb743f9814252b0b6da76241e43852e726e8114d0947084449c5d49e9",
+          "code_length": 5
+        },
+        {
+          "name": "setSocketTimeout",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "ecf24598b91cb0cd0d54639dde2c1459f244cd3732da3a24eb3bab9689fbcfc9",
+          "code_length": 10
+        },
+        {
+          "name": "createMimeMessage",
+          "descriptor": "(Ljavax/mail/Session;)Ljavax/mail/internet/MimeMessage;",
+          "access": 4,
+          "code_sha256": "0321f76a372bd6546bb9904fc5e9eaf0d1a1579ab49f674d48eaf24e7b3b6d5c",
+          "code_length": 9
+        },
+        {
+          "name": "createFoldedHeaderValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "16824417efed46b914a2fae95c1faaa1c5ff5b826be5f6a895f455ce5e76520c",
+          "code_length": 75
+        },
+        {
+          "name": "createInternetAddress",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/mail/internet/InternetAddress;",
+          "access": 2,
+          "code_sha256": "152c08c1b15a2827bc634f5a0e5de5f55812c29c36aab86c7ef19bfd563fdf74",
+          "code_length": 88,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "checkSessionAlreadyInitialized",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "439aa94c06fd7cff2c843c3d87a329628440e662735192764c33964dec832121",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "[Ljavax/mail/internet/InternetAddress;",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/nio/charset/Charset",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Date",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Properties",
+        "java/util/Set",
+        "javax/mail/Message",
+        "javax/mail/Message$RecipientType",
+        "javax/mail/MessagingException",
+        "javax/mail/Session",
+        "javax/mail/Store",
+        "javax/mail/Transport",
+        "javax/mail/internet/AddressException",
+        "javax/mail/internet/InternetAddress",
+        "javax/mail/internet/MimeMessage",
+        "javax/mail/internet/MimeUtility",
+        "javax/naming/Context",
+        "javax/naming/InitialContext",
+        "javax/naming/NamingException",
+        "org/apache/commons/mail/DefaultAuthenticator",
+        "org/apache/commons/mail/Email",
+        "org/apache/commons/mail/EmailException",
+        "org/apache/commons/mail/EmailUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailUtils.class",
+      "occurrence": 0,
+      "sha256": "0ec63f57b86afaa700462549c6ef4c73a1a20db2f5eb20400dd1756dc4fef26e",
+      "name": "org/apache/commons/mail/EmailUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RANDOM",
+          "descriptor": "Ljava/util/Random;",
+          "access": 26
+        },
+        {
+          "name": "US_ASCII",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "RADIX",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ESCAPE_CHAR",
+          "descriptor": "C",
+          "access": 26
+        },
+        {
+          "name": "SAFE_URL",
+          "descriptor": "Ljava/util/BitSet;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 8,
+          "code_sha256": "3af24322d55f5dc9bd774f967549c5aec49e63cd3c026d981c48b4ac4a4e90ea",
+          "code_length": 17
+        },
+        {
+          "name": "isNotEmpty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 8,
+          "code_sha256": "349312efce7de68012348fc17c5d7a9f932fc8b82728d2666b1d7e2b75aaa295",
+          "code_length": 17
+        },
+        {
+          "name": "notNull",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)V",
+          "access": 8,
+          "code_sha256": "1224fbf5502713d6a111ac23cc8b4175e1c4f2781f49d0a4a47dc0734ff94da6",
+          "code_length": 14
+        },
+        {
+          "name": "randomAlphabetic",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "7c802a63e4ed65a8e4f9e1d272134d2246c5521395d416a68fc2f99695972aaa",
+          "code_length": 13
+        },
+        {
+          "name": "random",
+          "descriptor": "(IIIZZ[CLjava/util/Random;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "40a1ac6319bcd203ced0c1a5da7e37a583eb90d22df142b024e29d76cac0b3ae",
+          "code_length": 200
+        },
+        {
+          "name": "encodeUrl",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "93dcb528504f6eb8c928ceaab92cc044bb9b24b97372eae757048027f5b8c2bb",
+          "code_length": 142,
+          "throws": [
+            "java/io/UnsupportedEncodingException"
+          ]
+        },
+        {
+          "name": "writeMimeMessage",
+          "descriptor": "(Ljava/io/File;Ljavax/mail/internet/MimeMessage;)V",
+          "access": 8,
+          "code_sha256": "8d30a723979c2b18496c2e0b6325de8a038175eda533d60e427171e533eca336",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "javax/mail/MessagingException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a51ca533f5cdb34997d58bdc7c452ba3ff0969efb60e9a8effcf9b16068a2a64",
+          "code_length": 186
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Character",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/util/BitSet",
+        "java/util/Random",
+        "javax/mail/MessagingException",
+        "org/apache/commons/mail/EmailUtils",
+        "org/apache/commons/mail/util/MimeMessageUtils"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/ImageHtmlEmail.class",
+      "occurrence": 0,
+      "sha256": "3eab6b35740fbf711e91a0637d6d4fe09c90878167b82b4feac07284377b5740",
+      "name": "org/apache/commons/mail/ImageHtmlEmail",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/HtmlEmail",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "REGEX_IMG_SRC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "REGEX_SCRIPT_SRC",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "IMG_PATTERN",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 26
+        },
+        {
+          "name": "SCRIPT_PATTERN",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 26
+        },
+        {
+          "name": "dataSourceResolver",
+          "descriptor": "Lorg/apache/commons/mail/DataSourceResolver;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDataSourceResolver",
+          "descriptor": "()Lorg/apache/commons/mail/DataSourceResolver;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setDataSourceResolver",
+          "descriptor": "(Lorg/apache/commons/mail/DataSourceResolver;)V",
+          "access": 1,
+          "code_sha256": "52860e6fc7f9e5b84669354a8a23b2606c35569844d5e6f8dba8cb07e8b22955",
+          "code_length": 6
+        },
+        {
+          "name": "buildMimeMessage",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e16e9d3bad83a6f3a052ae13f0eac8579ce9eb534e665a96ce497da7aec7f752",
+          "code_length": 47,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "replacePattern",
+          "descriptor": "(Ljava/lang/String;Ljava/util/regex/Pattern;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "53e5e96c951e13674051de93f352148772ac288dd4aa26a821151f266b859107",
+          "code_length": 249,
+          "throws": [
+            "org/apache/commons/mail/EmailException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b4ed73e11a3106942f378ae59da5abfeccd37d84e5c1a43f6e898ba542631a73",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "javax/activation/DataSource",
+        "org/apache/commons/mail/DataSourceResolver",
+        "org/apache/commons/mail/EmailException",
+        "org/apache/commons/mail/EmailUtils",
+        "org/apache/commons/mail/HtmlEmail",
+        "org/apache/commons/mail/ImageHtmlEmail"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailConstants.class",
+      "occurrence": 0,
+      "sha256": "9ec09311aba9b7d73ecf06decdb66af4235d41e823039fb34c6c805969a3e4ad",
+      "name": "org/apache/commons/mail/EmailConstants",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SENDER_EMAIL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SENDER_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECEIVER_EMAIL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "RECEIVER_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EMAIL_SUBJECT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "EMAIL_BODY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CONTENT_TYPE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ATTACHMENTS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "FILE_SERVER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "KOI8_R",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "ISO_8859_1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "US_ASCII",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "UTF_8",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_DEBUG",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_HOST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_PORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_FROM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_AUTH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_USER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_PASSWORD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_PROTOCOL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SMTP",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEXT_HTML",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEXT_SUBTYPE_HTML",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEXT_PLAIN",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_TLS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_STARTTLS_ENABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_FALLBACK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_CLASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SOCKET_FACTORY_PORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_CONNECTIONTIMEOUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_TIMEOUT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "SOCKET_TIMEOUT_MS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAIL_TRANSPORT_STARTTLS_REQUIRED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SSL_ENABLE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SSL_CHECKSERVERIDENTITY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SSL_SOCKET_FACTORY_CLASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SSL_SOCKET_FACTORY_PORT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTP_SEND_PARTIAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_SMTPS_SEND_PARTIAL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_MIME_CHARSET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MAIL_FROM",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/mail/EmailConstants"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailException.class",
+      "occurrence": 0,
+      "sha256": "38755283cc9b4d5637cf1bc6b52c7543aa4b87f77c34cfd181401a27905d33b1",
+      "name": "org/apache/commons/mail/EmailException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c7021e2ca5dee0584483fa6381b595bf98a0a6e5ad7f0ec86e051dbe7c77a1c3",
+          "code_length": 7
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9ae637f9f7f7d578d08e519e1c37b7423da89af8943cb432ab4d9dbd1e05f163",
+          "code_length": 8
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintStream;)V",
+          "access": 1,
+          "code_sha256": "e57b95fd7b210a06d07b56c0616631f7f81cd576ce5e3691a5abb0b421c7bead",
+          "code_length": 36
+        },
+        {
+          "name": "printStackTrace",
+          "descriptor": "(Ljava/io/PrintWriter;)V",
+          "access": 1,
+          "code_sha256": "82e2b63245bdab5bd2e1a5d7077723d28f3b3e8d504f38cc100eaaf2a0659239",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/io/PrintWriter",
+        "java/lang/Exception",
+        "java/lang/System",
+        "org/apache/commons/mail/EmailException"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/EmailAttachment.class",
+      "occurrence": 0,
+      "sha256": "143404d1fe06814456a054390559771d5ea53af5601e9f31d9c76c3181e087f3",
+      "name": "org/apache/commons/mail/EmailAttachment",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ATTACHMENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INLINE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "path",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "url",
+          "descriptor": "Ljava/net/URL;",
+          "access": 2
+        },
+        {
+          "name": "disposition",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f6238b8967c0711976e7bdb830cf83e7259a5db1245c88f5ab7faa5d4a6c3bd9",
+          "code_length": 29
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getURL",
+          "descriptor": "()Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getDisposition",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "setDescription",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        },
+        {
+          "name": "setPath",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "935836f6468fbbdce3aa550163b41db4acc66eaba962e885841470780dddd4d2",
+          "code_length": 6
+        },
+        {
+          "name": "setURL",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 1,
+          "code_sha256": "3187f710dcb01652de862560cc7782b805f200c9af0d7b1df750b2924081e43c",
+          "code_length": 6
+        },
+        {
+          "name": "setDisposition",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/mail/EmailAttachment"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/HtmlEmail$InlineImage.class",
+      "occurrence": 0,
+      "sha256": "0b62d146727e116052dccb13a594e12ea3905339daa8ccef12684ae3026b7659",
+      "name": "org/apache/commons/mail/HtmlEmail$InlineImage",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cid",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "dataSource",
+          "descriptor": "Ljavax/activation/DataSource;",
+          "access": 18
+        },
+        {
+          "name": "mbp",
+          "descriptor": "Ljavax/mail/internet/MimeBodyPart;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataSource;Ljavax/mail/internet/MimeBodyPart;)V",
+          "access": 1,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20
+        },
+        {
+          "name": "getCid",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getDataSource",
+          "descriptor": "()Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getMbp",
+          "descriptor": "()Ljavax/mail/internet/MimeBodyPart;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ba85d32382e75bc44649443ca72edc24c387d9a540b415cd9e4a85dcc70f2743",
+          "code_length": 33
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4819026adda1454a683b5867c6aa3b60d55d0afc3774ab48df7cc05986cdc457",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/commons/mail/HtmlEmail",
+        "org/apache/commons/mail/HtmlEmail$InlineImage"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/mail/HtmlEmail.class",
+      "occurrence": 0,
+      "sha256": "5d95869f44549cdfc160577667a118c93b93e686d12f084cc5cf70324778b105",
+      "name": "org/apache/commons/mail/HtmlEmail",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/mail/MultiPartEmail",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CID_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HTML_MESSAGE_START",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "HTML_MESSAGE_END",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "text",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "html",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "inlineImages",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<Lorg/apache/commons/mail/HtmlEmail$InlineImage;>;"
+        },
+        {
+          "name": "inlineEmbeds",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/apache/commons/mail/HtmlEmail$InlineImage;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "setTextMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/HtmlEmail;",
+          "access": 1,
+          "code_sha256": "0283d06ce93a3c21e88a84451ba7ca231d2f66bedb57a620ee195d7a468791d2",
+          "code_length": 24,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setHtmlMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/HtmlEmail;",
+          "access": 1,
+          "code_sha256": "b35937356c5106fad24b48c979d846d455a54cfde5d7762885d435a9460a2b75",
+          "code_length": 24,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "setMsg",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/mail/Email;",
+          "access": 1,
+          "code_sha256": "38e4cfc34b58658a6fedb0e2e1967bdd69ec2717e1002422a753d65baca458ac",
+          "code_length": 74,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "32845f91f24ef675d38db289a23b9dcb102cc8ae12c9fd61394eda44914bcbdb",
+          "code_length": 26,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljava/net/URL;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b40b4cd6940b894ffd8c0e94943e850375dfdf295f6856f8dcaffc5025da023d",
+          "code_length": 190,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "806cc079b8231776a7fdd89a1dcb2eaab2d8aa0f5c5085c9774f3ebaf3582454",
+          "code_length": 19,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljava/io/File;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f91f23292a460c56a5221325136bd8a7ff4aefa4681188be7fc8180a96eff1d0",
+          "code_length": 362,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljavax/activation/DataSource;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79ed822588f42eeefa529af55e8d4ea567ef406027fe8f3358965f07c14b8277",
+          "code_length": 107,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "embed",
+          "descriptor": "(Ljavax/activation/DataSource;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "48fdc559fc4e9379351a74f3dd4d0c17ff079205173ed85263c4facaff5d9aa9",
+          "code_length": 142,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "buildMimeMessage",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ce67fd7207aecf2c62dab355ec0da69c2b475418cfa560621a560d37406448ff",
+          "code_length": 22,
+          "throws": [
+            "org/apache/commons/mail/EmailException"
+          ]
+        },
+        {
+          "name": "build",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aedbeacd9430406ae4e5458b17d538e9aeff6dec2ce3e4b6f31d204a01b31cc5",
+          "code_length": 392,
+          "throws": [
+            "javax/mail/MessagingException",
+            "org/apache/commons/mail/EmailException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/net/MalformedURLException",
+        "java/net/URL",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Locale",
+        "java/util/Map",
+        "javax/activation/DataHandler",
+        "javax/activation/FileDataSource",
+        "javax/activation/URLDataSource",
+        "javax/mail/BodyPart",
+        "javax/mail/MessagingException",
+        "javax/mail/internet/MimeBodyPart",
+        "javax/mail/internet/MimeMultipart",
+        "org/apache/commons/mail/EmailException",
+        "org/apache/commons/mail/EmailUtils",
+        "org/apache/commons/mail/HtmlEmail",
+        "org/apache/commons/mail/HtmlEmail$InlineImage",
+        "org/apache/commons/mail/MultiPartEmail"
+      ]
+    }
+  ]
+}

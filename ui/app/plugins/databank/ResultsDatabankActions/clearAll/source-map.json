@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsDatabankActions/clearAll bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/clearAll",
-  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
     "version": 1
   },
   "owner": {
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll",
       "id": "sqx-resultsdatabankactions-clearall-ui",
       "family": "bounded installed core action artifacts"
     }
@@ -35,16 +35,21 @@
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-clearall-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural inventory and scoped responsibility inspection",
-      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored existing frontend counterpart",
       "access_date": "2026-10-06",
-      "sha256": "25c858aa6868b38080ea4eeef3b0594db066b01da990ac35e47a8cb24c274781",
+      "sha256": "a4c6de075042db19a79a349cbbf57f260c3a6d2ad46d5d550a71050d37f1d366",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Independent extraction of existing frontend responsibility; no donor source copied"
+      "limitation": "Independent extraction of existing frontend responsibility; no donor source copied Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -52,5 +57,10 @@
       "path": "source-map.json",
       "reason": "Bounded structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

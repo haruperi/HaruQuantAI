@@ -1,0 +1,2492 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/svg-salamander-1.0.jar",
+  "archive_sha256": "c1ca16f6d892b6267b0b7cd9b8bac0ac6b3c71e99415ab6688bb354ca1c7f7b9",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/kitfox/svg/composite/AdobeCompositeContext.class",
+      "occurrence": 0,
+      "sha256": "2f664906896e391ffd0c4eebee7816a3694e3df767a38ddf674ab386e3deb244",
+      "name": "com/kitfox/svg/composite/AdobeCompositeContext",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/CompositeContext"
+      ],
+      "fields": [
+        {
+          "name": "compositeType",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "extraAlpha",
+          "descriptor": "F",
+          "access": 16
+        },
+        {
+          "name": "rgba_src",
+          "descriptor": "[F",
+          "access": 0
+        },
+        {
+          "name": "rgba_dstIn",
+          "descriptor": "[F",
+          "access": 0
+        },
+        {
+          "name": "rgba_dstOut",
+          "descriptor": "[F",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IF)V",
+          "access": 1,
+          "code_sha256": "bcc0bc21d7519764bf463f16d1fc77306c65cae784c6c77e6386a5f86b321675",
+          "code_length": 43
+        },
+        {
+          "name": "compose",
+          "descriptor": "(Ljava/awt/image/Raster;Ljava/awt/image/Raster;Ljava/awt/image/WritableRaster;)V",
+          "access": 1,
+          "code_sha256": "07bf281f584b847534d94a6310f4cf91c8ddf6cd06c9f40d8d04623b5ec79999",
+          "code_length": 311
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/composite/AdobeCompositeContext",
+        "java/awt/CompositeContext",
+        "java/awt/image/Raster",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/package-info.class",
+      "occurrence": 0,
+      "sha256": "321d9c398774a1b578af552809637444a4e14319b776829530b5d694152cd2c5",
+      "name": "com/kitfox/svg/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/kitfox/svg/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Arc.class",
+      "occurrence": 0,
+      "sha256": "79bb1c8611f57ee919e90b62c94f1b3e2670dce86520318a8f7b0cda37540948",
+      "name": "com/kitfox/svg/pathcmd/Arc",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rx",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "ry",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "xAxisRot",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "largeArc",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "sweep",
+          "descriptor": "Z",
+          "access": 1
+        },
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a607c00fc3f7311aefe75b84a18ab153437eeffb4e460ed060007207b11b9422",
+          "code_length": 40
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFFFZZFF)V",
+          "access": 1,
+          "code_sha256": "fa63013b281b521d24dd6e06c9f7c89322d26aac76d44534d1fafa847c4ad25f",
+          "code_length": 81
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "f0ef6a477842d4941c5c0122848dd34fd836870e082a31e0e400e3fc4afbcb1e",
+          "code_length": 117
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        },
+        {
+          "name": "arcTo",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;FFFZZFFFF)V",
+          "access": 1,
+          "code_sha256": "bd988fcc05186a04b1ae6a172746c51b5de77400506dd19abf8a20fab69d54d6",
+          "code_length": 110
+        },
+        {
+          "name": "computeArc",
+          "descriptor": "(DDDDDZZDD)Ljava/awt/geom/Arc2D;",
+          "access": 9,
+          "code_sha256": "1e60c1fdd9a9593ff25e1fb7babd9c7b9c6fdc26c7e7a14e1904dc5db87660b8",
+          "code_length": 624
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/Arc",
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/AffineTransform",
+        "java/awt/geom/Arc2D",
+        "java/awt/geom/Arc2D$Double",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/BuildHistory.class",
+      "occurrence": 0,
+      "sha256": "9af1ae7e77cd5cf310eff5542801be55b4c01a0a4545f1bea83a0070dd95ce11",
+      "name": "com/kitfox/svg/pathcmd/BuildHistory",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "history",
+          "descriptor": "[Ljava/awt/geom/Point2D$Float;",
+          "access": 0
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4eeebc756ae40126a3076c0a2eab0de9109b23776b5125ed29b8e99cf8f58e9e",
+          "code_length": 38
+        },
+        {
+          "name": "setPoint",
+          "descriptor": "(FF)V",
+          "access": 1,
+          "code_sha256": "c424ef87b204ad2aeddf9e1a4071cf18d670593aa7bafb8f900faa42c3fc3b6b",
+          "code_length": 17
+        },
+        {
+          "name": "setPointAndKnot",
+          "descriptor": "(FFFF)V",
+          "access": 1,
+          "code_sha256": "ba2865253c2b60e6a703071ad90ab2802d26f70e67118c44d36832e22bf8b27c",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Cubic.class",
+      "occurrence": 0,
+      "sha256": "18a1a46350fb10acc3a3d50329130e83f39374b5927e77043ec17f4abd73fdc7",
+      "name": "com/kitfox/svg/pathcmd/Cubic",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "k1x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "k1y",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "k2x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "k2y",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e7ef8b9c6d3266c13110b4b718f3eabe57e094813f85237a155c98a09036b0c6",
+          "code_length": 35
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFFFFFF)V",
+          "access": 1,
+          "code_sha256": "7141e4a9f165bd498d4e92d4d1277ceb3b1d541b7b202c71a606826c7229a8b0",
+          "code_length": 70
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "997a63771514969cb8a500a1a1156e35d6818de758df87e0ff0529ce26629dba",
+          "code_length": 117
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/Cubic",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/CubicSmooth.class",
+      "occurrence": 0,
+      "sha256": "87ec8c11b6ec609f3efff288ac481635749c3e293e77d974d73d71aab3efa5dc",
+      "name": "com/kitfox/svg/pathcmd/CubicSmooth",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "k2x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "k2y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "43f34674b6b6fc52b62524873a4ef25b753ebcd247222ab766d7a204617de6ef",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFFFF)V",
+          "access": 1,
+          "code_sha256": "718abec885b9d79bc99117812166f68578e93caac824e64c587c09cca00a5419",
+          "code_length": 48
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "f16a7434c6ddf1c7ef89c6459845c63c2c85615711ddb1f187b173f478360494",
+          "code_length": 212
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/CubicSmooth",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Horizontal.class",
+      "occurrence": 0,
+      "sha256": "d0c1081d08b094ddb3f647f1736fbb38fa8a26e145b626861c171616df6b12b1",
+      "name": "com/kitfox/svg/pathcmd/Horizontal",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5307b8ce2b0baf614f3eb8def93199c27126f3ca1e2e459cb9ace8485113a5a8",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZF)V",
+          "access": 1,
+          "code_sha256": "da77a7e3cfd1054d71cca757b1eea55d2428817fac0164a2454ad0455d9aa0fd",
+          "code_length": 16
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "4265df8a9559cb237b7dc341b221405ed3514cc711aa359c61d1ab7c09b36102",
+          "code_length": 57
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/Horizontal",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/LineTo.class",
+      "occurrence": 0,
+      "sha256": "6477939881e27398db40dff713e5e3a72c3cf1538c47284206e42e28819ca809",
+      "name": "com/kitfox/svg/pathcmd/LineTo",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e76b04bf0c004d664666627745ff9a4b7e20210eb36e4eb9b02ee076bd25d656",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFF)V",
+          "access": 1,
+          "code_sha256": "c73811069b18d321d5fcf7093198ea24b54ff96a9ee74a18d5e9cd7863a0737a",
+          "code_length": 26
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "ab8aa3750e46d58ce987145fdf0b8301dccfb3d6405b344bb018aa851c03c1ed",
+          "code_length": 78
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/LineTo",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/MoveTo.class",
+      "occurrence": 0,
+      "sha256": "133449ed6a1ab135ea9f1bd18bfad82a3d7f91e27eec82cb0dadf6f732858ec5",
+      "name": "com/kitfox/svg/pathcmd/MoveTo",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e76b04bf0c004d664666627745ff9a4b7e20210eb36e4eb9b02ee076bd25d656",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFF)V",
+          "access": 1,
+          "code_sha256": "c73811069b18d321d5fcf7093198ea24b54ff96a9ee74a18d5e9cd7863a0737a",
+          "code_length": 26
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "ab8aa3750e46d58ce987145fdf0b8301dccfb3d6405b344bb018aa851c03c1ed",
+          "code_length": 78
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/MoveTo",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/PathCommand.class",
+      "occurrence": 0,
+      "sha256": "1be446918a34841e62be07aa62f95aace68d3003224e5dd9af3865519a420f35",
+      "name": "com/kitfox/svg/pathcmd/PathCommand",
+      "major": 48,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "isRelative",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c0fbfaeac3ef56849bd6f93a2738d239c3164d3ee2f22a2d5e922d019907fb8b",
+          "code_length": 15
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1025
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/PathUtil.class",
+      "occurrence": 0,
+      "sha256": "06bd57ff7afcac78eb45cedf0223a4e7410c739942be7ef378c49216275c389c",
+      "name": "com/kitfox/svg/pathcmd/PathUtil",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "buildPathString",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "3c3d9393b6eca28fd5302dafed2c710ad842ecf1acb00088de15ef9bf324a8f7",
+          "code_length": 327
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/PathUtil",
+        "java/awt/geom/AffineTransform",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/PathIterator",
+        "java/lang/Object",
+        "java/lang/StringBuffer"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Quadratic.class",
+      "occurrence": 0,
+      "sha256": "987a8c9bad7f414f489f7f45410b4a8c5aec4d2a6dcd8296dd55680ebb341621",
+      "name": "com/kitfox/svg/pathcmd/Quadratic",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "kx",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "ky",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "43f34674b6b6fc52b62524873a4ef25b753ebcd247222ab766d7a204617de6ef",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFFFF)V",
+          "access": 1,
+          "code_sha256": "86cc4817edb85c8156f9eaa65b0eba4ec67c76fc042cc97f9f2cbe847b288ac1",
+          "code_length": 48
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "4172de86b2080bfa56c91b33a174bb890b86efcd796cf043f38f5fcdf6b30686",
+          "code_length": 104
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "com/kitfox/svg/pathcmd/Quadratic",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/QuadraticSmooth.class",
+      "occurrence": 0,
+      "sha256": "83f9af287b87f309db4e47487e68c1b85710d2052cde25c54934b26214de5c7b",
+      "name": "com/kitfox/svg/pathcmd/QuadraticSmooth",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "x",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e76b04bf0c004d664666627745ff9a4b7e20210eb36e4eb9b02ee076bd25d656",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZFF)V",
+          "access": 1,
+          "code_sha256": "c73811069b18d321d5fcf7093198ea24b54ff96a9ee74a18d5e9cd7863a0737a",
+          "code_length": 26
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "f0f8d75320fa6ae303be296d0a3bdd315272aa3e346fcd487a75562ca32ab1b0",
+          "code_length": 190
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "com/kitfox/svg/pathcmd/QuadraticSmooth",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Terminal.class",
+      "occurrence": 0,
+      "sha256": "10f6ee3a000590f1f90dcecde6701788b65644135c42e1c22994f8e60fa0f92f",
+      "name": "com/kitfox/svg/pathcmd/Terminal",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "f801071dae19a34a5c97224fa7d61e744df8ae8b4007c1e130f2e22dfddb54d6",
+          "code_length": 5
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "com/kitfox/svg/pathcmd/Terminal",
+        "java/awt/geom/GeneralPath"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pathcmd/Vertical.class",
+      "occurrence": 0,
+      "sha256": "f9ded04d786a1ed2f4211f6a31e6bd51a580cbff9c28e881ede1faf4fb4f0cd3",
+      "name": "com/kitfox/svg/pathcmd/Vertical",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/kitfox/svg/pathcmd/PathCommand",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "y",
+          "descriptor": "F",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5307b8ce2b0baf614f3eb8def93199c27126f3ca1e2e459cb9ace8485113a5a8",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZF)V",
+          "access": 1,
+          "code_sha256": "da77a7e3cfd1054d71cca757b1eea55d2428817fac0164a2454ad0455d9aa0fd",
+          "code_length": 16
+        },
+        {
+          "name": "appendPath",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lcom/kitfox/svg/pathcmd/BuildHistory;)V",
+          "access": 1,
+          "code_sha256": "9f55c2ce66237c230850ba39ac39e8bf7bc52dcaeb48a20344b5d90380d73a8f",
+          "code_length": 57
+        },
+        {
+          "name": "getNumKnotsAdded",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pathcmd/BuildHistory",
+        "com/kitfox/svg/pathcmd/PathCommand",
+        "com/kitfox/svg/pathcmd/Vertical",
+        "java/awt/geom/GeneralPath",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pattern/PatternPaint.class",
+      "occurrence": 0,
+      "sha256": "b0f5ac392775da6c83854b40f05d1a81349ff393a82c569b666701da24d875a5",
+      "name": "com/kitfox/svg/pattern/PatternPaint",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/Paint"
+      ],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 0
+        },
+        {
+          "name": "xform",
+          "descriptor": "Ljava/awt/geom/AffineTransform;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/geom/AffineTransform;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/awt/image/ColorModel;Ljava/awt/Rectangle;Ljava/awt/geom/Rectangle2D;Ljava/awt/geom/AffineTransform;Ljava/awt/RenderingHints;)Ljava/awt/PaintContext;",
+          "access": 1,
+          "code_sha256": "e5299f7a1edde960f9d930738d364b66461e5df8a97c847139fc2a9ef36a2b37",
+          "code_length": 19
+        },
+        {
+          "name": "getTransparency",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea63953cbeedd8d738fbae8a7c8ba0b739ad95d364cb03b75ff6b4089f7d86e7",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pattern/PatternPaint",
+        "com/kitfox/svg/pattern/PatternPaintContext",
+        "java/awt/Paint",
+        "java/awt/image/BufferedImage",
+        "java/awt/image/ColorModel",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/pattern/PatternPaintContext.class",
+      "occurrence": 0,
+      "sha256": "2aa8ad8925f318cf87ecd2fd7faf1e37592de04964b848c3cc279eb7c3ae8872",
+      "name": "com/kitfox/svg/pattern/PatternPaintContext",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/PaintContext"
+      ],
+      "fields": [
+        {
+          "name": "source",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 0
+        },
+        {
+          "name": "deviceBounds",
+          "descriptor": "Ljava/awt/Rectangle;",
+          "access": 0
+        },
+        {
+          "name": "xform",
+          "descriptor": "Ljava/awt/geom/AffineTransform;",
+          "access": 0
+        },
+        {
+          "name": "sourceWidth",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "sourceHeight",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "buf",
+          "descriptor": "Ljava/awt/image/BufferedImage;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/image/BufferedImage;Ljava/awt/Rectangle;Ljava/awt/geom/AffineTransform;Ljava/awt/geom/AffineTransform;)V",
+          "access": 1,
+          "code_sha256": "419fddc86962ac0e6541f5c063e9d8b00507061513b43e6657913cc1cbb3cc7b",
+          "code_length": 61
+        },
+        {
+          "name": "dispose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getColorModel",
+          "descriptor": "()Ljava/awt/image/ColorModel;",
+          "access": 1,
+          "code_sha256": "7ce9aef583407f2e76d34b7e568b7d8b392b0096e40695fad989be892e04c512",
+          "code_length": 8
+        },
+        {
+          "name": "getRaster",
+          "descriptor": "(IIII)Ljava/awt/image/Raster;",
+          "access": 1,
+          "code_sha256": "58ecdd27421756ab61ea498ad5ad99e999119a89c16d38bc9a8c40b8f7cf6c52",
+          "code_length": 216
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "e275561f6379426e5e4945e17c48e0a91c4e26f14343813d5f5b2ce03370437c",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/pattern/PatternPaintContext",
+        "java/awt/PaintContext",
+        "java/awt/geom/AffineTransform",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Float",
+        "java/awt/image/BufferedImage",
+        "java/io/PrintStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/Base64InputStream.class",
+      "occurrence": 0,
+      "sha256": "7372f4667d81e969a95b46235450f1f30124b5e550cec2175aab0be87aafe5c4",
+      "name": "com/kitfox/svg/xml/Base64InputStream",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "buf",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bufSize",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "drain",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "af02b70ff5eedfdb27e0bf9a2bbc08d74ec109a4d48597dc7ec66b9292017131",
+          "code_length": 11
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7d1a74442267534f71821434c085900a155cc3b411be24ad46ab3252343fba9c",
+          "code_length": 211,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/Base64InputStream",
+        "com/kitfox/svg/xml/Base64Util",
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "java/io/InputStream"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/Base64OutputStream.class",
+      "occurrence": 0,
+      "sha256": "8d66d0064ba1d9c3e0664dcf5c8c72cfdc3294047ab1714767216c0b5f26c7e7",
+      "name": "com/kitfox/svg/xml/Base64OutputStream",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterOutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "buf",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "numBytes",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "numChunks",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 24
+        },
+        {
+          "name": "class$com$kitfox$svg$xml$Base64OutputStream",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "aa39b0556b09d563fc6c75fdf278c9047f7f08b846d8c6de20a35468445bcc11",
+          "code_length": 6
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4e9a870a1983f8be9e63891b47496221e21f834997547ef8b090b5556fcea223",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3b994dc5930cd75c4f132a667bd561cc6198f4261fef1bf33320b808ac17e74a",
+          "code_length": 218,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7d0d6af4c60adac88f284924e9deb5a49a1746b82cf0b301e81e725845fe28bc",
+          "code_length": 113,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBase64Byte",
+          "descriptor": "(I)B",
+          "access": 1,
+          "code_sha256": "6b57dd50bcdde8beb0988be88f11c23a4a476b34fefcf127e8dc3cc6d361b858",
+          "code_length": 16
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "54a7c3288bcedd038bc00472457a6355e599cc4674354796f4253179a0c4bbea",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/Base64OutputStream",
+        "com/kitfox/svg/xml/Base64Util",
+        "java/io/FilterOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/Base64Util.class",
+      "occurrence": 0,
+      "sha256": "7effdeeb86e9fa5aa94aa8b4787fca421a6b3af453bdb35fcf31e1477d2b4c87",
+      "name": "com/kitfox/svg/xml/Base64Util",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "valueToBase64",
+          "descriptor": "[B",
+          "access": 24
+        },
+        {
+          "name": "base64ToValue",
+          "descriptor": "[B",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "encodeByte",
+          "descriptor": "(I)B",
+          "access": 9,
+          "code_sha256": "d4f81ae18b3d52124f0fcb0b443e006ab3e73d441f62b7ceed9d0ed234d57694",
+          "code_length": 6
+        },
+        {
+          "name": "decodeByte",
+          "descriptor": "(I)B",
+          "access": 9,
+          "code_sha256": "0f2752c176482c29434421020b877162eecb9d809406c55fb3ca886ca5893e2f",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a79585d55e48de766ce428986b0fb50fb85cd2f616ef50cf5a04e2ec936363fd",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/Base64Util",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/ColorTable.class",
+      "occurrence": 0,
+      "sha256": "f255ee91a58836cee4afaefca3e11b43f77d069eaf6b87e542048473b42251cf",
+      "name": "com/kitfox/svg/xml/ColorTable",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "colorTable",
+          "descriptor": "Ljava/util/Map;",
+          "access": 24
+        },
+        {
+          "name": "singleton",
+          "descriptor": "Lcom/kitfox/svg/xml/ColorTable;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "instance",
+          "descriptor": "()Lcom/kitfox/svg/xml/ColorTable;",
+          "access": 9,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "lookupColor",
+          "descriptor": "(Ljava/lang/String;)Ljava/awt/Color;",
+          "access": 1,
+          "code_sha256": "3be52208999da6a129c857fb5784f7af675f85e76fa4b0f01441add1815a092a",
+          "code_length": 24
+        },
+        {
+          "name": "parseColor",
+          "descriptor": "(Ljava/lang/String;)Ljava/awt/Color;",
+          "access": 9,
+          "code_sha256": "728e4ec93aa7c023aa4fcdfb3c321780bd25648dd9bc14b0e6d45917c71008ca",
+          "code_length": 281
+        },
+        {
+          "name": "parseHex",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "30c6b2d7a3f319c8a7d75b71c42fcea53cbd0c2e933d1538a08abc11d6c737dc",
+          "code_length": 110
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "45a165d95b29abb99c006e39e271d9fc2c73c9fad95c0a7aae8c9bfb02c37ddb",
+          "code_length": 2394
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/ColorTable",
+        "java/awt/Color",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/NumberWithUnits.class",
+      "occurrence": 0,
+      "sha256": "7085e4e230823cfd615cdb8c4079de3f53fd0ab03edea3c1609928e60e5e7f69",
+      "name": "com/kitfox/svg/xml/NumberWithUnits",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "UT_UNITLESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_PX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_CM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_MM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_IN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_EM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_EX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_PT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_PC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UT_PERCENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "value",
+          "descriptor": "F",
+          "access": 0
+        },
+        {
+          "name": "unitType",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7883a075031cd2c33e5dbc81232e612e6a7a3361745d3facbada6088b7ed1b48",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f7b88813c570998397eda857a5223c8a46916de55259f1a1b355982291a97b9c",
+          "code_length": 20
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(FI)V",
+          "access": 1,
+          "code_sha256": "9b8cf47db2b8ce93f5df6483314674fa7e0334ebf3b51b8e3c811098f78385fb",
+          "code_length": 25
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "getUnits",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "2aab915b7f6c978554b1a17228424e24c2b295413804fa0153f8c6ffa833f17c",
+          "code_length": 162
+        },
+        {
+          "name": "unitsAsString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2d2e2b79ae69058bd28ae5dcea7fb891df11e424d67d55a27e0d0798197c3d31",
+          "code_length": 82
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4bfedb8030486248b604d91e4de59b7d81d65c10754325717991f04c13463c11",
+          "code_length": 33
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "418508b29adaada461aab08e22a3e603b63d4a94f6e2c6c83fd6a5f6e71c20a4",
+          "code_length": 58
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "02dd8f3839bfcecf8343ae55956e699b80d853f0ee20f01793ec9b5d65a6b469",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/NumberWithUnits",
+        "com/kitfox/svg/xml/XMLParseUtil",
+        "java/io/Serializable",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/ReadableXMLElement.class",
+      "occurrence": 0,
+      "sha256": "0fefa10e8e9d50c7d580c73875098657ea6d79d50c8dc5ac0163b63cbc720068",
+      "name": "com/kitfox/svg/xml/ReadableXMLElement",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "read",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/net/URL;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/ReadableXMLElement",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/StyleAttribute.class",
+      "occurrence": 0,
+      "sha256": "2c2f6d99cf5729dee6712abe62711175bc15b0ecf1e22fabe37d768c4ad4032f",
+      "name": "com/kitfox/svg/xml/StyleAttribute",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "matchUrl",
+          "descriptor": "Ljava/util/regex/Matcher;",
+          "access": 24
+        },
+        {
+          "name": "matchFpNumUnits",
+          "descriptor": "Ljava/util/regex/Matcher;",
+          "access": 24
+        },
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "stringValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "colorCompatable",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "urlCompatable",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "561c0189228ee385816587d1e6683aea4419a6b265e835a7ae4e0a7aaeff0282",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "34ab2350e7d7c9d55847f3a76a2f398ee4c753ea1b9394b27e6863206871d69a",
+          "code_length": 25
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0a1801e5487dbd242a1d8567d79779bd12502fb7bb3222394c1b5af0b07618da",
+          "code_length": 25
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)Lcom/kitfox/svg/xml/StyleAttribute;",
+          "access": 1,
+          "code_sha256": "df83593a4c4029b099c6a8ae8a0696a80f3e7902fc34f5c8727cb5165072eccc",
+          "code_length": 7
+        },
+        {
+          "name": "getStringValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "getStringList",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5c02de53feaaa41be98096f2e89ff3390ca041985436e76591c87028d3d593de",
+          "code_length": 8
+        },
+        {
+          "name": "setStringValue",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "48fb720aa2a9b68dfbb952c6e9e11d36348ceb48bf0fec91e3294ba5ac037a6d",
+          "code_length": 6
+        },
+        {
+          "name": "getBooleanValue",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4e0b4372aab1ae98281e57b0698eb859dff4467d661efb451a6d4de59dad8825",
+          "code_length": 13
+        },
+        {
+          "name": "getIntValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c97f865ab20e9a57aa71bc5628e3d19421411b7394efcfa2ba1151a3294a37a5",
+          "code_length": 8
+        },
+        {
+          "name": "getIntList",
+          "descriptor": "()[I",
+          "access": 1,
+          "code_sha256": "2429df34fd352b61ee55c58c8426ba1eb4dd6ad9352ba9c0f2bbe2dd3eb9d46e",
+          "code_length": 8
+        },
+        {
+          "name": "getDoubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "433b722c3c9cc761c719b18c6cdbd103f8c8c8223240c244a28c5714e01a8ca7",
+          "code_length": 8
+        },
+        {
+          "name": "getDoubleList",
+          "descriptor": "()[D",
+          "access": 1,
+          "code_sha256": "988d0f3868e762a9edf4fd05ad1bf419b2592a04b40aabecaee0bfce75402c85",
+          "code_length": 8
+        },
+        {
+          "name": "getFloatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "070be5ed0f2a9492a8e6bbcc663dc273c479fe805e88f2a184b645ccf045531c",
+          "code_length": 8
+        },
+        {
+          "name": "getFloatList",
+          "descriptor": "()[F",
+          "access": 1,
+          "code_sha256": "2170dc7fcf88534499371ed1203627b6375bf91a803f26b06f49ae337336157a",
+          "code_length": 8
+        },
+        {
+          "name": "getRatioValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "10eabff6b8a2e2842d071493d02c59ed63d9f37ff8516fe2ac2ca26695c66104",
+          "code_length": 9
+        },
+        {
+          "name": "getUnits",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "be5feed26ae416f9b05aeb084bfada95f906e459dda7094eff0e5bf5e599225d",
+          "code_length": 31
+        },
+        {
+          "name": "getNumberWithUnits",
+          "descriptor": "()Lcom/kitfox/svg/xml/NumberWithUnits;",
+          "access": 1,
+          "code_sha256": "90410477f6e08800cf19e2248c8d666a6c69e9ee674df3dfeb82d9a500d7eaee",
+          "code_length": 8
+        },
+        {
+          "name": "getFloatValueWithUnits",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "e3e8d3c79fba2cad908bf714e6497175b38c7e5d404535d64ba18ee4b9d1c09c",
+          "code_length": 17
+        },
+        {
+          "name": "convertUnitsToPixels",
+          "descriptor": "(IF)F",
+          "access": 9,
+          "code_sha256": "69b9384faa6df2e2ecdb121addc4756b402fa6a49db22b8d7a50ec7b297f7b35",
+          "code_length": 109
+        },
+        {
+          "name": "getColorValue",
+          "descriptor": "()Ljava/awt/Color;",
+          "access": 1,
+          "code_sha256": "4b32ae8e4ce2edce4a7f12b9787453e2bd8bcb81cdfa5e72862eb23cab41b599",
+          "code_length": 8
+        },
+        {
+          "name": "parseURLFn",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bbf03bd9f689d64722cd3d9c814293f19c763b40c7c865277161a44b17f26777",
+          "code_length": 30
+        },
+        {
+          "name": "getURLValue",
+          "descriptor": "(Ljava/net/URL;)Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "82ed8122b438ca2f561917acaf686daee4d3e46f7d4ac7eaf8fb7ecee8486c39",
+          "code_length": 28
+        },
+        {
+          "name": "getURLValue",
+          "descriptor": "(Ljava/net/URI;)Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "07b79a8d01f4621f1d21f45ab54f92be97d85d6a12dce916992456e735c05998",
+          "code_length": 29
+        },
+        {
+          "name": "getURIValue",
+          "descriptor": "()Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "e12a2503d8bbd0bf80807116995947f04279bb1723340a7cfd4558404e9a88cf",
+          "code_length": 6
+        },
+        {
+          "name": "getURIValue",
+          "descriptor": "(Ljava/net/URI;)Ljava/net/URI;",
+          "access": 1,
+          "code_sha256": "0e73c7e44f1c3159d21da63f0642b7d14bffed822c7e656554285127b100bd78",
+          "code_length": 168
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "85f06074e4fa8de6f8125f22e3f5764b200e127b2f638c525e40ebdd644851a5",
+          "code_length": 63
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "63d01449b7b88a925f726b5c53fb10fce96176fee429dd562080f9be414eb24b",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/ColorTable",
+        "com/kitfox/svg/xml/NumberWithUnits",
+        "com/kitfox/svg/xml/StyleAttribute",
+        "com/kitfox/svg/xml/XMLParseUtil",
+        "java/awt/HeadlessException",
+        "java/awt/Toolkit",
+        "java/io/File",
+        "java/io/PrintStream",
+        "java/io/Serializable",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/net/URI",
+        "java/net/URL",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/WritableXMLElement.class",
+      "occurrence": 0,
+      "sha256": "e7eb7c9454e956024a20402e2b53214aa466dc76074a406c1384d548b2b8099e",
+      "name": "com/kitfox/svg/xml/WritableXMLElement",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/kitfox/svg/xml/WritableXMLElement",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/XMLParseUtil.class",
+      "occurrence": 0,
+      "sha256": "24762d68d710a25c942b1e7e748a895e00c82b5247bea0b2b06bcd71c13592b6",
+      "name": "com/kitfox/svg/xml/XMLParseUtil",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fpMatch",
+          "descriptor": "Ljava/util/regex/Matcher;",
+          "access": 24
+        },
+        {
+          "name": "intMatch",
+          "descriptor": "Ljava/util/regex/Matcher;",
+          "access": 24
+        },
+        {
+          "name": "class$com$kitfox$svg$xml$ReadableXMLElement",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "getTagText",
+          "descriptor": "(Lorg/w3c/dom/Element;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "3323e6206cac61b0f702d0b14eba2161988c2020009c5d789c5f9b6fdb871555",
+          "code_length": 72
+        },
+        {
+          "name": "getFirstChild",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "e0279ffcaf5e86a5c10404c16261b82650131ed21da2d49f6fe23e272748045c",
+          "code_length": 76
+        },
+        {
+          "name": "parseStringList",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "df89f7a1ba4f84bdad09b02d025824e0d67b1185a725b6b3c4c469318534a726",
+          "code_length": 64
+        },
+        {
+          "name": "isDouble",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "e7ca8ccf45bf5fd7263ef79bd0f27db0eccbe2cea20258444da76c531e91f765",
+          "code_length": 15
+        },
+        {
+          "name": "parseDouble",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "53e7fe7c99c438c0f63fa53eb4a218f2613697fa34cb74151a2a3dc5c43925fa",
+          "code_length": 5
+        },
+        {
+          "name": "findDouble",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 41,
+          "code_sha256": "2200aaf19c7448403d95a7e2d9c816a67f8595ea9c08b5b30c76c252a0942d23",
+          "code_length": 235
+        },
+        {
+          "name": "parseDoubleList",
+          "descriptor": "(Ljava/lang/String;)[D",
+          "access": 41,
+          "code_sha256": "67f990c35f66d520cc073790960f4e766ec06e3e4c862b2838b79e3e0a935c13",
+          "code_length": 99
+        },
+        {
+          "name": "parseFloat",
+          "descriptor": "(Ljava/lang/String;)F",
+          "access": 9,
+          "code_sha256": "a1fc72d325431109229a94cd70459e1e8012515e34110dc3f43cf2bc545a17be",
+          "code_length": 5
+        },
+        {
+          "name": "findFloat",
+          "descriptor": "(Ljava/lang/String;)F",
+          "access": 41,
+          "code_sha256": "e6fed41f1fb85c6f97d798e5e496584b46c05d5647c5305d8645c2100e613253",
+          "code_length": 69
+        },
+        {
+          "name": "parseFloatList",
+          "descriptor": "(Ljava/lang/String;)[F",
+          "access": 41,
+          "code_sha256": "b08b78c77d4ca11e3d2c2424e9eb832ba6be053d077e2e8d2a46b738a591ab63",
+          "code_length": 99
+        },
+        {
+          "name": "parseInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "725b767e5c34fa31994c7253f14a8e53df272a6562271322dcb200f3ea2e76c4",
+          "code_length": 19
+        },
+        {
+          "name": "findInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "0b9990b7fc80a117f16da1a84c6ae983f760efb4758ff158f90d6e9fdd5312b9",
+          "code_length": 45
+        },
+        {
+          "name": "parseIntList",
+          "descriptor": "(Ljava/lang/String;)[I",
+          "access": 9,
+          "code_sha256": "6e3aeebfc9b22ba0a39344a15bf5e45937a82346c12163bbcbc531ae4b270fdc",
+          "code_length": 98
+        },
+        {
+          "name": "parseRatio",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "5357d452e6c7ff67c837b38ac453c30e3ed0e7372840903d171256af7e64d6fc",
+          "code_length": 50
+        },
+        {
+          "name": "parseNumberWithUnits",
+          "descriptor": "(Ljava/lang/String;)Lcom/kitfox/svg/xml/NumberWithUnits;",
+          "access": 9,
+          "code_sha256": "2ffceeeb1803d3b188a80a1a12ec90d7f4781c556954be383faa6677a12e0898",
+          "code_length": 15
+        },
+        {
+          "name": "getAttribString",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "af57b73d14bd4254517f9f594f59023145b4119a8805a03fd8175fa03128ffff",
+          "code_length": 8
+        },
+        {
+          "name": "getAttribInt",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "8eec416c741080a808f91d0ec44cb5df58d0441cb036bc5b040b246c198de6f3",
+          "code_length": 22
+        },
+        {
+          "name": "getAttribIntHex",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "187e627295d9d08d20dd965e5cb3b2fd370971c618fa0d14c94959dfd8ca60f7",
+          "code_length": 24
+        },
+        {
+          "name": "getAttribFloat",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)F",
+          "access": 9,
+          "code_sha256": "f2da4cbf30f26ff41e9c10bd889da652c93bdbb1a5d2e34464a31545bafb4de8",
+          "code_length": 22
+        },
+        {
+          "name": "getAttribDouble",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)D",
+          "access": 9,
+          "code_sha256": "eaffd08386d84f9a733ee503d058aee0f79036889ef766a57a4befa0b538ad79",
+          "code_length": 22
+        },
+        {
+          "name": "getAttribBoolean",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "fdfa3b1930817baf39322954128627d8b99bc3609a20e64fa613efb893d5b794",
+          "code_length": 18
+        },
+        {
+          "name": "getAttribURL",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/net/URL;)Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "afbeed3b8f5e459ac32e11df25bbc098acfe9a968ff8eca1e009d4c142d9e175",
+          "code_length": 22
+        },
+        {
+          "name": "getElement",
+          "descriptor": "(Ljava/lang/Class;Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/net/URL;)Lcom/kitfox/svg/xml/ReadableXMLElement;",
+          "access": 9,
+          "code_sha256": "992f9a6739887dceafe5bc1fd8d2feb9847b48951ef1665216bf28d750f8f305",
+          "code_length": 163
+        },
+        {
+          "name": "getElementHashMap",
+          "descriptor": "(Ljava/lang/Class;Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/lang/String;Ljava/net/URL;)Ljava/util/HashMap;",
+          "access": 9,
+          "code_sha256": "147c92aaa36766f8bde0593abf0c42c13f620c010e8aa3ff7ba65718bb1418c6",
+          "code_length": 189
+        },
+        {
+          "name": "getElementHashSet",
+          "descriptor": "(Ljava/lang/Class;Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/net/URL;)Ljava/util/HashSet;",
+          "access": 9,
+          "code_sha256": "32fe86eb9f50e6ea02315b28f74e7d5ba8da9bd0089675413196d53862621562",
+          "code_length": 178
+        },
+        {
+          "name": "getElementLinkedList",
+          "descriptor": "(Ljava/lang/Class;Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/net/URL;)Ljava/util/LinkedList;",
+          "access": 9,
+          "code_sha256": "d90afc0bcdabc67ca53034fb49d07edb9173b79b5b547a7cd44c93123a898013",
+          "code_length": 169
+        },
+        {
+          "name": "getElementArray",
+          "descriptor": "(Ljava/lang/Class;Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/net/URL;)[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "06cfd76558d1f7c9e487732a512da457177f63342a6c281a5580c52bd6d8e60d",
+          "code_length": 70
+        },
+        {
+          "name": "getElementArrayInt",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/lang/String;)[I",
+          "access": 9,
+          "code_sha256": "26645befa938fcf8e9d538c8453f619748aef82c09a4be19486010915281f5d1",
+          "code_length": 186
+        },
+        {
+          "name": "getElementArrayString",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "5ad1fbad8119c248ae78da0be5324b3f21773d5fe3782625b1c5499ba80b320e",
+          "code_length": 162
+        },
+        {
+          "name": "parseStyle",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/HashMap;",
+          "access": 9,
+          "code_sha256": "410432a59e9391a638bf7c9a7f08abd0c6c0c6a6650c1b5b4f4c88e000820eb9",
+          "code_length": 12
+        },
+        {
+          "name": "parseStyle",
+          "descriptor": "(Ljava/lang/String;Ljava/util/HashMap;)Ljava/util/HashMap;",
+          "access": 9,
+          "code_sha256": "02153045afed3b30512df40a8ebb8e2029c72c6a81c141ba667a346e1dbfbfbe",
+          "code_length": 137
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c5f44cc06293f2a9f040fcddbc44b95e7f8f58dcf41e98eb2e60ace59a169786",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "com/kitfox/svg/xml/NumberWithUnits",
+        "com/kitfox/svg/xml/ReadableXMLElement",
+        "com/kitfox/svg/xml/StyleAttribute",
+        "com/kitfox/svg/xml/XMLParseUtil",
+        "java/awt/Toolkit",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringIndexOutOfBoundsException",
+        "java/lang/System",
+        "java/lang/reflect/Array",
+        "java/net/URL",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/w3c/dom/Element",
+        "org/w3c/dom/NodeList",
+        "org/w3c/dom/Text"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/cpx/CPXConsts.class",
+      "occurrence": 0,
+      "sha256": "b169540876b916142887746ea36ebdbe0eec1642895a33d76eb6f37b4204e1d6",
+      "name": "com/kitfox/svg/xml/cpx/CPXConsts",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAGIC_NUMBER",
+          "descriptor": "[B",
+          "access": 25
+        },
+        {
+          "name": "XL_PLAIN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XL_ZIP_CRYPT",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b57cb0d4a4c1707db1e3af0459cf208ba77ce33557115d6849eddc8e48fdd185",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/cpx/CPXConsts",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/cpx/CPXInputStream.class",
+      "occurrence": 0,
+      "sha256": "2dec6f7f92cbe58bce48b4c2f3b6159c6058d8b8f299d415972a70127893577e",
+      "name": "com/kitfox/svg/xml/cpx/CPXInputStream",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [
+        "com/kitfox/svg/xml/cpx/CPXConsts"
+      ],
+      "fields": [
+        {
+          "name": "sec",
+          "descriptor": "Ljava/security/SecureRandom;",
+          "access": 0
+        },
+        {
+          "name": "inflater",
+          "descriptor": "Ljava/util/zip/Inflater;",
+          "access": 0
+        },
+        {
+          "name": "xlateMode",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "head",
+          "descriptor": "[B",
+          "access": 0
+        },
+        {
+          "name": "headSize",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "headPtr",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "reachedEOF",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "inBuffer",
+          "descriptor": "[B",
+          "access": 0
+        },
+        {
+          "name": "decryptBuffer",
+          "descriptor": "[B",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "0dfe8d4dbe54a60ee3a133fece55c1f374a76574faef4eb22d25c9dfd08b0b6d",
+          "code_length": 131,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "markSupported",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "23c9c245b03c5f8aa0427b8ac96cc8da7723e98f6d36937010df393a86d928eb",
+          "code_length": 13,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "90ab3081c0ff6398dfacadf622a90a042d625b417c3b3b4138f7367884b796f6",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([B)I",
+          "access": 1,
+          "code_sha256": "756fd832a0c2d2c9c2b5271d73b8d9908c7e7bf84f24e439ec10da6ce71820cb",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "d7253c3ab82ae050f99443acf900a8fa3caf631a5b87e74bf70b61e378657a2b",
+          "code_length": 188,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "decryptChunk",
+          "descriptor": "()Z",
+          "access": 4,
+          "code_sha256": "01158a848191c1692f5a1b75c43a2561cbf8014ef1038f554540e90f8f3aea78",
+          "code_length": 47,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "available",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e0c0cbb6c44648bdc4709bc5713c393a28efd92fb56cf941bb9f79bda2b3118c",
+          "code_length": 13
+        },
+        {
+          "name": "skip",
+          "descriptor": "(J)J",
+          "access": 1,
+          "code_sha256": "6e5fac1ee5de3793620c5c06172a5658b22d38239afea2f3ced4fa5c43f3bfd9",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/cpx/CPXConsts",
+        "com/kitfox/svg/xml/cpx/CPXInputStream",
+        "java/io/FilterInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/security/SecureRandom",
+        "java/util/zip/DataFormatException",
+        "java/util/zip/Inflater"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/cpx/CPXOutputStream.class",
+      "occurrence": 0,
+      "sha256": "e098a8ce60079d1455e8977befb42cb9d20f63a146b3fb179b6a61ecbc0b3bb5",
+      "name": "com/kitfox/svg/xml/cpx/CPXOutputStream",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterOutputStream",
+      "interfaces": [
+        "com/kitfox/svg/xml/cpx/CPXConsts"
+      ],
+      "fields": [
+        {
+          "name": "deflater",
+          "descriptor": "Ljava/util/zip/Deflater;",
+          "access": 0
+        },
+        {
+          "name": "deflateBuffer",
+          "descriptor": "[B",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "e9d1c1afe38f6109bc276f65286bec61699ed73f60f0df29923b332fbbfa99ce",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e337245c5976167c9d4a6e1eab5205f4b4c1c31e95a3a5e60ea05fc2754189ca",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "99428ae6921d34aea54c1abaca120c1e3bdead377a559c9844599469e06c9f88",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "c6f3f65d9f35454f44d0bcc1c2f4a9f46a1ab52e67906ea83c4e6623585a6d64",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "processAllData",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "a9e537c0706d3fc817bf6336918b0888a34cfa78dae40357b96daf674745c619",
+          "code_length": 33,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7b3e4c6e3fa665536e0d87c92b22ddbf992ef903f56c559b7b8bd939c3e2e8dc",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "baff5d14c2ce3a2843a5f0fe828afd4f8c8ab8082b05b3b0ac89dd1aa77a3601",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/cpx/CPXConsts",
+        "com/kitfox/svg/xml/cpx/CPXOutputStream",
+        "java/io/FilterOutputStream",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/util/zip/Deflater"
+      ]
+    },
+    {
+      "entry": "com/kitfox/svg/xml/cpx/CPXTest.class",
+      "occurrence": 0,
+      "sha256": "673bbfb6fb077aa4eeeced4872588725dcb31472eebbae8c12e1ef5ca3846fa3",
+      "name": "com/kitfox/svg/xml/cpx/CPXTest",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "class$com$kitfox$svg$xml$cpx$CPXTest",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e263647f28af92c42cba35c10f95daddfeee1cc6f32cb136bb20cbb25bd8a160",
+          "code_length": 13
+        },
+        {
+          "name": "writeTest",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5ba09e3da2a88ccb1c6bf3d279e100c819f45ada7bad652f8ad2e4f2f2b83663",
+          "code_length": 91
+        },
+        {
+          "name": "readTest",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e36876492534790632e2146aa52bbeb182dd2db0875706393f77ac705826caaa",
+          "code_length": 65
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "3c23e196eb8cba74f3589af9eb6dc7cb45e0aaf92a3ecd0a7e33126f3ac91941",
+          "code_length": 9
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/kitfox/svg/xml/cpx/CPXInputStream",
+        "com/kitfox/svg/xml/cpx/CPXOutputStream",
+        "com/kitfox/svg/xml/cpx/CPXTest",
+        "java/io/BufferedReader",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/InputStream",
+        "java/io/InputStreamReader",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/System"
+      ]
+    }
+  ]
+}

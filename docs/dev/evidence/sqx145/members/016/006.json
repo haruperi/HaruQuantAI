@@ -1,0 +1,5058 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-collections-3.2.1.jar",
+  "archive_sha256": "87363a4c94eaabeefd8b930cb059f66b64c9f7d632862f23de3012da7660047b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/commons/collections/ProxyMap.class",
+      "occurrence": 0,
+      "sha256": "56a23f93dcf445b11132860502d189fc8f3b1a2ddeb99164d394aa9fcfe35b8d",
+      "name": "org/apache/commons/collections/ProxyMap",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map"
+      ],
+      "fields": [
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a4e8e717c862ccfa73a066a65b0a6e12d9fc8c5ef70a38c9a7e58e89c14e91fd",
+          "code_length": 10
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d995bb977b8481e95febc89391e0c45d1cb4873860ac74197ed90d5ca685647d",
+          "code_length": 11
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "872785afb2b741b6ee89888cfd39fb9cc107ee9bf3f7450c2c3996e3cf2616f6",
+          "code_length": 11
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "9e2d92a1e0087ac0ee9d1f37e2fe6f27827ddbba120843a3d8d8420c8e9cf4cb",
+          "code_length": 10
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0ef032131df2ae00d1bee56f521404e392866638c427cf59d3e35647460d7bae",
+          "code_length": 9
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2ffb495001556880201b03877f07bc90f70aecbd3577a8788b1339db31044db7",
+          "code_length": 11
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "574048b31caaefbf3edf8ad51362bc034c22b2d81255449350bb91c547aee40e",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d3ae3fecd4e0b540a7dd3157851e2d4460b1cd7dc915fe6938911ad29a9a30cc",
+          "code_length": 10
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "6052aa7bdf9fafb6dd3cbf21da4b6b38b3da94b2772649265c3ea38268739a32",
+          "code_length": 10
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "38e0eae5871721426b2b3fda62ad13ec59c263e3b59fdbed7305f7bfa82cd1bb",
+          "code_length": 12
+        },
+        {
+          "name": "putAll",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "d8903931af36d30a9d3d92780124b92a30e6b2a67a214708a01248e767e2473e",
+          "code_length": 11
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "039dffce92e036b766f4508165a8324e6755a5afd6bb2f768b37ad6bcbe32e3c",
+          "code_length": 11
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "63f85246df4e7fa3ac2d8d69053124e8afdfc3998edf31989ae366fdf8adda58",
+          "code_length": 10
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "df5a5617206966f5e46af99bae7565b928293bde8bfa7750d46b1228ed677935",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Map",
+        "org/apache/commons/collections/ProxyMap"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$1.class",
+      "occurrence": 0,
+      "sha256": "0cac4471b5a6e961bf82aa3eb76779ae8594b479f510f8246bc0a87ef1bff43d",
+      "name": "org/apache/commons/collections/ReferenceMap$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5532228531aa02eddc7e9274273be84de6773df549433aced382661bb9d58c16",
+          "code_length": 8
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ece9add26ea762318a6da2b1774a4294234859c97a9ac86023ac3acf1b3f2464",
+          "code_length": 52
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d9df7a04fb8832e4b2b93a96ebcbdca83b9a5199427865e05a382d4cd1571c8d",
+          "code_length": 31
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "67e01ca3226619296808fdb9f4c4f73a8024f9ba6fb399025841f96d8367bdeb",
+          "code_length": 12
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c3af71df5e19c04666ed10f4ec5b0844a125a2b641080ce6427fbad51230c6d6",
+          "code_length": 9
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a03612c1af90db91f713768eb46de033894c1797bfa1e53bd23b60f6ef5d8a20",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/AbstractSet",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$Entry",
+        "org/apache/commons/collections/ReferenceMap$EntryIterator",
+        "org/apache/commons/collections/keyvalue/DefaultMapEntry"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$2.class",
+      "occurrence": 0,
+      "sha256": "7be7b577897e93e63a47cc76351bb71337ae7e9d339ddda122342eecee9f97ab",
+      "name": "org/apache/commons/collections/ReferenceMap$2",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "a5337b0c9b292d7608a64b5e16b3dc0c58c2e9c9a33c7f4671fb85d8c73bc95a",
+          "code_length": 13
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "acad8155d62197eb4e81f3c79a8775710fde264b4926b2242d41f2ac7a95f3b5",
+          "code_length": 9
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d820b8e754c7f3da90424aa4e2c14d0ed6a510fca828cc7e9decd05b515a611f",
+          "code_length": 19
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1cbcdd3febcbacae1419a3a94ee89cefb2333120bcb336098a8c272451c8accb",
+          "code_length": 8
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d0668253c56d269b2010da928240aebf208dbf8f633d9ae7042e89afe61eb6e8",
+          "code_length": 9
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1a8fbd7832bc3b214585db3719553f84dc3c267557e4d58c375671f0a5d1289d",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/AbstractSet",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$2",
+        "org/apache/commons/collections/ReferenceMap$KeyIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$3.class",
+      "occurrence": 0,
+      "sha256": "9aea5e65974579e4c0556017999475021c5afab3eee1ceabd25cf50ebcc4fea3",
+      "name": "org/apache/commons/collections/ReferenceMap$3",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6946f4d7c95c9ceec3f4698fcd256c7fa4c22845695bc724e4807551d7c7733e",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5532228531aa02eddc7e9274273be84de6773df549433aced382661bb9d58c16",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "0ee4544894101a226daac9a61ddd6b1980f7a7ce62dcca41d52c51db999d6675",
+          "code_length": 13
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8adac38650f3d6b797363d9acad9a2d3db1373dda3af82977c1af55161e24c0d",
+          "code_length": 9
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "65370f1f8c9f032bb573791f0ed78242eef0f91f13fc474ec8a83f7af125a5ad",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/AbstractCollection",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$3",
+        "org/apache/commons/collections/ReferenceMap$ValueIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$Entry.class",
+      "occurrence": 0,
+      "sha256": "e14c1fca0148f95213cbc66f47e53a99f7fb9636ee967f07dc51da4ffc5e24ec",
+      "name": "org/apache/commons/collections/ReferenceMap$Entry",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;Ljava/lang/Object;ILjava/lang/Object;Lorg/apache/commons/collections/ReferenceMap$Entry;)V",
+          "access": 1,
+          "code_sha256": "eaee669d64f5465b82a37d009378b62be6a34c783ac7975c84e2569aaada5f8b",
+          "code_length": 32
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "96fbb9df9b3dd5bbdc6759ed350883c41e5f58ef940258cf35ccf8a8a86fc58c",
+          "code_length": 28
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4152138e88c7f6c2548a69d9f8d4769a2917c8d9b760b2a35f14d5dfe976dce2",
+          "code_length": 28
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3df9bdc0b6b209735f746f5968d2f72b05cd23ef45fc1c7d2d638fe35e93bd2e",
+          "code_length": 50
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "febf43860a10894f69f9bb5d6808a8ac0c2951384e7993009690c71f4ea7cb8c",
+          "code_length": 82
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8c8565d5b00c1eb696d66428a6bd0fc7d85ff29945d20ddeffcb1f01bac1868e",
+          "code_length": 23
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4afdbfecdbacacbbfd5d22db9688649a893c4718cfac7449efc8ec2f5f6e4bac",
+          "code_length": 30
+        },
+        {
+          "name": "purge",
+          "descriptor": "(Ljava/lang/ref/Reference;)Z",
+          "access": 0,
+          "code_sha256": "d16fcc11d5f4f5a16c5779dad2701f4949d6f9435da9dccefd71a98d8eed3460",
+          "code_length": 116
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/ref/Reference",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$Entry"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$EntryIterator.class",
+      "occurrence": 0,
+      "sha256": "a898b4f0550e721ef29dae504ed758b4a1741bd95a5db2d217875b58aff02cf1",
+      "name": "org/apache/commons/collections/ReferenceMap$EntryIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "entry",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 0
+        },
+        {
+          "name": "previous",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 0
+        },
+        {
+          "name": "nextKey",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "currentKey",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "currentValue",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        },
+        {
+          "name": "expectedModCount",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 1,
+          "code_sha256": "ded2a713e0ba93148dbc2ec2c0819ec8909131a732c2ee6636b256af3dad737b",
+          "code_length": 38
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "85bb4c8de7605a3db0c95711b37de13504176c706d50003128ac81f51ecd8a33",
+          "code_length": 110
+        },
+        {
+          "name": "checkMod",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "80760fe6150d43baaceb64572518d033fdf56ce5eacbb76f54f7cdec7991aa19",
+          "code_length": 23
+        },
+        {
+          "name": "nextNull",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "863ddff6e7dc2e13c36f6a64a98d36ebb203f0d33a464ecdbadc39c85b1aa066",
+          "code_length": 20
+        },
+        {
+          "name": "nextEntry",
+          "descriptor": "()Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 4,
+          "code_sha256": "b6de1a2d465bb242fa35644a1e04d988eea9402d4bf28663b57ff0f435c04bdf",
+          "code_length": 76
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ec158e4fb1792ac65ebe74a037a68673993c84c4f5f718f86bb5ce659ff6b709",
+          "code_length": 5
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3974cc19dad5b3cfcd87d73036f2a7a264d26b2cc670e9455cfe50c0996ffa6b",
+          "code_length": 58
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/ConcurrentModificationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$Entry",
+        "org/apache/commons/collections/ReferenceMap$EntryIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$KeyIterator.class",
+      "occurrence": 0,
+      "sha256": "89e84594a8955478757086f76c924a07014780bd311612116f16194500186ef8",
+      "name": "org/apache/commons/collections/ReferenceMap$KeyIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/collections/ReferenceMap$EntryIterator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 2,
+          "code_sha256": "fe2036a98942f6d9511a5c2adad8f009920f17565817336438a522c1301eb687",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c12baacdb58a8ba8c348fbc9aaae4001c05909259719e64ecea598607aad19d",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;Lorg/apache/commons/collections/ReferenceMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$Entry",
+        "org/apache/commons/collections/ReferenceMap$EntryIterator",
+        "org/apache/commons/collections/ReferenceMap$KeyIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$SoftRef.class",
+      "occurrence": 0,
+      "sha256": "0c678d16f02196c8e6d3ba2af7c20c88e3debd2c96936a8454097a4c50ac06be",
+      "name": "org/apache/commons/collections/ReferenceMap$SoftRef",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/ref/SoftReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V",
+          "access": 1,
+          "code_sha256": "19094bcd6b31481981895d8cbffb171885ef18686bf486c605d93a31a49de1b5",
+          "code_length": 12
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ref/SoftReference",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$SoftRef"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$ValueIterator.class",
+      "occurrence": 0,
+      "sha256": "0b578f51844f9707381bda04383827d5665e3a899a77df690a2244f769e3333c",
+      "name": "org/apache/commons/collections/ReferenceMap$ValueIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/collections/ReferenceMap$EntryIterator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/ReferenceMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)V",
+          "access": 2,
+          "code_sha256": "fe2036a98942f6d9511a5c2adad8f009920f17565817336438a522c1301eb687",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c12baacdb58a8ba8c348fbc9aaae4001c05909259719e64ecea598607aad19d",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;Lorg/apache/commons/collections/ReferenceMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$Entry",
+        "org/apache/commons/collections/ReferenceMap$EntryIterator",
+        "org/apache/commons/collections/ReferenceMap$ValueIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap$WeakRef.class",
+      "occurrence": 0,
+      "sha256": "97e16bd520dd73d0fc082ee8a943fb3da6c9bac62afec4751446704c910afc24",
+      "name": "org/apache/commons/collections/ReferenceMap$WeakRef",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/ref/WeakReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V",
+          "access": 1,
+          "code_sha256": "19094bcd6b31481981895d8cbffb171885ef18686bf486c605d93a31a49de1b5",
+          "code_length": 12
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/ref/WeakReference",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$WeakRef"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ReferenceMap.class",
+      "occurrence": 0,
+      "sha256": "328afc95e1e3c94587bdf796cdb41d9276859dac9a1730cd4f7696d1660f868c",
+      "name": "org/apache/commons/collections/ReferenceMap",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/AbstractMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "HARD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SOFT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WEAK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "keyType",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "valueType",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "loadFactor",
+          "descriptor": "F",
+          "access": 2
+        },
+        {
+          "name": "purgeValues",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "queue",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 130
+        },
+        {
+          "name": "table",
+          "descriptor": "[Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 130
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 130
+        },
+        {
+          "name": "threshold",
+          "descriptor": "I",
+          "access": 130
+        },
+        {
+          "name": "modCount",
+          "descriptor": "I",
+          "access": 194
+        },
+        {
+          "name": "keySet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 130
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 130
+        },
+        {
+          "name": "values",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 130
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6d1894c660788dd78b7d95394df89be9bc2a37c46d2e17a404c9b8002b62927c",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIZ)V",
+          "access": 1,
+          "code_sha256": "38df5c17a272849f2a06f632761b7b4835949aee2ee287ace1d8e63e7d4a24e3",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "62cfd7df0aafa625d966bbdd851a5027840d664bd815e41d4fd8c08948f2c401",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIIFZ)V",
+          "access": 1,
+          "code_sha256": "8a4ff9ef9e0449bef4d3fe77023eea0ce76b8d8706535639be3ccd54a247f5b5",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IIIF)V",
+          "access": 1,
+          "code_sha256": "38e31d02b24b38e0a20dadb46ba6d2f088fd437f9b6b84f1bc69d823ebf3aa9a",
+          "code_length": 125
+        },
+        {
+          "name": "verify",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 10,
+          "code_sha256": "3d242792545dd64a3570433edf44a6f2cf82e1a292a61e8cff3a637d60f1a7c5",
+          "code_length": 37
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "6f62a8394e3cdbe6a3d0178b94ebc22a0726066e5f14438e2bab93a0f4eff946",
+          "code_length": 71,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "feee7c5de73296b9f3e2b6be5ef10d373382eb3b55b01040595ffde83f656ea8",
+          "code_length": 72,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "toReference",
+          "descriptor": "(ILjava/lang/Object;I)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "4abce1362c81e7fa4e72742c2398acd2d32d0b187ba705d584bf166199988149",
+          "code_length": 66
+        },
+        {
+          "name": "getEntry",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 2,
+          "code_sha256": "6484df36bce48e0eb2e8f48d9ac7ace953aaf82fe931eacdc0ea55eabb047105",
+          "code_length": 66
+        },
+        {
+          "name": "indexFor",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "b5ae66dd981ee905671a26ce6f0028e35afab67160f2ae4c493b991644a6b81e",
+          "code_length": 55
+        },
+        {
+          "name": "resize",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "63af9e30459cda0f2d7c750409dee5dd6a288ed564d3abba73ba5436308b215c",
+          "code_length": 102
+        },
+        {
+          "name": "purge",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0ff0159e45f93944377bdc472bedcce83fc0eec2eac52d92ede661d054fc899a",
+          "code_length": 29
+        },
+        {
+          "name": "purge",
+          "descriptor": "(Ljava/lang/ref/Reference;)V",
+          "access": 2,
+          "code_sha256": "d007c1a4be1a138981481f999c324d6de7c2b0c7f3e3aecfd6f669f1eb1c69b1",
+          "code_length": 91
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "67e28854cdc9087e4f4b883f60024864620a8c3d80db384459acf540f4c168ad",
+          "code_length": 9
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "65a99c7c56ac252f8dbce5d1afbbef20302c342f834aa26c48e415abf4a4d1ff",
+          "code_length": 17
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "cfa3dcd915cd6665482fdc167b6e69601bb985b7773fb928261772d3aa28ec2e",
+          "code_length": 29
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "65bfddb63cb767863da6140467277e1cf8e0cdb662341888f9272c5253400905",
+          "code_length": 21
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ca974c1986feb4a9ee9dc17a8688ea4bceb770fadab878dde372e1f82ef02054",
+          "code_length": 192
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "265b151b9829ed6f8d55951f0001153085a10ca0c1e793ea495df8bf6d454902",
+          "code_length": 129
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6089429f30904b7bb59ae61d60a2c04d8181c4a3cb15f73ef96d3e4ea28c8530",
+          "code_length": 27
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "bcd2fb07fe07c4afd6d0c9dc5e43c0058b409209e32c7e27ff155ae1f34c2db3",
+          "code_length": 29
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "8830a641c629eb07ea13fa8051ecd00528897a5aafee2f78aab602bb66e67f84",
+          "code_length": 29
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "ab67c1ada8d9bbca884f10d9446bc381aaed6b52963ed400ece8aadbde412e62",
+          "code_length": 29
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;Ljava/lang/Object;)Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 8,
+          "code_sha256": "924c8e3f8917f4e58f9499b20caa2043337931fe6e32fe92cd01e36888dec30b",
+          "code_length": 6
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)I",
+          "access": 8,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)I",
+          "access": 8,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "access$500",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;ILjava/lang/Object;I)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "acf8d91a8637dedd0b1b114fa57abf04049ec3161b96a05509cab3b9273969a4",
+          "code_length": 8
+        },
+        {
+          "name": "access$600",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)Z",
+          "access": 8,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "access$700",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)[Lorg/apache/commons/collections/ReferenceMap$Entry;",
+          "access": 8,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$800",
+          "descriptor": "(Lorg/apache/commons/collections/ReferenceMap;)I",
+          "access": 8,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Error",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/ref/ReferenceQueue",
+        "java/util/AbstractMap",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/collections/ReferenceMap",
+        "org/apache/commons/collections/ReferenceMap$1",
+        "org/apache/commons/collections/ReferenceMap$2",
+        "org/apache/commons/collections/ReferenceMap$3",
+        "org/apache/commons/collections/ReferenceMap$Entry",
+        "org/apache/commons/collections/ReferenceMap$EntryIterator",
+        "org/apache/commons/collections/ReferenceMap$KeyIterator",
+        "org/apache/commons/collections/ReferenceMap$SoftRef",
+        "org/apache/commons/collections/ReferenceMap$ValueIterator",
+        "org/apache/commons/collections/ReferenceMap$WeakRef"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ResettableIterator.class",
+      "occurrence": 0,
+      "sha256": "b73f0076daba11aa02869ec1423a46bcd27d3aeb00ae61579836a4aaed99c725",
+      "name": "org/apache/commons/collections/ResettableIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/commons/collections/ResettableIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/ResettableListIterator.class",
+      "occurrence": 0,
+      "sha256": "d0a00b5e1bf481d569414fac3e8c30d0e8e989a7890ee64e027c452a801ecd81",
+      "name": "org/apache/commons/collections/ResettableListIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/ListIterator",
+        "org/apache/commons/collections/ResettableIterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ListIterator",
+        "org/apache/commons/collections/ResettableIterator",
+        "org/apache/commons/collections/ResettableListIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap$1.class",
+      "occurrence": 0,
+      "sha256": "d2ebcd7d394140cb460abffe3d40e4a422efcdf2a351b2c71700665a699c2e8c",
+      "name": "org/apache/commons/collections/SequencedHashMap$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "65b294a155a4ad507ebc6d3ee032e033c042c6b4ef6ede6aa3bda5f18a9ce8fe",
+          "code_length": 13
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "060e9c2536c722eef53b23feef634f00dba93adafba842729c0465ed6d66c19d",
+          "code_length": 19
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8ebf29da60792301ab15b035216341b3c0aaecc4d2410a19e1c44e30537e491c",
+          "code_length": 8
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4819026adda1454a683b5867c6aa3b60d55d0afc3774ab48df7cc05986cdc457",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1461172da6902d59499f3a1e5047591fb7240e7a87c6563b27ee3fa8515c1698",
+          "code_length": 8
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "2a7112bbee5ffa83228ccef3633d8c8a3a6cde0e04718e0d8201c7406875a3f6",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/util/AbstractSet",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$1",
+        "org/apache/commons/collections/SequencedHashMap$Entry",
+        "org/apache/commons/collections/SequencedHashMap$OrderedIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap$2.class",
+      "occurrence": 0,
+      "sha256": "e1d846410e754e365202e5a72ed0b1c3222d1fd81535fae25aa0207d6a145799",
+      "name": "org/apache/commons/collections/SequencedHashMap$2",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "30c05e09a4895933b6ac241dd54fda5bee2d17c24935e91278029000c0d5667f",
+          "code_length": 13
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "1a860bf5b7922ccff3cfa70982bd0bbf0856fa5bbbc76d4fffba973831a78389",
+          "code_length": 115
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a4cf5bba216c9094a2407552b496792ff1a32360d97f510b82c60c745fd7ec4d",
+          "code_length": 8
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a23e8e3c7d604225d2eed79962a3f64b87ad301c1104b377fc3b0ed04323246c",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c3709408ee83ece62e112807deeaaf3e4e87875020a959ccdbbf21a1b7f75fe8",
+          "code_length": 8
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "1d10053852ffe346d4d15354d8ea032bc5b3c669f24ca24a7b54e03e7660f018",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/AbstractCollection",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$2",
+        "org/apache/commons/collections/SequencedHashMap$Entry",
+        "org/apache/commons/collections/SequencedHashMap$OrderedIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap$3.class",
+      "occurrence": 0,
+      "sha256": "ae72c7f27a9d62d207057bb1ef3c17c0408a31a62670f85cfb129e6aa584a76e",
+      "name": "org/apache/commons/collections/SequencedHashMap$3",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "findEntry",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 2,
+          "code_sha256": "cfb1a13d94fc054605c014f425ed13ed8ce15a8b5d862549a7f3624781dbabeb",
+          "code_length": 56
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "14e4327009080aaa6f0e3af1f111402f504ab1199e965677b179ef35d4f25840",
+          "code_length": 13
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "00a5a7338265ca4cb8ffa257d866f68c446365a2a34aef992441edc94475c6df",
+          "code_length": 32
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8b01916536c2d3dfb7a51a39799001a9f91c745e5bec41c49aff6b526ee9a215",
+          "code_length": 8
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "88e2f02eea6c84d67b6fa010c8813b68dc1ac7805a475df30501c239ae00d68b",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f51ad8b08deb16c628a6e6da76c3318f4e0d9dc7d6fd9de42520569086fae0ec",
+          "code_length": 8
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "db8e079d272d88ca86b6e0a5242dd452e5a868e4e2dbf875e730197393ed225c",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/util/AbstractSet",
+        "java/util/HashMap",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$3",
+        "org/apache/commons/collections/SequencedHashMap$Entry",
+        "org/apache/commons/collections/SequencedHashMap$OrderedIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap$Entry.class",
+      "occurrence": 0,
+      "sha256": "c2edfc3ee8de84b0e6d83c84a845c166c036c8548d85f71f17533e5d2dc1aae5",
+      "name": "org/apache/commons/collections/SequencedHashMap$Entry",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 0
+        },
+        {
+          "name": "prev",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6173e139344b229a179c3982df0a0f3f95c784a655c9c6fd2e0bc53bc7a6f71d",
+          "code_length": 25
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "96c0894557d3f375d43e4fef46c1bb2f79d5be38bc4051b56f2f5e5241ca7664",
+          "code_length": 12
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "12b1cdd8d655fa1d69a317feb69126797fef2fb7ccf2532a3d9cc9e9ad74870a",
+          "code_length": 38
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f4a56c506750dd4659b0ac32a46b2dd3a9221ff5e204498ceb6e4dcbe488e33b",
+          "code_length": 103
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "313e92ff838448f7c795f128ca0a06bb08b20f1a242f659034a81e414b55b988",
+          "code_length": 40
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$Entry"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap$OrderedIterator.class",
+      "occurrence": 0,
+      "sha256": "e31c5dd39e167b07f63c249bf72c924a26a2fe270dd2fe8d362eceb7ebac14ad",
+      "name": "org/apache/commons/collections/SequencedHashMap$OrderedIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "returnType",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pos",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 2
+        },
+        {
+          "name": "expectedModCount",
+          "descriptor": "J",
+          "access": 130
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;I)V",
+          "access": 1,
+          "code_sha256": "b12cad2c48846ee378bd40e77c9faed41798424b57ec0c858a4a1010ed07ab72",
+          "code_length": 40
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e4aa65b0c5fff76faba25dd5cc09493c9b6d06e7006bd6862e389a926d3526c5",
+          "code_length": 23
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8a5a35de3f6c417027e6962b288077775a6985a7bf81c1b8ca9a78356c42f1f6",
+          "code_length": 151
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c2988d709f6b2a35b37543fe9ba09fc5054d61cdd71fc6a9953778caad888801",
+          "code_length": 80
+        }
+      ],
+      "class_references": [
+        "java/lang/Error",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/ConcurrentModificationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$Entry",
+        "org/apache/commons/collections/SequencedHashMap$OrderedIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SequencedHashMap.class",
+      "occurrence": 0,
+      "sha256": "463371452e7353d0a5ff9b057986b31fc34fb4ce875c7ec0fc84ef0e4998b101",
+      "name": "org/apache/commons/collections/SequencedHashMap",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map",
+        "java/lang/Cloneable",
+        "java/io/Externalizable"
+      ],
+      "fields": [
+        {
+          "name": "sentinel",
+          "descriptor": "Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 2
+        },
+        {
+          "name": "entries",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2
+        },
+        {
+          "name": "modCount",
+          "descriptor": "J",
+          "access": 130
+        },
+        {
+          "name": "KEY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "VALUE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "ENTRY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "REMOVED_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "createSentinel",
+          "descriptor": "()Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 26,
+          "code_sha256": "b8e6f00d185c7fbac7e8d7ba36230bd652551e5fc48d24265214678180abc0e6",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b4b31aee063329bf18692d8e5df86d03e1ce93d5b1ad7fb69c60026808946ed1",
+          "code_length": 28
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "071b80202d62876c2d09e5c4c7bbc872c93251724c1d8210e5370183569253e8",
+          "code_length": 29
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IF)V",
+          "access": 1,
+          "code_sha256": "712ec527e4ce554bbfd79a33a4f4362535b44fb6f6f3e517856d24a33f7df2a3",
+          "code_length": 30
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "9f191f04bbaa1573c8eeb8e91770c44f060ddd013a726648e86afdaa28ed97da",
+          "code_length": 10
+        },
+        {
+          "name": "removeEntry",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap$Entry;)V",
+          "access": 2,
+          "code_sha256": "39bdf45ee2f0bed1eb22f7ac01ab82df797c1950021c06a89a972a4814edacfd",
+          "code_length": 23
+        },
+        {
+          "name": "insertEntry",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap$Entry;)V",
+          "access": 2,
+          "code_sha256": "cc2175e727cb4e0fc6a63605660bfe7e3b202a906395717de7389ce8579aa9dd",
+          "code_length": 39
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "300fa52cb9a8fc13036e52fc8798e4a684d1a7b1d466309c54f7eed60a85444b",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "eee92a222213f1eef982ca1c5f254dfe0a79f331bc78828c776572152bd00100",
+          "code_length": 20
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "3b42a91effcbe5d6b714f55e011bdbf54fd653d7a7055be00e5701b85916b505",
+          "code_length": 9
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4d02c40d7c0b26dd2df4b62808fc5c426480a70a0a9da26cb30f294db9107ae3",
+          "code_length": 79
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "119ecad661022b4653b80285300ce307b4f07f71bec3684afbfcbe806bf0e393",
+          "code_length": 23
+        },
+        {
+          "name": "getFirst",
+          "descriptor": "()Ljava/util/Map$Entry;",
+          "access": 1,
+          "code_sha256": "f8c2af6e0fcc07027e502b2db79bda70a941980b37a48d0f9bd09db22e16c09a",
+          "code_length": 19
+        },
+        {
+          "name": "getFirstKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2e35f8b4733371b406ac55322ab3d81c75c1a0105061aca4ffa9992c748a7dac",
+          "code_length": 11
+        },
+        {
+          "name": "getFirstValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "207f14937a735974eacc38be9cac12868429a66f6b2c7cbe4f43cb6693b4bb14",
+          "code_length": 11
+        },
+        {
+          "name": "getLast",
+          "descriptor": "()Ljava/util/Map$Entry;",
+          "access": 1,
+          "code_sha256": "690798f5d6e382c23e1f5c164994309e15ddcb868b8588c04fe661f5933f9abd",
+          "code_length": 19
+        },
+        {
+          "name": "getLastKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6f18e36aed8283840c444dfb35e8b8cdad2d27bb7afb8fd284471436ffdcae69",
+          "code_length": 11
+        },
+        {
+          "name": "getLastValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b7af2fc6b6eb548baf4bd18fea67255c6152b479fa7eef7f21bb55f954409c98",
+          "code_length": 11
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "988cbf6e410ce54b3ff0b09b9687fb551c2aa8cd68010797525ef380f393b567",
+          "code_length": 76
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e95cc6e78cd5e69cdb39cb32c1f763cc930d102befca3213bd25d89c96825d4f",
+          "code_length": 19
+        },
+        {
+          "name": "removeImpl",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 2,
+          "code_sha256": "e636b2e8cf2fb0befa924e8d417c98827afb11ed4ca9edd417524444ddbab532",
+          "code_length": 35
+        },
+        {
+          "name": "putAll",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "a8922440128d044577357deeb4eb81c144ada2f1d1121b52900a84a1fda5704e",
+          "code_length": 52
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4cc2742b0edba8cdb78f2d378f70ce0d1327d611afa70283a669a4c03bdbfcf5",
+          "code_length": 40
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f08c3ba42b20874e3a773a0b5a68b367456ef02aa72a0de64c71476196613cf4",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1ca7ebac52f34a180fd036c69cb6f870dec723764ac1ffe2b5afa9e561a51dbf",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2b5aeab0cf0e1682bbee8cf37fee6dc5c732743e29c7841d20101b44010704c1",
+          "code_length": 94
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "19da5826fd3c7e8c0d5d9c92717cf92a3628646b6f7278750fe5be502e8c7ab8",
+          "code_length": 9
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "f57e51c144e8ee74d792b30d3080ebaf81541d48e35e97a88c3ed29557209435",
+          "code_length": 9
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "729bb2c1dc3944a28827e4d716ec1c09c92de0a793057d1b7d2627a7002e25e8",
+          "code_length": 9
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5551c48f7466e66279e776b9e68648bd037c109a70ff22b3a305f93580a026ea",
+          "code_length": 33,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "getEntry",
+          "descriptor": "(I)Ljava/util/Map$Entry;",
+          "access": 2,
+          "code_sha256": "6dea6b3ac5946609de76a353dc20f3a1936ba7521d2f8ebff232934fbeb2e835",
+          "code_length": 116
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8100b2568fe6b49286f8eb7e1820b74e72fdd4238037a406d7392b67b22c6865",
+          "code_length": 11
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1c820d93537a5a899e9018b143e2b4adc12b2913d4de3cfce19e37e05f77505f",
+          "code_length": 11
+        },
+        {
+          "name": "indexOf",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "55dd9fb61abe6ec9f02ffcb8295e0da441935f6c97b6a4b19e65402870465d0e",
+          "code_length": 44
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "5f7ebd6a78dd3834f750fe8f348f8b032d2c51164e9f8fdbfc8506818153d35d",
+          "code_length": 10
+        },
+        {
+          "name": "lastIndexOf",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "08054110ed366a77d420b35b24496f0515b96ea1ea0063ab9b27ace7a9f2fce8",
+          "code_length": 6
+        },
+        {
+          "name": "sequence",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "cbb0212f3ab97afe19335088ff40224fc2facf141802a170924dbd1658481753",
+          "code_length": 52
+        },
+        {
+          "name": "remove",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e9cb456e6df16185e5e7a78bf993dc880b028a5489fd7e01ed61cdcd290ee3b9",
+          "code_length": 10
+        },
+        {
+          "name": "readExternal",
+          "descriptor": "(Ljava/io/ObjectInput;)V",
+          "access": 1,
+          "code_sha256": "1ee218c6369dd4f40ee1932aee27e733217bc42c656a6a4a6c612ecff1d9916d",
+          "code_length": 46,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "writeExternal",
+          "descriptor": "(Ljava/io/ObjectOutput;)V",
+          "access": 1,
+          "code_sha256": "5b659b7e5bb189420c804ebca1281ef27273f71d5468ae9e9bda5a05e1c4dca9",
+          "code_length": 55,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;Ljava/lang/Object;)Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 8,
+          "code_sha256": "432b5ca5f104e4d8be3ed77a35c90386a92237d94916f0f2f449ed177f892197",
+          "code_length": 6
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)Lorg/apache/commons/collections/SequencedHashMap$Entry;",
+          "access": 8,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)Ljava/util/HashMap;",
+          "access": 8,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/apache/commons/collections/SequencedHashMap;)J",
+          "access": 8,
+          "code_sha256": "f982d9dd65b730ecf929f713debf6e7bbf462b130509e8c934c67fddd48ac604",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/Externalizable",
+        "java/io/IOException",
+        "java/io/ObjectInput",
+        "java/io/ObjectOutput",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/ClassNotFoundException",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/collections/SequencedHashMap",
+        "org/apache/commons/collections/SequencedHashMap$1",
+        "org/apache/commons/collections/SequencedHashMap$2",
+        "org/apache/commons/collections/SequencedHashMap$3",
+        "org/apache/commons/collections/SequencedHashMap$Entry",
+        "org/apache/commons/collections/SequencedHashMap$OrderedIterator",
+        "org/apache/commons/collections/list/UnmodifiableList"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/AbstractSerializableSetDecorator.class",
+      "occurrence": 0,
+      "sha256": "52debffe896841738dc52a1d9584ec5c1f1bb821db67c94594978f14e73eb0f6",
+      "name": "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/collections/set/AbstractSetDecorator",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "b4f450c15546cda0428233c73640a00b7b7918d1186e87961434e0d17f4bf760",
+          "code_length": 13,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "a76faeba0f07151f5ec685b40a7aac4e00dee8eee6d105b59aa1c5e45cdb5ae5",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/util/Collection",
+        "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+        "org/apache/commons/collections/set/AbstractSetDecorator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/AbstractSetDecorator.class",
+      "occurrence": 0,
+      "sha256": "bfa86675ffdbc2189faf3ae13152411136fe60a3396aad2e2d2966391405ddbf",
+      "name": "org/apache/commons/collections/set/AbstractSetDecorator",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/collections/collection/AbstractCollectionDecorator",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getSet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 4,
+          "code_sha256": "5336a553a03ad36268c77dba0023c7c696f0fc48e06b83cf96fc4984a70b6ae2",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/util/Set",
+        "org/apache/commons/collections/collection/AbstractCollectionDecorator",
+        "org/apache/commons/collections/set/AbstractSetDecorator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/AbstractSortedSetDecorator.class",
+      "occurrence": 0,
+      "sha256": "1ea1356f5776707f347332a38a03b5b298933c615e9cd48645083dc8d355134b",
+      "name": "org/apache/commons/collections/set/AbstractSortedSetDecorator",
+      "major": 46,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "org/apache/commons/collections/set/AbstractSetDecorator",
+      "interfaces": [
+        "java/util/SortedSet"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getSortedSet",
+          "descriptor": "()Ljava/util/SortedSet;",
+          "access": 4,
+          "code_sha256": "5336a553a03ad36268c77dba0023c7c696f0fc48e06b83cf96fc4984a70b6ae2",
+          "code_length": 8
+        },
+        {
+          "name": "subSet",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "792122e4e172aea9875a01bd5a88408cf43a7ec1ee8a6510e4340d74dcf83bf9",
+          "code_length": 12
+        },
+        {
+          "name": "headSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "11e55a6e69b84c1fbdb9892739302b08eddaa0e40d51102e8bf61d1ba287857f",
+          "code_length": 11
+        },
+        {
+          "name": "tailSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "3541ee683395f4cdcb7f58a7e71b65760d2c9fe7c3394181160c4ea9bfa602be",
+          "code_length": 11
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "4881539420e653603ddf7f483bfb7eb882c3dba472593b7b363f4f5ece3c94a8",
+          "code_length": 10
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1205d645d7e1a4f890d222d7c847672b7543791efe576de84eac041c54109f83",
+          "code_length": 10
+        },
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1,
+          "code_sha256": "9f43cf6732f31154396eb515baec30f4724977aa29ab7587b14663c7bf7c6b32",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/util/SortedSet",
+        "org/apache/commons/collections/set/AbstractSetDecorator",
+        "org/apache/commons/collections/set/AbstractSortedSetDecorator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/CompositeSet$SetMutator.class",
+      "occurrence": 0,
+      "sha256": "8444af932f0deb233453fba7841b41516a0cc987967baabbd1eb078ea24caa0a",
+      "name": "org/apache/commons/collections/set/CompositeSet$SetMutator",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/collections/collection/CompositeCollection$CollectionMutator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "resolveCollision",
+          "descriptor": "(Lorg/apache/commons/collections/set/CompositeSet;Ljava/util/Set;Ljava/util/Set;Ljava/util/Collection;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/collection/CompositeCollection",
+        "org/apache/commons/collections/collection/CompositeCollection$CollectionMutator",
+        "org/apache/commons/collections/set/CompositeSet",
+        "org/apache/commons/collections/set/CompositeSet$SetMutator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/CompositeSet.class",
+      "occurrence": 0,
+      "sha256": "4902bb1d61b0aa7ef999e99b953db8aa5d18a453905e06afde16d6b13d97db6c",
+      "name": "org/apache/commons/collections/set/CompositeSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/collection/CompositeCollection",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "addComposited",
+          "descriptor": "(Ljava/util/Collection;)V",
+          "access": 33,
+          "code_sha256": "b8a7e221a4be51da8c3f5343572447f7c742d94f94c94d1e6cc5a4ae1e8fba70",
+          "code_length": 159
+        },
+        {
+          "name": "addComposited",
+          "descriptor": "(Ljava/util/Collection;Ljava/util/Collection;)V",
+          "access": 33,
+          "code_sha256": "e7af0bf88dcdc10ad33041556775b26cf8111234f10092ce9ee6244884434f9c",
+          "code_length": 57
+        },
+        {
+          "name": "addComposited",
+          "descriptor": "([Ljava/util/Collection;)V",
+          "access": 33,
+          "code_sha256": "807c2ae87f22e634667ff87052aefe21d9b75b491ac4c585a1ee29a42f6ab976",
+          "code_length": 23
+        },
+        {
+          "name": "setMutator",
+          "descriptor": "(Lorg/apache/commons/collections/collection/CompositeCollection$CollectionMutator;)V",
+          "access": 1,
+          "code_sha256": "d714f037fab4e8461a87973e19d0bb6fa3053e39afb4b6eef71eb9b30d5ac380",
+          "code_length": 6
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0977432fd6db47fc83399375f147bb2c927c5ecd60e39d16a058c3917d6db9df",
+          "code_length": 52
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "cbdfdf92247bdde8f02f86dd6e99c26c49398d419b786624043661636239811c",
+          "code_length": 39
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6cc361767e2057677fb213b1ec06b4cc069d91a8685f2485f4fab4bd7481c339",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Set",
+        "org/apache/commons/collections/CollectionUtils",
+        "org/apache/commons/collections/collection/CompositeCollection",
+        "org/apache/commons/collections/collection/CompositeCollection$CollectionMutator",
+        "org/apache/commons/collections/set/CompositeSet",
+        "org/apache/commons/collections/set/CompositeSet$SetMutator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/ListOrderedSet$1.class",
+      "occurrence": 0,
+      "sha256": "36287a04c1087ab44ea942addc19044b4a4912c673a93445fb6e6eae496c80d7",
+      "name": "org/apache/commons/collections/set/ListOrderedSet$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/set/ListOrderedSet",
+        "org/apache/commons/collections/set/ListOrderedSet$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/ListOrderedSet$OrderedSetIterator.class",
+      "occurrence": 0,
+      "sha256": "240cadc522851c318da375c3bf2a3539885dc6d48167abb22d5baaa7d6ce7ec0",
+      "name": "org/apache/commons/collections/set/ListOrderedSet$OrderedSetIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/collections/iterators/AbstractIteratorDecorator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "set",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 20
+        },
+        {
+          "name": "last",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;Ljava/util/Collection;)V",
+          "access": 2,
+          "code_sha256": "15d7a8c03dce8ac355e69421b098e6d3703f08669f3360a17b596c5b4d308c44",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a565b87bc7afb6590db4b4ff5489db85d184748912c9ba08edcba68d9166bb8f",
+          "code_length": 18
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "efc247cc39e4427c263936f390f013714149e38fd0b0a74d790a2a4fa898e090",
+          "code_length": 29
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Iterator;Ljava/util/Collection;Lorg/apache/commons/collections/set/ListOrderedSet$1;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/commons/collections/iterators/AbstractIteratorDecorator",
+        "org/apache/commons/collections/set/ListOrderedSet",
+        "org/apache/commons/collections/set/ListOrderedSet$1",
+        "org/apache/commons/collections/set/ListOrderedSet$OrderedSetIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/ListOrderedSet.class",
+      "occurrence": 0,
+      "sha256": "09f269e634f3893fb20ce1d0da9bc948154d1948e3542313d47c618a26782a75",
+      "name": "org/apache/commons/collections/set/ListOrderedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "setOrder",
+          "descriptor": "Ljava/util/List;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;Ljava/util/List;)Lorg/apache/commons/collections/set/ListOrderedSet;",
+          "access": 9,
+          "code_sha256": "f607b40cb510a86739a3f2bd79d2affaf4a475ac472b099aa2f6690a0493a2ea",
+          "code_length": 66
+        },
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;)Lorg/apache/commons/collections/set/ListOrderedSet;",
+          "access": 9,
+          "code_sha256": "79b7fb6c2dbf0bf665ef6deef4d6db4ac0dd8b3077560ad6fcc600603e5d6d27",
+          "code_length": 9
+        },
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/List;)Lorg/apache/commons/collections/set/ListOrderedSet;",
+          "access": 9,
+          "code_sha256": "04dca77348da329a16c4426962b1a7b35fa1f30b1b11d6177e161f91d0b210ec",
+          "code_length": 41
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2e636d9a0dd3db320bcc8e09eb13edd83776bde87c42cf9bb38b929365256fdb",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "ceb0953fe0019244ef03385a1f3a758537c49433c091bdde86ab71d082c027bd",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/util/List;)V",
+          "access": 4,
+          "code_sha256": "51d514a80609cde9e52ad7e2e90ebfd91df4b33ee80c61578a2b8249a8a695ce",
+          "code_length": 25
+        },
+        {
+          "name": "asList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "b9a0e58ff6ae45de8d4385cd12d34eb12c4461fc892fb879b548d66af26317a2",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ae5806701057e27bf557f4d6d4c76712345ff99f2bc702ab2ccd917bdc800c9b",
+          "code_length": 19
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "4ce85069d4291e554bc9b823ac8c94805c4b8a671803e109f6a78fb57af6bb3d",
+          "code_length": 22
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "5260e8272ecac576a4ef859dd3a4a7f78ef5a440ddffb672b4ed08bc3d57c15e",
+          "code_length": 48
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "3b5c284e2a7060c71e2e4b73f00dbe09c9ffaf01d63ee439c0b4f81acec116fc",
+          "code_length": 40
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4aea003608754051d257c6545ee0a02827284f7863f6f15a280f413902d246d8",
+          "code_length": 24
+        },
+        {
+          "name": "removeAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "98c74fb9373c22634ddbbb7845137ef5667e84cf7ff68b9999cb8d298c166e7e",
+          "code_length": 40
+        },
+        {
+          "name": "retainAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "1213c1db65a029ec8834ebd1fcfb2234984e777db6992f376699bfb471d9ab8a",
+          "code_length": 93
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "a5ace96518ccd565917fbca331d6792094f9c208a33640f377face910c92aaf0",
+          "code_length": 10
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0adf7f1f1b5ac0cbb5fe18d46a3fe41a833f8eb3d8cfe8e86fe3b23ca1d440a6",
+          "code_length": 11
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6892ff623778ef092740fb66dd2941c49214aff7e3f830b79285c2dc13b4ec2f",
+          "code_length": 11
+        },
+        {
+          "name": "indexOf",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 1,
+          "code_sha256": "b276625695b23df125fd5250f5b60b247ad774dbc663e7db7c95c555ed4c2f9e",
+          "code_length": 11
+        },
+        {
+          "name": "add",
+          "descriptor": "(ILjava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "c27febe7db6d076fdb8a5b4a6289dd1186a382670e436822c7bd45c395923e8d",
+          "code_length": 31
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(ILjava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "4633d8e53a5c4f3944c06f23d842070c2d270ff74c3b23d2f8022185f4027882",
+          "code_length": 72
+        },
+        {
+          "name": "remove",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ee7f77ea418595aa16452f9a412a4dee084f5d9c80d67cc3955177c966207055",
+          "code_length": 19
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8a272c707117f7dd4c8c4231d31846606f25f9cd742e9f89887e742e6952ebc0",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/apache/commons/collections/list/UnmodifiableList",
+        "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+        "org/apache/commons/collections/set/ListOrderedSet",
+        "org/apache/commons/collections/set/ListOrderedSet$1",
+        "org/apache/commons/collections/set/ListOrderedSet$OrderedSetIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/MapBackedSet.class",
+      "occurrence": 0,
+      "sha256": "19ed2944bab7fa02269abda564446e8c7b44f01cf6f226c86c6499a186fa4e98",
+      "name": "org/apache/commons/collections/set/MapBackedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Set",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/Map;",
+          "access": 20
+        },
+        {
+          "name": "dummyValue",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "582a2f800f06e1dc10edd004bc66782020febe3f9ab843256158ca2089110f15",
+          "code_length": 6
+        },
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Object;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "23db0ff11f63408c7dfebf730e94c6a44974a068e2426b1f7a5112a49617ed83",
+          "code_length": 24
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "7cf210ce5f599e99c40c8e9dde1ed4efb4b81cae1ef1ba848cf1c55564bb2f67",
+          "code_length": 15
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7ef94dd1ba49683ef53b456690624af8ddec8751b2b3d32f345927c9c5d9b55f",
+          "code_length": 10
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5758d21c902a9e5977af61a47db7942919f6831a2e48087def5f3428210f01b1",
+          "code_length": 10
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "84292d0f814473c8ec5b900394f99a21acda8a32a3d827f636e83558220be716",
+          "code_length": 15
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4222891df5614de1b771c2620b2bdcecd4a84fac82c6cc826cb1a1322a31f380",
+          "code_length": 11
+        },
+        {
+          "name": "containsAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "cfed840c3c164ec7bc50ebcedc282b56939101d7e8694b38742cadae86fb2f03",
+          "code_length": 16
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "ef69be6ee7aedfc02b072af7496e0560cd92fc792fff2f6cb5a33a5ec07fb098",
+          "code_length": 44
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "9bd205c37dd639465b5089383fc4121cc36dae39356e486693f531047c57e8f9",
+          "code_length": 72
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8f5da0f1f906cb52f03f585d768e567f6903e39e3c7e053774c50a8adcea18c2",
+          "code_length": 40
+        },
+        {
+          "name": "removeAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "a3e13b8a208ff7d606f9a5f988c95f38acffb66481caabc06058acdf46be8906",
+          "code_length": 16
+        },
+        {
+          "name": "retainAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "aa9d5c5c39561f66f512a8c10b5f76ea247ccd85c3c655354e032d72fb094917",
+          "code_length": 16
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6e44e58be679c745ecaf2e26ad4aae7a099424ad116e57aced680a2934272b0b",
+          "code_length": 10
+        },
+        {
+          "name": "toArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d09fefc0bff36661a1189212658b24bafbbd7c75b22d5af43854fa3f6eb5c36d",
+          "code_length": 15
+        },
+        {
+          "name": "toArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ba77c8ae7a3178f2ecb7b6453d755a63b3f61ef0fbf8042f6cc03b9405c2339e",
+          "code_length": 16
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0da083e69b9c37f01fc77726efa7b453e0d403091bc23b2587c72602b4db8b14",
+          "code_length": 14
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "878f97896bfa1c3efb6a69a5d543b0dc20cd6f6e60cff8791bfea3daa488fc45",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/io/Serializable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Set",
+        "org/apache/commons/collections/set/MapBackedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/PredicatedSet.class",
+      "occurrence": 0,
+      "sha256": "48a9b5a95ebfa7e2cd7de0592a6ef876990dd432d95dfd9c8876d4469b2d20dd",
+      "name": "org/apache/commons/collections/set/PredicatedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/collection/PredicatedCollection",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Predicate;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "0c044478252d1b7aa03302b235d5c163716252165276131bb773f88ca1c14199",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Predicate;)V",
+          "access": 4,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "getSet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 4,
+          "code_sha256": "04875e5a1b6e3cbc3b6846f591223dee271236dd4e29a0b266719ce3db7f9153",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/util/Set",
+        "org/apache/commons/collections/collection/PredicatedCollection",
+        "org/apache/commons/collections/set/PredicatedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/PredicatedSortedSet.class",
+      "occurrence": 0,
+      "sha256": "9bb855be16972f3a543737d6d17a80cfd7f7003722c001f75d33952ecf86ad52",
+      "name": "org/apache/commons/collections/set/PredicatedSortedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/set/PredicatedSet",
+      "interfaces": [
+        "java/util/SortedSet"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Predicate;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "0c044478252d1b7aa03302b235d5c163716252165276131bb773f88ca1c14199",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Predicate;)V",
+          "access": 4,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "getSortedSet",
+          "descriptor": "()Ljava/util/SortedSet;",
+          "access": 2,
+          "code_sha256": "04875e5a1b6e3cbc3b6846f591223dee271236dd4e29a0b266719ce3db7f9153",
+          "code_length": 8
+        },
+        {
+          "name": "subSet",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "60743bec84544a920dd9f4256f5b5d366530fab56e97a936bab2d2b7b70dd642",
+          "code_length": 25
+        },
+        {
+          "name": "headSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "c0a4bac05bfdfda322efaad7245c8d0358feb80786e4d34d1d53952ca09660e7",
+          "code_length": 24
+        },
+        {
+          "name": "tailSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "c6414a0dbff14c1a525e9ea7e976dc66acbb67323e82e3a1df7e3e68315e718e",
+          "code_length": 24
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "eb035dbd00aeff5d8c57ce2255abe4fad337e2b1d96f9ca43b4f4f31c4e9aa24",
+          "code_length": 10
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b0886f00bd4003f252c45a7fc1554ba376e22f8cd2efc9b2f98d0a3745ac3822",
+          "code_length": 10
+        },
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1,
+          "code_sha256": "3e989030558ff93b1967471debc7c5fbf2d3541e0cac80544ef7f2da880e9d65",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/util/SortedSet",
+        "org/apache/commons/collections/set/PredicatedSet",
+        "org/apache/commons/collections/set/PredicatedSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/SynchronizedSet.class",
+      "occurrence": 0,
+      "sha256": "7492423ba149dcc8b74a85f009be321e14a2cad3efe28fcb0456c62146b4a963",
+      "name": "org/apache/commons/collections/set/SynchronizedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/collection/SynchronizedCollection",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "ca8ac0e1ba54e1a47e51674ef2e7b6052e0d2a9832b1b63fe8cd68bf4284357e",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 4,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Ljava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "c7021e2ca5dee0584483fa6381b595bf98a0a6e5ad7f0ec86e051dbe7c77a1c3",
+          "code_length": 7
+        },
+        {
+          "name": "getSet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 4,
+          "code_sha256": "8a9e5b2fc1f049c0089d7c39d5a4953bd2f96c2dd7b0bc31e79b013be3524266",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/util/Set",
+        "org/apache/commons/collections/collection/SynchronizedCollection",
+        "org/apache/commons/collections/set/SynchronizedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/SynchronizedSortedSet.class",
+      "occurrence": 0,
+      "sha256": "e5606be6d8f2556b76140f27cd5b678b081a208d18247dffe838e52861d0af31",
+      "name": "org/apache/commons/collections/set/SynchronizedSortedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/collection/SynchronizedCollection",
+      "interfaces": [
+        "java/util/SortedSet"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/SortedSet;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "ca8ac0e1ba54e1a47e51674ef2e7b6052e0d2a9832b1b63fe8cd68bf4284357e",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/SortedSet;)V",
+          "access": 4,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/SortedSet;Ljava/lang/Object;)V",
+          "access": 4,
+          "code_sha256": "c7021e2ca5dee0584483fa6381b595bf98a0a6e5ad7f0ec86e051dbe7c77a1c3",
+          "code_length": 7
+        },
+        {
+          "name": "getSortedSet",
+          "descriptor": "()Ljava/util/SortedSet;",
+          "access": 4,
+          "code_sha256": "8a9e5b2fc1f049c0089d7c39d5a4953bd2f96c2dd7b0bc31e79b013be3524266",
+          "code_length": 8
+        },
+        {
+          "name": "subSet",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "6f14e4bd57b26de3919e652aa74969b88cd8d8f7664129c23580f9855195c7c0",
+          "code_length": 43
+        },
+        {
+          "name": "headSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "87b8257f05d2c5e8c39c820c5ebcbd15bb1b64a36635c99690f179e3568c450d",
+          "code_length": 40
+        },
+        {
+          "name": "tailSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "02f20965e1f7d53ef3287cbee8af9d0d52e0d182c9b3bd8389b8473f27f293b4",
+          "code_length": 40
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1768a2ce54fbca0b07dbfaae42c901b607950a96e20ced1a199aefcb9f6832c7",
+          "code_length": 24
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "20e40733288a95985e898cdbcad52fda2054189ac1844090c5a7f95d1a041800",
+          "code_length": 24
+        },
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1,
+          "code_sha256": "98838a417d680fc85953fe65e2c2746e95c47db917547112c0d8dac6e1d0e468",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/util/SortedSet",
+        "org/apache/commons/collections/collection/SynchronizedCollection",
+        "org/apache/commons/collections/set/SynchronizedSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/TransformedSet.class",
+      "occurrence": 0,
+      "sha256": "98f05d4065e8caeba486539bbe87b28f3401d33dfa249b566307fb2e29a90eda",
+      "name": "org/apache/commons/collections/set/TransformedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/collection/TransformedCollection",
+      "interfaces": [
+        "java/util/Set"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Transformer;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "0c044478252d1b7aa03302b235d5c163716252165276131bb773f88ca1c14199",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Transformer;)V",
+          "access": 4,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/util/Set",
+        "org/apache/commons/collections/collection/TransformedCollection",
+        "org/apache/commons/collections/set/TransformedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/TransformedSortedSet.class",
+      "occurrence": 0,
+      "sha256": "5d443d64c42903f50edabd0dad0ab181a2d5d14e27cc499c4a80c6bfd8f49f94",
+      "name": "org/apache/commons/collections/set/TransformedSortedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/set/TransformedSet",
+      "interfaces": [
+        "java/util/SortedSet"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Transformer;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "0c044478252d1b7aa03302b235d5c163716252165276131bb773f88ca1c14199",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Transformer;)V",
+          "access": 4,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "getSortedSet",
+          "descriptor": "()Ljava/util/SortedSet;",
+          "access": 4,
+          "code_sha256": "2ab71b0a54f016b0cd02134a9d5b924014d3c2f29077293f46e272bad3defe7a",
+          "code_length": 8
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "75c0a535df4149f947fd8ffe325492e26fb3bc1ba71e054b44a3ec11859cf991",
+          "code_length": 10
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5a7241bfda19d3687503b014e0457c43a9ae44db161bbbcf217cda5a6733301f",
+          "code_length": 10
+        },
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1,
+          "code_sha256": "1ec18e3bb79a754a2354374dba8de8d764833b31ce718cad6dc07bc1334ad243",
+          "code_length": 10
+        },
+        {
+          "name": "subSet",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "29aa3cdcd7545064e7f88cc8dfb21a38f13452927d9bca56cdc98d1eb940c040",
+          "code_length": 25
+        },
+        {
+          "name": "headSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "a2ed06679092a8254b7083a5fb587a01da76ac56e16ca1ff2416b0fa6a4552d0",
+          "code_length": 24
+        },
+        {
+          "name": "tailSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "8814ef4ba1d07ac265a819d4fbd656747f8c6b563f42b6052733a1a0466b2a81",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "java/util/SortedSet",
+        "org/apache/commons/collections/set/TransformedSet",
+        "org/apache/commons/collections/set/TransformedSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/TypedSet.class",
+      "occurrence": 0,
+      "sha256": "f7b103640c19d8cab5261611a30fe9a808a73d27be88c5f794a4295ab1c7c070",
+      "name": "org/apache/commons/collections/set/TypedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;Ljava/lang/Class;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "ac0caaae0f07bbee29c944a4538f5b3d0717d042e334a3dad2ca9dd4870abcde",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "ec13924c62330cec641b07cb26251a98d912aaa81f8f9ca142098a7066953461",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/functors/InstanceofPredicate",
+        "org/apache/commons/collections/set/PredicatedSet",
+        "org/apache/commons/collections/set/TypedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/TypedSortedSet.class",
+      "occurrence": 0,
+      "sha256": "e2bafbd32272cf04a1dee1c53a075228fee6a95f8e6910b4b7b4ae5b716af4a0",
+      "name": "org/apache/commons/collections/set/TypedSortedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/SortedSet;Ljava/lang/Class;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "ac0caaae0f07bbee29c944a4538f5b3d0717d042e334a3dad2ca9dd4870abcde",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "ec13924c62330cec641b07cb26251a98d912aaa81f8f9ca142098a7066953461",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/functors/InstanceofPredicate",
+        "org/apache/commons/collections/set/PredicatedSortedSet",
+        "org/apache/commons/collections/set/TypedSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/UnmodifiableSet.class",
+      "occurrence": 0,
+      "sha256": "ead382e0dfadabee75d59b5ed41ba113a62bcb79c7af5f14b037c8f15b4e0242",
+      "name": "org/apache/commons/collections/set/UnmodifiableSet",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+      "interfaces": [
+        "org/apache/commons/collections/Unmodifiable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/Set;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "be92a39db21919ffefff1410a557d57c437230ff6cb3bb588bb551330248316e",
+          "code_length": 18
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Set;)V",
+          "access": 2,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "2b7da7f1650ffd3dfaaf06bbed595b4a4ac81b288f5b0c4ad69221fde69a6da7",
+          "code_length": 13
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        },
+        {
+          "name": "removeAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        },
+        {
+          "name": "retainAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "748f27bbd54b9b39eb9685f1f5a601ad68048ff53312ae48be9c7394a02f80fb",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/UnsupportedOperationException",
+        "java/util/Collection",
+        "org/apache/commons/collections/Unmodifiable",
+        "org/apache/commons/collections/iterators/UnmodifiableIterator",
+        "org/apache/commons/collections/set/AbstractSerializableSetDecorator",
+        "org/apache/commons/collections/set/UnmodifiableSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/set/UnmodifiableSortedSet.class",
+      "occurrence": 0,
+      "sha256": "fe1b5dfa1ee5c8c429db024053fdb829ada13bf14ecf8f9c74fc9e55baf9a1a4",
+      "name": "org/apache/commons/collections/set/UnmodifiableSortedSet",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/commons/collections/set/AbstractSortedSetDecorator",
+      "interfaces": [
+        "org/apache/commons/collections/Unmodifiable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "decorate",
+          "descriptor": "(Ljava/util/SortedSet;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "be92a39db21919ffefff1410a557d57c437230ff6cb3bb588bb551330248316e",
+          "code_length": 18
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "ad79dd427e36f0b0614c8364a2c722ebb99e3474ddbc52e60dc5c8d4727e161e",
+          "code_length": 13,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "04af7c8a3df8282e6ca6a7564ec579d88d88fd435fa977f9898e8671e2fb6685",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/SortedSet;)V",
+          "access": 2,
+          "code_sha256": "e4809e52bed85bd35bfdd91c6eb1f8331f8f6e307993b2bed352f92c868c703e",
+          "code_length": 6
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "996572851f1cb8390948705e24e8b8872dd9ac3c952551b28d898e206a0d9316",
+          "code_length": 13
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "addAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "removeAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "retainAll",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "9de90592b5cf9357f65036323513ea1546330aa78070819637c29bb1ee5ac9eb",
+          "code_length": 8
+        },
+        {
+          "name": "subSet",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "b11931a179cf11911cdef92ec87df88448581d1ddf61d04bf20539df639f5b63",
+          "code_length": 21
+        },
+        {
+          "name": "headSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "b5dc2e44d555234a4174fe314a2294c2ee0c26fed73c849b6254fd4988479e0a",
+          "code_length": 20
+        },
+        {
+          "name": "tailSet",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/SortedSet;",
+          "access": 1,
+          "code_sha256": "5d1902fa66aa62d3456d361dfbbde6355a4b2d454524a48eafdb4380226e634a",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/io/Serializable",
+        "java/lang/ClassNotFoundException",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Collection",
+        "java/util/SortedSet",
+        "org/apache/commons/collections/Unmodifiable",
+        "org/apache/commons/collections/iterators/UnmodifiableIterator",
+        "org/apache/commons/collections/set/AbstractSortedSetDecorator",
+        "org/apache/commons/collections/set/UnmodifiableSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SetUtils.class",
+      "occurrence": 0,
+      "sha256": "18f2b21165c00cd70fcddd8722d9da7c5118122c274593e7feec3049664d8dcb",
+      "name": "org/apache/commons/collections/SetUtils",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY_SET",
+          "descriptor": "Ljava/util/Set;",
+          "access": 25
+        },
+        {
+          "name": "EMPTY_SORTED_SET",
+          "descriptor": "Ljava/util/SortedSet;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isEqualSet",
+          "descriptor": "(Ljava/util/Collection;Ljava/util/Collection;)Z",
+          "access": 9,
+          "code_sha256": "2bd5a5a2310709de7869f527f7736dd7c336c7fd86749e50261a871e8452964c",
+          "code_length": 40
+        },
+        {
+          "name": "hashCodeForSet",
+          "descriptor": "(Ljava/util/Collection;)I",
+          "access": 9,
+          "code_sha256": "008558ea880eee0a8e844a21f7f0f2cd396c82e362ab193e4998ec917c6f5779",
+          "code_length": 49
+        },
+        {
+          "name": "synchronizedSet",
+          "descriptor": "(Ljava/util/Set;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "a3f9b22dab790f5659153d6467aa5c9df0a4a38e7d06c4e31ee5bb5024e15008",
+          "code_length": 5
+        },
+        {
+          "name": "unmodifiableSet",
+          "descriptor": "(Ljava/util/Set;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "3197674797e6ef7dd063cdfcfbc7cca3c0b5f126ff9a486559a2c872dc5adfbb",
+          "code_length": 5
+        },
+        {
+          "name": "predicatedSet",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Predicate;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "c989f212b258cf5c199fabc00ae0c1ad075ba46614409c005971db1ebce88341",
+          "code_length": 6
+        },
+        {
+          "name": "typedSet",
+          "descriptor": "(Ljava/util/Set;Ljava/lang/Class;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "ed3f1d1f876f7284d16f75adf759dc1868682a4d0c550b7208ad7f2d73a8120e",
+          "code_length": 6
+        },
+        {
+          "name": "transformedSet",
+          "descriptor": "(Ljava/util/Set;Lorg/apache/commons/collections/Transformer;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "bccbc9c3b026a97a4dd960d60dc42f20d0ebc642a1096e3eda6007638b8389ff",
+          "code_length": 6
+        },
+        {
+          "name": "orderedSet",
+          "descriptor": "(Ljava/util/Set;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "dcfad17ffecca370f37d96501be731d7796fc33815576b9bd79436cf2d0c59dc",
+          "code_length": 5
+        },
+        {
+          "name": "synchronizedSortedSet",
+          "descriptor": "(Ljava/util/SortedSet;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "474dfdaa45b2cd7737660221dae1639b5e5400f523c9497da956f5655d821bd2",
+          "code_length": 5
+        },
+        {
+          "name": "unmodifiableSortedSet",
+          "descriptor": "(Ljava/util/SortedSet;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "360f50ce5d596a6d1659c41dab1b2cf700af0147978531c4d0974374bb3d8557",
+          "code_length": 5
+        },
+        {
+          "name": "predicatedSortedSet",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Predicate;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "9417fba4dc547fa3b1ecb83a472df2b478540005de6961b3c872b4dec5209ddb",
+          "code_length": 6
+        },
+        {
+          "name": "typedSortedSet",
+          "descriptor": "(Ljava/util/SortedSet;Ljava/lang/Class;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "0a95dbda38bd1407fc85031c971ac0669892dfc4b54694f1eebb0cc7f1ade79c",
+          "code_length": 6
+        },
+        {
+          "name": "transformedSortedSet",
+          "descriptor": "(Ljava/util/SortedSet;Lorg/apache/commons/collections/Transformer;)Ljava/util/SortedSet;",
+          "access": 9,
+          "code_sha256": "c9b4207ef5e6112cf8c5eaa2e369d9ac86c604ff63c8fccd15bc9c359bdf8cbf",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6751e82527611112556824a3fe877b60a2dfa8bd3f1f7b355a637428e9cde029",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/TreeSet",
+        "org/apache/commons/collections/SetUtils",
+        "org/apache/commons/collections/set/ListOrderedSet",
+        "org/apache/commons/collections/set/PredicatedSet",
+        "org/apache/commons/collections/set/PredicatedSortedSet",
+        "org/apache/commons/collections/set/SynchronizedSet",
+        "org/apache/commons/collections/set/SynchronizedSortedSet",
+        "org/apache/commons/collections/set/TransformedSet",
+        "org/apache/commons/collections/set/TransformedSortedSet",
+        "org/apache/commons/collections/set/TypedSet",
+        "org/apache/commons/collections/set/TypedSortedSet",
+        "org/apache/commons/collections/set/UnmodifiableSet",
+        "org/apache/commons/collections/set/UnmodifiableSortedSet"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SortedBag.class",
+      "occurrence": 0,
+      "sha256": "9ec25f13137e16d3da0c439382529d0c9449cf29fd08b0e0a9673eb9f09ca4bf",
+      "name": "org/apache/commons/collections/SortedBag",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/collections/Bag"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1025
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/Bag",
+        "org/apache/commons/collections/SortedBag"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SortedBidiMap.class",
+      "occurrence": 0,
+      "sha256": "859628044f3a51d108bb798c92b495a4a9bc2d7696ca5fdb74d07d6a2bd08fd4",
+      "name": "org/apache/commons/collections/SortedBidiMap",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/collections/OrderedBidiMap",
+        "java/util/SortedMap"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "inverseBidiMap",
+          "descriptor": "()Lorg/apache/commons/collections/BidiMap;",
+          "access": 1025
+        },
+        {
+          "name": "inverseSortedBidiMap",
+          "descriptor": "()Lorg/apache/commons/collections/SortedBidiMap;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/SortedMap",
+        "org/apache/commons/collections/OrderedBidiMap",
+        "org/apache/commons/collections/SortedBidiMap"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$1.class",
+      "occurrence": 0,
+      "sha256": "85ac712bc8a803dd60abb953fb08a43f9ff88990b5880ae3a4bf62547cfbb79a",
+      "name": "org/apache/commons/collections/StaticBucketMap$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$EntryIterator.class",
+      "occurrence": 0,
+      "sha256": "b20f6fa255d4817bd6af14c1d58a6ad7aa7a62064b3e23d6f09d10e1f34e0a2e",
+      "name": "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "current",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2
+        },
+        {
+          "name": "bucket",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "last",
+          "descriptor": "Ljava/util/Map$Entry;",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "ba9780232fafc6271cb36014e6f3824350f0e95c33768d9fc6ad87e298bd9dd1",
+          "code_length": 21
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2c051856e097fa9c4e9c7903040ebb70504f42f51bb65e4631fcdab9b2b4270b",
+          "code_length": 115
+        },
+        {
+          "name": "nextEntry",
+          "descriptor": "()Ljava/util/Map$Entry;",
+          "access": 4,
+          "code_sha256": "e2e6d7a80daa1b487afda319023d88fa44b1f8fdb3c81f8b7d25bc6a743f5c5a",
+          "code_length": 43
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f964b2d0e1908ddde45891eb550c0e17b34ea5419abc1987f98b5af5ec127efd",
+          "code_length": 5
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "11169899e997a1adf9e0c7be728329401bf059c50f661b6389de0af4eba6fe89",
+          "code_length": 38
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/NoSuchElementException",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+        "org/apache/commons/collections/StaticBucketMap$Lock",
+        "org/apache/commons/collections/StaticBucketMap$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$EntrySet.class",
+      "occurrence": 0,
+      "sha256": "a39123d65cdcedd4555302875caf759f63bbe3f31aba6c7afa29701e616134ad",
+      "name": "org/apache/commons/collections/StaticBucketMap$EntrySet",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "ec2c21f00e3cbcac835cbdf4e45288d76c6eec5f5c164c49b95238585558e8c0",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad4897a227293229968fab59337da5296807a18a08660035ab7f89b5c74cba27",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f5317d1f249df4aa215b4407834561df42247daaff85aed36ac6075eb7c1fa0d",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "2482d886c0d482da0f8f6706a8054bd01107d349f8e4ed1459cc47d6bf4eed4c",
+          "code_length": 13
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "828fd84a9848244eb2cf9871c03c9fcabcc081ac38f6d7bbff1cebc0edb7c804",
+          "code_length": 88
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d227823344c7e4065fbf15ae9b64e06af62da59b07904f98a4d66b8b2b3808c3",
+          "code_length": 110
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/util/AbstractSet",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+        "org/apache/commons/collections/StaticBucketMap$EntrySet",
+        "org/apache/commons/collections/StaticBucketMap$Lock",
+        "org/apache/commons/collections/StaticBucketMap$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$KeyIterator.class",
+      "occurrence": 0,
+      "sha256": "b34fbf2aba32d5755febdae1cd7373da0efd3c8ac555c00e55efe52ead435c6c",
+      "name": "org/apache/commons/collections/StaticBucketMap$KeyIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "628419cf97c65a061a9a5be6a4408b8387ff8bba5a9a25361317c77f598ab20a",
+          "code_length": 12
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "757d08de3c814e03b7199edd62c926557b28ec76ea35e30e151d3e0de906feca",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+        "org/apache/commons/collections/StaticBucketMap$KeyIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$KeySet.class",
+      "occurrence": 0,
+      "sha256": "b2f06d1d11e3ebf2f5c8a430e5be66805d14bc7d520fd992db4f004ecd56ac75",
+      "name": "org/apache/commons/collections/StaticBucketMap$KeySet",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractSet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "ec2c21f00e3cbcac835cbdf4e45288d76c6eec5f5c164c49b95238585558e8c0",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad4897a227293229968fab59337da5296807a18a08660035ab7f89b5c74cba27",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f5317d1f249df4aa215b4407834561df42247daaff85aed36ac6075eb7c1fa0d",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "2482d886c0d482da0f8f6706a8054bd01107d349f8e4ed1459cc47d6bf4eed4c",
+          "code_length": 13
+        },
+        {
+          "name": "contains",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "d1dd9077645df3e6c09092a87b2c0b28395959044ad6c737ddfeada3e57fd973",
+          "code_length": 9
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "a5ff4ae2cb5a01506c1614c0f3b22e1326a9447cb8ed8807c48fc4852ea13709",
+          "code_length": 102
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/AbstractSet",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$KeyIterator",
+        "org/apache/commons/collections/StaticBucketMap$KeySet",
+        "org/apache/commons/collections/StaticBucketMap$Lock",
+        "org/apache/commons/collections/StaticBucketMap$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$Lock.class",
+      "occurrence": 0,
+      "sha256": "5e25c0440421ba45328da4a07450e8e4015d1db6e7aab1fec53cf04042622c98",
+      "name": "org/apache/commons/collections/StaticBucketMap$Lock",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$Lock"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$Node.class",
+      "occurrence": 0,
+      "sha256": "b2fde24ffb9d76aed37aa574919105e281e5359317556df1d31da48910a05f3f",
+      "name": "org/apache/commons/collections/StaticBucketMap$Node",
+      "major": 46,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 4
+        },
+        {
+          "name": "next",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap$Node;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e74466716ad344da44a537fc00845ff4c20df60a8c6a062994976ac85689f1de",
+          "code_length": 38
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "cb91926c9e71104309c115e137f0a2cb64106d9adada38a7c0e74542cfa01116",
+          "code_length": 103
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0702a3ee2ab45023a4eae08ca55e160e3408a13676546a0db9390c138ce610e9",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/KeyValue",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$ValueIterator.class",
+      "occurrence": 0,
+      "sha256": "8e2c2f89ec795105a96250e26b821370e353775fd63785ddbb24569a0872537c",
+      "name": "org/apache/commons/collections/StaticBucketMap$ValueIterator",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "628419cf97c65a061a9a5be6a4408b8387ff8bba5a9a25361317c77f598ab20a",
+          "code_length": 12
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "757d08de3c814e03b7199edd62c926557b28ec76ea35e30e151d3e0de906feca",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+        "org/apache/commons/collections/StaticBucketMap$ValueIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap$Values.class",
+      "occurrence": 0,
+      "sha256": "c968424bd4efe9422c749f7e0a26b5f7519e782376134a0ba9c48a7e14c30bd0",
+      "name": "org/apache/commons/collections/StaticBucketMap$Values",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/StaticBucketMap;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)V",
+          "access": 2,
+          "code_sha256": "ec2c21f00e3cbcac835cbdf4e45288d76c6eec5f5c164c49b95238585558e8c0",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad4897a227293229968fab59337da5296807a18a08660035ab7f89b5c74cba27",
+          "code_length": 8
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f5317d1f249df4aa215b4407834561df42247daaff85aed36ac6075eb7c1fa0d",
+          "code_length": 8
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "2482d886c0d482da0f8f6706a8054bd01107d349f8e4ed1459cc47d6bf4eed4c",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Lorg/apache/commons/collections/StaticBucketMap$1;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/util/AbstractCollection",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$ValueIterator",
+        "org/apache/commons/collections/StaticBucketMap$Values"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/StaticBucketMap.class",
+      "occurrence": 0,
+      "sha256": "de172a3511805fb20839173a90a7c29457ddaa70b131bc878a66d09b2acb3f71",
+      "name": "org/apache/commons/collections/StaticBucketMap",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_BUCKETS",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "m_buckets",
+          "descriptor": "[Lorg/apache/commons/collections/StaticBucketMap$Node;",
+          "access": 2
+        },
+        {
+          "name": "m_locks",
+          "descriptor": "[Lorg/apache/commons/collections/StaticBucketMap$Lock;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "02531cade6371d4a3ced8f0094e75363e597f8eec299d245c3064eeb3902b46c",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b38fc43016bfd5a24610e67944dab5970f1cbcb1f4b5baf161767441a9937821",
+          "code_length": 64
+        },
+        {
+          "name": "getHash",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 18,
+          "code_sha256": "b9c9b1d36e4e791bd57eb83412a702b8205e8e4b895564a582f7443e6b261e46",
+          "code_length": 76
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "aacf09822a622c24b3a44266efc8a79195f416bc62cc896b0aa326e141e8f033",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1ff4ef2ce707b1b3437f4551d0a18d62680c8ae95878021925e0d2161097203b",
+          "code_length": 33
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1524416d6510214c0bc7baeef48ee83545f4aa0716242eb4335280df45ac970f",
+          "code_length": 210
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c2016abad5064a57d51fa86f5c921a5a1a8c30a1bb21ff97df243c146ed9da50",
+          "code_length": 89
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "c9df08b7fd7c1f4d3ece60171f2b6b872e202b0cce483730c2788b75256e5ca4",
+          "code_length": 85
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "9d39a8fe23f26a43e8631f5b68c235c947a21e56de7c7c9ca4ff8321796591ce",
+          "code_length": 96
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "fea709193ccffc526a30ef317ee3aaae17d6103d8c45b4219caf1e818edff015",
+          "code_length": 10
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "0aefd8f59aa47810181bc03686ac03b7ebb8dae4edb46d7d102cbef62d4ddd34",
+          "code_length": 10
+        },
+        {
+          "name": "putAll",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "5d1aa232428acd8bf824faa91c5af806e6d61dd93d530ad173de9ed1045d5d65",
+          "code_length": 45
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2c990bd43d47099f0a5a87f62859723300d5cf5d586d6555e1a6297f9a64fe69",
+          "code_length": 141
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "677b49a10952691437bebf4f4c4f6844b0ba6dcd6730fca7149406b949f63f65",
+          "code_length": 13
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "6bef9447c4916038a60230b180c70ec49adca0bf58abdcf11a541795c9f2780d",
+          "code_length": 53
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "63496275bcd9a61e86ad2b1078fc34215e9b7ec312096311f16358cb4f18b0f2",
+          "code_length": 41
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "00a3ec6bd62c8982b6101a193f66a7f789c6985cf2ec04d76c0941ed5ad132d0",
+          "code_length": 73
+        },
+        {
+          "name": "atomic",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 1,
+          "code_sha256": "5580db34d051dd6bf18224083c71bbf09c1607edb86b911a7789ec0822224170",
+          "code_length": 19
+        },
+        {
+          "name": "atomic",
+          "descriptor": "(Ljava/lang/Runnable;I)V",
+          "access": 2,
+          "code_sha256": "0f7bedbbcc30dcc77dab415939ae2536cccff559105f44f2ba732ed0fd714239",
+          "code_length": 46
+        },
+        {
+          "name": "access$500",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)[Lorg/apache/commons/collections/StaticBucketMap$Node;",
+          "access": 8,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "access$600",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;)[Lorg/apache/commons/collections/StaticBucketMap$Lock;",
+          "access": 8,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$800",
+          "descriptor": "(Lorg/apache/commons/collections/StaticBucketMap;Ljava/lang/Object;)I",
+          "access": 8,
+          "code_sha256": "857223fe110cd383a072afad3dfabd2785d10bfc0e341277f11836c739997116",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Set",
+        "org/apache/commons/collections/StaticBucketMap",
+        "org/apache/commons/collections/StaticBucketMap$1",
+        "org/apache/commons/collections/StaticBucketMap$EntryIterator",
+        "org/apache/commons/collections/StaticBucketMap$EntrySet",
+        "org/apache/commons/collections/StaticBucketMap$KeyIterator",
+        "org/apache/commons/collections/StaticBucketMap$KeySet",
+        "org/apache/commons/collections/StaticBucketMap$Lock",
+        "org/apache/commons/collections/StaticBucketMap$Node",
+        "org/apache/commons/collections/StaticBucketMap$ValueIterator",
+        "org/apache/commons/collections/StaticBucketMap$Values"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/SynchronizedPriorityQueue.class",
+      "occurrence": 0,
+      "sha256": "6a373c01e56eb20c806241cfec52d61ac30d084665551fdf4015842740079bb2",
+      "name": "org/apache/commons/collections/SynchronizedPriorityQueue",
+      "major": 46,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/commons/collections/PriorityQueue"
+      ],
+      "fields": [
+        {
+          "name": "m_priorityQueue",
+          "descriptor": "Lorg/apache/commons/collections/PriorityQueue;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/PriorityQueue;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "a4e8e717c862ccfa73a066a65b0a6e12d9fc8c5ef70a38c9a7e58e89c14e91fd",
+          "code_length": 10
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 33,
+          "code_sha256": "897e605dced5b54e12efb75964b156982b89ce9157d7d6cf53267e7a93285dcc",
+          "code_length": 10
+        },
+        {
+          "name": "insert",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 33,
+          "code_sha256": "7253bc08a041230d679778de1e358ebbdf456ec9a97f6d1047fafa6b567dbea8",
+          "code_length": 11
+        },
+        {
+          "name": "peek",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 33,
+          "code_sha256": "9e2d92a1e0087ac0ee9d1f37e2fe6f27827ddbba120843a3d8d8420c8e9cf4cb",
+          "code_length": 10,
+          "throws": [
+            "java/util/NoSuchElementException"
+          ]
+        },
+        {
+          "name": "pop",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 33,
+          "code_sha256": "ae3be53f03ac72f42b287a052dda7076f43cc24620d22c824a811d0b8734e19c",
+          "code_length": 10,
+          "throws": [
+            "java/util/NoSuchElementException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "c1753d3b6b86734ae58c3c2db611ec0efdd6fbc2ff490498e8ddcbec8449c743",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/NoSuchElementException",
+        "org/apache/commons/collections/PriorityQueue",
+        "org/apache/commons/collections/SynchronizedPriorityQueue"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/Transformer.class",
+      "occurrence": 0,
+      "sha256": "fa9453454cabef32b7672e2bffe5f34a46ba27fb39a09e9f3ae2b6657015ba10",
+      "name": "org/apache/commons/collections/Transformer",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "transform",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/Transformer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/TransformerUtils.class",
+      "occurrence": 0,
+      "sha256": "4ad31300cae75aa12f9f2e2a91ec7e3240f3be05738507a65d9bc3536596dae0",
+      "name": "org/apache/commons/collections/TransformerUtils",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "exceptionTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "nullTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "7dce45470ce11b005c4bd504408c0a8d8802f3d308124b41edb171ccc07c237c",
+          "code_length": 4
+        },
+        {
+          "name": "nopTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "9218d75e15d3c12db9bddb0ff93b7088d4009257a2d47cde3384ca27082d635a",
+          "code_length": 4
+        },
+        {
+          "name": "cloneTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "5f68107637f46ea355ce889725fce8ae59bf62377222d99f4e9456a8a7970043",
+          "code_length": 4
+        },
+        {
+          "name": "constantTransformer",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "16bea948ac886b34e6a1099f0ada21e14c2b9b693ae037b9ad83d3a3807a0fef",
+          "code_length": 5
+        },
+        {
+          "name": "asTransformer",
+          "descriptor": "(Lorg/apache/commons/collections/Closure;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "46244573c32d6a50702a0aaa354038b03d87d304cbedaa24bce7dba9dbb335f9",
+          "code_length": 5
+        },
+        {
+          "name": "asTransformer",
+          "descriptor": "(Lorg/apache/commons/collections/Predicate;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "a3f9b22dab790f5659153d6467aa5c9df0a4a38e7d06c4e31ee5bb5024e15008",
+          "code_length": 5
+        },
+        {
+          "name": "asTransformer",
+          "descriptor": "(Lorg/apache/commons/collections/Factory;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "3197674797e6ef7dd063cdfcfbc7cca3c0b5f126ff9a486559a2c872dc5adfbb",
+          "code_length": 5
+        },
+        {
+          "name": "chainedTransformer",
+          "descriptor": "(Lorg/apache/commons/collections/Transformer;Lorg/apache/commons/collections/Transformer;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "c989f212b258cf5c199fabc00ae0c1ad075ba46614409c005971db1ebce88341",
+          "code_length": 6
+        },
+        {
+          "name": "chainedTransformer",
+          "descriptor": "([Lorg/apache/commons/collections/Transformer;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "92d2e74fc3098517e7ad14b7a412f1df1b581e20ba1a5b725e1de564964d09da",
+          "code_length": 5
+        },
+        {
+          "name": "chainedTransformer",
+          "descriptor": "(Ljava/util/Collection;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "ac713bfe0d26e615620a3fc3384d823720666c1bcd07dbdcf26b4be3067506db",
+          "code_length": 5
+        },
+        {
+          "name": "switchTransformer",
+          "descriptor": "(Lorg/apache/commons/collections/Predicate;Lorg/apache/commons/collections/Transformer;Lorg/apache/commons/collections/Transformer;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "f88a61af6e3ac2130358e381e8622ed9dc78eebf0dc78da878e657805e8e7ae6",
+          "code_length": 21
+        },
+        {
+          "name": "switchTransformer",
+          "descriptor": "([Lorg/apache/commons/collections/Predicate;[Lorg/apache/commons/collections/Transformer;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "445fb1bb2bdebd93255a5c280a6e29376e51f27086dcdc1e6a18ec698ff43bd3",
+          "code_length": 7
+        },
+        {
+          "name": "switchTransformer",
+          "descriptor": "([Lorg/apache/commons/collections/Predicate;[Lorg/apache/commons/collections/Transformer;Lorg/apache/commons/collections/Transformer;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "9af1f42a72576365e6d04dbaee6d5fc50242ccfbc37512b78f7ae5cc3085b3f5",
+          "code_length": 7
+        },
+        {
+          "name": "switchTransformer",
+          "descriptor": "(Ljava/util/Map;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "973eace95f94610b13772f49c682c44a2420a7f2831100f71e2cb90012183596",
+          "code_length": 5
+        },
+        {
+          "name": "switchMapTransformer",
+          "descriptor": "(Ljava/util/Map;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "2062627321a3763ba8b3e208bcb12aeb09b4e1ba3b46b14cc915bf474c57484a",
+          "code_length": 128
+        },
+        {
+          "name": "instantiateTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "1fc8794e005aeef7383fa62a67a55d726e506e8f3f1809a824cf133c83faba31",
+          "code_length": 4
+        },
+        {
+          "name": "instantiateTransformer",
+          "descriptor": "([Ljava/lang/Class;[Ljava/lang/Object;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "a65ec60ead44a4df0b0a7f61b546285100542f79be746506ba98ca5bd8dc415d",
+          "code_length": 6
+        },
+        {
+          "name": "mapTransformer",
+          "descriptor": "(Ljava/util/Map;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "982e60d4a158afbfe41e11a3b43bea03891603512f03b38e5d2c82263fe6bfac",
+          "code_length": 5
+        },
+        {
+          "name": "invokerTransformer",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "e8ccfa8ea19f9979aa0a781320addfed807b6e6cf500c3543d3c2b3b02abbb84",
+          "code_length": 7
+        },
+        {
+          "name": "invokerTransformer",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Class;[Ljava/lang/Object;)Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "2923a7ed0f7999738d52f7830f4dbe8fa01af12c933fca33f274863989096edf",
+          "code_length": 7
+        },
+        {
+          "name": "stringValueTransformer",
+          "descriptor": "()Lorg/apache/commons/collections/Transformer;",
+          "access": 9,
+          "code_sha256": "9e77a3544a6ee87efb972b6a402a68c67a65cf3d0f79476f9651c8afc47293c1",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/apache/commons/collections/Predicate",
+        "org/apache/commons/collections/Transformer",
+        "org/apache/commons/collections/TransformerUtils",
+        "org/apache/commons/collections/functors/ChainedTransformer",
+        "org/apache/commons/collections/functors/CloneTransformer",
+        "org/apache/commons/collections/functors/ClosureTransformer",
+        "org/apache/commons/collections/functors/ConstantTransformer",
+        "org/apache/commons/collections/functors/EqualPredicate",
+        "org/apache/commons/collections/functors/ExceptionTransformer",
+        "org/apache/commons/collections/functors/FactoryTransformer",
+        "org/apache/commons/collections/functors/InstantiateTransformer",
+        "org/apache/commons/collections/functors/InvokerTransformer",
+        "org/apache/commons/collections/functors/MapTransformer",
+        "org/apache/commons/collections/functors/NOPTransformer",
+        "org/apache/commons/collections/functors/PredicateTransformer",
+        "org/apache/commons/collections/functors/StringValueTransformer",
+        "org/apache/commons/collections/functors/SwitchTransformer"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/TreeBag.class",
+      "occurrence": 0,
+      "sha256": "404acf4757e262abaf1cd5b14e26f562650d086437adf0243941ed86e27264e1",
+      "name": "org/apache/commons/collections/TreeBag",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/commons/collections/DefaultMapBag",
+      "interfaces": [
+        "org/apache/commons/collections/SortedBag"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Comparator;)V",
+          "access": 1,
+          "code_sha256": "ab51d872bda1148ef72038992f09fc8071bfacbdfa3971224ed323b1e16177a6",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;)V",
+          "access": 1,
+          "code_sha256": "d519ce942cb2e68875d9fb3f06d37d0d3d2b3f42a4843f5f9fba905b7f553157",
+          "code_length": 11
+        },
+        {
+          "name": "first",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3c8da65da4ced153828f05b7615d61ea6c481058e1c11d38be7cb7d8603fc31c",
+          "code_length": 13
+        },
+        {
+          "name": "last",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "71dd11670bc3625fd031dc6a5a2dda00dd0c03968332c219681072dce78bb37f",
+          "code_length": 13
+        },
+        {
+          "name": "comparator",
+          "descriptor": "()Ljava/util/Comparator;",
+          "access": 1,
+          "code_sha256": "79673e666de9f2e3959a712d97ad341ef08ea96c7822fdbaadcefdee31a5c489",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/util/SortedMap",
+        "java/util/TreeMap",
+        "org/apache/commons/collections/DefaultMapBag",
+        "org/apache/commons/collections/SortedBag",
+        "org/apache/commons/collections/TreeBag"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/UnboundedFifoBuffer$1.class",
+      "occurrence": 0,
+      "sha256": "ebb1c9a0873f9e497ace75573323b8b58d37f0bfec5ae1cf02e158ac2ac18f77",
+      "name": "org/apache/commons/collections/UnboundedFifoBuffer$1",
+      "major": 46,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastReturnedIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/commons/collections/UnboundedFifoBuffer;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/commons/collections/UnboundedFifoBuffer;)V",
+          "access": 0,
+          "code_sha256": "a8d11aecd5199c15315cdf21b9c3c61b6c404f32ad47c88cac3cd5587407f565",
+          "code_length": 26
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "e0adc08ebdecce42d7f2efb4c69dc96ea04ce8926b0b8148b526b2b734215275",
+          "code_length": 20
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "60887fe2cc02f8100edcd40c34523bebf8b607acd1b19481412e328f38ce6ce3",
+          "code_length": 51
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dccbf2a709874c8d33d0edf720e477c65211368c7442114d4328ef678aeb151b",
+          "code_length": 162
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/apache/commons/collections/UnboundedFifoBuffer",
+        "org/apache/commons/collections/UnboundedFifoBuffer$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/UnboundedFifoBuffer.class",
+      "occurrence": 0,
+      "sha256": "5c4f10ae0a47aed79c1bac3797e5c52c86b5c1b370ddab3aaa7b08a5fc3ce561",
+      "name": "org/apache/commons/collections/UnboundedFifoBuffer",
+      "major": 46,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/AbstractCollection",
+      "interfaces": [
+        "org/apache/commons/collections/Buffer"
+      ],
+      "fields": [
+        {
+          "name": "m_buffer",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 4
+        },
+        {
+          "name": "m_head",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "m_tail",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "68fd4a810d917c76df6914d04d6c9e2e5bd3a51d69cd045036c6203a51e849a0",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a3ea9f8dc8b686de3ca88a30726fd66bef0baac7b10b1dc1ec66b578954aea38",
+          "code_length": 39
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1be3667924ffe8d6567ae731cc01a800191705e690c7799731db5b047fdc7cdc",
+          "code_length": 44
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f6d50e1ac199de93665355ad197f795b96607adfa6a498e9fadfd7347acec7d4",
+          "code_length": 13
+        },
+        {
+          "name": "add",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "db48d80e343de5e1b9eb6b673aa08ef4540466ffc15c52e1154f4a1661f6dd10",
+          "code_length": 154
+        },
+        {
+          "name": "get",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "279de61801c160253f5e8004c5b2633fc9c39c8f5c137c8ce672c55a5863d330",
+          "code_length": 27
+        },
+        {
+          "name": "remove",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "eefd5b63cba2ba0714ea84e7d1b8d3f4e80da4aa5a21160a750831e8e41e7ea4",
+          "code_length": 71
+        },
+        {
+          "name": "increment",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "aba07d0304a8cc332d5536d09481f985f75634c22c4a11cd1fa7f9dcc97e67a1",
+          "code_length": 16
+        },
+        {
+          "name": "decrement",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "0b3941ed622f3a03a3d0186455f5a86fbbf443a464d532afa8c235c64a348722",
+          "code_length": 17
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "d37db74f672db6b798b80be0d46df89cd9eacb49a4a0f2c229c3c7e96078304e",
+          "code_length": 9
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/commons/collections/UnboundedFifoBuffer;I)I",
+          "access": 8,
+          "code_sha256": "55e623fcabcdbbec64a136123b2427649a3ad8d79381e5dc3f69b66080a57a5c",
+          "code_length": 6
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/commons/collections/UnboundedFifoBuffer;I)I",
+          "access": 8,
+          "code_sha256": "eb9cd2ec24fe271eeb660b6ffce890d7d4507346071b41487b6723c0c44e3436",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/util/AbstractCollection",
+        "org/apache/commons/collections/Buffer",
+        "org/apache/commons/collections/BufferUnderflowException",
+        "org/apache/commons/collections/UnboundedFifoBuffer",
+        "org/apache/commons/collections/UnboundedFifoBuffer$1"
+      ]
+    },
+    {
+      "entry": "org/apache/commons/collections/Unmodifiable.class",
+      "occurrence": 0,
+      "sha256": "9c5da2aa2d781771f4e6ffafa31be3f0247c39d9507481eddec1120f6cb95969",
+      "name": "org/apache/commons/collections/Unmodifiable",
+      "major": 46,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/commons/collections/Unmodifiable"
+      ]
+    }
+  ]
+}

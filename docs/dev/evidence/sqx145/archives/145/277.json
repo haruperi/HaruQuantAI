@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskGoToTask/TaskGoToTask.jar",
+  "sha256": "628a7f446e50d191ba73b01c07fe276209379659ec9fcff2f1ed45ccc42f822d",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/GoToTask/GoToTask.class": "c465ef90dcc4876fe940f368681b3e3dfaa5f218b9a896cec32f96070ebcd527"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/GoToTask/GoToTask.class",
+      "occurrence": 0,
+      "sha256": "c465ef90dcc4876fe940f368681b3e3dfaa5f218b9a896cec32f96070ebcd527",
+      "member_shard": "docs/dev/evidence/sqx145/members/277/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/277/001.json",
+      "sha256": "a8f29da698111817b0c3ef7650d74291111ec1fa5ff740612225635c97f7ffe4"
+    }
+  ]
+}

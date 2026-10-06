@@ -1,0 +1,335 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/classmate-1.7.0.jar",
+  "sha256": "cb868f231c5cceb89d795ea00e6e1b7a93b8f4ac1ce1d8be76dde322dff4a046",
+  "class_count": 44,
+  "unique_class_entries": 44,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration.class": "baa8fe6d61e1469f3a74db2213c57ad8cba8afc340a41f7aec60ca6184d343db",
+    "com/fasterxml/classmate/AnnotationConfiguration.class": "98ac27a159f779fa7cd65b917074710bff1f0563075d8bba6586150090236085",
+    "com/fasterxml/classmate/AnnotationInclusion.class": "355382e69d80081404ce9aa9edc988ca49db51bf3d546526d8a6b9474b0963c3",
+    "com/fasterxml/classmate/AnnotationOverrides$StdBuilder.class": "89c55ea8253f37bdb8818ce123f50c9d7c02e33560a7944afdd2a1d3793c13e8",
+    "com/fasterxml/classmate/AnnotationOverrides$StdImpl.class": "34626cf5218bd8dfa569f29c29554ed006335d09c00e603881b77aa0c666d602",
+    "com/fasterxml/classmate/AnnotationOverrides.class": "758acfd5dd5c918eb4e9867b669970bac50685c2f0c378c972e1045c56b90ef1",
+    "com/fasterxml/classmate/Annotations.class": "9cef57c1c693c53c01f4af2583692b4ec71d31614442e2ae8ff382637adffd0a",
+    "com/fasterxml/classmate/Filter.class": "98cb77a89aa2429779c032de09c68067fee66204923590ce9bae57c0e551751c",
+    "com/fasterxml/classmate/GenericType.class": "7a7c83740c45114361fc7889ef2463af8f31c42f5caaa25184a90407796940c3",
+    "com/fasterxml/classmate/MemberResolver.class": "28ddfb209f1aae24e8e97c46d5afe679c158c283e42c72d9be9ce1299ec0ef4d",
+    "com/fasterxml/classmate/ResolvedType.class": "26f104cf22c01fcaee8d7f82eb965f6de23d0243ba0adc54f96cbfbdecbf17ca",
+    "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler.class": "2952ffb1918da9b650d3aa58694ad4b7058adb2c1f1f0dfd2b87f95dd877c747",
+    "com/fasterxml/classmate/ResolvedTypeWithMembers.class": "ee002278878c9028effcff04597313edef0d9bdd24752ad282ae13ac80267932",
+    "com/fasterxml/classmate/TypeBindings.class": "5e634290b6182a3bf8fe8db0c69eba297f17fa687785ec94ca359ab43b628a25",
+    "com/fasterxml/classmate/TypeResolver.class": "668f05d1f9733ff5aa30719a2cd7686f1130abd91ed11d2f064ef8b1bfdeff45",
+    "com/fasterxml/classmate/members/HierarchicType.class": "1fcbd2a1bc10103021a668c02ae65336978d05c59a67946e075f6ef0fb32ca74",
+    "com/fasterxml/classmate/members/RawConstructor.class": "6bf053d3bcbba4f7511b469eee6eb6d49b13525b47360895dbd155e9701c2529",
+    "com/fasterxml/classmate/members/RawField.class": "4e6aa91afece2b78f47f8e3284e4732a24759d5e37d8a0576db0f1b10b8955d4",
+    "com/fasterxml/classmate/members/RawMember.class": "efd5625dfd358f36fb75fb6984fc279ee6e095bb31ef249ffc2b4b73facd1a41",
+    "com/fasterxml/classmate/members/RawMethod.class": "4b04c7882f3c4b3215b2a01fd70ea8fae18c56d227253aa32b42af75e1d274c3",
+    "com/fasterxml/classmate/members/ResolvedConstructor.class": "d9b3da750aadbf34d427679dad36d387fa469f425272d4ca84d31ebbebcba540",
+    "com/fasterxml/classmate/members/ResolvedField.class": "18d1a8cc99a24a83ad780884dae09f7f838eeaaa351efe490aa3fe70f0429bba",
+    "com/fasterxml/classmate/members/ResolvedMember.class": "5e65ca7805aa2a9adbe13b4338af8adbefb3fc5c0a29232940b37eb770949f47",
+    "com/fasterxml/classmate/members/ResolvedMethod.class": "7106827bd52db3ad04cba7982f1eaac5a59daa97a5ddb637a76853e265118fd8",
+    "com/fasterxml/classmate/members/ResolvedParameterizedMember.class": "ca8ca6db32127cf8614c7c32035742d463e6cc2c876e6356408d15a0806fb8bd",
+    "com/fasterxml/classmate/members/package-info.class": "43f8be67b941cb8c7be38bbb25804f9712c3420df42cc56f135b9e60a6a6379d",
+    "com/fasterxml/classmate/package-info.class": "1b4e39b1500127a921b840eca22b2475bd959f967cf18525415ca56ba5002530",
+    "com/fasterxml/classmate/types/ResolvedArrayType.class": "8fcd11fb81e44e66a807c5e744fe05a8ec2719bf90d9001df3469d61eb1d055a",
+    "com/fasterxml/classmate/types/ResolvedInterfaceType.class": "c601fd95d4ba1a8a9111c2064e77b1b5a744359f29a75cc8a219021fdde368ce",
+    "com/fasterxml/classmate/types/ResolvedObjectType.class": "be6149cd1a4c9641bde948a172cc49e117051a4c866babd909e3ea52ed0bee44",
+    "com/fasterxml/classmate/types/ResolvedPrimitiveType.class": "1778840d583060d0fc3f86334fbed84450120cdb90a38fc10d7aacbbde96c853",
+    "com/fasterxml/classmate/types/ResolvedRecursiveType.class": "8f7afc37146c81aed8b69ba353d7026f153d24e1f96edd8d3a8f9959883d1cda",
+    "com/fasterxml/classmate/types/TypePlaceHolder.class": "3d03458100a7cdfad22b8dd3be435ae99fef5c7a6fe8788e62f0f221c40e5aad",
+    "com/fasterxml/classmate/types/package-info.class": "fbad5eaa7086c41b27d56b8a0c93a7235aca3973494004d9b4b47070d52e48e1",
+    "com/fasterxml/classmate/util/ClassKey.class": "5aad85eaf9a3b4ac81ff2b69d13af44b2431bbdf3cc15804d5078c4eb93b3995",
+    "com/fasterxml/classmate/util/ClassStack.class": "447c2ce86e5b023a1a51b35f686792cdccfbf0c22b77da9ed68b709632070b20",
+    "com/fasterxml/classmate/util/ConcurrentTypeCache.class": "aae0fe9a4b0d6d231cb0497ba01749e23cb5d36c3406b3dffb34f842374bf682",
+    "com/fasterxml/classmate/util/LRUTypeCache$CacheMap.class": "768ccb120952523070dee0a28f53a375ef013b023ce75f89a38ce88304a49623",
+    "com/fasterxml/classmate/util/LRUTypeCache.class": "821134c5083a680dd2cebf62960a8452805d3d9edf0ec0282ab5f100b2a94013",
+    "com/fasterxml/classmate/util/MethodKey.class": "d21ea768b6a4e6642c0e406f405f8a4d7b35fb8e03f407c9516e49166158cae8",
+    "com/fasterxml/classmate/util/ResolvedTypeCache.class": "52fdbb70ad6aa750fb89280220affdbcd40facf3a38d696881099900fc9f9a83",
+    "com/fasterxml/classmate/util/ResolvedTypeKey.class": "c70d9b2a401859349ea7fdbd855f8d908deb1d8b2874a720f7aeca8777c3e498",
+    "com/fasterxml/classmate/util/package-info.class": "118128dee871fe44449e8ff4ebce9645e590c0dde220324d125124ef3e3f2b51",
+    "module-info.class": "68837cbdb9587006d0518bb0b3c1f7f54b3932647fdc1567832bdcad6e01e5fa"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "b66039d8538c95f03efcfb4ac1eae849c72c87a2a7b642e47055767b8ffb49ff",
+    "META-INF/LICENSE": "7d8d549eb31995fe67822c860acc7ac3dd958a03a5a71aef4069033e7df72d94",
+    "META-INF/NOTICE": "1a8c67aaade274bc7bf06a7044571ab280d59fe3686941b6499b2176a072ea6d",
+    "META-INF/maven/com.fasterxml/classmate/pom.properties": "e13c99f9c1bb0132b74d58084d20b87909cf9c7478e087afb6aa6fa2fbaef397",
+    "META-INF/maven/com.fasterxml/classmate/pom.xml": "64711adef0ec92f1f6cdaa7b2eac06b2e5667a4a6991ecfb8bfac46681d5b931"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/fasterxml/classmate/AnnotationConfiguration$StdConfiguration.class",
+      "occurrence": 0,
+      "sha256": "baa8fe6d61e1469f3a74db2213c57ad8cba8afc340a41f7aec60ca6184d343db",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationConfiguration.class",
+      "occurrence": 0,
+      "sha256": "98ac27a159f779fa7cd65b917074710bff1f0563075d8bba6586150090236085",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationInclusion.class",
+      "occurrence": 0,
+      "sha256": "355382e69d80081404ce9aa9edc988ca49db51bf3d546526d8a6b9474b0963c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides$StdBuilder.class",
+      "occurrence": 0,
+      "sha256": "89c55ea8253f37bdb8818ce123f50c9d7c02e33560a7944afdd2a1d3793c13e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides$StdImpl.class",
+      "occurrence": 0,
+      "sha256": "34626cf5218bd8dfa569f29c29554ed006335d09c00e603881b77aa0c666d602",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/AnnotationOverrides.class",
+      "occurrence": 0,
+      "sha256": "758acfd5dd5c918eb4e9867b669970bac50685c2f0c378c972e1045c56b90ef1",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/Annotations.class",
+      "occurrence": 0,
+      "sha256": "9cef57c1c693c53c01f4af2583692b4ec71d31614442e2ae8ff382637adffd0a",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/Filter.class",
+      "occurrence": 0,
+      "sha256": "98cb77a89aa2429779c032de09c68067fee66204923590ce9bae57c0e551751c",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/GenericType.class",
+      "occurrence": 0,
+      "sha256": "7a7c83740c45114361fc7889ef2463af8f31c42f5caaa25184a90407796940c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/MemberResolver.class",
+      "occurrence": 0,
+      "sha256": "28ddfb209f1aae24e8e97c46d5afe679c158c283e42c72d9be9ce1299ec0ef4d",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedType.class",
+      "occurrence": 0,
+      "sha256": "26f104cf22c01fcaee8d7f82eb965f6de23d0243ba0adc54f96cbfbdecbf17ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedTypeWithMembers$AnnotationHandler.class",
+      "occurrence": 0,
+      "sha256": "2952ffb1918da9b650d3aa58694ad4b7058adb2c1f1f0dfd2b87f95dd877c747",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/ResolvedTypeWithMembers.class",
+      "occurrence": 0,
+      "sha256": "ee002278878c9028effcff04597313edef0d9bdd24752ad282ae13ac80267932",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/TypeBindings.class",
+      "occurrence": 0,
+      "sha256": "5e634290b6182a3bf8fe8db0c69eba297f17fa687785ec94ca359ab43b628a25",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/TypeResolver.class",
+      "occurrence": 0,
+      "sha256": "668f05d1f9733ff5aa30719a2cd7686f1130abd91ed11d2f064ef8b1bfdeff45",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/HierarchicType.class",
+      "occurrence": 0,
+      "sha256": "1fcbd2a1bc10103021a668c02ae65336978d05c59a67946e075f6ef0fb32ca74",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawConstructor.class",
+      "occurrence": 0,
+      "sha256": "6bf053d3bcbba4f7511b469eee6eb6d49b13525b47360895dbd155e9701c2529",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawField.class",
+      "occurrence": 0,
+      "sha256": "4e6aa91afece2b78f47f8e3284e4732a24759d5e37d8a0576db0f1b10b8955d4",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawMember.class",
+      "occurrence": 0,
+      "sha256": "efd5625dfd358f36fb75fb6984fc279ee6e095bb31ef249ffc2b4b73facd1a41",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/RawMethod.class",
+      "occurrence": 0,
+      "sha256": "4b04c7882f3c4b3215b2a01fd70ea8fae18c56d227253aa32b42af75e1d274c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedConstructor.class",
+      "occurrence": 0,
+      "sha256": "d9b3da750aadbf34d427679dad36d387fa469f425272d4ca84d31ebbebcba540",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedField.class",
+      "occurrence": 0,
+      "sha256": "18d1a8cc99a24a83ad780884dae09f7f838eeaaa351efe490aa3fe70f0429bba",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedMember.class",
+      "occurrence": 0,
+      "sha256": "5e65ca7805aa2a9adbe13b4338af8adbefb3fc5c0a29232940b37eb770949f47",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedMethod.class",
+      "occurrence": 0,
+      "sha256": "7106827bd52db3ad04cba7982f1eaac5a59daa97a5ddb637a76853e265118fd8",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/ResolvedParameterizedMember.class",
+      "occurrence": 0,
+      "sha256": "ca8ca6db32127cf8614c7c32035742d463e6cc2c876e6356408d15a0806fb8bd",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/members/package-info.class",
+      "occurrence": 0,
+      "sha256": "43f8be67b941cb8c7be38bbb25804f9712c3420df42cc56f135b9e60a6a6379d",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/package-info.class",
+      "occurrence": 0,
+      "sha256": "1b4e39b1500127a921b840eca22b2475bd959f967cf18525415ca56ba5002530",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedArrayType.class",
+      "occurrence": 0,
+      "sha256": "8fcd11fb81e44e66a807c5e744fe05a8ec2719bf90d9001df3469d61eb1d055a",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedInterfaceType.class",
+      "occurrence": 0,
+      "sha256": "c601fd95d4ba1a8a9111c2064e77b1b5a744359f29a75cc8a219021fdde368ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedObjectType.class",
+      "occurrence": 0,
+      "sha256": "be6149cd1a4c9641bde948a172cc49e117051a4c866babd909e3ea52ed0bee44",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedPrimitiveType.class",
+      "occurrence": 0,
+      "sha256": "1778840d583060d0fc3f86334fbed84450120cdb90a38fc10d7aacbbde96c853",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/ResolvedRecursiveType.class",
+      "occurrence": 0,
+      "sha256": "8f7afc37146c81aed8b69ba353d7026f153d24e1f96edd8d3a8f9959883d1cda",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/TypePlaceHolder.class",
+      "occurrence": 0,
+      "sha256": "3d03458100a7cdfad22b8dd3be435ae99fef5c7a6fe8788e62f0f221c40e5aad",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/types/package-info.class",
+      "occurrence": 0,
+      "sha256": "fbad5eaa7086c41b27d56b8a0c93a7235aca3973494004d9b4b47070d52e48e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ClassKey.class",
+      "occurrence": 0,
+      "sha256": "5aad85eaf9a3b4ac81ff2b69d13af44b2431bbdf3cc15804d5078c4eb93b3995",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ClassStack.class",
+      "occurrence": 0,
+      "sha256": "447c2ce86e5b023a1a51b35f686792cdccfbf0c22b77da9ed68b709632070b20",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ConcurrentTypeCache.class",
+      "occurrence": 0,
+      "sha256": "aae0fe9a4b0d6d231cb0497ba01749e23cb5d36c3406b3dffb34f842374bf682",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/LRUTypeCache$CacheMap.class",
+      "occurrence": 0,
+      "sha256": "768ccb120952523070dee0a28f53a375ef013b023ce75f89a38ce88304a49623",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/LRUTypeCache.class",
+      "occurrence": 0,
+      "sha256": "821134c5083a680dd2cebf62960a8452805d3d9edf0ec0282ab5f100b2a94013",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/MethodKey.class",
+      "occurrence": 0,
+      "sha256": "d21ea768b6a4e6642c0e406f405f8a4d7b35fb8e03f407c9516e49166158cae8",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ResolvedTypeCache.class",
+      "occurrence": 0,
+      "sha256": "52fdbb70ad6aa750fb89280220affdbcd40facf3a38d696881099900fc9f9a83",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/ResolvedTypeKey.class",
+      "occurrence": 0,
+      "sha256": "c70d9b2a401859349ea7fdbd855f8d908deb1d8b2874a720f7aeca8777c3e498",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "com/fasterxml/classmate/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "118128dee871fe44449e8ff4ebce9645e590c0dde220324d125124ef3e3f2b51",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    },
+    {
+      "entry": "module-info.class",
+      "occurrence": 0,
+      "sha256": "68837cbdb9587006d0518bb0b3c1f7f54b3932647fdc1567832bdcad6e01e5fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/013/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/013/001.json",
+      "sha256": "b05f601e626a141e0a22325305bcef0b5423e9f4de15f2d718d30deb09d28597"
+    }
+  ]
+}

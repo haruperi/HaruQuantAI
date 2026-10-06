@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsExplore/ResultsExplore.jar",
+  "sha256": "bb8f0211b555d30032a8807b0082d34adcb0291567b6a30c2950d0a1947120ef",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/Explore/ExplorePlugin.class": "9c1f973c76d38563d7e494770285db5be74c9bbfe6a94af8eab003f6c143a40b",
+    "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache.class": "fd2619a7569e7f2557e6e1a1bd229a5e10460f787d2861d7e61312363cf97212",
+    "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet.class": "26a1bae8fc39889289af00f39ceaa5583bef93c521b5d963be7b4fe00886efeb"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExplorePlugin.class",
+      "occurrence": 0,
+      "sha256": "9c1f973c76d38563d7e494770285db5be74c9bbfe6a94af8eab003f6c143a40b",
+      "member_shard": "docs/dev/evidence/sqx145/members/204/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet$DataCache.class",
+      "occurrence": 0,
+      "sha256": "fd2619a7569e7f2557e6e1a1bd229a5e10460f787d2861d7e61312363cf97212",
+      "member_shard": "docs/dev/evidence/sqx145/members/204/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Explore/ExploreServlet.class",
+      "occurrence": 0,
+      "sha256": "26a1bae8fc39889289af00f39ceaa5583bef93c521b5d963be7b4fe00886efeb",
+      "member_shard": "docs/dev/evidence/sqx145/members/204/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/204/001.json",
+      "sha256": "a11060e9e0a26d84286661055f5ae56aaa6fe436bab6671a07f673d14b389210"
+    }
+  ]
+}

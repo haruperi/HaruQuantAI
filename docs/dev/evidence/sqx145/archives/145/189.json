@@ -1,0 +1,52 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar",
+  "sha256": "d2d109daf04075fe48e02fa888f53f938710744f1ab628fb7f011ea747cb0b0f",
+  "class_count": 4,
+  "unique_class_entries": 4,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult$1.class": "0a676d182c9a9d51b3b7b46ea41151a1089dc587a8da2edb51527cc9b90a6312",
+    "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult$Goal.class": "f6dec9576af4e7a0cf1f7ea42e360ac07a57aba1861d62c6e82552ba175339aa",
+    "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult.class": "a8e7a3bef40e7c48d6c90ac1c5915d48f1bd8e1c1ef999aba10e241d1c4eefbb",
+    "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResultServlet.class": "17b1a8edd8ad0f01fdb8cc1de6e4733ecdb783244b644521ebbc49960c07c057"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult$1.class",
+      "occurrence": 0,
+      "sha256": "0a676d182c9a9d51b3b7b46ea41151a1089dc587a8da2edb51527cc9b90a6312",
+      "member_shard": "docs/dev/evidence/sqx145/members/189/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult$Goal.class",
+      "occurrence": 0,
+      "sha256": "f6dec9576af4e7a0cf1f7ea42e360ac07a57aba1861d62c6e82552ba175339aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/189/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResult.class",
+      "occurrence": 0,
+      "sha256": "a8e7a3bef40e7c48d6c90ac1c5915d48f1bd8e1c1ef999aba10e241d1c4eefbb",
+      "member_shard": "docs/dev/evidence/sqx145/members/189/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/FitnessMethod/impl/StrategyResult/FitnessMethodStrategyResultServlet.class",
+      "occurrence": 0,
+      "sha256": "17b1a8edd8ad0f01fdb8cc1de6e4733ecdb783244b644521ebbc49960c07c057",
+      "member_shard": "docs/dev/evidence/sqx145/members/189/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/189/001.json",
+      "sha256": "3e201a939ae3b6697afea0c4ba7b79b238d346d38760a4ccc9703192fdd3d4b5"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskNotification/TaskNotification.jar",
+  "sha256": "5e6c4218cc934ca7f89960ec776bee8990d38acfe0f2f26c10af777cc877417e",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/Notification/NotificationTask.class": "5d27783b63437b472222275958019045b0860a7300e9b4fb4bda841a34bab6d1"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Notification/NotificationTask.class",
+      "occurrence": 0,
+      "sha256": "5d27783b63437b472222275958019045b0860a7300e9b4fb4bda841a34bab6d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/282/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/282/001.json",
+      "sha256": "6af5a8cec10085cebffe4a2e325c35907eedba8b25ed1ae23c3804eec882075e"
+    }
+  ]
+}

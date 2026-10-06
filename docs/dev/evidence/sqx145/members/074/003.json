@@ -1,0 +1,1543 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/logback-classic-1.4.14.jar",
+  "archive_sha256": "8e832f7263ca606ae36dabb2d8b24c2f43d82cf634e81dad9d1640fa6ee3c596",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "ch/qos/logback/classic/turbo/MDCValueLevelPair.class",
+      "occurrence": 0,
+      "sha256": "e9bca506deb92a5a283fb5915bc7651b1d67d4469d5fb651e3439540899adecd",
+      "name": "ch/qos/logback/classic/turbo/MDCValueLevelPair",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "level",
+          "descriptor": "Lch/qos/logback/classic/Level;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "getLevel",
+          "descriptor": "()Lch/qos/logback/classic/Level;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "setLevel",
+          "descriptor": "(Lch/qos/logback/classic/Level;)V",
+          "access": 1,
+          "code_sha256": "b5c6632fdead94e6cf5d078f9da49015f7742cbf1bf22678e79eecefc50ff91a",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/turbo/MDCValueLevelPair",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/turbo/MarkerFilter.class",
+      "occurrence": 0,
+      "sha256": "eec69f5e7be761af81cd5777fe86afae1256b81cbb0e1682f54c2d52359454fb",
+      "name": "ch/qos/logback/classic/turbo/MarkerFilter",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ch/qos/logback/classic/turbo/MatchingFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "markerToMatch",
+          "descriptor": "Lorg/slf4j/Marker;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1bf3fc01093e6f830ee162ea37c3fe4a5116e149adae38d69b5dcee641c5c6fd",
+          "code_length": 28
+        },
+        {
+          "name": "decide",
+          "descriptor": "(Lorg/slf4j/Marker;Lch/qos/logback/classic/Logger;Lch/qos/logback/classic/Level;Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)Lch/qos/logback/core/spi/FilterReply;",
+          "access": 1,
+          "code_sha256": "e9d735c045b923835c88f4ac77e69fa9c38982bacc9ae42cc19f2986b32c87d2",
+          "code_length": 43
+        },
+        {
+          "name": "setMarker",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cf9035ea1ba2e4faaed7d61969bf0f86502bcdc1b3f1fc003ae312efb305bdb3",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/turbo/MarkerFilter",
+        "ch/qos/logback/classic/turbo/MatchingFilter",
+        "ch/qos/logback/core/spi/FilterReply",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/slf4j/Marker",
+        "org/slf4j/MarkerFactory"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/turbo/MatchingFilter.class",
+      "occurrence": 0,
+      "sha256": "046b1bba06d4e0abeeb8a67dc5bf109472c1f2c6c33b5a8030f8965959f93572",
+      "name": "ch/qos/logback/classic/turbo/MatchingFilter",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "ch/qos/logback/classic/turbo/TurboFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "onMatch",
+          "descriptor": "Lch/qos/logback/core/spi/FilterReply;",
+          "access": 4
+        },
+        {
+          "name": "onMismatch",
+          "descriptor": "Lch/qos/logback/core/spi/FilterReply;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7877c60c3b0d7580a41ba290c17dcb8a84d1d9d4a35133beef4003fe82d96e26",
+          "code_length": 19
+        },
+        {
+          "name": "setOnMatch",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 17,
+          "code_sha256": "43e3b2852a3bef2076bd9f88d0018fa3acad4bf783719b68fb10d514278cfdda",
+          "code_length": 55
+        },
+        {
+          "name": "setOnMismatch",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 17,
+          "code_sha256": "72db5b9574c0d217cd48460d1c4a6d24aefb3c888b8583520232c865840faac5",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/turbo/MatchingFilter",
+        "ch/qos/logback/classic/turbo/TurboFilter",
+        "ch/qos/logback/core/spi/FilterReply",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter$ReconfiguringThread.class",
+      "occurrence": 0,
+      "sha256": "3dcd4729a963737ff4a44c0811617254d5fd6f67a314d4596352cb4245aedbac",
+      "name": "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter$ReconfiguringThread",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cab4e7e2874f0701ea6fffd67429a087242077fd6c8918b25fe811c5cdfd17e6",
+          "code_length": 109
+        },
+        {
+          "name": "performXMLConfiguration",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;)V",
+          "access": 2,
+          "code_sha256": "45adea3473224cb50b693937ef5c7f7f755063ca8349b993a23d7b80d5255ee8",
+          "code_length": 105
+        },
+        {
+          "name": "fallbackConfiguration",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;Lch/qos/logback/core/model/Model;Ljava/net/URL;)V",
+          "access": 2,
+          "code_sha256": "1d93853c9102418d7ca5bb308fcde3a2025543979b904823c6594ac132ef102a",
+          "code_length": 103
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/LoggerContext",
+        "ch/qos/logback/classic/joran/JoranConfigurator",
+        "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter",
+        "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter$ReconfiguringThread",
+        "ch/qos/logback/core/Context",
+        "ch/qos/logback/core/joran/spi/JoranException",
+        "ch/qos/logback/core/joran/util/ConfigurationWatchListUtil",
+        "ch/qos/logback/core/model/Model",
+        "ch/qos/logback/core/model/ModelUtil",
+        "ch/qos/logback/core/status/StatusUtil",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/net/URL"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter.class",
+      "occurrence": 0,
+      "sha256": "1b94d974a76bc5e8c1994f31f9ea2a7450638b23156533cc525d916de38e8a0a",
+      "name": "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ch/qos/logback/classic/turbo/TurboFilter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_REFRESH_PERIOD",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "refreshPeriod",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "mainConfigurationURL",
+          "descriptor": "Ljava/net/URL;",
+          "access": 0
+        },
+        {
+          "name": "nextCheck",
+          "descriptor": "J",
+          "access": 68
+        },
+        {
+          "name": "configurationWatchList",
+          "descriptor": "Lch/qos/logback/core/joran/spi/ConfigurationWatchList;",
+          "access": 0
+        },
+        {
+          "name": "invocationCounter",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "mask",
+          "descriptor": "J",
+          "access": 66
+        },
+        {
+          "name": "lastMaskCheck",
+          "descriptor": "J",
+          "access": 66
+        },
+        {
+          "name": "MAX_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MASK_INCREASE_THRESHOLD",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "MASK_DECREASE_THRESHOLD",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5ef410cb8ca8a7ede77a0364f796e7701001b1e3612411740eaa887f937c7b52",
+          "code_length": 31
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9479ba3035815f220e1c6771898305b87afe3baf93670f049b0c6ba4d9223b17",
+          "code_length": 117
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "257eb8660ab2881a0167afaf619bb25a2c69cb9847057c5577edaa726d4ad063",
+          "code_length": 10
+        },
+        {
+          "name": "decide",
+          "descriptor": "(Lorg/slf4j/Marker;Lch/qos/logback/classic/Logger;Lch/qos/logback/classic/Level;Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)Lch/qos/logback/core/spi/FilterReply;",
+          "access": 1,
+          "code_sha256": "fc7700aa8f928cf09138c796dd1415c92b2ee92f8d9b01bc43eea17b515e6f6c",
+          "code_length": 93
+        },
+        {
+          "name": "updateMaskIfNecessary",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "f28637798311038073afc9d33076ff9f312dac40951dd25515df328a51e12960",
+          "code_length": 65
+        },
+        {
+          "name": "detachReconfigurationToNewThread",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "445269f8fc8795f4f4052f0ec8325ef3a98ecf521d0b3f1e9bc0c4d16ed84b2f",
+          "code_length": 43
+        },
+        {
+          "name": "updateNextCheck",
+          "descriptor": "(J)V",
+          "access": 0,
+          "code_sha256": "b90f679fe5b75d7757aa1178c094df3336feacc401c167338a1d7b6fdf46eb14",
+          "code_length": 11
+        },
+        {
+          "name": "changeDetected",
+          "descriptor": "(J)Z",
+          "access": 4,
+          "code_sha256": "e3281367975be1a655244d3fa9a43701e5d637a3b07c86e473aca5f4bac715a2",
+          "code_length": 24
+        },
+        {
+          "name": "disableSubsequentReconfiguration",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "71e43c15d23c1f460b9b2db982f720a8728cd2ea9253bff94753645ef0ee16f6",
+          "code_length": 8
+        },
+        {
+          "name": "getRefreshPeriod",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "1727b6b853ec82483086f9d4b7ec66d50fb76f92d9fb128f2fcf5945f54eb92e",
+          "code_length": 5
+        },
+        {
+          "name": "setRefreshPeriod",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "05c5231de72d65d90ab0f8be11822d4b81d49ecaebcc680cafb06b7cbe8c9338",
+          "code_length": 6
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$500",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "access$600",
+          "descriptor": "(Lch/qos/logback/classic/turbo/ReconfigureOnChangeFilter;)Lch/qos/logback/core/Context;",
+          "access": 4104,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter",
+        "ch/qos/logback/classic/turbo/ReconfigureOnChangeFilter$ReconfiguringThread",
+        "ch/qos/logback/classic/turbo/TurboFilter",
+        "ch/qos/logback/core/Context",
+        "ch/qos/logback/core/CoreConstants",
+        "ch/qos/logback/core/joran/spi/ConfigurationWatchList",
+        "ch/qos/logback/core/joran/util/ConfigurationWatchListUtil",
+        "ch/qos/logback/core/spi/FilterReply",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/util/List",
+        "java/util/concurrent/ExecutorService"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/turbo/TurboFilter.class",
+      "occurrence": 0,
+      "sha256": "f4a357565a1164941ee3dd02e3f87a17f94a7809358e025a8c63614bc575e891",
+      "name": "ch/qos/logback/classic/turbo/TurboFilter",
+      "major": 55,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "ch/qos/logback/core/spi/ContextAwareBase",
+      "interfaces": [
+        "ch/qos/logback/core/spi/LifeCycle"
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "start",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "207f00ad17706d0807f258512ff6cfa62fd9f0a9732598a2dd118fb3d2983d8b",
+          "code_length": 10
+        },
+        {
+          "name": "decide",
+          "descriptor": "(Lorg/slf4j/Marker;Lch/qos/logback/classic/Logger;Lch/qos/logback/classic/Level;Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)Lch/qos/logback/core/spi/FilterReply;",
+          "access": 1025
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e4693fdbaee017d2277f03e1d816e967536d561ec2fc519d3209748ef948b53e",
+          "code_length": 6
+        },
+        {
+          "name": "isStarted",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c2bab0dc021a3e3234f3a6f683dc1010cddf2d5ba2ced5da38b161d5367fa610",
+          "code_length": 6
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b5c6632fdead94e6cf5d078f9da49015f7742cbf1bf22678e79eecefc50ff91a",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/turbo/TurboFilter",
+        "ch/qos/logback/core/spi/ContextAwareBase",
+        "ch/qos/logback/core/spi/LifeCycle"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/ClassicEnvUtil.class",
+      "occurrence": 0,
+      "sha256": "a4d8f9bc4d666a1824b951a372c0c645eb18522e8fcf8412b956fd2ddf0e88ea",
+      "name": "ch/qos/logback/classic/util/ClassicEnvUtil",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "isGroovyAvailable",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "16aa30b95a4bda9fe5342dfe6a6a7b6f0d9e063afcb87ef2bc4b19bc4a770eaf",
+          "code_length": 8
+        },
+        {
+          "name": "loadFromServiceLoader",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/ClassLoader;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "63075c83c2fcfbce75181bba3b27b6cf0068d5dcee329392c3eff01784f0737d",
+          "code_length": 53,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;Ljava/lang/ClassLoader;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/util/ClassicEnvUtil",
+        "ch/qos/logback/core/util/EnvUtil",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/ServiceLoader"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/ContextInitializer$1.class",
+      "occurrence": 0,
+      "sha256": "b923f5a4690ec8af303d14ae5b235c003aaad67770146a07477e7c0e435fcf6c",
+      "name": "ch/qos/logback/classic/util/ContextInitializer$1",
+      "major": 55,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lch/qos/logback/classic/util/ContextInitializer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lch/qos/logback/classic/util/ContextInitializer;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lch/qos/logback/classic/spi/Configurator;Lch/qos/logback/classic/spi/Configurator;)I",
+          "access": 1,
+          "code_sha256": "12e3e27d302c61b0157e970204fd15cf5314eac5c39374f2e74ccce51cdff0be",
+          "code_length": 84
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "c443aa7a8cd1742229c140e9ddc70cef4b81bd97b6e83ce326c360ed48882373",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lch/qos/logback/classic/spi/Configurator;>;",
+      "class_references": [
+        "ch/qos/logback/classic/spi/Configurator",
+        "ch/qos/logback/classic/spi/ConfiguratorRank",
+        "ch/qos/logback/classic/util/ContextInitializer",
+        "ch/qos/logback/classic/util/ContextInitializer$1",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/util/Comparator"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/ContextInitializer.class",
+      "occurrence": 0,
+      "sha256": "78ee273c419b064b4e85772186ccc2fdeb3c9a17261dbb35bc5f0ea1e84b307b",
+      "name": "ch/qos/logback/classic/util/ContextInitializer",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "AUTOCONFIG_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "TEST_AUTOCONFIG_FILE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "CONFIG_FILE_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INTERNAL_CONFIGURATOR_CLASSNAME_LIST",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "loggerContext",
+          "descriptor": "Lch/qos/logback/classic/LoggerContext;",
+          "access": 16
+        },
+        {
+          "name": "contextAware",
+          "descriptor": "Lch/qos/logback/core/spi/ContextAware;",
+          "access": 16
+        },
+        {
+          "name": "rankComparator",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Comparator<Lch/qos/logback/classic/spi/Configurator;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;)V",
+          "access": 1,
+          "code_sha256": "5c43dfac118dede4905b85fca0630bd41595f8a2262863287f83d063aa2381f3",
+          "code_length": 58
+        },
+        {
+          "name": "autoConfig",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f776fb84ca7837028a2dd601356afd20a3c8f4cfdc267ba34adee034d003ac75",
+          "code_length": 10,
+          "throws": [
+            "ch/qos/logback/core/joran/spi/JoranException"
+          ]
+        },
+        {
+          "name": "autoConfig",
+          "descriptor": "(Ljava/lang/ClassLoader;)V",
+          "access": 1,
+          "code_sha256": "9151640d974fc8489a91719d7e2f8cea048b8cd04a4b1db396781bd67c71ff37",
+          "code_length": 224,
+          "throws": [
+            "ch/qos/logback/core/joran/spi/JoranException"
+          ]
+        },
+        {
+          "name": "instantiateConfiguratorByClassName",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)Lch/qos/logback/classic/spi/Configurator;",
+          "access": 2,
+          "code_sha256": "1bb4223224adcc880d329477cf296b2a129850379b3c232c24bcb75a3e3cfb1c",
+          "code_length": 46
+        },
+        {
+          "name": "invokeConfigure",
+          "descriptor": "(Lch/qos/logback/classic/spi/Configurator;)Lch/qos/logback/classic/spi/Configurator$ExecutionStatus;",
+          "access": 2,
+          "code_sha256": "0de33234c4990232ab312888d819d3f3ab502f433b47d19d4adcfa9f571fcfe9",
+          "code_length": 100
+        },
+        {
+          "name": "printConfiguratorOrder",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "85bd79ff59b2fd8c2ac772023dbf9e094e1daf128cca2e29706995f9fe324809",
+          "code_length": 75,
+          "generic_signature": "(Ljava/util/List<Lch/qos/logback/classic/spi/Configurator;>;)V"
+        },
+        {
+          "name": "printDuration",
+          "descriptor": "(JLch/qos/logback/classic/spi/Configurator;Lch/qos/logback/classic/spi/Configurator$ExecutionStatus;)V",
+          "access": 2,
+          "code_sha256": "ad8fbb4df805126659ec2ef65faef21e3cc7507315dbeaf5392429cf0c0895ca",
+          "code_length": 42
+        },
+        {
+          "name": "attemptConfigurationUsingJoranUsingReflexion",
+          "descriptor": "(Ljava/lang/ClassLoader;)Lch/qos/logback/classic/spi/Configurator$ExecutionStatus;",
+          "access": 2,
+          "code_sha256": "ef3960a2c8ad8a698dc295203d32f0d43513bc2db9c9828d947b562a1b79b230",
+          "code_length": 53
+        },
+        {
+          "name": "compareRankValue",
+          "descriptor": "(II)I",
+          "access": 2,
+          "code_sha256": "e89aaf8f2b19eb70221f66d7a84e2a4640a2b524abe1659b704b85123e82905f",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "ch/qos/logback/classic/ClassicConstants",
+        "ch/qos/logback/classic/LoggerContext",
+        "ch/qos/logback/classic/spi/Configurator",
+        "ch/qos/logback/classic/spi/Configurator$ExecutionStatus",
+        "ch/qos/logback/classic/util/ClassicEnvUtil",
+        "ch/qos/logback/classic/util/ContextInitializer",
+        "ch/qos/logback/classic/util/ContextInitializer$1",
+        "ch/qos/logback/core/CoreConstants",
+        "ch/qos/logback/core/LogbackException",
+        "ch/qos/logback/core/joran/spi/JoranException",
+        "ch/qos/logback/core/spi/ContextAware",
+        "ch/qos/logback/core/spi/ContextAwareImpl",
+        "ch/qos/logback/core/status/InfoStatus",
+        "ch/qos/logback/core/status/StatusManager",
+        "ch/qos/logback/core/util/EnvUtil",
+        "ch/qos/logback/core/util/Loader",
+        "ch/qos/logback/core/util/StatusListenerConfigHelper",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/Object",
+        "java/lang/ReflectiveOperationException",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/lang/reflect/Constructor",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/ContextSelectorStaticBinder.class",
+      "occurrence": 0,
+      "sha256": "7dc417c14b88a18c735574d9d62917e46687a296a2621336a760745ef299af4a",
+      "name": "ch/qos/logback/classic/util/ContextSelectorStaticBinder",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "singleton",
+          "descriptor": "Lch/qos/logback/classic/util/ContextSelectorStaticBinder;",
+          "access": 8
+        },
+        {
+          "name": "contextSelector",
+          "descriptor": "Lch/qos/logback/classic/selector/ContextSelector;",
+          "access": 0
+        },
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSingleton",
+          "descriptor": "()Lch/qos/logback/classic/util/ContextSelectorStaticBinder;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "8b12454d5087de257b1a968fe874e613ed0b556ea57d79bec72c8cb6bd41ebfa",
+          "code_length": 92,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/lang/NoSuchMethodException",
+            "java/lang/InstantiationException",
+            "java/lang/IllegalAccessException",
+            "java/lang/reflect/InvocationTargetException"
+          ]
+        },
+        {
+          "name": "dynamicalContextSelector",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;Ljava/lang/String;)Lch/qos/logback/classic/selector/ContextSelector;",
+          "access": 8,
+          "code_sha256": "007d828752f768851dcfda67265e49bb58cec784fbee53cdf2dafb25ea8584be",
+          "code_length": 35,
+          "throws": [
+            "java/lang/ClassNotFoundException",
+            "java/lang/SecurityException",
+            "java/lang/NoSuchMethodException",
+            "java/lang/IllegalArgumentException",
+            "java/lang/InstantiationException",
+            "java/lang/IllegalAccessException",
+            "java/lang/reflect/InvocationTargetException"
+          ]
+        },
+        {
+          "name": "getContextSelector",
+          "descriptor": "()Lch/qos/logback/classic/selector/ContextSelector;",
+          "access": 1,
+          "code_sha256": "d9805f1cc312a6c5dc7280f67846541eb4e5c517e0172dd663b5749d4f0e247f",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ef268613cfd2c7aa380d7fa20550cb3cea7e5c001031f4f7587fe7c4e3985fa4",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/ClassicConstants",
+        "ch/qos/logback/classic/LoggerContext",
+        "ch/qos/logback/classic/selector/ContextJNDISelector",
+        "ch/qos/logback/classic/selector/ContextSelector",
+        "ch/qos/logback/classic/selector/DefaultContextSelector",
+        "ch/qos/logback/classic/util/ContextSelectorStaticBinder",
+        "ch/qos/logback/core/util/Loader",
+        "ch/qos/logback/core/util/OptionHelper",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/CopyOnInheritThreadLocal.class",
+      "occurrence": 0,
+      "sha256": "5105ae92891f6b1cca8bfc10e368336a6274f4acb409956853673dd366ccf484",
+      "name": "ch/qos/logback/classic/util/CopyOnInheritThreadLocal",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/InheritableThreadLocal",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "childValue",
+          "descriptor": "(Ljava/util/HashMap;)Ljava/util/HashMap;",
+          "access": 4,
+          "code_sha256": "d6ef8a750eb85d28e709bc52e613e7e1197e0bd79134336c68e903ed72ac3d26",
+          "code_length": 15,
+          "generic_signature": "(Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;)Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "childValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "dff3f2d9a1eb672ffdd4e8021cea49889f366b8cc20892b22832b14dfc4b3bb0",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/InheritableThreadLocal<Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;>;",
+      "class_references": [
+        "ch/qos/logback/classic/util/CopyOnInheritThreadLocal",
+        "java/lang/InheritableThreadLocal",
+        "java/util/HashMap"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/DefaultJoranConfigurator.class",
+      "occurrence": 0,
+      "sha256": "51d4850a37609f5adbcf5c329cc0ec5cc1b59834f8daa24bdc7d5611e4f37c90",
+      "name": "ch/qos/logback/classic/util/DefaultJoranConfigurator",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ch/qos/logback/core/spi/ContextAwareBase",
+      "interfaces": [
+        "ch/qos/logback/classic/spi/Configurator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lch/qos/logback/classic/LoggerContext;)Lch/qos/logback/classic/spi/Configurator$ExecutionStatus;",
+          "access": 1,
+          "code_sha256": "88a4f541c2bfe8a9617fc251ebe1f9368fbe15f3b47c0e9acbfe29e08e000f94",
+          "code_length": 31
+        },
+        {
+          "name": "performMultiStepConfigurationFileSearch",
+          "descriptor": "(Z)Ljava/net/URL;",
+          "access": 2,
+          "code_sha256": "88bb7b624282367e86428817fb79f52bdd1c96db92279ed2a2fdb6cf3e095fe4",
+          "code_length": 42
+        },
+        {
+          "name": "configureByResource",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 1,
+          "code_sha256": "15f222ef7319d9b79891370967a076243c65c1fb476be89690f39c69db4178ff",
+          "code_length": 70,
+          "throws": [
+            "ch/qos/logback/core/joran/spi/JoranException"
+          ]
+        },
+        {
+          "name": "findURLOfDefaultConfigurationFile",
+          "descriptor": "(Z)Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "2e370a0e6e0557961dcd09de65d57bcc4f4305425dc70ecc285053b2974d1c96",
+          "code_length": 6
+        },
+        {
+          "name": "findConfigFileURLFromSystemProperties",
+          "descriptor": "(Ljava/lang/ClassLoader;Z)Ljava/net/URL;",
+          "access": 2,
+          "code_sha256": "1507e82c44e6de4eff2e467ed1526bf8ceae662b052c3d5b376b0400a4d940e8",
+          "code_length": 166
+        },
+        {
+          "name": "getResource",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/net/URL;",
+          "access": 2,
+          "code_sha256": "4633d759030be732865b2556a5d9d150aae9f6357dd6e3820a3e534e8af5c3b9",
+          "code_length": 22
+        },
+        {
+          "name": "statusOnResourceSearch",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;Ljava/net/URL;)V",
+          "access": 2,
+          "code_sha256": "8630c77790900687e104eba60e732a3496ed054153f124ce7579b85cfc2625a2",
+          "code_length": 77
+        },
+        {
+          "name": "multiplicityWarning",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/ClassLoader;)V",
+          "access": 2,
+          "code_sha256": "3859159b8d01a322256e22601bf728623266c157515e6a27065fded1ac49f641",
+          "code_length": 98
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/ClassicConstants",
+        "ch/qos/logback/classic/LoggerContext",
+        "ch/qos/logback/classic/joran/JoranConfigurator",
+        "ch/qos/logback/classic/spi/Configurator",
+        "ch/qos/logback/classic/spi/Configurator$ExecutionStatus",
+        "ch/qos/logback/classic/util/DefaultJoranConfigurator",
+        "ch/qos/logback/core/Context",
+        "ch/qos/logback/core/LogbackException",
+        "ch/qos/logback/core/joran/spi/JoranException",
+        "ch/qos/logback/core/spi/ContextAwareBase",
+        "ch/qos/logback/core/status/InfoStatus",
+        "ch/qos/logback/core/status/StatusManager",
+        "ch/qos/logback/core/util/Loader",
+        "ch/qos/logback/core/util/OptionHelper",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/ClassLoader",
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "java/net/MalformedURLException",
+        "java/net/URI",
+        "java/net/URL",
+        "java/util/Iterator",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/LevelToSyslogSeverity.class",
+      "occurrence": 0,
+      "sha256": "804d86c20268e3535293ddc2785165271d47adbe8b721d8d23c55e8e14be63e8",
+      "name": "ch/qos/logback/classic/util/LevelToSyslogSeverity",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "convert",
+          "descriptor": "(Lch/qos/logback/classic/spi/ILoggingEvent;)I",
+          "access": 9,
+          "code_sha256": "0e713867551cdb82dd56f97f9ba41fb5f051a4b3a4abe3807cc6498484e7fe16",
+          "code_length": 87
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/Level",
+        "ch/qos/logback/classic/spi/ILoggingEvent",
+        "ch/qos/logback/classic/util/LevelToSyslogSeverity",
+        "ch/qos/logback/core/net/SyslogConstants",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/LogbackMDCAdapter.class",
+      "occurrence": 0,
+      "sha256": "279d4ad1490ac0eac93c176392924e12a06c92e70c21b8a4dac3f5c3fd5a405f",
+      "name": "ch/qos/logback/classic/util/LogbackMDCAdapter",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/slf4j/spi/MDCAdapter"
+      ],
+      "fields": [
+        {
+          "name": "readWriteThreadLocalMap",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 16,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "readOnlyThreadLocalMap",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 16,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "threadLocalMapOfDeques",
+          "descriptor": "Lorg/slf4j/helpers/ThreadLocalMapOfStacks;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a6df9f7542134f1d5f0e9da633c6027ecb847de15603450eaf8d7f5d084628bd",
+          "code_length": 38
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9eb192c8350c1fc9972accc3f6aad9fe60c9571cff95ab03e52abfb96e2ef20b",
+          "code_length": 59,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bcd065f866c6b29e92ea08bb4aa9139474579022c836445624bb6dec8590728d",
+          "code_length": 32
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "5ca9388a312cc7e7886fe4eee3dc132601f05dd2ddb92407217e7cda2c4dc0d0",
+          "code_length": 33
+        },
+        {
+          "name": "nullifyReadOnlyThreadLocalMap",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4fa693fb7a2633672e9e786282fcb960a46f542b8aa071e1db58e0ae4acce810",
+          "code_length": 9
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "db0bc81cd98f9e249d7d48bb69bfe5222f307c09e87424fe8cfbe7b2af0d6542",
+          "code_length": 13
+        },
+        {
+          "name": "getPropertyMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "0b86972f4c1567117f146c45265c1056beb23b9538af258778eba01a9a247b68",
+          "code_length": 54,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "getCopyOfContextMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "e2cd3fec5da1a3b2223dd7e06de0563e59117647d6ec2fb213c0b43d416e0c76",
+          "code_length": 20
+        },
+        {
+          "name": "getKeys",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "9bcb9e04561581de736a8f83352a797c460c980a95c7b567c0a16e2296b5586d",
+          "code_length": 18,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "setContextMap",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "8c7e953e2c2a3d3c5c81b1c4933e41f8b64e0c41d27668056ee3efcae4833cd6",
+          "code_length": 35
+        },
+        {
+          "name": "pushByKey",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "16a3a433a17f7d516d84150b3c77e095602fba78995b8877415957de9f31f9c1",
+          "code_length": 10
+        },
+        {
+          "name": "popByKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a6c2b61ff701afb3445cc0019c91b871c09d625353fb1141d922a9b48c2e8f39",
+          "code_length": 9
+        },
+        {
+          "name": "getCopyOfDequeByKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Deque;",
+          "access": 1,
+          "code_sha256": "a9771b0d3bddd52fdca34e56952f4f0de1a4bbe93ce761ebdbcfc3d171234f32",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/Deque<Ljava/lang/String;>;"
+        },
+        {
+          "name": "clearDequeByKey",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "61d4950e815962f0d415241605d8e2f109dacb987abbf0ab4734f0ed4831e8fa",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/util/LogbackMDCAdapter",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/ThreadLocal",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/slf4j/helpers/ThreadLocalMapOfStacks",
+        "org/slf4j/spi/MDCAdapter"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/LogbackMDCAdapterSimple.class",
+      "occurrence": 0,
+      "sha256": "5b29d4440456dacf344b309e4e9fdab00020d21eaf0c70797fdc3fe8d8effdcd",
+      "name": "ch/qos/logback/classic/util/LogbackMDCAdapterSimple",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/slf4j/spi/MDCAdapter"
+      ],
+      "fields": [
+        {
+          "name": "threadLocalUnmodifiableMap",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 16,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "threadLocalMapOfDeques",
+          "descriptor": "Lorg/slf4j/helpers/ThreadLocalMapOfStacks;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dc54885c3714c974992e4f27bbf2682ec075f3e2d2a00487e5ba80105654afe5",
+          "code_length": 27
+        },
+        {
+          "name": "duplicateMap",
+          "descriptor": "(Ljava/util/Map;)Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "c50b94357d97648324aa16efe11df1c4cf6b95ab0ca5f56fddd1b32b3bd19a03",
+          "code_length": 21,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "6dc219a859ef0fa069febc4259491a2392817bd715ef681606f3300129171c5e",
+          "code_length": 49,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "makeUnmodifiableAndThreadLocalSet",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "ad372f1fb152a28f7350d155e8145304f129954661403ec3f01d94f4d5a47d2a",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a4c46c0d14d948490b04b214b1dd63f005c9358b7c4776269ec46b27ba772351",
+          "code_length": 41
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a5446aa11e9b3d4fe37bd6fbdea5b4b080c0a71dd13a17463c70805d16c08a84",
+          "code_length": 8
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "13399bc6395fbe38b6bfd6e7e9fefa657e8ad62316a250420988a1dc24ec71e6",
+          "code_length": 32
+        },
+        {
+          "name": "getPropertyMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "42d6fd293610ec76f7865834542c6aae64a8feda128f3086b95b081a50bdd2dc",
+          "code_length": 11,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "getKeys",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "13ab9d5a6cc057c250c33a0bc89ca6973e965e95e493dd99dc7cdbe773d1cb19",
+          "code_length": 18,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getCopyOfContextMap",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "9bd78a4958d06c7ab61a144577193a8228a1d92843025ba522954be0d483d6a2",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "setContextMap",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "a786ff66e040f103be7b72d42e7b2ca2854e1c5d7ed254f28f45e491cf45f6d0",
+          "code_length": 7,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "pushByKey",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "eb658aa4e536b6689ac0136bf255bf1ec8b29e0109e47eece261e3eb03be7b1c",
+          "code_length": 10
+        },
+        {
+          "name": "popByKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6e4ae751b7fc947173320a7e749d24779f0824f2ab8dd3b9c0c33ea1e7db7373",
+          "code_length": 9
+        },
+        {
+          "name": "getCopyOfDequeByKey",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Deque;",
+          "access": 1,
+          "code_sha256": "bd578c716097df612adbee22695add223220ea33cf442a29bdf83405b4a196f1",
+          "code_length": 9,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/Deque<Ljava/lang/String;>;"
+        },
+        {
+          "name": "clearDequeByKey",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "034f3f2e33599f73fddceec3458fee476d185715910265028bd16e5a82f8f5bc",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/util/LogbackMDCAdapterSimple",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/ThreadLocal",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/slf4j/helpers/ThreadLocalMapOfStacks",
+        "org/slf4j/spi/MDCAdapter"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/LoggerNameUtil.class",
+      "occurrence": 0,
+      "sha256": "f270ffbaf78b9bd1d67866b381a5f9fa4433dbdad74c4b25af6d5cccb46e42bb",
+      "name": "ch/qos/logback/classic/util/LoggerNameUtil",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getFirstSeparatorIndexOf",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "16f61d15c2b858a9ba595e593566d3b60a63056d112ebfb13f6f6dccb9c87897",
+          "code_length": 6
+        },
+        {
+          "name": "getSeparatorIndexOf",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 9,
+          "code_sha256": "8dc9c4e9d543851571528b9628c9be79f116f6f6b1ff76737792a40cadb15f8f",
+          "code_length": 53
+        },
+        {
+          "name": "computeNameParts",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "afaa42a35060dbc07d3f078d9e27207ddb159c744c7afe417dd06da2b8aa9436",
+          "code_length": 58,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/util/LoggerNameUtil",
+        "ch/qos/logback/core/CoreConstants",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "ch/qos/logback/classic/util/StatusViaSLF4JLoggerFactory.class",
+      "occurrence": 0,
+      "sha256": "7cfe7f016a7d52b46a79e244bd597467da3cfa7a03e3b68d7f656da7aa568803",
+      "name": "ch/qos/logback/classic/util/StatusViaSLF4JLoggerFactory",
+      "major": 55,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "addInfo",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "3fe313a3b038fcd28f6c131e5dc7c864ed8fe10b24404d356dac938aca7c0475",
+          "code_length": 13
+        },
+        {
+          "name": "addError",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "75d7b67e862268b2c105720f75ddaf5ff09c952a586974d512b97fb622584ca2",
+          "code_length": 13
+        },
+        {
+          "name": "addError",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 9,
+          "code_sha256": "8be66470b309777af5f7712d278a507c335b747245979ba397cfa9971b2969a4",
+          "code_length": 14
+        },
+        {
+          "name": "addStatus",
+          "descriptor": "(Lch/qos/logback/core/status/Status;)V",
+          "access": 9,
+          "code_sha256": "f246c380ac753462a2419fb6ad359bac9f5b390b573623a7089e05f45b1f11dd",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "ch/qos/logback/classic/LoggerContext",
+        "ch/qos/logback/classic/util/StatusViaSLF4JLoggerFactory",
+        "ch/qos/logback/core/spi/ContextAwareBase",
+        "ch/qos/logback/core/status/ErrorStatus",
+        "ch/qos/logback/core/status/InfoStatus",
+        "java/lang/Object",
+        "org/slf4j/ILoggerFactory",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "module-info.class",
+      "occurrence": 0,
+      "sha256": "57b0dac221e15310d4dc2e5c23ff59ac075e13e331c9c15e3d8c9525e979d82d",
+      "name": "module-info",
+      "major": 55,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "ch/qos/logback/classic/spi/Configurator",
+        "ch/qos/logback/classic/spi/LogbackServiceProvider",
+        "module-info",
+        "org/slf4j/spi/SLF4JServiceProvider"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
+  "sha256": "b3a965b9aed288cf77ff6c30c6a7a60719bae6593e65e415a8b8ac59691e9ea1",
+  "class_count": 5,
+  "unique_class_entries": 5,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDPlugin.class": "1f66f7bf664c54bfc5480045762aae7a791749d4a778e0f0d143122e04cd2b12",
+    "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet.class": "b3cba15f2d5af286d178cf577febde78923a9b1254c2e956a76d6a62fc74983c",
+    "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager.class": "676fc6b4cd2d19f71cd68b836b7294af838e76e0ed33f866531b5e34cb42f638",
+    "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1.class": "da75bf5b8da2953f15fb67cc10546e308a51b400ab731d883a125c8b78a0b185",
+    "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob.class": "03ddddff6b8e5096e936823a08d8735d0b13ca2df069e07924c6bcb82318c807"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDPlugin.class",
+      "occurrence": 0,
+      "sha256": "1f66f7bf664c54bfc5480045762aae7a791749d4a778e0f0d143122e04cd2b12",
+      "member_shard": "docs/dev/evidence/sqx145/members/180/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/DataSourceTDServlet.class",
+      "occurrence": 0,
+      "sha256": "b3cba15f2d5af286d178cf577febde78923a9b1254c2e956a76d6a62fc74983c",
+      "member_shard": "docs/dev/evidence/sqx145/members/180/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/TDDataManager.class",
+      "occurrence": 0,
+      "sha256": "676fc6b4cd2d19f71cd68b836b7294af838e76e0ed33f866531b5e34cb42f638",
+      "member_shard": "docs/dev/evidence/sqx145/members/180/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob$1.class",
+      "occurrence": 0,
+      "sha256": "da75bf5b8da2953f15fb67cc10546e308a51b400ab731d883a125c8b78a0b185",
+      "member_shard": "docs/dev/evidence/sqx145/members/180/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/TD/job/ImportFileJob.class",
+      "occurrence": 0,
+      "sha256": "03ddddff6b8e5096e936823a08d8735d0b13ca2df069e07924c6bcb82318c807",
+      "member_shard": "docs/dev/evidence/sqx145/members/180/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/180/001.json",
+      "sha256": "b525833ee8a74585fcc9578147f8722c83934a6d1060c4b8e63fd999f598d3dd"
+    }
+  ]
+}

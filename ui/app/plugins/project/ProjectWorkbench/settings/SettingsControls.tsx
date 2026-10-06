@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 
 /**
  * Donor-look shared controls for the Full settings tabs (donor evidence
- * SQX144-EV-000038..043): sq-fieldset with legend, sq-wradio radios with
+ * retained target UI; current donor equivalence unverified): sq-fieldset with legend, sq-wradio radios with
  * mark, sqn-spinner with -/+ buttons, sq-slider, plain checkboxes, select
  * boxes, and the additional-config gear popup shell. All styled by the
  * sqd-settings-* classes in the theme-aware skin.

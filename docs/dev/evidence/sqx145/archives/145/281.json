@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar",
+  "sha256": "ae6ec1406158b23fc416b4e4d3d8e053ae128894aa4ac0c25cb12067920569e5",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/NeuralNetworkTrainer/NeuralNetworkTrainerTask.class": "60af7e7758b6681aecafb7b1c3da21a9ab5cf076b1914474aa91ec6102261d02"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/NeuralNetworkTrainer/NeuralNetworkTrainerTask.class",
+      "occurrence": 0,
+      "sha256": "60af7e7758b6681aecafb7b1c3da21a9ab5cf076b1914474aa91ec6102261d02",
+      "member_shard": "docs/dev/evidence/sqx145/members/281/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/281/001.json",
+      "sha256": "7c9a559271a583255dd3e784d73ae7d88e9e945980080048d3686c3f8ba27713"
+    }
+  ]
+}

@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jspf.remote.jar",
+  "archive_sha256": "9987cca1d084129a024a5c7132e561a039c9ec933cc8ebe8697bf89e79412652",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "net/xeoh/plugins/remote/ExportResult.class",
+      "occurrence": 0,
+      "sha256": "c3af98e2639742ed65e993291d4b692c82bf950592a12ad580461efe1729c4fc",
+      "name": "net/xeoh/plugins/remote/ExportResult",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getExportURIs",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Ljava/net/URI;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/remote/ExportResult"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/PublishMethod.class",
+      "occurrence": 0,
+      "sha256": "256d297de341dffbc4f64c7cfeae7b6faba2e18f9cdea05771c6c6e5783de3df",
+      "name": "net/xeoh/plugins/remote/PublishMethod",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ERMI",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "OTHER",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "XMLRPC",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "XMLRPCDELIGHT",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "JAVASCRIPT",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "JSON",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "LIPE",
+          "descriptor": "Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ee1bb7c6814a186cd31ae2fcac38ba61171e408b2980b4afcc7fbdaceadc52ae",
+          "code_length": 144
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lnet/xeoh/plugins/remote/PublishMethod;>;",
+      "class_references": [
+        "[Lnet/xeoh/plugins/remote/PublishMethod;",
+        "java/lang/Enum",
+        "net/xeoh/plugins/remote/PublishMethod"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/RemoteAPI.class",
+      "occurrence": 0,
+      "sha256": "897467bffcf80650fbb70422f355b83380fbf38c36f255f7774ee75d1ab51eca",
+      "name": "net/xeoh/plugins/remote/RemoteAPI",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/base/Plugin"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "exportPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Lnet/xeoh/plugins/remote/ExportResult;",
+          "access": 1025
+        },
+        {
+          "name": "getPublishMethod",
+          "descriptor": "()Lnet/xeoh/plugins/remote/PublishMethod;",
+          "access": 1025
+        },
+        {
+          "name": "getRemoteProxy",
+          "descriptor": "(Ljava/net/URI;Ljava/lang/Class;)Lnet/xeoh/plugins/base/Plugin;",
+          "access": 1025,
+          "generic_signature": "<R::Lnet/xeoh/plugins/base/Plugin;>(Ljava/net/URI;Ljava/lang/Class<TR;>;)TR;"
+        },
+        {
+          "name": "unexportPlugin",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/remote/RemoteAPI"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/RemotePluginHandler.class",
+      "occurrence": 0,
+      "sha256": "5984997593037844dd5bc7fb83e6753c87fbe9896514fea1c53fbb62d28e15ab",
+      "name": "net/xeoh/plugins/remote/RemotePluginHandler",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "disconnect",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "getRoundtripDelay",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "net/xeoh/plugins/remote/RemotePluginHandler"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/util/internal/PluginExport.class",
+      "occurrence": 0,
+      "sha256": "7a158970c40d9d707028ad47c78f6f20a2d0e303ffa71616fa6aff33f49b326a",
+      "name": "net/xeoh/plugins/remote/util/internal/PluginExport",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getExportName",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8a453517a2baccb8301d220b3bd878ec4ab7d710023cb03aaf158c43b1894ded",
+          "code_length": 94
+        },
+        {
+          "name": "getHashedName",
+          "descriptor": "(Lnet/xeoh/plugins/base/Plugin;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "262d5880ad84a8706cb48f4f4d81409f5cada09c11d2c0c99b380a9c05d08eda",
+          "code_length": 262
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[C",
+        "java/io/UnsupportedEncodingException",
+        "java/lang/Byte",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/security/MessageDigest",
+        "java/security/NoSuchAlgorithmException",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/logging/Logger",
+        "net/xeoh/plugins/base/Plugin",
+        "net/xeoh/plugins/base/util/PluginUtil",
+        "net/xeoh/plugins/remote/util/internal/PluginExport"
+      ]
+    },
+    {
+      "entry": "net/xeoh/plugins/remote/util/vanilla/ExportResultImpl.class",
+      "occurrence": 0,
+      "sha256": "f534456f6bc03343cda1c878b8669dc2adb20ce9fd576b101371916abeb3daca",
+      "name": "net/xeoh/plugins/remote/util/vanilla/ExportResultImpl",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "net/xeoh/plugins/remote/ExportResult"
+      ],
+      "fields": [
+        {
+          "name": "uris",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/net/URI;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/net/URI;)V",
+          "access": 129,
+          "code_sha256": "74245f4d2255e32fdc070f3c65623d31a551c649326337f01443b800ca3e254c",
+          "code_length": 13
+        },
+        {
+          "name": "getExportURIs",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Collection<Ljava/net/URI;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Arrays",
+        "net/xeoh/plugins/remote/ExportResult",
+        "net/xeoh/plugins/remote/util/vanilla/ExportResultImpl"
+      ]
+    }
+  ]
+}

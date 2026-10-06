@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskUpdateData/TaskUpdateData.jar",
+  "sha256": "bfa0bb75056cfc77dac3ae15b19e58fc62fc86178154d9d9a04c6f0dd3d47508",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask$1.class": "4a45f7bfa70700c756743557f2735188a1b1db0835d178186441168d685409d8",
+    "com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask.class": "ae7dcf47bb8bb400c622cbb39c9e8fd44e58edc1e27320cf3b77b3c4193c5987"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask$1.class",
+      "occurrence": 0,
+      "sha256": "4a45f7bfa70700c756743557f2735188a1b1db0835d178186441168d685409d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/287/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/UpdateData/UpdateDataTask.class",
+      "occurrence": 0,
+      "sha256": "ae7dcf47bb8bb400c622cbb39c9e8fd44e58edc1e27320cf3b77b3c4193c5987",
+      "member_shard": "docs/dev/evidence/sqx145/members/287/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/287/001.json",
+      "sha256": "52a14a0cecc489f0e04e58753b1c45d94428b4afa705a4f0f6bbac527eee11c6"
+    }
+  ]
+}

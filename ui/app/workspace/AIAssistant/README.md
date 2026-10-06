@@ -18,7 +18,7 @@ simulated assistant replies, provider usage, tool results or memory documents.
 
 ## Reference mapping
 
-Read-only donor root: `C:/SQX-145/internal/web/SQAI`.
+Read-only donor root: `SQX_145_REFERENCE_ROOT/internal/web/SQAI`.
 
 | Native surface | Donor evidence | Adaptation |
 | --- | --- | --- |
@@ -43,3 +43,7 @@ P19 backend parity.
 - `npm --prefix ui run test -- tests/unit/app/router.test.ts`
 - `npm --prefix ui run test:ui -- tests/e2e/sidebar-navigation.spec.ts tests/e2e/ai-assistant-parity.spec.ts --workers=1`
 - `npm --prefix ui run build`
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

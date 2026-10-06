@@ -1,13 +1,18 @@
 # P18 — Whole-app integration and independently verified release
 
-- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; SHA-256 `9abec0aa2faf6bd78b39e80c2dcfb7dfcae62ae412d9b56a77904de6a7b5a54c`.
-- **Dependencies:** P00–P17; P00 prerequisites are in the P01 file.
-- **Scope:** eight qualification tasks; no new primary JAR allocations.
+- **Source:** `HARUQUANTAI_ROOT/docs/dev/sqx-full-application-roadmap.md`; current-only source inventory `docs/dev/evidence/p00-inventory.json`.
+- **Dependencies:** P00–P17,P19; P00 prerequisites are in the P01 file.
 - **State:** proposed execution checklists; claims require recorded observations and independent review.
 - **File labels:** Create means proposed new output; Modify means verified existing file.
 - **Execution:** task plan/approval first; isolated stores; no Git or live external mutations without separate authority.
 - **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
 - **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
+
+
+- **Release order:** P19 Q/agentic research is also a dependency; P18 remains the final qualification even though P19 has a higher identifier.
+
+- **Donor baseline:** SQX145 Dev 1 only; all source fingerprints and member seeds use `SQX_145_REFERENCE_ROOT`. Missing bodies remain prerequisites.
+- **Scope:** 8 tasks; current archive allocations and resource/integration tasks only.
 
 # 18.1 Complete archive/class/FR traceability
 
@@ -41,10 +46,12 @@
 - [ ] **Step 4:** Validate atomic ledger claims, schema, source references, record links, clean-room flags and review/commit metadata.
 - [ ] **Step 5:** Reject missing dispositions or dangling IDs; keep contradictions and supersession links visible.
 
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run python tests/reference/qualification/traceability.py`; zero unresolved IDs/unclassified accepted items; missing references fail.
 - **Manual / Browser Verification:** Review the per-feature disposition matrix and unverified/excluded capability list with the owner.
+
 
 # 18.2 Independent numerical and format qualification
 
@@ -79,10 +86,13 @@
 - [ ] **Step 5:** Round-trip native formats and generated targets; preserve unknown fields and qualify supported toolchains.
 - [ ] **Step 6:** Record mismatches as unresolved evidence; rerun independently before claiming a passing capability.
 
+- [ ] **Step 7:** Qualify COT release-time alignment, profile/TPO/AnchoredVWAP vectors and per-block platform limits; compile/import native NinjaTrader fixtures and verify on-tick rejection.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/reference/qualification/test_differential.py tests/reference/qualification/test_format_roundtrips.py --no-cov`; accepted traces/formats match under explicit tolerances; injected mismatches fail.
 - **Manual / Browser Verification:** Inspect representative same-bar fills, WF boundaries, MC seeds and saved/exported strategies against source observations.
+
 
 # 18.3 Whole application frontend/backend journeys
 
@@ -97,7 +107,7 @@
 - **Ownership:** existing phase feature/FR owners; qualification does not replace domain status or invent SQX facts.
 - **Gap:** all accepted journeys use real domain outputs and reload/restart correctly; expected outcomes remain unverified until recorded.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/app`; `SQX_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_REFERENCE_ROOT/internal/web/common/templates.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/app`; `SQX_145_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_145_REFERENCE_ROOT/internal/web/common/templates.html`.
 - **Existing UI connection:** host connection; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/host/HostConnection.tsx`; wire session/readiness, capability availability and server-owned shell state.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -132,12 +142,15 @@
 - [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind session/readiness, capability availability and server-owned shell state to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
 - [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
 
+- [ ] **Step 9:** Exercise Q goal → discovery → build → retest, COT creation/update, NinjaTrader export/session import and Marketplace resource lifecycle against the real isolated host.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_application_journeys.py --no-cov`; all accepted journeys use real domain outputs and reload/restart correctly.
 - **Manual / Browser Verification:** Run `npm --prefix ui run test:ui -- tests/e2e/sqx-application-journeys.spec.ts`; review loading/empty/error/cancelled/ready states.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-18-3.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-application-journeys.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise host connection for 18.3; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 18.4 Failure, recovery and authority qualification
 
@@ -152,7 +165,7 @@
 - **Ownership:** existing phase feature/FR owners; qualification does not replace domain status or invent SQX facts.
 - **Gap:** bounded failures; no unauthorized mutation; redacted correlated diagnostics; expected outcomes remain unverified until recorded.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/app`; `SQX_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_REFERENCE_ROOT/internal/web/common/templates.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/app`; `SQX_145_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_145_REFERENCE_ROOT/internal/web/common/templates.html`.
 - **Existing UI connection:** host connection; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/host/HostConnection.tsx`; wire session/readiness, capability availability and server-owned shell state.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -189,12 +202,15 @@
 - [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind session/readiness, capability availability and server-owned shell state to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
 - [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
 
+- [ ] **Step 9:** Verify Q permission/credit/provider denial, stopped/scheduled turns, missing skill/core bodies, COT synchronization/export failure and Marketplace checksum/containment failure.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_failure_recovery.py tests/integration/qualification/test_authority.py --no-cov`; bounded failures; no unauthorized mutation; redacted correlated diagnostics.
 - **Manual / Browser Verification:** Disconnect a worker/provider and expire the session; inspect UI recovery and verify every blocked side effect remains unapplied.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-18-4.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-application-journeys.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise host connection for 18.4; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 18.5 Capability removal, restart and retained data
 
@@ -209,7 +225,7 @@
 - **Ownership:** existing phase feature/FR owners; qualification does not replace domain status or invent SQX facts.
 - **Gap:** no leaked ownership; unaffected data preserved; isolated recovery is repeatable; expected outcomes remain unverified until recorded.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/app`; `SQX_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_REFERENCE_ROOT/internal/web/common/templates.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/app`; `SQX_145_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_145_REFERENCE_ROOT/internal/web/common/templates.html`.
 - **Existing UI connection:** host connection; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/host/HostConnection.tsx`; wire session/readiness, capability availability and server-owned shell state.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -246,12 +262,15 @@
 - [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind session/readiness, capability availability and server-owned shell state to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
 - [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
 
+- [ ] **Step 9:** Remove/reload approved Q procedures, native indicator packages and Marketplace contributions; reconcile host resources and retained data without live-store mutation.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_removal_matrix.py tests/integration/qualification/test_retention.py --no-cov`; no leaked ownership; unaffected data preserved; isolated recovery is repeatable.
 - **Manual / Browser Verification:** Remove a test capability while a fixture job runs; restart; inspect disabled dependents and preserved unrelated resources.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-18-5.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-application-journeys.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise host connection for 18.5; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 18.6 Resource limits, concurrency and repeatability
 
@@ -266,7 +285,7 @@
 - **Ownership:** existing phase feature/FR owners; qualification does not replace domain status or invent SQX facts.
 - **Gap:** ratified limits hold; injected overflow fails visibly; completed-job counts reconcile; expected outcomes remain unverified until recorded.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/app`; `SQX_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_REFERENCE_ROOT/internal/web/common/templates.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/app`; `SQX_145_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_145_REFERENCE_ROOT/internal/web/common/templates.html`.
 - **Existing UI connection:** host connection; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/host/HostConnection.tsx`; wire session/readiness, capability availability and server-owned shell state.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -303,12 +322,15 @@
 - [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind session/readiness, capability availability and server-owned shell state to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
 - [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
 
+- [ ] **Step 9:** Measure Q concurrent completion, bounded Python artifacts, schedule cancellation/reconnect and research workflow limits using independently approved fixtures.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_resource_limits.py --no-cov`; ratified limits hold; injected overflow fails visibly; completed-job counts reconcile.
 - **Manual / Browser Verification:** Run the bounded reference workloads; inspect progress, cancellation, resource recovery and chart/table responsiveness.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-18-6.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-application-journeys.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise host connection for 18.6; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 18.7 Application tooling and clean distribution
 
@@ -323,7 +345,7 @@
 - **Ownership:** existing phase feature/FR owners; qualification does not replace domain status or invent SQX facts.
 - **Gap:** fresh distribution boots/runs approved journeys; retained code and UI checks pass; expected outcomes remain unverified until recorded.
 
-- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/app`; `SQX_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_REFERENCE_ROOT/internal/web/common/templates.html`.
+- **UI donors:** `SQX_145_REFERENCE_ROOT/internal/web/app`; `SQX_145_REFERENCE_ROOT/internal/web/common`. Inspect `SQX_145_REFERENCE_ROOT/internal/web/app/login/LoginService.js`; `SQX_145_REFERENCE_ROOT/internal/web/common/templates.html`.
 - **Existing UI connection:** host connection; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/host/HostConnection.tsx`; wire session/readiness, capability availability and server-owned shell state.
 - **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
@@ -365,12 +387,15 @@
 - [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind session/readiness, capability availability and server-owned shell state to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
 - [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
 
+- [ ] **Step 10:** Audit embedded-helper/native/export packaging and both-cohort source pins; exclude sensitive state and qualify every retained dependency disposition.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_distribution.py --no-cov`; fresh distribution boots/runs approved journeys; retained code and UI checks pass.
 - **Manual / Browser Verification:** Install/launch the candidate in an isolated environment; check startup, resource paths, preferences and shutdown.
 - **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-18-7.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-application-journeys.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
 - **Connected browser acceptance:** Exercise host connection for 18.7; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 
 # 18.8 Evidence review and owner release gate
 
@@ -402,6 +427,8 @@
 - [ ] **Step 4:** Record source/lockfile/artifact hashes, exact commands/results, git status and proposed commit message.
 - [ ] **Step 5:** Create the canonical walkthrough; identify only independently verified capability-specific parity.
 - [ ] **Step 6:** Request owner review and distinct commit/publication authority; do not mark full functionality while accepted gaps remain.
+
+- [ ] **Step 7:** Require independently reviewed Build 145 feature/body/UI/provider outcomes, current-source integrity and resolution/disposition of source drift before any release claim.
 
 ## 5. Verification & Testing
 

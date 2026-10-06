@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+  "archive_sha256": "f8419ae945fc288763ebbc667dd65e14f9140859d2cd7c3bb3daf87409238348",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin.class",
+      "occurrence": 0,
+      "sha256": "38ac80f0d1fcbc0b4525ef5f6de7f4381064d1e548b099ba10bbb10a38b22cb3",
+      "name": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/results/file/ISaverPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "extensions",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b8a5889c4caaf8b90c8d447cc66fbb03948c8c4c7b4f6c60c991b37245f3b9f",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFileExtensions",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5614f0975841a072c334dcb1a5fd35d409bc52bdff8c14cb7f015a45ee4c650c",
+          "code_length": 4
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "69ab1221ee8cea482bae799467604b846a013d7f5b730522b82fa8f5241057ff",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "save",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "bd307b5543be47488920ba82495a36bb99359015925833039bc2cd6f15a22034",
+          "code_length": 262,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "shouldShowControlOrders",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "f8cdf7876d843f22aaad61e6b98e99491c3d54fb5ae89fd7dcc43e07f400b83d",
+          "code_length": 22
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/results/file/ISaverPlugin;",
+          "access": 1,
+          "code_sha256": "c55ced429284bd7db4aae3b63889fc8995153ae90a692e82fe9b9d4e23551a7e",
+          "code_length": 8
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "27e55d12e19edf821021b1ddc664e230130971084b9e2fe1bb58315993f9fd26",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2e6eba2e5e49996f779db15433ee743b507011c66c321df5c895a9f9226588a5",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/app/AppSettings",
+        "com/strategyquant/lib/app/AppSettingsConst",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/results/file/ISaverPlugin",
+        "com/strategyquant/tradinglib/tradelist/TradelistExport",
+        "com/strategyquant/tradinglib/tradelist/TradelistTableView",
+        "com/strategyquant/tradinglib/tradelist/TradelistViewsManager",
+        "java/lang/Boolean",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

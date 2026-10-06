@@ -1,0 +1,4227 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jackson-dataformat-yaml-2.21.1.jar",
+  "archive_sha256": "5c94fa55d4b93bd4ea9ac6f2cf4928ff50822d1c43e521e715d3abf23031a06d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException.class",
+      "occurrence": 0,
+      "sha256": "8c96569f43a85915941f2c9cfa8693ca36086a19f4a9929e4d8389808203bff8",
+      "name": "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/core/JsonParseException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 1,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonParseException",
+        "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/PackageVersion.class",
+      "occurrence": 0,
+      "sha256": "e150ac30e507aa7b459dcd2d17eb421c4292f2e5eab86cae7ad5aea302381b4c",
+      "name": "com/fasterxml/jackson/dataformat/yaml/PackageVersion",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/fasterxml/jackson/core/Versioned"
+      ],
+      "fields": [
+        {
+          "name": "VERSION",
+          "descriptor": "Lcom/fasterxml/jackson/core/Version;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "version",
+          "descriptor": "()Lcom/fasterxml/jackson/core/Version;",
+          "access": 1,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "61b62308fe48100605cda6587517d36a7999f03a4210879e139da2f56ab2bfa9",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/Versioned",
+        "com/fasterxml/jackson/core/util/VersionUtil",
+        "com/fasterxml/jackson/dataformat/yaml/PackageVersion",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/UTF8Reader.class",
+      "occurrence": 0,
+      "sha256": "83159ebade72fdd0b908dcaa18ea3e4776748efe88e0acbce0bab9854b15c97a",
+      "name": "com/fasterxml/jackson/dataformat/yaml/UTF8Reader",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/io/Reader",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "_bufferRecycler",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 28,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/ref/SoftReference<[[B>;>;"
+        },
+        {
+          "name": "_bufferHolder",
+          "descriptor": "[[B",
+          "access": 20
+        },
+        {
+          "name": "_inputSource",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 2
+        },
+        {
+          "name": "_autoClose",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_inputBuffer",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "_inputBufferReadOnly",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "_inputPtr",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_inputEnd",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_surrogate",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_charCount",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "_byteCount",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "_tmpBuffer",
+          "descriptor": "[C",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Z)V",
+          "access": 1,
+          "code_sha256": "436ca3dedebcb17fd6b0ae5bc4f74defebe8bcdfcdab04833e4522d0925bf824",
+          "code_length": 104
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([BIIZ)V",
+          "access": 1,
+          "code_sha256": "566fa59631ef04a6472038ec277991f6207d20ab6975f123368230b6bf0afd23",
+          "code_length": 73
+        },
+        {
+          "name": "_findBufferHolder",
+          "descriptor": "()[[B",
+          "access": 10,
+          "code_sha256": "9ea0c216ac156eaef10f1d5d9894f4772565053f47bc0f02bf2195949a3848ea",
+          "code_length": 52
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b2d5c72adc29d1c0eb2dc61a893a032cdcd9de95a3dfd9371fa16747397b4a45",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fbd661b867cb719cb6c7da649f91463d85d75f7d7d3a4cd5bad33ae6c0a48539",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([C)I",
+          "access": 1,
+          "code_sha256": "3ab5bc93a14770eb6916bb34f94ad48c01374bc990815845905be2e5c2c69b30",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([CII)I",
+          "access": 1,
+          "code_sha256": "6121c14adb54eeb68bfa16503fd81cb6497e988295b006736bae5771b296fd82",
+          "code_length": 596,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 20,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "()I",
+          "access": 20,
+          "code_sha256": "f6790c92902d0586cdfc1c676a3eacf7adf48ee02a09e236590cb8b78cfeec4a",
+          "code_length": 48,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readBytesAt",
+          "descriptor": "(I)I",
+          "access": 20,
+          "code_sha256": "b4a425f3f209ec51891c29442b0498d7d0b38be1f5c5d8321570368b52b6209c",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "freeBuffers",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "8def51ffb6afb8231dea3ed2e12e17b4545e3597c66910287577e70b405c2abd",
+          "code_length": 29
+        },
+        {
+          "name": "reportInvalidInitial",
+          "descriptor": "(II)V",
+          "access": 2,
+          "code_sha256": "5ecda3848a742e1376bc5b9fabe9618d810d758db80c4c766025639b031dd06d",
+          "code_length": 76,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reportInvalidOther",
+          "descriptor": "(II)V",
+          "access": 2,
+          "code_sha256": "f6a88aa3cd3d53911e6135f805db081363acc9bbbdce742d55f187246a4a7759",
+          "code_length": 74,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reportUnexpectedEOF",
+          "descriptor": "(II)V",
+          "access": 2,
+          "code_sha256": "467890b0119231f235182db3cc934fa5263419660e4fc9251f1989fa0c5e9778",
+          "code_length": 73,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "loadMore",
+          "descriptor": "(I)Z",
+          "access": 2,
+          "code_sha256": "a061667737af8e5020298439054e0504516382e5c52a7bd3eb44fdf329c84851",
+          "code_length": 227,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reportBounds",
+          "descriptor": "([CII)V",
+          "access": 4,
+          "code_sha256": "3a59daa264ccee9aaf55eed876d2f6862b1491bb252a711f2247a494512fc384",
+          "code_length": 51,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reportStrangeStream",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "c6ae2b018b838ca23cb56e23f22858d1efff0363e720ef0a610b99dbca94aeda",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "05deed04f956925d7142d2172c4351eeb2be4481d9dce14d1430951c042b66d2",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[C",
+        "[[B",
+        "com/fasterxml/jackson/dataformat/yaml/UTF8Reader",
+        "java/io/CharConversionException",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/Reader",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/ThreadLocal",
+        "java/lang/ref/SoftReference"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/UTF8Writer.class",
+      "occurrence": 0,
+      "sha256": "94168d9321e752873956f9323afaff6091c5795d72fc07baa0791b13bbe4b8fa",
+      "name": "com/fasterxml/jackson/dataformat/yaml/UTF8Writer",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/io/Writer",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SURR1_FIRST",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SURR1_LAST",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SURR2_FIRST",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SURR2_LAST",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DEFAULT_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "_bufferRecycler",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 28,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/ref/SoftReference<[[B>;>;"
+        },
+        {
+          "name": "_bufferHolder",
+          "descriptor": "[[B",
+          "access": 20
+        },
+        {
+          "name": "_out",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 2
+        },
+        {
+          "name": "_outBuffer",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "_outBufferEnd",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "_outPtr",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "_surrogate",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "e21aa890e72145f0cb6b9b30795e5eb4ef519ad7d839cf28149e277bdc0dbe23",
+          "code_length": 70
+        },
+        {
+          "name": "_findBufferHolder",
+          "descriptor": "()[[B",
+          "access": 10,
+          "code_sha256": "d40ddcf775d69ad5d1ba1849de0930231385dbe10c62cd3ac5d5c9bddcac265b",
+          "code_length": 52
+        },
+        {
+          "name": "append",
+          "descriptor": "(C)Ljava/io/Writer;",
+          "access": 1,
+          "code_sha256": "f8e5d5293978ee6bc809a38b2390dbe37679861725f3ad7740c00be22238e70b",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "763e403d581455d2a4dc2cf17ddee110976ac3648100fc1c95a1aec2023f27b1",
+          "code_length": 97,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "50093bcf370fcce0e9f5f4e461c153683134817839e90faa420538e4d23d964f",
+          "code_length": 43,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([C)V",
+          "access": 1,
+          "code_sha256": "678977ee9a57e53022f3b5195dd04218b665f63b38ddd2ff677367897819bc55",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "([CII)V",
+          "access": 1,
+          "code_sha256": "40b2d191882eaa980739d5d2088103c8338669dd1885de379c77b8d7ece9c55e",
+          "code_length": 466,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "767462d7cbee59b2c63d50d8fbb552b9d4e7cf92e81675facb733b18d217bca7",
+          "code_length": 317,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "870c61d03170581acff6846eb3fd9cded81f03309f73c29369002a1cf7dfdd7f",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "write",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 1,
+          "code_sha256": "d1242a51bbcec7712cf8aee04ee4ebc117345def32247ceb0995fc7e93f4f7c6",
+          "code_length": 476,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "convertSurrogate",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "2cc0a457a232361d878840fc54e53538627902de77b0bac7059d9cb478649e1f",
+          "code_length": 85,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "throwIllegal",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "455a31134f495f0a46370b74ebec640c3756fae1b8037900e18e1fbf213728f9",
+          "code_length": 158,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "append",
+          "descriptor": "(C)Ljava/lang/Appendable;",
+          "access": 4161,
+          "code_sha256": "5c7e71fde61baf8dd26dee98118927bb7c2f290e15ab4a05b3c111ac70f4b14b",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "aa67c62aef37778e847d848e3b9825f64acbde9d2fcb862f2bf4443bbc4fb65e",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[[B",
+        "com/fasterxml/jackson/dataformat/yaml/UTF8Writer",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/Writer",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/ThreadLocal",
+        "java/lang/ref/SoftReference"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory.class",
+      "occurrence": 0,
+      "sha256": "a616704c00b8ff4e011346d71dbede6ff6a4301460cbf9b56858d4e05fd283cd",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/ObjectCodec;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;Lcom/fasterxml/jackson/core/ObjectCodec;)V",
+          "access": 1,
+          "code_sha256": "d667f7aef5e5ee1f0928c276180e378f5346b7c17a43e13370bb335c217ee258",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;)V",
+          "access": 4,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory;",
+          "access": 1,
+          "code_sha256": "a90f5f021abf21b9195c3c65f170f83c1cfe57a5510fec59d48a259bb6bf220d",
+          "code_length": 19
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "0300590daa5eb50c0123b10a86d10d5d4f53421ef0854a4b76664ad46416ee26",
+          "code_length": 13
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/InputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "c538c8fba6606683e52536fcead3c8030d74c07e66af15f2062a63166f7eacf6",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/Reader;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "cf2e9866e36ac64bdf99ded5014221dd714ffb5345fc7371486a5c26e233baa1",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([CIILcom/fasterxml/jackson/core/io/IOContext;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "b49ee737052eb0a5a7df838fcbbf6ada8efb28337694da89f75f146bdeb77e8e",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([BIILcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "a40028e5ec8f438cbd96452adaf65bf694eb2255b66ce83186a9d00b78f57698",
+          "code_length": 39,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 4161,
+          "code_sha256": "f523d4d194e98af8cfed4f6084be102bb92f40ee9797f3a5d09958e93a45c9c5",
+          "code_length": 5
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([BIILcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "d4c74039af6fdd45f82b1592a3896530fa79af197e35483e71082fd8027a3b04",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([CIILcom/fasterxml/jackson/core/io/IOContext;Z)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "2b84d54a0e46c63e52b0965982565f94a2468678ae89543fdb33b53034ded785",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/Reader;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "14bb715899260543461b617cadb2b5dc5f1287134028d571e4b94cbf073658d9",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/InputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "dc999c31b0d2b4978529cee285b81d75177666a7214e302a697b9fc9a49ab6df",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonFactory;",
+          "access": 4161,
+          "code_sha256": "f523d4d194e98af8cfed4f6084be102bb92f40ee9797f3a5d09958e93a45c9c5",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonEncoding",
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingFactory",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+        "java/io/CharArrayReader",
+        "java/io/IOException"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext.class",
+      "occurrence": 0,
+      "sha256": "503a7d196693481784ee267c092da1c319a234b3e0692ec93462f205c4aed5c6",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "anchor",
+          "descriptor": "Ljava/lang/String;",
+          "access": 17
+        },
+        {
+          "name": "events",
+          "descriptor": "Ljava/util/List;",
+          "access": 17,
+          "generic_signature": "Ljava/util/List<Lorg/yaml/snakeyaml/events/Event;>;"
+        },
+        {
+          "name": "depth",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "eef15ae1dda3b61fd00f719d5c2e24fef87c6bcafbaa76e3778ebe9e32db2fe4",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext",
+        "java/lang/Object",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser.class",
+      "occurrence": 0,
+      "sha256": "60f60d1876783431ac4f0653895e6d68f23e97cb1f8711e3f40014bf7e8a9751",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_EVENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAX_ANCHORS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAX_MERGES",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAX_REFS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "mergeStack",
+          "descriptor": "Ljava/util/ArrayDeque;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayDeque<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "tokenStack",
+          "descriptor": "Ljava/util/ArrayDeque;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayDeque<Lcom/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext;>;"
+        },
+        {
+          "name": "referencedObjects",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/util/List<Lorg/yaml/snakeyaml/events/Event;>;>;"
+        },
+        {
+          "name": "refEvents",
+          "descriptor": "Ljava/util/ArrayDeque;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayDeque<Lorg/yaml/snakeyaml/events/Event;>;"
+        },
+        {
+          "name": "globalDepth",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILorg/yaml/snakeyaml/LoaderOptions;Lcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Reader;)V",
+          "access": 1,
+          "code_sha256": "5bac95b78260e7494f9fa9312b5d1516ea891352aafe495a163d40f6ccd8146e",
+          "code_length": 63
+        },
+        {
+          "name": "finishContext",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext;)V",
+          "access": 2,
+          "code_sha256": "d56b075bde6184913147efa8789a2a2cbd7187b87061eed628b65ac00867f7ad",
+          "code_length": 113,
+          "throws": [
+            "com/fasterxml/jackson/core/exc/StreamConstraintsException"
+          ]
+        },
+        {
+          "name": "trackDepth",
+          "descriptor": "(Lorg/yaml/snakeyaml/events/Event;)Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4,
+          "code_sha256": "7b7a18f6e6bbdaa37bc89d275a842914540abe30470f6cb9a3de66fab05a8a29",
+          "code_length": 39
+        },
+        {
+          "name": "filterEvent",
+          "descriptor": "(Lorg/yaml/snakeyaml/events/Event;)Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4,
+          "code_sha256": "4714104881b9abb76575c066614f1df97dec3404f36b1f1b5b2324fe5da7c079",
+          "code_length": 49
+        },
+        {
+          "name": "getEvent",
+          "descriptor": "()Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4,
+          "code_sha256": "059d7bdebfc7263ced27666ebaca770504e814f0d67cccbb6ce5791314bb21f3",
+          "code_length": 478,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonParseException",
+        "com/fasterxml/jackson/core/exc/StreamConstraintsException",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLAnchorReplayingParser$AnchorContext",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayDeque",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "org/yaml/snakeyaml/events/AliasEvent",
+        "org/yaml/snakeyaml/events/CollectionEndEvent",
+        "org/yaml/snakeyaml/events/CollectionStartEvent",
+        "org/yaml/snakeyaml/events/Event",
+        "org/yaml/snakeyaml/events/MappingEndEvent",
+        "org/yaml/snakeyaml/events/MappingStartEvent",
+        "org/yaml/snakeyaml/events/NodeEvent",
+        "org/yaml/snakeyaml/events/ScalarEvent"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLFactory.class",
+      "occurrence": 0,
+      "sha256": "f8982c5ba482a06405acf5f88d7f227c7214722a407fc0d39c3018db42bd9367",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/core/JsonFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "FORMAT_NAME_YAML",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_YAML_PARSER_FEATURE_FLAGS",
+          "descriptor": "I",
+          "access": 28
+        },
+        {
+          "name": "DEFAULT_YAML_GENERATOR_FEATURE_FLAGS",
+          "descriptor": "I",
+          "access": 28
+        },
+        {
+          "name": "UTF8_BOM_1",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "UTF8_BOM_2",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "UTF8_BOM_3",
+          "descriptor": "B",
+          "access": 26
+        },
+        {
+          "name": "_yamlGeneratorFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_yamlParserFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_version",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$Version;",
+          "access": 20
+        },
+        {
+          "name": "_quotingChecker",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;",
+          "access": 20
+        },
+        {
+          "name": "_loaderOptions",
+          "descriptor": "Lorg/yaml/snakeyaml/LoaderOptions;",
+          "access": 20
+        },
+        {
+          "name": "_dumperOptions",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "154f622e17d7dc8ae7133ae9b2de0f7dccab0dc4e1ad9b6b1df06aef81c7ef79",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/ObjectCodec;)V",
+          "access": 1,
+          "code_sha256": "dfcce59ba272f40255e9312b6055e0699e5fe408cb51766840ab2ad3ae1d0e7e",
+          "code_length": 56
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;Lcom/fasterxml/jackson/core/ObjectCodec;)V",
+          "access": 1,
+          "code_sha256": "660b3e553e08fc444f898d3c3a4e7d1d59d3003d61a96de7ca9c7cb53dc3c06c",
+          "code_length": 69
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;)V",
+          "access": 4,
+          "code_sha256": "d8284ee97e0b349eef796cb947a2f0eed8d769d6ce6687cfc73b4bf17f9f3527",
+          "code_length": 69
+        },
+        {
+          "name": "rebuild",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "1a9659fca4482acd5474126d328ee5a18caa12ec10fa0e93f8636ca0971535de",
+          "code_length": 9
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 9,
+          "code_sha256": "a4ee17371ba59217e576d463fc579214b9708121a2c5064f008760b6982fa99a",
+          "code_length": 8
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "66d2361236eb784f489a52683c78c9eb1a10639a0201479c3a7a8f9372b80325",
+          "code_length": 16
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "8925251c69fa6d76dcc4927d12b99cff56e887bba0b2dc95eb2620480ef91617",
+          "code_length": 13
+        },
+        {
+          "name": "version",
+          "descriptor": "()Lcom/fasterxml/jackson/core/Version;",
+          "access": 1,
+          "code_sha256": "1144ff04366b49ef2a01d37a606196bc9d5556ff7082c3ca6c9b6a8606e0d07a",
+          "code_length": 4
+        },
+        {
+          "name": "canUseCharArrays",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getFormatReadFeatureType",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "7a7a67753b3824536512981300eef9a2b5a60547aa8a68aeac31d54ec41dacdb",
+          "code_length": 3,
+          "generic_signature": "()Ljava/lang/Class<Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;>;"
+        },
+        {
+          "name": "getFormatWriteFeatureType",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "8a505064e09b9e9da14904b09135baa847b28c7dca820afe2f85f79b5a747188",
+          "code_length": 3,
+          "generic_signature": "()Ljava/lang/Class<Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;>;"
+        },
+        {
+          "name": "getFormatName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ebee5ee604098f1ed8977f52a5a6e1673c67cc8666b58e529185b3c8ba36b58c",
+          "code_length": 3
+        },
+        {
+          "name": "hasFormat",
+          "descriptor": "(Lcom/fasterxml/jackson/core/format/InputAccessor;)Lcom/fasterxml/jackson/core/format/MatchStrength;",
+          "access": 1,
+          "code_sha256": "b10d56a7c052d209d073715c43c77b901631b1a652ca2a129e1c36341e8827b3",
+          "code_length": 156,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 17,
+          "code_sha256": "2bf5199011670a62eca0d7e780850ebcd0cb75a4bb452146f586c2ffa5a12494",
+          "code_length": 21
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "ea5b70f3805b56eff906df02d4caab93607e27b50b10939078f3c861e53bfbd5",
+          "code_length": 15
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "ba0d71812269ad38636e67b36c8efa8aeb1075b5572b0964a68c46e16c5e3d62",
+          "code_length": 17
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Z",
+          "access": 17,
+          "code_sha256": "db4fa86499db96629969847b1d998b331115c4f6365d96f309228496bccf4bc9",
+          "code_length": 18
+        },
+        {
+          "name": "getFormatGeneratorFeatures",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 17,
+          "code_sha256": "59147e4f9f38761bcc742897474c7c19334b2b207aed8117b50411405580d107",
+          "code_length": 21
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "5e2192bb75324c7932a3055c88283cb8c8bb02c52118909ded30df1819803184",
+          "code_length": 15
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "bbfe0b9aa330cb4f9dd1c2da978a61dc48940b89289c1a3385f4555dfa247490",
+          "code_length": 17
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Z",
+          "access": 17,
+          "code_sha256": "0aeabeb795d1ad57821c5f0e3ff83945336c09461c345c6b17c02f9439ba8f08",
+          "code_length": 18
+        },
+        {
+          "name": "getFormatParserFeatures",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "1cc67f40e33acad3c38a0dd653b3a79990b2cc4e9d082e4d39ecb86ed5d46e15",
+          "code_length": 13,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/File;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "dae37b3d822b5528177730c22318bb6e2e55da354103bbfaa6e24623842dc9c8",
+          "code_length": 30,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/net/URL;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "171bae78c7709e72ba2246e44f236b63faf6852c05819356d2fafa35996d258c",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "2c2cf5fef38d3c8febf582dc565466889f26e3207b79edf4595ff5d5b46d3784",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "0a0b0936e167b9b786d7a4ca047ecac582578a0b4bcd2f9e2045231caf028cd6",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([C)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "ce351a03be4bf745916ab6f5f18d7d9f211f18547176f744ffba1a4058edb967",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([CII)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "f7f364ad7222efef84c6ae1bcfb38b3179f97f6f404d88ab4f8c3298c4fe7c69",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([B)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "a570875e52422fc9024cc8fe63070dcd3dc58822d3949c4ee9bec1da9e7d41d1",
+          "code_length": 52,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([BII)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 1,
+          "code_sha256": "179ca091c8d4220aa4658937e097bffc22f3c60ca1519afc0e82fea2fdd97a07",
+          "code_length": 59,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;Lcom/fasterxml/jackson/core/JsonEncoding;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "194ca57ffde94db3fc626bc86476c69cad2e5d49031a71d632f762c74b93a641",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "efae41517e2b32ab5843b0eefdc2ec85247424aaebc329458b739cd5f7a7d62a",
+          "code_length": 31,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "1e3ecc01f4d2066012c91bbdc9654865301b28533738a1bab595aebc26434cc8",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/File;Lcom/fasterxml/jackson/core/JsonEncoding;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 1,
+          "code_sha256": "ccf90bafa3215e534b166355cd4cc7e351fab7c0225daa5bbb569cd85a545c49",
+          "code_length": 48,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/InputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "7d8714de5461e1df45b5a0f2acb8665089ff8790ccd62f693d35bb34b7f6b3b2",
+          "code_length": 32,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/Reader;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "feb6065d76eab062909347017c53d77605a4fccdf1fc611abc743f3366eb2d77",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([CIILcom/fasterxml/jackson/core/io/IOContext;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "05db7119dd1990866e0b171f507392526df084780f001cdea1ab937e834cea3a",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([BIILcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser;",
+          "access": 4,
+          "code_sha256": "2ce08d7b82fd345b55bb93800f125949ee89d05f76f96f76d5ceac8ae93a5ce9",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createGenerator",
+          "descriptor": "(Ljava/io/Writer;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 4,
+          "code_sha256": "ce62e99ff791176468656e6e606ca2c952e3f15592209201b7daf88a58b2cbc5",
+          "code_length": 66,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createUTF8Generator",
+          "descriptor": "(Ljava/io/OutputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 4,
+          "code_sha256": "a9f90c58995ea6b7417f30e5ac1a3289e6a72319f4e83941f38f76c246563f67",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createWriter",
+          "descriptor": "(Ljava/io/OutputStream;Lcom/fasterxml/jackson/core/JsonEncoding;Lcom/fasterxml/jackson/core/io/IOContext;)Ljava/io/Writer;",
+          "access": 4,
+          "code_sha256": "afa1c9efb2c4324b6c8a96aebb4cd3238f16a9682fbeeae05138bc373b1073ce",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createReader",
+          "descriptor": "(Ljava/io/InputStream;Lcom/fasterxml/jackson/core/JsonEncoding;Lcom/fasterxml/jackson/core/io/IOContext;)Ljava/io/Reader;",
+          "access": 4,
+          "code_sha256": "256791fb868ed306982074174acb1cd01a85df5e2cde47de9ef9936b09d5e50a",
+          "code_length": 63,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createReader",
+          "descriptor": "([BIILcom/fasterxml/jackson/core/JsonEncoding;Lcom/fasterxml/jackson/core/io/IOContext;)Ljava/io/Reader;",
+          "access": 4,
+          "code_sha256": "2242ad9518c87d719cfd178daf05a79285610fbdf69e6957125e843eef3ddeaf",
+          "code_length": 62,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createUTF8Generator",
+          "descriptor": "(Ljava/io/OutputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4164,
+          "code_sha256": "fe73d9b1b937ea403c67abd6ea1b708d7ed2ba7b096b12b0d998862811f2c12a",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createGenerator",
+          "descriptor": "(Ljava/io/Writer;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4164,
+          "code_sha256": "795db3346a7887f3fa8c4a347d87af6a4dac3ae9787becef9c0e8140853fed70",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([BIILcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "ddb764e5ffbff741fc06bca135c801fd47f5ce22e1da41342caec94e04a4bcaa",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "([CIILcom/fasterxml/jackson/core/io/IOContext;Z)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "c1ea2e8fe04514910c1d76df158e08c5e69c70898f73ef1b595b9e7fb16c43aa",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/Reader;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "d7c8111e3adf4b53c0dde786843174da95183086be19419a47f9cbc2174effbb",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_createParser",
+          "descriptor": "(Ljava/io/InputStream;Lcom/fasterxml/jackson/core/io/IOContext;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4164,
+          "code_sha256": "7577e0a61df9425af18e8e1f4a853e2ef82fdb662bc4a9c1288ce9bb43f2fd01",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4161,
+          "code_sha256": "e0ec64ce8761aec99d83e35c9259a28d0ba6b5b788a6fe07f0673df08555aba4",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4161,
+          "code_sha256": "341f20641e9135a3e1c827345076a876c62cf28aac9e2d46c9b53286252fef28",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;Lcom/fasterxml/jackson/core/JsonEncoding;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4161,
+          "code_sha256": "aacad36b6f61c48b55db040a00fa382a498c60a59462e43916d07f9193a17a36",
+          "code_length": 7,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([CII)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "9fc28addeae92a6f6eef56b509bed05273c6ace75b59f0cea2179af2729cf568",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([C)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "9963333e3c697ee97251e0e8839482b99a0a3a0a0e0664d5fca5347f1c0c08da",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "4e6e39af9bcfc3188b5b99fd979e8b0f6d31d613f9323de054057234d2f33cd0",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([BII)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "43709fb253792eb8f3752c1083b30efc490c5deee4d8eba1cc591dd12b6f1e3f",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "([B)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "719cec7b4c5446b75069eaf1328bb9a946ea6166952f7fe0905bda43d8541e9b",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "cbc63bbe11edc9b54ad3db5c8e70bb64019cea55393bf5d4a700e96e3b90da2a",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "bf1fcfa3399a6a4f9d578fcd1e7a3ad8eeaf2bcda92126c37993abba35517b59",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/net/URL;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "38a4b2bc2a6c992358e9fb176b6158d343e7f2e7b5ca10aaafd1d969ecbb172a",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/File;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 4161,
+          "code_sha256": "22d24248435f44fc78f76edc6fb01f7250d2e0e20423fea003f8b79fa4398c33",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonParseException"
+          ]
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonFactory;",
+          "access": 4161,
+          "code_sha256": "a7c9038059618b6710bae6efb969f43d890f543a6490390fb0f5eaf2c8f6f7d6",
+          "code_length": 5
+        },
+        {
+          "name": "rebuild",
+          "descriptor": "()Lcom/fasterxml/jackson/core/TSFBuilder;",
+          "access": 4161,
+          "code_sha256": "7e910c6f68a1559be18fa99090ac259339eb665a6a5e404a5576c5eae6e66bc1",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3802a224fe9ebdd3fca6d806e31632a911f7856ead45fc33a9d7f5212b5ff0b1",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonEncoding",
+        "com/fasterxml/jackson/core/JsonFactory",
+        "com/fasterxml/jackson/core/JsonParseException",
+        "com/fasterxml/jackson/core/JsonParser",
+        "com/fasterxml/jackson/core/JsonParser$Feature",
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/core/format/InputAccessor",
+        "com/fasterxml/jackson/core/format/MatchStrength",
+        "com/fasterxml/jackson/core/io/IOContext",
+        "com/fasterxml/jackson/core/io/InputDecorator",
+        "com/fasterxml/jackson/dataformat/yaml/PackageVersion",
+        "com/fasterxml/jackson/dataformat/yaml/UTF8Reader",
+        "com/fasterxml/jackson/dataformat/yaml/UTF8Writer",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+        "java/io/ByteArrayInputStream",
+        "java/io/CharArrayReader",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/OutputStreamWriter",
+        "java/io/StringReader",
+        "java/lang/IllegalStateException",
+        "org/yaml/snakeyaml/DumperOptions",
+        "org/yaml/snakeyaml/DumperOptions$Version"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder.class",
+      "occurrence": 0,
+      "sha256": "b59d303a0e39a0dc70c328a4b4755e7a42a2a54c261d9e387982629a10bb1215",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/core/TSFBuilder",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_formatGeneratorFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_formatParserFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_quotingChecker",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;",
+          "access": 4
+        },
+        {
+          "name": "_version",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$Version;",
+          "access": 4
+        },
+        {
+          "name": "_loaderOptions",
+          "descriptor": "Lorg/yaml/snakeyaml/LoaderOptions;",
+          "access": 4
+        },
+        {
+          "name": "_dumperOptions",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "40cdbcf9a81bc2a9778f2b521170c3d9a387785017d68688181ae61bb7f893c2",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;)V",
+          "access": 1,
+          "code_sha256": "a8f59f63cfee7c57d6c69615e496909debe037c0c2bcf0173c283c0d92fb64ea",
+          "code_length": 38
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "e143453d4616afcfb41ccad12b3feccee817362dc71c872ff50f965717040b08",
+          "code_length": 15
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 129,
+          "code_sha256": "195c5276c42e2567829c78e4fbb233c232f3d35515cd45af9725c941c9b25f11",
+          "code_length": 57
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "711da7138ee673a4bb7ed863e0633ff868970e6c11ffb0b399ec97c7dd07e536",
+          "code_length": 17
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 129,
+          "code_sha256": "08ef578a2896228a25f5eafd574add4ee4e3a183f4a38e4e831b20357c00be6b",
+          "code_length": 61
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "8f74d7c758ec51f0b3f7f657e9bc11f68eee071d21c8717771c285e93d78f9bf",
+          "code_length": 18
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "87fe86bef9c93635f21c61646a989041b356acb25ec123e40e5db52dde2d04a1",
+          "code_length": 15
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 129,
+          "code_sha256": "958d6b954b991fe47487891b93174e94440ca91fbd4c580ec6e8e67e98f2d9d6",
+          "code_length": 57
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "9c66d18921e4bb25154697e2a09426944f632e942466968a1aac90a7e2edcc53",
+          "code_length": 17
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 129,
+          "code_sha256": "6fd7c5b436257108e06ed203606fc37771da28cf619691c40651b2c626ea8bc0",
+          "code_length": 61
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "4fc5e8f6e3c0d505f0005ad50a8341fe18ffbc2d02ea3126c5a6edc07e22bdc3",
+          "code_length": 18
+        },
+        {
+          "name": "stringQuotingChecker",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "06f0bb27498fb86e1b385fd5bc795db8729b182a07b117ac5659f04afc874b52",
+          "code_length": 7
+        },
+        {
+          "name": "yamlVersionToWrite",
+          "descriptor": "(Lorg/yaml/snakeyaml/DumperOptions$Version;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "87bf85d0355ac78130445e6350675a6e86f6efeb58b509f11ca0270d69336d6a",
+          "code_length": 7
+        },
+        {
+          "name": "loaderOptions",
+          "descriptor": "(Lorg/yaml/snakeyaml/LoaderOptions;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "ed14be3f542a7fbb4ac137320f0660352fe125a04b34d9e91f2680cefed9067b",
+          "code_length": 25
+        },
+        {
+          "name": "dumperOptions",
+          "descriptor": "(Lorg/yaml/snakeyaml/DumperOptions;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;",
+          "access": 1,
+          "code_sha256": "2136dadd0ec617329797bc244b0721f407660f2075fd55ab3d8b9d41d4065630",
+          "code_length": 7
+        },
+        {
+          "name": "formatParserFeaturesMask",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "formatGeneratorFeaturesMask",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "yamlVersionToWrite",
+          "descriptor": "()Lorg/yaml/snakeyaml/DumperOptions$Version;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "stringQuotingChecker",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;",
+          "access": 1,
+          "code_sha256": "a9b40aa09185329ac9da3db8dd61541f294e7b260f082c05cd884c456f536d41",
+          "code_length": 16
+        },
+        {
+          "name": "loaderOptions",
+          "descriptor": "()Lorg/yaml/snakeyaml/LoaderOptions;",
+          "access": 1,
+          "code_sha256": "351482787419cb548e387866a5102826e1a8ad255b201e26e7dfdb36fe9daca7",
+          "code_length": 5
+        },
+        {
+          "name": "dumperOptions",
+          "descriptor": "()Lorg/yaml/snakeyaml/DumperOptions;",
+          "access": 1,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 1,
+          "code_sha256": "dd85f3d97b3837f54ab874ac5fe1c86054c4193993b5b4e08bce070694e6ae38",
+          "code_length": 9
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonFactory;",
+          "access": 4161,
+          "code_sha256": "67445957a2c4ecee9205fabf761f00dfb9aac9d94f4a8e572c4924577f20c48b",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Lcom/fasterxml/jackson/core/TSFBuilder<Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder;>;",
+      "class_references": [
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+        "com/fasterxml/jackson/core/StreamReadFeature",
+        "com/fasterxml/jackson/core/TSFBuilder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactoryBuilder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+        "org/yaml/snakeyaml/DumperOptions",
+        "org/yaml/snakeyaml/DumperOptions$Version",
+        "org/yaml/snakeyaml/LoaderOptions"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature.class",
+      "occurrence": 0,
+      "sha256": "0e55bf7b7e5202f47c919e6692f17851ddb3877b293780ff3cd6aa37f1835381",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "com/fasterxml/jackson/core/FormatFeature"
+      ],
+      "fields": [
+        {
+          "name": "WRITE_DOC_START_MARKER",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "USE_NATIVE_OBJECT_ID",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "USE_NATIVE_TYPE_ID",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "CANONICAL_OUTPUT",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "SPLIT_LINES",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "MINIMIZE_QUOTES",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "ALWAYS_QUOTE_NUMBERS_AS_STRINGS",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "LITERAL_BLOCK_STYLE",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "INDENT_ARRAYS",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "INDENT_ARRAYS_WITH_INDICATOR",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "USE_PLATFORM_LINE_BREAKS",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "ALLOW_LONG_KEYS",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "_defaultState",
+          "descriptor": "Z",
+          "access": 20
+        },
+        {
+          "name": "_mask",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "collectDefaults",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "641d18231120c475bb277f3cd727507532e9a9ea2adf869726e9f3bf0ec621b1",
+          "code_length": 45
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IZ)V",
+          "access": 2,
+          "code_sha256": "72fbe5cee33a767e86be9bf05f24711bcebf2bd0294a00c11f9a185dc696ef23",
+          "code_length": 22,
+          "generic_signature": "(Z)V"
+        },
+        {
+          "name": "enabledByDefault",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "enabledIn",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "7579d072e35a89dba609ce08b724f3bc4c36423af27be3c2659972f53f52f229",
+          "code_length": 15
+        },
+        {
+          "name": "getMask",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c4be5d4e2bc69b8b56edcc530b23f83be000df4423c40efe0643a11c4f79b40",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e92eb36bdf40c28acd4ed31b62691874b659c4bd510d9757b1a888a33d1f16ff",
+          "code_length": 261
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;>;Lcom/fasterxml/jackson/core/FormatFeature;",
+      "class_references": [
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+        "com/fasterxml/jackson/core/FormatFeature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator.class",
+      "occurrence": 0,
+      "sha256": "bd914bcc9d02f579e3296156471cc21549f3066744f4a56e36c1b9bab46c86ea",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/core/base/GeneratorBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MIN_INT_AS_LONG",
+          "descriptor": "J",
+          "access": 28
+        },
+        {
+          "name": "MAX_INT_AS_LONG",
+          "descriptor": "J",
+          "access": 28
+        },
+        {
+          "name": "PLAIN_NUMBER_P",
+          "descriptor": "Ljava/util/regex/Pattern;",
+          "access": 28
+        },
+        {
+          "name": "TAG_BINARY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 28
+        },
+        {
+          "name": "_streamWriteConstraints",
+          "descriptor": "Lcom/fasterxml/jackson/core/StreamWriteConstraints;",
+          "access": 20
+        },
+        {
+          "name": "_formatFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_writer",
+          "descriptor": "Ljava/io/Writer;",
+          "access": 4
+        },
+        {
+          "name": "_outputOptions",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions;",
+          "access": 4
+        },
+        {
+          "name": "_docVersion",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$Version;",
+          "access": 20
+        },
+        {
+          "name": "STYLE_UNQUOTED_NAME",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "STYLE_SCALAR",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "STYLE_QUOTED",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "STYLE_LITERAL",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "STYLE_BASE64",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "STYLE_PLAIN",
+          "descriptor": "Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;",
+          "access": 26
+        },
+        {
+          "name": "_emitter",
+          "descriptor": "Lorg/yaml/snakeyaml/emitter/Emitter;",
+          "access": 4
+        },
+        {
+          "name": "_objectId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_typeId",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_rootValueCount",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_quotingChecker",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;",
+          "access": 20
+        },
+        {
+          "name": "NO_TAGS",
+          "descriptor": "Lorg/yaml/snakeyaml/events/ImplicitTuple;",
+          "access": 26
+        },
+        {
+          "name": "EXPLICIT_TAGS",
+          "descriptor": "Lorg/yaml/snakeyaml/events/ImplicitTuple;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;Lcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Writer;Lorg/yaml/snakeyaml/DumperOptions$Version;)V",
+          "access": 1,
+          "code_sha256": "b19b7961fc6b362b9027e1bd4d0a18cd587e8aeff80c3bc5b63f7ae99c2767f7",
+          "code_length": 99,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker;Lcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Writer;Lorg/yaml/snakeyaml/DumperOptions;)V",
+          "access": 1,
+          "code_sha256": "9528e56fe7f192e19dc3a517efb309648333494f5f1dfab56887aac3e384da55",
+          "code_length": 96,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Writer;Lorg/yaml/snakeyaml/DumperOptions$Version;)V",
+          "access": 1,
+          "code_sha256": "398466a4f4628c7e150dca2944fad8459eb2a4cb66531c926350a28edb8fe4c0",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "buildDumperOptions",
+          "descriptor": "(IILorg/yaml/snakeyaml/DumperOptions$Version;)Lorg/yaml/snakeyaml/DumperOptions;",
+          "access": 4,
+          "code_sha256": "c0d03880ecaf6e4468c8f10fd292148f835d18ca041cfeab7bf2bd7161a6007c",
+          "code_length": 155
+        },
+        {
+          "name": "streamWriteConstraints",
+          "descriptor": "()Lcom/fasterxml/jackson/core/StreamWriteConstraints;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "version",
+          "descriptor": "()Lcom/fasterxml/jackson/core/Version;",
+          "access": 1,
+          "code_sha256": "696b5dbfb16f6ae9378047570c5fb15ed0b3d37b1ea4c29d808b5a4d25133475",
+          "code_length": 4
+        },
+        {
+          "name": "useDefaultPrettyPrinter",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "setPrettyPrinter",
+          "descriptor": "(Lcom/fasterxml/jackson/core/PrettyPrinter;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputTarget",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getOutputBuffered",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ea3444f7b732d2379c3e81ad7a08e24c072cb9468be2734659ffef7ecaec49ed",
+          "code_length": 2
+        },
+        {
+          "name": "getFormatFeatures",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "overrideFormatFeatures",
+          "descriptor": "(II)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 1,
+          "code_sha256": "17fb6d93a968c8494c48161df417cbf3a2609325d35fad855d911cc51264490c",
+          "code_length": 18
+        },
+        {
+          "name": "canUseSchema",
+          "descriptor": "(Lcom/fasterxml/jackson/core/FormatSchema;)Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "canWriteFormattedNumbers",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getWriteCapabilities",
+          "descriptor": "()Lcom/fasterxml/jackson/core/util/JacksonFeatureSet;",
+          "access": 1,
+          "code_sha256": "1d892439c95318f72e41f60396fd5aff640d938081693186449ab0fd2198b62e",
+          "code_length": 4,
+          "generic_signature": "()Lcom/fasterxml/jackson/core/util/JacksonFeatureSet<Lcom/fasterxml/jackson/core/StreamWriteCapability;>;"
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "50961ce3826b8f7c544272b9baf366bdae7d62f1965d41d2be81c33c9302f905",
+          "code_length": 15
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "ce723e7d0f9df7a15b912ee24774829a62d41c687605f7ba4bbafcb461b1ce21",
+          "code_length": 17
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Z",
+          "access": 17,
+          "code_sha256": "7210c5a73b2a6be51e4fe05ea1a5f5a92db2ea28f3a3f60e446b0417e8d5937a",
+          "code_length": 18
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator;",
+          "access": 1,
+          "code_sha256": "27d3390d3849b01aac757a6b393449c4495cd00db5781d9911de35dc64cefa43",
+          "code_length": 21
+        },
+        {
+          "name": "writeFieldName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 17,
+          "code_sha256": "1d7dde2190d0bf551aea78eefac9f3db1c9d8f6724ad5d225a3e36403f89a65b",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeFieldName",
+          "descriptor": "(Lcom/fasterxml/jackson/core/SerializableString;)V",
+          "access": 17,
+          "code_sha256": "52dc18027b9801022456418692560c9dd7615c07f9e878bb7b373e327d1c6a63",
+          "code_length": 34,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeFieldId",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "911e016b5af4f4cc169b4cf94859a39a3ea5a40f50dba691a93974d5c86a9494",
+          "code_length": 37,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_writeFieldName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 18,
+          "code_sha256": "f9132acaf2a1684eb2457a1cb16a506c7d5a03e33ed6070754a972d835680504",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "flush",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "94f254c9668068ae17ed52c1f1825dd2e6dd7d3284ec9cf892c0e3a03a5d2fef",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a3313a5083efe7440c9375c92e31e6bd9d714221a994b2e411f172bb9de29fff",
+          "code_length": 83,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeStartArray",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "78d39bf7883c1dbcceec6407549b1241cad6d54dde4c2f86b64f2fe031e8406d",
+          "code_length": 89,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeEndArray",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "142116ae703aaaa3220e7c36222f7b2d219a0d79dc01535c456fb95c094a923a",
+          "code_length": 69,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeStartObject",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "646c322e13dea7be658c0d999523bcc3cda83d6e3d2b3b7039ccfd0eff427b4c",
+          "code_length": 89,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeEndObject",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "7f3ed910f3d0e7928643da5745b2a15a756809ab2f1285170e658f1bad14ae23",
+          "code_length": 69,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "320e2c9b64f96c48818b66887e156a70952ba732dfe88b7c00b350cbac542f5d",
+          "code_length": 155,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonGenerationException"
+          ]
+        },
+        {
+          "name": "writeString",
+          "descriptor": "([CII)V",
+          "access": 1,
+          "code_sha256": "4d6db5f76039a8d3c6a3ab113c34c912d821d9c58c6a753f612ffb55f09f56d2",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeString",
+          "descriptor": "(Lcom/fasterxml/jackson/core/SerializableString;)V",
+          "access": 17,
+          "code_sha256": "c6368a68ccbc5c6cd114d05d8dabc41464eb90e559f04d69e78a78ad5ac0036d",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRawUTF8String",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeUTF8String",
+          "descriptor": "([BII)V",
+          "access": 17,
+          "code_sha256": "896e34463bf9ad4fe7c6de1ca989256873289c952faab39f4f131c6b689e3912",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRaw",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRaw",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRaw",
+          "descriptor": "([CII)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRaw",
+          "descriptor": "(C)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRawValue",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRawValue",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeRawValue",
+          "descriptor": "([CII)V",
+          "access": 1,
+          "code_sha256": "0b7030b3b4aae69037ace25ab12305fa2d0914db63ea8e2d0b02a55d782c150e",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeBinary",
+          "descriptor": "(Lcom/fasterxml/jackson/core/Base64Variant;[BII)V",
+          "access": 1,
+          "code_sha256": "94651917cb9a48f3f1b1d69252769d9ce646e45e1e23232d3591296a511d7868",
+          "code_length": 45,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeBoolean",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "e907488e7e4b4323718bc9ff97e48af0230c2af4b419e9e61993778edd734895",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d9d8c09ebf637bd4a5032663ce9bf9db51d3cad9f61450c36ec4485ce4104558",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "1809e0fa7d478c50939824d3561b32e419b425cb5d6c5902705cadfe1be3b09b",
+          "code_length": 43,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(Ljava/math/BigInteger;)V",
+          "access": 1,
+          "code_sha256": "0042e8e3ec0db91ba1c7d4c5e0ecf86e4dc6a1a677dd481093e9a287d9a162db",
+          "code_length": 32,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "80be1caca0cd79c0f9b79f0ed5357f5ac389003d0b52fa75a88a747ba284a96e",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(F)V",
+          "access": 1,
+          "code_sha256": "897018f0c570ea2aa36e08b7a9483249a7a73f8fdf3c77d9df4e2cfa7cce268a",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(Ljava/math/BigDecimal;)V",
+          "access": 1,
+          "code_sha256": "e6c33e77408855a0e8337673d119d538a1ce71d214e53b36c6482b3778ad6106",
+          "code_length": 48,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeNumber",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1ac77b2fd81a7cc85abf02bdb97620e28e84fd7a5bb737c3a7bb64a50e18c911",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException",
+            "com/fasterxml/jackson/core/JsonGenerationException",
+            "java/lang/UnsupportedOperationException"
+          ]
+        },
+        {
+          "name": "writeNull",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "73c7e13f88673607fdcf904c069a454c8291315b1665a361e677e3e37ddd3127",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "canWriteObjectId",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f364ad2d5b40d63d3bae2f4ea00f0a042449044e369900709b97f84eb27217f0",
+          "code_length": 11
+        },
+        {
+          "name": "canWriteTypeId",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "452cf9fb46968cd8585b62e675da42a971e8abf9b21347e8265df82fd95c4283",
+          "code_length": 11
+        },
+        {
+          "name": "writeTypeId",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "3d9c138ba5457d733ce10547c496b63f17707b3710cbc5a85272ea77055355e1",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeObjectRef",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e0481e8a2b9ff65c3336659450fcceb213cc1b55ef9bc7dfd4ab8c36aefefc90",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeObjectId",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "20bb36a41c9496de1e02b7a99b3863a81b9dafe749b2b7227c94bf5550a3f102",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_verifyValueWrite",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 20,
+          "code_sha256": "5d25461d9d745c0384e51a6fc56cb360b48ac6c1a434b09e7acec58278cb82de",
+          "code_length": 70,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_releaseBuffers",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "_writeScalar",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;)V",
+          "access": 4,
+          "code_sha256": "d3a0fdff29c73750f36833d0e9c462d29b7d8f97fa1b586f8ddd64b12e596ab0",
+          "code_length": 11,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_writeScalarBinary",
+          "descriptor": "(Lcom/fasterxml/jackson/core/Base64Variant;[B)V",
+          "access": 2,
+          "code_sha256": "a6b871481ac520c08f34c0162e2f645cca26d4d7e0de32d6c2ed2d95127014e1",
+          "code_length": 47,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_scalarEvent",
+          "descriptor": "(Ljava/lang/String;Lorg/yaml/snakeyaml/DumperOptions$ScalarStyle;)Lorg/yaml/snakeyaml/events/ScalarEvent;",
+          "access": 4,
+          "code_sha256": "43b3411f8b4fa9e245111f7131b194a74ecaa60a8f7d2eae7803577193bd3649",
+          "code_length": 48
+        },
+        {
+          "name": "_lf",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "84261b161581a5827ab546e34f36142c1bca5be7f06c31778704cb2aed8b2f86",
+          "code_length": 11
+        },
+        {
+          "name": "_emitStartDocument",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "5f71bc7c707a5713c3e16252a04008e1071a3090a9e96ef37e62753a41d3a160",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_emitEndDocument",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "3eaedf31e5e093ee8e8143d586accd09c1bb237c91e7f4184f146d492c985416",
+          "code_length": 15,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_emit",
+          "descriptor": "(Lorg/yaml/snakeyaml/events/Event;)V",
+          "access": 20,
+          "code_sha256": "36fe8b6fb8d6cda3155db0a789d2c40e72efafc4da78a11f94de6eafd8800901",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "useDefaultPrettyPrinter",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4161,
+          "code_sha256": "d80e8c4ffb5a289f4a0dd4be9eb9fcfe138540195a55e457a4c09277b653dce9",
+          "code_length": 5
+        },
+        {
+          "name": "setPrettyPrinter",
+          "descriptor": "(Lcom/fasterxml/jackson/core/PrettyPrinter;)Lcom/fasterxml/jackson/core/JsonGenerator;",
+          "access": 4161,
+          "code_sha256": "8ff6a85407acdaa854352560f536bbe57535c8aa886428dfeec5c9bfae51f493",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "db65ff83f707371bc24551deea7fd57d1ad41ff480ad6aba766a075ac683f94f",
+          "code_length": 78
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/core/Base64Variant",
+        "com/fasterxml/jackson/core/Base64Variants",
+        "com/fasterxml/jackson/core/JsonGenerationException",
+        "com/fasterxml/jackson/core/JsonGenerator",
+        "com/fasterxml/jackson/core/JsonGenerator$Feature",
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/core/SerializableString",
+        "com/fasterxml/jackson/core/StreamWriteConstraints",
+        "com/fasterxml/jackson/core/base/GeneratorBase",
+        "com/fasterxml/jackson/core/io/IOContext",
+        "com/fasterxml/jackson/core/json/JsonWriteContext",
+        "com/fasterxml/jackson/dataformat/yaml/PackageVersion",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+        "java/io/IOException",
+        "java/io/Writer",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/UnsupportedOperationException",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "org/yaml/snakeyaml/DumperOptions",
+        "org/yaml/snakeyaml/DumperOptions$FlowStyle",
+        "org/yaml/snakeyaml/DumperOptions$LineBreak",
+        "org/yaml/snakeyaml/DumperOptions$ScalarStyle",
+        "org/yaml/snakeyaml/DumperOptions$Version",
+        "org/yaml/snakeyaml/emitter/Emitter",
+        "org/yaml/snakeyaml/events/AliasEvent",
+        "org/yaml/snakeyaml/events/DocumentEndEvent",
+        "org/yaml/snakeyaml/events/DocumentStartEvent",
+        "org/yaml/snakeyaml/events/ImplicitTuple",
+        "org/yaml/snakeyaml/events/MappingEndEvent",
+        "org/yaml/snakeyaml/events/MappingStartEvent",
+        "org/yaml/snakeyaml/events/ScalarEvent",
+        "org/yaml/snakeyaml/events/SequenceEndEvent",
+        "org/yaml/snakeyaml/events/SequenceStartEvent",
+        "org/yaml/snakeyaml/events/StreamEndEvent",
+        "org/yaml/snakeyaml/events/StreamStartEvent",
+        "org/yaml/snakeyaml/nodes/Tag"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder.class",
+      "occurrence": 0,
+      "sha256": "cd126766d0e915868475caa1ff04a6b60e809a79a938de2a025d607f640b63d8",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/databind/cfg/MapperBuilder",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "enable",
+          "descriptor": "([Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 129,
+          "code_sha256": "10fbaea36ab79203c73ecd63b070de3d955eb52fe807c66656ac4681c0d7b55f",
+          "code_length": 41
+        },
+        {
+          "name": "disable",
+          "descriptor": "([Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 129,
+          "code_sha256": "ae7e44e2bf071b5649381e60b0b02027f9e95111e1436c0f16f1c8afd489a478",
+          "code_length": 41
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 1,
+          "code_sha256": "d9f16de44f93b0028c35ad2a814bd2cfab8bbfb29a578a6902eb9098836ffa1a",
+          "code_length": 33
+        },
+        {
+          "name": "enable",
+          "descriptor": "([Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 129,
+          "code_sha256": "8fcf455c0828aa4d6ff00912a5373c19e706033043d7a4fef380998b81a64e58",
+          "code_length": 41
+        },
+        {
+          "name": "disable",
+          "descriptor": "([Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 129,
+          "code_sha256": "b4418d5fa245a08625c5d64dedf3338ced409e301d70c64f3f8ffdb7eda17adb",
+          "code_length": 41
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 1,
+          "code_sha256": "75f5e3e8cf3bce9819a083f134283915597821765473adae1eb3121af1ec49ad",
+          "code_length": 33
+        }
+      ],
+      "generic_signature": "Lcom/fasterxml/jackson/databind/cfg/MapperBuilder<Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;>;",
+      "class_references": [
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;",
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+        "com/fasterxml/jackson/databind/cfg/MapperBuilder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLMapper",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper.class",
+      "occurrence": 0,
+      "sha256": "0ad0cf5223fd9b76850557ea97268d00aba3a5127240669a8c9dd609a34daddc",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLMapper",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/databind/ObjectMapper",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;)V",
+          "access": 1,
+          "code_sha256": "e94cbec863ce2bacdef2d231d78fad8a3c830b97bb2e2a9b150059d99135cd71",
+          "code_length": 6
+        },
+        {
+          "name": "builder",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 9,
+          "code_sha256": "a565050385fefe56c4fb3ed039f873f18e0d9efc376bc0e61f61e96d0e7380c1",
+          "code_length": 15
+        },
+        {
+          "name": "builder",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder;",
+          "access": 9,
+          "code_sha256": "4fe8107b1a825a3e01684d7f5dee2c583e58c0e5fc414d0d44c5d4c848e6ec0e",
+          "code_length": 16
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "89a9b1ce457a490e57d5a4e505a06cf7a4901b6b754da6710a291da83be65697",
+          "code_length": 15
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "b972fb71fcedcb1ce45830d4676c489e37f798418230c236ee35b2aa4550b42f",
+          "code_length": 18
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;Z)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "0ec36d1b356bd11c1a826f881cb3ed92a2b16e00fc383c4fb6fd391163b96b81",
+          "code_length": 18
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "779919c042096d84a8d045ff46b931ba27925a8a880d02316dda6d5987325bde",
+          "code_length": 14
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "4053f379c72343a9f08f91fde811bd4ef0120f75454b40c9b49aa6430544e8c0",
+          "code_length": 14
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "95f215d8ca5d653af752928fe84341bbb4f4c609a4a35b2fea15bd271a630089",
+          "code_length": 14
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLMapper;",
+          "access": 1,
+          "code_sha256": "58c7e6b1b9b78ffbdf6719881e6e8a68e09199657429af83507cfafddd336a52",
+          "code_length": 14
+        },
+        {
+          "name": "getFactory",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/YAMLFactory;",
+          "access": 17,
+          "code_sha256": "da00914c87b21acde4164e64e9d8fa82ce2c9829a4a5c1923c9031046176eb21",
+          "code_length": 8
+        },
+        {
+          "name": "getFactory",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonFactory;",
+          "access": 4161,
+          "code_sha256": "6ce8336204e5bdb31dcaf40133771a186a3c413b7a7a875064349ab58ec20a1a",
+          "code_length": 5
+        },
+        {
+          "name": "copy",
+          "descriptor": "()Lcom/fasterxml/jackson/databind/ObjectMapper;",
+          "access": 4161,
+          "code_sha256": "324087ed0347a4f6d6b1dab76eb3867eb0acf3a69f04952c438cd61da180aded",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/databind/ObjectMapper",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLGenerator$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLMapper",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLMapper$Builder",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature.class",
+      "occurrence": 0,
+      "sha256": "35a816af4db24eba773aaabda81667a901f7d1ef5e3fbd00f9914fce26435600",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "com/fasterxml/jackson/core/FormatFeature"
+      ],
+      "fields": [
+        {
+          "name": "EMPTY_DOCUMENT_AS_EMPTY_OBJECT",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "EMPTY_STRING_AS_NULL",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "PARSE_BOOLEAN_LIKE_WORDS_AS_STRINGS",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 16409
+        },
+        {
+          "name": "_defaultState",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "_mask",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "collectDefaults",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "641d18231120c475bb277f3cd727507532e9a9ea2adf869726e9f3bf0ec621b1",
+          "code_length": 45
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IZ)V",
+          "access": 2,
+          "code_sha256": "72fbe5cee33a767e86be9bf05f24711bcebf2bd0294a00c11f9a185dc696ef23",
+          "code_length": 22,
+          "generic_signature": "(Z)V"
+        },
+        {
+          "name": "enabledByDefault",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "enabledIn",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "7579d072e35a89dba609ce08b724f3bc4c36423af27be3c2659972f53f52f229",
+          "code_length": 15
+        },
+        {
+          "name": "getMask",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4c4be5d4e2bc69b8b56edcc530b23f83be000df4423c40efe0643a11c4f79b40",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e250972c31a865839712b0df676f119a9c0c54eb70bd7177049c82cadeca06d1",
+          "code_length": 68
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;>;Lcom/fasterxml/jackson/core/FormatFeature;",
+      "class_references": [
+        "[Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;",
+        "com/fasterxml/jackson/core/FormatFeature",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/YAMLParser.class",
+      "occurrence": 0,
+      "sha256": "6305cc9b09650ede2855fdbd03265f2e34eb698cb4425d57663e97c3e697749d",
+      "name": "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/core/base/ParserBase",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_objectCodec",
+          "descriptor": "Lcom/fasterxml/jackson/core/ObjectCodec;",
+          "access": 4
+        },
+        {
+          "name": "_formatFeatures",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "_cfgEmptyStringsToNull",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "_reader",
+          "descriptor": "Ljava/io/Reader;",
+          "access": 20
+        },
+        {
+          "name": "_yamlParser",
+          "descriptor": "Lorg/yaml/snakeyaml/parser/ParserImpl;",
+          "access": 20
+        },
+        {
+          "name": "_yamlResolver",
+          "descriptor": "Lorg/yaml/snakeyaml/resolver/Resolver;",
+          "access": 20
+        },
+        {
+          "name": "_lastEvent",
+          "descriptor": "Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4
+        },
+        {
+          "name": "_lastTagEvent",
+          "descriptor": "Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4
+        },
+        {
+          "name": "_textValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_cleanedTextValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_currentFieldName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_currentIsAlias",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "_currentAnchor",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "_hasContent",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "_emittingSyntheticEmptyObject",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;Lcom/fasterxml/jackson/core/util/BufferRecycler;IILcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Reader;)V",
+          "access": 1,
+          "code_sha256": "5231a975446c6cc03b2b53739398b7ac0927141e07fb6b8da7c90c4dcb36323a",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILorg/yaml/snakeyaml/LoaderOptions;Lcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Reader;)V",
+          "access": 1,
+          "code_sha256": "e4d3b8390118715fd0c34e580bb09a03f294e1e880103bd397956c2b2425b2bb",
+          "code_length": 45
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/io/IOContext;IILcom/fasterxml/jackson/core/ObjectCodec;Ljava/io/Reader;Lorg/yaml/snakeyaml/parser/ParserImpl;)V",
+          "access": 4,
+          "code_sha256": "399faccd81522fc8e7fde262cf41abd659e103d8307f5e5e89c9153b593b1e39",
+          "code_length": 52
+        },
+        {
+          "name": "getCodec",
+          "descriptor": "()Lcom/fasterxml/jackson/core/ObjectCodec;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "setCodec",
+          "descriptor": "(Lcom/fasterxml/jackson/core/ObjectCodec;)V",
+          "access": 1,
+          "code_sha256": "b5c6632fdead94e6cf5d078f9da49015f7742cbf1bf22678e79eecefc50ff91a",
+          "code_length": 6
+        },
+        {
+          "name": "isCurrentAlias",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c82aed037c5afb54cd1235f0acbd9e50ea5462301ecc01f1e215873f28b1fa33",
+          "code_length": 5
+        },
+        {
+          "name": "getCurrentAnchor",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "version",
+          "descriptor": "()Lcom/fasterxml/jackson/core/Version;",
+          "access": 1,
+          "code_sha256": "56e0a11ba9ddad2a66c1eb4fbf1bffb4152b4296ca4f390e3ab8972a4c81a799",
+          "code_length": 4
+        },
+        {
+          "name": "requiresCustomCodec",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "canReadObjectId",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "canReadTypeId",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getReadCapabilities",
+          "descriptor": "()Lcom/fasterxml/jackson/core/util/JacksonFeatureSet;",
+          "access": 1,
+          "code_sha256": "d75ea59d0215d9d41b958759d55dc7bc7190b8afedb26b862a3c8b841c0239ad",
+          "code_length": 4,
+          "generic_signature": "()Lcom/fasterxml/jackson/core/util/JacksonFeatureSet<Lcom/fasterxml/jackson/core/StreamReadCapability;>;"
+        },
+        {
+          "name": "_closeInput",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8913f9907595932b6f457a6b3e3923c41e782b8cc092dc402819c36faa349287",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getFormatFeatures",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2ad01858457e03a189abd6a15f4e3cd0779d9c0d9e5c686467387584975d81bb",
+          "code_length": 5
+        },
+        {
+          "name": "overrideFormatFeatures",
+          "descriptor": "(II)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 1,
+          "code_sha256": "d74b57bab4af0fbf6976cba31e7d7d836c0ac01777ac987fac99f9aee5a10890",
+          "code_length": 32
+        },
+        {
+          "name": "enable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 1,
+          "code_sha256": "d1b3c98a00b08f0695c90ff1dab4e3ff01046bc130e2ed5a6db3f2a332e2c0e0",
+          "code_length": 29
+        },
+        {
+          "name": "disable",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 1,
+          "code_sha256": "8fc77967ced9dcfa5e973fc0b8c4830eb0bfbeb91c211b48bf3eb3857791fc74",
+          "code_length": 31
+        },
+        {
+          "name": "configure",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;Z)Lcom/fasterxml/jackson/core/JsonParser;",
+          "access": 1,
+          "code_sha256": "16025e6ce40736f8a98faba1fd3d532b4817f6ef6386b0c3e429e741d82937fe",
+          "code_length": 21
+        },
+        {
+          "name": "isEnabled",
+          "descriptor": "(Lcom/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature;)Z",
+          "access": 1,
+          "code_sha256": "630f6be52cf92f3b20aa45ad12635987a00fa7d39f0f7d88de9fbd168c4079f3",
+          "code_length": 18
+        },
+        {
+          "name": "currentLocation",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonLocation;",
+          "access": 1,
+          "code_sha256": "ff1c1718b02c6d633599123e44728eeb5c07c84f6a11e6ea9e42eac711544023",
+          "code_length": 23
+        },
+        {
+          "name": "currentTokenLocation",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonLocation;",
+          "access": 1,
+          "code_sha256": "c96c0a4a0689652148fd78ffce3a66f908a5af3578e552f5e0414a422e1deb85",
+          "code_length": 23
+        },
+        {
+          "name": "getCurrentLocation",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonLocation;",
+          "access": 1,
+          "code_sha256": "ba54a88374fdb350121020baa098dbf1e6c861549021138e7fefa712d0b909bb",
+          "code_length": 5
+        },
+        {
+          "name": "getTokenLocation",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonLocation;",
+          "access": 1,
+          "code_sha256": "79bd359d8750ef42dd0112ce00f4b87a2cbf0121494b502d2602cda2942b6699",
+          "code_length": 5
+        },
+        {
+          "name": "_locationFor",
+          "descriptor": "(Lorg/yaml/snakeyaml/error/Mark;)Lcom/fasterxml/jackson/core/JsonLocation;",
+          "access": 4,
+          "code_sha256": "bbd7a03f7d16484d0dda7d684e00b2ac274d040a69015d5adeefa70883166abd",
+          "code_length": 56
+        },
+        {
+          "name": "nextToken",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 1,
+          "code_sha256": "0a8a839b19faa1aa9cd3e9f78b7f274d5915ef84a384381262b2166300740d60",
+          "code_length": 701,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getEvent",
+          "descriptor": "()Lorg/yaml/snakeyaml/events/Event;",
+          "access": 4,
+          "code_sha256": "4b13008c411791547969d48e0ce0b55470240b251ffc51bc1158903ad78124b8",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeScalar",
+          "descriptor": "(Lorg/yaml/snakeyaml/events/ScalarEvent;)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 4,
+          "code_sha256": "dc412bab4167e7e804692922099fb5f706beb5f0bbcd9bb22c8ae69a487c7ac3",
+          "code_length": 384,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_matchYAMLBoolean",
+          "descriptor": "(Ljava/lang/String;I)Ljava/lang/Boolean;",
+          "access": 4,
+          "code_sha256": "244bd1d922273f68873a9bbb67214a90a0a9d973ea24ffda04c7bbf972beb575",
+          "code_length": 211
+        },
+        {
+          "name": "_decodeNumberScalar",
+          "descriptor": "(Ljava/lang/String;I)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 4,
+          "code_sha256": "cf606d76b1d8dc5a4679ab5675ebe4996251a1ab1af6e131fc1f82cf46ada689",
+          "code_length": 353,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeNumberIntBinary",
+          "descriptor": "(Ljava/lang/String;IIZ)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 4,
+          "code_sha256": "bc672d0bc9eae524104cdeceec0cbef1a20e944c817c7aa47fcde10e3fa30581",
+          "code_length": 104,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeNumberIntOctal",
+          "descriptor": "(Ljava/lang/String;IIZ)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 4,
+          "code_sha256": "6bf73d38ac1f18fff99855e26539ae5823ce26813d95c79e6b23c55dc801e9eb",
+          "code_length": 96,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeNumberIntHex",
+          "descriptor": "(Ljava/lang/String;IIZ)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 4,
+          "code_sha256": "ad3b74cf629916d9cd1b11538725e57c3f4ef613758c31d399ae2412d721b49e",
+          "code_length": 107,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeFromLong",
+          "descriptor": "(JZZ)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 2,
+          "code_sha256": "16404ed507f309d16bfe23f62e4df472224caa14e15001e8aa645f616311befa",
+          "code_length": 84
+        },
+        {
+          "name": "_decodeFromBigInteger",
+          "descriptor": "(Ljava/math/BigInteger;Z)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 2,
+          "code_sha256": "6c0612072bb197fb591cdb2392921819f943550c97ce1c6b0fd3ee760feac0a1",
+          "code_length": 29
+        },
+        {
+          "name": "_decodeInt",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 2,
+          "code_sha256": "ba0d496317b1ac13bdb19b42dc9b72606a34c6498e48d54fabcb592e8f74d22d",
+          "code_length": 21,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeLong",
+          "descriptor": "(Ljava/lang/String;I)J",
+          "access": 2,
+          "code_sha256": "43423a4ee1ae5a145006735fdde765f4f011c89533dce6a3679518813330babc",
+          "code_length": 21,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_decodeBigInt",
+          "descriptor": "(Ljava/lang/String;I)Ljava/math/BigInteger;",
+          "access": 2,
+          "code_sha256": "86cb66168ff25ca272dc5d644a86888d2af27fa6d6cd31de18257191688637b5",
+          "code_length": 56,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_reportInvalidNumber",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/Exception;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "e007af3f3a4d24f7a6d2412400f272a97d5fe2689f52264b67e0a6842ca8b639",
+          "code_length": 33,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;ILjava/lang/Exception;)TT;"
+        },
+        {
+          "name": "currentName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3e06f073a137e4179b882027356e7a1386e8f13fdaec74a1746239523985e038",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getCurrentName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "619078778b4ca164c6ddffdabd02f8bb6c01de8c4b9e91174b0e50005f0730fe",
+          "code_length": 20,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "hasTextCharacters",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "09a777035938925457ee0ae45deeb20f252a4b29ddc6e02e94360a5e67181dac",
+          "code_length": 62,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTextCharacters",
+          "descriptor": "()[C",
+          "access": 1,
+          "code_sha256": "6d6d30264ae8c9482eba3111c7ee5d7658209cdebdbe314408da25b01124acf5",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTextLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "28327716b4639167dc4d8e802136b280c0515b326f38ded25d9fd373fec89538",
+          "code_length": 18,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTextOffset",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getText",
+          "descriptor": "(Ljava/io/Writer;)I",
+          "access": 1,
+          "code_sha256": "04aa7df9ce65c4207340b9329bab1ee51656ba9e3ed88435a3eb1137786e6a57",
+          "code_length": 21,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getEmbeddedObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0685799ee3cffada5401b7768da506477337ebec366ef00f0eb732ce72369bf2",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readBinaryValue",
+          "descriptor": "(Lcom/fasterxml/jackson/core/Base64Variant;Ljava/io/OutputStream;)I",
+          "access": 1,
+          "code_sha256": "5c0b0db08b07ca9b19802931cfcdb23bad6e9d65f001bc4ce1412a0b81fb220c",
+          "code_length": 14,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getNumberTypeFP",
+          "descriptor": "()Lcom/fasterxml/jackson/core/JsonParser$NumberTypeFP;",
+          "access": 1,
+          "code_sha256": "dd479ce83b47b5985b0dc5daa857697114991fc32a71374e18b233bfacb10c84",
+          "code_length": 4,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getNumberValueDeferred",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ee452de8303a9b5a27839f3d9bd6e7d06722ca9b4fbf4ddbb5347ce701d755f9",
+          "code_length": 173,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_parseNumericValue",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "228a5ecb983312d71d1a93d4f81b13588aef14fd761c883f68ba9fb7d77b9b22",
+          "code_length": 396,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_parseIntValue",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "cdb162c900d8e7384b0fe17ae403d3385a3df8663c67b9a5dfb719c17f10fa07",
+          "code_length": 81,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getObjectId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTypeId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e6226fffb3a0973b40c1929ca573881daa213e8feeecd91ccaf6c0dae5d3d0d0",
+          "code_length": 76,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_cleanYamlInt",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 2,
+          "code_sha256": "186d57f236ef6921c8f290aab08bb9a49f63185178e526096fc136bebd8cbee6",
+          "code_length": 116,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "_cleanUnderscores",
+          "descriptor": "(Ljava/lang/String;II)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f2be77cf62a42aa2e2de4172b7aa4387a6f64230551b38d064cfc4aae741ca96",
+          "code_length": 60
+        },
+        {
+          "name": "_cleanYamlFloat",
+          "descriptor": "(Ljava/lang/String;)Lcom/fasterxml/jackson/core/JsonToken;",
+          "access": 2,
+          "code_sha256": "09394a283e55b0be7be2e258347fafec7670b0d8709bc85324e3c37b03cf71d6",
+          "code_length": 104
+        },
+        {
+          "name": "getTypeId",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "28421faa717f9ad3c08860fa6e0f85e58b9bb75b9998ab1e63348975f9ec26e2",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getObjectId",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "771457c92cb870b719d25aaa27cd654ef2de2fa8b48168ac02693c060ce00ed6",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[C",
+        "[Ljava/lang/String;",
+        "com/fasterxml/jackson/core/Base64Variant",
+        "com/fasterxml/jackson/core/Base64Variants",
+        "com/fasterxml/jackson/core/JsonLocation",
+        "com/fasterxml/jackson/core/JsonParser",
+        "com/fasterxml/jackson/core/JsonParser$Feature",
+        "com/fasterxml/jackson/core/JsonParser$NumberTypeFP",
+        "com/fasterxml/jackson/core/JsonToken",
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/core/StreamReadConstraints",
+        "com/fasterxml/jackson/core/StreamReadFeature",
+        "com/fasterxml/jackson/core/base/ParserBase",
+        "com/fasterxml/jackson/core/base/ParserMinimalBase",
+        "com/fasterxml/jackson/core/io/IOContext",
+        "com/fasterxml/jackson/core/io/NumberInput",
+        "com/fasterxml/jackson/core/json/JsonReadContext",
+        "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException",
+        "com/fasterxml/jackson/dataformat/yaml/PackageVersion",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLParser$Feature",
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/Reader",
+        "java/io/Writer",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/math/BigInteger",
+        "org/yaml/snakeyaml/LoaderOptions",
+        "org/yaml/snakeyaml/error/Mark",
+        "org/yaml/snakeyaml/error/MarkedYAMLException",
+        "org/yaml/snakeyaml/error/YAMLException",
+        "org/yaml/snakeyaml/events/AliasEvent",
+        "org/yaml/snakeyaml/events/CollectionStartEvent",
+        "org/yaml/snakeyaml/events/Event",
+        "org/yaml/snakeyaml/events/Event$ID",
+        "org/yaml/snakeyaml/events/ImplicitTuple",
+        "org/yaml/snakeyaml/events/MappingStartEvent",
+        "org/yaml/snakeyaml/events/NodeEvent",
+        "org/yaml/snakeyaml/events/ScalarEvent",
+        "org/yaml/snakeyaml/nodes/NodeId",
+        "org/yaml/snakeyaml/nodes/Tag",
+        "org/yaml/snakeyaml/parser/ParserImpl",
+        "org/yaml/snakeyaml/reader/StreamReader",
+        "org/yaml/snakeyaml/resolver/Resolver"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/package-info.class",
+      "occurrence": 0,
+      "sha256": "482e0b7397bb0b10f0f4a94ccb3a762fb3aeb753954864bae89a75c8fa6a54fa",
+      "name": "com/fasterxml/jackson/dataformat/yaml/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark.class",
+      "occurrence": 0,
+      "sha256": "3d12a692a1c086a5af1098bcba826b0a001045d1904dd28b93f27b5371e3a5b5",
+      "name": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_source",
+          "descriptor": "Lorg/yaml/snakeyaml/error/Mark;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/yaml/snakeyaml/error/Mark;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "from",
+          "descriptor": "(Lorg/yaml/snakeyaml/error/Mark;)Lcom/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark;",
+          "access": 9,
+          "code_sha256": "169977bb087a0c21def3f08d9873c5ebdb3b8b469a4f606f8754fe83a14bada2",
+          "code_length": 17
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fc952e06b26f683a6f4f933f0d04ac34d3f91f25fe9cbcd8f78a8f20c2356c85",
+          "code_length": 8
+        },
+        {
+          "name": "get_snippet",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79ee51fde0769d1eae9c8849583c96051eaffd9d2b5477c6203e1eedc5bd5f0d",
+          "code_length": 8
+        },
+        {
+          "name": "get_snippet",
+          "descriptor": "(II)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0d2c5a287bdd9a3f238a16c44a490fd25ac137bafc7ee7e18af94eec5c2a0411",
+          "code_length": 10
+        },
+        {
+          "name": "getColumn",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1461172da6902d59499f3a1e5047591fb7240e7a87c6563b27ee3fa8515c1698",
+          "code_length": 8
+        },
+        {
+          "name": "getLine",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "574048b31caaefbf3edf8ad51362bc034c22b2d81255449350bb91c547aee40e",
+          "code_length": 8
+        },
+        {
+          "name": "getIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "872927bf3dd78ebdaec19515055f34a2434ed214c158b7b07fbd4fdde8fa76db",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark",
+        "java/lang/Object",
+        "org/yaml/snakeyaml/error/Mark"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException.class",
+      "occurrence": 0,
+      "sha256": "ae6369fc8809b1cf9cc2ec453fee6aec5f7ab12e27898ff62d03b7f1958593fa",
+      "name": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "_source",
+          "descriptor": "Lorg/yaml/snakeyaml/error/MarkedYAMLException;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;Lorg/yaml/snakeyaml/error/MarkedYAMLException;)V",
+          "access": 4,
+          "code_sha256": "f692a9c2d8d0fa8d3b860a91134b140550bb8c37eb636e237d45776778bb5fcd",
+          "code_length": 12
+        },
+        {
+          "name": "from",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;Lorg/yaml/snakeyaml/error/MarkedYAMLException;)Lcom/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException;",
+          "access": 9,
+          "code_sha256": "ccd407328eb504a846ae3c2ce515e386f66717a9788871d0a85b1580342fcf33",
+          "code_length": 10
+        },
+        {
+          "name": "getContext",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fc952e06b26f683a6f4f933f0d04ac34d3f91f25fe9cbcd8f78a8f20c2356c85",
+          "code_length": 8
+        },
+        {
+          "name": "getContextMark",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark;",
+          "access": 1,
+          "code_sha256": "fb626ca64d7c7fd779bb331849f65ccc19a4e7783fa21eb719add9af8d9499ae",
+          "code_length": 11
+        },
+        {
+          "name": "getProblem",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c1753d3b6b86734ae58c3c2db611ec0efdd6fbc2ff490498e8ddcbec8449c743",
+          "code_length": 8
+        },
+        {
+          "name": "getProblemMark",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark;",
+          "access": 1,
+          "code_sha256": "dded33b7ef3eee1daf7a7db3ab73f622f4ead1bad81f7f967a45231f80207b79",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/Mark",
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/MarkedYAMLException",
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException",
+        "org/yaml/snakeyaml/error/MarkedYAMLException"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException.class",
+      "occurrence": 0,
+      "sha256": "ccf93008811730f5de9ca85bf266069c2e84f8678fbd4d5869467264490bc35e",
+      "name": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;Lorg/yaml/snakeyaml/error/YAMLException;)V",
+          "access": 1,
+          "code_sha256": "37d1ed4b2dcb3b4f63de4947ea4e55159665adfc5d5c23689464f91070405560",
+          "code_length": 11
+        },
+        {
+          "name": "from",
+          "descriptor": "(Lcom/fasterxml/jackson/core/JsonParser;Lorg/yaml/snakeyaml/error/YAMLException;)Lcom/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException;",
+          "access": 9,
+          "code_sha256": "ccd407328eb504a846ae3c2ce515e386f66717a9788871d0a85b1580342fcf33",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/JacksonYAMLParseException",
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/YAMLException",
+        "org/yaml/snakeyaml/error/YAMLException"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/package-info.class",
+      "occurrence": 0,
+      "sha256": "ec0962f1481d6ffbeca40ce34c95858f8d4907c7d1c41c391ef5b17ed4af51d6",
+      "name": "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/snakeyaml/error/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default.class",
+      "occurrence": 0,
+      "sha256": "7c2f7808c09bc2875df38172ebeded9a9c9e8cc0a97c213ed274575f7079c0c4",
+      "name": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "instance",
+          "descriptor": "()Lcom/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default;",
+          "access": 9,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "needToQuoteName",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "581c734c374a3c372e132e29b2daf359d949343064ee0e31243bfd434265146c",
+          "code_length": 30
+        },
+        {
+          "name": "needToQuoteValue",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "74b3e16629386bc5e4ee613f1373a1b7ac00ca8cc69e584d3cdfc5ddb110bc69",
+          "code_length": 22
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "75ca888dbb846fe97af736c786cf00c80defa27cd35a9a4f6c8bb63cc3b6dda0",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+        "java/io/Serializable"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker.class",
+      "occurrence": 0,
+      "sha256": "a05c916d5d2e55748d5e2fbe6aaad68d5f761381989ec8b41913e4bd9181927d",
+      "name": "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "RESERVED_KEYWORDS",
+          "descriptor": "Ljava/util/Set;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "needToQuoteName",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "needToQuoteValue",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "isReservedKeyword",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "64ca9cc14f44145f0fc2237d74735496d98bd5090a85c573e6fe717621f535bf",
+          "code_length": 20
+        },
+        {
+          "name": "_isReservedKeyword",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "e136633aea8eecc43d1eacf38ef5bf7b499be11b44291fe1c1c77a863fba4935",
+          "code_length": 114
+        },
+        {
+          "name": "looksLikeYAMLNumber",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "0ccafba72d4c61c0a94e82bba410b20c1eab0d34a0a55c5596c8f67c7338de12",
+          "code_length": 20
+        },
+        {
+          "name": "_looksLikeYAMLNumber",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "72ae79323e124ef358e8be5e612f2b8c5336fd68dbd8df22eb574c506700989a",
+          "code_length": 80
+        },
+        {
+          "name": "valueHasQuotableChar",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "1283e6b36e0be1f262e8fc28a0264a63a31f8c282e124f4ef9a06b850bf4a914",
+          "code_length": 116
+        },
+        {
+          "name": "precededOnlyByBlank",
+          "descriptor": "(Ljava/lang/String;I)Z",
+          "access": 4,
+          "code_sha256": "63af013803b12c4b41b56d38cc813ea6077442916f61ca16f11752e218bf7d63",
+          "code_length": 18
+        },
+        {
+          "name": "followedOnlyByBlank",
+          "descriptor": "(Ljava/lang/String;I)Z",
+          "access": 4,
+          "code_sha256": "6d17beed5d4895704dfa2d96b79aca52c9cf720d0d3b0cc21f7ae0db2af30011",
+          "code_length": 24
+        },
+        {
+          "name": "isBlank",
+          "descriptor": "(C)Z",
+          "access": 4,
+          "code_sha256": "ec2f480108ee1ee14319564cc706eb18e52782d5882537b4e76ee56d1b293120",
+          "code_length": 18
+        },
+        {
+          "name": "nameHasQuotableChar",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "8b4dfcf66b92c9a2ec2fbe6c82fa2095ffa03d5ec0893177bb18ad97d67bbc77",
+          "code_length": 36
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6b946167cc6d328fbd2cf823e4436d022ecb65f9185998bf0d6a6799d3f2b407",
+          "code_length": 163
+        }
+      ],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker",
+        "com/fasterxml/jackson/dataformat/yaml/util/StringQuotingChecker$Default",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Arrays",
+        "java/util/HashSet",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/fasterxml/jackson/dataformat/yaml/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "9e3422b84e91366d758ae91789c971ab3700b6cba4e448fb57d44d46724f87b6",
+      "name": "com/fasterxml/jackson/dataformat/yaml/util/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/dataformat/yaml/util/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "c058f4a066d01d392c521b96b8b1ff6816112be613f6f3727f6dac4955fa0a9f",
+      "name": "module-info",
+      "major": 53,
+      "minor": 0,
+      "access": 32768,
+      "superclass": null,
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "com/fasterxml/jackson/core/JsonFactory",
+        "com/fasterxml/jackson/core/ObjectCodec",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLFactory",
+        "com/fasterxml/jackson/dataformat/yaml/YAMLMapper",
+        "module-info"
+      ]
+    }
+  ]
+}

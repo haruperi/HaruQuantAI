@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar",
+  "archive_sha256": "17330cbe60fbd5a601ef69ffd9d8c6d751143dbdbc6760f0619d4dfad0fad136",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CryptoExchange/impl/Poloniex/CryptoExchangePoloniexPlugin.class",
+      "occurrence": 0,
+      "sha256": "be41dd51f1d030431265cbb8ac6c640d86c788a41af9af400daa53be1045cc3e",
+      "name": "com/strategyquant/plugin/CryptoExchange/impl/Poloniex/CryptoExchangePoloniexPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/exchange/Exchange",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "availableSymbols",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70e8411ed87192ad55eaaf582299ae93aae251f70e9c737839e631b2d4e4d677",
+          "code_length": 10
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "19997f2effcb3e3b6d81522e6e8615c317e4b3f80fb5f224a8d37aa472126fba",
+          "code_length": 3
+        },
+        {
+          "name": "getSymbols",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "997d54bf86d5386c0031efdba2c112c8695e421d2904f672f2890c9ccf60b6a8",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lcom/strategyquant/tradinglib/exchange/IExchange;",
+          "access": 1,
+          "code_sha256": "f8ba0b3cdb027d135b27a1fa7ed9fb8653cb5564b92732815fd07cd6ddbeabba",
+          "code_length": 8
+        },
+        {
+          "name": "download",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e760dc9d50aa921566369cc2962dcfd3f9175e67933ab25338c84e47e73441cb",
+          "code_length": 433,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getEndOfTime",
+          "descriptor": "(JILjava/lang/String;)J",
+          "access": 2,
+          "code_sha256": "1b32db0b687420c8fe28dea61faa2b563dfa77d2e49bf5193df3fc4b8e4bb533",
+          "code_length": 218,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getMinimalDate",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 2,
+          "code_sha256": "ef9736861be11a57c1cce51b272e9548db15b0b970c7544c5c96d1a1990324c9",
+          "code_length": 85
+        },
+        {
+          "name": "parseData",
+          "descriptor": "(Lorg/json/JSONArray;)Lcom/strategyquant/datalib/data/io/VersatileData;",
+          "access": 2,
+          "code_sha256": "ee3cd70c95e6dc29137efe7015d712ee27769c6be59a6b684c85c080f04e7a12",
+          "code_length": 65
+        },
+        {
+          "name": "availableTimeframes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "d359fca56714ad80e2b87788c692756517ac62d98251d683b2c2cbd8964b4c21",
+          "code_length": 44
+        },
+        {
+          "name": "convertTimeframe",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cd697077266044d637e34f988a6ac672215852c5fe2b32024dbcc63832335275",
+          "code_length": 245,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkSymbolExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "b789630a337d231aff1e67fca422c8b08b394db38e943a889d313fb29373ce2b",
+          "code_length": 50
+        },
+        {
+          "name": "getSymbolInfo",
+          "descriptor": "(Ljava/lang/String;)Lcom/strategyquant/tradinglib/exchange/SymbolInfo;",
+          "access": 1,
+          "code_sha256": "adc9b5e6b75562dd011595ff361275f6f4211dd642061cef031d7fb53006ba23",
+          "code_length": 117
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "7c9c12d5ced0e1c7f84503e3a6a8ec333ca6018c41fed218fd9b8c523e248f5e",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/data/io/VersatileData",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/CryptoExchange/impl/Poloniex/CryptoExchangePoloniexPlugin",
+        "com/strategyquant/tradinglib/dukascopy/DukascopyBinaryMerger",
+        "com/strategyquant/tradinglib/dukascopy/ImportInfo",
+        "com/strategyquant/tradinglib/exchange/Exchange",
+        "com/strategyquant/tradinglib/exchange/SymbolInfo",
+        "com/strategyquant/tradinglib/historyData/HttpApacheManager",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/math/BigDecimal",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    }
+  ]
+}

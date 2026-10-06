@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppBuilder/AppBuilder.jar",
+  "sha256": "69c29c561d0d82d4f8841e9fa94fac0ec9a0f6797b8c9e209f9985318c04ac0f",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/Builder/BuilderAppPlugin.class": "412c371e543e512b5e0e038a4dc7df4817f9852ebc1189da4ce7410aabf76d58"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Builder/BuilderAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "412c371e543e512b5e0e038a4dc7df4817f9852ebc1189da4ce7410aabf76d58",
+      "member_shard": "docs/dev/evidence/sqx145/members/124/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/124/001.json",
+      "sha256": "527a3bc9eaafe1cbba5ab32004feb40589b62daf787ae0d3f6a48e16ab84b802"
+    }
+  ]
+}

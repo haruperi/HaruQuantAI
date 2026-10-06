@@ -1,0 +1,95 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jsonschema-module-jackson-4.38.0.jar",
+  "sha256": "36fbd3f1c27379c3ba8420ac2cb0b42411f7bc3b3df8bdd11d8d7e024a1c28ca",
+  "class_count": 10,
+  "unique_class_entries": 10,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "com/github/victools/jsonschema/module/jackson/JacksonOption.class": "5e59fdd7a2622c830b1f82aaeeb0caead28b39f9a4044f8e93d96dbc8b0996ef",
+    "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver.class": "717b84ba2d9f565c4a63376ea8c9a40c0e9acd37cb4287e007b4bccd11183eb4",
+    "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider.class": "89e3f5e69ee0de45759e55ad78b173980fc1ecb98919cdf675611341e33948e7",
+    "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider.class": "1a509344ce7036259df0c88cbb728f962207ecd9f3fca17e28eadb355bf5bf35",
+    "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider.class": "7608e3b6a2a00051d81244a0f914b19811cca6ab715f4ab7843a73fc3f7d627c",
+    "com/github/victools/jsonschema/module/jackson/JsonPropertySorter.class": "2e94e46db189845ea0fa277d8b07f3f654800b377c6c8f09464f7ccb3fd27f16",
+    "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1.class": "762560f1d174541d89d04288ed2ee4f6f7ab44cb5fb864efa8f63c5f93f212c3",
+    "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails.class": "4dcad0d1b3732ee458402ed052fc41adda8d956fedd317bb086f40511e6e14dd",
+    "com/github/victools/jsonschema/module/jackson/JacksonModule.class": "f3e7a0615eb8d9f701f9d136d3578e2b20416725ece2d19e0b2e25b2394dffd8",
+    "META-INF/versions/9/module-info.class": "995314dc59dd8cbb29ff8c1a0f9820404c651260249f3fb2d24066887e422e6d"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "b32c3483e13303f4fc20f88fe07663ca1d5219f01d0c7463faffc18f35aac3e3",
+    "META-INF/maven/com.github.victools/jsonschema-module-jackson/pom.xml": "df1351018eecf2ae102389b42159209864ba7e43ac5ab9f192a2bdeab90a8fb5",
+    "META-INF/maven/com.github.victools/jsonschema-module-jackson/pom.properties": "338b8cb860091ffe25b6377165af7b07823ba3f4a72e1fa38f21c37a73b8b7d9"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JacksonOption.class",
+      "occurrence": 0,
+      "sha256": "5e59fdd7a2622c830b1f82aaeeb0caead28b39f9a4044f8e93d96dbc8b0996ef",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver.class",
+      "occurrence": 0,
+      "sha256": "717b84ba2d9f565c4a63376ea8c9a40c0e9acd37cb4287e007b4bccd11183eb4",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/CustomEnumDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "89e3f5e69ee0de45759e55ad78b173980fc1ecb98919cdf675611341e33948e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonUnwrappedDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "1a509344ce7036259df0c88cbb728f962207ecd9f3fca17e28eadb355bf5bf35",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonIdentityReferenceDefinitionProvider.class",
+      "occurrence": 0,
+      "sha256": "7608e3b6a2a00051d81244a0f914b19811cca6ab715f4ab7843a73fc3f7d627c",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonPropertySorter.class",
+      "occurrence": 0,
+      "sha256": "2e94e46db189845ea0fa277d8b07f3f654800b377c6c8f09464f7ccb3fd27f16",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$1.class",
+      "occurrence": 0,
+      "sha256": "762560f1d174541d89d04288ed2ee4f6f7ab44cb5fb864efa8f63c5f93f212c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JsonSubTypesResolver$SubtypeDefinitionDetails.class",
+      "occurrence": 0,
+      "sha256": "4dcad0d1b3732ee458402ed052fc41adda8d956fedd317bb086f40511e6e14dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "com/github/victools/jsonschema/module/jackson/JacksonModule.class",
+      "occurrence": 0,
+      "sha256": "f3e7a0615eb8d9f701f9d136d3578e2b20416725ece2d19e0b2e25b2394dffd8",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "995314dc59dd8cbb29ff8c1a0f9820404c651260249f3fb2d24066887e422e6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/068/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/068/001.json",
+      "sha256": "1fa74b58e8b50e9be36ce7b8404a72fba4f30085b34f58c3bbf9ded4079bf6f2"
+    }
+  ]
+}

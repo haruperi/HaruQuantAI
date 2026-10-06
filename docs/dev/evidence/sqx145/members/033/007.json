@@ -1,0 +1,3823 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/h2-1.3.149.jar",
+  "archive_sha256": "7c3e3b93ffaf617393126870be7f8e1708bbe8e05b931c51c638a8cb03f79a36",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/h2/value/ValueBytes.class",
+      "occurrence": 0,
+      "sha256": "cc9d00759737452c12d1ada7eb9796f2737ab60599d1cb5245278a13e95385a9",
+      "name": "org/h2/value/ValueBytes",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "Lorg/h2/value/ValueBytes;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "([B)Lorg/h2/value/ValueBytes;",
+          "access": 9,
+          "code_sha256": "6c058ad21e69fd3f22b6063fa06a915ab999de97649649e487aa6cbeb6dc5f28",
+          "code_length": 19
+        },
+        {
+          "name": "getNoCopy",
+          "descriptor": "([B)Lorg/h2/value/ValueBytes;",
+          "access": 9,
+          "code_sha256": "7f77517bdba6eec20026624dddcfb9a5059921ba80c208c2ebcf028eab7b4600",
+          "code_length": 36
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "88a19f4453be07a60fef4e7c56b82b3beef50fb8691158f9e79bd86470e19002",
+          "code_length": 3
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "552aea9f4d97ad3b0b58a7fe8fea27dbaa88a529fd6312e9b2b2bd0aac39a743",
+          "code_length": 28
+        },
+        {
+          "name": "getBytesNoCopy",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "7d948c8aeea2ffbb6420232bfcb31322bcf8a69fb829fe319853375429aac65a",
+          "code_length": 8
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "c8d3c2dc091d173878a80d636822d4f5605a468bca9a65763170c4beaf345302",
+          "code_length": 17
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0f35048faf35782990925abcb4dd28664c89211913bf51cee6bcb10312fb3717",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c8468dc030af6fc99d40f340980139a08db4f0cc62d230ecb701b63c8a951e04",
+          "code_length": 7
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6799309c4d62c5ece298f649762cb7a57e4d8ac05f88347f7d6c2aed411179c2",
+          "code_length": 23
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6ce8336204e5bdb31dcaf40133771a186a3c413b7a7a875064349ab58ec20a1a",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "f6fd6f8db538b10252cecf216b48bc26b53aff13898b63178cabae80c5892e06",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e41e3f827e1c38426bec210ba4a48d09e72b4846be823b9d4a8aa2ccbe8ead5c",
+          "code_length": 14
+        },
+        {
+          "name": "getMemory",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "edf27efd2cb2f8e96c8724c4449b9a46f76f7d1af45e0322091e61b9dd7db7f4",
+          "code_length": 9
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "da9f7a45e619226d05bc52c5808ecd93b5c50d4601a1abeb68f99772f5abd74a",
+          "code_length": 30
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f0787be9da3474831e0c60c1610b4a9014b8a90198618009774c2bfb748a80f5",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/StringBuilder",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/util/MathUtils",
+        "org/h2/util/StringUtils",
+        "org/h2/util/Utils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueBytes"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueDate.class",
+      "occurrence": 0,
+      "sha256": "9993e2daae22b937a8ae406f3dfdba09376065add446323253681e68aee48c7a",
+      "name": "org/h2/value/ValueDate",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/sql/Date;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/sql/Date;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "parseDate",
+          "descriptor": "(Ljava/lang/String;)Ljava/sql/Date;",
+          "access": 9,
+          "code_sha256": "803ab3136411026efcbecab0acc0847356d5d412c4e4868c474b30d12202ff62",
+          "code_length": 12
+        },
+        {
+          "name": "getDate",
+          "descriptor": "()Ljava/sql/Date;",
+          "access": 1,
+          "code_sha256": "3dc06937c509ac2313cef0b8ab40b1706376d49e3fa97f672ca5ab23cbc851c2",
+          "code_length": 11
+        },
+        {
+          "name": "getDateNoCopy",
+          "descriptor": "()Ljava/sql/Date;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b373a775d82caa9c9f0bc63cc1797698662c193c60495795decd6e95ee8d43cd",
+          "code_length": 28
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "6f097d199c6c1f237f3b4efa0bf003d32e2876354041da402fb6e349a3283499",
+          "code_length": 20
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7464999f13fdfd395e87b10eed8e15f1209611ff094f023282f8136e98cd84de",
+          "code_length": 87
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "89d3f04f9f87568d889eece3f5817e6c293be5debfe0745b618e960137ba762c",
+          "code_length": 4
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e71fdff3effbb0181e9b42634755e591d2892ce5dee2e31eadb51280ed72c930",
+          "code_length": 8
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "89635fb89ac92dcdcb2ddf8340a2d30d5b14fe5e38895edf504bd75ca2f9c4b9",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "3c0e5598a0ffb77c1ac2f87c8c40fe311ae0695949ea2ee9d70a49f263a3814b",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/sql/Date;)Lorg/h2/value/ValueDate;",
+          "access": 9,
+          "code_sha256": "6d21bc3820a432ee9418c4c96e739e6840576f96093f8ab036ff68ba4e117a12",
+          "code_length": 10
+        },
+        {
+          "name": "getNoCopy",
+          "descriptor": "(Ljava/sql/Date;)Lorg/h2/value/ValueDate;",
+          "access": 9,
+          "code_sha256": "b8cf0414fc5317a4468502c1ec925c89a27461092400a824dfcdc281591b0de5",
+          "code_length": 15
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4b28e27181a56b48356ab75665dbaedac4f6783e40ab259bea259bc61f46468f",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/sql/Date",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/util/DateTimeUtils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueDate",
+        "org/h2/value/ValueTimestamp"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueDecimal.class",
+      "occurrence": 0,
+      "sha256": "3d7990117836f399e5396462cd78e34c07e6df1d56d2f1563251ec39c6b2c04b",
+      "name": "org/h2/value/ValueDecimal",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 25
+        },
+        {
+          "name": "ONE",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_PRECISION",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DEFAULT_SCALE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DEFAULT_DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DIVIDE_SCALE_ADD",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/math/BigDecimal;",
+          "access": 18
+        },
+        {
+          "name": "valueString",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "precision",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigDecimal;)V",
+          "access": 2,
+          "code_sha256": "aad204e76685697f17f23236e1326630991220304395004ac4b116fc6fd4f585",
+          "code_length": 70
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "8265701fb84da6670724d90405cd957f26fa20b22202446df00d3afca688be6f",
+          "code_length": 20
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "ccf5753f4e1d4abdcae0d03e95dbe24caf1601259fa177fe0d12d89ecc2d333f",
+          "code_length": 20
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "c8b8e244f8e3931ae93d67637e5f00d88ea5782dd8961b7489d3147925f9e34b",
+          "code_length": 11
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "897ce80fa914920a5829afe290fb4890373c73356e74afc3e2fc4f6d9fa7510c",
+          "code_length": 20
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "60eedb2c39cab216d83d1cffc057a5986b4c48425a41a320176ffe11afdab5f8",
+          "code_length": 158
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4b8fcfd7fbb533988899d3f7153f2cf3fa90d2cd792107f3ec7981e30cbb3926",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "63720abead0901a3fcd92501947f7d31fb90743daf3fd108a3c1e8198a030a78",
+          "code_length": 17
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "78441ed3c9b03473671511eac6a544b1eab2e04f2dac83503773bade711f8f0a",
+          "code_length": 8
+        },
+        {
+          "name": "getBigDecimal",
+          "descriptor": "()Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "82c4189caf0ca296408c80e9ddfd1a8a72e0705c5c3e07daf69f4377427a42dd",
+          "code_length": 23
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ebe74e5d1a664bfef9bc9a97119d0ba6abfcedecb78b69925ef1ec094ec5a6d7",
+          "code_length": 24
+        },
+        {
+          "name": "checkPrecision",
+          "descriptor": "(J)Z",
+          "access": 1,
+          "code_sha256": "f4e6f844515995d515e10424bf04e3ecd6aa4f32faed7c401716f90c6e6f11da",
+          "code_length": 25
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "db002c7c9964a8b9bc8c7e642774aeb9a3b3b07dd4d0002920408cdc826c1b0d",
+          "code_length": 8
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c2a30028c817417c89b099db3e4a7fd0b626fd91cbe3711e68dcc145d3030db6",
+          "code_length": 8
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "4b90d78dacef80c32410f4e32293b2527391af77b523268bd32162189253ca0d",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "convertScale",
+          "descriptor": "(ZI)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "b96942568179227d279daaf02c80764962e2aa925040be4d27176e40063ec427",
+          "code_length": 51
+        },
+        {
+          "name": "convertPrecision",
+          "descriptor": "(J)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "5f4eeea55e6ab6b7d1d2fad67760b027fa23bbda40f0ab19fcb2c47a60d0c50a",
+          "code_length": 36
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/math/BigDecimal;)Lorg/h2/value/ValueDecimal;",
+          "access": 9,
+          "code_sha256": "b3074a3bb481fd257c383ccd747609e1e0f35c662d5cb87766c1523f845826ea",
+          "code_length": 49
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d3b77fb6f61d677db559d0d77f6f76ecfabf43d8ed1561c7cc64b802350eee73",
+          "code_length": 12
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "91d2a88b8c371691312338474d9d8e3697b68b195cdcd41cb5630164e105e729",
+          "code_length": 30
+        },
+        {
+          "name": "getMemory",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "00fc7fe0c3599b5850ad0754f96b8a4ab244c7ee3dde68465132385a7f0caf0a",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b27de56be2f4f0df3384e57e3fc0101d28e8074f91d688b649cefb62066485b2",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/message/DbException",
+        "org/h2/util/MathUtils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueDecimal"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueDouble.class",
+      "occurrence": 0,
+      "sha256": "1f9280d85b26c3531142fc7669dcd63f92b3a8be0c37fae6c0bb6cfee9a9f529",
+      "name": "org/h2/value/ValueDouble",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DOUBLE_ZERO",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "DOUBLE_ONE",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "ZERO",
+          "descriptor": "Lorg/h2/value/ValueDouble;",
+          "access": 26
+        },
+        {
+          "name": "ONE",
+          "descriptor": "Lorg/h2/value/ValueDouble;",
+          "access": 26
+        },
+        {
+          "name": "NAN",
+          "descriptor": "Lorg/h2/value/ValueDouble;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(D)V",
+          "access": 2,
+          "code_sha256": "2a88f748111cfef441c20dc70a9237846d5572ef8290cffca03e39b72e0487e6",
+          "code_length": 10
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "a1c3222155e096643cb4212ca5c85236d04cf436bba65fcd9bc21d2e731139dc",
+          "code_length": 18
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "db652a156211e55f21ab1b61d41b4c3bb00718c92c3f6e00ed0774ff75ea0eeb",
+          "code_length": 18
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "7b3fca943d7dd224316957454086450ea3c6ffc17713e5483558673fba599fc1",
+          "code_length": 9
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "6c8be9ef9f1bcd889be1241c9d8d6ea024d45a54b61782d14f2cc67f0f6a9589",
+          "code_length": 18
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "b176e50be9dc596d890358b7cf6c238d86950692bffb8f3159ed0afb74c41b79",
+          "code_length": 38
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "194eac18305d2181320d5a264b9866f310f19bded211702d62be12bc94933e42",
+          "code_length": 46
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3d10585867ae6b9d94f86ca3c742ac18cd2312ffbb2ad8399a46c2ae5de238cd",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "e3a10490532f207476cce8387077d7fede8ab8591ede7dc8a82eff91ef24ce53",
+          "code_length": 17
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ba7c0dfa25bdcbde3044d40146e4f28a0c26d563e4beaf506f018deffbb6bb38",
+          "code_length": 28
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "c76899d02dbcf516752264315c6c2f699213a16172bf525692f8e7d62932ac9a",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "327556b8a74253376d3120eb918683f359eab022c5d57c8cc52965fe6545abfb",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "65dfbadcdbed68193e7f9b50083e28e9d50192a12cf63aa9e763b37bd29202f3",
+          "code_length": 4
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "dafd577388a7f4678c62b3030bb9d1da4cc86d673ad962edf0ba0a4afd635515",
+          "code_length": 16
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "7f2d0ab02901d36ddbe72d064f021835f0af73aae8f3f8f4ad07798880158b4a",
+          "code_length": 8
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "7954268807137dd7f5ed91871773e390a19c8115499061e9d10b9648a6cfbbfb",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(D)Lorg/h2/value/ValueDouble;",
+          "access": 9,
+          "code_sha256": "18b29f153f4e5ff8bcddc902bf4ff3e3d53a82da91b6f3e71d5d41137768358e",
+          "code_length": 46
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fa2d8ea9f1faf5a0d6f242d6883771d3aba6738b3588219a0f5d901742bc05cf",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "fe71f8a16eb4b3396504658565a31f70c062b14ba458a14f08a34e6de0e01f66",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "94630c28aedc20fe04b32656b04cd9983b4ef447e1a59a196637a80d4f2cc266",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/String",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/value/Value",
+        "org/h2/value/ValueDouble"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueFloat.class",
+      "occurrence": 0,
+      "sha256": "f329cdc7bda9e50e93dcce20c85a199d55efeceff5afd3a9629ab1ef070b9ec0",
+      "name": "org/h2/value/ValueFloat",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "FLOAT_ZERO",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "FLOAT_ONE",
+          "descriptor": "F",
+          "access": 26
+        },
+        {
+          "name": "ZERO",
+          "descriptor": "Lorg/h2/value/ValueFloat;",
+          "access": 26
+        },
+        {
+          "name": "ONE",
+          "descriptor": "Lorg/h2/value/ValueFloat;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "F",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(F)V",
+          "access": 2,
+          "code_sha256": "59c8aa633820ad6e963abf69bb22977c090adf66a1cdae492bd32db54ce559a2",
+          "code_length": 10
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "2b240c15ea9cb22a31ec18561caa2e38524f7f9066304227b8432b8254fa578b",
+          "code_length": 18
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "4ef2adf88e37f128003aa50d0fc0ebd27dfb0b1b5d600b5f0bdd5786329153d7",
+          "code_length": 18
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "d530a8da50aae73bcba39a2a4c35a0864b510f498f49da7c28ce1f740779762a",
+          "code_length": 9
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "fd3927a35b246d3679557d4ff1405d40c9dd1662e222d3d8a70d2c09feffe307",
+          "code_length": 18
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "b60d0c7712ac61737e80b2be68dad8d5edf4b1ef4da2a0c950dcaaa0bdaf3bbf",
+          "code_length": 39
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "550747dc06e7e0d09234e3d6cd9466e8f64c5dbf9f8f50db2c222d44752e02e3",
+          "code_length": 45
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f0c928136c16477825deffb5af228bb2445687e407432f0fe5e632c82a80e060",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "3300b3b26a75b0bca5806cb74e81104f5a3027cc8f5ad9942de5124e115c561c",
+          "code_length": 17
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a3273ba18a0b09cec0ace513e301fa92284bba68e7fe3b15639c3f4963a42f68",
+          "code_length": 28
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "6d74664de638cf081662de38e229a827b03c687dd0e7c17e7a10761692bd050d",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2230a39631ae6d5c08bd88fc390254aaa2d3eb9284a81af7d8ea75a2b30880d5",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "670b69da87e2484b563410133eb9f81b87bd916958c291d030f4e88605b053d1",
+          "code_length": 4
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "788018a56ecad77a154ecb74b9dbf103973525e0748768cd68d9ee6c8fc5ec6d",
+          "code_length": 17
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0cb1fff8d653ca3668322fb63bbc9d8b22f2dc8c6a3082a3201594ce8c06c874",
+          "code_length": 8
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "53c19117a13268ecda498dd38721a0a7c5c6808bb1c5425c1db5ddaecce08146",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(F)Lorg/h2/value/ValueFloat;",
+          "access": 9,
+          "code_sha256": "b6996123364f7aebf40381f6b4ebf20b50f1224eace2179edb7bbead90ebee81",
+          "code_length": 35
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7cbbba3ca52a9125a3f073edd4ba1a09d8f38838299b98c21b878fb3232b269f",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e4d8c609a3e19de4016c0f6325acd01d7d8260a513cc3c9e6f65ce4a3f70445c",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c3f6bf7e47b0004c19553cae81646e06dd243a3f67429ef0140cfb1e2fce10aa",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/String",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/value/Value",
+        "org/h2/value/ValueFloat"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueInt.class",
+      "occurrence": 0,
+      "sha256": "4c41ca2c74fa40d587e89231a1ca4cfb7dd734a3252d98df85489ac39bd02ece",
+      "name": "org/h2/value/ValueInt",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STATIC_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "DYNAMIC_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "STATIC_CACHE",
+          "descriptor": "[Lorg/h2/value/ValueInt;",
+          "access": 26
+        },
+        {
+          "name": "DYNAMIC_CACHE",
+          "descriptor": "[Lorg/h2/value/ValueInt;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Lorg/h2/value/ValueInt;",
+          "access": 9,
+          "code_sha256": "d2550f2078a4432e844ccc814ded416edd383d831ab44b147369be1a963a9dd1",
+          "code_length": 60
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "1c884609e02e3c6b5547d6f0ea84e9d8153ad4c6a4234447a9e0becf5dec93a1",
+          "code_length": 21
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "(J)Lorg/h2/value/ValueInt;",
+          "access": 2,
+          "code_sha256": "389509b7d781c6cbb31d4730410de0cd6820cb2aa515dcee1017cd3a6e3301d3",
+          "code_length": 35
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e06b970b6c200db9a048636f2234d9a5650c2569722e28f730b09b039ebc6e24",
+          "code_length": 8
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "2899fb1feeb7f50f546b52a18c44474d5bbcb77fb7649b72594e58f08158cbdf",
+          "code_length": 11
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "f64cfc20446ccc53a559842d46857921c6dbd145697b12b46922c3cddc4543af",
+          "code_length": 21
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "feec7ee885fdbb650813bbd730bafd00f8c1b4331fbc281ed6fec17deb10ce32",
+          "code_length": 21
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "38c84b75935b387d666523307b55ded997ac9604ef864f2c4834ab54e88e7336",
+          "code_length": 36
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f964b2d0e1908ddde45891eb550c0e17b34ea5419abc1987f98b5af5ec127efd",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        },
+        {
+          "name": "getInt",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getLong",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c543065eec86007f963d4820efebbc6e0030a998e8e093ffbeb26b6675adfb95",
+          "code_length": 6
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "96f6762ac201f61f80ab2436ae02123535f16334653813eb0ccdc3df19c60d86",
+          "code_length": 17
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7f2d0ab02901d36ddbe72d064f021835f0af73aae8f3f8f4ad07798880158b4a",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "d37bc447d5723f7fefabd54c5aa1c690b2b8d47efb066b4795e3c0ba679a82fb",
+          "code_length": 4
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "775c306dfbd49681af8754ba1e8633d09915e581e5d7b9e4ba6c2bfda4d31e21",
+          "code_length": 8
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "ebc68746ff1dbcd1942266f4ba9fd4b3b6d5c1a491a17671cdeb4c03b079c897",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "1c7cf2fe268bff959eeef4183fe4e97083c137a12dc7adab9959ed553d52ddcc",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0a607d242bbdd7be3dd6b3b101679635e54cf5c252302575e898655321c16ef5",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/util/MathUtils",
+        "org/h2/value/DataType",
+        "org/h2/value/Value",
+        "org/h2/value/ValueInt"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueJavaObject.class",
+      "occurrence": 0,
+      "sha256": "26e1d99c8f00f37c36b731970e6ac03efd9186615bda633dcf0232634ed21d53",
+      "name": "org/h2/value/ValueJavaObject",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/ValueBytes",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "Lorg/h2/value/ValueJavaObject;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 4,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getNoCopy",
+          "descriptor": "([B)Lorg/h2/value/ValueJavaObject;",
+          "access": 9,
+          "code_sha256": "efd59387e8a0eb60bbb6aa8993833af1468141cebb7b63c75f97f126a0afe379",
+          "code_length": 36
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7b1982918e9085d8134a4ba6a1094416c56622c4a0354469e952e2ef02f3416f",
+          "code_length": 3
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "69eb2f184fd32e8f68f7754bed02e4248202fedb305e1d7d5d0350996efbd2fc",
+          "code_length": 20,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "260e5473d1b1f912e072daff0997154e196bf485a6402f02f6cd30bca1ff612d",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/util/Utils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueBytes",
+        "org/h2/value/ValueJavaObject"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueLob.class",
+      "occurrence": 0,
+      "sha256": "562817654b0434f5c69c272e84a7c0dcbb8f88fb1407bb0a92685c3098244241",
+      "name": "org/h2/value/ValueLob",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dirCounter",
+          "descriptor": "I",
+          "access": 10
+        },
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "precision",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "handler",
+          "descriptor": "Lorg/h2/store/DataHandler;",
+          "access": 2
+        },
+        {
+          "name": "tableId",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "objectId",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "fileName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "linked",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "small",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "compression",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "tempFile",
+          "descriptor": "Lorg/h2/store/FileStore;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/h2/store/DataHandler;Ljava/lang/String;IIZJZ)V",
+          "access": 2,
+          "code_sha256": "4f2a5a11d9b05c6b079375116b2bb678c6b21b3ff4caa32a3a404c642f7f537c",
+          "code_length": 50
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I[B)V",
+          "access": 2,
+          "code_sha256": "dff692aa8988aba30cf117580a2dfb5e9548d57c22921b7278bf6ca6be628d72",
+          "code_length": 47
+        },
+        {
+          "name": "copy",
+          "descriptor": "(Lorg/h2/value/ValueLob;)Lorg/h2/value/ValueLob;",
+          "access": 10,
+          "code_sha256": "8bf0eb1d52366da93b00a4cc4754a54a8faa6fc452b03a35ab7b79ab5dba82e3",
+          "code_length": 58
+        },
+        {
+          "name": "createSmallLob",
+          "descriptor": "(I[B)Lorg/h2/value/ValueLob;",
+          "access": 9,
+          "code_sha256": "21b47ec8eb00d81865819baf2dcbf46dbb9521717c3fcde2ffee2bb8214c6506",
+          "code_length": 10
+        },
+        {
+          "name": "getFileName",
+          "descriptor": "(Lorg/h2/store/DataHandler;II)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "96e4df67e53eacb8f448d0d6be11cf49a584bea8e99bad5bc26b1a46cd96c2c2",
+          "code_length": 82
+        },
+        {
+          "name": "open",
+          "descriptor": "(ILorg/h2/store/DataHandler;IIJZ)Lorg/h2/value/ValueLob;",
+          "access": 9,
+          "code_sha256": "da6a42046f02421dbf50ab14095a757e9f9908dfec9ca0ae026a4896b9ec4637",
+          "code_length": 27
+        },
+        {
+          "name": "createClob",
+          "descriptor": "(Ljava/io/Reader;JLorg/h2/store/DataHandler;)Lorg/h2/value/ValueLob;",
+          "access": 9,
+          "code_sha256": "09fb1d38857089ffa525db968a9608b734cc560df9a36b960c6f027e07063739",
+          "code_length": 203
+        },
+        {
+          "name": "getBufferSize",
+          "descriptor": "(Lorg/h2/store/DataHandler;ZJ)I",
+          "access": 10,
+          "code_sha256": "b17a1c32d05554ed6ecde847922bdde322286899487d5bc4d0f16901cb361e3c",
+          "code_length": 121
+        },
+        {
+          "name": "createFromReader",
+          "descriptor": "([CILjava/io/Reader;JLorg/h2/store/DataHandler;)V",
+          "access": 2,
+          "code_sha256": "280b6bc120a5e8ccdb65b86976212b31ffa450b0a6ccfb4e5219419e1fd0894e",
+          "code_length": 139
+        },
+        {
+          "name": "getFileNamePrefix",
+          "descriptor": "(Ljava/lang/String;I)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "03a7d9b11ca05ace4c792c57de646f3d13e84f91d433631a4a79bc7b9edb3755",
+          "code_length": 121
+        },
+        {
+          "name": "getNewObjectId",
+          "descriptor": "(Lorg/h2/store/DataHandler;)I",
+          "access": 2,
+          "code_sha256": "186741d3b9be814d6eb95aef62c94a013d83e7b2efc7a9980ca38e4af5b04d5b",
+          "code_length": 289
+        },
+        {
+          "name": "resetDirCounter",
+          "descriptor": "()V",
+          "access": 9,
+          "code_sha256": "06a468e325083fdb279ae1ef9ecd582f72c56d27ccc2f7ea12f910bdee85a1c6",
+          "code_length": 5
+        },
+        {
+          "name": "invalidateFileList",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "8fca6d08900e6de82bd0edbdf11eb1498cf02d11b15aecf63cd0307dd7f7305e",
+          "code_length": 37
+        },
+        {
+          "name": "getFileList",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ba7412da43d09d5b60c4824977fec408630f9d8df74e10f08c728ab21c9679ed",
+          "code_length": 71
+        },
+        {
+          "name": "createBlob",
+          "descriptor": "(Ljava/io/InputStream;JLorg/h2/store/DataHandler;)Lorg/h2/value/ValueLob;",
+          "access": 9,
+          "code_sha256": "366019cf06876c2172ee908b87d715efca912e720b3deded5aa97ae66a028f75",
+          "code_length": 183
+        },
+        {
+          "name": "initLarge",
+          "descriptor": "(Lorg/h2/store/DataHandler;)Lorg/h2/store/FileStoreOutputStream;",
+          "access": 2,
+          "code_sha256": "b63ba6aac16c28d500260cdd85a5f72ed09277ade08256ef36eaffe3aaed1c74",
+          "code_length": 191
+        },
+        {
+          "name": "createFromStream",
+          "descriptor": "([BILjava/io/InputStream;JLorg/h2/store/DataHandler;)V",
+          "access": 2,
+          "code_sha256": "3514ec06db805ec5f3fe0cd43dfd0b8e1198bcb0685c210a7212d11612925b95",
+          "code_length": 119
+        },
+        {
+          "name": "convertTo",
+          "descriptor": "(I)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "f3ff116122d54395f242e2d64913800eef7574d5f2301b6cf310a8be89fde7d6",
+          "code_length": 62
+        },
+        {
+          "name": "isLinked",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getFileName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ca80430e25cea2a55d70314cd998fe0aad9f368087d0eb5e8453aa8dbdfb505a",
+          "code_length": 33
+        },
+        {
+          "name": "unlink",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e701154218c6e860f2bd2e9fc2d1cc344df681a155360a525185ebc57b859b8d",
+          "code_length": 103
+        },
+        {
+          "name": "link",
+          "descriptor": "(Lorg/h2/store/DataHandler;I)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "1ea3dc85b1fede7f103b32c142919828d0aa182e6dde8d06e78632b6addb9643",
+          "code_length": 143
+        },
+        {
+          "name": "getTableId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "getObjectId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e4b93242fc8694d30fe77646a1c427557b8672e9731e35d618dd14ba23a2e68f",
+          "code_length": 103
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "c9ed229ef5d15d1a4afbda39f863b26a67aa2b82a1e0850481c567ec96edc554",
+          "code_length": 24
+        },
+        {
+          "name": "getBytesNoCopy",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "bd48707413b3e50cc573f79712a203563041b00b4ec39a93d43b81f2c5718594",
+          "code_length": 46
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b37fa1caec94a43f397016e953b8bc3dfd9cebcff09a65f88f058c8e8901b2ff",
+          "code_length": 71
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "98d26d5fe27353e60b3bef7bd31a3445e5220db6a74da431a841f1cc74da73dc",
+          "code_length": 38
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "dbd8ac332a438de83acb7490ca8a1247dae3e8dabba49fcd6bf458f096ffd150",
+          "code_length": 19
+        },
+        {
+          "name": "getReader",
+          "descriptor": "()Ljava/io/Reader;",
+          "access": 1,
+          "code_sha256": "0ed91f45bf5bd95a29ed8fe8dc113a0892f06a0f9bdcb50f65f496c11a93906f",
+          "code_length": 8
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "0c0079e5fda90e803c30ceead5cc4fce59dec2d07f4a63352fb1c6ec8f3ecb64",
+          "code_length": 68
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "5fcc5c6da2f0564a66c07f2e1eeb09f60a37cc4ab866a0bc35ccb9394fdcd353",
+          "code_length": 62,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fbaa3ab3bf3f93e685354ca861db88f7a0e11297ef124710ef80a5519864ee62",
+          "code_length": 54
+        },
+        {
+          "name": "getTraceSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e536b0666b0f16de2f6cb238385ddfbb917094c7b8907b34718eb93cff047610",
+          "code_length": 100
+        },
+        {
+          "name": "getSmall",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e334c59429b0acdd593d26a03ae051d96aab6f984a1e16b91a187aa66cf872e7",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8e84660afe2db0e565d404419ca7a7b586f30d488473517e6efad0b2963df82f",
+          "code_length": 25
+        },
+        {
+          "name": "convertToFileIfRequired",
+          "descriptor": "(Lorg/h2/store/DataHandler;)V",
+          "access": 1,
+          "code_sha256": "f29ad6eda735af9a6523cbab5a4e1771b3c2d97ea4d09b528c81f2bf4bafe7bd",
+          "code_length": 126
+        },
+        {
+          "name": "removeAllForTable",
+          "descriptor": "(Lorg/h2/store/DataHandler;I)V",
+          "access": 9,
+          "code_sha256": "3171b669f20ce69fa1381886a58aae1f83863908250aed0e1fac2dd055a9386a",
+          "code_length": 18
+        },
+        {
+          "name": "removeAllForTable",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;I)V",
+          "access": 10,
+          "code_sha256": "3abc6bb2bfeba08b993e9dc1122b25ba56328a067e3b370aba93a3265271b3c7",
+          "code_length": 88
+        },
+        {
+          "name": "useCompression",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "isFileBased",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "3b8a600fdf117400080087dd657541ce8ea30ea2c359d645ba9818a0b3e6ef65",
+          "code_length": 13
+        },
+        {
+          "name": "deleteFile",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;)V",
+          "access": 42,
+          "code_sha256": "efc1a2a39188f2503b83cbd85715395404cc06e33d54e2b1d0d76a272a94c0ca",
+          "code_length": 24
+        },
+        {
+          "name": "renameFile",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 42,
+          "code_sha256": "ffc0977389000bbaf3391dc5165d333d86d7cb007ad4ab28e42d0b6b98e65a0b",
+          "code_length": 27
+        },
+        {
+          "name": "copyFileTo",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "ab03f0ffc488bc3af14ea6afdf8477a0c30afb8783af02f9daecf61a0fdc2348",
+          "code_length": 34
+        },
+        {
+          "name": "setFileName",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 1,
+          "code_sha256": "9c43d926e375b2d74db298f06162265b7c3d346199f43190f90bd593e9dbce42",
+          "code_length": 11
+        },
+        {
+          "name": "getMemory",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "93e4186cc3cb8d00b1f8012a01821af2a1aaac99819e555027c9236cd471fd24",
+          "code_length": 20
+        },
+        {
+          "name": "copyToTemp",
+          "descriptor": "()Lorg/h2/value/ValueLob;",
+          "access": 1,
+          "code_sha256": "ad6dfe4207ebe5d28ac87c3685c4c3a7ca7fcbc1a1a15938e42b679327340410",
+          "code_length": 46
+        },
+        {
+          "name": "copyToTemp",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 4161,
+          "code_sha256": "dad97d8d0a47507bd252cab5ef41e1b74c3569c0a3f7c480dd1e437b22940918",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/io/BufferedInputStream",
+        "java/io/ByteArrayInputStream",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/NumberFormatException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/message/DbException",
+        "org/h2/store/DataHandler",
+        "org/h2/store/FileStore",
+        "org/h2/store/FileStoreInputStream",
+        "org/h2/store/FileStoreOutputStream",
+        "org/h2/store/fs/FileSystem",
+        "org/h2/util/IOUtils",
+        "org/h2/util/MathUtils",
+        "org/h2/util/SmallLRUCache",
+        "org/h2/util/StringUtils",
+        "org/h2/util/Utils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueLob"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueLobDb.class",
+      "occurrence": 0,
+      "sha256": "a883dae1634980fa0b624e0c7b22b0ca91b0c932b128fea58e27d29d57ea7557",
+      "name": "org/h2/value/ValueLobDb",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [
+        "org/h2/value/Value$ValueClob",
+        "org/h2/value/Value$ValueBlob"
+      ],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "precision",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "tableId",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lobStorage",
+          "descriptor": "Lorg/h2/store/LobStorage;",
+          "access": 2
+        },
+        {
+          "name": "lobId",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "small",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "handler",
+          "descriptor": "Lorg/h2/store/DataHandler;",
+          "access": 2
+        },
+        {
+          "name": "tempFile",
+          "descriptor": "Lorg/h2/store/FileStore;",
+          "access": 2
+        },
+        {
+          "name": "fileName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/h2/store/LobStorage;Ljava/lang/String;IJJ)V",
+          "access": 2,
+          "code_sha256": "85de39307115ae42021760b3247892f8f3e929795db66265ef562892b55703a8",
+          "code_length": 38
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I[BJ)V",
+          "access": 2,
+          "code_sha256": "1fce67d4a6766069c3bd60a8802d8484f17cadd0d6d78f0035cefaabcefc8b13",
+          "code_length": 20
+        },
+        {
+          "name": "create",
+          "descriptor": "(ILorg/h2/store/LobStorage;Ljava/lang/String;IJJ)Lorg/h2/value/ValueLobDb;",
+          "access": 9,
+          "code_sha256": "15b5886e1a88d0ed2be0c9da8ed6ae59e013db7eb9a13a8cc1f78c9a5025233e",
+          "code_length": 16
+        },
+        {
+          "name": "createSmallLob",
+          "descriptor": "(I[BJ)Lorg/h2/value/ValueLobDb;",
+          "access": 9,
+          "code_sha256": "1e15a902c83266fb2f19f68205a62b1b158c9f48e9ae4508d34d98abd9a8cb11",
+          "code_length": 11
+        },
+        {
+          "name": "convertTo",
+          "descriptor": "(I)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "417723bc568521f19daaad42ff6f7467bc29fb98481c6abb242cf6378f3395c6",
+          "code_length": 76
+        },
+        {
+          "name": "isLinked",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "bd443f8018b7f93b92ff96ac7ffd7ccd4b66117055721e9e2ca0734197b14c07",
+          "code_length": 14
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3fc79c9c70ed9e774963310b135319c4a611033af50a9239f5c1009ee744ded4",
+          "code_length": 33
+        },
+        {
+          "name": "deleteFile",
+          "descriptor": "(Lorg/h2/store/DataHandler;Ljava/lang/String;)V",
+          "access": 42,
+          "code_sha256": "22dfa5202e6bf9c1044719d684dd93aea5e37bda1cc557bc356dadacf6ed63fa",
+          "code_length": 24
+        },
+        {
+          "name": "unlink",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7733108809e31e861f1c015ae18585ae2489f45e50b45481d2e3f52d3125cf43",
+          "code_length": 33
+        },
+        {
+          "name": "link",
+          "descriptor": "(Lorg/h2/store/DataHandler;I)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "4a5ad80f6fa8f06920c7851ad7d4967718e038361803b7476bf3c731f954f3d8",
+          "code_length": 136
+        },
+        {
+          "name": "getTableId",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "dc4302e4afb670f8cd2a9c021af6209bfeb99ab4725cf5e06028230aade73f84",
+          "code_length": 5
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8d9e6d36d137b033a0cea058ee29edfb5456221a1ac3e5e9c2737936ba99756b",
+          "code_length": 103
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "53db7a9067768321d6974951f9f0cfa946e3ed3d4b233618ad428c415d02d304",
+          "code_length": 24
+        },
+        {
+          "name": "getBytesNoCopy",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "caee3dee3071d5eb4eb408141a298fbf3a252dd956164ef491e66d995daae60f",
+          "code_length": 46
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "bdd112b511081d88fa1b0e5bcadd4d59aab26662d83383d56e9a169dc7cf93bc",
+          "code_length": 71
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "e0563ae46d4082200743d63b66f85c8adee8408bd56cb8b5bb73a327a61dca13",
+          "code_length": 85
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b4263941fb4bc5578879709f88bb354c8c98eca3ab92431b8a8880a26641438e",
+          "code_length": 19
+        },
+        {
+          "name": "getReader",
+          "descriptor": "()Ljava/io/Reader;",
+          "access": 1,
+          "code_sha256": "13f05f54150430e12731648fe1c9a7e637b9187672370eb846ed16e2ac0ac03c",
+          "code_length": 8
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "b7ade6b7dd34f2a8381d8ed13d8b27291bf595007ad7282fa42c87aa29f72e5c",
+          "code_length": 115
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "168273c2bb27a6b921edb677f1207711b7370ad9153f22d01b64b9b56152170d",
+          "code_length": 62,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0b7101d44d611f9137de125aa917cc2d4ec0f69680da6c98bdcfccfcb43bf3a7",
+          "code_length": 54
+        },
+        {
+          "name": "getTraceSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bd436bb6373a180b497d61f50a0360693edc504918924f6abd9094c43c267f22",
+          "code_length": 112
+        },
+        {
+          "name": "getSmall",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64623a60ea9144b840e23c5587b21b67f2dee7efaf77aeecb122df4dcd1ee03e",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "a68daf89d7671b1c4dad833e99babdeb3eec7943dc143086b49f65bb3b53759d",
+          "code_length": 25
+        },
+        {
+          "name": "isFileBased",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "979d90bccf2cd63f09ce4779a78c5e3e19b7c9c325d46870134275c6a1111173",
+          "code_length": 13
+        },
+        {
+          "name": "getMemory",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2316f7d9b2e9c629e04ad930357b71ccc9864f97935a9c7fd4485dd80990d499",
+          "code_length": 20
+        },
+        {
+          "name": "copyToTemp",
+          "descriptor": "()Lorg/h2/value/ValueLobDb;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "getLobId",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "setPrecision",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "2d2f9680c93fa06ff99cf3fb61f0d10ca50885dd5b58095b6d8a826bcdb17072",
+          "code_length": 6
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a43b3a4c7491760737cd54f073350c842d2f90391f6b26f13aeb52c50bd2fe8f",
+          "code_length": 47
+        },
+        {
+          "name": "createTempClob",
+          "descriptor": "(Ljava/io/Reader;JLorg/h2/store/DataHandler;)Lorg/h2/value/ValueLobDb;",
+          "access": 9,
+          "code_sha256": "2a33532913de854bf91baea211b4ddbb10322a4d9348c8fab4c08e17e0ff1c46",
+          "code_length": 184
+        },
+        {
+          "name": "createTempBlob",
+          "descriptor": "(Ljava/io/InputStream;JLorg/h2/store/DataHandler;)Lorg/h2/value/ValueLobDb;",
+          "access": 9,
+          "code_sha256": "6ceccb4c233aca78f62b637afb00f144ec1b6cfce4704aa89d49ecc7eae8ef2f",
+          "code_length": 168
+        },
+        {
+          "name": "createTempFromReader",
+          "descriptor": "([CILjava/io/Reader;JLorg/h2/store/DataHandler;)V",
+          "access": 2,
+          "code_sha256": "c50e0f211ad5bbf57bbcf581f0f1e5ca44c44d14337d5211db9fda620279c36c",
+          "code_length": 119
+        },
+        {
+          "name": "createTempFromStream",
+          "descriptor": "([BILjava/io/InputStream;JLorg/h2/store/DataHandler;)V",
+          "access": 2,
+          "code_sha256": "0798f714229f2dc19c36fc9a7af1fca1aff572a1956f8712b904ae70481c5ad9",
+          "code_length": 119
+        },
+        {
+          "name": "initTemp",
+          "descriptor": "(Lorg/h2/store/DataHandler;)Lorg/h2/store/FileStoreOutputStream;",
+          "access": 2,
+          "code_sha256": "d4149e2e9bc22d5f17ce02bad0bd725e440b868b6d178e7b79703da307fc9c09",
+          "code_length": 105
+        },
+        {
+          "name": "getBufferSize",
+          "descriptor": "(Lorg/h2/store/DataHandler;ZJ)I",
+          "access": 10,
+          "code_sha256": "2954ab59d6652ddb1ca375faf3f7377b5a27d3e90c918c6d57a6632c2265e8ea",
+          "code_length": 121
+        },
+        {
+          "name": "copyToTemp",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 4161,
+          "code_sha256": "6c5a391c6dc531982bf21971a764cacf326365bc909aed0ba126a3528cc1a100",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedInputStream",
+        "java/io/ByteArrayInputStream",
+        "java/io/IOException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/message/DbException",
+        "org/h2/store/DataHandler",
+        "org/h2/store/FileStore",
+        "org/h2/store/FileStoreInputStream",
+        "org/h2/store/FileStoreOutputStream",
+        "org/h2/store/LobStorage",
+        "org/h2/util/IOUtils",
+        "org/h2/util/MathUtils",
+        "org/h2/util/StringUtils",
+        "org/h2/util/Utils",
+        "org/h2/value/Value",
+        "org/h2/value/Value$ValueBlob",
+        "org/h2/value/Value$ValueClob",
+        "org/h2/value/ValueLobDb"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueLong.class",
+      "occurrence": 0,
+      "sha256": "d6c3887e0b28063a19d7802d045da30de0b00e92238d8bf45a12741635b75423",
+      "name": "org/h2/value/ValueLong",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX",
+          "descriptor": "Ljava/math/BigInteger;",
+          "access": 25
+        },
+        {
+          "name": "MIN_BD",
+          "descriptor": "Ljava/math/BigDecimal;",
+          "access": 25
+        },
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MIN",
+          "descriptor": "Ljava/math/BigInteger;",
+          "access": 26
+        },
+        {
+          "name": "STATIC_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "STATIC_CACHE",
+          "descriptor": "[Lorg/h2/value/ValueLong;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 2,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "d9fa62b788abd55b8bf8bdbe6e47aa55dbf6dd4a1d41947248ed990558a9f810",
+          "code_length": 73
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "36a4454188fd69c9c281253b28bdf3eba2e49284a47c19117f66504b123e7656",
+          "code_length": 8
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "21235411b615ddfb2a3bf4c3995b545983b08971cb434aea1d2075be5cdf12a7",
+          "code_length": 25
+        },
+        {
+          "name": "getOverflow",
+          "descriptor": "()Lorg/h2/message/DbException;",
+          "access": 2,
+          "code_sha256": "27433d0ad2721c41654bb107008f0dd4d6e653901bae46024b7cd9ae536d2304",
+          "code_length": 13
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "6d363a6af95266362dcd967b109f3cd6fcadaebddc85e6826704461ff64dcd0c",
+          "code_length": 55
+        },
+        {
+          "name": "isInteger",
+          "descriptor": "(J)Z",
+          "access": 2,
+          "code_sha256": "0140b9c7e5c05b0171aebd9d3ef289bf872766c3d68cecc9eaa7cc09e4eb171b",
+          "code_length": 22
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "2124201cb00115126c759aedce25349b9491b8e50a681994a28c67f54c6b82fc",
+          "code_length": 146
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "37355051d25b3fad1562d733b79515bf56be8cdab0283c7fb50dad191c039bcb",
+          "code_length": 38
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "89de02e22fd2f05bd1f29fe2bc1ae407589a8211994b25d6b08d39d7d8c2025f",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "84abad56e1dbb7b0a3fb49218b5277aaa689b3358eb1b09b5c630281ef147a9e",
+          "code_length": 2
+        },
+        {
+          "name": "getLong",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "6df8e3e6ace3ba2759968cdd9a10121437e34e1cedccdd6da20a6acc1677c4c7",
+          "code_length": 17
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "93d0f6771904710ed8461637e3c256a9fbf3eeb237a5887cfc89d61e2cd1241e",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "a02914c4491ce47549fcb84182703ef3100d643cbf5ace56a30e51536b690fc3",
+          "code_length": 4
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7de7e14b0266225ac56e3262ef4ee0f001a7980be0ffd5c41147bcc879d1fb69",
+          "code_length": 14
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ae64f832aad0be88222af0e9f451ebf591f5bfd5b5054e5b899a0cd589d1e82d",
+          "code_length": 8
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "f7e24f5529bf63d480818a4f1192f5b0420fd5f7bfec3e0054d23221f7a79cbe",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(J)Lorg/h2/value/ValueLong;",
+          "access": 9,
+          "code_sha256": "47b7318e56c15c2730851c23064c52611e47e409f2916f7122a67c481765753f",
+          "code_length": 36
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "de35150e24150e8208c82ef524cd41667de4ba7abacbe7bfaef5eba4fc4531b6",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "a79d8ad9cc818740f885c9ebc1cb0f4aca0a295d44dff5d472674732ddec85b6",
+          "code_length": 28
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2336a6d667a959fd947b2ad93dc99693dd178b34041f244de27eb9995b382855",
+          "code_length": 64
+        }
+      ],
+      "class_references": [
+        "java/lang/Long",
+        "java/lang/String",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/util/MathUtils",
+        "org/h2/value/DataType",
+        "org/h2/value/Value",
+        "org/h2/value/ValueLong"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueNull.class",
+      "occurrence": 0,
+      "sha256": "f1f00f46a9d87a3f3b31074a530725b765be423759145e4264f2f1b081061270",
+      "name": "org/h2/value/ValueNull",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/h2/value/ValueNull;",
+          "access": 25
+        },
+        {
+          "name": "DELETED",
+          "descriptor": "Lorg/h2/value/ValueNull;",
+          "access": 25
+        },
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "083a332fc09c8ef29ebe2c7a40949fffaecaf26521bbe7c7743b64b51d3226e4",
+          "code_length": 3
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getBoolean",
+          "descriptor": "()Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDate",
+          "descriptor": "()Ljava/sql/Date;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getTime",
+          "descriptor": "()Ljava/sql/Time;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getTimestamp",
+          "descriptor": "()Ljava/sql/Timestamp;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getByte",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getShort",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getBigDecimal",
+          "descriptor": "()Ljava/math/BigDecimal;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "76790b5c8ead87f989332851cf78efea9767f8e7cdfef2fcbdd616a92d5ae24c",
+          "code_length": 2
+        },
+        {
+          "name": "getInt",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getLong",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "5717f6e8570ce8ad094cad7edcf2036257c2a39dec413b53e50f772e22c19c29",
+          "code_length": 2
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getReader",
+          "descriptor": "()Ljava/io/Reader;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "convertTo",
+          "descriptor": "(I)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "ec43937441098408e7a7f30f768ae50a7835281a612b3257e0bf9dbe043cc7eb",
+          "code_length": 6
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "fa28529b9aa7ac7d02554a1218a08984c0fd85098f6cb7b17e70262583c32960",
+          "code_length": 2
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "8c4bb2d2b40c606460cd93d330a2b216ddf8c39d748f75453492e02574e13737",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b1c94692e6f88bcb912733a96359e4158fc19857d0da5eeebc414461e16ebe4e",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "76d90e809517a7f759e7356daeb65c8719f3810fa857c6e21a4f3f4387aaf645",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/value/DataType",
+        "org/h2/value/Value",
+        "org/h2/value/ValueNull"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueResultSet.class",
+      "occurrence": 0,
+      "sha256": "39bdbe5d8e3a3f20ffa285cfffb86f1290136342635574782eb6f1155b977a13",
+      "name": "org/h2/value/ValueResultSet",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "result",
+          "descriptor": "Ljava/sql/ResultSet;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/sql/ResultSet;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/sql/ResultSet;)Lorg/h2/value/ValueResultSet;",
+          "access": 9,
+          "code_sha256": "e3aa254a5fa4307126e1c1710b06412c84dd0236dc98406504715672f11067c4",
+          "code_length": 11
+        },
+        {
+          "name": "getCopy",
+          "descriptor": "(Ljava/sql/ResultSet;I)Lorg/h2/value/ValueResultSet;",
+          "access": 9,
+          "code_sha256": "44d2d51cc984cb4296c09ed49e20222506e515276103b3e7c027f3300d75ae44",
+          "code_length": 192
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4880ff1802b4fb984018a88545ef24b538b2886635da6d7f914fb47699fa1f7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "5717f6e8570ce8ad094cad7edcf2036257c2a39dec413b53e50f772e22c19c29",
+          "code_length": 2
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "27f295611ad3b9d58ae29a9cf88456f55e2bc93feeeaf90cbeb975b8f555a04b",
+          "code_length": 3
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "55f72b66a0418f7db74c1576f2994d18a0e99e853ce25b735c59388be8d32f72",
+          "code_length": 175
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "c68d5c6181870b52275bdfcec9d231baf2afc28b534bd1377bf2f35a8abfba4e",
+          "code_length": 7
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b1c94692e6f88bcb912733a96359e4158fc19857d0da5eeebc414461e16ebe4e",
+          "code_length": 11
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getResultSet",
+          "descriptor": "()Ljava/sql/ResultSet;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "f045e7fa5ff08cdcf25077a7df33e2202322e13a708d328b89bfa98aeff4f85b",
+          "code_length": 7
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8f48e4f3b33bfbe8fa16fc1b49fc029dc08bd2b1d6b4f21a5ec290416498bebc",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/sql/ResultSet",
+        "java/sql/ResultSetMetaData",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/tools/SimpleResultSet",
+        "org/h2/util/StatementBuilder",
+        "org/h2/value/DataType",
+        "org/h2/value/Value",
+        "org/h2/value/ValueResultSet"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueShort.class",
+      "occurrence": 0,
+      "sha256": "69436c9cd361a6072af9473189c61c124711328218b525b64434fd06ce58cb26",
+      "name": "org/h2/value/ValueShort",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "value",
+          "descriptor": "S",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(S)V",
+          "access": 2,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "948aede5dae2dc8b084a7bb102c3e2d707db1283ef78fd0a0efe97c2f34a7d9c",
+          "code_length": 19
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "(I)Lorg/h2/value/ValueShort;",
+          "access": 2,
+          "code_sha256": "e8b069ed0c39e8a0752326c0f3a5281ea1fc95f1ef88fb93856db5a3e58f4b23",
+          "code_length": 33
+        },
+        {
+          "name": "getSignum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f6b1246097143977e81c1aefb3e3af492b1478e76a839e6785d2719ffb98c475",
+          "code_length": 8
+        },
+        {
+          "name": "negate",
+          "descriptor": "()Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "f21eaa10cdebd8aa26a2834747566426b77b9019108e732572dea57fbedc85f4",
+          "code_length": 10
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "aa117c3467d1e1ddd16d133a22e9fb4302912ff1b77f83dac8c2af32cf9a7b86",
+          "code_length": 19
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "1da44e750830a1236399402ca341df8f039221f3b7b601cbe5c6483740190d22",
+          "code_length": 19
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "a3e4cfdd17d8e42fbc8400aafb7dcfeb89eed830b097a87ebde63c1244af4839",
+          "code_length": 37
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "33baff9e7ac9d0a40e05a7d31d9f13b63246343be73222eef8a6d5840d6f34a2",
+          "code_length": 5
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2aa3b8c641f9fb2da52054da18aeb7ce8524fd71d21f4ce9d042f43f527cc675",
+          "code_length": 2
+        },
+        {
+          "name": "getShort",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "687c70c53d6e72438c06254ec7c6afc82c0082dab692307ad15b0dafb4b194f6",
+          "code_length": 17
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "df0b43c2599abb67ed55efdd4b826138e2f46c83f1d41e8a090813f2173c7af0",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "44f1dd43c2b6787f6fba63a0aac6c7e656c4d64a5251d3bc60df5da454051edd",
+          "code_length": 4
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "327556b8a74253376d3120eb918683f359eab022c5d57c8cc52965fe6545abfb",
+          "code_length": 8
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "37ce34128da93ee3bcb62b5c3ce6cbab1c88eb9750d042282400a14350a030d8",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(S)Lorg/h2/value/ValueShort;",
+          "access": 9,
+          "code_sha256": "100b030263cf59666dee2aa93b93c71b73c3660de9f5075ed01eae4e901069eb",
+          "code_length": 15
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "fc1dd1bda9ada9877cbcfde94ac574479652f7c7bc394055eefc5b723300ef10",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/message/DbException",
+        "org/h2/util/MathUtils",
+        "org/h2/value/DataType",
+        "org/h2/value/Value",
+        "org/h2/value/ValueShort"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueString.class",
+      "occurrence": 0,
+      "sha256": "4bf9662d99436c368f4962340a5aab70567ab63233fb12c72d7429c87ef500ee",
+      "name": "org/h2/value/ValueString",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "Lorg/h2/value/ValueString;",
+          "access": 26
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/String;",
+          "access": 20
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bb9219944ffbf06cbbbbf95b1c6bf9a6f9e2d32f8206f4259cb8f19664351ac4",
+          "code_length": 8
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "fff198e2e69a98293c5cd124ff2585fd18169ab8f0d08f25707b8cb6e2e593b5",
+          "code_length": 30
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "a2d712bce01e1a39965bc144006880f172452da186ef0e2cacef2f61e37d2c4f",
+          "code_length": 19
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "5d7f2d26088c057c88cd5c4ef7b65f3da6f8e0d34b37820b093a3e9ade465e11",
+          "code_length": 9
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "1b888ffa78ca56317d26099a23092c919f60769788a1e0a15aecab12cc419c3a",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4819026adda1454a683b5867c6aa3b60d55d0afc3774ab48df7cc05986cdc457",
+          "code_length": 8
+        },
+        {
+          "name": "getMemory",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8d3a787bf7e5f6bbea789975aa28c0f7c8183288bc5d1c1de2482dfda5b6e889",
+          "code_length": 13
+        },
+        {
+          "name": "convertPrecision",
+          "descriptor": "(J)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "6cd7de08b7e0420702eac16e73c87b519657baa5740bf41f51d496f380a7cd56",
+          "code_length": 40
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a23e8e3c7d604225d2eed79962a3f64b87ad301c1104b377fc3b0ed04323246c",
+          "code_length": 8
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7d18742fefb6ca94c0dff1ff5cdd439a0414eb3ff6a08530c99c8740b6de6cb1",
+          "code_length": 3
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/ValueString;",
+          "access": 9,
+          "code_sha256": "d748a91c1dce36c7b76b836d5e75c0c00d23bac3978175cacae428fafb7832ca",
+          "code_length": 43
+        },
+        {
+          "name": "getNew",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/Value;",
+          "access": 4,
+          "code_sha256": "95ed3c4b1b399e5e8196dd9d9fd7b0eb3d973e256980e68632246c64a7be1937",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6c114c1d0b52d259d6b019a0389ce93ee5e23a7fe430373ca8d7f7eafd781619",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "org/h2/constant/SysProperties",
+        "org/h2/util/MathUtils",
+        "org/h2/util/StringUtils",
+        "org/h2/value/CompareMode",
+        "org/h2/value/Value",
+        "org/h2/value/ValueString"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueStringFixed.class",
+      "occurrence": 0,
+      "sha256": "2458714691d3cf0847d2485fd7750377d74accd646c8a77e7e808b17c9397f41",
+      "name": "org/h2/value/ValueStringFixed",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/ValueString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "Lorg/h2/value/ValueStringFixed;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "trimRight",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "8c9604043011e3f84655d205df2401ba267bf878c32f4a9f9547d9b38a3da32b",
+          "code_length": 49
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "06310bc3bb41a705d9c2908cd0484aa92ef7fe4bbffa360b13977a25dbe91443",
+          "code_length": 3
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/ValueStringFixed;",
+          "access": 9,
+          "code_sha256": "748c00483c08beba4f3fa7fefaa814430038bd4b7e699bdc23c791d88f32a338",
+          "code_length": 48
+        },
+        {
+          "name": "getNew",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/Value;",
+          "access": 4,
+          "code_sha256": "9901acff2e915171a1b106aacf8ac7590832d03e47d600f9d27f129ce0210f79",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8d5bd839e7f2e21936571607462491a24ef2370fd91c245ed599693f55aa71fb",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "org/h2/constant/SysProperties",
+        "org/h2/util/StringUtils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueString",
+        "org/h2/value/ValueStringFixed"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueStringIgnoreCase.class",
+      "occurrence": 0,
+      "sha256": "aa4854dbc5238403cab73838dba2c7eb8542d9403f51260108dd93704defa55b",
+      "name": "org/h2/value/ValueStringIgnoreCase",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/ValueString",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "Lorg/h2/value/ValueStringIgnoreCase;",
+          "access": 26
+        },
+        {
+          "name": "hash",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "397b84c53e61c267077bc90b2a2e9993166b0ecfc49b8f1f557e398a42a3ef9c",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "f4df6c0877d27d15820f643c3c50151e5518802de311af41304c05024198ea82",
+          "code_length": 19
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "aba7eaa057c199c64331687806dea288565211adcaa03e7c273b1bb204b2140c",
+          "code_length": 30
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "58e536c69351ac00e738bb48b2a263124697cdcc3188c1044f8e99c3a808c27a",
+          "code_length": 26
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7e36f73036b2d71090449ffd85b74c4cefc399dedbd50c4d9260fb81477774b3",
+          "code_length": 31
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/ValueStringIgnoreCase;",
+          "access": 9,
+          "code_sha256": "0f3a6110137ae7eb89ce485e88447f01ff6637d07c24a0ef8486c37165dc175d",
+          "code_length": 58
+        },
+        {
+          "name": "getNew",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/Value;",
+          "access": 4,
+          "code_sha256": "c01c89564b571b55a2c02577c7393ce665a61b8f7fb2c7f3d1f2be8d2ff71099",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b104638352c22541760ebd4ac0ba18e6dd1c1b7a880f7a55c808687889f334ad",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/h2/constant/SysProperties",
+        "org/h2/util/StringUtils",
+        "org/h2/value/CompareMode",
+        "org/h2/value/Value",
+        "org/h2/value/ValueString",
+        "org/h2/value/ValueStringIgnoreCase"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueTime.class",
+      "occurrence": 0,
+      "sha256": "959f03dc56849585af101304304fc17a786443d7103d4a8075158d60c95f3b07",
+      "name": "org/h2/value/ValueTime",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/sql/Time;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/sql/Time;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "parseTime",
+          "descriptor": "(Ljava/lang/String;)Ljava/sql/Time;",
+          "access": 9,
+          "code_sha256": "933e0bac25907324e67e280bc4a315cce1b584a7575de713eeaeedc7c4cc06d9",
+          "code_length": 12
+        },
+        {
+          "name": "getTime",
+          "descriptor": "()Ljava/sql/Time;",
+          "access": 1,
+          "code_sha256": "3dc06937c509ac2313cef0b8ab40b1706376d49e3fa97f672ca5ab23cbc851c2",
+          "code_length": 11
+        },
+        {
+          "name": "getTimeNoCopy",
+          "descriptor": "()Ljava/sql/Time;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b373a775d82caa9c9f0bc63cc1797698662c193c60495795decd6e95ee8d43cd",
+          "code_length": 28
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "1c57347dfaf7fe51a07376a2535176b04eea60adf3a6310ed44f64376e146b0d",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "6f097d199c6c1f237f3b4efa0bf003d32e2876354041da402fb6e349a3283499",
+          "code_length": 20
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c95073a45aa5b12c95511e226106dba09ca9b1baa58f502220a10b36d5d69bfc",
+          "code_length": 8
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "65dfbadcdbed68193e7f9b50083e28e9d50192a12cf63aa9e763b37bd29202f3",
+          "code_length": 4
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3f298384983d16cd0dbeaa699f91a0461e6a417b1ebaeec29bc8e2489de187d4",
+          "code_length": 8
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6ce8336204e5bdb31dcaf40133771a186a3c413b7a7a875064349ab58ec20a1a",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "f6fd6f8db538b10252cecf216b48bc26b53aff13898b63178cabae80c5892e06",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/sql/Time;)Lorg/h2/value/ValueTime;",
+          "access": 9,
+          "code_sha256": "e58d14dd31b01f02d927f26f65f0b370574a58d82483e048cf28e2157d20d71f",
+          "code_length": 10
+        },
+        {
+          "name": "getNoCopy",
+          "descriptor": "(Ljava/sql/Time;)Lorg/h2/value/ValueTime;",
+          "access": 9,
+          "code_sha256": "6ce80efe86dad060b38593f3c574b0cf4a80b40ea4cd7bc36395e49ad8e2c1d1",
+          "code_length": 15
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f0c928136c16477825deffb5af228bb2445687e407432f0fe5e632c82a80e060",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8bf74ca7ccd55a92f73c13f4507f99e53d8da31a0d80f8f10b969b24e7856801",
+          "code_length": 30
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "8674259b56675ffddc9b2bded82b79a2a48c7f0204ce77f1dad17f394e397fff",
+          "code_length": 28
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "a27d98af7abff0aa94170a057b4823a5ce8396a8e74dd3e8ee834dc2a2d83654",
+          "code_length": 28
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "953b8bf60dcce40f734e3e183f81b11a545e0c4224677ad03fae046484a776f0",
+          "code_length": 55
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "be566321d1403f2f2b246e396aaed1739bcf0f28fe81afe1d020a3d0e7ef6a2f",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/StringBuilder",
+        "java/sql/Date",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "java/sql/Time",
+        "org/h2/util/DateTimeUtils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueTime"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueTimestamp.class",
+      "occurrence": 0,
+      "sha256": "1f5641cfaae70b12daea68a97b65beed599109432aee0e2828fc5ab8ce33f02e",
+      "name": "org/h2/value/ValueTimestamp",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "DEFAULT_SCALE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "YEAR_ONE",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "YEAR_9999",
+          "descriptor": "J",
+          "access": 24
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/sql/Timestamp;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/sql/Timestamp;)V",
+          "access": 2,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getTimestamp",
+          "descriptor": "()Ljava/sql/Timestamp;",
+          "access": 1,
+          "code_sha256": "b08b840b72c28f79b1e216e96aef9160f8c4eb9e66a4a1f1d9a3b7b295601c62",
+          "code_length": 11
+        },
+        {
+          "name": "getTimestampNoCopy",
+          "descriptor": "()Ljava/sql/Timestamp;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a2c56b163809a8191847297035f1c0af1978e912d79c99edb8b3e5783174d54d",
+          "code_length": 28
+        },
+        {
+          "name": "parseTimestamp",
+          "descriptor": "(Ljava/lang/String;)Ljava/sql/Timestamp;",
+          "access": 9,
+          "code_sha256": "530ba357a1cca861f6eb3027a141e636cab5d04f045462ace5e9a6ae2df0375e",
+          "code_length": 12
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "3bc3499ef8aacf9993280cdfcf9ae8dc939af86fe3c47e7221b9a3c2f40cbe7a",
+          "code_length": 3
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "6f097d199c6c1f237f3b4efa0bf003d32e2876354041da402fb6e349a3283499",
+          "code_length": 20
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4a74ef45e7817c5f296fe65bdf254c458ec445c6f2e45a4cbd4d6228730b02fd",
+          "code_length": 71
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "72464ed3f8eb0d766ed7995687a9b4e622b0e604c21e1abf9e7fa0fbfe3922ea",
+          "code_length": 4
+        },
+        {
+          "name": "getScale",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64674037c774bbed05a1a2b668cdb887eb36dbc305b058015bd0ba282da730cb",
+          "code_length": 3
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f9ccabd062d668a8584619925dbf286d761eaf0f22b4a6a38c94059a9fd10180",
+          "code_length": 8
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "89de02e22fd2f05bd1f29fe2bc1ae407589a8211994b25d6b08d39d7d8c2025f",
+          "code_length": 5
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "bb79c52856010eaeaa06bcfe802ce172af143f34271a20eea30d75b54bd5f328",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/sql/Timestamp;)Lorg/h2/value/ValueTimestamp;",
+          "access": 9,
+          "code_sha256": "5a33cd4ed2389673fe321f93a4a07c84ab9fca61e03046f79ce889da2ccd4433",
+          "code_length": 13
+        },
+        {
+          "name": "getNoCopy",
+          "descriptor": "(Ljava/sql/Timestamp;)Lorg/h2/value/ValueTimestamp;",
+          "access": 9,
+          "code_sha256": "584b86e1d085d2f981d28308be28618bb1fa865d78a287261687f346941ada3a",
+          "code_length": 15
+        },
+        {
+          "name": "convertScale",
+          "descriptor": "(ZI)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "f4e71a4973b6618bc41fc1924699614278334a7ccc6daf2037aad2df89c01745",
+          "code_length": 134
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9e34f340986772dee817c83c15374fd1fd28277975e2440b9630ef48635e8547",
+          "code_length": 3
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "8c1a3fdc1f3ab2bf8282d333e4af4b9422fc38fb25ca3c04a1c9f5181795c308",
+          "code_length": 30
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "047590d8825b886e6663b838e3e61cdf711bfa852af8e1c64be0b8c2dc265832",
+          "code_length": 54
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/h2/value/Value;)Lorg/h2/value/Value;",
+          "access": 1,
+          "code_sha256": "bc03037a022af75897045730640289693465a297528ed7557dbc044fcf1b65c3",
+          "code_length": 54
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "32ea28ca6262647a1489cddbd4b369941c291a08de9934a4806d6037dd7cfa2e",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/math/BigDecimal",
+        "java/sql/Date",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "java/sql/Time",
+        "java/sql/Timestamp",
+        "org/h2/message/DbException",
+        "org/h2/util/DateTimeUtils",
+        "org/h2/util/MathUtils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueTime",
+        "org/h2/value/ValueTimestamp"
+      ]
+    },
+    {
+      "entry": "org/h2/value/ValueUuid.class",
+      "occurrence": 0,
+      "sha256": "8dcb854082173424e863de0c6515c05f1c0e12b6666886a3e0b323a046cb6623",
+      "name": "org/h2/value/ValueUuid",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/h2/value/Value",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PRECISION",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "DISPLAY_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "high",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "low",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJ)V",
+          "access": 2,
+          "code_sha256": "b0477379120404ee9f6311e86c1a306dc918691c53d34af9e72910c49af74199",
+          "code_length": 15
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "64671f0fddb964d43b90ff1328b3eba0edf6ab3a4a497d8d1247f8181c4131e7",
+          "code_length": 27
+        },
+        {
+          "name": "getNewRandom",
+          "descriptor": "()Lorg/h2/value/ValueUuid;",
+          "access": 9,
+          "code_sha256": "d444c0aec7df152f1bc58e3632ced37ea3dddc62c22ef34ef193350e879aa7b1",
+          "code_length": 38
+        },
+        {
+          "name": "get",
+          "descriptor": "([B)Lorg/h2/value/ValueUuid;",
+          "access": 9,
+          "code_sha256": "cf02cebbc5b3c9827f7aa9af62780e64585a2f87a1eb49c2bef6440a6d4a39d8",
+          "code_length": 44
+        },
+        {
+          "name": "get",
+          "descriptor": "(JJ)Lorg/h2/value/ValueUuid;",
+          "access": 9,
+          "code_sha256": "d5ad4bec1a717ee31885fd608cb9827186e425b046fb1d7ed39abd0d8ab25634",
+          "code_length": 16
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Lorg/h2/value/ValueUuid;",
+          "access": 9,
+          "code_sha256": "bc716e1b820873c108886c6267dd84e35684f76b930df5840c6fd5319dbf8c7b",
+          "code_length": 164
+        },
+        {
+          "name": "getSQL",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f7abb4b8d5922d08e6fac3095f42954e0fbef11bc929bd8ad1340078ed75167d",
+          "code_length": 8
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "de35150e24150e8208c82ef524cd41667de4ba7abacbe7bfaef5eba4fc4531b6",
+          "code_length": 3
+        },
+        {
+          "name": "getPrecision",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "87b35bf13b964b769e12667bc0de47ad61e9aa6a67a0ff4891afaf2e3b5e4bf3",
+          "code_length": 4
+        },
+        {
+          "name": "appendHex",
+          "descriptor": "(Ljava/lang/StringBuilder;JI)V",
+          "access": 2,
+          "code_sha256": "ae8e8ee12942644aa94d701897cb7732d19e580214d1881d837be9af79d2df62",
+          "code_length": 53
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "434ff93ddfbac28446f4e987e659ed19717083f8ba86680f6abb7dcb9b9a85e9",
+          "code_length": 103
+        },
+        {
+          "name": "compareSecure",
+          "descriptor": "(Lorg/h2/value/Value;Lorg/h2/value/CompareMode;)I",
+          "access": 4,
+          "code_sha256": "0b8ef6b1d6f6f1895f4e39cfef40c29f61cf8a0774718262e9fae44609633519",
+          "code_length": 54
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "0b564e2e82a256b5b94ffc1f1aca34fd7b196a5f9a99db4878c3e5871e4e604b",
+          "code_length": 25
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8ba59cbb173103bb59fb7207dc73c7620bca209e75e07ba783c1643e7084f671",
+          "code_length": 16
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "b957b79453e005e1ffdd40b5b7639ed870e1b8d2c2005f51937e304243c36c18",
+          "code_length": 66
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/sql/PreparedStatement;I)V",
+          "access": 1,
+          "code_sha256": "977feab5190d5bd87e8ce13d84fb32df8e3790100bc9b3cb867170adcd2432d8",
+          "code_length": 12,
+          "throws": [
+            "java/sql/SQLException"
+          ]
+        },
+        {
+          "name": "getHigh",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        },
+        {
+          "name": "getLow",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "1adbce9c0c11e92e86c281910cf3bf79030dca0e1f4e4592311e627d4176d481",
+          "code_length": 5
+        },
+        {
+          "name": "getDisplaySize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e7c8fc7dd9d72002a775d212579f11f7a319000e30ad87257361d356f0eeb05d",
+          "code_length": 3
+        }
+      ],
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/sql/PreparedStatement",
+        "java/sql/SQLException",
+        "java/util/UUID",
+        "org/h2/util/MathUtils",
+        "org/h2/util/StringUtils",
+        "org/h2/util/Utils",
+        "org/h2/value/Value",
+        "org/h2/value/ValueUuid"
+      ]
+    }
+  ]
+}

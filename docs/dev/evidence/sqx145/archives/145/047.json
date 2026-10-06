@@ -1,0 +1,242 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/java-image-scaling-0.8.6.jar",
+  "sha256": "fabd02916eed5cd1cd5881d94970ea3c74e140b4c21acc6b640ddf3ed1472b95",
+  "class_count": 31,
+  "unique_class_entries": 31,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {
+    "com/mortennobel/imagescaling/AdvancedResizeOp$UnsharpenMask.class": "2d3976566faab55fc5c6e60b1c8fe9151a1c789ca34e45661b4a237942a00046",
+    "com/mortennobel/imagescaling/AdvancedResizeOp.class": "5476fbfecf01785f48f76a0e5f94b2694137febc6cce4dcb4f1a27371fe9f775",
+    "com/mortennobel/imagescaling/BellFilter.class": "e045be1c2ae325f9c38ace58da64df69c36d874c6bdb1ac78af7823e74b29b32",
+    "com/mortennobel/imagescaling/BiCubicFilter.class": "7da819bcecae29ada2237055211920e8d499f3830b1606e90329011321cb7ffe",
+    "com/mortennobel/imagescaling/BiCubicHighFreqResponse.class": "30062fff86e36b97613060754bec4808d50fc5a618c08b5aeb4a909d30b89c70",
+    "com/mortennobel/imagescaling/BoxFilter.class": "0a71828b3491bb6a25b46fc222fe72bb8dad9fe9941c25c69622631f4781fe8b",
+    "com/mortennobel/imagescaling/BSplineFilter.class": "6283e78cbd876f886f89fa0a1558bffae27bbc1abadbf1c7c0519ed1eb3fb258",
+    "com/mortennobel/imagescaling/DimensionConstrain$1.class": "15b4465b05bd943fbecefd4e3d315b52db2c8d5700aa4dc7cda388096423bd23",
+    "com/mortennobel/imagescaling/DimensionConstrain$2.class": "68d6d6c829c2335b7aff4ed95ca80d70522261c6d201ed6420748e6346aea3b3",
+    "com/mortennobel/imagescaling/DimensionConstrain$3.class": "e310435f65001117a7d0eb2fe183476ce45084549a34218d4c6247fd2f0f282e",
+    "com/mortennobel/imagescaling/DimensionConstrain$4.class": "6d3f62e555f12a43ce551ad909d4831484f52f3c61bcfc9c0f15aa0350c43af2",
+    "com/mortennobel/imagescaling/DimensionConstrain.class": "2110cee3a23895e40f0a12b0511751feba52b85ca0ad3fb9144c853b10db1a3f",
+    "com/mortennobel/imagescaling/experimental/ImprovedMultistepRescaleOp.class": "c2118e04a6cb9878a5b4886e0ab4eb45ab61430db1c38e66f687cc05f47769ed",
+    "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread$1.class": "8ff1eca09fd32b236ddcd37ee7dda42a76b9c4434634da4a00370fab6826bdf0",
+    "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread$SubSamplingData.class": "82bf416e5c856c9a2148f7e164f35c74e6b744674153a15b45fd244654c12ec9",
+    "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread.class": "ef608aa56ae023385e7ffb078182407419b72b1484dc97f46d63b65a468f3c26",
+    "com/mortennobel/imagescaling/HermiteFilter.class": "b14eacc1bfa597c02001fac08817133a2d6a5f1c2710e977b7ffb91dd418d51a",
+    "com/mortennobel/imagescaling/ImageUtils.class": "ba97825da11890a92b98e0f51cc5e2780184d766c17def8a8768653150e5692c",
+    "com/mortennobel/imagescaling/Lanczos3Filter.class": "cd141a4b09d3a2b3688652b7c844750dc250dc2e4cfe8bbd6df4b58c17751da8",
+    "com/mortennobel/imagescaling/MitchellFilter.class": "62606aad3488d601b73c6455d49db6f4b1e6b794474aaa08cbc1d377127751d3",
+    "com/mortennobel/imagescaling/MultiStepRescaleOp.class": "f6933d2b617722c5efed60e43da6459ecfdc90f02f55813fd8603a9b27e314d5",
+    "com/mortennobel/imagescaling/ProgressListener.class": "af85feae94ae0fb4525956bb5a7c6bd5922e44f93be1dadcf2676b4f52ff536c",
+    "com/mortennobel/imagescaling/ResampleFilter.class": "6b95d5f5c25d9e1f9ecb7d69f6f67eb8bea04f7c25c3e22f51b521b8fa8719bd",
+    "com/mortennobel/imagescaling/ResampleFilters.class": "e3d7a89b61bca43c0408b89d71e7d7f1acc50ff9a2c46ae27527620ad2bdfddf",
+    "com/mortennobel/imagescaling/ResampleOp$1.class": "70a07d922339a9e7fc6321bb8911284f58318d6850b594412a9cce6c6b107681",
+    "com/mortennobel/imagescaling/ResampleOp$2.class": "b42a6eb5ced3149f0459a29fc27b488344c507fe01ffab914dc54fcb72af6a35",
+    "com/mortennobel/imagescaling/ResampleOp$SubSamplingData.class": "79aeabe4900b8c445de5ddffc770c12276568c608dc5e27f2699721ff57821a6",
+    "com/mortennobel/imagescaling/ResampleOp.class": "7b010e6578e28e9d681179dda897a5e679f81361ce21b86fc61098068032beac",
+    "com/mortennobel/imagescaling/ThumbnailRescaleOp$Sampling.class": "cce6542072b99945b6301955a7a0a23d2817aa7ed775791a19c77ee979611ecf",
+    "com/mortennobel/imagescaling/ThumbnailRescaleOp.class": "46d77720e0734253835c039653bfcbefebde7b0fdcd8f6f6d7ac7c5e0e291423",
+    "com/mortennobel/imagescaling/TriangleFilter.class": "2406747c5e14deae5abd837e1b146da4bccd9d16bf2b51ed9e704833c48b0089"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "b041d51ebc1aac038529c40b2415292b9f9b6ba8aa9f2cfb41c740af2ca06bef",
+    "META-INF/maven/com.mortennobel/java-image-scaling/pom.xml": "b567fa2dae5a7ecbcb64d935a990727ca92236779b51ddfae96dbd45cb596f5e",
+    "META-INF/maven/com.mortennobel/java-image-scaling/pom.properties": "d4addb473ae0fc0e644a0fe04573ac243520f5253527e34c07b9d1b6b35881f2"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/mortennobel/imagescaling/AdvancedResizeOp$UnsharpenMask.class",
+      "occurrence": 0,
+      "sha256": "2d3976566faab55fc5c6e60b1c8fe9151a1c789ca34e45661b4a237942a00046",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/AdvancedResizeOp.class",
+      "occurrence": 0,
+      "sha256": "5476fbfecf01785f48f76a0e5f94b2694137febc6cce4dcb4f1a27371fe9f775",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/BellFilter.class",
+      "occurrence": 0,
+      "sha256": "e045be1c2ae325f9c38ace58da64df69c36d874c6bdb1ac78af7823e74b29b32",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/BiCubicFilter.class",
+      "occurrence": 0,
+      "sha256": "7da819bcecae29ada2237055211920e8d499f3830b1606e90329011321cb7ffe",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/BiCubicHighFreqResponse.class",
+      "occurrence": 0,
+      "sha256": "30062fff86e36b97613060754bec4808d50fc5a618c08b5aeb4a909d30b89c70",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/BoxFilter.class",
+      "occurrence": 0,
+      "sha256": "0a71828b3491bb6a25b46fc222fe72bb8dad9fe9941c25c69622631f4781fe8b",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/BSplineFilter.class",
+      "occurrence": 0,
+      "sha256": "6283e78cbd876f886f89fa0a1558bffae27bbc1abadbf1c7c0519ed1eb3fb258",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/DimensionConstrain$1.class",
+      "occurrence": 0,
+      "sha256": "15b4465b05bd943fbecefd4e3d315b52db2c8d5700aa4dc7cda388096423bd23",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/DimensionConstrain$2.class",
+      "occurrence": 0,
+      "sha256": "68d6d6c829c2335b7aff4ed95ca80d70522261c6d201ed6420748e6346aea3b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/DimensionConstrain$3.class",
+      "occurrence": 0,
+      "sha256": "e310435f65001117a7d0eb2fe183476ce45084549a34218d4c6247fd2f0f282e",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/DimensionConstrain$4.class",
+      "occurrence": 0,
+      "sha256": "6d3f62e555f12a43ce551ad909d4831484f52f3c61bcfc9c0f15aa0350c43af2",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/DimensionConstrain.class",
+      "occurrence": 0,
+      "sha256": "2110cee3a23895e40f0a12b0511751feba52b85ca0ad3fb9144c853b10db1a3f",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/experimental/ImprovedMultistepRescaleOp.class",
+      "occurrence": 0,
+      "sha256": "c2118e04a6cb9878a5b4886e0ab4eb45ab61430db1c38e66f687cc05f47769ed",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread$1.class",
+      "occurrence": 0,
+      "sha256": "8ff1eca09fd32b236ddcd37ee7dda42a76b9c4434634da4a00370fab6826bdf0",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread$SubSamplingData.class",
+      "occurrence": 0,
+      "sha256": "82bf416e5c856c9a2148f7e164f35c74e6b744674153a15b45fd244654c12ec9",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/experimental/ResampleOpSingleThread.class",
+      "occurrence": 0,
+      "sha256": "ef608aa56ae023385e7ffb078182407419b72b1484dc97f46d63b65a468f3c26",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/HermiteFilter.class",
+      "occurrence": 0,
+      "sha256": "b14eacc1bfa597c02001fac08817133a2d6a5f1c2710e977b7ffb91dd418d51a",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ImageUtils.class",
+      "occurrence": 0,
+      "sha256": "ba97825da11890a92b98e0f51cc5e2780184d766c17def8a8768653150e5692c",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/Lanczos3Filter.class",
+      "occurrence": 0,
+      "sha256": "cd141a4b09d3a2b3688652b7c844750dc250dc2e4cfe8bbd6df4b58c17751da8",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/MitchellFilter.class",
+      "occurrence": 0,
+      "sha256": "62606aad3488d601b73c6455d49db6f4b1e6b794474aaa08cbc1d377127751d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/MultiStepRescaleOp.class",
+      "occurrence": 0,
+      "sha256": "f6933d2b617722c5efed60e43da6459ecfdc90f02f55813fd8603a9b27e314d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ProgressListener.class",
+      "occurrence": 0,
+      "sha256": "af85feae94ae0fb4525956bb5a7c6bd5922e44f93be1dadcf2676b4f52ff536c",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleFilter.class",
+      "occurrence": 0,
+      "sha256": "6b95d5f5c25d9e1f9ecb7d69f6f67eb8bea04f7c25c3e22f51b521b8fa8719bd",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleFilters.class",
+      "occurrence": 0,
+      "sha256": "e3d7a89b61bca43c0408b89d71e7d7f1acc50ff9a2c46ae27527620ad2bdfddf",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleOp$1.class",
+      "occurrence": 0,
+      "sha256": "70a07d922339a9e7fc6321bb8911284f58318d6850b594412a9cce6c6b107681",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleOp$2.class",
+      "occurrence": 0,
+      "sha256": "b42a6eb5ced3149f0459a29fc27b488344c507fe01ffab914dc54fcb72af6a35",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleOp$SubSamplingData.class",
+      "occurrence": 0,
+      "sha256": "79aeabe4900b8c445de5ddffc770c12276568c608dc5e27f2699721ff57821a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ResampleOp.class",
+      "occurrence": 0,
+      "sha256": "7b010e6578e28e9d681179dda897a5e679f81361ce21b86fc61098068032beac",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ThumbnailRescaleOp$Sampling.class",
+      "occurrence": 0,
+      "sha256": "cce6542072b99945b6301955a7a0a23d2817aa7ed775791a19c77ee979611ecf",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/ThumbnailRescaleOp.class",
+      "occurrence": 0,
+      "sha256": "46d77720e0734253835c039653bfcbefebde7b0fdcd8f6f6d7ac7c5e0e291423",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    },
+    {
+      "entry": "com/mortennobel/imagescaling/TriangleFilter.class",
+      "occurrence": 0,
+      "sha256": "2406747c5e14deae5abd837e1b146da4bccd9d16bf2b51ed9e704833c48b0089",
+      "member_shard": "docs/dev/evidence/sqx145/members/047/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/047/001.json",
+      "sha256": "2290eeaa6afcce052aa211cf927d71bc5f256c5f70ed430a44205f43dc6499a9"
+    }
+  ]
+}

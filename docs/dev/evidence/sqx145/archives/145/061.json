@@ -1,0 +1,2107 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/joda-time-2.3.jar",
+  "sha256": "602fd8006641f8b3afd589acbd9c9b356712bdcf0f9323557ec8648cd234983b",
+  "class_count": 232,
+  "unique_class_entries": 232,
+  "resource_count": 453,
+  "duplicate_entries": [],
+  "classes": {
+    "org/joda/time/base/AbstractDateTime.class": "c332072b1250be8c95705508a1009e6962e06b560abe1b9fd136c80fdd6a3994",
+    "org/joda/time/base/AbstractDuration.class": "21c9ad3c6808ee7dcac587985c3eca62e1be283d20b3ef3ba21381f8c7e7dc09",
+    "org/joda/time/base/AbstractInstant.class": "3336c45b8f3b7156e3a46c524a2887b160054c969586cb03079430bee16b3a35",
+    "org/joda/time/base/AbstractInterval.class": "6d878348e7f56b4fe3be3c984ff1e18ee3eb19e43c0bbab31ee96cf150a2dfb1",
+    "org/joda/time/base/AbstractPartial.class": "51e544f2c3856cda4226110edec7cb591527833cbaab480296f38b4b2865e692",
+    "org/joda/time/base/AbstractPeriod.class": "a2ac683774d83cba1beb31e3fa7e180ca3d4ca5491e91ceea6bd60cd8c793e4b",
+    "org/joda/time/base/BaseDateTime.class": "4402862c237d17841252c0be23c9fed8ae20253e28fe6e50206be6ea9308b8ee",
+    "org/joda/time/base/BaseDuration.class": "0ba15f5d27c1886cc732a35393c8717ffafa4d366e37f54b73fc46896a3a3c1e",
+    "org/joda/time/base/BaseInterval.class": "4fb8ccf6f96933d3264577ec53c11ffa75b7468c0a277ec99d033eb6846fe831",
+    "org/joda/time/base/BaseLocal.class": "79688fefc5d3348882f4aae9336abde37e47e5ca8416648dcce121b69b0346e5",
+    "org/joda/time/base/BasePartial.class": "ec9e7505a90f9f98914253f9c44a07a358083500d46a47ca58b2c4e405982fbc",
+    "org/joda/time/base/BasePeriod$1.class": "2b69a24370f739cb721e447d38a4d57d8d3680c006c5610fa7e86b7f12f952c1",
+    "org/joda/time/base/BasePeriod.class": "6988d95c683fcea3800d7e695b65028f6d219ec8e98ba1ea7365dc0b9f7c8496",
+    "org/joda/time/base/BaseSingleFieldPeriod.class": "c17dd93aca15cedf1cf7f0a08bec47c42d3a682b63ace331aade8aa4b99d05e5",
+    "org/joda/time/chrono/AssembledChronology$Fields.class": "b7e611ee9922079d88171b6216d4735d82227f6e11ad96fc2174527e4dcf53a2",
+    "org/joda/time/chrono/AssembledChronology.class": "65bc48d88353bded66cb886acb44c309f8bea49e22fdd22ab5ff1b9b78986e61",
+    "org/joda/time/chrono/BaseChronology.class": "a77a84d05b927b568bc129c8483aadaf30ea0a28405a9cb0d619ae8a1f5e669f",
+    "org/joda/time/chrono/BasicChronology$HalfdayField.class": "17862304df4cb355b30697a8579b8f5f4d8790291ee30c1a31dc16ddf67cdee7",
+    "org/joda/time/chrono/BasicChronology$YearInfo.class": "eca52cf464f0ed974c24cef28d08204d355c1550ea4e98ce778e124b10ecf81b",
+    "org/joda/time/chrono/BasicChronology.class": "95faafbe461cc966ca3eac6cb9a05546bcd992fa71ca30bae9d58ffe4308539d",
+    "org/joda/time/chrono/BasicDayOfMonthDateTimeField.class": "2024fe393af45b8cc0e35b054877ddd34c1eb52d1f1bb39e840b2051007f5324",
+    "org/joda/time/chrono/BasicDayOfYearDateTimeField.class": "2ac207458131a280b13263f1f0ab7073fbe72b6bec9756615703acd20b48bd5e",
+    "org/joda/time/chrono/BasicFixedMonthChronology.class": "30bbe500acb1163d4f57d5ff8d4afd88e365b2556844a498c4cce1a84824c430",
+    "org/joda/time/chrono/BasicGJChronology.class": "bb5044428b43910fd5226c0b300a403ecf298e7e308ca405731fbed7a698f444",
+    "org/joda/time/chrono/BasicMonthOfYearDateTimeField.class": "f14c777100d7538787132271b2b72b939b12a3034a37bef6ee7d29aad8840cd6",
+    "org/joda/time/chrono/BasicSingleEraDateTimeField.class": "56082b7c6ebc3f57aa7f4be2362eab074480debad2654493221c1fd57139e21d",
+    "org/joda/time/chrono/BasicWeekOfWeekyearDateTimeField.class": "b9745bca141d3898b4f6bdbe0865b568936a0d0fa204e5c4044127ec5959e29b",
+    "org/joda/time/chrono/BasicWeekyearDateTimeField.class": "145c3068dee10aa97fc5e085f4d9276eeaf80670a4bef0e70e66c752a7014fa0",
+    "org/joda/time/chrono/BasicYearDateTimeField.class": "6fb303fa12689057726ce3370e76b70c55ac4b6fdb3ff93045c2eedd1cb43c11",
+    "org/joda/time/chrono/BuddhistChronology.class": "e98ca87709ab5f2896e2d6529318c423ce35563eb3802650716f327e7207bdb0",
+    "org/joda/time/chrono/CopticChronology.class": "2ab39baf8bbc9b631d3e2836253fe7d134f72fbf29d87dc5c04e8cac97bed24a",
+    "org/joda/time/chrono/EthiopicChronology.class": "941eb08b67e49d6728a395eecc2603def02c7bb7ff8126e0d3cccfcb4dc99a17",
+    "org/joda/time/chrono/GJChronology$CutoverField.class": "b718bbb1e640b35c57542e6b1c93f207ca2a900cd248683b24edbe9c1f497077",
+    "org/joda/time/chrono/GJChronology$ImpreciseCutoverField.class": "f504ca26d54e3ff7639ccf5944cd40eb9fa17676e804ca9081dc2bbea6472150",
+    "org/joda/time/chrono/GJChronology$LinkedDurationField.class": "51b3d67c59e759e4c6813edf812835d74c3d018522b2f6495d71489fba620a0f",
+    "org/joda/time/chrono/GJChronology.class": "cb21d1a3c77f26b37d9fa18a16c8250fdebbb24804f82847b8250e0163180c7a",
+    "org/joda/time/chrono/GJDayOfWeekDateTimeField.class": "490de708ace6be4c4f0ccf0f89ab4b8d41423da12da584c7270faa126fd9005d",
+    "org/joda/time/chrono/GJEraDateTimeField.class": "72b07bf92920ac2342d3b2be8288e69d3c92ccba45b5c298ae68455fa6cd79c0",
+    "org/joda/time/chrono/GJLocaleSymbols.class": "8a06d3db6fc1e906dbb48750f10bd5bcf4895809be787ad482e147f769beac07",
+    "org/joda/time/chrono/GJMonthOfYearDateTimeField.class": "e7db7413d6040edfbca55381fc2b7d820fe1ea87cf203b245b066d4b5873db35",
+    "org/joda/time/chrono/GJYearOfEraDateTimeField.class": "14a0842216a58586ae678f70c9643eda4d9e5bb17a5610d278f53fe1d4dd2480",
+    "org/joda/time/chrono/GregorianChronology.class": "dabceb192a019f2d04aae6dad70b13bafa440126e35b3460caf04cb27ef842a9",
+    "org/joda/time/chrono/IslamicChronology$LeapYearPatternType.class": "c0f8bd1a78735fd695944294a1ea4fc05d8565a4a52497e081d83629b487b39a",
+    "org/joda/time/chrono/IslamicChronology.class": "c22438aaea75177f8cc0678e88c6949c21b18a083156deabed8a44bdeea5908f",
+    "org/joda/time/chrono/ISOChronology$Stub.class": "c7e0d51d7458e4d8bd774d0952918b5e91b74f073b64d98f11aa94a016287d6e",
+    "org/joda/time/chrono/ISOChronology.class": "0dad2d8eb87a48700a09962d00cceb7dae8673fc774ac11c29df34241deefbe5",
+    "org/joda/time/chrono/ISOYearOfEraDateTimeField.class": "a829c93cfd205dc39fc86d0cc1513a5885f66528015a80cb55c17ed2dcc62565",
+    "org/joda/time/chrono/JulianChronology.class": "b846ece141808b21171b537749384218e1648a1de2ce6df2228dd49326c3206b",
+    "org/joda/time/chrono/LenientChronology.class": "14421822414edcb0642647ecfc49fe49916c9595b6983153703e2d874d58ca25",
+    "org/joda/time/chrono/LimitChronology$LimitDateTimeField.class": "faf603e4bc979dc65aab541a65a001f4489ea22a80c4b6904fcc80a75c2afef9",
+    "org/joda/time/chrono/LimitChronology$LimitDurationField.class": "3a31113fb9473204524b49a8b76f8d1dc9419f6f342a08c2cbb5abe41c2ad551",
+    "org/joda/time/chrono/LimitChronology$LimitException.class": "bb26cddcb375d80063c7db95d2d5a56f84f024eb94ddff10844f45cf88e6d06a",
+    "org/joda/time/chrono/LimitChronology.class": "5f5aae58945b538cddb5fe36bf0e9b9b18ff29799b8637054bda84756e681876",
+    "org/joda/time/chrono/StrictChronology.class": "74b959eb5bd5960d5766ebba0c44ff7b9aff1bf6be62f9132449b78730845f61",
+    "org/joda/time/chrono/ZonedChronology$ZonedDateTimeField.class": "036a1260b016ad74e0ad52b4ebec57957c4aa2ca47e5e84659def4e3f8398c5c",
+    "org/joda/time/chrono/ZonedChronology$ZonedDurationField.class": "26bc591aa1c9db2b6c4a6815e892065c73537c778b2af3a085b8c07b561981cb",
+    "org/joda/time/chrono/ZonedChronology.class": "1675a3cfb4c3e7ed44c5e8448e28b1c150c91ba6d440a4a6d9d7cba9d0ef1a40",
+    "org/joda/time/Chronology.class": "33f8e6b2911e6e544c640772548a099346af4f8796b200ce4fb43b45e4ac854c",
+    "org/joda/time/convert/AbstractConverter.class": "657b055e1547db93ac8df5232f1d21cf5bf6c22bebc432ea3cb0b300d51ce214",
+    "org/joda/time/convert/CalendarConverter.class": "48758fb4b9620cd5d7d82f15a6217981c493d271668d4c5d0547b4af9960e6a3",
+    "org/joda/time/convert/Converter.class": "2cbfbcdb318a230b8226031198534528b735be8ad5a8bf91d828593829b54880",
+    "org/joda/time/convert/ConverterManager.class": "ccaa45e02a6df2f052bd48ae291c549c57a1728e6a2ebc0f67fb8da77cf2bd66",
+    "org/joda/time/convert/ConverterSet$Entry.class": "a333335a42453696fe971bd05902ebb37bb884179032e0fe0fbe5bebc8a0a4a3",
+    "org/joda/time/convert/ConverterSet.class": "daec47cc6d11af148239a8a0153831e63990a9fc256860b7a4368cca6b2e11ee",
+    "org/joda/time/convert/DateConverter.class": "86e6207edc05de00681242490d6f07dd241ad82d47825682027386bcbef1103a",
+    "org/joda/time/convert/DurationConverter.class": "00c6f14eb402f082aa44107aff167f649aedb055cc6d49db758af6937b35b510",
+    "org/joda/time/convert/InstantConverter.class": "4388430844cecf946838b5d7de0019fafbbfa9976186d43aedce26f46c156881",
+    "org/joda/time/convert/IntervalConverter.class": "24ea5cbb33fa848e38569ae53909ce58167180fbbaa53cdb481cd0ba7dda1b60",
+    "org/joda/time/convert/LongConverter.class": "9159a3be3cd3b0703609186f68fd8482409088f720fda1db0be3b38b1427010c",
+    "org/joda/time/convert/NullConverter.class": "6d2fa193b94c7ca36eea2dd641c0a971eb297d1cd8e7a648d390b7bef2e0eb24",
+    "org/joda/time/convert/PartialConverter.class": "676893d3d68255e789281699311705997a0cb335e4aa9c9b33df2e85571149d6",
+    "org/joda/time/convert/PeriodConverter.class": "4adc59b2f7fc1cfe832d28fc4248cfac85fe4fb980c463cbf37701fdf17cf1ee",
+    "org/joda/time/convert/ReadableDurationConverter.class": "eb865f03053b8cb1f8ace554645bd130a00a70670b51853abf7a645038be2c43",
+    "org/joda/time/convert/ReadableInstantConverter.class": "70d158b8e8db0327e9754b9ae795dc954ea75e0c6e22ac65517367f219a69431",
+    "org/joda/time/convert/ReadableIntervalConverter.class": "dc8f5f44a9802b33551c662726f3aaf48203097af7801af96713e71788aebba0",
+    "org/joda/time/convert/ReadablePartialConverter.class": "803bfbb3d2e46f37472f69484a647bd3d51d986f984df71f791c2cb5bd2b898f",
+    "org/joda/time/convert/ReadablePeriodConverter.class": "fb042de9a2baadee3d43da9a682c97f55b233d8a95f39f4091751194f8ac0fa9",
+    "org/joda/time/convert/StringConverter.class": "7c1d99e3d0176ca0d9bbc0686299db3520b060a37be91492c87fd46802caabbe",
+    "org/joda/time/DateMidnight$Property.class": "4e87e980620ed927927fd96e48abc1be8e37f89d39cd253eb53696fdb141a4ce",
+    "org/joda/time/DateMidnight.class": "37c3847ad0b19634613378ffcfe7893adcd27f5c94717ebfcb3ddb38dd7be0f8",
+    "org/joda/time/DateTime$Property.class": "7e32f002bd30467c0d9d4188053b0df5c07fa225813cef2d300192902c805f83",
+    "org/joda/time/DateTime.class": "f13b13b679fbc902b6e3b31c3d175973b1dbc95cac22c10498277f6795e47e23",
+    "org/joda/time/DateTimeComparator.class": "9a506673b649347eb70a3b608970056f89063eb7bc6cc8be4cf7a65f7f3a9e6d",
+    "org/joda/time/DateTimeConstants.class": "4c7df6e4941ee432e12add058ca15042c32d8a8e6f05734c09f11ae17fb50359",
+    "org/joda/time/DateTimeField.class": "6006cafaeb3134a895227ddb9bd6a9487df0fa5bfc73689258863074cee243c6",
+    "org/joda/time/DateTimeFieldType$StandardDateTimeFieldType.class": "0f86fcbb397d026dd7faeb5291a96afb4d01c9e0d490b9c92648e069403084c1",
+    "org/joda/time/DateTimeFieldType.class": "fa895b214e40be9930336511484674dc904e70e73da867459ad7e3765a3b9b8c",
+    "org/joda/time/DateTimeUtils$FixedMillisProvider.class": "8eea3f23eacda95a88d532e60dfe389e5062f83f6840ac30a21eaf985a1bf02b",
+    "org/joda/time/DateTimeUtils$MillisProvider.class": "7daec6c5ea9dffa0451c4c557451cf245adb7c2f6128279300d40080426b8714",
+    "org/joda/time/DateTimeUtils$OffsetMillisProvider.class": "fbec0edf1044c5447888f9cb4f399cbefd09da90b35fef21151403bdc9d8736d",
+    "org/joda/time/DateTimeUtils$SystemMillisProvider.class": "22c2f8909c275d213470f1ef4f52d81806259d96ae41cb5532ab653a51ba4636",
+    "org/joda/time/DateTimeUtils.class": "276e5cce8da6bcde3609222131c9af082e33f44e6253f98f6e0d5ea52237350f",
+    "org/joda/time/DateTimeZone$1.class": "928da1f0c1996bab27e006fab9fd2719c719d370a093a68f2e8cf0777005598e",
+    "org/joda/time/DateTimeZone$Stub.class": "2bd86b3b2f9c23be2de535b4eb3ef134c5e174e09f8849b0a552c56f3d256718",
+    "org/joda/time/DateTimeZone.class": "87ecb494f3d850ee4262b9dfe774ecc1cefb4cd719f09a926302865435c87e1e",
+    "org/joda/time/Days.class": "752f726cb6e7020929d9dda1f9b9a8993a2866c0da930619bc6c1912d977cbd7",
+    "org/joda/time/Duration.class": "6abf4d755476f185e60d132faad8cc0984041aae805233f428910adbeeebbb0b",
+    "org/joda/time/DurationField.class": "c9e7eb3572dd9d043f4dcff19aa6c0a64547dafda65fa2e27926bce1f18415a5",
+    "org/joda/time/DurationFieldType$StandardDurationFieldType.class": "9480664787c1b8af14c37efe8b785a75005be198fe51a3b30efdeb2b71862401",
+    "org/joda/time/DurationFieldType.class": "6d8fde1fd313b1c882468f5846912a1ffa44ba8bec54b37eff8f9919641f5e82",
+    "org/joda/time/field/AbstractPartialFieldProperty.class": "197f7d54e178fbcd257c9f2c40ab3a18b829b553fc3c1267825af8e8ae4d31a5",
+    "org/joda/time/field/AbstractReadableInstantFieldProperty.class": "21c5d2efa9a35e9f576420fbfa396c2a216a2b53aee085daac309f8cf54116a8",
+    "org/joda/time/field/BaseDateTimeField.class": "22fb9c095b4ca4dfa9933d657c5829b409ba473eb87d54aed954d8971faed49f",
+    "org/joda/time/field/BaseDurationField.class": "d576fadfb2064d3edbe65846e13d7866c83bbec8c3d4c7650a371b6c64ba4f2e",
+    "org/joda/time/field/DecoratedDateTimeField.class": "573dac73a6a3def765da5863ea2ad06b2ede4c1f09a70edf3ab80f7848f71743",
+    "org/joda/time/field/DecoratedDurationField.class": "02faa44b9ffee768e2543904a1a46260d2817dc476ef6fe44d6904feca7c9a2e",
+    "org/joda/time/field/DelegatedDateTimeField.class": "6e7517967e4ac55ae70490d57980358e3613b778351b7f045111f736bd36bc5e",
+    "org/joda/time/field/DelegatedDurationField.class": "d7d8427ac86f7cc52d1bb8722635542e04254db2a440a8c013e0b4eef067ed28",
+    "org/joda/time/field/DividedDateTimeField.class": "ccb04cc9344ae399b49260845983197fdd8b7730fb799ab83e33d63a472d9fb6",
+    "org/joda/time/field/FieldUtils.class": "d6d866918da0198bc4148e34764d22b69a5d35fd676f728464840b99a701af3f",
+    "org/joda/time/field/ImpreciseDateTimeField$LinkedDurationField.class": "296e3477589ce0b550d2e555e1cdb4020f5478ee8079da1ba62a5ae4b9ba62f1",
+    "org/joda/time/field/ImpreciseDateTimeField.class": "1f5c9189b3787ed6182391c5f1079e6c9e5cc39084407e52aabdcf07d6dc781b",
+    "org/joda/time/field/LenientDateTimeField.class": "69e5533f398d8d0a838327e05b546fb9aac2e80f1b4642bcf8061097d0e7990b",
+    "org/joda/time/field/MillisDurationField.class": "9838b626b7ba83f250623a6c2b1939d15ec742e9c062f435fbbdaaee5fcd1602",
+    "org/joda/time/field/OffsetDateTimeField.class": "cfa25222b47fea3d5b0c294567a3162d08f3c1797421a8cef7c3fb7fe4a0c4f3",
+    "org/joda/time/field/PreciseDateTimeField.class": "67793b0976366219e8269d3e7b1720afd2cc4a3ffa70475777c91885f62a6e7a",
+    "org/joda/time/field/PreciseDurationDateTimeField.class": "27eff509f984a963e44518c377f011bfd5f25bf4664666f348b848b7ec300c04",
+    "org/joda/time/field/PreciseDurationField.class": "8bd1b101af1ec57ae6b7af569efcd67924fecaa1d6099928276371b5f927960a",
+    "org/joda/time/field/RemainderDateTimeField.class": "74b549c53e86aafd59068647d81d69eb864bb8912f4e25131d2091220a2d5cd0",
+    "org/joda/time/field/ScaledDurationField.class": "38ab28ada5b40aa19ae4bf4ff3e670601e3062a178e76757b22f113369333f58",
+    "org/joda/time/field/SkipDateTimeField.class": "b8c01187545844ae6640cd1bc978c31d1fa6228609801fe945c86b3c49a7be52",
+    "org/joda/time/field/SkipUndoDateTimeField.class": "765597c308827fd7a9fb458495f7aba72c2157e6dd177898de33d803171c729a",
+    "org/joda/time/field/StrictDateTimeField.class": "75df0f60904d25bdf871b3051dd04a3bb04a339d9acc6ce4085d66a398e1acb1",
+    "org/joda/time/field/UnsupportedDateTimeField.class": "9d6f3f9f431e96da2c43b794ed11f6c6b69cf0c1f2ca78b85dc0291f8e91c014",
+    "org/joda/time/field/UnsupportedDurationField.class": "e85719bb991d5592f7f9b7a6a182a1bf19d2d96282892b5d4736c522cac3613b",
+    "org/joda/time/field/ZeroIsMaxDateTimeField.class": "12892682f3fceaf26de5f4e1c754d5c8c1bdd4715cbb14178dd1ff0608e98c48",
+    "org/joda/time/format/DateTimeFormat$1.class": "04e7c12b0e630ba840f33de84271b332fa50f68f84b4bf824fb7723d5e691999",
+    "org/joda/time/format/DateTimeFormat$StyleFormatter.class": "20ea741f2d742eaf1d833df0d54b841f002fd96116d9475681e4e2cc19a9e0fa",
+    "org/joda/time/format/DateTimeFormat.class": "70371afbe9dbc1a817320974cae22c185ee3534b4505528735351e6f05d94108",
+    "org/joda/time/format/DateTimeFormatter.class": "245db0f8138d841f70b1dae40b5840fc580f7700a2eb1f07adc276c3779a5d77",
+    "org/joda/time/format/DateTimeFormatterBuilder$CharacterLiteral.class": "79924cfab501ab4325c825c9fe4e0067d305858e411e997a28be9ac7bc8c40ac",
+    "org/joda/time/format/DateTimeFormatterBuilder$Composite.class": "2a3244e8a47c08d612d1fb529d3a9ea3aa1b75a2d01a6fd233df304b7f61cb5a",
+    "org/joda/time/format/DateTimeFormatterBuilder$FixedNumber.class": "dec151c47aaeac690cfeac09185d8050eafb6c5826512cd4009e33b1d6e17784",
+    "org/joda/time/format/DateTimeFormatterBuilder$Fraction.class": "f4b2dc25ce89cd6046f27408281cf4251cb719694cd2790195db8914e5982bdf",
+    "org/joda/time/format/DateTimeFormatterBuilder$MatchingParser.class": "13680975bf7e90074ecc7162a215da0069bb109914d8275edcb6e91283d5ff34",
+    "org/joda/time/format/DateTimeFormatterBuilder$NumberFormatter.class": "a4776d87fe706d7172c1e9d1c7bda405b0576229f27cfd1daf5ce07dfe00f307",
+    "org/joda/time/format/DateTimeFormatterBuilder$PaddedNumber.class": "1f8fc7b82c4f4b6fae728a4bf119fc3a346b23c410cc1ab8e5a5549d58ca8a63",
+    "org/joda/time/format/DateTimeFormatterBuilder$StringLiteral.class": "c20dc4078f291c949e49eafcaed59140acafec44a5611474ab52997bd7652825",
+    "org/joda/time/format/DateTimeFormatterBuilder$TextField.class": "47c2d80124c63f9c5128a1672a163c358d30ef9e8c29e81013fc1fcf8ab73fcb",
+    "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneId.class": "6b67b4df8291190243e791bff644144e83f32623174f882514ab4cd8fa01ccfc",
+    "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneName.class": "f690fa4bae1dcf71c31fbcebbb653b605ed6f923623dfd4a688b7e77be9b91ab",
+    "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneOffset.class": "83800bfbd69fcbee845f6225e72aae196d168231944bee0ffe5ad9afa17cc721",
+    "org/joda/time/format/DateTimeFormatterBuilder$TwoDigitYear.class": "b398377811f546119531ec3e62543d25af9f07b7b1d37b6a1a6810f0afebf825",
+    "org/joda/time/format/DateTimeFormatterBuilder$UnpaddedNumber.class": "5d7dd66a9d8aaeb43e79907f18255476eb40365ceb5caee8261cf1972bf8fb9b",
+    "org/joda/time/format/DateTimeFormatterBuilder.class": "6623520c40d67eea1013b4c8b6c413510951b3705a419133f1b5e720a5b52304",
+    "org/joda/time/format/DateTimeParser.class": "1bc6a1966a1a5effcec4753722af3278be65d6b804cb59cc29f5e95fb8c2f32c",
+    "org/joda/time/format/DateTimeParserBucket$SavedField.class": "55bf26cbfa0ae16af0959d0912893258bd632432140100088bebe92e38ff0bdb",
+    "org/joda/time/format/DateTimeParserBucket$SavedState.class": "07d374925b2dbc7cdcef9c275293410008b5349408c3dbbfad67a1b9962277a7",
+    "org/joda/time/format/DateTimeParserBucket.class": "baea8cbedb9d3b62837ecdb1b04d7e2a39a6eb014ed10e3de084591d03b7671f",
+    "org/joda/time/format/DateTimePrinter.class": "f9a13ab16d9ba47190a32c72a3c16c097eb33ed1194497e600604cde9c273ecc",
+    "org/joda/time/format/FormatUtils.class": "f52352b5d65bf08599ed0a1279cdd2ec68fb04688b25ee059655881a45b4798e",
+    "org/joda/time/format/ISODateTimeFormat$Constants.class": "93bed9e4e21f8381abd664f655a060b2c3310bbab545138859a0828b69e3d022",
+    "org/joda/time/format/ISODateTimeFormat.class": "dd27ac6bd1ccd2efe2c493e0d7bdc5c24c41b1fe8f571fcf00a718874bc9430e",
+    "org/joda/time/format/ISOPeriodFormat.class": "b965bac1c3cbc331f441a81e1c90d920a7ef0dc6ac22358da141b3f0b262648d",
+    "org/joda/time/format/PeriodFormat.class": "de84b0a0b83b85c564b9ee885cb882c8ed01ec731c7aa4b37f4230d2474f70ae",
+    "org/joda/time/format/PeriodFormatter.class": "3230a8c4e0fb1fff3c6fe465b7526b1e5832f8f7de1458c27c7e54d97e2fce6a",
+    "org/joda/time/format/PeriodFormatterBuilder$Composite.class": "f73cd2af0bd70e28a9848745e6ae00c74cc760ee7b7a24ab671d138f9bfe213f",
+    "org/joda/time/format/PeriodFormatterBuilder$CompositeAffix.class": "6755c0c7b9c02430b1ba8d447dbd5cb7ab86142569cea79cc881d34ed44ec3cf",
+    "org/joda/time/format/PeriodFormatterBuilder$FieldFormatter.class": "ebd363ba68935fd5077a97203ff8d3774f72cbd6be998a52a54c4e80731d0434",
+    "org/joda/time/format/PeriodFormatterBuilder$Literal.class": "f8b04030cb8aa3b238c0b00fda9381a8767997b98fb2db31a75a48948c159f27",
+    "org/joda/time/format/PeriodFormatterBuilder$PeriodFieldAffix.class": "32a14cfa65f4a9c87bad9d5b9a562cfe7b806f774b4312292464d16ed2e8d4f3",
+    "org/joda/time/format/PeriodFormatterBuilder$PluralAffix.class": "292142fd92f80b64e3a3bd71a166bfac7cb5f657817bfe3045b37ef73e87342b",
+    "org/joda/time/format/PeriodFormatterBuilder$Separator.class": "b50320ad39acfc780e024045d8ab6a8d61c90767be70d1c02e66854f9750c957",
+    "org/joda/time/format/PeriodFormatterBuilder$SimpleAffix.class": "5d970942a66838609046ab9cc477d45813700f7bcf5c250bcb2965dd5f3dfbce",
+    "org/joda/time/format/PeriodFormatterBuilder.class": "89e4eeb5c6eecd2f5ab7a74c8a4ba9e79b75749bc66cae4455d4eed7567024b0",
+    "org/joda/time/format/PeriodParser.class": "54b2d0019c95b2d3901fb84acc752efbc269732d1a81f4d05bac38456b292f4c",
+    "org/joda/time/format/PeriodPrinter.class": "b81ddd8ed43a81ec771877d0c17ed3f4eabdb5195baddc3edb8ca9b1e280b7ae",
+    "org/joda/time/Hours.class": "d289e8d98deeb8400932bf3231a135f15c9548d8214fc6a04635abeb8979d065",
+    "org/joda/time/IllegalFieldValueException.class": "ad3d5ae65afa362593b52b9c52037440677e85b8e93bff51cc950226c4c38b05",
+    "org/joda/time/IllegalInstantException.class": "8030f5f9c23960b4fe6811f600445cb1acc508667755b8af6559a8f92a9e28fc",
+    "org/joda/time/Instant.class": "edf9fa46c96a593d4a507981b79026f1e49f2c0d355deb0fe74089e32f6fec82",
+    "org/joda/time/Interval.class": "d09eff0de25404bdadeb609f0a7b0cd55cd62694e27fbc36763a8aeee3e03f6f",
+    "org/joda/time/JodaTimePermission.class": "b3c62a654428587464546b88fdf7b50ba4526b075fe8ff9d41411c3d2015fbf9",
+    "org/joda/time/LocalDate$Property.class": "45fe461238f3411768cfeb5b9cbe8200f5a397fe7e45aaa4dd5e115b979fad61",
+    "org/joda/time/LocalDate.class": "a13896bb4968960015fc98367e1a22ed3f0180fba97908545e81581000d75514",
+    "org/joda/time/LocalDateTime$Property.class": "d33b46d0e16e48959c67737f701e898a9fe4ea063e28e7ef83101ce636ad18c9",
+    "org/joda/time/LocalDateTime.class": "52c8e015f0e7752f58cb87174cf7502f03dc5d4cb4f650b7c2c913a9e8ca8da3",
+    "org/joda/time/LocalTime$Property.class": "bee413c2b1bac3e1b2424803ee77b3c34d62183891e930fa5ce57d821059b255",
+    "org/joda/time/LocalTime.class": "0e11497d0414cdadbe1a27348dd69dbebeb7f2195279de8bf6379b624ec0d2f2",
+    "org/joda/time/Minutes.class": "ae0976ce262fbf2f6f13fa7b52673bfcb43c5142b89c6ed3af9c71701627e024",
+    "org/joda/time/MonthDay$Property.class": "54ee902a93ba5ce77a416fc49528c5377e71b3abea405ea8cf4ea22aaa4edd1a",
+    "org/joda/time/MonthDay.class": "65ac35c173eabecabbcfd62c483265bee8eb7a7bf4f4e4420486bc5e09c9a9b2",
+    "org/joda/time/Months.class": "f27b6a9f48ccb173477fc4af66dfa25a1416ac913e867d937d28303556be00a1",
+    "org/joda/time/MutableDateTime$Property.class": "1894e230792a4aa0a2e97d04c7c81ddcae394b578999f6598c2b440b89e80744",
+    "org/joda/time/MutableDateTime.class": "e3cfaac984ff1c03bb95951d785312367bb068b12b2903161e6d918a3fe782b4",
+    "org/joda/time/MutableInterval.class": "b92426e0c6696133658bd2980f57b424256bfa82f34ccea79ad2c57d2e6b3a5a",
+    "org/joda/time/MutablePeriod.class": "f2672859e630ab54a23b3526604bb5e0501f096dd4db3dec0dec9283551a1834",
+    "org/joda/time/Partial$Property.class": "876d398980142e72cad19b15c45b5f020f47d7269b719d4f776f5ce5011b5a18",
+    "org/joda/time/Partial.class": "dfb56fd87f26edb29ba7d84863130ba7fa6b580bbcf971f251ad0713abaffade",
+    "org/joda/time/Period.class": "b0de624a06e18c9c1aac7bf2fdb191e98e6331d1301994a7888b96a82984b8ab",
+    "org/joda/time/PeriodType.class": "15a295cbb2473cbf624ee71697120c69bd9ade25612d033cc499c154606f3435",
+    "org/joda/time/ReadableDateTime.class": "ca92cfbacbe03bbbb2e5a7a4aafe018ec0586140b93873e4b930f66275d7a482",
+    "org/joda/time/ReadableDuration.class": "48311b59b665b69481d4ed5de29316a644f7549471f30bd0cf64adb8245a79df",
+    "org/joda/time/ReadableInstant.class": "ee4872cff934d9880945e3dd86bdb2670d9584f66930dfe8feb54d3e4355c117",
+    "org/joda/time/ReadableInterval.class": "d598cbd4492322b57940e6f7abf17827a8f73fcbc005852497ebef01e5cfdb3d",
+    "org/joda/time/ReadablePartial.class": "997d3079abb587aa50810a9be4bc68e8dab00e896fc2544c49ccee3b11f66872",
+    "org/joda/time/ReadablePeriod.class": "f502997059c818d72bef2d1be94d970f9db71e2664e7c006f24dbfa7d4da68cd",
+    "org/joda/time/ReadWritableDateTime.class": "6a863b3a5aa892f3cc56b6fe7974f2c9160dd827a9891296499daf60f131fc7d",
+    "org/joda/time/ReadWritableInstant.class": "ef904e006bf65eff1869945764fb541723ced6ed9c1ece828248c194c54f2457",
+    "org/joda/time/ReadWritableInterval.class": "bb31d81cf8dc48859dea8c4c160a13e602252243498bb17553d5b2f8c9af3bde",
+    "org/joda/time/ReadWritablePeriod.class": "dca6b4186d3dde91340f2276d27b0978aa1fdbf17eaa56b3a7cde373e2f9df03",
+    "org/joda/time/Seconds.class": "f1fc288f3fd2a95ac0f0146c808c78d6217e14684fa4c75c18f232ea904f286c",
+    "org/joda/time/TimeOfDay$Property.class": "05d1d17213b972037994ccfadf2af391202da79cdd78beb63871ac394ed58528",
+    "org/joda/time/TimeOfDay.class": "be30a43e84d08c082570ec8511ad8e2bdcd9ebf09964f24c0f705798d5c94a0e",
+    "org/joda/time/tz/CachedDateTimeZone$Info.class": "4a1ab0a9a77506f47d39f31cd208282591091e8c146365a3f4ea7704d1c201dd",
+    "org/joda/time/tz/CachedDateTimeZone.class": "9a3ac7499962dc57a786387d7eca37eaf0bce349d5b6100d46f8c6eafe18d3fd",
+    "org/joda/time/tz/DateTimeZoneBuilder$DSTZone.class": "5f5249e48dc508a6887b0839415a6ba0da9f389988b3ac025be9d7d84c9e5aab",
+    "org/joda/time/tz/DateTimeZoneBuilder$OfYear.class": "b138b6e91d002466b15242712ecec345a8b4004d6f9d4789cd60ad1be4dd287f",
+    "org/joda/time/tz/DateTimeZoneBuilder$PrecalculatedZone.class": "0ad58f8630ee4b366054be64403fe64bb1df52f0c3d78f925da91ed86ada6384",
+    "org/joda/time/tz/DateTimeZoneBuilder$Recurrence.class": "3908c42f1956abd9b8316e53bbac35ea2dd4c5c3530b4494ad5523299a68a64b",
+    "org/joda/time/tz/DateTimeZoneBuilder$Rule.class": "6044298e3b1882d524358a41fc96ce28244afc3b6203f63328797c1c14aa7a5b",
+    "org/joda/time/tz/DateTimeZoneBuilder$RuleSet.class": "b4c290cc9c5abd13bc2291f664c74c4ea569b552b435368a5d879a3e36fc3f26",
+    "org/joda/time/tz/DateTimeZoneBuilder$Transition.class": "66310c163ecb659f69eb72b8ced75f239fb10abcef6808bf7d9760b1a629f905",
+    "org/joda/time/tz/DateTimeZoneBuilder.class": "7b02079f88b97eb150d32392b73224d0f2719ad271d03e0b16a3d56358b7e5ee",
+    "org/joda/time/tz/DefaultNameProvider.class": "93456be6a94848f3fa2d96eae7c5735da46fdddbadbd4ab41ab0ac5358ff76ea",
+    "org/joda/time/tz/FixedDateTimeZone.class": "7d823dbd1707f2e6f529b632122e1adad8beb6411594f314787132acf82a3068",
+    "org/joda/time/tz/NameProvider.class": "4da65258216dcf59f7a50c6faeda55cde9bb4d7c47079e244788113eceb12fdd",
+    "org/joda/time/tz/Provider.class": "bcaef2ee7be8e52647b423cf992d67ec78adebcccaaa16ad36357be7d5eb9960",
+    "org/joda/time/tz/UTCProvider.class": "d2cd7c8f3a194a466c8a2c028f8c47df92dcf9ff685557fb941e7366c9685645",
+    "org/joda/time/tz/ZoneInfoCompiler$1.class": "c0bba8f2a727fd66a87b7a0b9700c57c17f74d562834851c049566564d4c5b22",
+    "org/joda/time/tz/ZoneInfoCompiler$DateTimeOfYear.class": "b8d9f45d089c8f3dfbf5bb5a9fa72c39b740f91d04676a28f067967af3c81ca6",
+    "org/joda/time/tz/ZoneInfoCompiler$Rule.class": "1d00def7bd1276f3b174407facc91b3da67b836d42057dd3270d442d08988780",
+    "org/joda/time/tz/ZoneInfoCompiler$RuleSet.class": "5b2377a6346c7136ad03c9300e157ff2d01bfbc54fde2dc1bd8456fda99e632d",
+    "org/joda/time/tz/ZoneInfoCompiler$Zone.class": "b33239c207256168206d4291c49be436d0fd5cac273caae13b8f993a6a204287",
+    "org/joda/time/tz/ZoneInfoCompiler.class": "3d2ce052de42af421d5ad0ea8cdfffc6df3c0405269e6ad3ebcf2f7bb5ca79e7",
+    "org/joda/time/tz/ZoneInfoProvider.class": "b633e4b5e05c6fd3541db64ad1fdbc5055fd8b49d06ca8c6f2b788a4dc14e572",
+    "org/joda/time/Weeks.class": "b2a36ba45f8f871c2f7014227b399fbd88e17e507d3fcafa3724642e9d180720",
+    "org/joda/time/YearMonth$Property.class": "c1f430bfef4446db224a648b80d9f47d50e10c92347db798712d39e93bd1b68c",
+    "org/joda/time/YearMonth.class": "2bcd115dd97f920365e505d7604f8ac2abd3a000cad89468f63a79235b585050",
+    "org/joda/time/YearMonthDay$Property.class": "4256c1be33d720349142d0b6a3b87adbabc6f878fdb41a5f52da7eaf249e07aa",
+    "org/joda/time/YearMonthDay.class": "10843be54443480db19474b8173ae5377387d313e77b5b7dd537bef448e8b489",
+    "org/joda/time/Years.class": "e0951a9d788fe032edd56265d83939bfbdf947670a745191be7dfeba36e4d4b3"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "e59d451134e8e39fbd484d5e33e557c0df9cab8dbed014c3e2952a16c95fe617",
+    "META-INF/LICENSE.txt": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+    "META-INF/NOTICE.txt": "b154bf92635c234c6bb4ba9178f1d4a45da2c581580602d7371dd21579b588d0",
+    "org/joda/time/format/messages.properties": "eb07afe2320c7210c051f9d47e36d878431d320c002901895355a764661c547e",
+    "org/joda/time/format/messages_da.properties": "6bb420a969b20e1ae54797413423ca825c86dd9572c76f044cb175c82648444a",
+    "org/joda/time/format/messages_de.properties": "d522c76958f4248a19bfef8e2c902646b15e8f5827c8d5fddd1be1435def3508",
+    "org/joda/time/format/messages_en.properties": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "org/joda/time/format/messages_es.properties": "8d2525ccf6308f3b57cff8f14b65400d41d83a6ab40a1c0a06c02d699289c00d",
+    "org/joda/time/format/messages_fr.properties": "b81454d234037d4123848a7fd07382cae729db8aaaf810399c4bd88a9b9563ee",
+    "org/joda/time/format/messages_ja.properties": "08ccd208c136adae4f5e03e17c7a42209e85380488201ca8d524e4d67305907a",
+    "org/joda/time/format/messages_nl.properties": "a0697f339eaad1cfca3516907fe17a0b52d86a0e7a0551fe8860263ca438a251",
+    "org/joda/time/format/messages_pt.properties": "1931eea9f2fef294cbac95aa57982fc5c3729f402a7913daa486e8e281c145d4",
+    "org/joda/time/tz/data/Africa/Abidjan": "0bdced4536b32102e9dbc0d4d9add475461fd38a656f7942173136ac91548910",
+    "org/joda/time/tz/data/Africa/Accra": "23d6a817260c623491701e3e1707b0938e0bb31626fa5c96e80a009a5f623bb9",
+    "org/joda/time/tz/data/Africa/Addis_Ababa": "6795a1e0d65bce9eafeea6d83b5ab7d959dfa55f69917b8edfa0c087a858ac60",
+    "org/joda/time/tz/data/Africa/Algiers": "282af51a9cdc68d489303fb5c28e8811b8edc58d3e7b222323f9de8cf9f22aa5",
+    "org/joda/time/tz/data/Africa/Asmara": "6d464c0caa3880e709e6593f0cdd4489679d90c6931a8259b1780782022c36c5",
+    "org/joda/time/tz/data/Africa/Bamako": "405f2030c7439a1fbe7eb27783fccf1c8aa49bf0c9bcb323644200c9c2c08527",
+    "org/joda/time/tz/data/Africa/Bangui": "9be92565db5e4bba7d6606aa7da7c7975655ce323ebadf4c8dd8641923e77dc8",
+    "org/joda/time/tz/data/Africa/Banjul": "f70ac74c2332059fa3ad26103c37427a53fd92e6e2914ac906f2888955e5034f",
+    "org/joda/time/tz/data/Africa/Bissau": "73e66d89d24df2e91a355263d97e2390bae2fbfa90813dd1a4acb195fa7f6fae",
+    "org/joda/time/tz/data/Africa/Blantyre": "256fa6309c2e1967ce6efaa64cfdddb959a249ed6461b652906beeb083040c1d",
+    "org/joda/time/tz/data/Africa/Brazzaville": "f7b3f76bb16262261ff4052fb8e565a6011aa341c9f3b9d8532e37afd5111c63",
+    "org/joda/time/tz/data/Africa/Bujumbura": "8b35eda052994f079a7553f06cd22ff51583f7603038a2a3a4741910a9378f2a",
+    "org/joda/time/tz/data/Africa/Cairo": "c6aa59bbf1f1a9aa33fb19fe3df72c2fd73526cbc323d604ae254e548aab7b69",
+    "org/joda/time/tz/data/Africa/Casablanca": "bd53d9a6c7b42279769612a9021949376322232e142bc0cafe92796895ec9b44",
+    "org/joda/time/tz/data/Africa/Ceuta": "8ac94bafc07f6947660c99813be524e7183082fa3530ed1013ce7baa43a93c5d",
+    "org/joda/time/tz/data/Africa/Conakry": "1761f53e37a9b2725d9845ea4c6a62bfa0d5bbe28a636c50c2540b33e7904304",
+    "org/joda/time/tz/data/Africa/Dakar": "0e8f1cda2babb284c59d2c188f26c9bbec145b094dea7d0bb41bee654712d6a9",
+    "org/joda/time/tz/data/Africa/Dar_es_Salaam": "1fc72e2d5e8bd5ffc1b5b00142ce074a13e93eee2c99be9807fe4465353f5692",
+    "org/joda/time/tz/data/Africa/Djibouti": "055a7b551b613cc7d510e3660600bdfaede69357f8dddee6753999c0e17a68d9",
+    "org/joda/time/tz/data/Africa/Douala": "b4c2910d9b32f4fe6dbfd9b7ca9beb51d0e3abf21d2a428df08f2952cadf2467",
+    "org/joda/time/tz/data/Africa/El_Aaiun": "90515523578c8a3657298ebe14cf9c1269a8fe4f2e4243ad72889ddf771e7703",
+    "org/joda/time/tz/data/Africa/Freetown": "bd678a12a9716f5895738852ad1d55d0b350b39ec95695a00f04120b8c9b556d",
+    "org/joda/time/tz/data/Africa/Gaborone": "15bc96dfad5b9b75c2649fb7a2ba191fa6b434533aa0a4f6e80a2dd8bd73db94",
+    "org/joda/time/tz/data/Africa/Harare": "1e8bfbe37f20966f7b28a04adeca55624606a58598e3d6e0c30119c70a53b357",
+    "org/joda/time/tz/data/Africa/Johannesburg": "94004df40392bcc1e761376ab562675de7137f3e86fc2a07f1058da67cd819b3",
+    "org/joda/time/tz/data/Africa/Juba": "a118cbf5966a34165d41111bf233449f2c355f31d17684ae4d51cc1a3c0c417c",
+    "org/joda/time/tz/data/Africa/Kampala": "928e45276df2531485be365757cb9ee38b1e963e61d1e859b079465442470726",
+    "org/joda/time/tz/data/Africa/Khartoum": "c1eb94dee584913792c5942477c552e656c3056c2910acbe7a245c11f546bb2b",
+    "org/joda/time/tz/data/Africa/Kigali": "59a14750e18d3bff9f9ed069ce78abce626adea34571ef356eedd444fc2daed7",
+    "org/joda/time/tz/data/Africa/Kinshasa": "850d0ea496b2554c6212f55be603f2fa922bf682757221ce92d69b1c0b4cf2d4",
+    "org/joda/time/tz/data/Africa/Lagos": "ac420f388d80af3b5de05e703d69421a7e8bdfc9d81244fc663da93701c3a03f",
+    "org/joda/time/tz/data/Africa/Libreville": "889ac56a6773458dbe7d9f4ce9813423ccd84efcc418882e065e7e73af57c947",
+    "org/joda/time/tz/data/Africa/Lome": "025c95cc0621eb4e183fc359ab8a621620d60581812e24e41823d1df537cc3c3",
+    "org/joda/time/tz/data/Africa/Luanda": "87f7546dcc6123b9ac91837817b26c32dee66a998440549b92fd86dc07f3023a",
+    "org/joda/time/tz/data/Africa/Lubumbashi": "9c8405bbbc155d46c51ac267bc8088b98ca0501e4b044e7a144e6cab14cc7daf",
+    "org/joda/time/tz/data/Africa/Lusaka": "495be08399962eab857e2a4d58493b84a52e967e0693a29655ef1d83de32b52f",
+    "org/joda/time/tz/data/Africa/Malabo": "92f20e541ef4150f5a7566226c53a9e23212435be8dc0ee8e5345c10bd9a9a7e",
+    "org/joda/time/tz/data/Africa/Maputo": "2444b877660cbc6c2804dde1aaec4e4a8042801e7ddba2b6f36e71ea30bea55a",
+    "org/joda/time/tz/data/Africa/Maseru": "2b6c9a9af8c100a476ee76183ed25577254c9c0f217b442ca32512f13e4f2595",
+    "org/joda/time/tz/data/Africa/Mbabane": "e1e19189a5c01d699110d348897f13ba528395c3ab4dd6f6ae435bc7c7905bb9",
+    "org/joda/time/tz/data/Africa/Mogadishu": "d281b5e1410386b90b926531abbcef4e5b79f26d5862244b39fa824000821acf",
+    "org/joda/time/tz/data/Africa/Monrovia": "0fff3df4f9f18eda47e5397374692ec0c575e746d95d3b5a32f843d728236501",
+    "org/joda/time/tz/data/Africa/Nairobi": "a287d1cfee7d07a051323a1ef863bf10beab2b77e1d92e38c254d1e37d6e7a44",
+    "org/joda/time/tz/data/Africa/Ndjamena": "f02b38e263e2d47efdd2f70e263b9ed06b434fcb7116e1b69d5ebf1d5fd22368",
+    "org/joda/time/tz/data/Africa/Niamey": "1ab1234fba6d61cfcb682b92b86fb8861a56b7ac1e96a4b48ad6bae8c589ba2f",
+    "org/joda/time/tz/data/Africa/Nouakchott": "2f73d50f5444c035d0517116dec203a66b68aa9ea12b2dca05179b96a02c6d34",
+    "org/joda/time/tz/data/Africa/Ouagadougou": "23fb3a551e1de818d34a25ff5b979c796b18879efbc99d71b07fca1a4752c246",
+    "org/joda/time/tz/data/Africa/Porto-Novo": "16ef0b317c228d870767da7e79f33e36edab66b390acb88873aca9ce09e6c595",
+    "org/joda/time/tz/data/Africa/Sao_Tome": "10833e623040170a0a37c75c8212f398c61ed52220e556fb5707a19173d53aaa",
+    "org/joda/time/tz/data/Africa/Tripoli": "fcd3baeaff2b775f5e7d2e88d4dc6af86bf16ead62a710a8553e59fc350495d8",
+    "org/joda/time/tz/data/Africa/Tunis": "f71c257fc38ffd05290074ea4dcf81d4161a73dc70e360d6ca2c9ed03bf042e7",
+    "org/joda/time/tz/data/Africa/Windhoek": "7e8b0746a20cc57e6db866f522eb61392422a4b5621b5e4a182c55764642d1d5",
+    "org/joda/time/tz/data/America/Adak": "1444d68d46292dcc455877315ae7b2d022901404206c252fa7d474b4aece0d45",
+    "org/joda/time/tz/data/America/Anchorage": "41680521213ac57cf4358930712a6c737cdb4a14703237691f71b05a4f0b99c3",
+    "org/joda/time/tz/data/America/Anguilla": "fc0004a92e46bbf7c220b22b349c05879013e32bd807a387db089c8708294540",
+    "org/joda/time/tz/data/America/Antigua": "b19acc7152b8a7bacf3435cabb34e5907dd503d50773436c77e0a1b338d194e7",
+    "org/joda/time/tz/data/America/Araguaina": "16b874dd6ffe884839b2d00c44a0543af0d12d42c0a1c0e35cf361d9f2153218",
+    "org/joda/time/tz/data/America/Argentina/Buenos_Aires": "8e15231f8c0c438364d0f52efaa04cffe1ff320eacd9488fc3b59858012d7a55",
+    "org/joda/time/tz/data/America/Argentina/Catamarca": "a33b4376dac7359f0659b6d7ee43f64bcba85ee3c520e03d4e37f8d231759181",
+    "org/joda/time/tz/data/America/Argentina/Cordoba": "bdb4817b5e90c946e70eb26c3a343e263d3a9833f440c87f3dac5a460070f01a",
+    "org/joda/time/tz/data/America/Argentina/Jujuy": "aa67e0359258c8734ca2fc5ce92f65b8caf32531c4ec89bd7a7e656b8da27afb",
+    "org/joda/time/tz/data/America/Argentina/La_Rioja": "b6371dee37a6b1f0e7177dddf3add9c6f8e888188cd267bcd5faee9a3cc86608",
+    "org/joda/time/tz/data/America/Argentina/Mendoza": "b32e3eed663eca51bf74c19c425050fb538be6f9f35565741f9bb49c4eeaf210",
+    "org/joda/time/tz/data/America/Argentina/Rio_Gallegos": "d986856dc83718eca4936853c20103704ed6f8df8a32487258d741021a8de56f",
+    "org/joda/time/tz/data/America/Argentina/Salta": "5e5bf588277a31a69aea248639f85a546e0e38551cfcb9b8322761a07de80d3c",
+    "org/joda/time/tz/data/America/Argentina/San_Juan": "b8858585d364aadc806d84a6d22dfd156124ed96d8f8852cf0f98af89eadfa2a",
+    "org/joda/time/tz/data/America/Argentina/San_Luis": "093b2672d339bde7aaa99727c956ff0281e5e5c29a68c9dde37d79a15c1a96ad",
+    "org/joda/time/tz/data/America/Argentina/Tucuman": "50d1bb732cd83135b099c51c35d89f386fc9dadab4fa8990122f0032c7fb259d",
+    "org/joda/time/tz/data/America/Argentina/Ushuaia": "5437f4d908b29ea4847f6357a1fb270caa2b239c04ffb618042318c56ec7159e",
+    "org/joda/time/tz/data/America/Aruba": "9dcd6dc6ac271f3bd658a11038d2525e09e2b1f18c41604d1c53fe9a47fdfbef",
+    "org/joda/time/tz/data/America/Asuncion": "fefebe1be865c5f398d02b20605d7cf2323a86215327d6842fd105c0c91045a4",
+    "org/joda/time/tz/data/America/Atikokan": "5208f8323881713ad896edcc3ea2ccb6afeecbd2997c04efefe9228187bfc7e9",
+    "org/joda/time/tz/data/America/Bahia": "9bb583eb96e71fe0ebc3e9bd1ceb69a70e1c39dd8b7a0fa58dc7cb9a2066796b",
+    "org/joda/time/tz/data/America/Bahia_Banderas": "022e8d25a38b8d2d7e00a1d27332d6d8b9a1a5b79701749ea8c0500b94f0da83",
+    "org/joda/time/tz/data/America/Barbados": "61ed811f89339b256e36236867a3c590b0366baa61e8679e7e493eeed7a2c56c",
+    "org/joda/time/tz/data/America/Belem": "98f698a40da75d0e0e8d234c057a82c1aed09c52996b685dabc607e2b0a9305c",
+    "org/joda/time/tz/data/America/Belize": "e4501a40252f953b7db5e5435d98af7bcaf3f49f6ac3ddeae1f8a5eb9376224d",
+    "org/joda/time/tz/data/America/Blanc-Sablon": "144b52673aac25b57f01b13f500da0f34fe3c29395e005609ac503c14f126734",
+    "org/joda/time/tz/data/America/Boa_Vista": "613e77bac161303832f75944e74c4b9a79c123ab518f0e1c7ad8dc7ccad23786",
+    "org/joda/time/tz/data/America/Bogota": "b72fb7e70685cabe058c1418c3c0f498e5e0e8b96b0840e72156ee7131945471",
+    "org/joda/time/tz/data/America/Boise": "46a3dffceee9ed60bf4734a5022bf276acecc8bb51a08ebc2c09569537b7d01b",
+    "org/joda/time/tz/data/America/Cambridge_Bay": "9aa0ce8650b6ca9966af897001ee326cecce152a0536ec5d83b08647ebb5f55c",
+    "org/joda/time/tz/data/America/Campo_Grande": "2abb86a50d1b505befeeb6adbe4efa75b86777183bc88502c4ebf3d6313ca47f",
+    "org/joda/time/tz/data/America/Cancun": "79aee99a9ea959f0779ea87fe0fac85698a898685126ce37d6bfe7a3a10bf028",
+    "org/joda/time/tz/data/America/Caracas": "449b87966cd7e9fc27259de79d7a50f3e805e3528e74969afc8db6a58356b2c1",
+    "org/joda/time/tz/data/America/Cayenne": "5a48d803a6b7fe693a1f417adfa7ecd08004e02be188f613e08f1676feae860c",
+    "org/joda/time/tz/data/America/Cayman": "9cdbb7eef4e89113a2b603167318c57a2683aba8411ac4652375dfdce3ec908e",
+    "org/joda/time/tz/data/America/Chicago": "c84b6901b8e4339704d0eabff2c1b67f515bb99bea806712db4e2bdcac7cee60",
+    "org/joda/time/tz/data/America/Chihuahua": "c1dea9d992592aaf219573fa7095ec1a59633d0f31e6f3edf1f7a75e58ad3834",
+    "org/joda/time/tz/data/America/Costa_Rica": "df752bed6f5dac91fd14797696f8abba407b115d4215a59011869b372e98b21a",
+    "org/joda/time/tz/data/America/Creston": "f631a6cae232557fa187d85bd31b5a23d65cc3fc69d8c770fc63a03594961a3a",
+    "org/joda/time/tz/data/America/Cuiaba": "44d6a2a85aab61bb953736563dbc6a7f5f00cf6602ee10e9d98bb659c833ac70",
+    "org/joda/time/tz/data/America/Curacao": "f9eb8abb09bc0e9a1be10db275b02c8c53e782b766c7521f9a3fd76a794831b6",
+    "org/joda/time/tz/data/America/Danmarkshavn": "fc2941a1fc51c176414af811506f103c7b22773d2d7b91b4d96f55c4f59e4673",
+    "org/joda/time/tz/data/America/Dawson": "77aaa4eaf26cf4fcc1775ac81c57ad7aabbe4c2846e8372490103e3ede717933",
+    "org/joda/time/tz/data/America/Dawson_Creek": "9b274cfcc97316f9af85fc203f66fd29b3e32ae90fac8c26103e15ee26242273",
+    "org/joda/time/tz/data/America/Denver": "e33a75f644defcfe6771fff890dd4866051e971585a2effa3bfec74e3708615f",
+    "org/joda/time/tz/data/America/Detroit": "6375c607bf0d8948ef0230b067e07b18dd89d61aadc00166e68b4a01d5ef2cdc",
+    "org/joda/time/tz/data/America/Dominica": "8812aa4861a10095161b34f9797437883a9b312ebd3fc621ba0bc9b08a800715",
+    "org/joda/time/tz/data/America/Edmonton": "398c264223329c228acd51f824ccffd00b8dd69df03b97a02aa7513883579007",
+    "org/joda/time/tz/data/America/Eirunepe": "bb1ebe899b359bea1a78260a647e3e41d0d7209045997ba1605a8e6527779715",
+    "org/joda/time/tz/data/America/El_Salvador": "dcf73507f9cc26e03851a2c3f43e783a2a2188feedf7729a181263e7090726d8",
+    "org/joda/time/tz/data/America/Fortaleza": "9ee90dc9b9daf9ec60a9c0d20428842ef7a3779d8836baaf9e668450f3fd7e4f",
+    "org/joda/time/tz/data/America/Glace_Bay": "af6d88026ab8772abc95633dc195bb794b8500848bca21851f1e1ae992daf085",
+    "org/joda/time/tz/data/America/Godthab": "9f44f36162fcd647cf4367b9c66945960db85f8a121647ecaee87fbedc0623b7",
+    "org/joda/time/tz/data/America/Goose_Bay": "8d60ba68a87757d11541dcb7bcdcf0b1cbe6f29461ceef9767fd10be82bb437d",
+    "org/joda/time/tz/data/America/Grand_Turk": "d0bf9dd415002ccdc07833cb35b757e006026805d82afcbe444d4a8ea0e0cd41",
+    "org/joda/time/tz/data/America/Grenada": "bf3d3c90cf300e2d1dda2ec81b18de0ac57a1a705a216ddfaaf6690f2fc7b37f",
+    "org/joda/time/tz/data/America/Guadeloupe": "172479de0d68ff3a6478ac58a672d6abb9822023bb821e8473ec290dd921e012",
+    "org/joda/time/tz/data/America/Guatemala": "091a3b37b8d68fa69b8d46c6f35d43929f235239ccdd6c5ff3f004bc4da8dd2d",
+    "org/joda/time/tz/data/America/Guayaquil": "e30c63fad4f56d328b5951089b2c8242de9f5eb0387415c1afb70b4e406786e5",
+    "org/joda/time/tz/data/America/Guyana": "f22c615cf1f87be743e75615698835011d565ef610b0456b4cd303f7d46eb426",
+    "org/joda/time/tz/data/America/Halifax": "d8317ea422b2140a120ef325e42ebfc7e007822d74ce10ab0bc939a432497673",
+    "org/joda/time/tz/data/America/Havana": "3cd4f912d5fd231af0b46a2a1172be602ed5512a81196e22c13ba6e98898a664",
+    "org/joda/time/tz/data/America/Hermosillo": "128567150bc17595802f15bc4d3e35cfc222eba7c00edfb66ef1f072209962cb",
+    "org/joda/time/tz/data/America/Indiana/Indianapolis": "21aafcf126d9e84c329e6503f818d9911f9cb526029264965f82e0fa70956a18",
+    "org/joda/time/tz/data/America/Indiana/Knox": "25afa2b5587f5c4ca328179f6358aa38f2a8c3451bf7dd25f10724c28ee42162",
+    "org/joda/time/tz/data/America/Indiana/Marengo": "a303772e5e15a18a08bc46ea3f4c1ddbcf3299e7effcd08ca3774f06aa7bcad1",
+    "org/joda/time/tz/data/America/Indiana/Petersburg": "7d4d1b65d09cea0200c87dbc96f4f9981bd348f294dca4fb24bdaed30ee0d283",
+    "org/joda/time/tz/data/America/Indiana/Tell_City": "ec162ad01a10e928e6fcb792ea391f8934d6add53d252e29b06b4d1089b1bffe",
+    "org/joda/time/tz/data/America/Indiana/Vevay": "e8d7ccbfabaaf0b3f1a28bd5e52817421af81911a90036c319761d0157ffcf19",
+    "org/joda/time/tz/data/America/Indiana/Vincennes": "b41b2a7a8a402093b346bd78bdd986cfbba72b536360ade0d783b2b0c215f8c7",
+    "org/joda/time/tz/data/America/Indiana/Winamac": "efb668a5bc71cfa403d23658021a86503c1cd365669436fa2b8b207d719ac2fe",
+    "org/joda/time/tz/data/America/Inuvik": "1cd9e33b3b3b5fbec347be7203328ef9b17f4adcb2d16791731571ec38fe5549",
+    "org/joda/time/tz/data/America/Iqaluit": "4f1b7f0b495eb274993e6e24a32a87a57f76130167b8d6ecf89d9e6b6f12698f",
+    "org/joda/time/tz/data/America/Jamaica": "341861e650905561a944bf607dd1e554f19ed1c60f2f4d6505b72dfc04290429",
+    "org/joda/time/tz/data/America/Juneau": "53cec868fe92e58064d3ee1c32989b328b742772630642958382eaf3900281f7",
+    "org/joda/time/tz/data/America/Kentucky/Louisville": "451cd44c0be44bbda1957140dd8dcb60fa49d9593ac20e4686930532a403e7f6",
+    "org/joda/time/tz/data/America/Kentucky/Monticello": "53741e7cd60eed7c9c7cb0ebe3421535a79828192339a9f95a2620b222bb1ea2",
+    "org/joda/time/tz/data/America/La_Paz": "425e6c76add617cdb5a0ab5c1aa1471ec1becee69610a4120c15cd6f0b39715d",
+    "org/joda/time/tz/data/America/Lima": "e5efc8df08fece74339df77cfaa65c585bbcb773e9527a239d41da198a9f0ba7",
+    "org/joda/time/tz/data/America/Los_Angeles": "08ae21d43b1ed324810338f793fa82b5b80c387249a0b7ce2c658e3e51343645",
+    "org/joda/time/tz/data/America/Maceio": "1ae52045874f46c27c57847431cfa8739563779b0b9932e1be6842b8393d5266",
+    "org/joda/time/tz/data/America/Managua": "edcabacfff8b7a64ba9ac854bd02bcd72ad8a12b4c3cefa40443084bc6eec5a9",
+    "org/joda/time/tz/data/America/Manaus": "f6009cf8da21c0537fb9a672e2c21826f0da3aff4dad740748fc8a9b48e1b1c6",
+    "org/joda/time/tz/data/America/Martinique": "16bc001aebe7414f5c483b1ddfd347d375902c7453953fe8429b0245f87b8bc6",
+    "org/joda/time/tz/data/America/Matamoros": "0faa450323800fb4f3a59fb3bfe4ecfc971b852d39eed0e495eb65ab696bbe7c",
+    "org/joda/time/tz/data/America/Mazatlan": "4a8cd1406f091d6a17d332aa177aa5a1d2dcf886ed0ba75b63760cda81f81d9a",
+    "org/joda/time/tz/data/America/Menominee": "562f59fcc0e52e786d14e6ebffaa773efdd247408349ff0ddb369be8e44dea6c",
+    "org/joda/time/tz/data/America/Merida": "4b8307d5b84fe435f382153c3933dfce64ce95635c937cb4a2e5d0cc467f0106",
+    "org/joda/time/tz/data/America/Metlakatla": "946888bfb743a1a53a80e3bbd0a8b8ee56240c7da19cbbc0b20a4a4452befe73",
+    "org/joda/time/tz/data/America/Mexico_City": "68a4714e19ab2d9297aa3d0adcd44524accdae3594b62458a50800d30ab7fdc1",
+    "org/joda/time/tz/data/America/Miquelon": "e1621e0f4d5946238a07d5930d2e526755e0f8137853c2164c205978a947e500",
+    "org/joda/time/tz/data/America/Moncton": "3d6f274dee3a13d3ea3d768551c71286c0bd65afb6b742ba2112a1446ab0cfbb",
+    "org/joda/time/tz/data/America/Monterrey": "83e05f1b21786bce7bd035ee07a3c25da1f6b057f3bd3aa1e085b8471956a768",
+    "org/joda/time/tz/data/America/Montevideo": "04da91bc4a82a36659f44507e65b36b4b5b92832377d28256724b9dda5bbd93c",
+    "org/joda/time/tz/data/America/Montreal": "49dca1f2adfbb725ed44073c557852a623c5ef291186ec8f8b5d2c1335fcd994",
+    "org/joda/time/tz/data/America/Montserrat": "763796cc5154fbfe39c031c2a65156057488c474a14f023fa22543be5f48cf52",
+    "org/joda/time/tz/data/America/Nassau": "08c3ea23b2f0e93607d729146f50d3873b5d9f156c7f3262aff614f75c2deb7b",
+    "org/joda/time/tz/data/America/New_York": "dc713957747cf38aa92711e2108c1e58af53b778afdc53d23611ecabe790bb8c",
+    "org/joda/time/tz/data/America/Nipigon": "b805e80389c30c30d35b581144feea2d64cf283ecfcf3650f727a94198a85e88",
+    "org/joda/time/tz/data/America/Nome": "1c6b5cb3231632a1878fc4e230d0a3a136c6f41cc9e9a07988f0533b2c37d8e3",
+    "org/joda/time/tz/data/America/Noronha": "6f78545ad3c4034bb9ed4cb209995acc8f5fceaf3056a5dc93133ae26b188248",
+    "org/joda/time/tz/data/America/North_Dakota/Beulah": "4768fc41b7e31d2408061931b0ad99222de3a8ca0ac051cddee8fead90a808f6",
+    "org/joda/time/tz/data/America/North_Dakota/Center": "b457d672a883d70dcb098154e4ab2bf5f3f00948a9e8c07229ddeb58e54e82d8",
+    "org/joda/time/tz/data/America/North_Dakota/New_Salem": "8b6869928e274f3fbe28534ee4f5318c419152c43793b0f100f4ed43b9264bd6",
+    "org/joda/time/tz/data/America/Ojinaga": "e3f96145c69386f9158f16b1463b76e95cfba9223752942512484f397ae498e6",
+    "org/joda/time/tz/data/America/Panama": "de304712b7704c76ce39eec309db66306ac9f2e4d9aa43274be5e176c763b1d0",
+    "org/joda/time/tz/data/America/Pangnirtung": "6d5b2314ac7298f3ebc617ebd6fd57d851d17184270e80a8b549938758ffad92",
+    "org/joda/time/tz/data/America/Paramaribo": "c991a22ef11362cd5d3833c359c14abfbc599c03affcbdf4523b7cdc7322fcd6",
+    "org/joda/time/tz/data/America/Phoenix": "0a7579aec40e54c76c84dfd84a208b8808b69ff595c2255fabb0d3539b8c4c84",
+    "org/joda/time/tz/data/America/Port-au-Prince": "0d4b4890c7e8f7f720e500c063d23dfecf77edfafd03d10971e1165273b3284c",
+    "org/joda/time/tz/data/America/Porto_Velho": "9a610a92afcf5f03f66b3263ec586a46d6243ccacade488bafc341851a5a4367",
+    "org/joda/time/tz/data/America/Port_of_Spain": "b24abbc42e16a553006f45e8935ef102ab3cdd61d9f542701c6bf7fdfbda3f61",
+    "org/joda/time/tz/data/America/Puerto_Rico": "c03776d66000a92b51dab56b461fbe08e18974ae8fe0484c238ad32933f01bac",
+    "org/joda/time/tz/data/America/Rainy_River": "e0dacc72d3ac1799f388268d4b6254159398b8290921556db312d7cb3d4a5c45",
+    "org/joda/time/tz/data/America/Rankin_Inlet": "da060a220cd49cbae5f90b5172662c9930348a8cf257fb4aead88dedfa97dca0",
+    "org/joda/time/tz/data/America/Recife": "91dd78a137cb8419c97168fc3ee8e0778a903a28cf92267a0f9792716546c179",
+    "org/joda/time/tz/data/America/Regina": "fb2431f110d9fe639815525fe72714dfebef67f1bf8ba925989a9deb9fba7c89",
+    "org/joda/time/tz/data/America/Resolute": "e9edd8c376a00653e0e419e7b2a2318784f307fc6ac9462946917ecfdb20669d",
+    "org/joda/time/tz/data/America/Rio_Branco": "8951cc8c7821ea47bfccdb5882bac4e3b80c5aefc34417e299b6353f401b7169",
+    "org/joda/time/tz/data/America/Santarem": "77f6f39c6b38f0b00d66ca378a1ab9a09732912807d280f26b10cd1e1b6bf855",
+    "org/joda/time/tz/data/America/Santa_Isabel": "02bd0fe56d02211de2bfe136149e2df64aebaa834564b3fae45706a717c7f38c",
+    "org/joda/time/tz/data/America/Santiago": "5284f599044d096f091b2ef02cf6a33f0452fbd1fbf695c642a222a20060a744",
+    "org/joda/time/tz/data/America/Santo_Domingo": "9281f16cd5e32f6f2f7f80fd7f5aa2368544a36b8d253be7e71867329c60dfdf",
+    "org/joda/time/tz/data/America/Sao_Paulo": "dda6d452cba2c8dec1d30cc8d4c66978c4177c0119296b4d12e52d986dcf760a",
+    "org/joda/time/tz/data/America/Scoresbysund": "2b6cb9530a810ba65e2b024704e5ef7fe5c2f0c535b70bd21cfc241db6f9b2aa",
+    "org/joda/time/tz/data/America/Sitka": "39227d6e553a0d9d92b5c6d3c2db83d763d01179e002528a003424fd201504f2",
+    "org/joda/time/tz/data/America/St_Johns": "8ab88f707e609a1fb501b04dc462eb0b06ec2373484ec93923375f335ac95e7d",
+    "org/joda/time/tz/data/America/St_Kitts": "9f9b7ca12810364690ffde4faea114e5a503e422bbd2c14ece43a175b8befd95",
+    "org/joda/time/tz/data/America/St_Lucia": "df9acb17ac598b4d52d8589d6fe8824cb8fd22f734fedbbf19adcc4c64786f9d",
+    "org/joda/time/tz/data/America/St_Thomas": "de630ffb55232411e63dbef8dbbdf27f5aced304e27cf5bb448892a1f20f7ca0",
+    "org/joda/time/tz/data/America/St_Vincent": "983acf165c40a1359cf2e9e1904f952633fbb5fba7bbf4c2b898e6fbd34357df",
+    "org/joda/time/tz/data/America/Swift_Current": "b49d8761a3f9216d82e0b233babb7017bb24ec09296d960c359796e00c01d77c",
+    "org/joda/time/tz/data/America/Tegucigalpa": "b26447b3b99644f588166ab95d91bf7c73c33ac184536f9599239b580b2d87dd",
+    "org/joda/time/tz/data/America/Thule": "884c0e87e4152430a4b1f6e5b9dca314a741af28ac0543cceb098063f2d80490",
+    "org/joda/time/tz/data/America/Thunder_Bay": "ae0bc7f1fd81f586d21f514348a7cf22ebd108ce971e00d69c2d19f6a2e31bf3",
+    "org/joda/time/tz/data/America/Tijuana": "cdd89ddd8f8236bbca58de338636457d3ff4e7acfa02bca558af13d385a464e3",
+    "org/joda/time/tz/data/America/Toronto": "1023640ff966087f5eb02429b3543083d80c731624b866e19f70425464152b62",
+    "org/joda/time/tz/data/America/Tortola": "046b568fd10812d5a4c55293cdd1876dc10030257b59dd9394d59f1c6e020a0e",
+    "org/joda/time/tz/data/America/Vancouver": "023d2ba4f6832e98fd502dd2540f5fd76658d067deaf1b890d8b295efd7d612c",
+    "org/joda/time/tz/data/America/Whitehorse": "21de5e20f08e56f6a74ccbcec306aac25520f3d168ed28d20a9b2ea859d0c931",
+    "org/joda/time/tz/data/America/Winnipeg": "3bf633eb5f199ac853298e903b934b3a8df0ac2db4db42adf66b6cfc79a853f4",
+    "org/joda/time/tz/data/America/Yakutat": "3083a2912da427f22c05e0ea1ec757ffd6777d1984053774b8c980ddf85953df",
+    "org/joda/time/tz/data/America/Yellowknife": "137012b34d9833106433efe71e0890df7bbe31bb3e1e3a65377daf617e905458",
+    "org/joda/time/tz/data/Antarctica/Casey": "fd62e305c1dae59a48c490a15fe0f0af01c2237adec7eff8b685b1d288a5af43",
+    "org/joda/time/tz/data/Antarctica/Davis": "832e16b1618dda59c06b60d6163284826fe7c321c59232b0e4d96ae9b7294d29",
+    "org/joda/time/tz/data/Antarctica/DumontDUrville": "3fc0b3696437b74c4d275e02f64280efeb04613fcb6398a1e043d85d7f6be8ff",
+    "org/joda/time/tz/data/Antarctica/Macquarie": "a2e0d818358651d9d83c1a4f152dcedbf78705aa263f03892026abf179c95204",
+    "org/joda/time/tz/data/Antarctica/Mawson": "2e239f1ca7b592741586b56e4bc7eb9ff58fbd6155f46002da7f4bb14454925a",
+    "org/joda/time/tz/data/Antarctica/McMurdo": "75847aa82b73f42fa3d56202b5baf207fcbe438af6d75363abd83b6b331af31a",
+    "org/joda/time/tz/data/Antarctica/Palmer": "d2021eece3b76cbf00d726df0caacb7ec0de2a1db1ec7650436b594a07733efb",
+    "org/joda/time/tz/data/Antarctica/Rothera": "2cb496110aafef24de2c8102454ba296e3267f4eae33c2fc9a9097e7c773850f",
+    "org/joda/time/tz/data/Antarctica/Syowa": "883ffce14de051d7af7336145c0d3b8f1ef618be1cb940fccf6478ca6c461ac3",
+    "org/joda/time/tz/data/Antarctica/Vostok": "5c77ad44a19ef87839fe143c0db3f54bd141483d14f628cc1a21bbf4a7dbfaa2",
+    "org/joda/time/tz/data/Asia/Aden": "6cd0d49a295ac3fe2024c698c7929842df36a7e5c908d9381c8a769f5d2cc3e3",
+    "org/joda/time/tz/data/Asia/Almaty": "5be7c2ed7692fc1e36fe9162b46ad6fa815d2b83180e8ea27b6dfb8495b87bbf",
+    "org/joda/time/tz/data/Asia/Amman": "adc91f354445b4975221da192469ec3150ee73dd5cecc0ddf7424d404f0af6b3",
+    "org/joda/time/tz/data/Asia/Anadyr": "b9acb74a57192293ca12689e0e3d809975d427c2bba3a5ee732508963b627338",
+    "org/joda/time/tz/data/Asia/Aqtau": "a4fc80ab9e6755b83a443d1e43f7515e4146a959106d7521c3ee1ba50c417950",
+    "org/joda/time/tz/data/Asia/Aqtobe": "b0b9a9c29ac3415b47381dfd1a5ad224cb9028a5eaaccae0b471fad1b47e23a0",
+    "org/joda/time/tz/data/Asia/Ashgabat": "67573a195cde738a5f7a2d12742e540a1e6306db327bdc5c16abce9b7fcad996",
+    "org/joda/time/tz/data/Asia/Baghdad": "f12def1f89d242705301202e899cc5cfb1d18ffb94218a79acbfe1fb091c8503",
+    "org/joda/time/tz/data/Asia/Bahrain": "3d3c04553280f490d2094dce1e20c5a7bc193d93add2188e3eb59a9bf7dbb0ca",
+    "org/joda/time/tz/data/Asia/Baku": "05ba95e969ffdba98a4c72631cc678e7a5e7e6e3c24dc30bb4a9b4b911a77287",
+    "org/joda/time/tz/data/Asia/Bangkok": "f2481502329331bbb157c3e96e7352d067ab116b5cd38c29216de2b0d7d351d7",
+    "org/joda/time/tz/data/Asia/Beirut": "3233701a5098bce5d70428e5ff3a7d0b590696cbe97394492ecdef83d357776a",
+    "org/joda/time/tz/data/Asia/Bishkek": "a9813c8a1eafc6f3c6d1d36f197e13ec9b72637e4079c9110b6bdb4f17d764de",
+    "org/joda/time/tz/data/Asia/Brunei": "03e48cc81590418eeb982c70e24cf629ba8006931d47f1ce57968bc7fc06a58b",
+    "org/joda/time/tz/data/Asia/Choibalsan": "9ebc840a99c32d8ce652b067e440e152e468d1a17338ad1fc94d9fd126f9e0b5",
+    "org/joda/time/tz/data/Asia/Chongqing": "33c0e28aad164cba3ef0cc343593b47073fe608101abd525aaf74c8b99b35c35",
+    "org/joda/time/tz/data/Asia/Colombo": "e870bfc2467260db41cd88308b0a34f6717fc5241ecdde48379b2c435f342a46",
+    "org/joda/time/tz/data/Asia/Damascus": "ea5ed3b49f1a4343a2e9074098ed35e9d7fbce17f999ffa3628d29299b9820d4",
+    "org/joda/time/tz/data/Asia/Dhaka": "948283bbbcc6bb5ab353d5b74bff36828f0626c40dee4869a083985a95f019e0",
+    "org/joda/time/tz/data/Asia/Dili": "1bcb2603e498364ed80d83e5b15ff4962594c1e2779f295a2c6f617273f720cb",
+    "org/joda/time/tz/data/Asia/Dubai": "3f5900b8d6f568141d1f57dfccc5aa3b90c20bbfe28a29de5a6167a4274bcff5",
+    "org/joda/time/tz/data/Asia/Dushanbe": "9edae6d6bcdb74d4cb8822e6abcd75c2515aae33a37b6f7b8cf62c900a67749c",
+    "org/joda/time/tz/data/Asia/Gaza": "ed8e97a9ac9132b51712cb05364ec4e135ddeb9c571f78f27b18c225eee047d1",
+    "org/joda/time/tz/data/Asia/Harbin": "eb448a5fc726cdc831d4dc512acf188e9d6e4e632f49483eff4c8a822d52b002",
+    "org/joda/time/tz/data/Asia/Hebron": "46adf5616661d59f990ca5f0827ff78a78a487b49918fceb6275f59e9ed8ab41",
+    "org/joda/time/tz/data/Asia/Hong_Kong": "ff9584bd24a615cfcb93795d6c5a180920deb5a300dd4cd800fb7c2e4943548d",
+    "org/joda/time/tz/data/Asia/Hovd": "bf1ed05060786a4e5ccf2b9f7ee4ecb83e848050b671dab33301228c45985bf3",
+    "org/joda/time/tz/data/Asia/Ho_Chi_Minh": "366db04ac2f5e48e1bfd4bf71856ed3c8e78b612071769279823351cd0079407",
+    "org/joda/time/tz/data/Asia/Irkutsk": "52126ed61b683c2d92acfb866fabf325da679f526bb6f850209517df51c06e6d",
+    "org/joda/time/tz/data/Asia/Jakarta": "14658ebf0213e495565bbb396843e718a05e67142134acc463534afe4c552330",
+    "org/joda/time/tz/data/Asia/Jayapura": "0eabd35eef4fa3e37fb6cf15b78b2cb57aea2c67b2c9c648d5194aa224caad28",
+    "org/joda/time/tz/data/Asia/Jerusalem": "156a030f6aec5aa1457fd1e92b9d0070c521dc38d63433b9c7372ad6f3b2101c",
+    "org/joda/time/tz/data/Asia/Kabul": "4b6819e912da0d99630614548d786d2a5660c4fcc1eaa53e14c3e062de2079eb",
+    "org/joda/time/tz/data/Asia/Kamchatka": "54334513a49a9160bdcb23418458c62f43697db3cf3759a90933dce12790e331",
+    "org/joda/time/tz/data/Asia/Karachi": "a8671833625fa8559f95440e37fad31121be75b318b471c31cb90f15c06848fb",
+    "org/joda/time/tz/data/Asia/Kashgar": "800a0cb77960b3480ce8a64b31584e38e8bdb93e9d7fdbf6c002b323fa652bb0",
+    "org/joda/time/tz/data/Asia/Kathmandu": "c449f58ec8756d6e09c7c79c22f9addfbb3bf433907655c20a1df63aa7e91753",
+    "org/joda/time/tz/data/Asia/Khandyga": "c64d4c7cf0fc06501613e2aacbc3ff5a04cad3dc9ae95094065d91187aa12694",
+    "org/joda/time/tz/data/Asia/Kolkata": "69070bec16f3ce38d13dac7d20d723087d592e035400a6716b1233c451386e39",
+    "org/joda/time/tz/data/Asia/Krasnoyarsk": "f22289483713d8136767631165410c6a1b33f4a902b8001997c72e9b89fb116b",
+    "org/joda/time/tz/data/Asia/Kuala_Lumpur": "9604d342fc450476d99d178ff5512124419a5d83f2dd950ef8a71ef5d3569a8e",
+    "org/joda/time/tz/data/Asia/Kuching": "b55a55aaeeed29ea1a5b70c99577b1ba359276aaf6cc7c92c96b3c769c6cb8bd",
+    "org/joda/time/tz/data/Asia/Kuwait": "95bdc87c4231620c6c9c1ddff8157f7e4cadfff6616988d2f26143e67cec2e38",
+    "org/joda/time/tz/data/Asia/Macau": "565fba76ef22a4c73b5723b7cdaecb4d29de3eb70f8edf80646ad9370dc60368",
+    "org/joda/time/tz/data/Asia/Magadan": "60151397d34a8242561f99caaec7c2a2e587b59a08348b79fd9a8855c240b1ad",
+    "org/joda/time/tz/data/Asia/Makassar": "4cda8d4d69d69d0166add3b615b47e0348056533c74e00c0d6b5304996771cc5",
+    "org/joda/time/tz/data/Asia/Manila": "6af854a251c82bd7a4e442a654e256188c36b8c9b6bfc02338a1b31bac448c39",
+    "org/joda/time/tz/data/Asia/Muscat": "ae4deec4f5d2447d71c64041e957bd34b503581c42d1a5e72d0845dc2131b765",
+    "org/joda/time/tz/data/Asia/Nicosia": "27fed6fd77c86e75e67a48d6258488ae63d24bec17c40ebbc9e166c02d71eb5d",
+    "org/joda/time/tz/data/Asia/Novokuznetsk": "5cfc78eae3a046a8e0e05567215beeaa6c51a59f8b5a35bcb3e00b025c9de502",
+    "org/joda/time/tz/data/Asia/Novosibirsk": "312e36cfb7c2170e99ebfdec69c6d60758dd6306f52d40a07b836234e464ba2c",
+    "org/joda/time/tz/data/Asia/Omsk": "815e2c7b81bb113bfeb0731e54520094319f3f4aec5bfafbd39efe8aec0a034e",
+    "org/joda/time/tz/data/Asia/Oral": "50b4b898de371c9fd3c51da1d06dcc7a6a775ab1d347afbfe450f8a54fb5e2bd",
+    "org/joda/time/tz/data/Asia/Phnom_Penh": "aa78e84a9442960fcd8c96ce4e0771d9bc743a54acf6e4a594336b56da764d57",
+    "org/joda/time/tz/data/Asia/Pontianak": "ad35ef4af51d33d87636fbb6a8f392d9ee78e8d5e34c47c7cd5b0e5de5c2ed8f",
+    "org/joda/time/tz/data/Asia/Pyongyang": "9e8692fdb31aff0cd879ce17d1b97a7f31d65d2bb0557b8c8500ab51de2dd999",
+    "org/joda/time/tz/data/Asia/Qatar": "9d1c7b38424ac589b2189d2e0f9313249de6920c60a28d9ab9f0239064db8ac1",
+    "org/joda/time/tz/data/Asia/Qyzylorda": "591bf71175a92b5dc4ab54439f838d984d35cf2678ad015bcb5c64b364f8aeff",
+    "org/joda/time/tz/data/Asia/Rangoon": "021a31882fbe11ae1b2db5f5aa153c84b83a24b326420ac71be8ba1998f827af",
+    "org/joda/time/tz/data/Asia/Riyadh": "f157fa58de436ed4ea3d85173cc4a0d545fff73ac52bf82c4f764d7eb43ac017",
+    "org/joda/time/tz/data/Asia/Sakhalin": "85658917c642cb4253dfd95c70745eb3786128138d560b10bc229abab412e5e0",
+    "org/joda/time/tz/data/Asia/Samarkand": "240288ea3e232cd9fb874496b796761c5f803303263a530dc851a24adf3a39f5",
+    "org/joda/time/tz/data/Asia/Seoul": "8643018b148cabc648f5f60e770454b69da4fd90f8b6f242c059a0028a346c80",
+    "org/joda/time/tz/data/Asia/Shanghai": "a1a2d8d1be61dd9e3cb275be7d6b19d83cecc37240149da9b0c9d5ae7030953e",
+    "org/joda/time/tz/data/Asia/Singapore": "33946d7ded0423ede5e3bcb2e54d06d2d358ad70ab58cdf1f93b1f879a8bdf33",
+    "org/joda/time/tz/data/Asia/Taipei": "47cd7047512a291c4ba8de34e20e5706f8c986736addc76862c4056b7b2e3c71",
+    "org/joda/time/tz/data/Asia/Tashkent": "facf982e42709cd823f3156a041b8459f89f8cea9e3d03ec0755ff361f320bc9",
+    "org/joda/time/tz/data/Asia/Tbilisi": "0ecea54e31660b161fdde2e7dd5c6bf98b16a5cd81a4314579b5f8b9b7a7ff2e",
+    "org/joda/time/tz/data/Asia/Tehran": "5550add9403a6c0eed09f2e4039e61e215dec7698536824fb036fd0f40256d61",
+    "org/joda/time/tz/data/Asia/Thimphu": "3033f8d5b640f272371a75877607abe38f24e3cc772184db8dc3ae0b8e666e3c",
+    "org/joda/time/tz/data/Asia/Tokyo": "ae9aed574142215bd76304a716e69088ba7a359cf6d17918cee1bf40058ae355",
+    "org/joda/time/tz/data/Asia/Ulaanbaatar": "b18afc0273cb7620bc6cd61a68b6bb238b5b4d2279f2f114bfd74175ab0e34a7",
+    "org/joda/time/tz/data/Asia/Urumqi": "3012627b77a1bc4dc068410f1d72e2af6f9714cbd972bbd58cdfea292d9b1171",
+    "org/joda/time/tz/data/Asia/Ust-Nera": "9a8924d830ef06e5e3de298c1b95ffe21871eb0c5b06b7d6482abfd771d2aa32",
+    "org/joda/time/tz/data/Asia/Vientiane": "92b0e3de079d251604d7ecb8297659f552805b9f700f191bb69f6963b2b65548",
+    "org/joda/time/tz/data/Asia/Vladivostok": "7112281ffe7db03c456439e0645f546a8b572d5ecb683a4420727a1d65c17119",
+    "org/joda/time/tz/data/Asia/Yakutsk": "e7036e7fb40063cd5ca4647bd7e083c3b163d065d2083b74e96bbfd8d062a01b",
+    "org/joda/time/tz/data/Asia/Yekaterinburg": "51868aec915a3f74878143863c56098718238ab94108ad9c8937c13e40df8fe8",
+    "org/joda/time/tz/data/Asia/Yerevan": "6eb3c26240d896526374b9eb231630f5f32fe7e1dc61fb65e58a5a741a41f95b",
+    "org/joda/time/tz/data/Atlantic/Azores": "2b143c96abbf101d2183c32b0023b58cb134e277d7c5071962f56a3d1df01855",
+    "org/joda/time/tz/data/Atlantic/Bermuda": "e7d7d9bea2858126ec697916613d11e261ebcff83404152469e64a2e1c86bc46",
+    "org/joda/time/tz/data/Atlantic/Canary": "7e83b423ca95da03489865e025d730b1f6abfca4f44fec2285fad16757bea8e9",
+    "org/joda/time/tz/data/Atlantic/Cape_Verde": "aaa64f4c36d583541a9a42d7269556fe892daf0b6f379b998ec83bc767ff7dbe",
+    "org/joda/time/tz/data/Atlantic/Faroe": "b742a1a407ab83338bd0a40e6280f5d7c4f1d21e40ba84a3a8ff1a93b221d9ea",
+    "org/joda/time/tz/data/Atlantic/Madeira": "7b7707d620d5f01301931dafdc23c8ee16f1d7d95d5fd9a31298ddf5d786f5a9",
+    "org/joda/time/tz/data/Atlantic/Reykjavik": "9dfe97ded6aae16bddec69d4775fb92e1638c20a9bb6eb74886ffcbb97e7c56d",
+    "org/joda/time/tz/data/Atlantic/South_Georgia": "f597bc6edbe4b70ce4e99c6a9e0a72cd3a7bf449465d41549945b09d6e06691a",
+    "org/joda/time/tz/data/Atlantic/Stanley": "8ea87c8c4b7c8a4668ec8ff1031b51403b6902eb30096a6735ab3730d63c80d1",
+    "org/joda/time/tz/data/Atlantic/St_Helena": "0e8e6a5b6edda4d7903aca2354da0509a82af68511aebebcfa7f2ae7e396e70f",
+    "org/joda/time/tz/data/Australia/Adelaide": "b2a284049132976180f8ac5351378c9ca14c0762b4860bfc19706ed3e7776280",
+    "org/joda/time/tz/data/Australia/Brisbane": "2e54071b710b9f7330ac59122c5b22dd4333f51908c287ec9dc1452f2c01f175",
+    "org/joda/time/tz/data/Australia/Broken_Hill": "1574be3bbb3140bc195887811c2110a90c0143c56af0eb29dc2dae14a95d134e",
+    "org/joda/time/tz/data/Australia/Currie": "9dcbdb2a0836d637846f8384d3aeb71023c6c0039811a0b76eb6ed000e0a8ec6",
+    "org/joda/time/tz/data/Australia/Darwin": "62019b9417e9f60fb70371f43d665fb1768e2aa184d94243f04aab070d41f457",
+    "org/joda/time/tz/data/Australia/Eucla": "75ff3b417fef2be3348654031be5e8ee8a4f5246fbcf87a00757388308d4129f",
+    "org/joda/time/tz/data/Australia/Hobart": "ecc1a02f4b471b6a25cb79db5d29e9da72d25827ff92b0695edad1b400a1037d",
+    "org/joda/time/tz/data/Australia/Lindeman": "373f4b553260fabf53b4b62f91b6ab1b0b2bd62de1bb7a047afe3111144de889",
+    "org/joda/time/tz/data/Australia/Lord_Howe": "ea57f6195d22922e25947c1bd93c3bf3ef3c7d04751254c89263c80fc2b2a496",
+    "org/joda/time/tz/data/Australia/Melbourne": "707210b413969d9f17a65d2cd055504a68fbbb57d1e5fb47137a66293011c568",
+    "org/joda/time/tz/data/Australia/Perth": "b59b19b24f876dcd491b4665a5e1efc21cacbffd4540707736ff83231873f0d7",
+    "org/joda/time/tz/data/Australia/Sydney": "404068a7a5d7549c8e2ff38eb0c752427458ccdbfbf363aba0677d12e284a636",
+    "org/joda/time/tz/data/CET": "1c45af384e3d1ec83a6c12f82a5942714b80d29e7b47660a840b498740fe1e22",
+    "org/joda/time/tz/data/CST6CDT": "de962652e3ad4abe5e37b68edf3666ae61bf428115ffcc24720dcdfc1de1a991",
+    "org/joda/time/tz/data/EET": "2ae9d2b6c0dfa435b481679d86f4c489444ca90ac3d02e341fb6987e4d837aad",
+    "org/joda/time/tz/data/EST": "fe06019181bbcbbaed31390ce6fdc4abb50bf2b8491fcd217e23e4e1e9a40621",
+    "org/joda/time/tz/data/EST5EDT": "16496a099ea7705364bbd20bc1fe562898d79d908ae1b84e3858752f498cefbf",
+    "org/joda/time/tz/data/Etc/GMT": "115f13a8ea37aba35cb5a44920dab063f0bdae42e1f66e5beeba7dde4e080085",
+    "org/joda/time/tz/data/Etc/GMT+1": "5c2b11f0b2bff28c138b645a6dff49ef0f175aa73eb3573c9e7d40999d3d7c75",
+    "org/joda/time/tz/data/Etc/GMT+10": "234e6ebdf4936989958c0f991a8c7444986f39e088ca6a2fb595c6a54ca65a77",
+    "org/joda/time/tz/data/Etc/GMT+11": "2ada5deab604009a7079237710ce3fe1246534d6bf294af6cfb0df48005a8bca",
+    "org/joda/time/tz/data/Etc/GMT+12": "f2bc61f9cd5e857617b6c2f9707480f2302896cf123ac8e5b6a8aa3c1107cf96",
+    "org/joda/time/tz/data/Etc/GMT+2": "6409078cdf5f9a3871c39460c9da1a5ed83c669efea92e12de0a9d7d762373fe",
+    "org/joda/time/tz/data/Etc/GMT+3": "e4ef0fab04caa4dcf0217df19d4165c316e3137455814fbf36c45100c9f22e10",
+    "org/joda/time/tz/data/Etc/GMT+4": "9279b698b4ed959a07dd981861f8049e3767c2382b5677cf4243d1da4964e84e",
+    "org/joda/time/tz/data/Etc/GMT+5": "6a44a7b9fb610e1c04bf5008c232ae40ba498f9ddb6ba13899e6a35e40fae2e1",
+    "org/joda/time/tz/data/Etc/GMT+6": "29213e60f5da900a9546d29895a90d09d5e15fb2fbbb51b7a32642ef55e448ad",
+    "org/joda/time/tz/data/Etc/GMT+7": "b1675fc269b0c32c512c0063c1f27632e92ad96ea8b87d47d928293d296d1b3f",
+    "org/joda/time/tz/data/Etc/GMT+8": "164d3c76debd4335d2d8e92ff8c769b1bb97e25cce6ccf94a384087db5ab3fe4",
+    "org/joda/time/tz/data/Etc/GMT+9": "13b796a53d64f46c7a3e221f09d153ce51066f15a2fd08458619135587de8d20",
+    "org/joda/time/tz/data/Etc/GMT-1": "9e3941a90cd354e38f5899ba54f8ccc11ce4fff2cae72a77f7a732542b058a04",
+    "org/joda/time/tz/data/Etc/GMT-10": "97694ed370640c282fec3f726e9b8227be33d5b5f5b10e68ce46b2c8cf355a45",
+    "org/joda/time/tz/data/Etc/GMT-11": "91a65337bc1d9c599fceded1ea2ab445e0522f418eb0bc83dcf0ae14cb3ede2e",
+    "org/joda/time/tz/data/Etc/GMT-12": "ea68f1c0b989fee1225e5d7436a3d034db10e420b4119d494306932d9d75da2c",
+    "org/joda/time/tz/data/Etc/GMT-13": "12e4d4a33201d51fa7579136ab2f82cc4e2b8d2223b6bb7fd150a8cb141e199c",
+    "org/joda/time/tz/data/Etc/GMT-14": "7d34ffed49c12ce5d394967da3d274304f81d04e1f63117ebf94c48c8963e366",
+    "org/joda/time/tz/data/Etc/GMT-2": "14114b4723c519eb390f1ad06510889c605842889c5539d2f16afdcafb7e3a22",
+    "org/joda/time/tz/data/Etc/GMT-3": "30b70092a1c231a98341960c8cb996bb88d2e28ab33320cf17eb4fb94d7d1f56",
+    "org/joda/time/tz/data/Etc/GMT-4": "027fa1219a928b8f2980ff4502c73611e2a68cb3908d868858b0deaa3908c483",
+    "org/joda/time/tz/data/Etc/GMT-5": "b1317b9a3ccc99cad021dc7764ba7d51c44949701c83b987b9fe536ae70aff1d",
+    "org/joda/time/tz/data/Etc/GMT-6": "49a7bdd279dd58dd36dbe481d8433be3dac82bbf9c36380648cf160cff8a9bdd",
+    "org/joda/time/tz/data/Etc/GMT-7": "8e2fcba84ec3462b80467410f0da2f2f36a7cfd7c259e2e0418de1903b3e7f39",
+    "org/joda/time/tz/data/Etc/GMT-8": "9eeea1fc07e83acaa8108547d7f9b9300edb48eac50dfdd3bb6df6d45cc43941",
+    "org/joda/time/tz/data/Etc/GMT-9": "827b418fc74cce9f7f7a63f07410d5f58ef57e978352baa50ec5a2d81cfd8bbc",
+    "org/joda/time/tz/data/Etc/UCT": "95d7a1baaba71b821c20d504a30c8648901aae9611aca4f1f0382587ff2f80e3",
+    "org/joda/time/tz/data/Etc/UTC": "99d437d0a43bef6286748f150245a1e30a0f60c586fa371fa39accee87cb861e",
+    "org/joda/time/tz/data/Europe/Amsterdam": "09621ecc85e2f14c7add12150b8abbf939593f1960a6c86cc7e6a3c69936f0c8",
+    "org/joda/time/tz/data/Europe/Andorra": "576930742dc4d7dea303c9697de9829c78d177720284256967d11083f958bc08",
+    "org/joda/time/tz/data/Europe/Athens": "7b95ad3fe5cd7f074d2be8078a0c7986591544870fa9e94d01454e6b1d71f4f8",
+    "org/joda/time/tz/data/Europe/Belgrade": "48d2fd50003ba1a396dddddbcc86868b95fa6c775ca1da4fa20c04168759db49",
+    "org/joda/time/tz/data/Europe/Berlin": "31234320aed1aaaa48befc42458f2a1c25981a370a96061af1a9944a2d5b88e2",
+    "org/joda/time/tz/data/Europe/Brussels": "c6b1cb39939ac3f792302922cb8c8b7102c3ee71ea8ad8ab9d2b358d671ae08a",
+    "org/joda/time/tz/data/Europe/Bucharest": "99755e90cadef12c9f87e7e4277080b43082a2a13f2369675d0300595a02519f",
+    "org/joda/time/tz/data/Europe/Budapest": "087c93758de90e111027009820e06a29bf922a327508147c5b4162f58bc6fbb7",
+    "org/joda/time/tz/data/Europe/Chisinau": "f78913ce6b1e9c0a5b26c5ac8d5477371849f5f45764b4e01ba6e2d26d21cca3",
+    "org/joda/time/tz/data/Europe/Copenhagen": "9a7fbb882b57be6800f4fd706b0ddd82633bbf88748eb7bc64799bc3689915fb",
+    "org/joda/time/tz/data/Europe/Dublin": "8c4eb06d86bab196a434c1f7a4cc50b6a8705cdc2c4757ff78e353b30e1850fa",
+    "org/joda/time/tz/data/Europe/Gibraltar": "7d644ad26d35daf71d4e0e9268d0bd6a6c71a37b20e67b70a41afe9d4f3e7d81",
+    "org/joda/time/tz/data/Europe/Helsinki": "244842a81a42f2a425a2f5d87b83fedc0ad5372df50f20a8fd4b952b8c3ee450",
+    "org/joda/time/tz/data/Europe/Istanbul": "e55eca3e6bef39da70e09e7916e34d267fa41ba4ae96ab1d4ea9d0c99da42768",
+    "org/joda/time/tz/data/Europe/Kaliningrad": "fff383591c9ffdf2ce4b4e77d993a16cc0678de16d50a5ccdf6236034d50f2af",
+    "org/joda/time/tz/data/Europe/Kiev": "6f133066eb3dbf21d566e6606e1301037e900a39cb6fdcda5338e5cd5d536521",
+    "org/joda/time/tz/data/Europe/Lisbon": "c6a6e793538e59e9b95ee7e0f3746bd4b3af71a73e7d8809ee7224ae4ff84f96",
+    "org/joda/time/tz/data/Europe/London": "4bcd4553a8df7dbdfe0b54646210a583f1a246ed73cfbf473107a6fb8d8674da",
+    "org/joda/time/tz/data/Europe/Luxembourg": "5769951c82d0b342a4764c122b072ea051bf42dd5acb353de5c93cf6f48719ff",
+    "org/joda/time/tz/data/Europe/Madrid": "fa90c07595e8279c843fe9d11768d45b939156871b4b6bd965011fc2cc03df89",
+    "org/joda/time/tz/data/Europe/Malta": "4066640f48dc82f68caabf4db7fa3ab1d39249c933f93205bcc61a006616a1fa",
+    "org/joda/time/tz/data/Europe/Minsk": "ed7e25f7c2964467cca863b85b04a3db336d99ec774e05544886b09cf2195b2b",
+    "org/joda/time/tz/data/Europe/Monaco": "6ed078b8de51bb970cef493b96d928125ba4a0ffa8bef4e28580b98f21fa5d82",
+    "org/joda/time/tz/data/Europe/Moscow": "092ad49c85130ca45dbbde0b6aaeb8d6186f94eddf53ae6215dc88b108eef1c8",
+    "org/joda/time/tz/data/Europe/Oslo": "46e0161d956dd3006d6d912d754ee668252197bd2f6f82d5087fac7cb9347b27",
+    "org/joda/time/tz/data/Europe/Paris": "632bac455b691cd6f88681d2004ad8bf2830b6eb47d10818121a16997b303e3e",
+    "org/joda/time/tz/data/Europe/Prague": "0beffb6ed942df8f77391577044537bc0e60ebd468372bd37030d9bf865fa9e4",
+    "org/joda/time/tz/data/Europe/Riga": "4a83aec5118d39f16ef05c1fa552ae0750f49589ecd990e4c9c2ba8f0ea0359f",
+    "org/joda/time/tz/data/Europe/Rome": "b866f7cc3c10113ed73337c9bde20e4973c9add82e36c1118178da66d3f4a4f7",
+    "org/joda/time/tz/data/Europe/Samara": "5bc050c0a1769ea3b8f452d3fdea68084f298320e3c52f765dd40ff79a7c7bf3",
+    "org/joda/time/tz/data/Europe/Simferopol": "5fb7843cb815b60076b5d1287d432528f580ace6f17c81c15cb56e80dfeebcd3",
+    "org/joda/time/tz/data/Europe/Sofia": "8177cb230a622220f3b3782c10ebf3bd467306189353e282cfede03bbba6a134",
+    "org/joda/time/tz/data/Europe/Stockholm": "5c683207e2d0786f88221c1117a27b5afec47cc37bbceff78452cd294805f268",
+    "org/joda/time/tz/data/Europe/Tallinn": "554070b4fd93973e9b76fb4487019320d8140cab0c15f5dd15180efd10eff5de",
+    "org/joda/time/tz/data/Europe/Tirane": "090a4d36f1bd4a761a52727452553a4797356e614ad1363e86ef1ab33ede08d8",
+    "org/joda/time/tz/data/Europe/Uzhgorod": "adbd012d264e472e0d05bd894b5bc54615a6df3f5718ed3ad4d7c25452d55960",
+    "org/joda/time/tz/data/Europe/Vaduz": "7c193f2243e2a883a3cee10d1d582aae4f9e895d9ee51a95ed728e75803919ef",
+    "org/joda/time/tz/data/Europe/Vienna": "35fd70653edef84b52c317c68c9f54d3491e8f8c3b8e49428738cc3a76ea2c62",
+    "org/joda/time/tz/data/Europe/Vilnius": "355ac85f0019286a0a8236f5aa3f9a8d9c9f4d1f44508ac30c52338ea0bb3847",
+    "org/joda/time/tz/data/Europe/Volgograd": "6abbcaffe9fd6b767557f6dad0e309e13afc38011dcabc5ca4b5c7c2f889a431",
+    "org/joda/time/tz/data/Europe/Warsaw": "77f3381959252b9306da320647f64fcac2791c5e76a32cf17bae096bb4bfb6dc",
+    "org/joda/time/tz/data/Europe/Zaporozhye": "6381e5fc55e447ad343043179b926d5af9c4acaa3cd0fd70ca4a51048622c9ad",
+    "org/joda/time/tz/data/Europe/Zurich": "78221098790d2189497c6074ebcec4f5be69f875aff70609aa0b2fc6691d6a7c",
+    "org/joda/time/tz/data/HST": "38c77f785260197edacf5a7aa7acdfe9773a475400b8e8e4bfa2c132b6c98246",
+    "org/joda/time/tz/data/Indian/Antananarivo": "a1ee801db1abaaaff8359304b069d3f61dfd4204a282454cb72ee5e172b18b26",
+    "org/joda/time/tz/data/Indian/Chagos": "75ebafaa73fda704f422c8236591cb0ab28ee20a9bf3e350657d65c0d77c44c7",
+    "org/joda/time/tz/data/Indian/Christmas": "6000a9fc2ac3209fd38fa0efd13a32228dcd3180f2e69baf72636b69e8128ad3",
+    "org/joda/time/tz/data/Indian/Cocos": "c8e31194d295665e846f20a8dfbc43d57ac803fc7acf187547d565475ed90974",
+    "org/joda/time/tz/data/Indian/Comoro": "e9aa1f4b3589828f9b8d7a3f945ca96248177c552d7807b8364859e227413365",
+    "org/joda/time/tz/data/Indian/Kerguelen": "0732f4f9352d2e2467a670f7dc7549dd54f7e8d2d72ab44a9317c8f86b3ba1d8",
+    "org/joda/time/tz/data/Indian/Mahe": "d2f71384d0b100996bca09e4272f0066b466dc69468ad9eed97b23adc264f9d0",
+    "org/joda/time/tz/data/Indian/Maldives": "4192b5e75b38a7c52f4eebf43f9a05157f996e35a01755e572ba9d2e80c7dfc4",
+    "org/joda/time/tz/data/Indian/Mauritius": "777cc4fd2be33526f8af82f167f1d6998cb94b476f6a293191f02dc9dcfa33cf",
+    "org/joda/time/tz/data/Indian/Mayotte": "7eb3fca555ce1bdbf263c9dbe9deb8402434eb94281cfa51b10d2018bf9c05a6",
+    "org/joda/time/tz/data/Indian/Reunion": "097dcf0122de676b27d319e04e1cee60c980c2ea6397456a07065436d7c7fbf1",
+    "org/joda/time/tz/data/MET": "26bb4c2a5a513b8a93f7668902e7e89cfb94928c8758740aa9c4df41fc521e36",
+    "org/joda/time/tz/data/MST": "839fc791a24faf4f8d28e9e7eb9096f82c52644d06847e2512cf95c83819b717",
+    "org/joda/time/tz/data/MST7MDT": "aca69266aaadee8db0f6245bd67220f64c8d1e172fe428ecb97f1b9157837f90",
+    "org/joda/time/tz/data/Pacific/Apia": "faf92f46b9cd56f85aac172881b50043bcd57e621cea8e52d58b972bfd4f6ee1",
+    "org/joda/time/tz/data/Pacific/Auckland": "f3874059341cbfaae6bd72a21a6af832fd0dfbd2d2dd40337f13c2153c94ff2a",
+    "org/joda/time/tz/data/Pacific/Chatham": "83b5483d8e9641220808cdfba97472bccd8be1e9d94f646b9727e0cf38b40fe7",
+    "org/joda/time/tz/data/Pacific/Chuuk": "3c397ff755fdf8e19b9f39c507e9b3fc2023d11cf4f9c053749a8f7de288466e",
+    "org/joda/time/tz/data/Pacific/Easter": "8f84e00fd8bfe3175b422ffedb5b056838936e43e62d35d6b43ce9de82a01f8e",
+    "org/joda/time/tz/data/Pacific/Efate": "daeec53e8731a008583c0b9ad9a26c2f07bf140d5a4da4a813e497bd0fb60a2e",
+    "org/joda/time/tz/data/Pacific/Enderbury": "4544285d52a90347bebab69686964bb3836b107b5381e7c4e0dd615f3a3fa982",
+    "org/joda/time/tz/data/Pacific/Fakaofo": "a9ec735e15c40711e8326d2a6be118a7ad54ebb841bd455cec7ad34cf83271c6",
+    "org/joda/time/tz/data/Pacific/Fiji": "0700fddfaecf3b350d40c768ec9d63d725cdadf7da9c0982dc7f19976ca9b280",
+    "org/joda/time/tz/data/Pacific/Funafuti": "121fa791e1c2544ab68403b005e455d44a1f24d9c0e91d62facb685ce7932ab6",
+    "org/joda/time/tz/data/Pacific/Galapagos": "3abd29e2899e0cfbfe60489dd915bd7fba2fc20cd904db99490a0bd20a1e78de",
+    "org/joda/time/tz/data/Pacific/Gambier": "c5461ab25e0f68cebc9910b709a8a5ea5e8a9faaa3d6de7430ba48ba7a9d617f",
+    "org/joda/time/tz/data/Pacific/Guadalcanal": "687fe555173694c91305c8a957a9d5f0eef717232726412c1f0f37db926c2377",
+    "org/joda/time/tz/data/Pacific/Guam": "9436d8ec2bdb54396a7276585e6986a40a5ea1f0194eb0a834c6cc8f2bd74675",
+    "org/joda/time/tz/data/Pacific/Honolulu": "93ea36f3d22f6a92a816dbc13cb659dce0886036ef9b01549a41c58234c7ccbc",
+    "org/joda/time/tz/data/Pacific/Johnston": "38c77f785260197edacf5a7aa7acdfe9773a475400b8e8e4bfa2c132b6c98246",
+    "org/joda/time/tz/data/Pacific/Kiritimati": "123dde7380ff8b4163b06969e4e390f84fc676d326ee7ce1a927d3753c5f0122",
+    "org/joda/time/tz/data/Pacific/Kosrae": "5fd83179faf1e2b5ea81213ade974a53cfb428f97fae503d361d211fa18117e7",
+    "org/joda/time/tz/data/Pacific/Kwajalein": "fed2648c9fe21d39a913da0eacd5fd1c54a0e0f97af6eb10aea51117e7e455c8",
+    "org/joda/time/tz/data/Pacific/Majuro": "b7703d8f2f9e6ddb251425ca6254a1c1fdd5e742f42370e943da2b346a806162",
+    "org/joda/time/tz/data/Pacific/Marquesas": "ce9476758c92d369e2fe07b117176546962bc48bc0f10224dd9a718ea00b1456",
+    "org/joda/time/tz/data/Pacific/Midway": "fa9fd93c7300e007eef9053e62963e9f08c02fdb1603795ad9f0c6df792e3839",
+    "org/joda/time/tz/data/Pacific/Nauru": "2d62573fae004a9713627536cd15395e7a6a4e6de94222253ebd15eec384ef97",
+    "org/joda/time/tz/data/Pacific/Niue": "ff81e194157e2cbd8e5b2acd6c8ff1e64e5df58325789e2e14e1fc6642e07b9f",
+    "org/joda/time/tz/data/Pacific/Norfolk": "9361d7b4367b92a571f7a925c08865ba4be5f3e45e1f360b3793f1d384ac0b33",
+    "org/joda/time/tz/data/Pacific/Noumea": "2c19d761f8b9dcc42c35453eca69f704296ed566d269ba83eabee3c76d8d09e4",
+    "org/joda/time/tz/data/Pacific/Pago_Pago": "4670c0aaad5641e9d1cae849b0af40e2afa302ed637ef4a18511416fc8829024",
+    "org/joda/time/tz/data/Pacific/Palau": "0218d67ddfcde177313d0b1fba3c479c663b17580d6f7e7884630a039a4e97fa",
+    "org/joda/time/tz/data/Pacific/Pitcairn": "18bb81a77da7c2e66a78cd0d62b7f6aefd9190bcc8410c5e0c390517e5393b7a",
+    "org/joda/time/tz/data/Pacific/Pohnpei": "3aae9579e0642f9d3933868548be08696f99e99a12ded591a39331e62509a610",
+    "org/joda/time/tz/data/Pacific/Port_Moresby": "0a423af4ed18c402d41f53dd4dc06f4c6400ee7b79ad840f5291b79bd6fe9b04",
+    "org/joda/time/tz/data/Pacific/Rarotonga": "c1f52075efb18118cfc98fd0dccba28ffc1ee7e9bf4ad73b2b4c5d15f5a3ef53",
+    "org/joda/time/tz/data/Pacific/Saipan": "10f03e11765a59b43235d251ca32a72b375e591c899779375819e5c4789659e6",
+    "org/joda/time/tz/data/Pacific/Tahiti": "6e1e4c399cafa972d79fee1822baa04e3cf0c845c030f185b925f12c80961fab",
+    "org/joda/time/tz/data/Pacific/Tarawa": "4cf178f758e6b93e5899b34f8a3f0a87f1e054947751953fe20c98ebd0ebb186",
+    "org/joda/time/tz/data/Pacific/Tongatapu": "b828c57bac404cd240897dd4c28a4511fcbf4ea5b50cc3396e71628a39e97635",
+    "org/joda/time/tz/data/Pacific/Wake": "645847fe3a9a8510a877b73d9534750a48fa0b1a37038ccd7eb2d1cf4cb104c2",
+    "org/joda/time/tz/data/Pacific/Wallis": "5611be8a177faf641a1d0720e49a084f6a8514456b822bc00675d786ac6fe33d",
+    "org/joda/time/tz/data/PST8PDT": "6995e2b16186fc5fc9b15dd6a8c0b3917d229628d202b7f1519465457a098380",
+    "org/joda/time/tz/data/WET": "c1e0dd284081a60a11601112d991ef0971ae7b4c552ec5b0672ac29a5fc8d237",
+    "org/joda/time/tz/data/ZoneInfoMap": "ee76499d3f0d76813a8896428762bc6fd4b94b27291875d7f14ec9663ed8b719",
+    "META-INF/maven/joda-time/joda-time/pom.xml": "43131da4ad24d2b84cf7a53fd0715248ca3738380d7a68cf446ec5c29dc69cc9",
+    "META-INF/maven/joda-time/joda-time/pom.properties": "c6a9f3d2f4840c837aa2299db011b00a8e067b77cdbb5af404baf2cf76d60815"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/joda/time/base/AbstractDateTime.class",
+      "occurrence": 0,
+      "sha256": "c332072b1250be8c95705508a1009e6962e06b560abe1b9fd136c80fdd6a3994",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/AbstractDuration.class",
+      "occurrence": 0,
+      "sha256": "21c9ad3c6808ee7dcac587985c3eca62e1be283d20b3ef3ba21381f8c7e7dc09",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/AbstractInstant.class",
+      "occurrence": 0,
+      "sha256": "3336c45b8f3b7156e3a46c524a2887b160054c969586cb03079430bee16b3a35",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/AbstractInterval.class",
+      "occurrence": 0,
+      "sha256": "6d878348e7f56b4fe3be3c984ff1e18ee3eb19e43c0bbab31ee96cf150a2dfb1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/AbstractPartial.class",
+      "occurrence": 0,
+      "sha256": "51e544f2c3856cda4226110edec7cb591527833cbaab480296f38b4b2865e692",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/AbstractPeriod.class",
+      "occurrence": 0,
+      "sha256": "a2ac683774d83cba1beb31e3fa7e180ca3d4ca5491e91ceea6bd60cd8c793e4b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BaseDateTime.class",
+      "occurrence": 0,
+      "sha256": "4402862c237d17841252c0be23c9fed8ae20253e28fe6e50206be6ea9308b8ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BaseDuration.class",
+      "occurrence": 0,
+      "sha256": "0ba15f5d27c1886cc732a35393c8717ffafa4d366e37f54b73fc46896a3a3c1e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BaseInterval.class",
+      "occurrence": 0,
+      "sha256": "4fb8ccf6f96933d3264577ec53c11ffa75b7468c0a277ec99d033eb6846fe831",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BaseLocal.class",
+      "occurrence": 0,
+      "sha256": "79688fefc5d3348882f4aae9336abde37e47e5ca8416648dcce121b69b0346e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BasePartial.class",
+      "occurrence": 0,
+      "sha256": "ec9e7505a90f9f98914253f9c44a07a358083500d46a47ca58b2c4e405982fbc",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BasePeriod$1.class",
+      "occurrence": 0,
+      "sha256": "2b69a24370f739cb721e447d38a4d57d8d3680c006c5610fa7e86b7f12f952c1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BasePeriod.class",
+      "occurrence": 0,
+      "sha256": "6988d95c683fcea3800d7e695b65028f6d219ec8e98ba1ea7365dc0b9f7c8496",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/base/BaseSingleFieldPeriod.class",
+      "occurrence": 0,
+      "sha256": "c17dd93aca15cedf1cf7f0a08bec47c42d3a682b63ace331aade8aa4b99d05e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/AssembledChronology$Fields.class",
+      "occurrence": 0,
+      "sha256": "b7e611ee9922079d88171b6216d4735d82227f6e11ad96fc2174527e4dcf53a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/AssembledChronology.class",
+      "occurrence": 0,
+      "sha256": "65bc48d88353bded66cb886acb44c309f8bea49e22fdd22ab5ff1b9b78986e61",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BaseChronology.class",
+      "occurrence": 0,
+      "sha256": "a77a84d05b927b568bc129c8483aadaf30ea0a28405a9cb0d619ae8a1f5e669f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicChronology$HalfdayField.class",
+      "occurrence": 0,
+      "sha256": "17862304df4cb355b30697a8579b8f5f4d8790291ee30c1a31dc16ddf67cdee7",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicChronology$YearInfo.class",
+      "occurrence": 0,
+      "sha256": "eca52cf464f0ed974c24cef28d08204d355c1550ea4e98ce778e124b10ecf81b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicChronology.class",
+      "occurrence": 0,
+      "sha256": "95faafbe461cc966ca3eac6cb9a05546bcd992fa71ca30bae9d58ffe4308539d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicDayOfMonthDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "2024fe393af45b8cc0e35b054877ddd34c1eb52d1f1bb39e840b2051007f5324",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicDayOfYearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "2ac207458131a280b13263f1f0ab7073fbe72b6bec9756615703acd20b48bd5e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicFixedMonthChronology.class",
+      "occurrence": 0,
+      "sha256": "30bbe500acb1163d4f57d5ff8d4afd88e365b2556844a498c4cce1a84824c430",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicGJChronology.class",
+      "occurrence": 0,
+      "sha256": "bb5044428b43910fd5226c0b300a403ecf298e7e308ca405731fbed7a698f444",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicMonthOfYearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "f14c777100d7538787132271b2b72b939b12a3034a37bef6ee7d29aad8840cd6",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicSingleEraDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "56082b7c6ebc3f57aa7f4be2362eab074480debad2654493221c1fd57139e21d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicWeekOfWeekyearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "b9745bca141d3898b4f6bdbe0865b568936a0d0fa204e5c4044127ec5959e29b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicWeekyearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "145c3068dee10aa97fc5e085f4d9276eeaf80670a4bef0e70e66c752a7014fa0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BasicYearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "6fb303fa12689057726ce3370e76b70c55ac4b6fdb3ff93045c2eedd1cb43c11",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/BuddhistChronology.class",
+      "occurrence": 0,
+      "sha256": "e98ca87709ab5f2896e2d6529318c423ce35563eb3802650716f327e7207bdb0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/CopticChronology.class",
+      "occurrence": 0,
+      "sha256": "2ab39baf8bbc9b631d3e2836253fe7d134f72fbf29d87dc5c04e8cac97bed24a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/EthiopicChronology.class",
+      "occurrence": 0,
+      "sha256": "941eb08b67e49d6728a395eecc2603def02c7bb7ff8126e0d3cccfcb4dc99a17",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJChronology$CutoverField.class",
+      "occurrence": 0,
+      "sha256": "b718bbb1e640b35c57542e6b1c93f207ca2a900cd248683b24edbe9c1f497077",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJChronology$ImpreciseCutoverField.class",
+      "occurrence": 0,
+      "sha256": "f504ca26d54e3ff7639ccf5944cd40eb9fa17676e804ca9081dc2bbea6472150",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJChronology$LinkedDurationField.class",
+      "occurrence": 0,
+      "sha256": "51b3d67c59e759e4c6813edf812835d74c3d018522b2f6495d71489fba620a0f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJChronology.class",
+      "occurrence": 0,
+      "sha256": "cb21d1a3c77f26b37d9fa18a16c8250fdebbb24804f82847b8250e0163180c7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJDayOfWeekDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "490de708ace6be4c4f0ccf0f89ab4b8d41423da12da584c7270faa126fd9005d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJEraDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "72b07bf92920ac2342d3b2be8288e69d3c92ccba45b5c298ae68455fa6cd79c0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJLocaleSymbols.class",
+      "occurrence": 0,
+      "sha256": "8a06d3db6fc1e906dbb48750f10bd5bcf4895809be787ad482e147f769beac07",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJMonthOfYearDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "e7db7413d6040edfbca55381fc2b7d820fe1ea87cf203b245b066d4b5873db35",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GJYearOfEraDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "14a0842216a58586ae678f70c9643eda4d9e5bb17a5610d278f53fe1d4dd2480",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/GregorianChronology.class",
+      "occurrence": 0,
+      "sha256": "dabceb192a019f2d04aae6dad70b13bafa440126e35b3460caf04cb27ef842a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/IslamicChronology$LeapYearPatternType.class",
+      "occurrence": 0,
+      "sha256": "c0f8bd1a78735fd695944294a1ea4fc05d8565a4a52497e081d83629b487b39a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/IslamicChronology.class",
+      "occurrence": 0,
+      "sha256": "c22438aaea75177f8cc0678e88c6949c21b18a083156deabed8a44bdeea5908f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ISOChronology$Stub.class",
+      "occurrence": 0,
+      "sha256": "c7e0d51d7458e4d8bd774d0952918b5e91b74f073b64d98f11aa94a016287d6e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ISOChronology.class",
+      "occurrence": 0,
+      "sha256": "0dad2d8eb87a48700a09962d00cceb7dae8673fc774ac11c29df34241deefbe5",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ISOYearOfEraDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "a829c93cfd205dc39fc86d0cc1513a5885f66528015a80cb55c17ed2dcc62565",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/JulianChronology.class",
+      "occurrence": 0,
+      "sha256": "b846ece141808b21171b537749384218e1648a1de2ce6df2228dd49326c3206b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/LenientChronology.class",
+      "occurrence": 0,
+      "sha256": "14421822414edcb0642647ecfc49fe49916c9595b6983153703e2d874d58ca25",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/LimitChronology$LimitDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "faf603e4bc979dc65aab541a65a001f4489ea22a80c4b6904fcc80a75c2afef9",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/LimitChronology$LimitDurationField.class",
+      "occurrence": 0,
+      "sha256": "3a31113fb9473204524b49a8b76f8d1dc9419f6f342a08c2cbb5abe41c2ad551",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/LimitChronology$LimitException.class",
+      "occurrence": 0,
+      "sha256": "bb26cddcb375d80063c7db95d2d5a56f84f024eb94ddff10844f45cf88e6d06a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/LimitChronology.class",
+      "occurrence": 0,
+      "sha256": "5f5aae58945b538cddb5fe36bf0e9b9b18ff29799b8637054bda84756e681876",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/StrictChronology.class",
+      "occurrence": 0,
+      "sha256": "74b959eb5bd5960d5766ebba0c44ff7b9aff1bf6be62f9132449b78730845f61",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ZonedChronology$ZonedDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "036a1260b016ad74e0ad52b4ebec57957c4aa2ca47e5e84659def4e3f8398c5c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ZonedChronology$ZonedDurationField.class",
+      "occurrence": 0,
+      "sha256": "26bc591aa1c9db2b6c4a6815e892065c73537c778b2af3a085b8c07b561981cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/chrono/ZonedChronology.class",
+      "occurrence": 0,
+      "sha256": "1675a3cfb4c3e7ed44c5e8448e28b1c150c91ba6d440a4a6d9d7cba9d0ef1a40",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/Chronology.class",
+      "occurrence": 0,
+      "sha256": "33f8e6b2911e6e544c640772548a099346af4f8796b200ce4fb43b45e4ac854c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/AbstractConverter.class",
+      "occurrence": 0,
+      "sha256": "657b055e1547db93ac8df5232f1d21cf5bf6c22bebc432ea3cb0b300d51ce214",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/CalendarConverter.class",
+      "occurrence": 0,
+      "sha256": "48758fb4b9620cd5d7d82f15a6217981c493d271668d4c5d0547b4af9960e6a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/Converter.class",
+      "occurrence": 0,
+      "sha256": "2cbfbcdb318a230b8226031198534528b735be8ad5a8bf91d828593829b54880",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ConverterManager.class",
+      "occurrence": 0,
+      "sha256": "ccaa45e02a6df2f052bd48ae291c549c57a1728e6a2ebc0f67fb8da77cf2bd66",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ConverterSet$Entry.class",
+      "occurrence": 0,
+      "sha256": "a333335a42453696fe971bd05902ebb37bb884179032e0fe0fbe5bebc8a0a4a3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ConverterSet.class",
+      "occurrence": 0,
+      "sha256": "daec47cc6d11af148239a8a0153831e63990a9fc256860b7a4368cca6b2e11ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/DateConverter.class",
+      "occurrence": 0,
+      "sha256": "86e6207edc05de00681242490d6f07dd241ad82d47825682027386bcbef1103a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/DurationConverter.class",
+      "occurrence": 0,
+      "sha256": "00c6f14eb402f082aa44107aff167f649aedb055cc6d49db758af6937b35b510",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/InstantConverter.class",
+      "occurrence": 0,
+      "sha256": "4388430844cecf946838b5d7de0019fafbbfa9976186d43aedce26f46c156881",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/IntervalConverter.class",
+      "occurrence": 0,
+      "sha256": "24ea5cbb33fa848e38569ae53909ce58167180fbbaa53cdb481cd0ba7dda1b60",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/LongConverter.class",
+      "occurrence": 0,
+      "sha256": "9159a3be3cd3b0703609186f68fd8482409088f720fda1db0be3b38b1427010c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/NullConverter.class",
+      "occurrence": 0,
+      "sha256": "6d2fa193b94c7ca36eea2dd641c0a971eb297d1cd8e7a648d390b7bef2e0eb24",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/PartialConverter.class",
+      "occurrence": 0,
+      "sha256": "676893d3d68255e789281699311705997a0cb335e4aa9c9b33df2e85571149d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/PeriodConverter.class",
+      "occurrence": 0,
+      "sha256": "4adc59b2f7fc1cfe832d28fc4248cfac85fe4fb980c463cbf37701fdf17cf1ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ReadableDurationConverter.class",
+      "occurrence": 0,
+      "sha256": "eb865f03053b8cb1f8ace554645bd130a00a70670b51853abf7a645038be2c43",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ReadableInstantConverter.class",
+      "occurrence": 0,
+      "sha256": "70d158b8e8db0327e9754b9ae795dc954ea75e0c6e22ac65517367f219a69431",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ReadableIntervalConverter.class",
+      "occurrence": 0,
+      "sha256": "dc8f5f44a9802b33551c662726f3aaf48203097af7801af96713e71788aebba0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ReadablePartialConverter.class",
+      "occurrence": 0,
+      "sha256": "803bfbb3d2e46f37472f69484a647bd3d51d986f984df71f791c2cb5bd2b898f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/ReadablePeriodConverter.class",
+      "occurrence": 0,
+      "sha256": "fb042de9a2baadee3d43da9a682c97f55b233d8a95f39f4091751194f8ac0fa9",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/convert/StringConverter.class",
+      "occurrence": 0,
+      "sha256": "7c1d99e3d0176ca0d9bbc0686299db3520b060a37be91492c87fd46802caabbe",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/DateMidnight$Property.class",
+      "occurrence": 0,
+      "sha256": "4e87e980620ed927927fd96e48abc1be8e37f89d39cd253eb53696fdb141a4ce",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/DateMidnight.class",
+      "occurrence": 0,
+      "sha256": "37c3847ad0b19634613378ffcfe7893adcd27f5c94717ebfcb3ddb38dd7be0f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/001.json"
+    },
+    {
+      "entry": "org/joda/time/DateTime$Property.class",
+      "occurrence": 0,
+      "sha256": "7e32f002bd30467c0d9d4188053b0df5c07fa225813cef2d300192902c805f83",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTime.class",
+      "occurrence": 0,
+      "sha256": "f13b13b679fbc902b6e3b31c3d175973b1dbc95cac22c10498277f6795e47e23",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeComparator.class",
+      "occurrence": 0,
+      "sha256": "9a506673b649347eb70a3b608970056f89063eb7bc6cc8be4cf7a65f7f3a9e6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeConstants.class",
+      "occurrence": 0,
+      "sha256": "4c7df6e4941ee432e12add058ca15042c32d8a8e6f05734c09f11ae17fb50359",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeField.class",
+      "occurrence": 0,
+      "sha256": "6006cafaeb3134a895227ddb9bd6a9487df0fa5bfc73689258863074cee243c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeFieldType$StandardDateTimeFieldType.class",
+      "occurrence": 0,
+      "sha256": "0f86fcbb397d026dd7faeb5291a96afb4d01c9e0d490b9c92648e069403084c1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeFieldType.class",
+      "occurrence": 0,
+      "sha256": "fa895b214e40be9930336511484674dc904e70e73da867459ad7e3765a3b9b8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeUtils$FixedMillisProvider.class",
+      "occurrence": 0,
+      "sha256": "8eea3f23eacda95a88d532e60dfe389e5062f83f6840ac30a21eaf985a1bf02b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeUtils$MillisProvider.class",
+      "occurrence": 0,
+      "sha256": "7daec6c5ea9dffa0451c4c557451cf245adb7c2f6128279300d40080426b8714",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeUtils$OffsetMillisProvider.class",
+      "occurrence": 0,
+      "sha256": "fbec0edf1044c5447888f9cb4f399cbefd09da90b35fef21151403bdc9d8736d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeUtils$SystemMillisProvider.class",
+      "occurrence": 0,
+      "sha256": "22c2f8909c275d213470f1ef4f52d81806259d96ae41cb5532ab653a51ba4636",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeUtils.class",
+      "occurrence": 0,
+      "sha256": "276e5cce8da6bcde3609222131c9af082e33f44e6253f98f6e0d5ea52237350f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeZone$1.class",
+      "occurrence": 0,
+      "sha256": "928da1f0c1996bab27e006fab9fd2719c719d370a093a68f2e8cf0777005598e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeZone$Stub.class",
+      "occurrence": 0,
+      "sha256": "2bd86b3b2f9c23be2de535b4eb3ef134c5e174e09f8849b0a552c56f3d256718",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DateTimeZone.class",
+      "occurrence": 0,
+      "sha256": "87ecb494f3d850ee4262b9dfe774ecc1cefb4cd719f09a926302865435c87e1e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/Days.class",
+      "occurrence": 0,
+      "sha256": "752f726cb6e7020929d9dda1f9b9a8993a2866c0da930619bc6c1912d977cbd7",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/Duration.class",
+      "occurrence": 0,
+      "sha256": "6abf4d755476f185e60d132faad8cc0984041aae805233f428910adbeeebbb0b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DurationField.class",
+      "occurrence": 0,
+      "sha256": "c9e7eb3572dd9d043f4dcff19aa6c0a64547dafda65fa2e27926bce1f18415a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DurationFieldType$StandardDurationFieldType.class",
+      "occurrence": 0,
+      "sha256": "9480664787c1b8af14c37efe8b785a75005be198fe51a3b30efdeb2b71862401",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/DurationFieldType.class",
+      "occurrence": 0,
+      "sha256": "6d8fde1fd313b1c882468f5846912a1ffa44ba8bec54b37eff8f9919641f5e82",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/AbstractPartialFieldProperty.class",
+      "occurrence": 0,
+      "sha256": "197f7d54e178fbcd257c9f2c40ab3a18b829b553fc3c1267825af8e8ae4d31a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/AbstractReadableInstantFieldProperty.class",
+      "occurrence": 0,
+      "sha256": "21c5d2efa9a35e9f576420fbfa396c2a216a2b53aee085daac309f8cf54116a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/BaseDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "22fb9c095b4ca4dfa9933d657c5829b409ba473eb87d54aed954d8971faed49f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/BaseDurationField.class",
+      "occurrence": 0,
+      "sha256": "d576fadfb2064d3edbe65846e13d7866c83bbec8c3d4c7650a371b6c64ba4f2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/DecoratedDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "573dac73a6a3def765da5863ea2ad06b2ede4c1f09a70edf3ab80f7848f71743",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/DecoratedDurationField.class",
+      "occurrence": 0,
+      "sha256": "02faa44b9ffee768e2543904a1a46260d2817dc476ef6fe44d6904feca7c9a2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/DelegatedDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "6e7517967e4ac55ae70490d57980358e3613b778351b7f045111f736bd36bc5e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/DelegatedDurationField.class",
+      "occurrence": 0,
+      "sha256": "d7d8427ac86f7cc52d1bb8722635542e04254db2a440a8c013e0b4eef067ed28",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/DividedDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "ccb04cc9344ae399b49260845983197fdd8b7730fb799ab83e33d63a472d9fb6",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/FieldUtils.class",
+      "occurrence": 0,
+      "sha256": "d6d866918da0198bc4148e34764d22b69a5d35fd676f728464840b99a701af3f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/ImpreciseDateTimeField$LinkedDurationField.class",
+      "occurrence": 0,
+      "sha256": "296e3477589ce0b550d2e555e1cdb4020f5478ee8079da1ba62a5ae4b9ba62f1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/ImpreciseDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "1f5c9189b3787ed6182391c5f1079e6c9e5cc39084407e52aabdcf07d6dc781b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/LenientDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "69e5533f398d8d0a838327e05b546fb9aac2e80f1b4642bcf8061097d0e7990b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/MillisDurationField.class",
+      "occurrence": 0,
+      "sha256": "9838b626b7ba83f250623a6c2b1939d15ec742e9c062f435fbbdaaee5fcd1602",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/OffsetDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "cfa25222b47fea3d5b0c294567a3162d08f3c1797421a8cef7c3fb7fe4a0c4f3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/PreciseDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "67793b0976366219e8269d3e7b1720afd2cc4a3ffa70475777c91885f62a6e7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/PreciseDurationDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "27eff509f984a963e44518c377f011bfd5f25bf4664666f348b848b7ec300c04",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/PreciseDurationField.class",
+      "occurrence": 0,
+      "sha256": "8bd1b101af1ec57ae6b7af569efcd67924fecaa1d6099928276371b5f927960a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/RemainderDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "74b549c53e86aafd59068647d81d69eb864bb8912f4e25131d2091220a2d5cd0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/ScaledDurationField.class",
+      "occurrence": 0,
+      "sha256": "38ab28ada5b40aa19ae4bf4ff3e670601e3062a178e76757b22f113369333f58",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/SkipDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "b8c01187545844ae6640cd1bc978c31d1fa6228609801fe945c86b3c49a7be52",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/SkipUndoDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "765597c308827fd7a9fb458495f7aba72c2157e6dd177898de33d803171c729a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/StrictDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "75df0f60904d25bdf871b3051dd04a3bb04a339d9acc6ce4085d66a398e1acb1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/UnsupportedDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "9d6f3f9f431e96da2c43b794ed11f6c6b69cf0c1f2ca78b85dc0291f8e91c014",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/UnsupportedDurationField.class",
+      "occurrence": 0,
+      "sha256": "e85719bb991d5592f7f9b7a6a182a1bf19d2d96282892b5d4736c522cac3613b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/field/ZeroIsMaxDateTimeField.class",
+      "occurrence": 0,
+      "sha256": "12892682f3fceaf26de5f4e1c754d5c8c1bdd4715cbb14178dd1ff0608e98c48",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormat$1.class",
+      "occurrence": 0,
+      "sha256": "04e7c12b0e630ba840f33de84271b332fa50f68f84b4bf824fb7723d5e691999",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormat$StyleFormatter.class",
+      "occurrence": 0,
+      "sha256": "20ea741f2d742eaf1d833df0d54b841f002fd96116d9475681e4e2cc19a9e0fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormat.class",
+      "occurrence": 0,
+      "sha256": "70371afbe9dbc1a817320974cae22c185ee3534b4505528735351e6f05d94108",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatter.class",
+      "occurrence": 0,
+      "sha256": "245db0f8138d841f70b1dae40b5840fc580f7700a2eb1f07adc276c3779a5d77",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$CharacterLiteral.class",
+      "occurrence": 0,
+      "sha256": "79924cfab501ab4325c825c9fe4e0067d305858e411e997a28be9ac7bc8c40ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$Composite.class",
+      "occurrence": 0,
+      "sha256": "2a3244e8a47c08d612d1fb529d3a9ea3aa1b75a2d01a6fd233df304b7f61cb5a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$FixedNumber.class",
+      "occurrence": 0,
+      "sha256": "dec151c47aaeac690cfeac09185d8050eafb6c5826512cd4009e33b1d6e17784",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$Fraction.class",
+      "occurrence": 0,
+      "sha256": "f4b2dc25ce89cd6046f27408281cf4251cb719694cd2790195db8914e5982bdf",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$MatchingParser.class",
+      "occurrence": 0,
+      "sha256": "13680975bf7e90074ecc7162a215da0069bb109914d8275edcb6e91283d5ff34",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$NumberFormatter.class",
+      "occurrence": 0,
+      "sha256": "a4776d87fe706d7172c1e9d1c7bda405b0576229f27cfd1daf5ce07dfe00f307",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$PaddedNumber.class",
+      "occurrence": 0,
+      "sha256": "1f8fc7b82c4f4b6fae728a4bf119fc3a346b23c410cc1ab8e5a5549d58ca8a63",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$StringLiteral.class",
+      "occurrence": 0,
+      "sha256": "c20dc4078f291c949e49eafcaed59140acafec44a5611474ab52997bd7652825",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$TextField.class",
+      "occurrence": 0,
+      "sha256": "47c2d80124c63f9c5128a1672a163c358d30ef9e8c29e81013fc1fcf8ab73fcb",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneId.class",
+      "occurrence": 0,
+      "sha256": "6b67b4df8291190243e791bff644144e83f32623174f882514ab4cd8fa01ccfc",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneName.class",
+      "occurrence": 0,
+      "sha256": "f690fa4bae1dcf71c31fbcebbb653b605ed6f923623dfd4a688b7e77be9b91ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$TimeZoneOffset.class",
+      "occurrence": 0,
+      "sha256": "83800bfbd69fcbee845f6225e72aae196d168231944bee0ffe5ad9afa17cc721",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$TwoDigitYear.class",
+      "occurrence": 0,
+      "sha256": "b398377811f546119531ec3e62543d25af9f07b7b1d37b6a1a6810f0afebf825",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder$UnpaddedNumber.class",
+      "occurrence": 0,
+      "sha256": "5d7dd66a9d8aaeb43e79907f18255476eb40365ceb5caee8261cf1972bf8fb9b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeFormatterBuilder.class",
+      "occurrence": 0,
+      "sha256": "6623520c40d67eea1013b4c8b6c413510951b3705a419133f1b5e720a5b52304",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeParser.class",
+      "occurrence": 0,
+      "sha256": "1bc6a1966a1a5effcec4753722af3278be65d6b804cb59cc29f5e95fb8c2f32c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeParserBucket$SavedField.class",
+      "occurrence": 0,
+      "sha256": "55bf26cbfa0ae16af0959d0912893258bd632432140100088bebe92e38ff0bdb",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeParserBucket$SavedState.class",
+      "occurrence": 0,
+      "sha256": "07d374925b2dbc7cdcef9c275293410008b5349408c3dbbfad67a1b9962277a7",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimeParserBucket.class",
+      "occurrence": 0,
+      "sha256": "baea8cbedb9d3b62837ecdb1b04d7e2a39a6eb014ed10e3de084591d03b7671f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/DateTimePrinter.class",
+      "occurrence": 0,
+      "sha256": "f9a13ab16d9ba47190a32c72a3c16c097eb33ed1194497e600604cde9c273ecc",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/FormatUtils.class",
+      "occurrence": 0,
+      "sha256": "f52352b5d65bf08599ed0a1279cdd2ec68fb04688b25ee059655881a45b4798e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/ISODateTimeFormat$Constants.class",
+      "occurrence": 0,
+      "sha256": "93bed9e4e21f8381abd664f655a060b2c3310bbab545138859a0828b69e3d022",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/ISODateTimeFormat.class",
+      "occurrence": 0,
+      "sha256": "dd27ac6bd1ccd2efe2c493e0d7bdc5c24c41b1fe8f571fcf00a718874bc9430e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/ISOPeriodFormat.class",
+      "occurrence": 0,
+      "sha256": "b965bac1c3cbc331f441a81e1c90d920a7ef0dc6ac22358da141b3f0b262648d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormat.class",
+      "occurrence": 0,
+      "sha256": "de84b0a0b83b85c564b9ee885cb882c8ed01ec731c7aa4b37f4230d2474f70ae",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatter.class",
+      "occurrence": 0,
+      "sha256": "3230a8c4e0fb1fff3c6fe465b7526b1e5832f8f7de1458c27c7e54d97e2fce6a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$Composite.class",
+      "occurrence": 0,
+      "sha256": "f73cd2af0bd70e28a9848745e6ae00c74cc760ee7b7a24ab671d138f9bfe213f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$CompositeAffix.class",
+      "occurrence": 0,
+      "sha256": "6755c0c7b9c02430b1ba8d447dbd5cb7ab86142569cea79cc881d34ed44ec3cf",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$FieldFormatter.class",
+      "occurrence": 0,
+      "sha256": "ebd363ba68935fd5077a97203ff8d3774f72cbd6be998a52a54c4e80731d0434",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$Literal.class",
+      "occurrence": 0,
+      "sha256": "f8b04030cb8aa3b238c0b00fda9381a8767997b98fb2db31a75a48948c159f27",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/002.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$PeriodFieldAffix.class",
+      "occurrence": 0,
+      "sha256": "32a14cfa65f4a9c87bad9d5b9a562cfe7b806f774b4312292464d16ed2e8d4f3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$PluralAffix.class",
+      "occurrence": 0,
+      "sha256": "292142fd92f80b64e3a3bd71a166bfac7cb5f657817bfe3045b37ef73e87342b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$Separator.class",
+      "occurrence": 0,
+      "sha256": "b50320ad39acfc780e024045d8ab6a8d61c90767be70d1c02e66854f9750c957",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder$SimpleAffix.class",
+      "occurrence": 0,
+      "sha256": "5d970942a66838609046ab9cc477d45813700f7bcf5c250bcb2965dd5f3dfbce",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodFormatterBuilder.class",
+      "occurrence": 0,
+      "sha256": "89e4eeb5c6eecd2f5ab7a74c8a4ba9e79b75749bc66cae4455d4eed7567024b0",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodParser.class",
+      "occurrence": 0,
+      "sha256": "54b2d0019c95b2d3901fb84acc752efbc269732d1a81f4d05bac38456b292f4c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/format/PeriodPrinter.class",
+      "occurrence": 0,
+      "sha256": "b81ddd8ed43a81ec771877d0c17ed3f4eabdb5195baddc3edb8ca9b1e280b7ae",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Hours.class",
+      "occurrence": 0,
+      "sha256": "d289e8d98deeb8400932bf3231a135f15c9548d8214fc6a04635abeb8979d065",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/IllegalFieldValueException.class",
+      "occurrence": 0,
+      "sha256": "ad3d5ae65afa362593b52b9c52037440677e85b8e93bff51cc950226c4c38b05",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/IllegalInstantException.class",
+      "occurrence": 0,
+      "sha256": "8030f5f9c23960b4fe6811f600445cb1acc508667755b8af6559a8f92a9e28fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Instant.class",
+      "occurrence": 0,
+      "sha256": "edf9fa46c96a593d4a507981b79026f1e49f2c0d355deb0fe74089e32f6fec82",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Interval.class",
+      "occurrence": 0,
+      "sha256": "d09eff0de25404bdadeb609f0a7b0cd55cd62694e27fbc36763a8aeee3e03f6f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/JodaTimePermission.class",
+      "occurrence": 0,
+      "sha256": "b3c62a654428587464546b88fdf7b50ba4526b075fe8ff9d41411c3d2015fbf9",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalDate$Property.class",
+      "occurrence": 0,
+      "sha256": "45fe461238f3411768cfeb5b9cbe8200f5a397fe7e45aaa4dd5e115b979fad61",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalDate.class",
+      "occurrence": 0,
+      "sha256": "a13896bb4968960015fc98367e1a22ed3f0180fba97908545e81581000d75514",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalDateTime$Property.class",
+      "occurrence": 0,
+      "sha256": "d33b46d0e16e48959c67737f701e898a9fe4ea063e28e7ef83101ce636ad18c9",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalDateTime.class",
+      "occurrence": 0,
+      "sha256": "52c8e015f0e7752f58cb87174cf7502f03dc5d4cb4f650b7c2c913a9e8ca8da3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalTime$Property.class",
+      "occurrence": 0,
+      "sha256": "bee413c2b1bac3e1b2424803ee77b3c34d62183891e930fa5ce57d821059b255",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/LocalTime.class",
+      "occurrence": 0,
+      "sha256": "0e11497d0414cdadbe1a27348dd69dbebeb7f2195279de8bf6379b624ec0d2f2",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Minutes.class",
+      "occurrence": 0,
+      "sha256": "ae0976ce262fbf2f6f13fa7b52673bfcb43c5142b89c6ed3af9c71701627e024",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MonthDay$Property.class",
+      "occurrence": 0,
+      "sha256": "54ee902a93ba5ce77a416fc49528c5377e71b3abea405ea8cf4ea22aaa4edd1a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MonthDay.class",
+      "occurrence": 0,
+      "sha256": "65ac35c173eabecabbcfd62c483265bee8eb7a7bf4f4e4420486bc5e09c9a9b2",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Months.class",
+      "occurrence": 0,
+      "sha256": "f27b6a9f48ccb173477fc4af66dfa25a1416ac913e867d937d28303556be00a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MutableDateTime$Property.class",
+      "occurrence": 0,
+      "sha256": "1894e230792a4aa0a2e97d04c7c81ddcae394b578999f6598c2b440b89e80744",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MutableDateTime.class",
+      "occurrence": 0,
+      "sha256": "e3cfaac984ff1c03bb95951d785312367bb068b12b2903161e6d918a3fe782b4",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MutableInterval.class",
+      "occurrence": 0,
+      "sha256": "b92426e0c6696133658bd2980f57b424256bfa82f34ccea79ad2c57d2e6b3a5a",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/MutablePeriod.class",
+      "occurrence": 0,
+      "sha256": "f2672859e630ab54a23b3526604bb5e0501f096dd4db3dec0dec9283551a1834",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Partial$Property.class",
+      "occurrence": 0,
+      "sha256": "876d398980142e72cad19b15c45b5f020f47d7269b719d4f776f5ce5011b5a18",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Partial.class",
+      "occurrence": 0,
+      "sha256": "dfb56fd87f26edb29ba7d84863130ba7fa6b580bbcf971f251ad0713abaffade",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Period.class",
+      "occurrence": 0,
+      "sha256": "b0de624a06e18c9c1aac7bf2fdb191e98e6331d1301994a7888b96a82984b8ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/PeriodType.class",
+      "occurrence": 0,
+      "sha256": "15a295cbb2473cbf624ee71697120c69bd9ade25612d033cc499c154606f3435",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadableDateTime.class",
+      "occurrence": 0,
+      "sha256": "ca92cfbacbe03bbbb2e5a7a4aafe018ec0586140b93873e4b930f66275d7a482",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadableDuration.class",
+      "occurrence": 0,
+      "sha256": "48311b59b665b69481d4ed5de29316a644f7549471f30bd0cf64adb8245a79df",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadableInstant.class",
+      "occurrence": 0,
+      "sha256": "ee4872cff934d9880945e3dd86bdb2670d9584f66930dfe8feb54d3e4355c117",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadableInterval.class",
+      "occurrence": 0,
+      "sha256": "d598cbd4492322b57940e6f7abf17827a8f73fcbc005852497ebef01e5cfdb3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadablePartial.class",
+      "occurrence": 0,
+      "sha256": "997d3079abb587aa50810a9be4bc68e8dab00e896fc2544c49ccee3b11f66872",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadablePeriod.class",
+      "occurrence": 0,
+      "sha256": "f502997059c818d72bef2d1be94d970f9db71e2664e7c006f24dbfa7d4da68cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadWritableDateTime.class",
+      "occurrence": 0,
+      "sha256": "6a863b3a5aa892f3cc56b6fe7974f2c9160dd827a9891296499daf60f131fc7d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadWritableInstant.class",
+      "occurrence": 0,
+      "sha256": "ef904e006bf65eff1869945764fb541723ced6ed9c1ece828248c194c54f2457",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadWritableInterval.class",
+      "occurrence": 0,
+      "sha256": "bb31d81cf8dc48859dea8c4c160a13e602252243498bb17553d5b2f8c9af3bde",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/ReadWritablePeriod.class",
+      "occurrence": 0,
+      "sha256": "dca6b4186d3dde91340f2276d27b0978aa1fdbf17eaa56b3a7cde373e2f9df03",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Seconds.class",
+      "occurrence": 0,
+      "sha256": "f1fc288f3fd2a95ac0f0146c808c78d6217e14684fa4c75c18f232ea904f286c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/TimeOfDay$Property.class",
+      "occurrence": 0,
+      "sha256": "05d1d17213b972037994ccfadf2af391202da79cdd78beb63871ac394ed58528",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/TimeOfDay.class",
+      "occurrence": 0,
+      "sha256": "be30a43e84d08c082570ec8511ad8e2bdcd9ebf09964f24c0f705798d5c94a0e",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/CachedDateTimeZone$Info.class",
+      "occurrence": 0,
+      "sha256": "4a1ab0a9a77506f47d39f31cd208282591091e8c146365a3f4ea7704d1c201dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/CachedDateTimeZone.class",
+      "occurrence": 0,
+      "sha256": "9a3ac7499962dc57a786387d7eca37eaf0bce349d5b6100d46f8c6eafe18d3fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$DSTZone.class",
+      "occurrence": 0,
+      "sha256": "5f5249e48dc508a6887b0839415a6ba0da9f389988b3ac025be9d7d84c9e5aab",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$OfYear.class",
+      "occurrence": 0,
+      "sha256": "b138b6e91d002466b15242712ecec345a8b4004d6f9d4789cd60ad1be4dd287f",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$PrecalculatedZone.class",
+      "occurrence": 0,
+      "sha256": "0ad58f8630ee4b366054be64403fe64bb1df52f0c3d78f925da91ed86ada6384",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$Recurrence.class",
+      "occurrence": 0,
+      "sha256": "3908c42f1956abd9b8316e53bbac35ea2dd4c5c3530b4494ad5523299a68a64b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$Rule.class",
+      "occurrence": 0,
+      "sha256": "6044298e3b1882d524358a41fc96ce28244afc3b6203f63328797c1c14aa7a5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$RuleSet.class",
+      "occurrence": 0,
+      "sha256": "b4c290cc9c5abd13bc2291f664c74c4ea569b552b435368a5d879a3e36fc3f26",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder$Transition.class",
+      "occurrence": 0,
+      "sha256": "66310c163ecb659f69eb72b8ced75f239fb10abcef6808bf7d9760b1a629f905",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DateTimeZoneBuilder.class",
+      "occurrence": 0,
+      "sha256": "7b02079f88b97eb150d32392b73224d0f2719ad271d03e0b16a3d56358b7e5ee",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/DefaultNameProvider.class",
+      "occurrence": 0,
+      "sha256": "93456be6a94848f3fa2d96eae7c5735da46fdddbadbd4ab41ab0ac5358ff76ea",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/FixedDateTimeZone.class",
+      "occurrence": 0,
+      "sha256": "7d823dbd1707f2e6f529b632122e1adad8beb6411594f314787132acf82a3068",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/NameProvider.class",
+      "occurrence": 0,
+      "sha256": "4da65258216dcf59f7a50c6faeda55cde9bb4d7c47079e244788113eceb12fdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/Provider.class",
+      "occurrence": 0,
+      "sha256": "bcaef2ee7be8e52647b423cf992d67ec78adebcccaaa16ad36357be7d5eb9960",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/UTCProvider.class",
+      "occurrence": 0,
+      "sha256": "d2cd7c8f3a194a466c8a2c028f8c47df92dcf9ff685557fb941e7366c9685645",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler$1.class",
+      "occurrence": 0,
+      "sha256": "c0bba8f2a727fd66a87b7a0b9700c57c17f74d562834851c049566564d4c5b22",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler$DateTimeOfYear.class",
+      "occurrence": 0,
+      "sha256": "b8d9f45d089c8f3dfbf5bb5a9fa72c39b740f91d04676a28f067967af3c81ca6",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler$Rule.class",
+      "occurrence": 0,
+      "sha256": "1d00def7bd1276f3b174407facc91b3da67b836d42057dd3270d442d08988780",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler$RuleSet.class",
+      "occurrence": 0,
+      "sha256": "5b2377a6346c7136ad03c9300e157ff2d01bfbc54fde2dc1bd8456fda99e632d",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler$Zone.class",
+      "occurrence": 0,
+      "sha256": "b33239c207256168206d4291c49be436d0fd5cac273caae13b8f993a6a204287",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoCompiler.class",
+      "occurrence": 0,
+      "sha256": "3d2ce052de42af421d5ad0ea8cdfffc6df3c0405269e6ad3ebcf2f7bb5ca79e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/tz/ZoneInfoProvider.class",
+      "occurrence": 0,
+      "sha256": "b633e4b5e05c6fd3541db64ad1fdbc5055fd8b49d06ca8c6f2b788a4dc14e572",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Weeks.class",
+      "occurrence": 0,
+      "sha256": "b2a36ba45f8f871c2f7014227b399fbd88e17e507d3fcafa3724642e9d180720",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/YearMonth$Property.class",
+      "occurrence": 0,
+      "sha256": "c1f430bfef4446db224a648b80d9f47d50e10c92347db798712d39e93bd1b68c",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/YearMonth.class",
+      "occurrence": 0,
+      "sha256": "2bcd115dd97f920365e505d7604f8ac2abd3a000cad89468f63a79235b585050",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/YearMonthDay$Property.class",
+      "occurrence": 0,
+      "sha256": "4256c1be33d720349142d0b6a3b87adbabc6f878fdb41a5f52da7eaf249e07aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/YearMonthDay.class",
+      "occurrence": 0,
+      "sha256": "10843be54443480db19474b8173ae5377387d313e77b5b7dd537bef448e8b489",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    },
+    {
+      "entry": "org/joda/time/Years.class",
+      "occurrence": 0,
+      "sha256": "e0951a9d788fe032edd56265d83939bfbdf947670a745191be7dfeba36e4d4b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/061/003.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/061/001.json",
+      "sha256": "dce71b019f55baaaa8043dc56dd862dcb8b3d4fac570913cb752b11d695400c8"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/061/002.json",
+      "sha256": "91dd3926a84750550f29fd0de54170a2266c9f334e6a206c252fbb443dba52d4"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/061/003.json",
+      "sha256": "ace7346b878965006953af924d4dc726372e601a92d10785801e592e57893a95"
+    }
+  ]
+}

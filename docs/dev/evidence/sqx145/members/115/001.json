@@ -1,0 +1,3298 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/uncommons-maths-1.2.2a.jar",
+  "archive_sha256": "eebe98f2f9d8cb5d2a030a1c3e52cfbb3ee0ff5b6a721a45e62092e3bbf83c5c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/uncommons/maths/Maths.class",
+      "occurrence": 0,
+      "sha256": "f4d07966ac4d30dc92e4ce0bd3431c47c92037606d289c2bea1da3857747bea5",
+      "name": "org/uncommons/maths/Maths",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_LONG_FACTORIAL",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "CACHE_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "BIG_FACTORIALS",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 26,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Ljava/lang/Integer;Ljava/math/BigInteger;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "factorial",
+          "descriptor": "(I)J",
+          "access": 9,
+          "code_sha256": "647f5c6ef8bbd955444f6aacb1af478c31ed4acf463112d8a38919aed42b5cd2",
+          "code_length": 42
+        },
+        {
+          "name": "bigFactorial",
+          "descriptor": "(I)Ljava/math/BigInteger;",
+          "access": 9,
+          "code_sha256": "3cd81a609a4bf526eb1a80bdc6ab7e6eb1e531b78beb5c6c7a7f52a40d68feea",
+          "code_length": 93
+        },
+        {
+          "name": "raiseToPower",
+          "descriptor": "(II)J",
+          "access": 9,
+          "code_sha256": "dfe6fdc7e5efc479ea046ce08f09683d5ef9f758e453ffa6caf42db707d712c0",
+          "code_length": 38
+        },
+        {
+          "name": "log",
+          "descriptor": "(DD)D",
+          "access": 9,
+          "code_sha256": "71e0718355b1fe6eccb874d964acc3c5ff376c23c66bffa34e05a035eeaa777f",
+          "code_length": 10
+        },
+        {
+          "name": "approxEquals",
+          "descriptor": "(DDD)Z",
+          "access": 9,
+          "code_sha256": "bb02ca4456c3a5d6877ece001a741a87e14ee55c52be61c81d6967e52580af1c",
+          "code_length": 44
+        },
+        {
+          "name": "restrictRange",
+          "descriptor": "(III)I",
+          "access": 9,
+          "code_sha256": "a73d886551a0f1b6193413c2687462d3956d81b161cb36ab3ab2402705bf88a0",
+          "code_length": 10
+        },
+        {
+          "name": "restrictRange",
+          "descriptor": "(JJJ)J",
+          "access": 9,
+          "code_sha256": "f2d86c11c768b381162d8b2514a873d9ecd223843c50ee38cd70dc0e632e90e4",
+          "code_length": 11
+        },
+        {
+          "name": "restrictRange",
+          "descriptor": "(DDD)D",
+          "access": 9,
+          "code_sha256": "13639ca857ee9d9056a4cf13cb5bcec39f9a62b2539e2dda1ff8a77eb18a13ed",
+          "code_length": 11
+        },
+        {
+          "name": "greatestCommonDivisor",
+          "descriptor": "(JJ)J",
+          "access": 9,
+          "code_sha256": "c1db4dd41b0d2c1cf7f2758dbce55798803f3e4ac2eeff522622521512fd596b",
+          "code_length": 31
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "46e4d7345aadc2f83afa9da6ce222f33f0a57841e1ccc337c4287943991f7be8",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/math/BigInteger",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "org/uncommons/maths/Maths"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/binary/BinaryUtils.class",
+      "occurrence": 0,
+      "sha256": "a7f04d5514d92b7a6e1046b4e32d036dd76cc49734c971c61c5b318a6408f501",
+      "name": "org/uncommons/maths/binary/BinaryUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "BITWISE_BYTE_TO_INT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "HEX_CHARS",
+          "descriptor": "[C",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "convertBytesToHexString",
+          "descriptor": "([B)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f1065696c228c6e679664f41601dee41013f464e5207bf33b9eac7c41d2c31e9",
+          "code_length": 73
+        },
+        {
+          "name": "convertHexStringToBytes",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 9,
+          "code_sha256": "3dbcd9649d9f49086d81b62faedaab4c8b97c2eff54d94a46c651289ad136884",
+          "code_length": 65
+        },
+        {
+          "name": "convertBytesToInt",
+          "descriptor": "([BI)I",
+          "access": 9,
+          "code_sha256": "edb0e27bad610f34f2a8f7626e4444f0a02fc46b4f97f407f73544f2d1f4921d",
+          "code_length": 47
+        },
+        {
+          "name": "convertBytesToInts",
+          "descriptor": "([B)[I",
+          "access": 9,
+          "code_sha256": "9b980d4299158d69e471e46ed649af4abce984c95675dfd43d46e0fdf37338f9",
+          "code_length": 50
+        },
+        {
+          "name": "convertBytesToLong",
+          "descriptor": "([BI)J",
+          "access": 9,
+          "code_sha256": "ac0b8fc1d88027c24f530c5dc94220e075de4e6ee3ffcb0d4573a4acfab573a8",
+          "code_length": 39
+        },
+        {
+          "name": "convertDoubleToFixedPointBits",
+          "descriptor": "(D)Lorg/uncommons/maths/binary/BitString;",
+          "access": 9,
+          "code_sha256": "2bed9c4c1ebb70139fba40fe2adcc1722f43a6699b31a58c3d91ff2e4a05ddc4",
+          "code_length": 97
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "36c45cdecb1794b88ac180c635db50080073e455953619951c59a4bdc8e37e28",
+          "code_length": 98
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/binary/BitString"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/binary/BitString.class",
+      "occurrence": 0,
+      "sha256": "4221501b42421b7e2aac709f3b8c43e5f0dd2ad09675ee3e39713521b21c448b",
+      "name": "org/uncommons/maths/binary/BitString",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable",
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "WORD_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "data",
+          "descriptor": "[I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f41d26b5b235ee6ba852e24eecdc536b3e4e1c2e83900311e3d78d50c718b28a",
+          "code_length": 39
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "592bcabc0cfd4f97ad24b7ce4a99eadfd194b922d6ca7e521ffce2a3cfe5d481",
+          "code_length": 73
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c08b5f71349e012de18009bfa56ad6b158a66b05b88349ce15a39b9d05710901",
+          "code_length": 88
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "getBit",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "6ed9f88112488da4ef22dbde7829d17fcfbc30df05e9f4f8727c0c78a4cf4a44",
+          "code_length": 34
+        },
+        {
+          "name": "setBit",
+          "descriptor": "(IZ)V",
+          "access": 1,
+          "code_sha256": "3f4f6afd913e6cded4fae088693dd31127075096ba51585a688f5ba67984c9c4",
+          "code_length": 52
+        },
+        {
+          "name": "flipBit",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "4f35ee7bd06e0152885e9a7ecf23c5acb79fd27a248ce0a8ef062658e70e3191",
+          "code_length": 28
+        },
+        {
+          "name": "assertValidIndex",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "ec3bf26651d53e17695250a5b360f7c6e12230a32c92c3e2bd96af8395725700",
+          "code_length": 57
+        },
+        {
+          "name": "countSetBits",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "86f4f15577abe3e5c79fdbada22eae8876bc4a5f00a0505ca5050f3ac785d776",
+          "code_length": 53
+        },
+        {
+          "name": "countUnsetBits",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c81d5fcf37c7c2d11ab8153e4adc55cb93216a2cb3cc7583c75f85d37d0dd1bc",
+          "code_length": 10
+        },
+        {
+          "name": "toNumber",
+          "descriptor": "()Ljava/math/BigInteger;",
+          "access": 1,
+          "code_sha256": "75581e2a78bf27b1a337ecbcbc7e63c8b9fa91ec5366814388594babd7e0808e",
+          "code_length": 13
+        },
+        {
+          "name": "swapSubstring",
+          "descriptor": "(Lorg/uncommons/maths/binary/BitString;II)V",
+          "access": 1,
+          "code_sha256": "e80cc21fe5cbb2c0a90f4164538d152fc6372489ee81cdcfd2a014f0f9698e7b",
+          "code_length": 136
+        },
+        {
+          "name": "swapBits",
+          "descriptor": "(Lorg/uncommons/maths/binary/BitString;II)V",
+          "access": 2,
+          "code_sha256": "10130b3977c29a35603f6df8c27b41cd9a22de77f6fd8520ce32f627ab88d1a3",
+          "code_length": 70
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "26d837b6713b05fc9b46cb69b9c72c2ad3449797880058124a7e1b90d933df1d",
+          "code_length": 50
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lorg/uncommons/maths/binary/BitString;",
+          "access": 1,
+          "code_sha256": "52974e08220f71a0a21c2850d2e2be029704ce65ef1d0b2dfcc72401f600d39e",
+          "code_length": 42
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f8724f3d8dc2c6ba8dc53020b154cc87f09676a12d12897b1c479be473ed1e6a",
+          "code_length": 60
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "0face1a7835040a6151831f945d4c8e6fc13a39b08c65e0c52ff49d1eebfe435",
+          "code_length": 20
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "bd2e476c07c1fba4ea676bb1fbc849971b0fa39865580025c0d523a9b4654314",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[I",
+        "java/io/Serializable",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Cloneable",
+        "java/lang/Error",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IndexOutOfBoundsException",
+        "java/lang/InternalError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/math/BigInteger",
+        "java/util/Arrays",
+        "java/util/Random",
+        "org/uncommons/maths/binary/BitString"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/binary/package-info.class",
+      "occurrence": 0,
+      "sha256": "4890e967c3e6938e9f5bcbe574d6deb22c009393b04575842e208c4c736fac26",
+      "name": "org/uncommons/maths/binary/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/binary/package-info"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/CombinationGenerator$1.class",
+      "occurrence": 0,
+      "sha256": "42e0237046c48ed3cdf02d23afb1b09eb8e30435fb3dcd3e61114b95b01966bb",
+      "name": "org/uncommons/maths/combinatorics/CombinationGenerator$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/uncommons/maths/combinatorics/CombinationGenerator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/combinatorics/CombinationGenerator;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7d54c10fd2ace87ea6f303548abd6d2cb84f7e5b4b8c7219a9cf7c238b53aab0",
+          "code_length": 8
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8c6af8b3d3f19c89e53488b5eecaac75a3474e113d5fa408cf0cb557a7c34716",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1f8e20f70172d69c266057fc8de2845667d744205763e562a1a1e013fa77f254",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "org/uncommons/maths/combinatorics/CombinationGenerator",
+        "org/uncommons/maths/combinatorics/CombinationGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/CombinationGenerator.class",
+      "occurrence": 0,
+      "sha256": "c4a76a48408ea2a268c4a03dd7d282650df9b39c75222dd3bf199eacc63f6900",
+      "name": "org/uncommons/maths/combinatorics/CombinationGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "elements",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "[TT;"
+        },
+        {
+          "name": "combinationIndices",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "remainingCombinations",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "totalCombinations",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;I)V",
+          "access": 1,
+          "code_sha256": "5d8bc21313d6461ba29a2c971aefe359742bfc02340bb804068fd0ea1ff42fcd",
+          "code_length": 110,
+          "generic_signature": "([TT;I)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;I)V",
+          "access": 1,
+          "code_sha256": "b7d3b75ac3a4589812b67ec69dec7db50eef009aeffce9f41d185c888c6a40c9",
+          "code_length": 24,
+          "generic_signature": "(Ljava/util/Collection<TT;>;I)V"
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "8e178bccb0df9c11d49096470db89e2049f5fea78f01cd4c1ade32d4efa3af13",
+          "code_length": 33
+        },
+        {
+          "name": "getRemainingCombinations",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "99789ec859e924df8e9a9916590f446f66a39c5f7f3863c9815a28864cf0ec13",
+          "code_length": 5
+        },
+        {
+          "name": "hasMore",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6f686d89075f59ecf9fac84dd0171ff75e0523974bc5e9c2c40020469c450676",
+          "code_length": 15
+        },
+        {
+          "name": "getTotalCombinations",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "c732dcdcfe2586a25d55cdc3ef0f1f6698a6c681c5159e197cfe75edca60bb00",
+          "code_length": 5
+        },
+        {
+          "name": "nextCombinationAsArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "43f0fa4d916b624493db7439d6946bc7d895b1d5b3864295a13b0f3e69f18783",
+          "code_length": 31,
+          "generic_signature": "()[TT;"
+        },
+        {
+          "name": "nextCombinationAsArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f2bd39d35740bb2f0e4c983b269ec3c8b8bd94b6b80ac544f59fdfb3c2963361",
+          "code_length": 57,
+          "generic_signature": "([TT;)[TT;"
+        },
+        {
+          "name": "nextCombinationAsList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "9bf5ec16ec608b4e1355c2e8ce93afd377ea05718fee730c41af61392f5cca0a",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "nextCombinationAsList",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "ded4b33bee569a86ba6ea1a88fe3ec92251ee7bbc3dac4f4d940e7d6d1b6b2ac",
+          "code_length": 55,
+          "generic_signature": "(Ljava/util/List<TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateNextCombinationIndices",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "55dd4e136d6ecde7ee48f2f09008f32fe7a63abe37a7bd36fd6e342f389761c1",
+          "code_length": 123
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "eec653f7f0188f80dfe80c8ac71619533319d1dfba305470b9256a6acd89fa4c",
+          "code_length": 9,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/util/List<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Iterable<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/reflect/Array",
+        "java/math/BigInteger",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/List",
+        "org/uncommons/maths/Maths",
+        "org/uncommons/maths/combinatorics/CombinationGenerator",
+        "org/uncommons/maths/combinatorics/CombinationGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/PermutationGenerator$1.class",
+      "occurrence": 0,
+      "sha256": "64f62d178150e3cc5974da94ef1c38f6f3c2cf50e5a5d191bd2a0496a66da813",
+      "name": "org/uncommons/maths/combinatorics/PermutationGenerator$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/uncommons/maths/combinatorics/PermutationGenerator;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/combinatorics/PermutationGenerator;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7d54c10fd2ace87ea6f303548abd6d2cb84f7e5b4b8c7219a9cf7c238b53aab0",
+          "code_length": 8
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8c6af8b3d3f19c89e53488b5eecaac75a3474e113d5fa408cf0cb557a7c34716",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1f8e20f70172d69c266057fc8de2845667d744205763e562a1a1e013fa77f254",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "org/uncommons/maths/combinatorics/PermutationGenerator",
+        "org/uncommons/maths/combinatorics/PermutationGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/PermutationGenerator.class",
+      "occurrence": 0,
+      "sha256": "43fbd645a3f521d08f47ac9859ff8c01e46cf3590acb627fd86610c4b428e9bf",
+      "name": "org/uncommons/maths/combinatorics/PermutationGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "elements",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "[TT;"
+        },
+        {
+          "name": "permutationIndices",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "remainingPermutations",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "totalPermutations",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6262056715578c669e8ea6281a794d2712b0a8dca9020d62fd02a454e65449fa",
+          "code_length": 54,
+          "generic_signature": "([TT;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Collection;)V",
+          "access": 1,
+          "code_sha256": "a5959472ae8d93c759bbebbd0ea03530b7979fa57a5cc3204fa56e390b88337a",
+          "code_length": 23,
+          "generic_signature": "(Ljava/util/Collection<TT;>;)V"
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "d190a6d280ab946f7eb4727cbf1ed9b0e49d2ffc6b08ec21a3f56b1125b9775f",
+          "code_length": 33
+        },
+        {
+          "name": "getRemainingPermutations",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "9c8f9bda87f8d7cff8f422a2991028ffa05993a641be1bbc1362d0bffa5142a7",
+          "code_length": 5
+        },
+        {
+          "name": "getTotalPermutations",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "2474113f7501d5e7cd5b9ebd0ab070a0d48b112ed2356fcc1bae4e93e27bac39",
+          "code_length": 5
+        },
+        {
+          "name": "hasMore",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "c57f5cc4f4b73a878ff29175684e8dadc19801e4554c5716de939f9843ea8d67",
+          "code_length": 15
+        },
+        {
+          "name": "nextPermutationAsArray",
+          "descriptor": "()[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "255a1e96319c4a1e2433ac060fd7c048520d7ff4f4eeb440b5c6a0bcf3bb067a",
+          "code_length": 31,
+          "generic_signature": "()[TT;"
+        },
+        {
+          "name": "nextPermutationAsArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "47305f86416436886027e7db7211b2586ca7684471991ab2c5df090f6e62550e",
+          "code_length": 57,
+          "generic_signature": "([TT;)[TT;"
+        },
+        {
+          "name": "nextPermutationAsList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "a4b82d8a13598281fbd441185055cecf0fe24127f3a7a74adee259065f2acee1",
+          "code_length": 19,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "nextPermutationAsList",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "3321c8415d998940646a4d0cf34e4df6344cd13afe42a80ffd333f3eb031082d",
+          "code_length": 55,
+          "generic_signature": "(Ljava/util/List<TT;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateNextPermutationIndices",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0d5c1665d637a25a2fe40bf2f9d079bcd08ca7500ebc6c96d6a9be53bdb19a45",
+          "code_length": 188
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "beae053a5e43c71fc25dd250f1ab49252d8e11f3af181952a662ec1272f94f1d",
+          "code_length": 9,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/util/List<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Iterable<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/reflect/Array",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/List",
+        "org/uncommons/maths/Maths",
+        "org/uncommons/maths/combinatorics/PermutationGenerator",
+        "org/uncommons/maths/combinatorics/PermutationGenerator$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/combinatorics/package-info.class",
+      "occurrence": 0,
+      "sha256": "7865039bc233d29a3865fdc881e61d3cbdd3f0ad7ab8ac40560b60361680e6e0",
+      "name": "org/uncommons/maths/combinatorics/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/combinatorics/package-info"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/number/AdjustableNumberGenerator.class",
+      "occurrence": 0,
+      "sha256": "b743a5dc07ff81f31f26d9c22e07ae2ebeffaadd6b4ffe7b5cc0a0c555834ae7",
+      "name": "org/uncommons/maths/number/AdjustableNumberGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReadWriteLock;",
+          "access": 18
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Number;",
+          "access": 2,
+          "generic_signature": "TT;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Number;)V",
+          "access": 1,
+          "code_sha256": "75f282fdde081fc0538543675859c779e118c4ace01e2715e52206468e24edc4",
+          "code_length": 21,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Number;)V",
+          "access": 1,
+          "code_sha256": "9327bf5354e4ec96a3bf46a3582cdb663a69da999997137d770adeaf28a369d0",
+          "code_length": 54,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "667ce846250196ace9e1c50d6524e0edcf23cd5d501e82c0ca3525678adcf5ab",
+          "code_length": 52,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Number;>Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReadWriteLock",
+        "java/util/concurrent/locks/ReentrantReadWriteLock",
+        "org/uncommons/maths/number/AdjustableNumberGenerator",
+        "org/uncommons/maths/number/NumberGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/number/ConstantGenerator.class",
+      "occurrence": 0,
+      "sha256": "6b6c59b86d19838216da0ef85b04395a352c2eba9876e741e066d3f8aee549ae",
+      "name": "org/uncommons/maths/number/ConstantGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "constant",
+          "descriptor": "Ljava/lang/Number;",
+          "access": 18,
+          "generic_signature": "TT;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Number;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(TT;)V"
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Number;>Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/number/NumberGenerator.class",
+      "occurrence": 0,
+      "sha256": "a95920a28f84701d983d17aa1617bfffad19562d9e314c876bf0b2e24dcc09ac",
+      "name": "org/uncommons/maths/number/NumberGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Number;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/number/NumberGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/number/Rational.class",
+      "occurrence": 0,
+      "sha256": "4ede8fdd3a01fb829f914eb3438ca47c117e6f13f1ae503050b0144bea04d4eb",
+      "name": "org/uncommons/maths/number/Rational",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Number",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "QUARTER",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "THIRD",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "HALF",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "TWO_THIRDS",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "THREE_QUARTERS",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "ONE",
+          "descriptor": "Lorg/uncommons/maths/number/Rational;",
+          "access": 25
+        },
+        {
+          "name": "numerator",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "denominator",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJ)V",
+          "access": 1,
+          "code_sha256": "afe64be3a812ba65942051d99a5ba5c9947ec6fa55df9b532b27e68f7f9abd3e",
+          "code_length": 44
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "79efe98d31a55af64e6ffc7da1e2992f3930ab43b3465f48ad1833d8c6de6160",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/math/BigDecimal;)V",
+          "access": 1,
+          "code_sha256": "2d7854adbcb6d111a1b31e5860d809f6cf044865bf483b3414b5eaa9ec370433",
+          "code_length": 62
+        },
+        {
+          "name": "getNumerator",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7b7398b59cd48910c9710158aa51c7ba732921e3e57fb07927e272c1d779623a",
+          "code_length": 5
+        },
+        {
+          "name": "getDenominator",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "dc4302e4afb670f8cd2a9c021af6209bfeb99ab4725cf5e06028230aade73f84",
+          "code_length": 5
+        },
+        {
+          "name": "add",
+          "descriptor": "(Lorg/uncommons/maths/number/Rational;)Lorg/uncommons/maths/number/Rational;",
+          "access": 1,
+          "code_sha256": "45fceaac34a4b2280230d2259dd94bde54b01ea1b6bdcda7d3dc76e4f3f6c05c",
+          "code_length": 69
+        },
+        {
+          "name": "subtract",
+          "descriptor": "(Lorg/uncommons/maths/number/Rational;)Lorg/uncommons/maths/number/Rational;",
+          "access": 1,
+          "code_sha256": "407e49b1171379b46c14bff258b45ec7acb25c2e5781317f9ed90271258c99c6",
+          "code_length": 69
+        },
+        {
+          "name": "multiply",
+          "descriptor": "(Lorg/uncommons/maths/number/Rational;)Lorg/uncommons/maths/number/Rational;",
+          "access": 1,
+          "code_sha256": "7fe683cd93dbd49880c015c95e2f16614dcbe1442de43f706d4858fe12ff70c1",
+          "code_length": 26
+        },
+        {
+          "name": "divide",
+          "descriptor": "(Lorg/uncommons/maths/number/Rational;)Lorg/uncommons/maths/number/Rational;",
+          "access": 1,
+          "code_sha256": "9c313413e71e4168c14a00df58c7c91d180599860e156e0265ea84a73c9aefbd",
+          "code_length": 26
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b4b56b5bc5e5ffc6f1f89d7d536a25ac9364d78e64c13640ed2c0bc1ad3795d0",
+          "code_length": 6
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ad5c15ee0b7f3e9a7a896f8bc76008d8ce691e16bcd00c0a8c0b6e4a2f1a7c65",
+          "code_length": 6
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "80eb0e2775ef9f931d156026349b249c0deffda70baee89e71367a5306cb8e72",
+          "code_length": 6
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "475b3ee52aa9e0d6cedca4a2fd5afbace767cd29d21a9db12d6fe544248f33fb",
+          "code_length": 12
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4cc40f22707bb923a04a90222aaa81045e9ad87f836cf72ef4bf3280c7ab9759",
+          "code_length": 59
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6430ee8c49ee177b3a5446a3f150848fa124bdd118b48f8545803b40e9d2b343",
+          "code_length": 35
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ecfa6a1911f85fb1857388bb8b896c72720d92ad0b89b6f5fe6002e01b3d4649",
+          "code_length": 47
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/uncommons/maths/number/Rational;)I",
+          "access": 1,
+          "code_sha256": "4f5139899dbd16d894d1a584532ef70d4d851a9b0111c05fe6628a9642625e9a",
+          "code_length": 62
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "f0bd533d15c127e826c66fa5b4dad2f44225ad3d8c19878a76c7cdc2029bfd37",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3f002bc1f5bf459b7a6a310e007de5cccbb646bc115664cd567683d3af302f92",
+          "code_length": 97
+        }
+      ],
+      "generic_signature": "Ljava/lang/Number;Ljava/lang/Comparable<Lorg/uncommons/maths/number/Rational;>;",
+      "class_references": [
+        "java/lang/Comparable",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Long",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/math/BigDecimal",
+        "java/math/BigInteger",
+        "org/uncommons/maths/Maths",
+        "org/uncommons/maths/number/Rational"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/number/package-info.class",
+      "occurrence": 0,
+      "sha256": "4df9f5980616ace7e4a87cb80fd5db3efca885961acd4ae2e1904d424a3bda3a",
+      "name": "org/uncommons/maths/number/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/number/package-info"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/package-info.class",
+      "occurrence": 0,
+      "sha256": "524963fc55fec4a1469869c75d9b8062fabf58c55a09bb5c86f49dcab7d693d3",
+      "name": "org/uncommons/maths/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/package-info"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG$1.class",
+      "occurrence": 0,
+      "sha256": "a4413c62593a53e1ce12f67bbbc26e6420124015719bff0711db78f01921ce36",
+      "name": "org/uncommons/maths/random/AESCounterRNG$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/random/AESCounterRNG",
+        "org/uncommons/maths/random/AESCounterRNG$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG$AESKey.class",
+      "occurrence": 0,
+      "sha256": "5e58dd8b7c9a7c3c0b5e6b52cd84143e7cfb4cb4cea0bd323eb38068b740cd52",
+      "name": "org/uncommons/maths/random/AESCounterRNG$AESKey",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/Key"
+      ],
+      "fields": [
+        {
+          "name": "keyData",
+          "descriptor": "[B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 2,
+          "code_sha256": "ec2c21f00e3cbcac835cbdf4e45288d76c6eec5f5c164c49b95238585558e8c0",
+          "code_length": 10
+        },
+        {
+          "name": "getAlgorithm",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c9cdc1d4e77197d79563e1ed9ee90789a892e4d5f35b7c42afe23ed087b4f220",
+          "code_length": 3
+        },
+        {
+          "name": "getFormat",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dc20e511568208b0ddf7e00244f9f5e5eae0787efab1c7fd15e8952b203dffca",
+          "code_length": 3
+        },
+        {
+          "name": "getEncoded",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([BLorg/uncommons/maths/random/AESCounterRNG$1;)V",
+          "access": 4096,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/Key",
+        "org/uncommons/maths/random/AESCounterRNG",
+        "org/uncommons/maths/random/AESCounterRNG$1",
+        "org/uncommons/maths/random/AESCounterRNG$AESKey"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/AESCounterRNG.class",
+      "occurrence": 0,
+      "sha256": "bf34f72925d95a49043ff17c1809ad7167c22109dd8e956ca2613e18ce910556",
+      "name": "org/uncommons/maths/random/AESCounterRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "cipher",
+          "descriptor": "Ljavax/crypto/Cipher;",
+          "access": 18
+        },
+        {
+          "name": "counter",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 18
+        },
+        {
+          "name": "currentBlock",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2ed64e8e0d5439000667ef2d2443cff0abd86b3014c1447fe0f379381a2cb43d",
+          "code_length": 7,
+          "throws": [
+            "java/security/GeneralSecurityException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "541e5ad47d4b4297f47a227aa53278f821a708b5eaaecf302c4c9f359130a833",
+          "code_length": 13,
+          "throws": [
+            "org/uncommons/maths/random/SeedException",
+            "java/security/GeneralSecurityException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "cd6b32a1314da0c6013136b486df0cf134045d4c81e21388faf98fda75cf7663",
+          "code_length": 12,
+          "throws": [
+            "java/security/GeneralSecurityException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "31150a0a5816ef3b1fa99bbc4148e70a7d533de2a03cc7979f23edafbf64a5e6",
+          "code_length": 88,
+          "throws": [
+            "java/security/GeneralSecurityException"
+          ]
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "c587ca23e53fcf618b87b11a7be341d060fa61611fc081cddbe9aca3c2fbe22a",
+          "code_length": 11
+        },
+        {
+          "name": "incrementCounter",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3cc462fb63f0ee824d084f861a9ec26432649bd265153f58feb63dccffd59542",
+          "code_length": 41
+        },
+        {
+          "name": "nextBlock",
+          "descriptor": "()[B",
+          "access": 2,
+          "code_sha256": "b638be8f98cee7c8bacd81196ef02c2376fd062b9943e80e1ef657f91f383787",
+          "code_length": 16,
+          "throws": [
+            "java/security/GeneralSecurityException"
+          ]
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)I",
+          "access": 20,
+          "code_sha256": "cb479a21013ae60517ed6a2bc0ae1043870a9385843e9b0a547ac07bb2b98a7e",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/security/GeneralSecurityException",
+        "java/util/Random",
+        "java/util/concurrent/locks/ReentrantLock",
+        "javax/crypto/Cipher",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/AESCounterRNG",
+        "org/uncommons/maths/random/AESCounterRNG$1",
+        "org/uncommons/maths/random/AESCounterRNG$AESKey",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/BinomialGenerator.class",
+      "occurrence": 0,
+      "sha256": "e55b60ae4b4e34fe193898a50fb7fcc946572b528a397b6613b252b3c9a11dad",
+      "name": "org/uncommons/maths/random/BinomialGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "n",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "p",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "pBits",
+          "descriptor": "Lorg/uncommons/maths/binary/BitString;",
+          "access": 130
+        },
+        {
+          "name": "lastP",
+          "descriptor": "D",
+          "access": 130
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IDLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "9b08fed0ef933676085772d2295ec416297fa727b53a7197b43ffcaf8d2faecb",
+          "code_length": 65
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "948539f0d90a680ebf9a197a24a5a75603df0f9c2c2d3589a154b25791611837",
+          "code_length": 127
+        },
+        {
+          "name": "binomialWithEvenProbability",
+          "descriptor": "(I)I",
+          "access": 2,
+          "code_sha256": "e2c033762cbe9fd60b2756a4dec56b2ca5015de1471bcc00dd65b701b7ccfaa3",
+          "code_length": 18
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "89635fb89ac92dcdcb2ddf8340a2d30d5b14fe5e38895edf504bd75ca2f9c4b9",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/binary/BitString",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/BinomialGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/CMWC4096RNG.class",
+      "occurrence": 0,
+      "sha256": "816219f24233c9a41d1bfe151fdfeb717f0734ad68befa62cf3363b8af38e020",
+      "name": "org/uncommons/maths/random/CMWC4096RNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "A",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "state",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "carry",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3101d40c34f3f41655f27b5d4d820beff674bb99f2d1076109e4b44a0ee8f3c6",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "dcdd44d211852fb500a6ef97b882eb5213c2d144396128bed76fc57e528a9593",
+          "code_length": 14,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "d785c505c75afeadcb92d1285ac939b782a9f757101d090d1c185e15cb0e7017",
+          "code_length": 70
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "00879bf607533ee1719f1c64765a11da6094fadf223ac3d8b738d1b7338d8ee3",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)I",
+          "access": 4,
+          "code_sha256": "12c66de419dd0f16e2458cc479d293b6cd1a5c225724d1ebd7e97302cebd3457",
+          "code_length": 138
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/util/Random",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/CMWC4096RNG",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/CellularAutomatonRNG.class",
+      "occurrence": 0,
+      "sha256": "39a2a2fd6b9561bc3e90567337e66521d654c139f9d959ca7c41db1ba549034c",
+      "name": "org/uncommons/maths/random/CellularAutomatonRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "AUTOMATON_LENGTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "RNG_RULE",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "cells",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 18
+        },
+        {
+          "name": "currentCellIndex",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "34b19956c9d101c0e8f6c4cf490ca72e41f551367af61f1a86fb052a92093569",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "a47bcf95283200f7daa35ec05cdf9ae44049f57c4b368581abd85d9f8cb483e9",
+          "code_length": 12,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "ed4367e03941a8e08d30b21d17c1b38a026349f2969bbe9774a75fa28f3eaf0b",
+          "code_length": 189
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "64d26a3f2123f4cd2c1bfe77425d63a92823e78f5e315c2ccb07d0168c7fb9a7",
+          "code_length": 214
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        },
+        {
+          "name": "convertCellsToInt",
+          "descriptor": "([II)I",
+          "access": 10,
+          "code_sha256": "231840f485441a8c6d78e67173e74b62c96fad71e4e394c42d1b6486f6d5f504",
+          "code_length": 31
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "43541bb2ea4083bc654f9b7e2c1650478d93bc9285110fbac9d28fa9fe276ed0",
+          "code_length": 3695
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/util/Random",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/CellularAutomatonRNG",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/ContinuousUniformGenerator.class",
+      "occurrence": 0,
+      "sha256": "cb793803d0724d7476ba1bcfe187445ee9d5e5267e9355c0a1f30a7418a6962c",
+      "name": "org/uncommons/maths/random/ContinuousUniformGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "range",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "minimumValue",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DDLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "f044a8383cf37ffe46339c77058729a7358b4cfae0c0d3e902cf711a7349c57f",
+          "code_length": 23
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "eb8785e5bd9f2840347fea7591e02cb4bb8fd56ad1256ed4d64345bb205d5f0d",
+          "code_length": 21
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/util/Random",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/ContinuousUniformGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/DefaultSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "248e48b07b809586c4fdeb80ef8c88cccd1da703af40c371396b9da5dcf6fa11",
+      "name": "org/uncommons/maths/random/DefaultSeedGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/random/SeedGenerator"
+      ],
+      "fields": [
+        {
+          "name": "DEBUG_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lorg/uncommons/maths/random/DefaultSeedGenerator;",
+          "access": 26
+        },
+        {
+          "name": "GENERATORS",
+          "descriptor": "[Lorg/uncommons/maths/random/SeedGenerator;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lorg/uncommons/maths/random/DefaultSeedGenerator;",
+          "access": 9,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "generateSeed",
+          "descriptor": "(I)[B",
+          "access": 1,
+          "code_sha256": "c3e12b2ddbe4c2342b78afcbc86d63a0a96c47bdee4545997a3773b972dde711",
+          "code_length": 147
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a19e70de2f4514850249dd1e4b842b3ddf51eb4dd37d355f29beb4bcc22eb849",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "java/io/PrintStream",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/DevRandomSeedGenerator",
+        "org/uncommons/maths/random/RandomDotOrgSeedGenerator",
+        "org/uncommons/maths/random/SecureRandomSeedGenerator",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/DevRandomSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "b9f7ea662012abdf64b259f451fd74139a2be0942b04426253814c1e483c506d",
+      "name": "org/uncommons/maths/random/DevRandomSeedGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/random/SeedGenerator"
+      ],
+      "fields": [
+        {
+          "name": "DEV_RANDOM",
+          "descriptor": "Ljava/io/File;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "generateSeed",
+          "descriptor": "(I)[B",
+          "access": 1,
+          "code_sha256": "130efe036676425376cac3604533a5f9d43e093b03f058b5d9df27dc8e2f9eb8",
+          "code_length": 170,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ca7826018a20739057f06b0bdd8ec8e2ed6c39f35af1e53f88d410ec55c99fb0",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b56066eaa2c20585aebee3abae5ccad31234bef88d2daeef7f0ab6fd581c47c5",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/StringBuilder",
+        "org/uncommons/maths/random/DevRandomSeedGenerator",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/DiehardInputGenerator.class",
+      "occurrence": 0,
+      "sha256": "8a221dcc50c254345ab3f6faf4de5fd029f992463fdbb071834c79e1b7f17527",
+      "name": "org/uncommons/maths/random/DiehardInputGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INT_COUNT",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "6f5641c2d8040f34574fbb3e7803ccada7997086b34604b0c0ac3962435f5eb1",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "generateOutputFile",
+          "descriptor": "(Ljava/util/Random;Ljava/io/File;)V",
+          "access": 9,
+          "code_sha256": "cc3f5f1104b00385c09be488a58936dd59388bbcdd80a7d6f5d59352008b30ef",
+          "code_length": 76,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedOutputStream",
+        "java/io/DataOutputStream",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Random",
+        "org/uncommons/maths/random/DiehardInputGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/DiscreteUniformGenerator.class",
+      "occurrence": 0,
+      "sha256": "c285a941a79b5362fd604e012c8114d10d1ae96b47eb06be1c225831c5c4206a",
+      "name": "org/uncommons/maths/random/DiscreteUniformGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "range",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "minimumValue",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IILjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "ce8472b2b1ca03c6e40ca406703679a727c4ffb95ccc906e12f113afb6096541",
+          "code_length": 24
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "49de58a992b3badecfe2a9ad33be893a986d02b74cce0cc2e998a122990e5a49",
+          "code_length": 20
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "265a422f1c581dc7d478e9354abe6158a78c5b9d2ec42cb65afaec6914d7d9aa",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/Random",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/DiscreteUniformGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/ExponentialGenerator.class",
+      "occurrence": 0,
+      "sha256": "a98b0f9125f657ee818e9cc479a93faade1406b8e043725b6ab630914b9ccdb2",
+      "name": "org/uncommons/maths/random/ExponentialGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rate",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(DLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "34954bee5b16fc732b638e2af5294e4ca4b2a5b593a9f86bca5efdf1c500bfa0",
+          "code_length": 17
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "f099fbe349513164cb6561cb486eb97b009fe024b6114b251213fd22ec99a927",
+          "code_length": 39
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "ee92d8f8f4f2cb079968db2998c7cdb91aa84488e763e42565ef4525a5b47dd2",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/ExponentialGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/GaussianGenerator.class",
+      "occurrence": 0,
+      "sha256": "e53b78ad6325f878e49d82771f99f8ec532916304a2c971c3c8f8f03040433b6",
+      "name": "org/uncommons/maths/random/GaussianGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "mean",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "standardDeviation",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(DDLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "b7dae89f60af740671d1a641b130b76f402db2d5286603e5bd54f436b690d836",
+          "code_length": 29
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "82f6fd485ae0e73abbd89e6a26dac295fff15fb238253a9605760fc787f94ff0",
+          "code_length": 43
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "ee92d8f8f4f2cb079968db2998c7cdb91aa84488e763e42565ef4525a5b47dd2",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/GaussianGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/JavaRNG.class",
+      "occurrence": 0,
+      "sha256": "e8122b506f6c4e0285d1d7e50945eb6c8d0d330a15f197d0f59782235f3d1057",
+      "name": "org/uncommons/maths/random/JavaRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d8632b8192afc470a3134e23637a9b707ec8b70c2d2eb66770a0509067bdbc02",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "4492d4e87cf56855fa6660f62b4e75f48e4a39d35395f127decf6beb2aa7b7ae",
+          "code_length": 13,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "0d289b0215ce11630666fc278388d74404a6eee3bc8bdc44cf0e017ae1dc56e0",
+          "code_length": 20
+        },
+        {
+          "name": "createLongSeed",
+          "descriptor": "([B)J",
+          "access": 10,
+          "code_sha256": "2e62010e65e1b593146c5459ce91b12d23427142e43a7c20a4d6e2225a05fd80",
+          "code_length": 27
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "656cc32b281de5295413311ee066dae19cdf167a508207a3105aca7edad5d1b9",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/util/Random",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/JavaRNG",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/MersenneTwisterRNG.class",
+      "occurrence": 0,
+      "sha256": "8949ba0f64e99128ac2ae12e604a568841a3776b703e8946484326635e7192a3",
+      "name": "org/uncommons/maths/random/MersenneTwisterRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "N",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "M",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MAG01",
+          "descriptor": "[I",
+          "access": 26
+        },
+        {
+          "name": "UPPER_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "LOWER_MASK",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "BOOTSTRAP_SEED",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "BOOTSTRAP_FACTOR",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SEED_FACTOR1",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "SEED_FACTOR2",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "GENERATE_MASK1",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "GENERATE_MASK2",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 18
+        },
+        {
+          "name": "mt",
+          "descriptor": "[I",
+          "access": 18
+        },
+        {
+          "name": "mtIndex",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9b4b9443cceb674ec1c5da2d08313c30e208d25e3b033dfbe3dfd81827e80fd8",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "77c9863c6d4ccb93958490f51c271052c31f4b04548fa17f2ce0bf9ff7229c25",
+          "code_length": 13,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "2b897a71eaa49164f138cbbdc184364052bbe6a80b76b186572ca47ffa644d04",
+          "code_length": 346
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "c78560d9dfadc3ae572fdf5886fa457b34285ab01abf76b8a0590b6cf8e113d3",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)I",
+          "access": 20,
+          "code_sha256": "346f8b6b9402861833d5ce36870f7e5ef27c200ba31c6031e80db44177ec054f",
+          "code_length": 280
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "837773139ea07c95dedda83889e7f039bef5e80e91156ed171ef893e386be0ce",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/util/Random",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/MersenneTwisterRNG",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/PoissonGenerator.class",
+      "occurrence": 0,
+      "sha256": "1c57841e73640ffb0c01b6199957edea6e7937577d7133082012822d13d001b7",
+      "name": "org/uncommons/maths/random/PoissonGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/number/NumberGenerator"
+      ],
+      "fields": [
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "mean",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(DLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "ab94e52de91dbd90579735d2fc9802c764aafd44250b74cd21d65f122dea42cd",
+          "code_length": 33
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "10c5aa482b2652527cf898ddeb9c12d78eb2d87cc3379b21cdd8a1a65a73e9e9",
+          "code_length": 53
+        },
+        {
+          "name": "nextValue",
+          "descriptor": "()Ljava/lang/Number;",
+          "access": 4161,
+          "code_sha256": "5441e2b7bb70a0da54bd1aecbf213e7bc0cc303667c80718650b7d85252b6f13",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/PoissonGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/Probability.class",
+      "occurrence": 0,
+      "sha256": "aefc77c802c3debe0d0e3c6348a4ea5cea78fcb9425d839c80590eaf5ddc2f0e",
+      "name": "org/uncommons/maths/random/Probability",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Number",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 25
+        },
+        {
+          "name": "EVENS",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 25
+        },
+        {
+          "name": "ONE",
+          "descriptor": "Lorg/uncommons/maths/random/Probability;",
+          "access": 25
+        },
+        {
+          "name": "probability",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "a4ff47681ec30f68bf60bdce9f42d8ac3bcfc7cb4c4d189754228ded3bb334da",
+          "code_length": 32
+        },
+        {
+          "name": "nextEvent",
+          "descriptor": "(Ljava/util/Random;)Z",
+          "access": 1,
+          "code_sha256": "a492ffb87cc2967666002109edee27d81de4f75f3acc9ced9806b81a51cb1a5b",
+          "code_length": 27
+        },
+        {
+          "name": "getComplement",
+          "descriptor": "()Lorg/uncommons/maths/random/Probability;",
+          "access": 1,
+          "code_sha256": "689ec878b44f63626722ef4bb5369787fd5893d329da0849ebb2056f074c07ed",
+          "code_length": 14
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ac36907731249b8818c5c80904c28a5d2de0ca716e1505a77d49da6281b20996",
+          "code_length": 27
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "f03e393e26e737968ff9d03602eec748f1c1f5de4530534b2842d1e29c51637f",
+          "code_length": 6
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "f0451b5885a520b2db840d6b66b150e864d0adb04fde3ec7b332e345b7e12839",
+          "code_length": 6
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "7cb397cd266479a99b83f7bec4befae5853aec2b7fcb1765d4d236caa5c08604",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "e6369de0935c69d340ccddd86dad3d4d05548fb465ba361b24165bffa52027e9",
+          "code_length": 49
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c80e98ed19523038f0f837c1327e0e0ebde190407a042dca21d64d3c616f20f5",
+          "code_length": 29
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/uncommons/maths/random/Probability;)I",
+          "access": 1,
+          "code_sha256": "4f72e39fa3677c1d3615969824cff83b5af472be4eb29af3018acee70b56e6f1",
+          "code_length": 12
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0063774efdfd8e61c6c89aa78045592f785ae3ddedb88ea7c19263de58aed3d6",
+          "code_length": 8
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "532f88107e8843d06f35ed1f064ffe4dcfa93feac722eee49eaede3074b37811",
+          "code_length": 9
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "112e8735c14ce0cb0ce2606d8d6693f24f945f173d65dce7e67eb71f31d58a48",
+          "code_length": 36
+        }
+      ],
+      "generic_signature": "Ljava/lang/Number;Ljava/lang/Comparable<Lorg/uncommons/maths/random/Probability;>;",
+      "class_references": [
+        "java/lang/ArithmeticException",
+        "java/lang/Comparable",
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Random",
+        "org/uncommons/maths/random/Probability"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/RandomDotOrgSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "b40120dde15f7b2b279dbe686ff3fde695cea514cec314bfea4a841f74a60e9a",
+      "name": "org/uncommons/maths/random/RandomDotOrgSeedGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/random/SeedGenerator"
+      ],
+      "fields": [
+        {
+          "name": "BASE_URL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "RANDOM_URL",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "USER_AGENT",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "MAX_REQUEST_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "cacheLock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 26
+        },
+        {
+          "name": "cache",
+          "descriptor": "[B",
+          "access": 10
+        },
+        {
+          "name": "cacheOffset",
+          "descriptor": "I",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "generateSeed",
+          "descriptor": "(I)[B",
+          "access": 1,
+          "code_sha256": "a365abbda1b21a1ef82cf0f02f263bde1499abcdbc9e28ad72692f784cf6caac",
+          "code_length": 135,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "refreshCache",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "b26a92e00da891111be426aaf8b6491213e1b985a463ba14b4b4f97553cc48eb",
+          "code_length": 182,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "13d8ddef4132bdae1679f3c426d751024d8b0e9edf6225ac4fca704b86143ad5",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8636f2a895ef6f04bcf9adfa6e02c79793ba7fe9057f6fe2c3973d91ccde1c5f",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "java/io/BufferedReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/lang/Class",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/System",
+        "java/net/URL",
+        "java/net/URLConnection",
+        "java/text/MessageFormat",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/maths/random/RandomDotOrgSeedGenerator",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/RepeatableRNG.class",
+      "occurrence": 0,
+      "sha256": "963c446c2955ca6d77e9843a284f54a2abbb90806d5292a5ee739b13f89992cc",
+      "name": "org/uncommons/maths/random/RepeatableRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/random/RepeatableRNG"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/SecureRandomSeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "63ae158cd04d4ed30798066c19c28e476ad853a8840e94ea295248b8d2517638",
+      "name": "org/uncommons/maths/random/SecureRandomSeedGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/maths/random/SeedGenerator"
+      ],
+      "fields": [
+        {
+          "name": "SOURCE",
+          "descriptor": "Ljava/security/SecureRandom;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "generateSeed",
+          "descriptor": "(I)[B",
+          "access": 1,
+          "code_sha256": "aebf56f7470b3a66ead797609f240f7cf7942c745dfde517db33ce9d90ef435e",
+          "code_length": 8,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c9cdc1d4e77197d79563e1ed9ee90789a892e4d5f35b7c42afe23ed087b4f220",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bfe691d9fc7eb5c07cc1798df83bf38bd8850bbc14af239b7451b51555f262d9",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/SecureRandom",
+        "org/uncommons/maths/random/SecureRandomSeedGenerator",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/SeedException.class",
+      "occurrence": 0,
+      "sha256": "1fd680fdb506bb9691c3e390fc760879d2262afc48e63dcca2213852048be159",
+      "name": "org/uncommons/maths/random/SeedException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "org/uncommons/maths/random/SeedException"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/SeedGenerator.class",
+      "occurrence": 0,
+      "sha256": "dfde2eac3e99c64435fdce07762fe191af9bba57549e4e165b0f7a3e4d2d8c5a",
+      "name": "org/uncommons/maths/random/SeedGenerator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "generateSeed",
+          "descriptor": "(I)[B",
+          "access": 1025,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/XORShiftRNG.class",
+      "occurrence": 0,
+      "sha256": "b1f3a6c944ab030538423ee9a95c64f2241b4b7d8f7ade516accaa859ce1c57c",
+      "name": "org/uncommons/maths/random/XORShiftRNG",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/Random",
+      "interfaces": [
+        "org/uncommons/maths/random/RepeatableRNG"
+      ],
+      "fields": [
+        {
+          "name": "SEED_SIZE_BYTES",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "state1",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "state2",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "state3",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "state4",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "state5",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "seed",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/ReentrantLock;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "19a88038837f2656f9ce0fdf00488d4f335abca7833787edf7b5fe2e2a8455b7",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/SeedGenerator;)V",
+          "access": 1,
+          "code_sha256": "d8dec81aad3234dd98f18e1b857828eeadb9e831331fea1a08a279c38ea71286",
+          "code_length": 13,
+          "throws": [
+            "org/uncommons/maths/random/SeedException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "697b6db0582e813c8ea01229fe16134f5ceb99b40f8b28e4f2315a4c8f296cb0",
+          "code_length": 88
+        },
+        {
+          "name": "getSeed",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "322d23c404bb0653b6eeb9061be0bd4ca004f4e57c91050ac189535e0f5a4d87",
+          "code_length": 11
+        },
+        {
+          "name": "next",
+          "descriptor": "(I)I",
+          "access": 4,
+          "code_sha256": "9dff0bb3eba7c78a8c6644d36a1c99228c142bf40d3b28df3c502260b702fcb3",
+          "code_length": 122
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/util/Random",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/maths/binary/BinaryUtils",
+        "org/uncommons/maths/random/DefaultSeedGenerator",
+        "org/uncommons/maths/random/RepeatableRNG",
+        "org/uncommons/maths/random/SeedException",
+        "org/uncommons/maths/random/SeedGenerator",
+        "org/uncommons/maths/random/XORShiftRNG"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/random/package-info.class",
+      "occurrence": 0,
+      "sha256": "1d4f522dd581e52029e15c37bcfe9e59d5ea1c957e652620123f79914e6f84ad",
+      "name": "org/uncommons/maths/random/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/random/package-info"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/DataSet.class",
+      "occurrence": 0,
+      "sha256": "8eaeb78c3e9cbf00fb65ec567e0824e9dec3f629982f8dfd13de578d7a7db60d",
+      "name": "org/uncommons/maths/statistics/DataSet",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_CAPACITY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "GROWTH_RATE",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "dataSet",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "dataSetSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "total",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "product",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "reciprocalSum",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "minimum",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "maximum",
+          "descriptor": "D",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5f19ebfd2e2e89cd599000152aff7620546f3776c9369b6a4a949207be340ad8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7228c7506037571643f5f7d7349b3b26a2b0fc846c3b487840f3bccf351ea10e",
+          "code_length": 51
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "57de6be0d759a5b3b6d992029432f94f8cd676fcf78fba4c80ce7ff6cfba06a0",
+          "code_length": 91
+        },
+        {
+          "name": "addValue",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "1e42b5fe3928b0f25dc3ca248fbd00ff6e85b4786908dfd9d76e2fc06085136b",
+          "code_length": 75
+        },
+        {
+          "name": "updateStatsWithNewValue",
+          "descriptor": "(D)V",
+          "access": 2,
+          "code_sha256": "a40ffd23460ababbedbb4ca95d089e02e4e088837e1cd7489e8d9892c9a20d4c",
+          "code_length": 57
+        },
+        {
+          "name": "assertNotEmpty",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d03ee9084841739b1bb87bfdb29bbf2dbdc62ca434c68429394dcbf32f6e7b34",
+          "code_length": 16
+        },
+        {
+          "name": "getSize",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getMinimum",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "6a655cc292603693b90c1620db41659faf25ee29de77346ec0d612d9e2713340",
+          "code_length": 9
+        },
+        {
+          "name": "getMaximum",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "96b6e000fb682ea4fb01b9638707ca4df83e6920c394d231417bec377e969281",
+          "code_length": 9
+        },
+        {
+          "name": "getMedian",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "2fa3794f18a6a36672b04197c92c3ee44a0c4badcecdb73348f29722a8f5611f",
+          "code_length": 63
+        },
+        {
+          "name": "getAggregate",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "6cd1eedafd38dc18d4e814b47cf81ff81c6cc2334a3f91f1e29b15bf000dd617",
+          "code_length": 9
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "30363ec384418cb41929be076d51ecd9927091794abc9d81904095de38f17b54",
+          "code_length": 9
+        },
+        {
+          "name": "getArithmeticMean",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "15f3a0688a04de0b4ed6154bcf9e718bf75d0a5d156624f556c5f7a26ad63213",
+          "code_length": 15
+        },
+        {
+          "name": "getGeometricMean",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "f41df49e7e8d73e989115babeef81189dee57cc100c6ef5145a762a1297f4a3a",
+          "code_length": 19
+        },
+        {
+          "name": "getHarmonicMean",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "3270622a8f96aa2d1947b6ea398461385c89fc8276a03898801ca3b67ee7107e",
+          "code_length": 15
+        },
+        {
+          "name": "getMeanDeviation",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "b848cc7ede46ff10a2549396c7adaaab91c235521ebbdde7aead897a2de657b3",
+          "code_length": 48
+        },
+        {
+          "name": "getVariance",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "b740cfc56bc7e49a9b7fe437af32561b53f93db86d3f235c837625a640f91f06",
+          "code_length": 11
+        },
+        {
+          "name": "sumSquaredDiffs",
+          "descriptor": "()D",
+          "access": 2,
+          "code_sha256": "822920a93d62f504ed814217c204abfcbe1199336d23ace0073979c3eb38f5df",
+          "code_length": 46
+        },
+        {
+          "name": "getStandardDeviation",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "8860389b74b478c3ba1e668ddcd64da8d52373e4cc3ff50dc2104671b2d4eb45",
+          "code_length": 8
+        },
+        {
+          "name": "getSampleVariance",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "d7f5eb5c7f1076c1c9e011b92c47717811aaa15f6ecb9bd1afed4f3b0d216c31",
+          "code_length": 13
+        },
+        {
+          "name": "getSampleStandardDeviation",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "c5d5b5697df5b9bb59d5d7e41e36c16fe0f4192ec94d1b1c0003616403b54d6f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[D",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Arrays",
+        "org/uncommons/maths/statistics/DataSet",
+        "org/uncommons/maths/statistics/EmptyDataSetException"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/EmptyDataSetException.class",
+      "occurrence": 0,
+      "sha256": "bad27e934fb45e98df1b2fd38edcf0a150efbcb7800a28d69ab4a7b46194ac7a",
+      "name": "org/uncommons/maths/statistics/EmptyDataSetException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dee61f6d75fa6ea289232ad4b010fc714ab62e032daf0b48fb0f96532a469f7e",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/uncommons/maths/statistics/EmptyDataSetException"
+      ]
+    },
+    {
+      "entry": "org/uncommons/maths/statistics/package-info.class",
+      "occurrence": 0,
+      "sha256": "1d5297d254086b62add50207cac54e13e89e8e5ac72faca746d60a29407223eb",
+      "name": "org/uncommons/maths/statistics/package-info",
+      "major": 49,
+      "minor": 0,
+      "access": 512,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/maths/statistics/package-info"
+      ]
+    }
+  ]
+}

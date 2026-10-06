@@ -1,0 +1,18 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/mcp-0.17.2.jar",
+  "sha256": "03933059322e5d64f2d305701338f0a3b894a2c983079b44b675b63ea12798b0",
+  "class_count": 0,
+  "unique_class_entries": 0,
+  "resource_count": 3,
+  "duplicate_entries": [],
+  "classes": {},
+  "resources": {
+    "META-INF/MANIFEST.MF": "35a9a568a3a3451df5304094d1253229238e0741fa112eb6b95c68608862e9b0",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp/pom.xml": "b20dc3d992740a05e0fcbb68d126425d27c45be9b24dd53ede41b4940367b939",
+    "META-INF/maven/io.modelcontextprotocol.sdk/mcp/pom.properties": "e82ab94d8cfc6a96ee4468c0175acf5acb38cc0dea26155cf0d0a6296c4da71a"
+  },
+  "class_occurrences": [],
+  "member_shards": []
+}

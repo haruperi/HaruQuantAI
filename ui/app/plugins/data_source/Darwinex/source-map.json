@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "UI-only Darwinex structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Darwinex",
-  "source_head": "b1f4137ba882901848681752df51cd75c0cfb133",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_130244_data-source-darwinex-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -27,7 +27,7 @@
   },
   "source_catalog": [
     {
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex",
       "id": "sqx-darwinex-ui",
       "family": "installed plugin UI artifacts"
     }
@@ -35,250 +35,345 @@
   "sources": [
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/addPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/addPopup.html",
       "relative_path": "add/addPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a5ab4aa7392ed729149d9e2eb82472b1c21b52a97f39e355df84d98c3d7ec7d8",
+      "sha256": "3f3d72365fc50f96c5624601cd78d05d285c1b4afd65fc31cd168ae1cb56d146",
       "target": "add/addPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js",
       "relative_path": "add/addPopupCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0ba920d07e9b0d99b337d0b3c33ba4946a3b1c26ddfd4c1341c2cfa85f908361",
+      "sha256": "caf98a78a6b80245dea7750372c44adbeba1bfaf6a2e4b5aef3e4bfec0d459ce",
       "target": "add/addPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/module.js",
       "relative_path": "add/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "716f1185430edbe6ba4cbdfe35d59cae5521825c59c7eb130054ae075ce7ed94",
+      "sha256": "08328ebed54b4f739785d71df786814a74258751edcbca5282c83b5c4404e989",
       "target": "add/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/selectInstrumentsPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/selectInstrumentsPopup.html",
       "relative_path": "add/selectInstrumentsPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3f57945590dc8dee2a6226e7db825ce9dce1761151bc18f8a95f56e8bfca23e4",
+      "sha256": "ca2e2980f0661bddf741a95cd4c2f20cd20d27893c6d02cd5d0660086f17c17b",
       "target": "add/selectInstrumentsPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/styles.css",
       "relative_path": "add/styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "6f90ac9e700f60d01e66cda8967d3717c4e38b1b9e96ebb97698242010b46400",
+      "sha256": "875409cd20a6c96db951d4525fc61ea20ae8756d54fb719b2b172e46d1815e1e",
       "target": "add/styles.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/darwinex.csv",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/darwinex.csv",
       "relative_path": "darwinex.csv",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "non-UI artifact excluded",
       "access_date": "2026-10-06",
-      "sha256": "6abeae36e8a0921056159b68cba5a83e6313e8a82b91e99b59cbfa47d42ce42f",
+      "sha256": "5b1070ab91026d637cf6b1402862d99694914700ccba381b252cf488f567f657",
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DarwinexService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DarwinexService.js",
       "relative_path": "DarwinexService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a9edddc8ca0f2008318c91f07564b687d23a136a8613ca92590eb25a7e04ca01",
+      "sha256": "46a8b9fc88d922295513c623aac0892ac6c013b3c7589733c0ee7555374ed86b",
       "target": "DarwinexService.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
       "relative_path": "DataSourceDarwinex.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "non-UI artifact excluded",
       "access_date": "2026-10-06",
-      "sha256": "8c0440e30abd2e2478b39bd0525f82426a7d909135a782c21c22f8f3180c6c88",
+      "sha256": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a",
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerCtrl.js",
       "relative_path": "disclaimer/darwinexDisclaimerCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0800faa1285f4a8a6695b258556c640da6b6cb66b11e5d7e42c0c1990a8b4ad3",
+      "sha256": "d51d2ebb32408024314ed529a88b6b6e9c912b07cb5892c74aca41c0203832c9",
       "target": "disclaimer/darwinexDisclaimerCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/darwinexDisclaimerPopup.html",
       "relative_path": "disclaimer/darwinexDisclaimerPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "a773d26e041f53380c9687b0bad56194d223e728396d19f9b97119472193260b",
+      "sha256": "99b7c139734e306aa06b4b129281449033a249f9959297375703cbbf5ad84a0a",
       "target": "disclaimer/darwinexDisclaimerPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/disclaimer/module.js",
       "relative_path": "disclaimer/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3aa8561df9a430d0e3846f82adb40ae9be273bbfe223bf6c79ef804cde2361b4",
+      "sha256": "ec4aa85f163167a429a7afe81b17de8273e26f932f967daf6dcf1f555c8a0ddd",
       "target": "disclaimer/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/downloadPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/downloadPopup.html",
       "relative_path": "download/downloadPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "4f9998eb727a4abf847217615b21443e8e9b7b43974e7ef0e4b4a43a03199b8c",
+      "sha256": "d760c6d337d7a94c257a295f7b0a5d1faa7dd4afc69f742234177248c947ac5f",
       "target": "download/downloadPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/downloadPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/downloadPopupCtrl.js",
       "relative_path": "download/downloadPopupCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "5b406663aa1a1d9f0788c4f62c54ba4cde10ea9702d0e55af8c458681b32b636",
+      "sha256": "eeaead19f1fcb10db9f8da287b88684ccfd60d847892d0eb782df898362c8d37",
       "target": "download/downloadPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/module.js",
       "relative_path": "download/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "4b38f755a05a6fcfd70b5590c4ac8da131f06703fd71a32a483416078bd138c5",
+      "sha256": "919da9e0fec42a576e594b29b14c902e884bce07b52a5a9f008f9fe72535a5a6",
       "target": "download/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/importPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/importPopup.html",
       "relative_path": "import/importPopup.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "f384e099ea777393c9eae289cd04148c864e0f768f41d9fb6202c3be954a97ad",
+      "sha256": "b34e199acbec8f82bbf71f70bd81a99e3067a2f32dae29dd4330a5c5ce1cff73",
       "target": "import/importPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/importPopupCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/importPopupCtrl.js",
       "relative_path": "import/importPopupCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "c07dea9d03e5b05c8d4b8908457bb51c552e19bf9fc343a6331ce92231544ce9",
+      "sha256": "85cbc106bceef863484bb04124473231ed68d50d6362c2f7c6d8be8d2990d739",
       "target": "import/importPopupCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/import/module.js",
       "relative_path": "import/module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "caddec7f79c4eab92f07961740674781772ed3137fcace454efaaa79c3e3856d",
+      "sha256": "2b1f1f0c3ea4049e96bd3d57f8432ed66eefef71e7af61a17919c0833f638afc",
       "target": "import/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "5e039ebeee48f40d3223355c947966aab08411a643f529b29bc5a22176942af0",
+      "sha256": "59d46e6c87ab646bf9dd0aa73824dcbac8c228568f7543330e455eca70ea87e0",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-darwinex-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/style.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/style.css",
       "relative_path": "style.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; excluded artifacts inventory/hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "099248b2ecb2090b72222c57e52291e1147befbe65b2d05b735f3507385d522a",
+      "sha256": "de8756c27491170c3baaa83f37e909a028591176566e3a2a9b1d61554ec2d629",
       "target": "style.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope."
+      "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -298,5 +393,10 @@
       "path": "source-map.json",
       "reason": "Structural provenance manifest, not behavioral ledger."
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskWaitFor/TaskWaitFor.jar",
+  "archive_sha256": "46957acd37eca2a2feb6b322230f323955380e952ab45d626dc47f52436ce7f8",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1.class",
+      "occurrence": 0,
+      "sha256": "9bebd6a1f71b1d5b84c8f69c6d9258416d0754c8084aa38c2b067509a1e21ab2",
+      "name": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$f",
+          "descriptor": "Ljava/io/File;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/WaitFor/WaitForTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/WaitFor/WaitForTask;Ljava/io/File;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da4c0d8dcbda2740808f6d3ff55b7fd2a6c9011b30dc27895c78f75661fb0ef8",
+          "code_length": 107
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask",
+        "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask.class",
+      "occurrence": 0,
+      "sha256": "a9bd2d1856b4a3863869d683d20278fe69dda4dc56dcd167a0f2eadaaa8bebb8",
+      "name": "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "file",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "action",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ba589f9de28a2e6158112198952145468bce1a38b36d52faebe98da91791e67c",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "bc21098e917932252dd51b19f0d5b8271f52225ee90a4cd56b966f2f4c386be9",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "786464753f64dae09d3c1897fbbee7d5d5a765d0780a6aed477330defdaef1a4",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ae627ab358fdc37e4b98cd4eeaef81622ea83c31d854e7822751c4e3c54763f6",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "ec03264e0e8a499ba063a58ef1c0f7406c43388e2ee65a40173a4fd861af32c4",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "b4fa9cae1cc23fb7667ce0dc128fbf62db4f6a6b2c774d2b848ff135e0362c81",
+          "code_length": 39
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8e11351ebd12d67f19bbe94cafeacf3c33cc6e9fd33554857f6ec166edcd9332",
+          "code_length": 234,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d7e88afc2abb2970e029d1d638812bbe720b8a3b818efc60b3c1fc74443ad6e9",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "69de8ab51a559f830f2e3707381f883aa69e57ff3edd6029c4d3f9b5d4b01543",
+          "code_length": 3
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "aeee597f96a411f6023723a0141d6525c8ec44ecd5eb0904f82728a2ce8b559f",
+          "code_length": 10
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "b916fab86ca5982e02b8ddcad12ff12268d6591d3480d01ab43ee96a20a5ebc2",
+          "code_length": 14
+        },
+        {
+          "name": "access$084",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/WaitFor/WaitForTask;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "f2b18006c0723137359a89a71d019c268aa758e0342f50fca26c306afcece8a8",
+          "code_length": 27
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/WaitFor/WaitForTask;)Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/WaitFor/WaitForTask;)Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask",
+        "com/strategyquant/plugin/Task/impl/WaitFor/WaitForTask$1",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "org/json/JSONObject"
+      ]
+    }
+  ]
+}

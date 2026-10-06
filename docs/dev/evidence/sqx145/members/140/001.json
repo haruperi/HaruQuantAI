@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppTaskManager/AppTaskManager.jar",
+  "archive_sha256": "c6d7819512130bf30f32f2368f0fc64f2532718b71dc0df5d0b2089d1d9db8d7",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "773e1708458054894db3826ef9753059c50ce09326596f626bda8c246782a0b6",
+      "name": "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerAppPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b6997e25dae7d692a0b041fbda795ec292c7ccc59c8320a602731631ef2f5009",
+          "code_length": 9,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getContextPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "74df402478ec2f9d2a653db8b0238cfaf8e2cdc86b0f3dab63b365b2c2c31d18",
+          "code_length": 3
+        },
+        {
+          "name": "getAppCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c720e486c1a0f9f51f3cf99fe968623a963afb24c1e69c66287d3bd71e932b2",
+          "code_length": 3
+        },
+        {
+          "name": "getTooltip",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c4da0d8a6165d94d26b71d7644c3b49d7730372d252a19f9d8139a8ced18571e",
+          "code_length": 3
+        },
+        {
+          "name": "getProject",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getDefaultTaskName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6924c572a1472ca69367245327d75acf977b0cda2c878c3175abbd5f0ae9dea5",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerAppPlugin",
+        "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerProgressPublisher",
+        "com/strategyquant/tradinglib/plugindef/app/IAppPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerProgressPublisher.class",
+      "occurrence": 0,
+      "sha256": "65a465539ed0d1871e15a621e488aa2b08e87e651e92ee0153b6437dff44cb93",
+      "name": "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerProgressPublisher",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "projectsStats",
+          "descriptor": "Lorg/json/JSONArray;",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 2
+        },
+        {
+          "name": "lastData",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9bbd9f1424a78bd5d7050ba2fc04bd688ad3aaa7ca1c291f678f1971301fdab6",
+          "code_length": 42
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "2f72f7b0e81aaca1dfdaccd257cc3745ba8308a068222a900831fa067de61958",
+          "code_length": 260
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "71a7f9999f0586b7d9d12815711eddf4b4761e06bb19cbdc047367929b404ca0",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/App/impl/TaskManager/TaskManagerProgressPublisher",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "it/unimi/dsi/fastutil/ints/IntList",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    }
+  ]
+}

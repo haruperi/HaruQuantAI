@@ -1,0 +1,1264 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+  "archive_sha256": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException.class",
+      "occurrence": 0,
+      "sha256": "51866d640e818b4b8d6d3819042812d3eb54dfd168aaf3118e4ec152372da77e",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationPlugin.class",
+      "occurrence": 0,
+      "sha256": "4501f7e40f638abef65c4a2028169d804906392c832d244b7c66e244eed6d565",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "52cac0a35df39a9461b0668cad6ea37a34efff959017ef4d3f18f269c6bd229e",
+          "code_length": 68
+        },
+        {
+          "name": "containsResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "f85d8ad1caa044d8e9a4306d7e63e6ac0e088c647a1aab60413ab7635295cd01",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "64afbfe5f4d61b6b75cd2a8a561856b2b1be2e4c2468e68d905dd2625889898a",
+          "code_length": 3
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationPlugin",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/results/AbstractResultsPlugin",
+        "java/lang/Exception",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender.class",
+      "occurrence": 0,
+      "sha256": "17065a9ba1ad892baff21874d30b784bf4c3ddf5c92e3f3547d9ee922f6708a5",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "toSend",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 2
+        },
+        {
+          "name": "data",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dd1797467bb95261284aac3dbb924b1179425b786546fa05760acddd5f2e7c94",
+          "code_length": 39
+        },
+        {
+          "name": "getData",
+          "descriptor": "()Lcom/strategyquant/tradinglib/project/websocket/DataToSend;",
+          "access": 1,
+          "code_sha256": "d6d3002e7e37932e6a7286f08296994513f9acbc7d2f1d36b053d2d551554d14",
+          "code_length": 40
+        },
+        {
+          "name": "sendData",
+          "descriptor": "(Lorg/json/JSONObject;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "resetLastData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "progress",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "265c2fba8177fba981e156dae1da6f9e55c50f8c6b26938d618570f66bacdbf6",
+          "code_length": 30
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "04c6a2c3aae094eba0c429efaaedeb02337c949c5dc3e659abe0162044d9e85b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+        "com/strategyquant/tradinglib/project/websocket/DataToSend",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/SynchronizedWebSocketPublisher",
+        "com/strategyquant/tradinglib/project/websocket/WebSocketConst",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1.class",
+      "occurrence": 0,
+      "sha256": "2f749ce5b123c37248cd55a6b6e584a46defd3bcdf4d544e529d1c52100cd070",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$rg",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 4112
+        },
+        {
+          "name": "val$_period",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$type",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 4112
+        },
+        {
+          "name": "val$_allowNegativeCorrelation",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 4112
+        },
+        {
+          "name": "val$_addEmptyPeriods",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;Lcom/strategyquant/tradinglib/ResultsGroup;ILcom/strategyquant/tradinglib/CorrelationType;Ljava/lang/Boolean;Ljava/lang/Boolean;)V",
+          "access": 0,
+          "code_sha256": "3a418f4e7719c5453dcd3c2ee7632aa7fe714cedd8f30b251039bceeff4029a3",
+          "code_length": 38
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1431d3a393eb0e17881431dcc4e7aa76b34b751d97ee0ca1e1c27ad17e57c0da",
+          "code_length": 322
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet.class",
+      "occurrence": 0,
+      "sha256": "ed5f9646c248812a961c2e9d681e91a47556b6085ea487938c7be06a16720e85",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "LOCK_PORTFCORRELSERVLET",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "sender",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender;",
+          "access": 2
+        },
+        {
+          "name": "correlationComputer",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer;",
+          "access": 2
+        },
+        {
+          "name": "overlappingTradesComputer",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer;",
+          "access": 2
+        },
+        {
+          "name": "rgProvider",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;",
+          "access": 10
+        },
+        {
+          "name": "running",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/results/IResultsGroupProvider;)V",
+          "access": 1,
+          "code_sha256": "e91e8e447d8c45cddaf7bfd7c8ddfce581952f84d874ae3f0c89c8507b850d9a",
+          "code_length": 62
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "09675e70bf6bddf6e93d074195f780eeb6f87a75513e41205149adf13eb423ee",
+          "code_length": 234,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCorrelation",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bef30bcc88dcb156a575cbd08c492e9b54ee8390e0a8d0acce30bcfcec026458",
+          "code_length": 99,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCorrelationSave",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "367a4a8a21664bb74c33ecd2de537b451ce19b860f4489d00f084ee57aff7b66",
+          "code_length": 51,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onOverlapping",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "507545c1b91fa08b3b280773640eb2cc67bfb609c2ca6a7af552d8f8001c8407",
+          "code_length": 99,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onCompute",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bdcf5ad86614aa0e837a4498241f577607661bcf980e25c8d3c9e30f51fe68f8",
+          "code_length": 228,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onStop",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c8950ca0c98e839f7bbae3ee0bcf66c93c4c9ade8022dff08835f34fa8554210",
+          "code_length": 39,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;Z)Z",
+          "access": 4104,
+          "code_sha256": "469fbf8757b03cb1ece1ae605e8e9deaa9bca5e04f5fc3bc09edb21767d54a1b",
+          "code_length": 7
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;)Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender;",
+          "access": 4104,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;)Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer;",
+          "access": 4104,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet;)Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer;",
+          "access": 4104,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "access$400",
+          "descriptor": "()Lorg/slf4j/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f48b86f91311d569a475dd4d05fcd9957d73b6a1cb5f1b809ce1864711baffde",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationServlet$1",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/correlation/CorrelationTypes",
+        "com/strategyquant/tradinglib/results/IResultsGroupProvider",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/Map",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask.class",
+      "occurrence": 0,
+      "sha256": "a90d8d3461a9b27ba1e458795f51986ef6d9a667ba6672d20898ddfc380fd34a",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "strategy",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2
+        },
+        {
+          "name": "symbol1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "symbol2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "period",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 2
+        },
+        {
+          "name": "allowNegativeCorrelation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "addEmptyPeriods",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "computer",
+          "descriptor": "Lcom/strategyquant/tradinglib/correlation/CorrelationComputer;",
+          "access": 2
+        },
+        {
+          "name": "orders1",
+          "descriptor": "Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2
+        },
+        {
+          "name": "orders2",
+          "descriptor": "Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2
+        },
+        {
+          "name": "periods",
+          "descriptor": "Lcom/strategyquant/tradinglib/correlation/CorrelationPeriods;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;ILcom/strategyquant/tradinglib/CorrelationType;ZZLcom/strategyquant/tradinglib/correlation/CorrelationPeriods;)V",
+          "access": 1,
+          "code_sha256": "a76fd75c328d3264245d14fb429f14de8a2b27f3bbdfc8c13845ea59732caa86",
+          "code_length": 71
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult;",
+          "access": 1,
+          "code_sha256": "b2515afec801e931e9f7b0b69d1c67d8e65ba4c51ee3cf2502425ca09e33ec1f",
+          "code_length": 176,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createOrdersFromStrategy",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "95ad7fa9e4a258cad4b013642870841c8beee2b337e34480fd62f9e7d113da2c",
+          "code_length": 133,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "83eb33a13d27d20142568d6e6c98f286bfe1fbb7daddeaa0710ae1386d8d1108",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "aca4bf5ba9389e76f27d196d9cf2fbc56248f8d978f0ff4107108181fd095457",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/concurrent/Callable<Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult;>;",
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/correlation/CorrelationComputer",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/concurrent/Callable",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult.class",
+      "occurrence": 0,
+      "sha256": "6d6a746b2308d56f71f2268b44ab55e26cd02f6567f94d64a929db480a8ea1ad",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "symbol1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "symbol2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "value",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.class",
+      "occurrence": 0,
+      "sha256": "7e26869e874b099f46f4a3f2782c759313625040df2c174d898cf5266bce0bdf",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "results",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult;>;"
+        },
+        {
+          "name": "allowNegativeCorrelation",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "addEmptyPeriods",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "cellFormat",
+          "descriptor": "Lcom/strategyquant/tradinglib/CustomCellFormat;",
+          "access": 2
+        },
+        {
+          "name": "type",
+          "descriptor": "Lcom/strategyquant/tradinglib/CorrelationType;",
+          "access": 2
+        },
+        {
+          "name": "period",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "symbolList",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "periods",
+          "descriptor": "Lcom/strategyquant/tradinglib/correlation/CorrelationPeriods;",
+          "access": 2
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "dc54885c3714c974992e4f27bbf2682ec075f3e2d2a00487e5ba80105654afe5",
+          "code_length": 27
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;ILcom/strategyquant/tradinglib/CorrelationType;ZZLcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "00d1fae2db650326c14140371d3a7882c8e9fdd59e444d4bc09730500d7b7b07",
+          "code_length": 496,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "precomputePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Lcom/strategyquant/tradinglib/correlation/CorrelationPeriods;",
+          "access": 2,
+          "code_sha256": "9b636d21192a4cfef3e8581ca9ac36241e693180163985227639de9535a52c7d",
+          "code_length": 163,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createOrdersFromStrategy",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2,
+          "code_sha256": "80e8582a7dd4f23b447bac75dc12ecf462658ab014c0b8611eda0940f037d1ab",
+          "code_length": 75,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printResults",
+          "descriptor": "(ILcom/strategyquant/tradinglib/CorrelationType;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "2bf0f47158c4d8f7fcca05bb8c6015b20b2fc2500c8d2ffa19876710ee8764ac",
+          "code_length": 504,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "key",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "72d7b0100a99634eb80d898270059f0c5a5d1ddacb79abfca4d5d4344e2f1813",
+          "code_length": 60
+        },
+        {
+          "name": "list",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;II)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "09aa9f100b0394d8a133568aeae84a0d6648a43178906a919cfb3af67a6a0b37",
+          "code_length": 527
+        },
+        {
+          "name": "filterEmptyPeriods",
+          "descriptor": "(Lcom/strategyquant/lib/TimePeriods;Lcom/strategyquant/lib/TimePeriods;Lcom/strategyquant/lib/TimePeriods;Lcom/strategyquant/lib/TimePeriods;)V",
+          "access": 2,
+          "code_sha256": "7cab30257988b5d7d3744ee4cb73f5b433b2dae1c211ef7c91bb116d680e1d99",
+          "code_length": 133
+        },
+        {
+          "name": "saveToCsv",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e0f0530869c9155dca67b6cf7802cff8afa044c6ab8b48bcdf1aea4d370d16e8",
+          "code_length": 523,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getColor",
+          "descriptor": "(D)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "c3a29d6266aa0dae37cf8acece886d4444f25d8d363aa4ace26b2cef3d1a082a",
+          "code_length": 107
+        },
+        {
+          "name": "getTextColor",
+          "descriptor": "(D)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "174ae884662777bbd09a0b25b98cb2908e68e564e54675646a7f9c0ddb55b9d0",
+          "code_length": 111
+        },
+        {
+          "name": "getColor2",
+          "descriptor": "(D)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "8688cdd05fc9e0b0ff2aa70a8ee9c44e7f4f2810cd216d816298ef59c508618f",
+          "code_length": 24
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7c19d6a87da90ebb047863e67f12009b19070b8345d99f87f9694a359b3938a4",
+          "code_length": 6
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1ed761428a332ee1b9e5d6383a98abfe98990e688511b5aaa8a00dc995ecdf9e",
+          "code_length": 20
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c1aca2e725f2251d3cb0156c378ac71a4de8e2d7d8fd20487bc631f15c5b73b1",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/lib/memory/CpuInfo",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationComputerTask",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/CorrelationResult",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/CustomCellFormat",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/correlation/CorrelationPeriodTypes",
+        "com/strategyquant/tradinglib/correlation/CorrelationPeriods",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/io/PrintWriter",
+        "java/io/Serializable",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult.class",
+      "occurrence": 0,
+      "sha256": "71bc1986b0ccbd8f2563252aaf7a0c5eaf2a19c6adaf74d12955e04bf72ce272",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "symbol1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "symbol2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "data",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade;>;"
+        },
+        {
+          "name": "selected",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a6bc1aee5a1db3088d480a0d21e6541e6eaf1b5cbdefc6827e26425abab0e05f",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult",
+        "java/lang/Object",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade.class",
+      "occurrence": 0,
+      "sha256": "5774cc8b6436950d8b6846c71876b6fcf2b1fdf7bf69521c99bbc8bf63463fd7",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "from1",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "to1",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "from2",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "to2",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "time",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JJJJLjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "331e3dabe22e9a25f64f9a0408f7fb2291a68fdb92e27451b543a6af4ed4076b",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades.class",
+      "occurrence": 0,
+      "sha256": "bf17ddb2c7cfc5a2bc1d7f88097d6f2f8ea124c0de25e4553930e7b3c80f830e",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/tradinglib/OrdersList;)Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult;",
+          "access": 1,
+          "code_sha256": "d08c97a1b77f45416f8d635ad098af276b850fe2c019ad4d130de1c3cceeabc9",
+          "code_length": 278,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.class",
+      "occurrence": 0,
+      "sha256": "8e5ff4744cdc4a93bcb488fa4c79e82a4d77dff6aca2fd1dae376ac03e52a386",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "results",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult;>;"
+        },
+        {
+          "name": "stopped",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "da3b7ff91a27f4acac104b1fb0c959ff8d3b3ec1b1d092da46de4c1866d84fba",
+          "code_length": 16
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender;)Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "3645df1500da1a2696fc4cbf4e153f37cc8daf9f836ce829abf1b165f6696b06",
+          "code_length": 442,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printResults",
+          "descriptor": "(Ljava/util/List;)Lorg/json/JSONObject;",
+          "access": 2,
+          "code_sha256": "10b9cb82e1b008f03b17304fd74c7727d07b8ade4ec9fdd6052587683594ebb3",
+          "code_length": 322,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Lorg/json/JSONObject;"
+        },
+        {
+          "name": "key",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "1096b6544597e605d4ac30ee6bfb8ce964ac799a7c0df45bc5788ad5771301fa",
+          "code_length": 58
+        },
+        {
+          "name": "list",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;II)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4eae3ed92165606b3015736746d14529e0cfcd794a6660d2663fd09889ed4d8e",
+          "code_length": 308
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d88c55527a7597c7a9b0c3d74be7c65166560a36bd3c8552c44134c5bc3dcb3b",
+          "code_length": 6
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "db9e9d5bc9a7e762d79847fad5af5c34f8ed6caa8bd8ee9813109c8cc87758de",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "2acf0a904d99ef55cb8be40fadc13dbfe7a7ba9d450c3a633b9eb6feead66433",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/memory/CpuInfo",
+        "com/strategyquant/lib/utils/JsonCreator",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationInterruptException",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/PortfolioCorrelationResultsSender",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrade",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask.class",
+      "occurrence": 0,
+      "sha256": "98dfaa1d5381fcad91b8939607a8f7e4842dc05c40eaebc6dfbc22de87b99762",
+      "name": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "strategy",
+          "descriptor": "Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2
+        },
+        {
+          "name": "symbol1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "symbol2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "computer",
+          "descriptor": "Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades;",
+          "access": 2
+        },
+        {
+          "name": "orders1",
+          "descriptor": "Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2
+        },
+        {
+          "name": "orders2",
+          "descriptor": "Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 1,
+          "code_sha256": "76b6b8f7d580b70fb098f0f3a94b0914347e361a439844a0dbda651f726fa1e3",
+          "code_length": 41
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult;",
+          "access": 1,
+          "code_sha256": "e53bf55b22c50a1f62b7ef4e2cf0fef891b30749fa29f0c448713d79d85cee28",
+          "code_length": 32,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createOrdersFromStrategy",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ba52f2630f828570d7654d24a0b27de689510237986eabc9f4ac3bb4909cbb42",
+          "code_length": 133,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "7327a1be110369f8dcbe054178af01d69156e8cf9d74dccd66ea4b510c982b4a",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7f22b06ea3a50064283cdbc61b2091e57c53f6261a14ac1705fe690fd7672036",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/concurrent/Callable<Lcom/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingResult;>;",
+      "class_references": [
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTrades",
+        "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesTask",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/concurrent/Callable",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

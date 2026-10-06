@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/EquityChartVolatility/EquityChartVolatility.jar",
+  "sha256": "5b6f80cefad2650fe7e24496eb3b18a91ef20d65a60c5bed0e33e048f19de840",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/EquityChart/impl/Volatility/Volatility.class": "264961820e44fea8952ce98c770d350fb0e856e86af217159a232ee2bebd379c"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/EquityChart/impl/Volatility/Volatility.class",
+      "occurrence": 0,
+      "sha256": "264961820e44fea8952ce98c770d350fb0e856e86af217159a232ee2bebd379c",
+      "member_shard": "docs/dev/evidence/sqx145/members/186/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/186/001.json",
+      "sha256": "f9c308fc9285b3609fa9a0746935e0210f82198548604e0556f1b567468a5e2f"
+    }
+  ]
+}

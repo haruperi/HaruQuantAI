@@ -1,0 +1,6391 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_OPEN_LOG_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "1ee14cd8cd007f29a21bee3585d4d82986c3bcc0813d5798c90d9d3ca64262fb",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_OPEN_LOG_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtOpenChannelPath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtOpenFilePath",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_OPEN_LOG_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_PUBLISHER_METADATA_PROPERTY_ID.class",
+      "occurrence": 0,
+      "sha256": "cf6059ff935b6d5b0a5ace35400a2f1a73b032ddd09d922a7b8ba18ba82bbd88",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_PUBLISHER_METADATA_PROPERTY_ID",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtPublisherMetadataPublisherGuid",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataResourceFilePath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataParameterFilePath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataMessageFilePath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataHelpLink",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataPublisherMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferences",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferencePath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferenceIndex",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferenceID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferenceFlags",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataChannelReferenceMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataLevels",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataLevelName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataLevelValue",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataLevelMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataTasks",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataTaskName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataTaskEventGuid",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataTaskValue",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataTaskMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataOpcodes",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataOpcodeName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataOpcodeValue",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataOpcodeMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataKeywords",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataKeywordName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataKeywordValue",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataKeywordMessageID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtPublisherMetadataPropertyIdEND",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_PUBLISHER_METADATA_PROPERTY_ID",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_QUERY_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "4fa8b508af0fe5111ec2f26f693b0c2cf06f2ac1206d09de5f8caf2dfecf16cb",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_QUERY_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtQueryChannelPath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryFilePath",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryForwardDirection",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryReverseDirection",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryTolerateQueryErrors",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_QUERY_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_QUERY_PROPERTY_ID.class",
+      "occurrence": 0,
+      "sha256": "f6e382d8ca06383ef04a8dbb1c413166b5c7bd76d83b3a9a358dbffe27078c25",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_QUERY_PROPERTY_ID",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtQueryNames",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryStatuses",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtQueryPropertyIdEND",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_QUERY_PROPERTY_ID",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RENDER_CONTEXT_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "90a3a6df03f4da1e8b203aa81f817ad3cb24bd0c3e6a85c61378fcdb7de2f6e7",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RENDER_CONTEXT_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtRenderContextValues",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRenderContextSystem",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRenderContextUser",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RENDER_CONTEXT_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RENDER_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "264cd4914f041c5d18ab516b546ffa72372d68685241045a88e23935bfeb7a22",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RENDER_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtRenderEventValues",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRenderEventXml",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRenderBookmark",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RENDER_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e981f6480ba5cab1982499959194fecaf202c4aa21282ef709b49a5c1ca0fffe",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByValue.class",
+      "occurrence": 0,
+      "sha256": "869c70850d3d498d1c1a8c3b3d91f7664f3f55a9d8141820eb9ec5c221d79c73",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByValue",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+      "interfaces": [
+        "com/sun/jna/Structure$ByValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByValue",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByValue"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN.class",
+      "occurrence": 0,
+      "sha256": "119373cee9e4d6aeca9b1ff3eb2f99be0e8b60daae526e6de139d52339a3d373",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Server",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "User",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Domain",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Password",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "794185f6e786e9c8245bcdac7d2004ce4a80aa27326e430b084cf72336f7b7d9",
+          "code_length": 35
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "4dd371e05f784989d5a5ebfb87393a9a4ccecba59e026cdfa0e9a7407ad7c6e0",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByReference",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN$ByValue",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "a6f7c08f98c19bfd332bc7d71f4c2057d4cb64f8b5ec7c939bba5e29605adb68",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtRpcLoginAuthDefault",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRpcLoginAuthNegotiate",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRpcLoginAuthKerberos",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtRpcLoginAuthNTLM",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_SEEK_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "c8906dad6f9a5f56eb45cae2a60fcb6e31aabb8e7519766175b44350014ea34e",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_SEEK_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtSeekRelativeToFirst",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSeekRelativeToLast",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSeekRelativeToCurrent",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSeekRelativeToBookmark",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSeekOriginMask",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSeekStrict",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_SEEK_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_FLAGS.class",
+      "occurrence": 0,
+      "sha256": "2118d51cca6a631a656f3fefdcfc7b08fdf72990ffc50ebe9703df072683f4ad",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_FLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtSubscribeToFutureEvents",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeStartAtOldestRecord",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeStartAfterBookmark",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeOriginMask",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeTolerateQueryErrors",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeStrict",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_FLAGS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_NOTIFY_ACTION.class",
+      "occurrence": 0,
+      "sha256": "0555fd195da6972a5e2a9fa9324c6b6f820024ac4b94871fff78157bfa65e269",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_NOTIFY_ACTION",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtSubscribeActionError",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSubscribeActionDeliver",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_NOTIFY_ACTION",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_SYSTEM_PROPERTY_ID.class",
+      "occurrence": 0,
+      "sha256": "22429b8d58be15a0638764590b8ad97f06fd395dc6bae8bbec2da122ee6e7e4d",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_SYSTEM_PROPERTY_ID",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtSystemProviderName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemProviderGuid",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemEventID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemQualifiers",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemLevel",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemTask",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemOpcode",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemKeywords",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemTimeCreated",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemEventRecordId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemActivityID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemRelatedActivityID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemProcessID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemThreadID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemChannel",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemComputer",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemUserID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemVersion",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EvtSystemPropertyIdEND",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_SYSTEM_PROPERTY_ID",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e444aedc500cef84be104c8c111750b5f488824ba7356927a36769620f0dea70",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByValue.class",
+      "occurrence": 0,
+      "sha256": "e5f87524c7406ee5d57de75574b8f9c3fa7cba4f5d8ae5c8b40e8e12864d46ca",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByValue",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+      "interfaces": [
+        "com/sun/jna/Structure$ByValue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByValue",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByValue"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$field1_union.class",
+      "occurrence": 0,
+      "sha256": "b9ac3b55aaa2a355e88e9285c0c34ada45eb4f8a99f4f9ae1c03e173b9d8ca8b",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$field1_union",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "byteValue",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "intValue",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "longValue",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "F",
+          "access": 1
+        },
+        {
+          "name": "doubleVal",
+          "descriptor": "D",
+          "access": 1
+        },
+        {
+          "name": "pointerValue",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$field1_union"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT.class",
+      "occurrence": 0,
+      "sha256": "3760bd3d3701ec215126d11a8e03b6b894ff05cbe07f1ceb277c8839bb778fcf",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "field1",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT$field1_union;",
+          "access": 1
+        },
+        {
+          "name": "Count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "holder",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "09c650b16ac50297b200ec30e0af3641e147f40a56cedae50a668f2e71cefa65",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "8f12b87dd5eb97123b68ee06c0a67d8bdc30ed9bebd25891e69fb7c4b0be6cf9",
+          "code_length": 10
+        },
+        {
+          "name": "use",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "cb2e711c2d91342b547e1c7dbf602890656b6d9e5101e0f224cefdf06418548f",
+          "code_length": 7
+        },
+        {
+          "name": "getBaseType",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "81ce5fca4983c831bf3bd1bcb7a967d9b66aded6dbd04bf3bd72316e15007be5",
+          "code_length": 8
+        },
+        {
+          "name": "isArray",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d19157680be2aef2065a7a08785ea736f04e93bcec21bc0bfd5cf60477cd6eb7",
+          "code_length": 20
+        },
+        {
+          "name": "getVariantType",
+          "descriptor": "()Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 1,
+          "code_sha256": "316e9d738670a70c0e70147e38c31b6e501554339427c58d8c9075c2246e25aa",
+          "code_length": 9
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "de71d4e7e3b190398b1a32520abaa7652d8a5f3980b80ea62a8e54fddc5809d9",
+          "code_length": 1884
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "056444fe58254dc1d92d8a78ae2de566fe64d80850ddcfe7236e2b5ea10fe9c5",
+          "code_length": 1078
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ce9d39ee83b0c771bf8f406ff87d29dda1e7d62fc1efd88a38e46dc5af24f2fa",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[D",
+        "[F",
+        "[I",
+        "[J",
+        "[Lcom/sun/jna/Pointer;",
+        "[Lcom/sun/jna/platform/win32/BaseTSD$SIZE_T;",
+        "[Lcom/sun/jna/platform/win32/WinDef$BOOL;",
+        "[Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+        "[Ljava/lang/String;",
+        "[S",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/StringArray",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$SIZE_T",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$BOOL",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$PSID",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$1",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByReference",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$ByValue",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT$field1_union",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/io/Serializable",
+        "java/lang/AssertionError",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE.class",
+      "occurrence": 0,
+      "sha256": "52b222d519c425de8cbcff9503de58cacb549c2ecbd5f758de8ced884fea31cc",
+      "name": "com/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EvtVarTypeNull",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeString",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeAnsiString",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeSByte",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeByte",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeInt16",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeUInt16",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeInt32",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeUInt32",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeInt64",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeUInt64",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeSingle",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeDouble",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeBoolean",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeBinary",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeGuid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeSizeT",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeFileTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeSysTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeSid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeHexInt32",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeHexInt64",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeEvtHandle",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "EvtVarTypeEvtXml",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 16409
+        },
+        {
+          "name": "field",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILjava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "e878f07e1e5b66f607f84167ef96d734ddafbe409d1d0c271b5c0a640780e0c1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/lang/String;)V"
+        },
+        {
+          "name": "getField",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f28a2c3c567892ff86654f2a9f92af6aef64c9c225173e04bf8ec809bf928f5e",
+          "code_length": 38
+        },
+        {
+          "name": "getArrField",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dc0147d3395987a8b541518f3049cc266e8e41c5576c518f7cccf2b6ad132361",
+          "code_length": 38
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f048586e8fdf4c2412ad17ddba5fd96d2df22407a9a204b7404927df81eb9561",
+          "code_length": 549
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;>;",
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE;",
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE",
+        "java/lang/Enum",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winevt.class",
+      "occurrence": 0,
+      "sha256": "c34a909f3ca40ffac39a6f035fd070270e72cb53373500bc36a83dfbb21db3e5",
+      "name": "com/sun/jna/platform/win32/Winevt",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EVT_VARIANT_TYPE_ARRAY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVT_VARIANT_TYPE_MASK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVT_READ_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVT_WRITE_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVT_ALL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EVT_CLEAR_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winevt",
+        "com/sun/jna/platform/win32/Winevt$1",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_CLOCK_TYPE",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_CONFIG_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_ISOLATION_TYPE",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_REFERENCE_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_SID_TYPE",
+        "com/sun/jna/platform/win32/Winevt$EVT_CHANNEL_TYPE",
+        "com/sun/jna/platform/win32/Winevt$EVT_EVENT_METADATA_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_EVENT_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_EXPORTLOG_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_FORMAT_MESSAGE_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_HANDLE",
+        "com/sun/jna/platform/win32/Winevt$EVT_LOGIN_CLASS",
+        "com/sun/jna/platform/win32/Winevt$EVT_LOG_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_OPEN_LOG_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_PUBLISHER_METADATA_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_QUERY_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_QUERY_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_RENDER_CONTEXT_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_RENDER_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN",
+        "com/sun/jna/platform/win32/Winevt$EVT_RPC_LOGIN_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_SEEK_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_FLAGS",
+        "com/sun/jna/platform/win32/Winevt$EVT_SUBSCRIBE_NOTIFY_ACTION",
+        "com/sun/jna/platform/win32/Winevt$EVT_SYSTEM_PROPERTY_ID",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT",
+        "com/sun/jna/platform/win32/Winevt$EVT_VARIANT_TYPE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO$UNION.class",
+      "occurrence": 0,
+      "sha256": "54fcf155d4e806c6e3b533c5ecf247d8f89d2e7943f1b9add333206862cbfd6f",
+      "name": "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO$UNION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwReserved",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwExemptDelta",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/Wininet",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO$UNION"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO.class",
+      "occurrence": 0,
+      "sha256": "eed9686071adc13a4e6d3bebd09364f39b82593a4bf5b6f433180e17b1ff92bd",
+      "name": "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwStructSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lpszSourceUrlName",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "lpszLocalFileName",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "CacheEntryType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwUseCount",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwHitRate",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwSizeLow",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwSizeHigh",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "LastModifiedTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "ExpireTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "LastAccessTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "LastSyncTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "lpHeaderInfo",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "dwHeaderInfoSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lpszFileExtension",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "u",
+          "descriptor": "Lcom/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO$UNION;",
+          "access": 1
+        },
+        {
+          "name": "additional",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e64eb3c70c4bff2a802a91d9e7cf40b533a586ffc40af81beb8eab09771ffecd",
+          "code_length": 12
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6bc388e660979618258060982337a6843628c74aac892e318d88ba05a4f4ace7",
+          "code_length": 75
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME",
+        "com/sun/jna/platform/win32/Wininet",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO$UNION",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wininet.class",
+      "occurrence": 0,
+      "sha256": "e9e9f48414b58342159faa4922587ab7a530667609f3c2ab080399d6da75945d",
+      "name": "com/sun/jna/platform/win32/Wininet",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Wininet;",
+          "access": 25
+        },
+        {
+          "name": "NORMAL_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STICKY_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EDITED_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TRACK_OFFLINE_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TRACK_ONLINE_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPARSE_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COOKIE_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "URLHISTORY_CACHE_ENTRY",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "FindCloseUrlCache",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Z",
+          "access": 1025
+        },
+        {
+          "name": "DeleteUrlCacheEntry",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "FindFirstUrlCacheEntry",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO;Lcom/sun/jna/ptr/IntByReference;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1025
+        },
+        {
+          "name": "FindNextUrlCacheEntry",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/Wininet",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WininetUtil.class",
+      "occurrence": 0,
+      "sha256": "450d21cc5fe30501236112b6021924ee54c9052e3982a5094a328ae87b86e8fa",
+      "name": "com/sun/jna/platform/win32/WininetUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getCache",
+          "descriptor": "()Ljava/util/Map;",
+          "access": 9,
+          "code_sha256": "8b2a79696db76ba06af05adf95b2a3f48509744f9cc54b765c614c7cf0807048",
+          "code_length": 535,
+          "generic_signature": "()Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/Win32Exception",
+        "com/sun/jna/platform/win32/WinError",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/Wininet",
+        "com/sun/jna/platform/win32/Wininet$INTERNET_CACHE_ENTRY_INFO",
+        "com/sun/jna/platform/win32/WininetUtil",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER$ByReference.class",
+      "occurrence": 0,
+      "sha256": "764ea36d0eed8af4dfdffb506a2837a0266be53a5eb1968d2f3dd2709e92a702",
+      "name": "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winioctl",
+        "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER",
+        "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER.class",
+      "occurrence": 0,
+      "sha256": "61cff3c13931acbe52b8f702f0aa63c8d5db5e4b5804c94e0daba8c57e4a9a0e",
+      "name": "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DeviceType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "DeviceNumber",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "PartitionNumber",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winioctl",
+        "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER",
+        "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winioctl.class",
+      "occurrence": 0,
+      "sha256": "27c54a9a045b7458f803233c64e21603872a5cf3745a9b842fae44d7b9ae7b1c",
+      "name": "com/sun/jna/platform/win32/Winioctl",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FILE_DEVICE_BEEP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CD_ROM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CD_ROM_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CONTROLLER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DATALINK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DFS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DISK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DISK_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_INPORT_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_KEYBOARD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MAILSLOT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MIDI_IN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MIDI_OUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MOUSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MULTI_UNC_PROVIDER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NAMED_PIPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NETWORK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NETWORK_BROWSER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NETWORK_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NULL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_PARALLEL_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_PHYSICAL_NETCARD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SCANNER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SERIAL_MOUSE_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SERIAL_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SCREEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SOUND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_STREAMS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_TAPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_TAPE_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_TRANSPORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_VIDEO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_VIRTUAL_DISK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_WAVE_IN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_WAVE_OUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_8042_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NETWORK_REDIRECTOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_BATTERY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_BUS_EXTENDER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MODEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_VDM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MASS_STORAGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SMB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_KS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CHANGER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SMARTCARD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_ACPI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DVD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_FULLSCREEN_VIDEO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DFS_FILE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DFS_VOLUME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SERENUM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_TERMSRV",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_KSEC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_FIPS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_INFINIBAND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_VMBUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CRYPT_PROVIDER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_WPD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_BLUETOOTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MT_COMPOSITE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_MT_TRANSPORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_BIOMETRIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_PMI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_EHSTOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_DEVAPI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_GPIO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_USBEX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_CONSOLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_NFP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_SYSENV",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_VIRTUAL_BLOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_DEVICE_POINT_OF_SERVICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_GET_COMPRESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_SET_COMPRESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_SET_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_GET_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_DELETE_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "METHOD_BUFFERED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "METHOD_IN_DIRECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "METHOD_OUT_DIRECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "METHOD_NEITHER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_ANY_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_SPECIAL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_READ_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FILE_WRITE_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "IOCTL_STORAGE_GET_DEVICE_NUMBER",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winioctl",
+        "com/sun/jna/platform/win32/Winioctl$STORAGE_DEVICE_NUMBER",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinioctlUtil.class",
+      "occurrence": 0,
+      "sha256": "cd743d23e9e7f1112a4dfa8c590da32646f9d349dd8ceac9ec5d44ea83b9545a",
+      "name": "com/sun/jna/platform/win32/WinioctlUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FSCTL_GET_COMPRESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_SET_COMPRESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_SET_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_GET_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FSCTL_DELETE_REPARSE_POINT",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "CTL_CODE",
+          "descriptor": "(IIII)I",
+          "access": 9,
+          "code_sha256": "59c8e6dde611dd9197e93eae7fd092bfa395a4e0bda5497f2a880ebf22cc6562",
+          "code_length": 16
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7ec6fc30d136c4dc025d5a7d965ba528857bccaa32013138654d675319ba91ee",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/Winioctl",
+        "com/sun/jna/platform/win32/WinioctlUtil",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$ConnectFlag.class",
+      "occurrence": 0,
+      "sha256": "ba146967a72afccb031fe596bac699cebf32ccd46dac56f71f230439808d7153",
+      "name": "com/sun/jna/platform/win32/Winnetwk$ConnectFlag",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CONNECT_UPDATE_PROFILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_INTERACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_PROMPT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_REDIRECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_LOCALDRIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_COMMANDLINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CONNECT_CMD_SAVECRED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winnetwk;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winnetwk;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$ConnectFlag",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e8214f37fb388b131cd23ad50b1b8887cb531505b9c124d767e35b4b7dc934ff",
+      "name": "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE",
+        "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE.class",
+      "occurrence": 0,
+      "sha256": "7b3058993c3415f11a67550c1948a6e1329aa6b2d249341ccdcc449551f3c7e4",
+      "name": "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwScope",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwDisplayType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwUsage",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lpLocalName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpRemoteName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpComment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpProvider",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE",
+        "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "004da2ac700114046b0328dee2f43207be861c74e9256290b22437694bf6a5c2",
+      "name": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO.class",
+      "occurrence": 0,
+      "sha256": "4ae096621ccbd0ac20c2caae257fa359b47082e6fa1ce6034a9c17098c7b9198",
+      "name": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpUniversalName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpConnectionName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpRemainingPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$RESOURCEDISPLAYTYPE.class",
+      "occurrence": 0,
+      "sha256": "3feb17cef23a94dea8fd9e4ea0cce86fe64178f4886ab51ac229a0fad28e4138",
+      "name": "com/sun/jna/platform/win32/Winnetwk$RESOURCEDISPLAYTYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RESOURCEDISPLAYTYPE_GENERIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEDISPLAYTYPE_DOMAIN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEDISPLAYTYPE_SERVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEDISPLAYTYPE_SHARE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEDISPLAYTYPE_FILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winnetwk;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winnetwk;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCEDISPLAYTYPE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$RESOURCESCOPE.class",
+      "occurrence": 0,
+      "sha256": "423df2843332b0312cb76a1a467a77273b5a6e37ff7b8ddd1deed6b6375caa9b",
+      "name": "com/sun/jna/platform/win32/Winnetwk$RESOURCESCOPE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RESOURCE_CONNECTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_GLOBALNET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_REMEMBERED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_RECENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCE_CONTEXT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winnetwk;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winnetwk;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCESCOPE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$RESOURCETYPE.class",
+      "occurrence": 0,
+      "sha256": "abf79fbe32417bd2eddf898dad4139e33a9af00f170b893f13d8c1a3f0d1edd8",
+      "name": "com/sun/jna/platform/win32/Winnetwk$RESOURCETYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RESOURCETYPE_ANY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCETYPE_DISK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCETYPE_PRINT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCETYPE_RESERVED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCETYPE_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winnetwk;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winnetwk;)V",
+          "access": 1,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCETYPE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$RESOURCEUSAGE.class",
+      "occurrence": 0,
+      "sha256": "42cab6251d9c81549394c189d68944e12c5dfe8f4cd851b902a9ed98b6d5b05e",
+      "name": "com/sun/jna/platform/win32/Winnetwk$RESOURCEUSAGE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RESOURCEUSAGE_CONNECTABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEUSAGE_CONTAINER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEUSAGE_NOLOCALDEVICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEUSAGE_SIBLING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEUSAGE_ATTACHED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RESOURCEUSAGE_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winnetwk;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Winnetwk;)V",
+          "access": 1,
+          "code_sha256": "ccdd9acd6fd96c995413bd95edb0d10800857d4d8fdabf48b7e790dfe81c7827",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCEUSAGE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "eda94fe40e2b3aee09ba000c34cb5452d1091aa2fdca20ce8f00d2983b67c482",
+      "name": "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO.class",
+      "occurrence": 0,
+      "sha256": "eb364bb002e473f49f40563e7f52ac68b21c98ed5e3d1e224101c0774988ec2a",
+      "name": "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpUniversalName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO$ByReference",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winnetwk.class",
+      "occurrence": 0,
+      "sha256": "bca99a0d068bf61d8e900fa07e82c10c3fe49377acabb7fc6b5e5992f2478366",
+      "name": "com/sun/jna/platform/win32/Winnetwk",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNIVERSAL_NAME_INFO_LEVEL",
+          "descriptor": "I",
+          "access": 9
+        },
+        {
+          "name": "REMOTE_NAME_INFO_LEVEL",
+          "descriptor": "I",
+          "access": 9
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ecb06dbccf8687ad815753b16c8726f8063dfe40979651d3c89c1c78b4aefd7a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winnetwk",
+        "com/sun/jna/platform/win32/Winnetwk$ConnectFlag",
+        "com/sun/jna/platform/win32/Winnetwk$NETRESOURCE",
+        "com/sun/jna/platform/win32/Winnetwk$REMOTE_NAME_INFO",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCEDISPLAYTYPE",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCESCOPE",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCETYPE",
+        "com/sun/jna/platform/win32/Winnetwk$RESOURCEUSAGE",
+        "com/sun/jna/platform/win32/Winnetwk$UNIVERSAL_NAME_INFO",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsock2.class",
+      "occurrence": 0,
+      "sha256": "0573b7615672f89ea4ee33b1ea4770351257f0a85dc44e78e68961b78be69e5e",
+      "name": "com/sun/jna/platform/win32/Winsock2",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winsock2;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "gethostname",
+          "descriptor": "([BI)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Winsock2",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$JOB_INFO_1.class",
+      "occurrence": 0,
+      "sha256": "fa8eb8ab64e0b6736bfc84ba129ab67fd8b99bd46f2a694c26aceafa854e17fd",
+      "name": "com/sun/jna/platform/win32/Winspool$JOB_INFO_1",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "JobId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pPrinterName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pMachineName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pUserName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDocument",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDatatype",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pStatus",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Status",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Priority",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Position",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "TotalPages",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "PagesPrinted",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Submitted",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$SYSTEMTIME;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b9e31020952205912049a9cbfbbd0e0d05493d8d26c340f47ebd4fd843baab93",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$JOB_INFO_1"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS.class",
+      "occurrence": 0,
+      "sha256": "31326dd79202fe2338731ac17bd971e705e6530a689c15e5401f1ffef945065c",
+      "name": "com/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pDatatype",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDevMode",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "DesiredAccess",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA.class",
+      "occurrence": 0,
+      "sha256": "dbdfaf12a80391d7d2cc42436067f78441dfcf13f7e4f98039f73d453485429f",
+      "name": "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "adwData",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "Data",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f709e98f0ef51dace715200678e34caff1d6323a6fd5c9e3f64275db6da43587",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA.class",
+      "occurrence": 0,
+      "sha256": "23b1b97b34e1588d413df23ccc3d3293d727e1f7e9923a9e1f0bc3d2de70773f",
+      "name": "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cbBuf",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pBuf",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_1.class",
+      "occurrence": 0,
+      "sha256": "26e6021df35d900466b39943c025c2bad38adf339625fd10e7d789c9e6ce0909",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_1",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pDescription",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pComment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b9e31020952205912049a9cbfbbd0e0d05493d8d26c340f47ebd4fd843baab93",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_1"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_2.class",
+      "occurrence": 0,
+      "sha256": "8fde213cd64bf27513b36d1aa60ffb158c6ce80418fb59f1896cab51fd5a1e37",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_2",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pServerName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pPrinterName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pShareName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pPortName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDriverName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pComment",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pLocation",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDevMode",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$INT_PTR;",
+          "access": 1
+        },
+        {
+          "name": "pSepFile",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pPrintProcessor",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pDatatype",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pParameters",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pSecurityDescriptor",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$INT_PTR;",
+          "access": 1
+        },
+        {
+          "name": "Attributes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Priority",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "DefaultPriority",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "StartTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "UntilTime",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Status",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cJobs",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "AveragePPM",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b9e31020952205912049a9cbfbbd0e0d05493d8d26c340f47ebd4fd843baab93",
+          "code_length": 14
+        },
+        {
+          "name": "hasAttribute",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "6c1cc10be2cc1673962ed0a36a9b9f44cb2154deb78fb852148e8f5dfc136265",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$INT_PTR",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_2"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_4.class",
+      "occurrence": 0,
+      "sha256": "a7a41649b22d60f89c2765a08e9d06835820517048795cbccf3262b09efdc216",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_4",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pPrinterName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pServerName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "Attributes",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b9e31020952205912049a9cbfbbd0e0d05493d8d26c340f47ebd4fd843baab93",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_4"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO.class",
+      "occurrence": 0,
+      "sha256": "8716d0921442f680c39b17db344e852c0483c0716a40777a5a3c3e10741039b1",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Version",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "aData",
+          "descriptor": "[Lcom/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b19cc8b6e765ccaa351ee68c45d84dfddfe76d185a06b7299a1456adb3867c1f",
+          "code_length": 13
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "62c606783a2599b060f940a0838e6ff8ba5e3d54e828c908a7afed25b5912119",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA.class",
+      "occurrence": 0,
+      "sha256": "b775214150d8988a217da722dc7da2c05e45df3ce28972fdd49cb67660e477dd",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Type",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "Field",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "Reserved",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Id",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "NotifyData",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winspool$NOTIFY_DATA;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "847473379e370c274cadaf79b0207e35cbb8100a49d82ee6ad81a9ae6636f8c5",
+          "code_length": 181
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS.class",
+      "occurrence": 0,
+      "sha256": "bb78e0178a850dd15e770f58dc9f0a4aa39bc8febf1b084ec6904931363d5ea0",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Version",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pTypes",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "77cb751c9450003b63bda2048861e9d755b12c99e7934cf79347ead4d68f1c72",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference.class",
+      "occurrence": 0,
+      "sha256": "f0f4cf8992a7012ed0fe20d1f3f57a4812f49447d024d850ef2d422f6470b186",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE.class",
+      "occurrence": 0,
+      "sha256": "45e19130939306b8e82df9de1bcfd8bcb5b24d0474aede9af22a840889e3c3eb",
+      "name": "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Type",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "Reserved0",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "Reserved1",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Reserved2",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pFields",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setFields",
+          "descriptor": "([S)V",
+          "access": 1,
+          "code_sha256": "e9d765123d8576ba63dc4c1c2fd8f523373be26fd5654450892c844ffea612e1",
+          "code_length": 43
+        },
+        {
+          "name": "getFields",
+          "descriptor": "()[S",
+          "access": 1,
+          "code_sha256": "ba01bfd938796a6f39ef235a4a27e05e25eb4da74b143d85568f02e998dcc9ed",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winspool.class",
+      "occurrence": 0,
+      "sha256": "9690fb6ea3104873628599aeadb953fe49dab3ff51dd17c475a93ddf1bd65bd2",
+      "name": "com/sun/jna/platform/win32/Winspool",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winspool;",
+          "access": 25
+        },
+        {
+          "name": "CCHDEVICENAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PAUSED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_ERROR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PENDING_DELETION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PAPER_JAM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PAPER_OUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_MANUAL_FEED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PAPER_PROBLEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_OFFLINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_IO_ACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_BUSY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PRINTING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_OUTPUT_BIN_FULL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_NOT_AVAILABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_WAITING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PROCESSING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_INITIALIZING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_WARMING_UP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_TONER_LOW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_NO_TONER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_PAGE_PUNT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_USER_INTERVENTION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_OUT_OF_MEMORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_DOOR_OPEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_SERVER_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_STATUS_POWER_SAVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_QUEUED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_DIRECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_DEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_SHARED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_NETWORK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_HIDDEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_LOCAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_ENABLE_DEVQ",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_KEEPPRINTEDJOBS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_DO_COMPLETE_FIRST",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_WORK_OFFLINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_ENABLE_BIDI",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_RAW_ONLY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_PUBLISHED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_FAX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_TS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_PUSHED_USER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_PUSHED_MACHINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_MACHINE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_FRIENDLY_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ATTRIBUTE_TS_GENERIC_DRIVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_SET_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_FAILED_CONNECTION_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_PRINTER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_SET_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_WRITE_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_JOB",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_FORM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_SET_FORM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_FORM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_FORM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_CONFIGURE_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_PORT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_PRINT_PROCESSOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_PRINT_PROCESSOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_PRINT_PROCESSOR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_SERVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ADD_PRINTER_DRIVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_SET_PRINTER_DRIVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_DELETE_PRINTER_DRIVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_PRINTER_DRIVER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_TIMEOUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ALL_WIN7",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_CHANGE_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_DEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_LOCAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_CONNECTIONS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_FAVORITE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_NAME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_REMOTE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_SHARED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_NETWORK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_EXPAND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_CONTAINER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICONMASK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON1",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON2",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON3",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON4",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON5",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON6",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON7",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_ICON8",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_ENUM_HIDE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_OPTIONS_REFRESH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_INFO_DISCARDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_TYPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_TYPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_SERVER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PRINTER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_SHARE_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PORT_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_DRIVER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_COMMENT",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_LOCATION",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_DEVMODE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_SEPFILE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PRINT_PROCESSOR",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PARAMETERS",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_DATATYPE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_SECURITY_DESCRIPTOR",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_ATTRIBUTES",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PRIORITY",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_DEFAULT_PRIORITY",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_START_TIME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_UNTIL_TIME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_STATUS",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_STATUS_STRING",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_CJOBS",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_AVERAGE_PPM",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_TOTAL_PAGES",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_PAGES_PRINTED",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_TOTAL_BYTES",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_BYTES_PRINTED",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_OBJECT_GUID",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_FRIENDLY_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_FIELD_BRANCH_OFFICE_PRINTING",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PRINTER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_MACHINE_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PORT_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_USER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_NOTIFY_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_DATATYPE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PRINT_PROCESSOR",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PARAMETERS",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_DRIVER_NAME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_DEVMODE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_STATUS",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_STATUS_STRING",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_SECURITY_DESCRIPTOR",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_DOCUMENT",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PRIORITY",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_POSITION",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_SUBMITTED",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_START_TIME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_UNTIL_TIME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_TIME",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_TOTAL_PAGES",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_PAGES_PRINTED",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_TOTAL_BYTES",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_BYTES_PRINTED",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "JOB_NOTIFY_FIELD_REMOTE_JOB_ID",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_CATEGORY_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PRINTER_NOTIFY_CATEGORY_3D",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "EnumPrinters",
+          "descriptor": "(ILjava/lang/String;ILcom/sun/jna/Pointer;ILcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "GetPrinter",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;ILcom/sun/jna/Pointer;ILcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "OpenPrinter",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;Lcom/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS;)Z",
+          "access": 1025
+        },
+        {
+          "name": "ClosePrinter",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Z",
+          "access": 1025
+        },
+        {
+          "name": "FindFirstPrinterChangeNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;IILcom/sun/jna/platform/win32/WinDef$LPVOID;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1025
+        },
+        {
+          "name": "FindFirstPrinterChangeNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;IILcom/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS;)Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 1025
+        },
+        {
+          "name": "FindNextPrinterChangeNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;Lcom/sun/jna/platform/win32/WinDef$LPVOID;Lcom/sun/jna/platform/win32/WinDef$LPVOID;)Z",
+          "access": 1025
+        },
+        {
+          "name": "FindNextPrinterChangeNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/platform/win32/WinDef$DWORDByReference;Lcom/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS;Lcom/sun/jna/ptr/PointerByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "FindClosePrinterChangeNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;)Z",
+          "access": 1025
+        },
+        {
+          "name": "FreePrinterNotifyInfo",
+          "descriptor": "(Lcom/sun/jna/Pointer;)Z",
+          "access": 1025
+        },
+        {
+          "name": "EnumJobs",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;IIILcom/sun/jna/Pointer;ILcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORDByReference",
+        "com/sun/jna/platform/win32/WinDef$LPVOID",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$JOB_INFO_1",
+        "com/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA",
+        "com/sun/jna/platform/win32/Winspool$NOTIFY_DATA_DATA",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_1",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_2",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_4",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_INFO_DATA",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_NOTIFY_OPTIONS_TYPE",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/WinspoolUtil.class",
+      "occurrence": 0,
+      "sha256": "754285c0498f2085e4729f70d2af8e57409d607c3134f983b81ecff37a249925",
+      "name": "com/sun/jna/platform/win32/WinspoolUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "getPrinterInfo1",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_1;",
+          "access": 9,
+          "code_sha256": "a940f8a523aac49d3567d0766d0f2317d26b11363d0b2ee352d061a698d45088",
+          "code_length": 115
+        },
+        {
+          "name": "getPrinterInfo2",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_2;",
+          "access": 9,
+          "code_sha256": "8cbe0b421a8355ecb22fdf0887bc8672929243b9a2159762e2038f5d4d9a2135",
+          "code_length": 5
+        },
+        {
+          "name": "getAllPrinterInfo2",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_2;",
+          "access": 9,
+          "code_sha256": "5c0541611b645f82c07619f0fd0e4ff201934820cea89548a9c84a9d36a6a17d",
+          "code_length": 6
+        },
+        {
+          "name": "getPrinterInfo2",
+          "descriptor": "(I)[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_2;",
+          "access": 10,
+          "code_sha256": "449016a0a584a52d4816ddb961990e0254e9a7372d351b886349b3a5afd31f0e",
+          "code_length": 115
+        },
+        {
+          "name": "getPrinterInfo2",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_2;",
+          "access": 9,
+          "code_sha256": "998c555d6c500b595979bc0101361e1db356c9e45ba97cf07bc4d3b195ac4ade",
+          "code_length": 360
+        },
+        {
+          "name": "getPrinterInfo4",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_4;",
+          "access": 9,
+          "code_sha256": "b7240a7ab8b91516714729250f8d95ecb62edd93b061907f96a7943aea81abe8",
+          "code_length": 115
+        },
+        {
+          "name": "getJobInfo1",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLEByReference;)[Lcom/sun/jna/platform/win32/Winspool$JOB_INFO_1;",
+          "access": 9,
+          "code_sha256": "88827f313e04a7cebeb3c54d3741802116b3a3b1f4e889c2366dea6d8cfea791",
+          "code_length": 157
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/jna/platform/win32/Winspool$JOB_INFO_1;",
+        "[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_1;",
+        "[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_2;",
+        "[Lcom/sun/jna/platform/win32/Winspool$PRINTER_INFO_4;",
+        "com/sun/jna/platform/win32/Kernel32",
+        "com/sun/jna/platform/win32/Win32Exception",
+        "com/sun/jna/platform/win32/WinError",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/WinNT$HANDLEByReference",
+        "com/sun/jna/platform/win32/Winspool",
+        "com/sun/jna/platform/win32/Winspool$JOB_INFO_1",
+        "com/sun/jna/platform/win32/Winspool$LPPRINTER_DEFAULTS",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_1",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_2",
+        "com/sun/jna/platform/win32/Winspool$PRINTER_INFO_4",
+        "com/sun/jna/platform/win32/WinspoolUtil",
+        "com/sun/jna/ptr/IntByReference",
+        "java/lang/Object",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info.class",
+      "occurrence": 0,
+      "sha256": "e923d9b1567be3aeb0066e9b810b70c0f797a34bfe4557fd5d156fd6b858985d",
+      "name": "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "33f7d43a93c875d3c17cc41a1770369f92f769e5ad3b5b09a540cc0f97a75b14",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "acf50f393d61fea7852a866b6474feb68902936a94c80f82a684697d9a5d2c20",
+          "code_length": 24
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/TypeMapper",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+        "com/sun/jna/win32/W32APITypeMapper",
+        "java/lang/Boolean"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS.class",
+      "occurrence": 0,
+      "sha256": "34cf84c07736ed6710f6538d6612ef343b465e95435b9536f1dca867918eebe2",
+      "name": "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpServiceName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpDisplayName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "ServiceStatus",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winsvc$SERVICE_STATUS;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS_PROCESS.class",
+      "occurrence": 0,
+      "sha256": "96503a28092dc50638b791f20f5d95a03660c34410eb0abef9cf11c91da2d83d",
+      "name": "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS_PROCESS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpServiceName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpDisplayName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "ServiceStatusProcess",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS_PROCESS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$Handler.class",
+      "occurrence": 0,
+      "sha256": "2cc9609dd7706edd975001a076d8b49f604af5464a07166ebc26ba45c27fb719",
+      "name": "com/sun/jna/platform/win32/Winsvc$Handler",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "callback",
+          "descriptor": "(I)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$Handler",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$HandlerEx.class",
+      "occurrence": 0,
+      "sha256": "14963572fb36222a7e67fcaa67515d3d72126c2b0408a698b82ee51ac04a6db0",
+      "name": "com/sun/jna/platform/win32/Winsvc$HandlerEx",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "callback",
+          "descriptor": "(IILcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$HandlerEx",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference.class",
+      "occurrence": 0,
+      "sha256": "24ddbfe0b692d349a979f6e93052a18758bf3cec557a76a59e1b459f2b1e8124",
+      "name": "com/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SC_ACTION.class",
+      "occurrence": 0,
+      "sha256": "1f5522d27b52b1ae28a4d8c7acdb089a7ce8e0de026e3cdbcd53afe5d38722d9",
+      "name": "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "delay",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SC_HANDLE.class",
+      "occurrence": 0,
+      "sha256": "ab882eedd62f8d1cf505c4527f5859478d17acafa66dc6f0d9b4de1a76a51bac",
+      "name": "com/sun/jna/platform/win32/Winsvc$SC_HANDLE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinNT$HANDLE",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SC_HANDLE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SC_STATUS_TYPE.class",
+      "occurrence": 0,
+      "sha256": "5744fd1d58c44c8291b30ac0ee37bbd7293ea7351d67afb38adc0f22e16067fc",
+      "name": "com/sun/jna/platform/win32/Winsvc$SC_STATUS_TYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SC_STATUS_PROCESS_INFO",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SC_STATUS_TYPE",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_DESCRIPTION.class",
+      "occurrence": 0,
+      "sha256": "f98ff047140601568fc20cd4dce6c21d5ab59c855838ed703cc49e7a55426946",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_DESCRIPTION",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpDescription",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_DESCRIPTION"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "6c8110177060075aa7f28456b02804283ec620410e32d0e50662b55bb1994450",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS.class",
+      "occurrence": 0,
+      "sha256": "3ff0f00cb9d9b9f9355a70fbf2dad8bf750d4afbc373d1daec06a1f8807045d4",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwResetPeriod",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lpRebootMsg",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpCommand",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "cActions",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lpsaActions",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION$ByReference",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS_FLAG.class",
+      "occurrence": 0,
+      "sha256": "1b83bb3df3738ddfbaf46b083440b06431e62e678e99dc53203f84e55b7cfa30",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS_FLAG",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fFailureActionsOnNonCrashFailures",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS_FLAG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION.class",
+      "occurrence": 0,
+      "sha256": "4755b2da963e197d539db08fdbb176989aea8e0255a9f18c6fac34b478c01d71",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "callback",
+          "descriptor": "(ILcom/sun/jna/Pointer;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/StdCallLibrary$StdCallCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS.class",
+      "occurrence": 0,
+      "sha256": "a373a567c66003ce325fb47cbb5da35776a73e2c349914e1f919c906244160e4",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwServiceType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwCurrentState",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwControlsAccepted",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwWin32ExitCode",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwServiceSpecificExitCode",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwCheckPoint",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwWaitHint",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_HANDLE.class",
+      "occurrence": 0,
+      "sha256": "0ac02be69efe623a5caf478de3b665a8494e6c7c532a568148d1f7e3cdc41d98",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_HANDLE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinNT$HANDLE",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_HANDLE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS.class",
+      "occurrence": 0,
+      "sha256": "5f876ae3afb42a3f961caffd385691d25675e382459f43acd0f7f91656fa5b21",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwServiceType",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwCurrentState",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwControlsAccepted",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwWin32ExitCode",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwServiceSpecificExitCode",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwCheckPoint",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwWaitHint",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwProcessId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "dwServiceFlags",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "b9e31020952205912049a9cbfbbd0e0d05493d8d26c340f47ebd4fd843baab93",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc$SERVICE_TABLE_ENTRY.class",
+      "occurrence": 0,
+      "sha256": "5fd08988cb178a0221a482494f227b155c4a8320fca66fda88a3f735801930cf",
+      "name": "com/sun/jna/platform/win32/Winsvc$SERVICE_TABLE_ENTRY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lpServiceName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "lpServiceProc",
+          "descriptor": "Lcom/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_TABLE_ENTRY",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Winsvc.class",
+      "occurrence": 0,
+      "sha256": "5f4a379f8087076f4c69a5c0cf38b1361821962beb37e01c84fd180c0b7a5355",
+      "name": "com/sun/jna/platform/win32/Winsvc",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SERVICE_RUNS_IN_SYSTEM_PROCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_CONNECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_CREATE_SERVICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_ENUMERATE_SERVICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_LOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_QUERY_LOCK_STATUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_MODIFY_BOOT_CONFIG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_MANAGER_ALL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_QUERY_CONFIG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CHANGE_CONFIG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_QUERY_STATUS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ENUMERATE_DEPENDENTS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_START",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_STOP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_PAUSE_CONTINUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_INTERROGATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_USER_DEFINED_CONTROL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ALL_ACCESS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_INACTIVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_STATE_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_STOP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_PAUSE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_CONTINUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_INTERROGATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_SHUTDOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_PARAMCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_NETBINDADD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_NETBINDREMOVE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_NETBINDENABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_NETBINDDISABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_DEVICEEVENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_HARDWAREPROFILECHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_POWEREVENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_SESSIONCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_PRESHUTDOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_TIMECHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_TRIGGEREVENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTROL_USERMODEREBOOT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_STOPPED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_START_PENDING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_STOP_PENDING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_RUNNING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONTINUE_PENDING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_PAUSE_PENDING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_PAUSED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_STOP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_PAUSE_CONTINUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_SHUTDOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_PARAMCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_NETBINDCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_HARDWAREPROFILECHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_POWEREVENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_SESSIONCHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_PRESHUTDOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_TIMECHANGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_ACCEPT_TRIGGEREVENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_DESCRIPTION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_FAILURE_ACTIONS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_DELAYED_AUTO_START_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_FAILURE_ACTIONS_FLAG",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_SERVICE_SID_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_REQUIRED_PRIVILEGES_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_PRESHUTDOWN_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_TRIGGER_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_PREFERRED_NODE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SERVICE_CONFIG_LAUNCH_PROTECTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_ACTION_NONE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_ACTION_RESTART",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_ACTION_REBOOT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_ACTION_RUN_COMMAND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SC_ENUM_PROCESS_INFO",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/Winsvc",
+        "com/sun/jna/platform/win32/Winsvc$ChangeServiceConfig2Info",
+        "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS",
+        "com/sun/jna/platform/win32/Winsvc$ENUM_SERVICE_STATUS_PROCESS",
+        "com/sun/jna/platform/win32/Winsvc$Handler",
+        "com/sun/jna/platform/win32/Winsvc$HandlerEx",
+        "com/sun/jna/platform/win32/Winsvc$SC_ACTION",
+        "com/sun/jna/platform/win32/Winsvc$SC_HANDLE",
+        "com/sun/jna/platform/win32/Winsvc$SC_STATUS_TYPE",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_DESCRIPTION",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_FAILURE_ACTIONS_FLAG",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_MAIN_FUNCTION",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_HANDLE",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_STATUS_PROCESS",
+        "com/sun/jna/platform/win32/Winsvc$SERVICE_TABLE_ENTRY",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTSINFO.class",
+      "occurrence": 0,
+      "sha256": "e732665185d19321059e2ef9bdaf95c3a366f60d5957f7d4a65bbf0fa5c9b558",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTSINFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CHAR_WIDTH",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "State",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SessionId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "IncomingBytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "OutgoingBytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "IncomingFrames",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "OutgoingFrames",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "IncomingCompressedBytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "OutgoingCompressedBytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "WinStationName",
+          "descriptor": "[B",
+          "access": 17
+        },
+        {
+          "name": "Domain",
+          "descriptor": "[B",
+          "access": 17
+        },
+        {
+          "name": "UserName",
+          "descriptor": "[B",
+          "access": 17
+        },
+        {
+          "name": "ConnectTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        },
+        {
+          "name": "DisconnectTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        },
+        {
+          "name": "LastInputTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        },
+        {
+          "name": "LogonTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        },
+        {
+          "name": "CurrentTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f6c6f64aefc1676f7bf4e07e4f40715878f762a1b57483ef2920c0c07ed32b61",
+          "code_length": 41
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "75340a07166972766ba9c57731dec4d1f55fcaec2a3891558e44d6044d9d63db",
+          "code_length": 46
+        },
+        {
+          "name": "getWinStationName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "83557456d5d0a59b0e798af054a5c3c3f56d2c4c764c303779fe26fda6f493a7",
+          "code_length": 11
+        },
+        {
+          "name": "getDomain",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "53d6f0f1e40cf178e8d0abaeb85023c4358b3c7abb04544fe8ff43663949b105",
+          "code_length": 11
+        },
+        {
+          "name": "getUserName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b31ee42ab1ab409fc3a47384a1a5a78ab3db45fb8b282fe01fa8ae4a602b587a",
+          "code_length": 11
+        },
+        {
+          "name": "getStringAtOffset",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "29e7e241b488bc767ce959db92f48746865d3c5bafa905b7bd35da22aefbca7d",
+          "code_length": 29
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b6d6fbbe0cb8f8080c1f168973d484a4fbe874540c6ca77b456ae95401abfcdb",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$LARGE_INTEGER",
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTSINFO",
+        "java/lang/Boolean",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTS_CLIENT_ADDRESS.class",
+      "occurrence": 0,
+      "sha256": "a778d5c810acbee2e55542b00d1872f403c047e736a1f7053fd509ea6aee3c09",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTS_CLIENT_ADDRESS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "AddressFamily",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "Address",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "96512ee1793d5ff27e7bcd8c19ecb3c2d130cc19951544cbb273aae8599e27e6",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "2bcac1b32f23e74932c9cc18a46ad543ee769d339190f04cd3efa96eb4955a60",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_CLIENT_ADDRESS"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTS_CONNECTSTATE_CLASS.class",
+      "occurrence": 0,
+      "sha256": "b048225fca0304218f19bc636e859ef03aa4b3abfff0a71739771c8034046a31",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTS_CONNECTSTATE_CLASS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WTSActive",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSConnected",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSConnectQuery",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSShadow",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSDisconnected",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSIdle",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSListen",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSReset",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSDown",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSInit",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_CONNECTSTATE_CLASS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTS_INFO_CLASS.class",
+      "occurrence": 0,
+      "sha256": "2a029fc860978b24572fa8fa58a55da7c8b8ebd8666eb6331f3f6471e2f40143",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTS_INFO_CLASS",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WTSInitialProgram",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSApplicationName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSWorkingDirectory",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSOEMId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSSessionId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSUserName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSWinStationName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSDomainName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSConnectState",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientBuildNumber",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientName",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientDirectory",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientProductId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientHardwareId",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientAddress",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientDisplay",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientProtocolType",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSIdleTime",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSLogonTime",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSIncomingBytes",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSOutgoingBytes",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSIncomingFrames",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSOutgoingFrames",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSClientInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSSessionInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSSessionInfoEx",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSConfigInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSValidationInfo",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSSessionAddressV4",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTSIsRemoteSession",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_INFO_CLASS",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTS_PROCESS_INFO_EX.class",
+      "occurrence": 0,
+      "sha256": "5be51d56fe5f557b36056a097cf1b04778598c20d0e8757d5ae84f9570ec85b0",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTS_PROCESS_INFO_EX",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SessionId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ProcessId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pProcessName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pUserSid",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$PSID;",
+          "access": 1
+        },
+        {
+          "name": "NumberOfThreads",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "HandleCount",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "PagefileUsage",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "PeakPagefileUsage",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "WorkingSetSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "PeakWorkingSetSize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "UserTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        },
+        {
+          "name": "KernelTime",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$LARGE_INTEGER;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$LARGE_INTEGER",
+        "com/sun/jna/platform/win32/WinNT$PSID",
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_PROCESS_INFO_EX",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32$WTS_SESSION_INFO.class",
+      "occurrence": 0,
+      "sha256": "a01ce12c54b533977173b879f231763bfa4f8f48308d35e498a8c66bbfe06416",
+      "name": "com/sun/jna/platform/win32/Wtsapi32$WTS_SESSION_INFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SessionId",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pWinStationName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "State",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15c84dfdfd7a33deedec2640e79083d0b4d1ff73941bab6eeefe9b664e6855ac",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_SESSION_INFO",
+        "com/sun/jna/win32/W32APITypeMapper"
+      ]
+    }
+  ]
+}

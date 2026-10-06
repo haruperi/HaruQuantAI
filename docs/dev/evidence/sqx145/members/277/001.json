@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskGoToTask/TaskGoToTask.jar",
+  "archive_sha256": "628a7f446e50d191ba73b01c07fe276209379659ec9fcff2f1ed45ccc42f822d",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/GoToTask/GoToTask.class",
+      "occurrence": 0,
+      "sha256": "c465ef90dcc4876fe940f368681b3e3dfaa5f218b9a896cec32f96070ebcd527",
+      "name": "com/strategyquant/plugin/Task/impl/GoToTask/GoToTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "targetTaskName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "resetEvaluatedCycles",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "resetActivatedCycles",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "conditions",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/project/IProjectCondition;>;"
+        },
+        {
+          "name": "logMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "evaluatedCycles",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "activatedCycles",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "561c0189228ee385816587d1e6683aea4419a6b265e835a7ae4e0a7aaeff0282",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "35ba26859355f976427fee42aa6942bd681a298c0a0963836f49f30995866262",
+          "code_length": 17,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8afa88f84001655edbc5eb62357fa4f1f7d948da06054557d07e9e97005b075b",
+          "code_length": 734,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f58f1839820e70f8f4e0b40c8de655d58c5ceaf48a0fdf96368c738926fcc255",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aef770a33eb33be8be565219f8f7fc13bcf29cb826640e7b71eb9957bbf06da4",
+          "code_length": 2
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bb29209fba8fc0539289c5b3d0939a5f23ad3aac49e556a759cac49f63e249bc",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e2b810366b4272ae3769ca4e5c55bcfa008bb632372dfc9e16c55fbd19549acd",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "a4411869c5cf8fc9325a4f14c14cb401af1307b616f8983b23d6a4b79cef7c9c",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "36a2ab31d2a56c0edeea1c6c023c94dc4083dfd8370f3c632c21e885c1c3d7a5",
+          "code_length": 10
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "b60fad94638adfd474df5da13d872f6c3f46add007c501a11b036dbaf44fd63c",
+          "code_length": 14
+        },
+        {
+          "name": "getCustomValue",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "87b3dc57be4510bc26b9bbbe3aeb3892b1e705a941c250bda56fb23e3244e07c",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Task/impl/GoToTask/GoToTask",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/project/GoToTaskException",
+        "com/strategyquant/tradinglib/project/IProjectCondition",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap"
+      ]
+    }
+  ]
+}

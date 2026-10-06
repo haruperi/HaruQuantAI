@@ -1,0 +1,2069 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-instrumentation-api-2.27.0.jar",
+  "archive_sha256": "e9928acbe8867fa84102c6a40c35266f39eef7f72c566884270565434b315c07",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder.class",
+      "occurrence": 0,
+      "sha256": "4f1f47cd4b75a70b335ff3d9b100db83000211411c7e0c70cd94bdda7a5f9797",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;",
+          "access": 16,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;"
+        },
+        {
+          "name": "knownMethods",
+          "descriptor": "Ljava/util/Set;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;)V",
+          "access": 0,
+          "code_sha256": "a5ee4921843d677f6ab1a66dccbb613863cd87b2271f1794b8a177c6ad50bca7",
+          "code_length": 17,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;)V"
+        },
+        {
+          "name": "setKnownMethods",
+          "descriptor": "(Ljava/util/Collection;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder;",
+          "access": 1,
+          "code_sha256": "5208527bc753d8ef72bec5408bc4b53d2750d16646f48bb0ec50d62ee4db0c35",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Collection<Ljava/lang/String;>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "setKnownMethods",
+          "descriptor": "(Ljava/util/Set;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder;",
+          "access": 1,
+          "code_sha256": "fabfca39faa84c7236c221c3694b56f73e7227f79b69c407a05d21697e62f911",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/opentelemetry/instrumentation/api/instrumenter/ContextCustomizer;",
+          "access": 1,
+          "code_sha256": "3f8c2c28a2fed276d57c64e78076004b29795903a84961fef1acb5ece761ea81",
+          "code_length": 20,
+          "generic_signature": "()Lio/opentelemetry/instrumentation/api/instrumenter/ContextCustomizer<TREQUEST;>;"
+        },
+        {
+          "name": "lambda$build$0",
+          "descriptor": "(Ljava/util/Set;Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/api/common/Attributes;)Lio/opentelemetry/context/Context;",
+          "access": 4098,
+          "code_sha256": "c4addd8323167c2b739e099ed547c349d276151146117bd4bdd23e961542350a",
+          "code_length": 55
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/instrumentation/api/internal/HttpConstants",
+        "io/opentelemetry/instrumentation/api/internal/HttpRouteState",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteBuilder",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/HashSet",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteGetter.class",
+      "occurrence": 0,
+      "sha256": "6cedfd08c7394587abcda6d4e686c741c0eb1c0c32614e0d910d9ec7f5b271d9",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1025,
+          "generic_signature": "(Lio/opentelemetry/context/Context;TT;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteGetter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource.class",
+      "occurrence": 0,
+      "sha256": "41041367911481045ce464120301b54b7882c7f37fe83b19298747c8959ad8ac",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SERVER_FILTER",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 16409
+        },
+        {
+          "name": "SERVER",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 16409
+        },
+        {
+          "name": "CONTROLLER",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 16409
+        },
+        {
+          "name": "NESTED_CONTROLLER",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 16409
+        },
+        {
+          "name": "order",
+          "descriptor": "I",
+          "access": 16
+        },
+        {
+          "name": "useFirst",
+          "descriptor": "Z",
+          "access": 16
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 9,
+          "code_sha256": "26c048c3cd0472a19c8e04d21be078495637e2670e6d115ae85d5e68da77e470",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 9,
+          "code_sha256": "652ef497d6f598ad1d3e4142513f7ef73e512dcc644e1f64337235350750e972",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;II)V",
+          "access": 2,
+          "code_sha256": "0535ba9d2261d0d771b6747068d9328c5f0c747e4070112bb55d44d8f9c45f0e",
+          "code_length": 9,
+          "generic_signature": "(I)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IIZ)V",
+          "access": 2,
+          "code_sha256": "bd99573ab57b9493050f3e3985a39ad8e84a3a0ebabff676e687ca2f46d13bde",
+          "code_length": 18,
+          "generic_signature": "(IZ)V"
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+          "access": 4106,
+          "code_sha256": "7eb496037d628003a3426761a310a8c75b1dbbd094b5392f14bcd2765a543473",
+          "code_length": 29
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e8d709ea83c124c18b7874ec38ffca8a57e9c65f707f9c95c15cc41d85370eb8",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;>;",
+      "class_references": [
+        "[Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource;",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerRouteSource",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Client.class",
+      "occurrence": 0,
+      "sha256": "ae617c94723fd0d21ed0c30c50a683a7361d082d1d20fa5faf951b3337d43929",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Client",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;"
+        },
+        {
+          "name": "knownMethods",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "urlTemplateExtractor",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 18,
+          "generic_signature": "Ljava/util/function/Function<TREQUEST;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;Ljava/util/Set;Ljava/util/function/Function;)V",
+          "access": 0,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;Ljava/util/Set<Ljava/lang/String;>;Ljava/util/function/Function<TREQUEST;Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3b557facd20dae721cdd42f5ba72542b7f8267ae6a56a7f25fd33261d7d8350a",
+          "code_length": 80,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor<TREQUEST;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Client",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Set",
+        "java/util/function/Function"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Server.class",
+      "occurrence": 0,
+      "sha256": "ae2bfc87d0fe47e5e9642f7f731ec55756d6ee7a22ade26962271d7f61e0bf60",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Server",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;"
+        },
+        {
+          "name": "knownMethods",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;Ljava/util/Set;)V",
+          "access": 0,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7e7859fcd7360f098c82f2f11ce43f4bd44a36ee3026b6f65395b777b70df8ce",
+          "code_length": 77,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor<TREQUEST;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Server",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "9718e457bcc8ae02595cf64553fa27fe367d78ce789437cbf89794ba6dbc6b16",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor;",
+          "access": 9,
+          "code_sha256": "97e12f825257e0a98a076dfc8611a381842548a310f9754c5e790e0348c4644d",
+          "code_length": 8,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor;",
+          "access": 9,
+          "code_sha256": "c5db8392cf4e48f0c535242834bfef87b06539dafb790510a910a5d9984d8c88",
+          "code_length": 8,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "builder",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder;",
+          "access": 9,
+          "code_sha256": "fd21cc2c29110913c78e463744047ff62540e0ffd53c1c6e081c60555fed821b",
+          "code_length": 10,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "builder",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder;",
+          "access": 9,
+          "code_sha256": "f286d966ebd178dda5baa5f1b39fe282a2920a25540419255cba8123ad67a72f",
+          "code_length": 10,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a9c6229f8627d4e536a6c126a138e2868ac1fa13c1edeae6ee722883cebffa65",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Client",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Server",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder.class",
+      "occurrence": 0,
+      "sha256": "2f81ad2ab4a79f6f93fad4cc3ae65d720a1d8c35a7aca47100aed264cc29d134",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "clientGetter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;",
+          "access": 16,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;"
+        },
+        {
+          "name": "serverGetter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;",
+          "access": 16,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;"
+        },
+        {
+          "name": "knownMethods",
+          "descriptor": "Ljava/util/Set;",
+          "access": 0,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "urlTemplateExtractor",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 0,
+          "generic_signature": "Ljava/util/function/Function<TREQUEST;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;)V",
+          "access": 1,
+          "code_sha256": "55dfe5bdb76b5019292d9906d16ede2fb5011825e2a4440aedb5bc38a6fcb57b",
+          "code_length": 31,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<TREQUEST;*>;Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<TREQUEST;*>;)V"
+        },
+        {
+          "name": "setKnownMethods",
+          "descriptor": "(Ljava/util/Collection;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder;",
+          "access": 1,
+          "code_sha256": "55dc7fb6d5827095f9d889a1203a012449f18b60729affa5a186f75a22d26663",
+          "code_length": 14,
+          "generic_signature": "(Ljava/util/Collection<Ljava/lang/String;>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "setKnownMethods",
+          "descriptor": "(Ljava/util/Set;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder;",
+          "access": 1,
+          "code_sha256": "e8419ff200c41264a058745acac6a3e7cc10a2c8120dc8796d1024dc99f355f4",
+          "code_length": 6,
+          "generic_signature": "(Ljava/util/Set<Ljava/lang/String;>;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder<TREQUEST;>;"
+        },
+        {
+          "name": "build",
+          "descriptor": "()Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor;",
+          "access": 1,
+          "code_sha256": "1da2d8ca14eef94f3474674d14c2dd4499fb957153a1eb766b88394131e40872",
+          "code_length": 57,
+          "generic_signature": "()Lio/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "lambda$static$1",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder;Ljava/util/function/Function;)V",
+          "access": 4106,
+          "code_sha256": "e7bd3d7dcc637464b3ee1cb064132ca5b3eca7c3bb17297d49f24a681141aae8",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$new$0",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8ae75ba79cbcd28062ecc5c85b42027400ae4cf252a7db3d1a55500599d2e8cf",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/internal/Experimental",
+        "io/opentelemetry/instrumentation/api/internal/HttpConstants",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Client",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractor$Server",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanNameExtractorBuilder",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/HashSet",
+        "java/util/Objects",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanStatusExtractor.class",
+      "occurrence": 0,
+      "sha256": "a04449dfa3ea7bbb92368cd2c66be2604a3db25b830f52f2b039b4dfe4984448",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanStatusExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter<-TREQUEST;-TRESPONSE;>;"
+        },
+        {
+          "name": "statusCodeConverter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor;",
+          "access": 9,
+          "code_sha256": "bff708e3072a66c04123a3372e07a2e2fd55d6f3f883b5941a22dcf3f68c7a7d",
+          "code_length": 12,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpClientAttributesGetter<-TREQUEST;-TRESPONSE;>;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor;",
+          "access": 9,
+          "code_sha256": "90245e63568ab9e0ce387884025feb861dabb8b99b9f3434000385466176f9aa",
+          "code_length": 12,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/http/HttpServerAttributesGetter<-TREQUEST;-TRESPONSE;>;)Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter;Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;)V",
+          "access": 2,
+          "code_sha256": "41998f2f42f5cc8358873bc9c2493b3cca339be38b9556ce28b8e428597e40d8",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter<-TREQUEST;-TRESPONSE;>;Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusBuilder;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a2deb4408340fd513f0b6b5de376d61d7033b0955de70cc4052aa763c8bff21c",
+          "code_length": 64,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusBuilder;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/api/trace/StatusCode",
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanStatusBuilder",
+        "io/opentelemetry/instrumentation/api/instrumenter/SpanStatusExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpSpanStatusExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+        "java/lang/Integer",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1.class",
+      "occurrence": 0,
+      "sha256": "7ee42d292740420060f162ed8d3f74fc602906c508cc6fcbf0b13ef87f89f6f0",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "isError",
+          "descriptor": "(I)Z",
+          "access": 0,
+          "code_sha256": "652635873e51c463396f30a2433b8e5a2d6a1d0476323f7ed2ed16a56ebadaba",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$2.class",
+      "occurrence": 0,
+      "sha256": "a9cb5474fbaf98406cc0d5f52a4794e80cbfdfaaad3a2e56dcd0007017bb7006",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$2",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 0,
+          "code_sha256": "ae631842ebf9776a08afb910ffdb8709db33c6181416ca37850bafe597fcb792",
+          "code_length": 8
+        },
+        {
+          "name": "isError",
+          "descriptor": "(I)Z",
+          "access": 0,
+          "code_sha256": "9714c97fb3dcd7abb0ea0ec302b659c34a514d6d6f2e9faf7abd73830514314f",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$2"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter.class",
+      "occurrence": 0,
+      "sha256": "bf572f034ebf3a0a38d75496d1f594f9f7f534fffc330ebdd026c54c05d185a5",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+      "major": 52,
+      "minor": 0,
+      "access": 17440,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SERVER",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 16409
+        },
+        {
+          "name": "CLIENT",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 9,
+          "code_sha256": "6e8f6dee26aa484b818ce553fb23b27c69d9508cc318e1139eb5c27e32532bbe",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 9,
+          "code_sha256": "fd8d2b0a540df0f89d04ea70f0be5f93b9ae2464317d58c73393e6a852992c0b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "d0f754dc9bbba1e96ce52eb130e1668c5ee903e0440d5e794de221fc7ec0037a",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "isError",
+          "descriptor": "(I)Z",
+          "access": 1024
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+          "access": 4106,
+          "code_sha256": "5a91927ddc78e4d3ff581b7bd32dbfa6f3d1e7192daa3d79e0af013b1fadfa79",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1;)V",
+          "access": 4096,
+          "code_sha256": "6f2f4a08b450faed0343ea558f222260e434fbd83ba79df8b86d1d750cf8e9a4",
+          "code_length": 7
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b4a42062cbbeb9df05770a5fff445dea7096dedaefc1d919ec9770c44aeb10d7",
+          "code_length": 33
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;>;",
+      "class_references": [
+        "[Lio/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter;",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$1",
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpStatusCodeConverter$2",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/package-info.class",
+      "occurrence": 0,
+      "sha256": "d96d6be75487f935ca618651f89800781f2713e574492b5e2864e9d284bf51b9",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/http/internal/HostAddressAndPortExtractor.class",
+      "occurrence": 0,
+      "sha256": "a95d2141548b8035053fdbf3fbbf1d626168e21f9e7a3f7be57f7e826d5c22b9",
+      "name": "io/opentelemetry/instrumentation/api/semconv/http/internal/HostAddressAndPortExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter<TREQUEST;*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter<TREQUEST;*>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "479d99d8bd707b5f337eff74375e73a70dabe6443dd4bcec201bcfc9c8352444",
+          "code_length": 72,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;TREQUEST;)V"
+        },
+        {
+          "name": "firstHeaderValue",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "ff1a99d396585082d58dc0ef0802d4dc845747072d26cb80c6d4acf885b57c82",
+          "code_length": 24,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "setPort",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/String;II)V",
+          "access": 10,
+          "code_sha256": "b75ce31c5c60a383fc222d1bfee7d78b05b819a89fc3bec5181d768f247a5a5f",
+          "code_length": 30
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/http/HttpCommonAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/http/internal/HostAddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "java/lang/Integer",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "782fb4aa7cac0285ad2d8e72683db2965e70dba03b86d89e2f8dae478018f5f6",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor"
+      ],
+      "fields": [
+        {
+          "name": "internalExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter<TREQUEST;>;)Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter;)V",
+          "access": 0,
+          "code_sha256": "e2a194cbc23eb2c4195582bb764efcb0d2d3e291902e549ff047defd095c6c17",
+          "code_length": 28,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter<TREQUEST;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "5acd385879b6d151623a4f6d3becc39b1fa8ed1cb9579af07f337e99f94132da",
+          "code_length": 10,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/ClientAddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "0254a896d828e72dfa651c1c0ab1d6b17cf3b9073c20abd3d76e93d29bbe725e",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getClientAddress",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        },
+        {
+          "name": "getClientPort",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/Integer;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "7fe01411d06003da79e9825570ddd021a6398a31b0c1d3e7a684318a638e65ea",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor"
+      ],
+      "fields": [
+        {
+          "name": "internalExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter<TREQUEST;TRESPONSE;>;)Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter;)V",
+          "access": 0,
+          "code_sha256": "707e888f26cd80cf40628de5c0fb37e0671501e6f697ae9d8bf57282bb661532",
+          "code_length": 19,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter<TREQUEST;TRESPONSE;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "b8a57b359e000fc34b04426c86e9208c04179464ada2e082baf88e262d58467f",
+          "code_length": 12,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "2ad2b162f2a05ad0e79d216692d7011519959deb8cc7d223c49e502aecbff42b",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getNetworkType",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "33f03a4316f1c749153de1dcdfb90fcc09adc90e4805ee62bfd194d8d3c773ee",
+          "code_length": 20,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkTransport",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkProtocolName",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkProtocolVersion",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkLocalInetSocketAddress",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/net/InetSocketAddress;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/net/InetSocketAddress;"
+        },
+        {
+          "name": "getNetworkLocalAddress",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "17ec9f952a21d058fae5de67aceb7892d735d87b8be5cdc6ddaeb9153fd68580",
+          "code_length": 12,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkLocalPort",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "d7be5dfff58fa1d67bd9386a77783aaeec5cab5c5265be2ea0060a3d4c236890",
+          "code_length": 12,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/Integer;"
+        },
+        {
+          "name": "getNetworkPeerInetSocketAddress",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/net/InetSocketAddress;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/net/InetSocketAddress;"
+        },
+        {
+          "name": "getNetworkPeerAddress",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ca491a1e2956861efe0a9714d8cdc05d7a7156af164888012fd3430bf573fe55",
+          "code_length": 12,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNetworkPeerPort",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "3d3f8c809d60493dc07fe024edf344617daf18f3e6c3cd528e2ae3df03e95db8",
+          "code_length": 12,
+          "generic_signature": "(TREQUEST;TRESPONSE;)Ljava/lang/Integer;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InetSocketAddressUtil",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "b140a3d850f3c631d68360ef4e9cf28095f2b8b7ad8f899914f15c8eb20512f0",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor"
+      ],
+      "fields": [
+        {
+          "name": "internalExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter<TREQUEST;>;)Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter;)V",
+          "access": 0,
+          "code_sha256": "5ac3ee80ab126e8cccb9aa2aeef301a64406f47f995e04be60d3ee844d446de6",
+          "code_length": 27,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter<TREQUEST;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "5acd385879b6d151623a4f6d3becc39b1fa8ed1cb9579af07f337e99f94132da",
+          "code_length": 10,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/ServerAddressAndPortExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "8202d78a21b1287676fd95565d7863ca21c5c0babf26ed802a12c3c7e18c2bf7",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getServerAddress",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        },
+        {
+          "name": "getServerPort",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/Integer;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/package-info.class",
+      "occurrence": 0,
+      "sha256": "1bb7133304975410fc16c5f94fd5ff6cd4b00aae90227fe5f629c5a6eea8ba07",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort.class",
+      "occurrence": 0,
+      "sha256": "328e865422565f6536ca3a664459a7757e498fa6eeddffa8bb8aeb225b2382dd",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink"
+      ],
+      "fields": [
+        {
+          "name": "address",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "port",
+          "descriptor": "Ljava/lang/Integer;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setAddress",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1d639c8f9d43d88d1092bc7e304fe5af5f3947dc8cd8d30fe244a71c9d82d654",
+          "code_length": 6
+        },
+        {
+          "name": "setPort",
+          "descriptor": "(Ljava/lang/Integer;)V",
+          "access": 1,
+          "code_sha256": "b5c6632fdead94e6cf5d078f9da49015f7742cbf1bf22678e79eecefc50ff91a",
+          "code_length": 6
+        },
+        {
+          "name": "getAddress",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getPort",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink.class",
+      "occurrence": 0,
+      "sha256": "c56854e628dcb3096a8e2b5e845c06b6ab83ea0755a719b91f96f79b1deb9101",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setAddress",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "setPort",
+          "descriptor": "(Ljava/lang/Integer;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor.class",
+      "occurrence": 0,
+      "sha256": "d5383dd2f57f249bc4379e5046650905d54894749a7db5a308ab32a0c6137ca6",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/Object;)Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort;",
+          "access": 1,
+          "code_sha256": "cedf46d7c6b302e42e5ca1763ff605a336a4cb2f83eb18e7d494e2fd1584c822",
+          "code_length": 18,
+          "generic_signature": "(TREQUEST;)Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort;"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;TREQUEST;)V"
+        },
+        {
+          "name": "noop",
+          "descriptor": "()Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;",
+          "access": 9,
+          "code_sha256": "54139510586e0d9b0c5f1d57cea1fd96a7d3932376bb234ad5f357fbf4071385",
+          "code_length": 6,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;>()Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "lambda$noop$0",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/ClientAddressAndPortExtractor.class",
+      "occurrence": 0,
+      "sha256": "355978e1b8aa9f2e36479e27372170ed361ce40909f5c890aa839e46e05b6f04",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/ClientAddressAndPortExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter<TREQUEST;>;"
+        },
+        {
+          "name": "fallbackAddressAndPortExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter<TREQUEST;>;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "0e5aea4321d43727075d1ecc866e4c8731522f20f34c2dac7a2e28f740614b11",
+          "code_length": 62,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;TREQUEST;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/ClientAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/ClientAddressAndPortExtractor",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/InetSocketAddressUtil.class",
+      "occurrence": 0,
+      "sha256": "c436eeb6d29ddc2917b2220fe0159e0c08d21d3a59f780461b6ace3706b101e6",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/InetSocketAddressUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getNetworkType",
+          "descriptor": "(Ljava/net/InetSocketAddress;Ljava/net/InetSocketAddress;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "096ac6ad74e3c756e5c0c9fb34cb44430720b853d7ff7543fa870101131f48ed",
+          "code_length": 39
+        },
+        {
+          "name": "getIpAddress",
+          "descriptor": "(Ljava/net/InetSocketAddress;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7211f88f5e6306e9fabbe727194105e34c4d6a338103a8a8c601fb2508006497",
+          "code_length": 22
+        },
+        {
+          "name": "getPort",
+          "descriptor": "(Ljava/net/InetSocketAddress;)Ljava/lang/Integer;",
+          "access": 9,
+          "code_sha256": "499946bc08fcfc5e5dfcfd7960b6ef4299f225348a1a7e1c51c9945214ecb7fa",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "476ac5b38e99fce01a0baab5e5685bc43f92560d03ca8371074d95f2df6955e1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InetSocketAddressUtil",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/net/Inet4Address",
+        "java/net/Inet6Address",
+        "java/net/InetAddress",
+        "java/net/InetSocketAddress"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "260ecc5a77159dd92f032105808c7899002a2f32d85093b19a2e672acdb3c443",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "addressAndPortExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "capturePort",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;Z)V",
+          "access": 1,
+          "code_sha256": "e7fd20388c12ef0705ea2852a57abd1f755c705eab8d5e5f5363296885237777",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;Z)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "7a2472ce4c9befa9b5e542c79c5d9f5505d92e7de55c6546573c0cf1762e0884",
+          "code_length": 78,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;TREQUEST;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalClientAttributesExtractor",
+        "io/opentelemetry/semconv/ClientAttributes",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "3a04bf141924b42e23e97ef45d7d5ac4939b84c78c8440301e25f8266715cde0",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "captureProtocolAttributes",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "captureLocalSocketAttributes",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter;ZZ)V",
+          "access": 1,
+          "code_sha256": "4642fc30f19fcaee00cddef9d7996801f89602fee1d4c44bf4e8238ec249f7b7",
+          "code_length": 20,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter<TREQUEST;TRESPONSE;>;ZZ)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e93138aff0e3c72301497fed05b59c55db0b7b05ac4ed1b6b41af833b1b30b09",
+          "code_length": 261,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;TREQUEST;TRESPONSE;)V"
+        },
+        {
+          "name": "lowercase",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "09e6528d82999667bec4beb2b5521f81fc28b81d1924ed7f48369ccb9ef72cf4",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/semconv/network/NetworkAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalNetworkAttributesExtractor",
+        "io/opentelemetry/semconv/NetworkAttributes",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Locale"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "7a7e9a17728ac7a6606431d957bcbbe39034a7a01f22695478ed6a5519409374",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "addressAndPortExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;)V",
+          "access": 1,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "b2da990f457e2c4d3fa22f4dff4123439f686567b81bb947962508cbb3cb2aec",
+          "code_length": 71,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;TREQUEST;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPort",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/InternalServerAttributesExtractor",
+        "io/opentelemetry/semconv/ServerAttributes",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/network/internal/ServerAddressAndPortExtractor.class",
+      "occurrence": 0,
+      "sha256": "6e072f8b8afefc40113f7fadedc3c2717c89751afaf8beec3af78d6af3ff0925",
+      "name": "io/opentelemetry/instrumentation/api/semconv/network/internal/ServerAddressAndPortExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor"
+      ],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter<TREQUEST;>;"
+        },
+        {
+          "name": "fallbackAddressAndPortExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter<TREQUEST;>;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "0e5aea4321d43727075d1ecc866e4c8731522f20f34c2dac7a2e28f740614b11",
+          "code_length": 62,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink;TREQUEST;)V"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor<TREQUEST;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/network/ServerAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/AddressAndPortExtractor$AddressPortSink",
+        "io/opentelemetry/instrumentation/api/semconv/network/internal/ServerAddressAndPortExtractor",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "8bd736d04b9f75b0243dbb762bf7776377d4f541cbf3cb52181eb73ae520659a",
+      "name": "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor"
+      ],
+      "fields": [
+        {
+          "name": "internalExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor<TREQUEST;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter;)Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter<TREQUEST;>;)Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter;)V",
+          "access": 0,
+          "code_sha256": "9497441548a530d7272c386131fbcfbedaa0b9ce0be0b42e689a343df2fe257a",
+          "code_length": 25,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter<TREQUEST;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "4dc0992500119d7dfec1906a837973d7bc05b7b24b9a486d7ae206c6aef489d7",
+          "code_length": 10,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        },
+        {
+          "name": "lambda$new$0",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor",
+        "io/opentelemetry/instrumentation/api/internal/HttpConstants",
+        "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "384717f6f9eea7fed0a152ed50d069d7eb137a1ff6b5097a1ba1be7a97ae00b0",
+      "name": "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getUrlScheme",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        },
+        {
+          "name": "getUrlPath",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        },
+        {
+          "name": "getUrlQuery",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/url/package-info.class",
+      "occurrence": 0,
+      "sha256": "ca35e7e22f37cae512d94b23c76c6eb2f89637a8a20f3f9fab57c8360e28e0eb",
+      "name": "io/opentelemetry/instrumentation/api/semconv/url/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/url/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "54cdce7a19f634492874f9dd1c8f9181acd4b182f3deebc8d4d7662e20e970bd",
+      "name": "io/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "getter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter<TREQUEST;>;"
+        },
+        {
+          "name": "alternateSchemeProvider",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 18,
+          "generic_signature": "Ljava/util/function/Function<TREQUEST;Ljava/lang/String;>;"
+        },
+        {
+          "name": "sensitiveQueryParameters",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter;Ljava/util/function/Function;Ljava/util/Set;)V",
+          "access": 1,
+          "code_sha256": "958e936615047d99241a418da6ebb03613a56d78a6d756bc8c304c44dac1f3ee",
+          "code_length": 20,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter<TREQUEST;>;Ljava/util/function/Function<TREQUEST;Ljava/lang/String;>;Ljava/util/Set<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "abd935ab123bb024e2d891c76146429d551fa28a9ebe7f4d2bd1d8d4ffd49369",
+          "code_length": 73,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;TREQUEST;)V"
+        },
+        {
+          "name": "getUrlScheme",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b21b2f463dc6684ac84cb333f4ace2d1f09bfa5f4115a77694490b2cffd2a29d",
+          "code_length": 31,
+          "generic_signature": "(TREQUEST;)Ljava/lang/String;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/semconv/url/UrlAttributesGetter",
+        "io/opentelemetry/instrumentation/api/semconv/url/internal/InternalUrlAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/semconv/url/internal/UrlQuerySanitizer",
+        "io/opentelemetry/semconv/UrlAttributes",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/function/Function"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/url/internal/UrlQuerySanitizer.class",
+      "occurrence": 0,
+      "sha256": "2e2ee2d16023e8faa9f341a884fbe89ef99cda29ab0e69f18f01b409aa6cd009",
+      "name": "io/opentelemetry/instrumentation/api/semconv/url/internal/UrlQuerySanitizer",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "REDACTED",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "redactQueryString",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f0637278cfda23dbe5f2b45a83c3e8d53e5e95b0b7945b9d3e9db47f46b8fcdc",
+          "code_length": 57,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "redactUrl",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Set;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "f110eeeced5d7d6bf051f1d5ac9bedeccad9fc85d6cd7c040c3e0607ad1fc494",
+          "code_length": 90,
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Set<Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "redactInternal",
+          "descriptor": "(Ljava/lang/String;ILjava/util/Set;Ljava/lang/StringBuilder;)V",
+          "access": 10,
+          "code_sha256": "25d9a0916114c620ea5cce40c403d76adf9527994632d1b757a7dc2de0ae7859",
+          "code_length": 175,
+          "generic_signature": "(Ljava/lang/String;ILjava/util/Set<Ljava/lang/String;>;Ljava/lang/StringBuilder;)V"
+        },
+        {
+          "name": "containsParamToRedact",
+          "descriptor": "(Ljava/lang/String;IILjava/util/Set;)Z",
+          "access": 10,
+          "code_sha256": "e8a34008284c094d2a9cc5557f51f2077c21e505eb703939727f4aae9797b7aa",
+          "code_length": 58,
+          "generic_signature": "(Ljava/lang/String;IILjava/util/Set<Ljava/lang/String;>;)Z"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/semconv/url/internal/UrlQuerySanitizer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/semconv/util/SpanNames.class",
+      "occurrence": 0,
+      "sha256": "a1370107a2e9b7871ccb6fd33d22abbb7d596e136c090fe2be5fccb6f95d4550",
+      "name": "io/opentelemetry/instrumentation/api/semconv/util/SpanNames",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "spanNameCaches",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache;",
+          "access": 26,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/Class<*>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "fromMethod",
+          "descriptor": "(Ljava/lang/reflect/Method;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "eaba3c693a0b069c3b95ef2bbdbf0fe612fd6e10f88f00c9976abfa00dcfc220",
+          "code_length": 12
+        },
+        {
+          "name": "fromMethod",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "71d08555c6e3fd34e81b491a3af4bc8bf436b9e25ebeb7e3f410d86feb4d6f56",
+          "code_length": 73,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c5b2f3cbb53c078222efd63b0c7e57e96b50744e2048ea545d26506b316726ea",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$fromMethod$0",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 4106,
+          "code_sha256": "5feeeffb9805944939bc00344e51fd757751062091242a06c24f7aa50cdc3353",
+          "code_length": 8
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3fa75101c5da7c1cbcd60422eb747ad2a20dcf44459900aa75d9dcc437c96409",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/internal/ClassNames",
+        "io/opentelemetry/instrumentation/api/internal/cache/Cache",
+        "io/opentelemetry/instrumentation/api/semconv/util/SpanNames",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Method",
+        "java/util/Map",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/util/VirtualField.class",
+      "occurrence": 0,
+      "sha256": "8240b42d5ea418dd6958638d482292cd4640d50946aa78ea5b9b313e0dfe27dc",
+      "name": "io/opentelemetry/instrumentation/api/util/VirtualField",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "find",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Class;)Lio/opentelemetry/instrumentation/api/util/VirtualField;",
+          "access": 9,
+          "code_sha256": "9db3628e5cc98d84e11c693b72729d1a59a34287b7a4c0d298a7f98244fe63e3",
+          "code_length": 11,
+          "generic_signature": "<U:TT;V:TF;T:Ljava/lang/Object;F:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;Ljava/lang/Class<TF;>;)Lio/opentelemetry/instrumentation/api/util/VirtualField<TU;TV;>;"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TT;)TF;"
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TT;TF;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;F:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/internal/RuntimeVirtualFieldSupplier",
+        "io/opentelemetry/instrumentation/api/internal/RuntimeVirtualFieldSupplier$VirtualFieldSupplier",
+        "io/opentelemetry/instrumentation/api/util/VirtualField",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/util/package-info.class",
+      "occurrence": 0,
+      "sha256": "fd9af7ee2f31731cdceea6df1691868359c091df1d4091d7963e6412065550a2",
+      "name": "io/opentelemetry/instrumentation/api/util/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/util/package-info",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

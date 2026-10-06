@@ -1,0 +1,2113 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/checker-qual-3.4.1.jar",
+  "archive_sha256": "bce5c887460542d69c0ffce05919fef8f56f9964a1505a99f6ae69a58351507e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/checkerframework/checker/index/qual/PolyLength.class",
+      "occurrence": 0,
+      "sha256": "2e192db5b0eba4e8e9a24e1665745f31c3c9aa0da3ab9e8ddb47694cf6c5d7dd",
+      "name": "org/checkerframework/checker/index/qual/PolyLength",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/PolyLength"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/PolyLowerBound.class",
+      "occurrence": 0,
+      "sha256": "5d24c3598eb15652a569838931f39cc6fbd20acc1a432ad7d97c79ad6259b4dc",
+      "name": "org/checkerframework/checker/index/qual/PolyLowerBound",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/PolyLowerBound"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/PolySameLen.class",
+      "occurrence": 0,
+      "sha256": "ee4a5c878de61dc53ee2afc716220eded595419541f43a9022050cd7ed8ae3eb",
+      "name": "org/checkerframework/checker/index/qual/PolySameLen",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/PolySameLen"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/PolyUpperBound.class",
+      "occurrence": 0,
+      "sha256": "049ba2a7e155bbd616f25bd1e84668ab73c1f9eac2f4d6342b3c063a88425c3f",
+      "name": "org/checkerframework/checker/index/qual/PolyUpperBound",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/PolyUpperBound"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/Positive.class",
+      "occurrence": 0,
+      "sha256": "bd36b4fa49e97aa8ad2c353f5a82c92cc7536cabd3e402c5bc68d4e9a96ac55c",
+      "name": "org/checkerframework/checker/index/qual/Positive",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/Positive"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SameLen.class",
+      "occurrence": 0,
+      "sha256": "a92c4ad903596bf3846f58ae6ec5af83b0ec9b3f1dbcac0657c4b9ace97dbfd2",
+      "name": "org/checkerframework/checker/index/qual/SameLen",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SameLen"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SameLenBottom.class",
+      "occurrence": 0,
+      "sha256": "4597f20d15395874759d884ef79873ef5eac542bec8ca5687c15bf179c54863c",
+      "name": "org/checkerframework/checker/index/qual/SameLenBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SameLenBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SameLenUnknown.class",
+      "occurrence": 0,
+      "sha256": "30f5df9557145ddb655336426310b54a27d8a5272b1c0fc98b1977d92b37cfb3",
+      "name": "org/checkerframework/checker/index/qual/SameLenUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SameLenUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SearchIndexBottom.class",
+      "occurrence": 0,
+      "sha256": "c380470d6ac8c014f2073d56e5ffdda90e1ad7a12d781f9a7e70b44009b7d87e",
+      "name": "org/checkerframework/checker/index/qual/SearchIndexBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SearchIndexBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SearchIndexFor.class",
+      "occurrence": 0,
+      "sha256": "50f40f5a72ca8f25c59db023f9cfa4ff2c92ccc7033e7f642b7f709c1a3a2567",
+      "name": "org/checkerframework/checker/index/qual/SearchIndexFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SearchIndexFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SearchIndexUnknown.class",
+      "occurrence": 0,
+      "sha256": "7600cbdede7d5cb59dccf2a6fbd6f273667384ca5c2a5aa90adc4ccfc821bbd2",
+      "name": "org/checkerframework/checker/index/qual/SearchIndexUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SearchIndexUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SubstringIndexBottom.class",
+      "occurrence": 0,
+      "sha256": "45f5c79eca6e06ecb72a7fe77bb6c752200d11870fecf5354807dd205de3b723",
+      "name": "org/checkerframework/checker/index/qual/SubstringIndexBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SubstringIndexBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SubstringIndexFor.class",
+      "occurrence": 0,
+      "sha256": "6efe673c5c5c5d49a5f4cc0cd12fb7a086437d776ea1791fdc5d49ff2eb99e71",
+      "name": "org/checkerframework/checker/index/qual/SubstringIndexFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "offset",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SubstringIndexFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/SubstringIndexUnknown.class",
+      "occurrence": 0,
+      "sha256": "539bc6da987295a5c30818df8f320f1763b8a6bc943cb914a197de78142c4b10",
+      "name": "org/checkerframework/checker/index/qual/SubstringIndexUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/SubstringIndexUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/UpperBoundBottom.class",
+      "occurrence": 0,
+      "sha256": "f109931e36ba0d1a8ec31eaf72f65338e8c946535b21fcb1e178795fa51d8ede",
+      "name": "org/checkerframework/checker/index/qual/UpperBoundBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/UpperBoundBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/index/qual/UpperBoundUnknown.class",
+      "occurrence": 0,
+      "sha256": "5f51b261c047542f9f2bdfcad12b7ae6b7188e8afc212a66c3b100df101349d1",
+      "name": "org/checkerframework/checker/index/qual/UpperBoundUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/index/qual/UpperBoundUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/initialization/qual/FBCBottom.class",
+      "occurrence": 0,
+      "sha256": "6762d7f0b3a491da3132dfa04ab9875353acaeba7185dfb7e04fb6f7df6de0e0",
+      "name": "org/checkerframework/checker/initialization/qual/FBCBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/initialization/qual/FBCBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/initialization/qual/Initialized.class",
+      "occurrence": 0,
+      "sha256": "e379a37f260ac26f49e64572846a916160a907ff8e47ee53989c5dcbea5b559b",
+      "name": "org/checkerframework/checker/initialization/qual/Initialized",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/initialization/qual/Initialized"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/initialization/qual/NotOnlyInitialized.class",
+      "occurrence": 0,
+      "sha256": "7839e091f65283d12cd89842741800ec1cdd34707940a19a51afb94a64267751",
+      "name": "org/checkerframework/checker/initialization/qual/NotOnlyInitialized",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/initialization/qual/NotOnlyInitialized"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/initialization/qual/UnderInitialization.class",
+      "occurrence": 0,
+      "sha256": "118561847a4c21bb9e214fec35d30cd5ec6e78b0c687660fe747c9577ce0146a",
+      "name": "org/checkerframework/checker/initialization/qual/UnderInitialization",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/initialization/qual/UnderInitialization"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/initialization/qual/UnknownInitialization.class",
+      "occurrence": 0,
+      "sha256": "6eaf670f6495ce40dbc544c8c8d14a963a2fa94bfe98c9c2f5ce203091f43a3d",
+      "name": "org/checkerframework/checker/initialization/qual/UnknownInitialization",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1025,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/initialization/qual/UnknownInitialization"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/InternMethod.class",
+      "occurrence": 0,
+      "sha256": "6b250182e235c355f1213709f2af3215ff97cbf27be0fda6c49e6bef1cfed752",
+      "name": "org/checkerframework/checker/interning/qual/InternMethod",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/InternMethod"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/Interned.class",
+      "occurrence": 0,
+      "sha256": "b9eb39ec2b415dfe865c4d83b1c88cb9523b0c530259a071d0a4ea93ad077a8d",
+      "name": "org/checkerframework/checker/interning/qual/Interned",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/Interned"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/InternedDistinct.class",
+      "occurrence": 0,
+      "sha256": "457329c3b621a4503d51b424aa45d8182f66fc2fed0eddc314ddcd4ef25f584b",
+      "name": "org/checkerframework/checker/interning/qual/InternedDistinct",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/InternedDistinct"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/PolyInterned.class",
+      "occurrence": 0,
+      "sha256": "7af08cf4c3da6749786655d41668dedbba5210b64672d6acbeed5bd675c0a641",
+      "name": "org/checkerframework/checker/interning/qual/PolyInterned",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/PolyInterned"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/UnknownInterned.class",
+      "occurrence": 0,
+      "sha256": "bd09ec8de04aff3a98be20debd9950b75f093061ddea95f84263de893374fe13",
+      "name": "org/checkerframework/checker/interning/qual/UnknownInterned",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/UnknownInterned"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/interning/qual/UsesObjectEquals.class",
+      "occurrence": 0,
+      "sha256": "874322a51eb0b482b0f3b8fc637c284ef5dff6288e3c3e95f0049a16288fc7d1",
+      "name": "org/checkerframework/checker/interning/qual/UsesObjectEquals",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/interning/qual/UsesObjectEquals"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/EnsuresLockHeld$List.class",
+      "occurrence": 0,
+      "sha256": "c2c0adfe245ebc4e643311874963776134d3e9ab7cc2cf1ccafea7a50b441041",
+      "name": "org/checkerframework/checker/lock/qual/EnsuresLockHeld$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/lock/qual/EnsuresLockHeld;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeld",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeld$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/EnsuresLockHeld.class",
+      "occurrence": 0,
+      "sha256": "dbe84bd01b5b814615d60c30331e4310220696dc24f8ff86cc4e6913a08dce05",
+      "name": "org/checkerframework/checker/lock/qual/EnsuresLockHeld",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeld",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeld$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf$List.class",
+      "occurrence": 0,
+      "sha256": "e7079cff8827427e585a2cf5725421498d0c758e6476d7676821f78643984797",
+      "name": "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/lock/qual/EnsuresLockHeldIf;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf.class",
+      "occurrence": 0,
+      "sha256": "d342b94115bb8954206029056df2aa00bc03c474d9174efd35923af2aaa717eb",
+      "name": "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "expression",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "result",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf",
+        "org/checkerframework/checker/lock/qual/EnsuresLockHeldIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/GuardSatisfied.class",
+      "occurrence": 0,
+      "sha256": "4eb3694468399a9f3a77dce97949fdfe04e6a8ce9b48838fbb2cbaf9cbfed58b",
+      "name": "org/checkerframework/checker/lock/qual/GuardSatisfied",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/GuardSatisfied"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/GuardedBy.class",
+      "occurrence": 0,
+      "sha256": "b1cd1e03369285de39e21a9c9bd577422ac5c8602a4156ebbea8da7ccf8ae7a5",
+      "name": "org/checkerframework/checker/lock/qual/GuardedBy",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/GuardedBy"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/GuardedByBottom.class",
+      "occurrence": 0,
+      "sha256": "3fb0a56ecbb8d54862fd2ef2169d96be2e8f3e662847d1c61c3cc5b17effbbc1",
+      "name": "org/checkerframework/checker/lock/qual/GuardedByBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/GuardedByBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/GuardedByUnknown.class",
+      "occurrence": 0,
+      "sha256": "e1a293ffd013e98bb9856b71875f3158aae2f8f60e8adb47e0ac4d64a71847f8",
+      "name": "org/checkerframework/checker/lock/qual/GuardedByUnknown",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/GuardedByUnknown"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/Holding.class",
+      "occurrence": 0,
+      "sha256": "4b4cb8ce8236cabb8ba6a81522b2862531cb3ab1d3e4179652e8e3a443561c17",
+      "name": "org/checkerframework/checker/lock/qual/Holding",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/Holding"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/LockHeld.class",
+      "occurrence": 0,
+      "sha256": "a0e6e0e4791ccfd05730bacd1b9eeeda1384938d9cccfec2e8fa1689b371582e",
+      "name": "org/checkerframework/checker/lock/qual/LockHeld",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/LockHeld"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/LockPossiblyHeld.class",
+      "occurrence": 0,
+      "sha256": "eeea994877bcb3883c946c5bec5be75a46c396df3adcad08eaebe68e8a1656e3",
+      "name": "org/checkerframework/checker/lock/qual/LockPossiblyHeld",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/LockPossiblyHeld"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/LockingFree.class",
+      "occurrence": 0,
+      "sha256": "fa5f4b73e6f97f64e25ffcd26491ed7b13bcf4796176412616f510ffd0c76305",
+      "name": "org/checkerframework/checker/lock/qual/LockingFree",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/LockingFree"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/MayReleaseLocks.class",
+      "occurrence": 0,
+      "sha256": "8742fa80d47e09212d546a1b6bc1955c49ffd48347dc79afe6c784f5fd5a087f",
+      "name": "org/checkerframework/checker/lock/qual/MayReleaseLocks",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/MayReleaseLocks"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/lock/qual/ReleasesNoLocks.class",
+      "occurrence": 0,
+      "sha256": "2ee8a41fa5b8fa8057a833a05e01a4e324bfb89cd4aa7c514e06bf733c431720",
+      "name": "org/checkerframework/checker/lock/qual/ReleasesNoLocks",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/lock/qual/ReleasesNoLocks"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/NullnessUtil.class",
+      "occurrence": 0,
+      "sha256": "033f6e8360a6ee12c531ac1eaf74b8101e5f69c6d269ab4fbfc51cb9e709050f",
+      "name": "org/checkerframework/checker/nullness/NullnessUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "castNonNull",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "dbf90aa4866d5a4bf14c7bb873b5e709545dd2ba47cfe52dd09d43a243be2993",
+          "code_length": 22,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;)TT;"
+        },
+        {
+          "name": "castNonNullDeep",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "46244573c32d6a50702a0aaa354038b03d87d304cbedaa24bce7dba9dbb335f9",
+          "code_length": 5,
+          "generic_signature": "<T:Ljava/lang/Object;>([TT;)[TT;"
+        },
+        {
+          "name": "castNonNullDeep",
+          "descriptor": "([[Ljava/lang/Object;)[[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "4f1160d48b3c1c583fe7961c019af53578f71c75a792433816c8b498cb6af07a",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>([[TT;)[[TT;"
+        },
+        {
+          "name": "castNonNullDeep",
+          "descriptor": "([[[Ljava/lang/Object;)[[[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "5c96b2c9af3c2b8592149628adc46a3298021f07b990625c73e4c77c90a61192",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>([[[TT;)[[[TT;"
+        },
+        {
+          "name": "castNonNullDeep",
+          "descriptor": "([[[[Ljava/lang/Object;)[[[[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "eb2051bf3aab901d60e3e6f28912407c59c9f8adbdf1edee231b16661105cca8",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>([[[[TT;)[[[[TT;"
+        },
+        {
+          "name": "castNonNullDeep",
+          "descriptor": "([[[[[Ljava/lang/Object;)[[[[[Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "40e5950fc14c998a39a9cdf39eee91cfdf2a4ded468ebb0b91eeeda20a437a66",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>([[[[[TT;)[[[[[TT;"
+        },
+        {
+          "name": "castNonNullArray",
+          "descriptor": "([Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "c719d5f05425c93cb2333671a657cfa0e7f7ba383bc097cdb8f4481635a4ecd8",
+          "code_length": 64,
+          "generic_signature": "<T:Ljava/lang/Object;>([TT;)[TT;"
+        },
+        {
+          "name": "checkIfArray",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 10,
+          "code_sha256": "1934c0d45d5b4b069fb9adda3840df9de1fab2c57118cec615f30768d2c7fcfe",
+          "code_length": 51
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9ae97147ebd2484feca41f2614abfd152b75b94030893475d711b0f344b1536f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "[[Ljava/lang/Object;",
+        "[[[Ljava/lang/Object;",
+        "[[[[Ljava/lang/Object;",
+        "[[[[[Ljava/lang/Object;",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Object",
+        "org/checkerframework/checker/nullness/NullnessUtil"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/Opt.class",
+      "occurrence": 0,
+      "sha256": "4ac60a452f827c9b98001a1cd255eff2cd4c4d781bf439cba76338d436509117",
+      "name": "org/checkerframework/checker/nullness/Opt",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "b2dc30c2ad2893778dfa3c7ec2a60fb29b24ebf7de3524378ee609b7bb04da67",
+          "code_length": 16,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;)TT;"
+        },
+        {
+          "name": "isPresent",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 9,
+          "code_sha256": "2705de4305885c714bef1880a65450e9cea07245a4e5aef14af593dfda666c05",
+          "code_length": 10
+        },
+        {
+          "name": "ifPresent",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Consumer;)V",
+          "access": 9,
+          "code_sha256": "7ffedf4c58cbd73ccd5298ad85ef100056470c0d1e184a1c68dc03ecd8895752",
+          "code_length": 12,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Ljava/util/function/Consumer<-TT;>;)V"
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Predicate;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "01588d2b1f6b099b9a0d33a04364c8ac3cd14b4fbfd5620611c037fb7862dd4c",
+          "code_length": 22,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Ljava/util/function/Predicate<-TT;>;)TT;"
+        },
+        {
+          "name": "map",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "a1aafff2981b167c66e2eb56c176bcf43030f24009547fc9a8624298fea90e89",
+          "code_length": 14,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(TT;Ljava/util/function/Function<-TT;+TU;>;)TU;"
+        },
+        {
+          "name": "orElse",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "8bdd72e9f1b157d0e14174e0173e4b1226cdf9cadf431d9497501d46949787e5",
+          "code_length": 10,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;TT;)TT;"
+        },
+        {
+          "name": "orElseGet",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Supplier;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "ec03725dadfa12678c21f80e7c50b7239a841d644022f99a665e336e1b37d3e6",
+          "code_length": 15,
+          "generic_signature": "<T:Ljava/lang/Object;>(TT;Ljava/util/function/Supplier<+TT;>;)TT;"
+        },
+        {
+          "name": "orElseThrow",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Supplier;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "a4f4c45bb94c186fc02d7294e5dee754086e13d6a879eb3aa9466d99c20a3934",
+          "code_length": 16,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;X:Ljava/lang/Throwable;>(TT;Ljava/util/function/Supplier<+TX;>;)TT;^TX;"
+        }
+      ],
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/NoSuchElementException",
+        "java/util/function/Consumer",
+        "java/util/function/Function",
+        "java/util/function/Predicate",
+        "java/util/function/Supplier",
+        "org/checkerframework/checker/nullness/Opt"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/AssertNonNullIfNonNull.class",
+      "occurrence": 0,
+      "sha256": "9957dcc51cf05996da07de728bea03ac879b29962a9815acd49d2a069e1f7f5e",
+      "name": "org/checkerframework/checker/nullness/qual/AssertNonNullIfNonNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/AssertNonNullIfNonNull"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresKeyFor$List.class",
+      "occurrence": 0,
+      "sha256": "103d6aba6334e2d737c520b2b9b6bb2996a174e1e327357a7b0b6b6945393553",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresKeyFor$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/nullness/qual/EnsuresKeyFor;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyFor",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyFor$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresKeyFor.class",
+      "occurrence": 0,
+      "sha256": "f0028ff4cb46b136b1bd99d79e57a2a198465237b874c39f92218e931b384b67",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresKeyFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "map",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyFor",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyFor$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf$List.class",
+      "occurrence": 0,
+      "sha256": "dc4c469c189324e1320c2d21e02da9e82415b230b9f378912b5d561bc6fb6815",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/nullness/qual/EnsuresKeyForIf;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf.class",
+      "occurrence": 0,
+      "sha256": "c705bc9498e14a4482935761b0de843e764c76e01370b7b870572e6841b85297",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "result",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "expression",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "map",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf",
+        "org/checkerframework/checker/nullness/qual/EnsuresKeyForIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresNonNull$List.class",
+      "occurrence": 0,
+      "sha256": "b7d47bd9934792dd61c339943db514cbec724fe7c6c851214e54f511539c5742",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresNonNull$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/nullness/qual/EnsuresNonNull;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNull",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNull$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresNonNull.class",
+      "occurrence": 0,
+      "sha256": "c84db4eda9847413b1c5b5b94543226159a087a2c92d4b45a8b3835d97028098",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresNonNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNull",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNull$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf$List.class",
+      "occurrence": 0,
+      "sha256": "3509d8f843ea106c4ade20440abff87f94a373e210464068bb8717cb9f11f7e7",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf$List",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Lorg/checkerframework/checker/nullness/qual/EnsuresNonNullIf;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf.class",
+      "occurrence": 0,
+      "sha256": "333d85943a765bb1716d78c2c8c68f002a0c40ee61ebd2e66e14ad5bcc7e6adf",
+      "name": "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "expression",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "result",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf",
+        "org/checkerframework/checker/nullness/qual/EnsuresNonNullIf$List"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/KeyFor.class",
+      "occurrence": 0,
+      "sha256": "95175bcb8ed2aa850552a8bbad3958150663ce4e5571772db7560cf8567623e6",
+      "name": "org/checkerframework/checker/nullness/qual/KeyFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/KeyFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/KeyForBottom.class",
+      "occurrence": 0,
+      "sha256": "8647bb9b0ac8429ba44d0a2e8881bedf2b81e2d2c4eaf6ef94d47160f894f3b1",
+      "name": "org/checkerframework/checker/nullness/qual/KeyForBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/KeyForBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/MonotonicNonNull.class",
+      "occurrence": 0,
+      "sha256": "fb5ba13baef19ab8355b9ac4f1274154f1ed121ea26ec5ed2371881ba0683fcd",
+      "name": "org/checkerframework/checker/nullness/qual/MonotonicNonNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/MonotonicNonNull"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/NonNull.class",
+      "occurrence": 0,
+      "sha256": "eb4fd113adf5befe6433ab2d79279e3c448623b2646990005e15e2bfcc75367e",
+      "name": "org/checkerframework/checker/nullness/qual/NonNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/NonNull"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/Nullable.class",
+      "occurrence": 0,
+      "sha256": "222db5864d860f87370ae72f756452e49eda85520cc684ae36ddd5d6d12bd158",
+      "name": "org/checkerframework/checker/nullness/qual/Nullable",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/Nullable"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/PolyKeyFor.class",
+      "occurrence": 0,
+      "sha256": "2c92a6eaa8284c275f3721c03f239988529d40214daf347d65087f696fe99bb4",
+      "name": "org/checkerframework/checker/nullness/qual/PolyKeyFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/PolyKeyFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/PolyNull.class",
+      "occurrence": 0,
+      "sha256": "1c7870ed4724fc8189be357eba988deee0e5df8e7830ceafbc0d0ce08b8f5f6d",
+      "name": "org/checkerframework/checker/nullness/qual/PolyNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/PolyNull"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/RequiresNonNull.class",
+      "occurrence": 0,
+      "sha256": "a4bce3bfb63f085ec1d6d1f64fbcb659adcf0149c5ebddbf9f27c95f38eb4591",
+      "name": "org/checkerframework/checker/nullness/qual/RequiresNonNull",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/RequiresNonNull"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/nullness/qual/UnknownKeyFor.class",
+      "occurrence": 0,
+      "sha256": "89ecc7e71c537660666a4b0e69e6a6ec6383e6fe87bd944254a096d392d77ede",
+      "name": "org/checkerframework/checker/nullness/qual/UnknownKeyFor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/nullness/qual/UnknownKeyFor"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/optional/qual/MaybePresent.class",
+      "occurrence": 0,
+      "sha256": "c2b5eeea61e4025b36cbfabc9359dd575b1f7ec03cf220527a7cc36666915719",
+      "name": "org/checkerframework/checker/optional/qual/MaybePresent",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/optional/qual/MaybePresent"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/optional/qual/PolyPresent.class",
+      "occurrence": 0,
+      "sha256": "981923038c2007221b3ceea84b843b6b351ed7c59835be208728b947dd363c6c",
+      "name": "org/checkerframework/checker/optional/qual/PolyPresent",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/optional/qual/PolyPresent"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/optional/qual/Present.class",
+      "occurrence": 0,
+      "sha256": "69e880377f1b16e08e3bdaae8e962a121baf0f88ac71bf67de891a11d3e427f1",
+      "name": "org/checkerframework/checker/optional/qual/Present",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/optional/qual/Present"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/propkey/qual/PropertyKey.class",
+      "occurrence": 0,
+      "sha256": "1d01375e8816660a01c5194578ed9284e9cee92ce9918767a9fa82cae7d3b015",
+      "name": "org/checkerframework/checker/propkey/qual/PropertyKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/propkey/qual/PropertyKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/propkey/qual/PropertyKeyBottom.class",
+      "occurrence": 0,
+      "sha256": "22c3b5bf835c561454181ba13bf06dcab36c3fddac166ee27d13f56ed5a160a0",
+      "name": "org/checkerframework/checker/propkey/qual/PropertyKeyBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/propkey/qual/PropertyKeyBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/propkey/qual/UnknownPropertyKey.class",
+      "occurrence": 0,
+      "sha256": "776d1e27de644d028f4c3579ec52f95d4b5781bb43ef6d6eb87367d25153d4a3",
+      "name": "org/checkerframework/checker/propkey/qual/UnknownPropertyKey",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/propkey/qual/UnknownPropertyKey"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/RegexUtil$CheckedPatternSyntaxException.class",
+      "occurrence": 0,
+      "sha256": "4d0c5068320166b3836559a1f3a38d6bb695886b7696da68ab21599a54cee6cc",
+      "name": "org/checkerframework/checker/regex/RegexUtil$CheckedPatternSyntaxException",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "pse",
+          "descriptor": "Ljava/util/regex/PatternSyntaxException;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/PatternSyntaxException;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;I)V",
+          "access": 1,
+          "code_sha256": "7815b2660fdb3bdca8a19535d2b12d70e6c855d7808b7e48f29cc1a3dcd88c70",
+          "code_length": 15
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79ee51fde0769d1eae9c8849583c96051eaffd9d2b5477c6203e1eedc5bd5f0d",
+          "code_length": 8
+        },
+        {
+          "name": "getIndex",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4819026adda1454a683b5867c6aa3b60d55d0afc3774ab48df7cc05986cdc457",
+          "code_length": 8
+        },
+        {
+          "name": "getMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c1753d3b6b86734ae58c3c2db611ec0efdd6fbc2ff490498e8ddcbec8449c743",
+          "code_length": 8
+        },
+        {
+          "name": "getPattern",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a8b08bd64f23acf18de1579ed2e8f5475dd7fbf69b3101713d490b34928d64fc",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/util/regex/PatternSyntaxException",
+        "org/checkerframework/checker/regex/RegexUtil",
+        "org/checkerframework/checker/regex/RegexUtil$CheckedPatternSyntaxException"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/RegexUtil.class",
+      "occurrence": 0,
+      "sha256": "18c6f1d02849832b7c2d52ab0ab38074a9c36f178c580ec781bdaae1453ef6cb",
+      "name": "org/checkerframework/checker/regex/RegexUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "26937c487ebc00664f65ec3320bd436f46a1084c8d2f1edf4d4a9dd0430098ec",
+          "code_length": 14
+        },
+        {
+          "name": "isRegex",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 9,
+          "code_sha256": "e152da0a014367c47e3a1f0699dad4c75985ddf8b7492c1314960367179cfe19",
+          "code_length": 6
+        },
+        {
+          "name": "isRegex",
+          "descriptor": "(Ljava/lang/String;I)Z",
+          "access": 9,
+          "code_sha256": "fb90ef53fa1694e8bdd5740b2be92b27a4a583da7c37e2e3127320d45c1612d7",
+          "code_length": 25
+        },
+        {
+          "name": "isRegex",
+          "descriptor": "(C)Z",
+          "access": 9,
+          "code_sha256": "11947f0054c17698c194b18c052608cfc1d0c5b282051b2883d6aa58e517e7fe",
+          "code_length": 8
+        },
+        {
+          "name": "regexError",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "62a3b146949e76bf5f20c3b6e41fce1e6feff84305267f10e1accd70b93cf641",
+          "code_length": 6
+        },
+        {
+          "name": "regexError",
+          "descriptor": "(Ljava/lang/String;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "1a95b94a8cc8a5f646653929bceaafa6bef6cbeb8b0d07cf28f609de62a99a7a",
+          "code_length": 33
+        },
+        {
+          "name": "regexException",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/regex/PatternSyntaxException;",
+          "access": 9,
+          "code_sha256": "fa07f2f6e96efecdfa0fc927d3847379ed2b124176fa6c6299eda490a5f12922",
+          "code_length": 6
+        },
+        {
+          "name": "regexException",
+          "descriptor": "(Ljava/lang/String;I)Ljava/util/regex/PatternSyntaxException;",
+          "access": 9,
+          "code_sha256": "2bca82d6f64c2a23615cb6217e206832f9487735e841b0457e023f779f11c243",
+          "code_length": 39
+        },
+        {
+          "name": "asRegex",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "e6cab71faf40782ca626e8c1eda14e0d9ac9e94e124a720537799d9d4cf396b3",
+          "code_length": 6
+        },
+        {
+          "name": "asRegex",
+          "descriptor": "(Ljava/lang/String;I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "4f84ca719310222b1420c54412de90045b50323cb3413dba84abead38a9f93cc",
+          "code_length": 41
+        },
+        {
+          "name": "regexErrorMessage",
+          "descriptor": "(Ljava/lang/String;II)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "8b257a27cfaadafcabe6df6703ee6048192925ccb73513ad88decdb93a15589b",
+          "code_length": 43
+        },
+        {
+          "name": "getGroupCount",
+          "descriptor": "(Ljava/util/regex/Pattern;)I",
+          "access": 10,
+          "code_sha256": "92947f2efdb5659a1761ecd89eb95e486e14e22bcbdcd22b31fe1fc153592a09",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/Error",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/regex/Matcher",
+        "java/util/regex/Pattern",
+        "java/util/regex/PatternSyntaxException",
+        "org/checkerframework/checker/regex/RegexUtil",
+        "org/checkerframework/checker/regex/RegexUtil$CheckedPatternSyntaxException"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/qual/PartialRegex.class",
+      "occurrence": 0,
+      "sha256": "2c5dc32a32ed2039d9547128330069140b65c1c3f88a191aa6a450db081dfedf",
+      "name": "org/checkerframework/checker/regex/qual/PartialRegex",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/regex/qual/PartialRegex"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/qual/PolyRegex.class",
+      "occurrence": 0,
+      "sha256": "9abcfe688f242563d6eee40bb2da45fe6034f819b92f19815adbabbc3d7a24a0",
+      "name": "org/checkerframework/checker/regex/qual/PolyRegex",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/regex/qual/PolyRegex"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/qual/Regex.class",
+      "occurrence": 0,
+      "sha256": "2833954b789e11dc00e6af8ca1f0ca089e68e49c7d2560d03e84d97a80e9e181",
+      "name": "org/checkerframework/checker/regex/qual/Regex",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/regex/qual/Regex"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/qual/RegexBottom.class",
+      "occurrence": 0,
+      "sha256": "3e93bdac0a06a116c0c95d0f39f103efee3f92784100615873ccba8bc04a777a",
+      "name": "org/checkerframework/checker/regex/qual/RegexBottom",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/regex/qual/RegexBottom"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/regex/qual/UnknownRegex.class",
+      "occurrence": 0,
+      "sha256": "b66afa6d2889da8ed1d08b747ed978af2cb4c75379a6bd54516483b6a5266b72",
+      "name": "org/checkerframework/checker/regex/qual/UnknownRegex",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/regex/qual/UnknownRegex"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/BinaryName.class",
+      "occurrence": 0,
+      "sha256": "83998814ee6bb13031655355160599053ad73c083d52fbc91cee467a13e7e91e",
+      "name": "org/checkerframework/checker/signature/qual/BinaryName",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/BinaryName"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/BinaryNameInUnnamedPackage.class",
+      "occurrence": 0,
+      "sha256": "2c78cce3b45cca35fc6d98936d2ce40a8ce9b921808b34e45044b9e72e651ed2",
+      "name": "org/checkerframework/checker/signature/qual/BinaryNameInUnnamedPackage",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/BinaryNameInUnnamedPackage"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/ClassGetName.class",
+      "occurrence": 0,
+      "sha256": "8bc7a07b5803d7347d5815e22834e039b4855a38073277027fc143d2ba3732cf",
+      "name": "org/checkerframework/checker/signature/qual/ClassGetName",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/ClassGetName"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/ClassGetSimpleName.class",
+      "occurrence": 0,
+      "sha256": "22d097fbf056ee657395b3b6a4b5c8c685a556d11b796fc346e061dca0eeec26",
+      "name": "org/checkerframework/checker/signature/qual/ClassGetSimpleName",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/ClassGetSimpleName"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/DotSeparatedIdentifiers.class",
+      "occurrence": 0,
+      "sha256": "e629115b17f3a4086b60a97b83b4629082dc19454361a3d2f71490cc24b35790",
+      "name": "org/checkerframework/checker/signature/qual/DotSeparatedIdentifiers",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/DotSeparatedIdentifiers"
+      ]
+    },
+    {
+      "entry": "org/checkerframework/checker/signature/qual/FieldDescriptor.class",
+      "occurrence": 0,
+      "sha256": "cc40d0e7bed025213b29b81b935c870692d526baf7262e80fefdcb5c66ea3d2e",
+      "name": "org/checkerframework/checker/signature/qual/FieldDescriptor",
+      "major": 52,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "org/checkerframework/checker/signature/qual/FieldDescriptor"
+      ]
+    }
+  ]
+}

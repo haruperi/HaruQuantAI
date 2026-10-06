@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppGridTest/AppGridTest.jar",
+  "sha256": "54052d60afe500b1cbe04113905e1812077bd2f6e696329e42b5e14ef8529023",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/GridTest/GridTestAppPlugin.class": "e2882348df6e30cc82a9f3d8e10e969b91f71e07e10134d9a40436ddfb2cdddf"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/GridTest/GridTestAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "e2882348df6e30cc82a9f3d8e10e969b91f71e07e10134d9a40436ddfb2cdddf",
+      "member_shard": "docs/dev/evidence/sqx145/members/129/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/129/001.json",
+      "sha256": "a03c84ff7ab1bd3ed36e7a3f898a6f89fdfb47cb328f39f7e204dffa434707a3"
+    }
+  ]
+}

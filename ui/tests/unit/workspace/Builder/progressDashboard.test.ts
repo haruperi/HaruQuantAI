@@ -14,7 +14,7 @@ import {
   toggleCrossCheck,
 } from '../../../../app/workspace/Builder/fixtures';
 
-describe('Progress tab fixtures (donor SQX144-EV-000032..037)', () => {
+describe('Progress tab fixtures (donor retained target UI; current donor equivalence unverified)', () => {
   it('keeps the idle stats snapshot at the donor idle values', () => {
     expect(idleProgressStats).toEqual({
       strategiesGenerated: 0,

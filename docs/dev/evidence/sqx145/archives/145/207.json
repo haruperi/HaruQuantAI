@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsPlugins/ResultsPlugins.jar",
+  "sha256": "f60cf40426b7786aa0a48e063ebe82ff2b9a060fa3234e5b51808e66694dfeb0",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/Plugins/ResultsPluginsServlet.class": "2b8ffa059b8ff7f59a1b0c47f31a07df9f03c68ee996ee95f2f8df1ebb92b9dd",
+    "com/strategyquant/plugin/Results/impl/Plugins/ResultsPluginsServletPlugin.class": "4c2799d527e4eeccc37c09202bc76f338c23f6bc5c9096ca1a7acf93dfbcb8e5"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Plugins/ResultsPluginsServlet.class",
+      "occurrence": 0,
+      "sha256": "2b8ffa059b8ff7f59a1b0c47f31a07df9f03c68ee996ee95f2f8df1ebb92b9dd",
+      "member_shard": "docs/dev/evidence/sqx145/members/207/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Plugins/ResultsPluginsServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "4c2799d527e4eeccc37c09202bc76f338c23f6bc5c9096ca1a7acf93dfbcb8e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/207/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/207/001.json",
+      "sha256": "6539d3b4bc11d6417beb065d6f0ab9411f1abe8f706fbab505f2bf81fe2a9775"
+    }
+  ]
+}

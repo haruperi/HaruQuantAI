@@ -1,0 +1,1105 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.jar",
+  "sha256": "991a817ef0cf97aa53e35744c8ab47667526c665701ab3084af00336cec7e3ed",
+  "class_count": 154,
+  "unique_class_entries": 154,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "io/opentelemetry/instrumentation/api/incubator/builder/internal/DefaultHttpClientInstrumenterBuilder.class": "c895aa627684f87bf0a29c3ac3d37d2f0c243562784f80d4260e571ce377aa16",
+    "io/opentelemetry/instrumentation/api/incubator/builder/internal/DefaultHttpServerInstrumenterBuilder.class": "895777756368dbc39ae3e278fcdbec4b4a211194782192a9563e5b9268de99a7",
+    "io/opentelemetry/instrumentation/api/incubator/config/internal/CommonConfig.class": "ed18edf5a81f765aff362a5edbfd00eadf550d10e9dc5c43000131dc6fb21606",
+    "io/opentelemetry/instrumentation/api/incubator/config/internal/DbConfig.class": "55635c2fa7a97348d14206fc661f2eabf0a860e05ba44ebbfd7a74cdb2a554fc",
+    "io/opentelemetry/instrumentation/api/incubator/config/internal/DeclarativeConfigUtil.class": "9373aeb909a9b7bb5f67914e9f5432e7117c72f20d922277d86abe61151731bd",
+    "io/opentelemetry/instrumentation/api/incubator/config/internal/EnduserConfig.class": "33814b114ec189af48f3f7f321ed11c6a00aec3e22fe869f479afd18368a96ca",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizer$InstrumentationType.class": "6df43d999a5b7a9b31d5aa9d2a0d8004ba4b3d1aeef36424fbaae589673e3ad1",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizer.class": "728d971edf593f18eedeb6fe6eb93dd70df5c21bd01d5f24375516392817789d",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizerProvider.class": "b84e3b0721925e02fdb476bbf406a62f417ea7e1b0812cdba29ad396a37bc21c",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InstrumenterCustomizerImpl.class": "23f637fbd307f890c9f8da2fbb71decf21b983b08b7a5dcae81f0dc15a268150",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InstrumenterCustomizerUtil.class": "7f2a0de1932145d0aa17b28154152e9f0b8d46326ee7ff0086e32977e23e8a63",
+    "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InternalInstrumenterCustomizerProviderImpl.class": "4f0f36f8b3dbba56d477c8c5be8690560fa811e5e792b46604ba7810b993e2c2",
+    "io/opentelemetry/instrumentation/api/incubator/log/LoggingContextConstants.class": "b1710c2855cb2e810b285af84c2627776da19c122b6d3850e0cb9920430d66be",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeAttributesExtractor.class": "8c28846f6e239fb4810b5abfaea6e189cf51741baf970642e6504853b082cf6a",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeAttributesGetter.class": "98ecca93442c50cf102e3090c39c53c890669128e54beeb44f8401d4808be4fc",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeSpanNameExtractor.class": "be9746ac5186201cb8dd853e118d3fb03d582fffc56bdc96eb7a55dd5f14e400",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$1.class": "15ab31d1acd7f4dd80454ed3b752dc1c9eded2d1921eef1d62d035c7471e1f84",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Alter.class": "4e4953d2b835bc02b66a2574596a739b1d0111b54127e6e93ef3089ac3145b70",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Call.class": "cfbd349a00e02290dc5759415284911504b5b2d02ea6415af18c84a00f5df591",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Create.class": "9cca36972d71eefc457a093b92cc353d7ae1764973f7bd92f615d4c6d9ab9180",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$DdlOperation.class": "768836d0feec1ecfda3bd83502f819dc9259e3118d89305a8727de3b026fee50",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Delete.class": "65d334e5aa1e8b246988d947e9d33392ad890ecd563d0ab5bfff99a2170c0e86",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Drop.class": "0e1de2b7b1b650ae35aa5cec3ea526682df4715b89bea2a59fb22d2235d66d05",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Insert.class": "ae46d46c08a47fd66658bf3b6d1752f13cc806bf7bb7b3493267bc634fc707fe",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Merge.class": "c5d813e5c80c158bbeec5d484b37ec71c367eeb4d9fdf8966523135fc8180bbc",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$NoOp.class": "2db6e8a30684205fdb54959b786ec270388f19da0732cbec8b17be004a617223",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Operation.class": "f80a79279cd495895f79c4836dc4df947a54c68149803e0bb8d55c265c3b9d56",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Select.class": "fb0b9b5790cf3099f2c3fded59af4374c09f6cf65f18ae57ea0f5b063a452dbf",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$SimpleOperation.class": "5857df8d27c428a0a486545439da589bfe06ee46c39b676aa5e114f73eeee22f",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Update.class": "ba9de7b010141b8ba5857bdc93858d8bfaf98d3389e94f221eb417b6db7e7711",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer.class": "747dcccf8d188fca6100d9ee0bfed589b058eb6beed1a230c0f045b658e82f40",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$1.class": "69bee4da9bba4c7352cc70a89cc6e2fe9a5c85fbcb66b43e98e9af78a2f3ca33",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Alter.class": "7e5c8076239d0f840a42abbf9c3dfe5061872848bfbda76891c08d7604541f86",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Call.class": "c8cd0eda672a8e596d022e0ca6a9e581ad751196912925a13c8e4b0f5b8b3f57",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Create.class": "a2e78c49329584baac01898f9aef20d93e15ec447bd331a6ef4ce76bb1f4ff7d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$DdlOperation.class": "8a75631924035afea79e3c78812559e746563e2d74dbae055332b001572638f4",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Delete.class": "eac726145e9709c2596c909ead454c01faafd4b8804295b29f97d36b1477fb88",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Drop.class": "47d8104cfec91fb992d78e7d97afa6827568e57db6a156715e0bc2c0270dd17d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Execute.class": "1051a807d0317fa0d68e9b863482f5a991627673a7ef229b506cc08fe58168ec",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Grant.class": "bd2bc0b1af6a6346dc29c84f96d6dc0c6843a24baeccedffe7dfa7a9ce564993",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Insert.class": "51f0a9f677a3ee324757f3bd62f308659124571e43ff37f3f0ea34eb7887f934",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Lock.class": "8bd335a34159717cb13b556abcae8e9bbafbb9340cda310f0b72592549dacb60",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Merge.class": "3bad3285e37229f7c3c75757389375e17f7f586c59f7365004e255dde88a9987",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Operation.class": "5fe2a2800cad37e9f57d67420086f2865646ab5091a3e41f84206866b2897f03",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Replace.class": "1ab9ee32409a4926020dfc5705addd7adc300e3c7c98da5a34213c488885b037",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Revoke.class": "3a9fb40fc6946e5d79db7eab2a3d2a1ab2550f1235ff051628afa7a88c6ac82f",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Select.class": "a3bca2dcf0b81589b6ee8b164b37f029182af7d0aa9b5379e4c662924c484b3d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Show.class": "09918616f9bfd1c848d5c1d43a15a1896471a60aa88b938d578070d405d70d9d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$SimpleOperation.class": "83d1d83b0f4b077099b38a4816d79a6cb45dd40f44d03cea914a317002410efd",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$TransactionControl.class": "119ae4aa28da43cdcc776ddf0d6333ca3570f231dbb78b8c4c99392114001e09",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Truncate.class": "4731911b0d716f77132e6fcc9a46e2fbd9d140ed0422ea3b5090e5e75784b117",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Update.class": "4e04c4abfdc390668a10756e717bf4c35184e86e5875230a6c6f295e9a7b87e2",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Use.class": "a1ac0f124857d0be01ec96682c56b4b3f13bad113a6c713f108dda3fdaeb0edf",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Values.class": "7f30c3f59de50f53f333b21744cc5d155fe71cafea47b7faf3cd9df4cf6b07fa",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$With.class": "838a2860acd6516579bc33fa979670068f7b7e9b9b1d99341e4b8406d1a52079",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary.class": "8e3ab7e1361bf4b004403ffc1227b6df7b718e49925be1dff8670480c5075c13",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_DbClientMetrics_State.class": "cbf4e18f2626c6e76eeec167d98c56b5fbe853b53716fc77f13a4ca0ced6436a",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect$1.class": "739e816382f0d197bea0feb3aaf8c624bcde1d349fa6396be9024ef898e043f6",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect$Builder.class": "77d89c536e2c92c647362aec546b7f502d14b9e3e26bb4c1a08f0a38c29bdba3",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect.class": "8901fb1527ab752f20a5f415fe156df474b1356a783eb796829ae039fe17d6aa",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlQuery.class": "7134dfcc04babc72f94f2eb10a7dec3505fc0937828f7d8632ff8fe92bc4ce23",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlQueryAnalyzer_CacheKey.class": "d46ac4e4c37f1ffd08e828248a51d35d605cacb2809d4dd10fedd06981c6606c",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesExtractor.class": "1e9c0e3cba2260af606cff354b9bafec98eff6c380e73112abd39e0efbcca5d3",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesExtractorBuilder.class": "fca0ea4d55755ac3495092869c6a3872ef24b5fa96a851ba040c69632e7c8e7c",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesGetter.class": "3fc72f6f3b9d346fad4cb92a71ce3f9db4abf1f17521414a61652d38f2819ad8",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetrics$State.class": "582eb3500345ddca124745fbb5d5b49e4e909bf251f64c5b99d30619c2ab42a6",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetrics.class": "710bc276bebbad70ec7e720e29e4b413f2925b31fb0ae975a36a496efd39b35f",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetricsAdvice.class": "978daaa755b18a6f808c32fdf7030f38780afe4fb17ae4de912fb824b995ec77",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$1.class": "93827557d9ae83a61345d0afa573881bf8ad8f715ed961e5ed568a3062e4bf40",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$GenericDbClientSpanNameExtractor.class": "7519f89be86a32c94d0664d078c02826034fc34cef86a333645175b4fdd00e24",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$GenericOldSemconvSqlClientSpanNameExtractor.class": "629b6d2cc95cf81650877ac208f762dfe14448a9d1938fc4f9665ed805b1b3ab",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$SqlClientSpanNameExtractor.class": "e1e426827c422d0438563164877a8dd9d0d6ad5a525ac3789edcd038b14df976",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor.class": "22868e4893cf1a7390b5b0a0cf7bbb829fbeabb9b7c54bea58a0d8ecbec4be70",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbConnectionPoolMetrics.class": "89edc93732d483b2aebf0c530c63f4d877e664b300d6abc6b75211e295fe19ba",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery$1.class": "cea1dd1507f6cc9c6aea077655084b3254b91473a28399f7c7df48799a0a743b",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery$UniqueValue.class": "9fb9502f973a6f1891cd2189a895a3567f1895a402cd6e6c4ddd724f78bd4ef3",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery.class": "1c2a7ceaedc58333ee982eb9469e04ceb83232a8c7623930dbdf311908be8d91",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$CommandAndNumArgs.class": "2cb16222fcb4f55a18437fbc6a8aa3eaafa77f722d8b11aff021aff560bca433",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$CommandSanitizer.class": "e64b3f9382f5925201d7f23acea39a0ac8d426e189bfebd81bcbdb43588703be",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$Eval.class": "ac298eecf131035e4bdbc6fbd8d2a76ea7fa965bc3c3ad1f675ef2f722b65da3",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$KeepAllArgs.class": "12b2e10be6d1004523264678a7164da17392b8e7e69010a0ef023306c9121661",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$MultiKeyValue.class": "c2901a05c88e1f334751a330744ddd856e3c0c360246a6bcd588f8011575fbe4",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer.class": "c1dfaef6008b4c0e1b6416fb124b2573eda76e3e730597dfbf1374300af100a1",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesExtractor.class": "ca61bc972ed0fe0b9be2a5c176ae377dce472044f5999c70e0bc8db99b502cce",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesExtractorBuilder.class": "08dda0ec34f93c7a3a07dff99b0f36c7fa755c4c47a76eeb1a7e1c340c1127a9",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesGetter.class": "d148310f6eb3e39e815e25a92c02857336e57641490ca8237cd4071a44ee6bd9",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlDialect$Builder.class": "7b9e38e0d0c8c3dd600784d351a0606bfe3a37e435ccfc30ad53d1ab1b29666e",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlDialect.class": "e145e7826c015146a9e925b292bf37390e7703ba5108dab65d5d6138652d777a",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQuery.class": "dbe71884d67c59b71c8bfbd92ce475a189fe577b1c369021d87846bf815b91aa",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzer$CacheKey.class": "31f178b93eb4da65e27504cb33a6fb86f0907df8770bc8187bcc9b91247f40c7",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzer.class": "1cf726b2639d80cc49b2f75e8d370173683d19996bff8e3f6f1af4ab1bc1156b",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzerUtil.class": "a5d57b77533c4f397a1719b5d20d112bcd372eb0d70f11a4ea05d56339e49be8",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenter.class": "6e4943868e19c017983e4f5449c856e300b668b3dab02949488a7a0705301985",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenterBuilder.class": "7d3a71f1bc2aeda53aa4808fd493486c5c00e246556327328878411bdf6efbad",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenterUtil.class": "f835595cc41b2611d144753e9dad21f819581682adf44e9ffff8e9e8990894d7",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/AutoValue_GenAiClientMetrics_State.class": "a13523ddc6dd0ba31c78bf83c623849447ace934b920d7f58f1555d9f760a365",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiAttributesExtractor.class": "70e113bcd1405c16df0d811f0ae976fabfc41a6fa5cb80563bd07ae675f2b794",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiAttributesGetter.class": "db0822d63b5a25eebd2b00d79fe63c48da35f296c33c0002e9871336555c6c7f",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiClientMetrics$State.class": "fe5672b800de1ced5a264dddb5855b884fc164d9b377c8614115d50ecd99edbe",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiClientMetrics.class": "a2255964d23be2a31213a17276897643607b48058b7c41ff1aa31e22986f6673",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiMetricsAdvice.class": "001c1d3a8476dc15b8a0d06d1f0ca973102e35a235e6d58145af0ebb13cdf881",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiSpanNameExtractor.class": "a61fcdf5c0420aa619bcf2c2b9e0766ca1c82c2e39ef6a9ede53d272011630a8",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientExperimentalAttributesGetter.class": "88a084a196d9bae0df2dd90e8cc27f77d9a739f29f8bd6723c0e835cbb327f39",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientExperimentalMetrics.class": "fc270d5eb88586207a62354410f2264c82b10ab9a31148e05c7b82fe71c9b598",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor$1.class": "3b7b5f5a05cc539cd42f9bc861b705a9a179c1c82e5352f6a8699add34c52a7a",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor$EmptyAttributesExtractor.class": "ee6631c885f20246c2a0bf851f4f980f64c07203cce8e98142ef72d9555bc2e9",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor.class": "d9882ee426d76f7f549b10d78e7edd6389bd4178be32b743269cf9076578d8cd",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplate$UrlTemplateState.class": "76c9eb9a0800716447c3e5ebc213da2d824657c99d53862d2f84d6c818954581",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplate.class": "932aa364f2e028afbcc8284f33c09e6b349f7b9c641c980aacab57cd2530b6e0",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplateCustomizer.class": "a2c952a1eceaa741db6ebcf4357074ca372d33b3ebac315efa4b8bf75ddf151d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpExperimentalAttributesExtractor.class": "ad78ebed85193c04123daea8d9abbd4af7bf3c5efc175f12028afb8f83f1ee04",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpExperimentalMetricsAdvice.class": "90d45ed9379a89dfaf1b22f563c5cf5ffaaa2866a0d829faf37ebe8ba09ec35e",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpMessageBodySizeUtil.class": "87b1564164796128e3155f2e28e812ca37bab50673da3d393fe653ce7df036da",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpServerExperimentalMetrics.class": "fb23a640f8d08f2feccce72edb8ec1a526a163c3ca13a8efd31e3a91a18113ac",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/http/internal/HttpClientUrlTemplateUtil.class": "5c20584f637bbcaae07732d6ba53cab3169c72f788919c95bbaa6a9de9382191",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/AutoValue_MessagingConsumerMetrics_State.class": "fbc7c21f68045599850740730d83cbb6e9b10204103774b241a8c32a623925df",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/AutoValue_MessagingProducerMetrics_State.class": "2cbc01d9967f414014aef872b934428b253d47c6f76f919bb715168d3c2fc7a2",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/CapturedMessageHeadersUtil.class": "ba446ffc19c431ba33bbaa5b15a08cb9bc1dcfff8d8856db0c15a455c9802603",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessageOperation.class": "c4e1fba154348ef720b139c9d1936c5b9979ca0159ff762cec970284ecbea5c7",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractor$1.class": "15d7dcdb5619ee3a449296e05ac1884015eca226789b6d518eb03c03629cd8d5",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractor.class": "1a20cd914cefd8108f0acb6b00258fe2f81e9ac872984c6338b54af7e5019f36",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractorBuilder.class": "2e19194af67fc205ed47ec5dd483e9092ba62b25f6b4ce34e82f1de6a94b281d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesGetter.class": "bf8b624660f509275df60dbc9ee43825d7ddda005de03ed7f3235a8ef802888f",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingConsumerMetrics$State.class": "2bcca2c2cbf27048d0ed6f1f903f37cd5241c9d145b1354d74acbd6d20097634",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingConsumerMetrics.class": "b038670fef489380485cc20da4cc85345a8719db575ba117f4ac9d30ff1558d5",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingMetricsAdvice.class": "e7c0885d4606b7512d9a6363974d5009352c95ef736b66c35012ca9671ad3d93",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingProducerMetrics$State.class": "5cdb9163d272c2649fe8a63acb2c0cfde15e6a5da2ccc1226616f8ddc0164214",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingProducerMetrics.class": "3091d417b36f4e45568f3f53950e624e5184223f78fce4187541c68b6ba8564c",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingSpanNameExtractor.class": "ec9c5c31e3004ba1125b71182ebc97760bba4f1960c97ad48350ea480d4349a5",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/net/internal/UrlParser.class": "621fdb66076de64075f122d2f091e30def51fc7d9fc59da2adc6debd75e6d313",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/AutoValue_RpcClientMetrics_State.class": "0a706f57789c536c339f0951b6db68af84ce1547396a161c4b555ce68c89aea5",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/AutoValue_RpcServerMetrics_State.class": "514dcb38cbb0b31c43347eeee34feb03b6556b76f54dac77a255f5d219043b9c",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcAttributesGetter.class": "01c775f830c3d5125494ae9e53cbb59f0f54c69ca9f89b165989083de949839a",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientAttributesExtractor.class": "06224f46e4c1e642bc702e46dbf5696b9f4ef804ea5270b054fe60362b15bb6b",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientMetrics$State.class": "fe8385c944d8988df866dd06a47ff1085cb8dc3a8e52098664d9dec73890970b",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientMetrics.class": "675c7dbc40151285afad8aac905f5203d22092cac249d2e65f1ef3f9f0d458d2",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcCommonAttributesExtractor.class": "348cd8ff11da3abdc3fba5ab931a2ae93a20c39087113a75958b2be1509f694b",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcMetricsAdvice.class": "934f3a28abe16e46f670cb38077c931dd2e89df10d4a782e969e49067ad2f4cb",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcMetricsContextCustomizers.class": "bbe8e9499ae36d795934a6569789bb7098abe8f6913386552453e33a0a41d65d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerAttributesExtractor.class": "395c5946707c5d241eef7a2517989df365a870b273446603292da9b44730b68d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerMetrics$State.class": "f17b40ef8736aaee703bf1cda738a3ee595ace295962a841d35b71c5eba4efc3",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerMetrics.class": "066a4d68cb7a87396dfddd436b00571e9f1718f06e6fc72a0fd0dd8bfb6465b1",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcSizeAttributesExtractor.class": "110647967d2d402f5b46ca86b25aebf27c68338aa378db9ae38e70a0735cec25",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcSpanNameExtractor.class": "e9e70f5bc24e64fe7b90efb80c2b02318bc9379d79eb00f268dd397756637549",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor$1.class": "caddea424a2cd9124befecfbe59500fa7454740a11a254557f2dc3d6a5eea552",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor$EmptyAttributesExtractor.class": "8869ef325c6b2a781188f9b25d65e53d56c6bf3cf11c2b259b192d9336dcc4b1",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor.class": "18a39c3e5adcd611ce83dd6d073de3e01e751701d6c5947527f219e6d4c46064",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/AutoValue_ServicePeerResolver_ServiceMatcher.class": "4646a903749cc81eac2148b7849b0a2aae61ff6fda3cdb276498a453d826dcdd",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver$ServiceMatcher.class": "05356597fe9de22ee98f9bdc670244974cf6b2fc96bed14249bf385264c1866d",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver$ServicePeer.class": "955f8ec3eb1bb6018cfe6d6345de95ae939810fe068990007e7a89578be07ad2",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver.class": "b68ff38f70fbaa90203df0b0f30d48949c3a7d065b790481f2c1e517da1b98de",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/util/AutoValue_ClassAndMethod.class": "610ecb76412846be277f4c84848d72c4e81bf4bcf872baa42455a3d75908dd98",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/util/ClassAndMethod.class": "d0cfe38fcce57c526183205646669a57f1551ecdbcc50937b2bdd78384f04a55",
+    "io/opentelemetry/instrumentation/api/incubator/semconv/util/ClassAndMethodAttributesGetter.class": "2d4f9ee7ec13a144b4ec2127a43ec02b0324af3a54c4b7d5cc9b9366359a8a87"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "c44cfea84eb2105a7eff29dff926df6dbd516102a51110a877d5c4cd31adcbc3"
+  },
+  "class_occurrences": [
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/builder/internal/DefaultHttpClientInstrumenterBuilder.class",
+      "occurrence": 0,
+      "sha256": "c895aa627684f87bf0a29c3ac3d37d2f0c243562784f80d4260e571ce377aa16",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/builder/internal/DefaultHttpServerInstrumenterBuilder.class",
+      "occurrence": 0,
+      "sha256": "895777756368dbc39ae3e278fcdbec4b4a211194782192a9563e5b9268de99a7",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/config/internal/CommonConfig.class",
+      "occurrence": 0,
+      "sha256": "ed18edf5a81f765aff362a5edbfd00eadf550d10e9dc5c43000131dc6fb21606",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/config/internal/DbConfig.class",
+      "occurrence": 0,
+      "sha256": "55635c2fa7a97348d14206fc661f2eabf0a860e05ba44ebbfd7a74cdb2a554fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/config/internal/DeclarativeConfigUtil.class",
+      "occurrence": 0,
+      "sha256": "9373aeb909a9b7bb5f67914e9f5432e7117c72f20d922277d86abe61151731bd",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/config/internal/EnduserConfig.class",
+      "occurrence": 0,
+      "sha256": "33814b114ec189af48f3f7f321ed11c6a00aec3e22fe869f479afd18368a96ca",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizer$InstrumentationType.class",
+      "occurrence": 0,
+      "sha256": "6df43d999a5b7a9b31d5aa9d2a0d8004ba4b3d1aeef36424fbaae589673e3ad1",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizer.class",
+      "occurrence": 0,
+      "sha256": "728d971edf593f18eedeb6fe6eb93dd70df5c21bd01d5f24375516392817789d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/InstrumenterCustomizerProvider.class",
+      "occurrence": 0,
+      "sha256": "b84e3b0721925e02fdb476bbf406a62f417ea7e1b0812cdba29ad396a37bc21c",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InstrumenterCustomizerImpl.class",
+      "occurrence": 0,
+      "sha256": "23f637fbd307f890c9f8da2fbb71decf21b983b08b7a5dcae81f0dc15a268150",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InstrumenterCustomizerUtil.class",
+      "occurrence": 0,
+      "sha256": "7f2a0de1932145d0aa17b28154152e9f0b8d46326ee7ff0086e32977e23e8a63",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/instrumenter/internal/InternalInstrumenterCustomizerProviderImpl.class",
+      "occurrence": 0,
+      "sha256": "4f0f36f8b3dbba56d477c8c5be8690560fa811e5e792b46604ba7810b993e2c2",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/log/LoggingContextConstants.class",
+      "occurrence": 0,
+      "sha256": "b1710c2855cb2e810b285af84c2627776da19c122b6d3850e0cb9920430d66be",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "8c28846f6e239fb4810b5abfaea6e189cf51741baf970642e6504853b082cf6a",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "98ecca93442c50cf102e3090c39c53c890669128e54beeb44f8401d4808be4fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/code/CodeSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "be9746ac5186201cb8dd853e118d3fb03d582fffc56bdc96eb7a55dd5f14e400",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$1.class",
+      "occurrence": 0,
+      "sha256": "15ab31d1acd7f4dd80454ed3b752dc1c9eded2d1921eef1d62d035c7471e1f84",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Alter.class",
+      "occurrence": 0,
+      "sha256": "4e4953d2b835bc02b66a2574596a739b1d0111b54127e6e93ef3089ac3145b70",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Call.class",
+      "occurrence": 0,
+      "sha256": "cfbd349a00e02290dc5759415284911504b5b2d02ea6415af18c84a00f5df591",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Create.class",
+      "occurrence": 0,
+      "sha256": "9cca36972d71eefc457a093b92cc353d7ae1764973f7bd92f615d4c6d9ab9180",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$DdlOperation.class",
+      "occurrence": 0,
+      "sha256": "768836d0feec1ecfda3bd83502f819dc9259e3118d89305a8727de3b026fee50",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Delete.class",
+      "occurrence": 0,
+      "sha256": "65d334e5aa1e8b246988d947e9d33392ad890ecd563d0ab5bfff99a2170c0e86",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Drop.class",
+      "occurrence": 0,
+      "sha256": "0e1de2b7b1b650ae35aa5cec3ea526682df4715b89bea2a59fb22d2235d66d05",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Insert.class",
+      "occurrence": 0,
+      "sha256": "ae46d46c08a47fd66658bf3b6d1752f13cc806bf7bb7b3493267bc634fc707fe",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Merge.class",
+      "occurrence": 0,
+      "sha256": "c5d813e5c80c158bbeec5d484b37ec71c367eeb4d9fdf8966523135fc8180bbc",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$NoOp.class",
+      "occurrence": 0,
+      "sha256": "2db6e8a30684205fdb54959b786ec270388f19da0732cbec8b17be004a617223",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Operation.class",
+      "occurrence": 0,
+      "sha256": "f80a79279cd495895f79c4836dc4df947a54c68149803e0bb8d55c265c3b9d56",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Select.class",
+      "occurrence": 0,
+      "sha256": "fb0b9b5790cf3099f2c3fded59af4374c09f6cf65f18ae57ea0f5b063a452dbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$SimpleOperation.class",
+      "occurrence": 0,
+      "sha256": "5857df8d27c428a0a486545439da589bfe06ee46c39b676aa5e114f73eeee22f",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer$Update.class",
+      "occurrence": 0,
+      "sha256": "ba9de7b010141b8ba5857bdc93858d8bfaf98d3389e94f221eb417b6db7e7711",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizer.class",
+      "occurrence": 0,
+      "sha256": "747dcccf8d188fca6100d9ee0bfed589b058eb6beed1a230c0f045b658e82f40",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$1.class",
+      "occurrence": 0,
+      "sha256": "69bee4da9bba4c7352cc70a89cc6e2fe9a5c85fbcb66b43e98e9af78a2f3ca33",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Alter.class",
+      "occurrence": 0,
+      "sha256": "7e5c8076239d0f840a42abbf9c3dfe5061872848bfbda76891c08d7604541f86",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Call.class",
+      "occurrence": 0,
+      "sha256": "c8cd0eda672a8e596d022e0ca6a9e581ad751196912925a13c8e4b0f5b8b3f57",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Create.class",
+      "occurrence": 0,
+      "sha256": "a2e78c49329584baac01898f9aef20d93e15ec447bd331a6ef4ce76bb1f4ff7d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$DdlOperation.class",
+      "occurrence": 0,
+      "sha256": "8a75631924035afea79e3c78812559e746563e2d74dbae055332b001572638f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Delete.class",
+      "occurrence": 0,
+      "sha256": "eac726145e9709c2596c909ead454c01faafd4b8804295b29f97d36b1477fb88",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Drop.class",
+      "occurrence": 0,
+      "sha256": "47d8104cfec91fb992d78e7d97afa6827568e57db6a156715e0bc2c0270dd17d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Execute.class",
+      "occurrence": 0,
+      "sha256": "1051a807d0317fa0d68e9b863482f5a991627673a7ef229b506cc08fe58168ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Grant.class",
+      "occurrence": 0,
+      "sha256": "bd2bc0b1af6a6346dc29c84f96d6dc0c6843a24baeccedffe7dfa7a9ce564993",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Insert.class",
+      "occurrence": 0,
+      "sha256": "51f0a9f677a3ee324757f3bd62f308659124571e43ff37f3f0ea34eb7887f934",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Lock.class",
+      "occurrence": 0,
+      "sha256": "8bd335a34159717cb13b556abcae8e9bbafbb9340cda310f0b72592549dacb60",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Merge.class",
+      "occurrence": 0,
+      "sha256": "3bad3285e37229f7c3c75757389375e17f7f586c59f7365004e255dde88a9987",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Operation.class",
+      "occurrence": 0,
+      "sha256": "5fe2a2800cad37e9f57d67420086f2865646ab5091a3e41f84206866b2897f03",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Replace.class",
+      "occurrence": 0,
+      "sha256": "1ab9ee32409a4926020dfc5705addd7adc300e3c7c98da5a34213c488885b037",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Revoke.class",
+      "occurrence": 0,
+      "sha256": "3a9fb40fc6946e5d79db7eab2a3d2a1ab2550f1235ff051628afa7a88c6ac82f",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Select.class",
+      "occurrence": 0,
+      "sha256": "a3bca2dcf0b81589b6ee8b164b37f029182af7d0aa9b5379e4c662924c484b3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Show.class",
+      "occurrence": 0,
+      "sha256": "09918616f9bfd1c848d5c1d43a15a1896471a60aa88b938d578070d405d70d9d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$SimpleOperation.class",
+      "occurrence": 0,
+      "sha256": "83d1d83b0f4b077099b38a4816d79a6cb45dd40f44d03cea914a317002410efd",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$TransactionControl.class",
+      "occurrence": 0,
+      "sha256": "119ae4aa28da43cdcc776ddf0d6333ca3570f231dbb78b8c4c99392114001e09",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Truncate.class",
+      "occurrence": 0,
+      "sha256": "4731911b0d716f77132e6fcc9a46e2fbd9d140ed0422ea3b5090e5e75784b117",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Update.class",
+      "occurrence": 0,
+      "sha256": "4e04c4abfdc390668a10756e717bf4c35184e86e5875230a6c6f295e9a7b87e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Use.class",
+      "occurrence": 0,
+      "sha256": "a1ac0f124857d0be01ec96682c56b4b3f13bad113a6c713f108dda3fdaeb0edf",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$Values.class",
+      "occurrence": 0,
+      "sha256": "7f30c3f59de50f53f333b21744cc5d155fe71cafea47b7faf3cd9df4cf6b07fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary$With.class",
+      "occurrence": 0,
+      "sha256": "838a2860acd6516579bc33fa979670068f7b7e9b9b1d99341e4b8406d1a52079",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoSqlSanitizerWithSummary.class",
+      "occurrence": 0,
+      "sha256": "8e3ab7e1361bf4b004403ffc1227b6df7b718e49925be1dff8670480c5075c13",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_DbClientMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "cbf4e18f2626c6e76eeec167d98c56b5fbe853b53716fc77f13a4ca0ced6436a",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect$1.class",
+      "occurrence": 0,
+      "sha256": "739e816382f0d197bea0feb3aaf8c624bcde1d349fa6396be9024ef898e043f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect$Builder.class",
+      "occurrence": 0,
+      "sha256": "77d89c536e2c92c647362aec546b7f502d14b9e3e26bb4c1a08f0a38c29bdba3",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlDialect.class",
+      "occurrence": 0,
+      "sha256": "8901fb1527ab752f20a5f415fe156df474b1356a783eb796829ae039fe17d6aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlQuery.class",
+      "occurrence": 0,
+      "sha256": "7134dfcc04babc72f94f2eb10a7dec3505fc0937828f7d8632ff8fe92bc4ce23",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/AutoValue_SqlQueryAnalyzer_CacheKey.class",
+      "occurrence": 0,
+      "sha256": "d46ac4e4c37f1ffd08e828248a51d35d605cacb2809d4dd10fedd06981c6606c",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "1e9c0e3cba2260af606cff354b9bafec98eff6c380e73112abd39e0efbcca5d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesExtractorBuilder.class",
+      "occurrence": 0,
+      "sha256": "fca0ea4d55755ac3495092869c6a3872ef24b5fa96a851ba040c69632e7c8e7c",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "3fc72f6f3b9d346fad4cb92a71ce3f9db4abf1f17521414a61652d38f2819ad8",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "582eb3500345ddca124745fbb5d5b49e4e909bf251f64c5b99d30619c2ab42a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetrics.class",
+      "occurrence": 0,
+      "sha256": "710bc276bebbad70ec7e720e29e4b413f2925b31fb0ae975a36a496efd39b35f",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientMetricsAdvice.class",
+      "occurrence": 0,
+      "sha256": "978daaa755b18a6f808c32fdf7030f38780afe4fb17ae4de912fb824b995ec77",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$1.class",
+      "occurrence": 0,
+      "sha256": "93827557d9ae83a61345d0afa573881bf8ad8f715ed961e5ed568a3062e4bf40",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$GenericDbClientSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "7519f89be86a32c94d0664d078c02826034fc34cef86a333645175b4fdd00e24",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$GenericOldSemconvSqlClientSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "629b6d2cc95cf81650877ac208f762dfe14448a9d1938fc4f9665ed805b1b3ab",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor$SqlClientSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "e1e426827c422d0438563164877a8dd9d0d6ad5a525ac3789edcd038b14df976",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbClientSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "22868e4893cf1a7390b5b0a0cf7bbb829fbeabb9b7c54bea58a0d8ecbec4be70",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/DbConnectionPoolMetrics.class",
+      "occurrence": 0,
+      "sha256": "89edc93732d483b2aebf0c530c63f4d877e664b300d6abc6b75211e295fe19ba",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery$1.class",
+      "occurrence": 0,
+      "sha256": "cea1dd1507f6cc9c6aea077655084b3254b91473a28399f7c7df48799a0a743b",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery$UniqueValue.class",
+      "occurrence": 0,
+      "sha256": "9fb9502f973a6f1891cd2189a895a3567f1895a402cd6e6c4ddd724f78bd4ef3",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/MultiQuery.class",
+      "occurrence": 0,
+      "sha256": "1c2a7ceaedc58333ee982eb9469e04ceb83232a8c7623930dbdf311908be8d91",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$CommandAndNumArgs.class",
+      "occurrence": 0,
+      "sha256": "2cb16222fcb4f55a18437fbc6a8aa3eaafa77f722d8b11aff021aff560bca433",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$CommandSanitizer.class",
+      "occurrence": 0,
+      "sha256": "e64b3f9382f5925201d7f23acea39a0ac8d426e189bfebd81bcbdb43588703be",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$Eval.class",
+      "occurrence": 0,
+      "sha256": "ac298eecf131035e4bdbc6fbd8d2a76ea7fa965bc3c3ad1f675ef2f722b65da3",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/001.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$KeepAllArgs.class",
+      "occurrence": 0,
+      "sha256": "12b2e10be6d1004523264678a7164da17392b8e7e69010a0ef023306c9121661",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer$MultiKeyValue.class",
+      "occurrence": 0,
+      "sha256": "c2901a05c88e1f334751a330744ddd856e3c0c360246a6bcd588f8011575fbe4",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/RedisCommandSanitizer.class",
+      "occurrence": 0,
+      "sha256": "c1dfaef6008b4c0e1b6416fb124b2573eda76e3e730597dfbf1374300af100a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "ca61bc972ed0fe0b9be2a5c176ae377dce472044f5999c70e0bc8db99b502cce",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesExtractorBuilder.class",
+      "occurrence": 0,
+      "sha256": "08dda0ec34f93c7a3a07dff99b0f36c7fa755c4c47a76eeb1a7e1c340c1127a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlClientAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "d148310f6eb3e39e815e25a92c02857336e57641490ca8237cd4071a44ee6bd9",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlDialect$Builder.class",
+      "occurrence": 0,
+      "sha256": "7b9e38e0d0c8c3dd600784d351a0606bfe3a37e435ccfc30ad53d1ab1b29666e",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlDialect.class",
+      "occurrence": 0,
+      "sha256": "e145e7826c015146a9e925b292bf37390e7703ba5108dab65d5d6138652d777a",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQuery.class",
+      "occurrence": 0,
+      "sha256": "dbe71884d67c59b71c8bfbd92ce475a189fe577b1c369021d87846bf815b91aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzer$CacheKey.class",
+      "occurrence": 0,
+      "sha256": "31f178b93eb4da65e27504cb33a6fb86f0907df8770bc8187bcc9b91247f40c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzer.class",
+      "occurrence": 0,
+      "sha256": "1cf726b2639d80cc49b2f75e8d370173683d19996bff8e3f6f1af4ab1bc1156b",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/SqlQueryAnalyzerUtil.class",
+      "occurrence": 0,
+      "sha256": "a5d57b77533c4f397a1719b5d20d112bcd372eb0d70f11a4ea05d56339e49be8",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenter.class",
+      "occurrence": 0,
+      "sha256": "6e4943868e19c017983e4f5449c856e300b668b3dab02949488a7a0705301985",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenterBuilder.class",
+      "occurrence": 0,
+      "sha256": "7d3a71f1bc2aeda53aa4808fd493486c5c00e246556327328878411bdf6efbad",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/db/internal/SqlCommenterUtil.class",
+      "occurrence": 0,
+      "sha256": "f835595cc41b2611d144753e9dad21f819581682adf44e9ffff8e9e8990894d7",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/AutoValue_GenAiClientMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "a13523ddc6dd0ba31c78bf83c623849447ace934b920d7f58f1555d9f760a365",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "70e113bcd1405c16df0d811f0ae976fabfc41a6fa5cb80563bd07ae675f2b794",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "db0822d63b5a25eebd2b00d79fe63c48da35f296c33c0002e9871336555c6c7f",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiClientMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "fe5672b800de1ced5a264dddb5855b884fc164d9b377c8614115d50ecd99edbe",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiClientMetrics.class",
+      "occurrence": 0,
+      "sha256": "a2255964d23be2a31213a17276897643607b48058b7c41ff1aa31e22986f6673",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiMetricsAdvice.class",
+      "occurrence": 0,
+      "sha256": "001c1d3a8476dc15b8a0d06d1f0ca973102e35a235e6d58145af0ebb13cdf881",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/genai/GenAiSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "a61fcdf5c0420aa619bcf2c2b9e0766ca1c82c2e39ef6a9ede53d272011630a8",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientExperimentalAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "88a084a196d9bae0df2dd90e8cc27f77d9a739f29f8bd6723c0e835cbb327f39",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientExperimentalMetrics.class",
+      "occurrence": 0,
+      "sha256": "fc270d5eb88586207a62354410f2264c82b10ab9a31148e05c7b82fe71c9b598",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor$1.class",
+      "occurrence": 0,
+      "sha256": "3b7b5f5a05cc539cd42f9bc861b705a9a179c1c82e5352f6a8699add34c52a7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor$EmptyAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "ee6631c885f20246c2a0bf851f4f980f64c07203cce8e98142ef72d9555bc2e9",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientServicePeerAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "d9882ee426d76f7f549b10d78e7edd6389bd4178be32b743269cf9076578d8cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplate$UrlTemplateState.class",
+      "occurrence": 0,
+      "sha256": "76c9eb9a0800716447c3e5ebc213da2d824657c99d53862d2f84d6c818954581",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplate.class",
+      "occurrence": 0,
+      "sha256": "932aa364f2e028afbcc8284f33c09e6b349f7b9c641c980aacab57cd2530b6e0",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpClientUrlTemplateCustomizer.class",
+      "occurrence": 0,
+      "sha256": "a2c952a1eceaa741db6ebcf4357074ca372d33b3ebac315efa4b8bf75ddf151d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpExperimentalAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "ad78ebed85193c04123daea8d9abbd4af7bf3c5efc175f12028afb8f83f1ee04",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpExperimentalMetricsAdvice.class",
+      "occurrence": 0,
+      "sha256": "90d45ed9379a89dfaf1b22f563c5cf5ffaaa2866a0d829faf37ebe8ba09ec35e",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpMessageBodySizeUtil.class",
+      "occurrence": 0,
+      "sha256": "87b1564164796128e3155f2e28e812ca37bab50673da3d393fe653ce7df036da",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/HttpServerExperimentalMetrics.class",
+      "occurrence": 0,
+      "sha256": "fb23a640f8d08f2feccce72edb8ec1a526a163c3ca13a8efd31e3a91a18113ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/http/internal/HttpClientUrlTemplateUtil.class",
+      "occurrence": 0,
+      "sha256": "5c20584f637bbcaae07732d6ba53cab3169c72f788919c95bbaa6a9de9382191",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/AutoValue_MessagingConsumerMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "fbc7c21f68045599850740730d83cbb6e9b10204103774b241a8c32a623925df",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/AutoValue_MessagingProducerMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "2cbc01d9967f414014aef872b934428b253d47c6f76f919bb715168d3c2fc7a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/CapturedMessageHeadersUtil.class",
+      "occurrence": 0,
+      "sha256": "ba446ffc19c431ba33bbaa5b15a08cb9bc1dcfff8d8856db0c15a455c9802603",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessageOperation.class",
+      "occurrence": 0,
+      "sha256": "c4e1fba154348ef720b139c9d1936c5b9979ca0159ff762cec970284ecbea5c7",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractor$1.class",
+      "occurrence": 0,
+      "sha256": "15d7dcdb5619ee3a449296e05ac1884015eca226789b6d518eb03c03629cd8d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "1a20cd914cefd8108f0acb6b00258fe2f81e9ac872984c6338b54af7e5019f36",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesExtractorBuilder.class",
+      "occurrence": 0,
+      "sha256": "2e19194af67fc205ed47ec5dd483e9092ba62b25f6b4ce34e82f1de6a94b281d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "bf8b624660f509275df60dbc9ee43825d7ddda005de03ed7f3235a8ef802888f",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingConsumerMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "2bcca2c2cbf27048d0ed6f1f903f37cd5241c9d145b1354d74acbd6d20097634",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingConsumerMetrics.class",
+      "occurrence": 0,
+      "sha256": "b038670fef489380485cc20da4cc85345a8719db575ba117f4ac9d30ff1558d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingMetricsAdvice.class",
+      "occurrence": 0,
+      "sha256": "e7c0885d4606b7512d9a6363974d5009352c95ef736b66c35012ca9671ad3d93",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingProducerMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "5cdb9163d272c2649fe8a63acb2c0cfde15e6a5da2ccc1226616f8ddc0164214",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingProducerMetrics.class",
+      "occurrence": 0,
+      "sha256": "3091d417b36f4e45568f3f53950e624e5184223f78fce4187541c68b6ba8564c",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/messaging/MessagingSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "ec9c5c31e3004ba1125b71182ebc97760bba4f1960c97ad48350ea480d4349a5",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/net/internal/UrlParser.class",
+      "occurrence": 0,
+      "sha256": "621fdb66076de64075f122d2f091e30def51fc7d9fc59da2adc6debd75e6d313",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/AutoValue_RpcClientMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "0a706f57789c536c339f0951b6db68af84ce1547396a161c4b555ce68c89aea5",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/AutoValue_RpcServerMetrics_State.class",
+      "occurrence": 0,
+      "sha256": "514dcb38cbb0b31c43347eeee34feb03b6556b76f54dac77a255f5d219043b9c",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "01c775f830c3d5125494ae9e53cbb59f0f54c69ca9f89b165989083de949839a",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "06224f46e4c1e642bc702e46dbf5696b9f4ef804ea5270b054fe60362b15bb6b",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "fe8385c944d8988df866dd06a47ff1085cb8dc3a8e52098664d9dec73890970b",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcClientMetrics.class",
+      "occurrence": 0,
+      "sha256": "675c7dbc40151285afad8aac905f5203d22092cac249d2e65f1ef3f9f0d458d2",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcCommonAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "348cd8ff11da3abdc3fba5ab931a2ae93a20c39087113a75958b2be1509f694b",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcMetricsAdvice.class",
+      "occurrence": 0,
+      "sha256": "934f3a28abe16e46f670cb38077c931dd2e89df10d4a782e969e49067ad2f4cb",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcMetricsContextCustomizers.class",
+      "occurrence": 0,
+      "sha256": "bbe8e9499ae36d795934a6569789bb7098abe8f6913386552453e33a0a41d65d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "395c5946707c5d241eef7a2517989df365a870b273446603292da9b44730b68d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerMetrics$State.class",
+      "occurrence": 0,
+      "sha256": "f17b40ef8736aaee703bf1cda738a3ee595ace295962a841d35b71c5eba4efc3",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcServerMetrics.class",
+      "occurrence": 0,
+      "sha256": "066a4d68cb7a87396dfddd436b00571e9f1718f06e6fc72a0fd0dd8bfb6465b1",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcSizeAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "110647967d2d402f5b46ca86b25aebf27c68338aa378db9ae38e70a0735cec25",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/rpc/RpcSpanNameExtractor.class",
+      "occurrence": 0,
+      "sha256": "e9e70f5bc24e64fe7b90efb80c2b02318bc9379d79eb00f268dd397756637549",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor$1.class",
+      "occurrence": 0,
+      "sha256": "caddea424a2cd9124befecfbe59500fa7454740a11a254557f2dc3d6a5eea552",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor$EmptyAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "8869ef325c6b2a781188f9b25d65e53d56c6bf3cf11c2b259b192d9336dcc4b1",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/ServicePeerAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "18a39c3e5adcd611ce83dd6d073de3e01e751701d6c5947527f219e6d4c46064",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/AutoValue_ServicePeerResolver_ServiceMatcher.class",
+      "occurrence": 0,
+      "sha256": "4646a903749cc81eac2148b7849b0a2aae61ff6fda3cdb276498a453d826dcdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver$ServiceMatcher.class",
+      "occurrence": 0,
+      "sha256": "05356597fe9de22ee98f9bdc670244974cf6b2fc96bed14249bf385264c1866d",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver$ServicePeer.class",
+      "occurrence": 0,
+      "sha256": "955f8ec3eb1bb6018cfe6d6345de95ae939810fe068990007e7a89578be07ad2",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/service/peer/internal/ServicePeerResolver.class",
+      "occurrence": 0,
+      "sha256": "b68ff38f70fbaa90203df0b0f30d48949c3a7d065b790481f2c1e517da1b98de",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/util/AutoValue_ClassAndMethod.class",
+      "occurrence": 0,
+      "sha256": "610ecb76412846be277f4c84848d72c4e81bf4bcf872baa42455a3d75908dd98",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/util/ClassAndMethod.class",
+      "occurrence": 0,
+      "sha256": "d0cfe38fcce57c526183205646669a57f1551ecdbcc50937b2bdd78384f04a55",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/incubator/semconv/util/ClassAndMethodAttributesGetter.class",
+      "occurrence": 0,
+      "sha256": "2d4f9ee7ec13a144b4ec2127a43ec02b0324af3a54c4b7d5cc9b9366359a8a87",
+      "member_shard": "docs/dev/evidence/sqx145/members/092/002.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/092/001.json",
+      "sha256": "f3d1f8dc9448ac66fd9965fa81f30240b50d330ee430ee957a99346700d8108c"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/092/002.json",
+      "sha256": "9c708e695921550ede20c62c82be37c9e9a00b75a871dae734b94b8fa0fa78f4"
+    }
+  ]
+}

@@ -1,56 +1,66 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only Source code/pseudoCode bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/pseudoCode",
-    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
-    "review":  {
-                   "version":  1,
-                   "state":  "owner-approved-plan",
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
-               },
-    "owner":  {
-                  "requirements":  [
-                                       "FR-UI-DATABANK-source-mapping",
-                                       "FR-UI-DATABANK-workflow-preservation",
-                                       "FR-UI-DATABANK-clean-room"
-                                   ],
-                  "feature":  "FEAT-UI-DATABANK_BUILDER",
-                  "domain":  "plugins/databank",
-                  "decision":  "DEC-UI-DATABANK-SOURCE-CODE-STRUCTURAL-OWNERSHIP"
-              },
-    "clean_room":  {
-                       "contains_personal_data":  false,
-                       "paraphrased_behavior_only":  true,
-                       "contains_sensitive_data":  false,
-                       "contains_proprietary_source":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode",
-                               "family":  "bounded installed source-code action artifacts",
-                               "id":  "sqx-resultsdatabankactions-sourcecode-pseudocode-ui"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-sourcecode-pseudocode-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural inventory and bounded ownership inspection",
-                        "inspection_method":  "local SHA-256 inventory and existing target responsibility audit",
-                        "relation":  "Existing independent frontend counterpart or justified absent-format exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "959a6301ead3f1069565747127ffc406607ee36c637c916ffda34117fe3fa187",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "No existing Databank nested-format choice/adaptor; Results generators are distinct Group14 ownership; preserve absence"
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "reason":  "Structural manifest; not behavioral ledger",
-                            "path":  "source-map.json"
-                        }
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only Source code/pseudoCode bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/sourceCode/pseudoCode",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank",
+    "decision": "DEC-UI-DATABANK-SOURCE-CODE-STRUCTURAL-OWNERSHIP"
+  },
+  "clean_room": {
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode",
+      "family": "bounded installed source-code action artifacts",
+      "id": "sqx-resultsdatabankactions-sourcecode-pseudocode-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-sourcecode-pseudocode-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/sourceCode/pseudoCode/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and bounded ownership inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "Existing independent frontend counterpart or justified absent-format exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "84dd5104f3754182fbf85712d08844620afbebc8d3b5f8a26f2d6645c6f3a22d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing Databank nested-format choice/adaptor; Results generators are distinct Group14 ownership; preserve absence Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest; not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ]
 }

@@ -1,0 +1,541 @@
+# httpclient-4.5.13.jar
+
+[Group index](README.md) | [All archives](../README.md)
+
+## Scope and provenance
+
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/libs/httpclient-4.5.13.jar`.
+- **SHA-256:** `6fe9026a566c6a5001608cf3fc32196641f6c1e5e1986d1037ccdbd5f31ef743`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 470 raw entries; 470 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-DATA-SOURCE-HTTPCLIENT`, P04; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [035.json](../../dev/evidence/sqx145/archives/145/035.json).
+
+## Complete member declarations
+
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
+
+- [001.json](../../dev/evidence/sqx145/members/035/001.json) — SHA-256 `73c15b6b1d62e928ad733abd144d1f5ee1f199369fa5dafd9ecfa8ec676e840f`.
+- [002.json](../../dev/evidence/sqx145/members/035/002.json) — SHA-256 `0f9ac1a47a349292a6968e37443598eb847a480dfd5fff076389811659d916a1`.
+- [003.json](../../dev/evidence/sqx145/members/035/003.json) — SHA-256 `e44a7274f91f148191fd257b495f403b6bd1111d84152b38c6abc933474242ea`.
+- [004.json](../../dev/evidence/sqx145/members/035/004.json) — SHA-256 `712e63fe366fddb7a0adc3f9553fe5e44a3d44ed34e0c902314aafaebb8a34ca`.
+- [005.json](../../dev/evidence/sqx145/members/035/005.json) — SHA-256 `260affd5d07a192e2acbc114ed32b1cfd6b3f44abc58f03ee0d5aa40e55b6c1a`.
+- [006.json](../../dev/evidence/sqx145/members/035/006.json) — SHA-256 `0242fa711ac247ea263406097b07d13536b22f0f5501e6c8f1b9d2e1ad08021c`.
+
+## Focused structural diagram
+
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
+
+```mermaid
+classDiagram
+    class C0["URIBuilder"]
+    class C1["URIUtils"]
+    class C2["ServiceUnavailableRetryStrategy"]
+    class C3["RedirectStrategy"]
+    class C4["HttpExecutionAware"]
+    class C5["HttpDelete"]
+    class C6["AbstractExecutionAwareRequest"]
+    class C7["HttpRequestBase"]
+    class C8["CookiePathComparator"]
+    class C9["Cookie"]
+    class C10["CookieAttributeHandler"]
+    class C11["CookieSpecRegistry"]
+    C7 <|-- C5
+    class E0["AbstractHttpMessage"]
+    E0 <|-- C6
+    C4 <|.. C6
+    class E1["AbortableHttpRequest"]
+    E1 <|.. C6
+    class E2["Cloneable"]
+    E2 <|.. C6
+    class E3["HttpRequest"]
+    E3 <|.. C6
+    C6 <|-- C7
+    class E4["HttpUriRequest"]
+    E4 <|.. C7
+    class E5["Configurable"]
+    E5 <|.. C7
+    class E6["Serializable"]
+    E6 <|.. C8
+    class E7["Comparator"]
+    E7 <|.. C8
+    class E8["Lookup"]
+    E8 <|.. C11
+```
+
+## Class inventory
+
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `org/apache/http/client/utils/URIBuilder.class` | 0 | `545ef7b27313857459b06708de5a4992d59ca9f44c833992fd7572c0beb9ed17` | 15 | 48 |
+| `org/apache/http/client/utils/URIUtils.class` | 0 | `048abf5a82b54940042daae291c315005c971c568cf3ddc30319d01e7e99ef1f` | 4 | 14 |
+| `org/apache/http/client/ServiceUnavailableRetryStrategy.class` | 0 | `ab07b8c8ae0928cb6da1eb2b4a55c6e60554561ce7e965bcaf7ce3b3ae046681` | 0 | 2 |
+| `org/apache/http/client/RedirectStrategy.class` | 0 | `344af3e9da32289d41e714481538173046206340f7181dc696dadce11ba1e8d2` | 0 | 2 |
+| `org/apache/http/client/methods/HttpExecutionAware.class` | 0 | `942bc5cb79d78986a818a791fc4605e39bbd86d80a6778fefda000349f934797` | 0 | 2 |
+| `org/apache/http/client/methods/HttpDelete.class` | 0 | `7a0fd3edb859800afe00af13d8165f323c91a3d72f9580bde4ddf7c7ac95c180` | 1 | 4 |
+| `org/apache/http/client/methods/HttpRequestWrapper$1.class` | 0 | `01b6de998f9ef239515e869e7ec2b5b8fde72b60a5bf087b158eb7bc47efb96f` | 0 | 0 |
+| `org/apache/http/client/methods/AbstractExecutionAwareRequest.class` | 0 | `46190664ac6dbde6b3dd656d6ad6619043fd2049a0e822add4a76fa648d13a14` | 1 | 9 |
+| `org/apache/http/client/methods/HttpRequestBase.class` | 0 | `7de2b568bbc2f1fe2c65c032ec89730303fb9347d6f0162ecff947df8b9825a1` | 3 | 12 |
+| `org/apache/http/cookie/CookiePathComparator.class` | 0 | `d17b40bf4419a56e4ba17143660a605cfa21d5a7115510cd3cc23fad43dbd265` | 2 | 5 |
+| `org/apache/http/cookie/Cookie.class` | 0 | `9ac400e7d0c337a97fa5fd51a696d74f60fa558b511023dd156d05f819af9859` | 0 | 12 |
+| `org/apache/http/cookie/CookieAttributeHandler.class` | 0 | `f6ef768a46b1428c26ef1fab6d16f4d4f1df89cbb0533c01f4ad77a387f350c1` | 0 | 3 |
+| `org/apache/http/cookie/CookieSpecRegistry.class` | 0 | `d894eeae8f9e1d047d93b1c29975e0e6418d744ecdc9f2e26cbc708d559c7984` | 1 | 9 |
+| `org/apache/http/cookie/CookieOrigin.class` | 0 | `3b1f0106c7beb3bfa5cd0e993442806852237b633c541da92977d506321a804a` | 4 | 6 |
+| `org/apache/http/cookie/MalformedCookieException.class` | 0 | `ebc16d320863c3eb51e0ffd853876c70260968d38cd771a0522c523a9440cde4` | 1 | 3 |
+| `org/apache/http/cookie/SetCookie.class` | 0 | `dc64d4795d01ba757a4d89341a66fdf2d499ef82446b4ba9430d4bc24292721b` | 0 | 7 |
+| `org/apache/http/cookie/ClientCookie.class` | 0 | `675a99031479db327b90787cc3dcb17966da3bb853f37ea14054a1f5af58d3e9` | 10 | 2 |
+| `org/apache/http/cookie/CookieRestrictionViolationException.class` | 0 | `47b6b3077a96f9dfc86bf6ba8a8221376595fa4f9a45d4050fd791d88fdfa8a3` | 1 | 2 |
+| `org/apache/http/cookie/SM.class` | 0 | `bee97065d4a351b04b9705c764a0bfde748ae10fa1abcae30cb43b5b3d7b432f` | 4 | 0 |
+| `org/apache/http/cookie/CookieSpec.class` | 0 | `ee401740b5971edb1a4a1a1182f8a1dc5624d1bdfe937aafafbaa8426294eb72` | 0 | 6 |
+| `org/apache/http/cookie/CookieSpecRegistry$1.class` | 0 | `07dd61f354ffe99dff59aac047acd3d350e331c37fd579a742f5fad9af24a67b` | 2 | 2 |
+| `org/apache/http/impl/client/NullBackoffStrategy.class` | 0 | `904641fa16b349d86eb5fbb69bd89d1b48ef98e1d6a215a77c20b4febcfc9961` | 0 | 3 |
+| `org/apache/http/impl/client/FutureRequestExecutionService.class` | 0 | `4ab7d5818685eee179567f9e8b9aeda7737c725d3996ea5512ab300bdd38149f` | 4 | 5 |
+| `org/apache/http/impl/client/IdleConnectionEvictor$1.class` | 0 | `51753dadc5cba5d6b5dcaff609f9a2f07f52e95141d0f9b8fc9922e7c23eb193` | 2 | 2 |
+| `org/apache/http/impl/client/HttpClientBuilder$1.class` | 0 | `3284f1e4a31a895489eb4d31afaa56f7efb591a050dda4fac940c69f373669f0` | 2 | 2 |
+| `org/apache/http/impl/client/RedirectLocations.class` | 0 | `9782fb600372a7adca2aa0fe8baf37ed626e49b98f55bd26bb709278d612bafb` | 2 | 13 |
+| `org/apache/http/impl/client/FutureRequestExecutionMetrics.class` | 0 | `1242ebd5fadb08f63d2db4fb1ec5aa967208c54efcb18215967ee1e17be47207` | 6 | 18 |
+| `org/apache/http/impl/client/BasicCookieStore.class` | 0 | `a7f81284c0527e1f7936c469f33c665f9efa34f6867c86a40387399ac6864584` | 3 | 8 |
+| `org/apache/http/impl/client/DefaultRedirectStrategy.class` | 0 | `fee5ff98c18471dddb8d74ce27b0b542432a45205e71ed5bf5c2ce94eca7091a` | 5 | 8 |
+| `org/apache/http/impl/cookie/LaxExpiresHandler.class` | 0 | `05363b574ed9c70a8d28c91d005d5ff8e7a6ed57c75361d98ed197e29d44b8ba` | 7 | 6 |
+| `org/apache/http/impl/cookie/PublicSuffixListParser.class` | 0 | `1fe108635a32e1aca4512f6ca120c86ae22f578a21463ad2d17b3990d38118ca` | 2 | 2 |
+| `org/apache/http/impl/cookie/DefaultCookieSpecProvider$CompatibilityLevel.class` | 0 | `ee65a424c67be760d69d13138a7122f185643ddc699f8944dae9535fb5e90587` | 3 | 4 |
+| `org/apache/http/impl/cookie/BrowserCompatSpec.class` | 0 | `83c4919ae01e43c227e1d3b1de3d02717a47811000de6cb1436b47a392968da9` | 1 | 10 |
+| `org/apache/http/impl/cookie/NetscapeDomainHandler.class` | 0 | `678e0a2ec33313f4b2ce0cf7cb448089b0028cafa867052bc7e8b3c3e2c671cd` | 0 | 6 |
+| `org/apache/http/impl/cookie/RFC2109SpecFactory.class` | 0 | `1e9fa17f2a0f563425af06cb67e208d1202990619eeb5e97ae253c193293cbcb` | 1 | 4 |
+| `org/apache/http/impl/cookie/RFC2109VersionHandler.class` | 0 | `7d982a2283c43f4c04a1236643a32d82c2505400e34258eef97f71589b7fe431` | 0 | 4 |
+| `org/apache/http/impl/cookie/RFC6265LaxSpec.class` | 0 | `94417f2ff7ec56a7f52a7f61be6c31a7880c72f4282400cb191d44eba93b8cc2` | 0 | 3 |
+| `org/apache/http/impl/execchain/RequestAbortedException.class` | 0 | `a590597ef23ba15aec16e2c18a78bcff57433c953ba7183614740cac629d6512` | 1 | 2 |
+| `org/apache/http/impl/execchain/BackoffStrategyExec.class` | 0 | `124aa8b6c2576f73af4d87746f31e7f03b8737396b98f8930abf8e985899c4dc` | 3 | 2 |
+| `org/apache/http/auth/AuthSchemeProvider.class` | 0 | `ea55daa242823a0bc26d096f7574a777cbd564abf346c57f657707f8c44a8c97` | 0 | 1 |
+| `org/apache/http/auth/AuthenticationException.class` | 0 | `d385dcb815c835438a2e4ee7833b91dbd8c2881a0189b62a0ed0f1a39c011b70` | 1 | 3 |
+| `org/apache/http/auth/AuthScope.class` | 0 | `9a74d8cee63b70f5603909b323a477ca77d7d76bc438eee4716ae3c837533b69` | 10 | 16 |
+| `org/apache/http/conn/util/InetAddressUtils.class` | 0 | `ca1c768681a631406b2724edb7f4a4d84dfab7fa00ad5054880aa543c77b73fe` | 7 | 7 |
+| `org/apache/http/conn/util/PublicSuffixList.class` | 0 | `1e33e065f6aa798fead926d50b4bb5198a9b8e0c2266246df2e4c61b08eaa525` | 3 | 5 |
+| `org/apache/http/conn/ssl/StrictHostnameVerifier.class` | 0 | `2fdb2266a99d7975e1d31f2d9503d2b82f1110c8bfa9bde12817d5ad3ec7278e` | 1 | 4 |
+| `org/apache/http/conn/ssl/AbstractVerifier.class` | 0 | `4052c589b92616f71a5d2ff8fde32cd8692f72c9f1dafb322ba06a8d755763c7` | 2 | 12 |
+| `org/apache/http/conn/ssl/DefaultHostnameVerifier.class` | 0 | `4675761b34ee2fcc3701185029e36461b02d5947247097b6ec82765d9ec866dc` | 2 | 20 |
+| `org/apache/http/conn/params/ConnManagerParams.class` | 0 | `7be00f6648e1b79f18e163de5607768676eb53fc5c02b30a3f3af31ef4e006b8` | 2 | 8 |
+| `org/apache/http/conn/ConnectionKeepAliveStrategy.class` | 0 | `65b0264f0bcb0450cff74113be82c09271822cea200f66112f0fb9db70e1841b` | 0 | 1 |
+| `org/apache/http/conn/scheme/SchemeSocketFactory.class` | 0 | `18ae34dc9ff0ca3fd8373f34a4c80d6cdfc8aadd644427ddb058a00ca2c97a6b` | 0 | 3 |
+| `org/apache/http/conn/scheme/SchemeLayeredSocketFactory.class` | 0 | `3f799f2127bb7a1839b13a04834243a24cce9696bc46ed2dcd155c49da38b510` | 0 | 1 |
+| `org/apache/http/conn/scheme/LayeredSocketFactoryAdaptor.class` | 0 | `6d45e1fe095505aec84329f2fe9b54475bb800cfe26c01ebd65a3d2c58069a25` | 1 | 2 |
+| `org/apache/http/conn/ConnectionRequest.class` | 0 | `cc0aff54e76f5fa840c75a6472725be1e7e56ea65c687090737183f68a589108` | 0 | 1 |
+| `org/apache/http/conn/BasicManagedEntity.class` | 0 | `711dc35dd56b1ba4103f86ed44e28046399b2d8ee85337d4502455de1bb86cd6` | 2 | 12 |
+| `org/apache/http/client/utils/JdkIdn.class` | 0 | `4db5a5f868b33982a87101d74a7ac9c02ecab3b5e752a03db63521c4fef9e153` | 1 | 2 |
+| `org/apache/http/client/utils/URIUtils$UriFlag.class` | 0 | `2e2074eb6af9f05a087377dbd6a06d37d458dbede0c35cfb911ab12f5e322468` | 3 | 4 |
+| `org/apache/http/client/entity/EntityBuilder.class` | 0 | `e6a76a37ec2e0b62c5e24b584feb0317bfafffc2f2abf9297a074978ca0170d0` | 10 | 26 |
+| `org/apache/http/client/params/AuthPolicy.class` | 0 | `d5868da9f7f7c5633300207a9492e075536d4ea7d29d0cf0d0804e3f29aa6934` | 5 | 1 |
+| `org/apache/http/client/params/HttpClientParamConfig.class` | 0 | `31e871993efcc61bd6be112a755400ab345291db1fdd1dac09cc0896722acd04` | 0 | 3 |
+| `org/apache/http/client/NonRepeatableRequestException.class` | 0 | `c504fee2582b31f62d0376f838a00f6b82dd6bd1aeb4def1177471858d54ea67` | 1 | 3 |
+| `org/apache/http/client/RedirectHandler.class` | 0 | `374db0292db2aeec9a2c020c9038f8dad32c7227eced010464175f2b0a541df2` | 0 | 2 |
+| `org/apache/http/client/config/RequestConfig$Builder.class` | 0 | `bceef3ed29eca0af931a12b6573b9a1b123e2edf0f02636b89e76345346b71aa` | 17 | 20 |
+| `org/apache/http/client/config/CookieSpecs.class` | 0 | `495eb57ad9f5d6d82ddde2a5c7ea4a4a9206768e866f6021339fb32839db9bbf` | 7 | 1 |
+| `org/apache/http/client/config/AuthSchemes.class` | 0 | `f13183011043c5b2aea3f391f0f86f1508914828648ff9056d1f74d8930e7b6e` | 6 | 1 |
+| `org/apache/http/client/AuthenticationStrategy.class` | 0 | `1cdff80d75539699c230f295207d40d135093e9792df54fb489f3ace616ee495` | 0 | 5 |
+| `org/apache/http/client/AuthCache.class` | 0 | `a0e999b12734237c2b35e8333475ddcb4553ed68251232670c1ec746a57d34d9` | 0 | 4 |
+| `org/apache/http/client/HttpRequestRetryHandler.class` | 0 | `ee5121d5d25562af0b8c40d1abaf90992b33733de1957666489c78eb47fb8ff3` | 0 | 1 |
+| `org/apache/http/client/BackoffManager.class` | 0 | `0f004df887001162c8039a25402d7bf490078a6103e6bedebf645576fda01280` | 0 | 2 |
+| `org/apache/http/client/CircularRedirectException.class` | 0 | `eba81b5771b800af5832d6eabd3d5b2618ac834fed31875935dc8b6654024bac` | 1 | 3 |
+| `org/apache/http/client/ConnectionBackoffStrategy.class` | 0 | `771a5a503ad93b16a343e21faf79ca22a1119d07104a95d7f73b2cf5876778cf` | 0 | 2 |
+| `org/apache/http/client/methods/Configurable.class` | 0 | `4330d9c571b9ebd6269b2cebdfacaa60b4941c30d41dd90f18e2274e67bdc6af` | 0 | 1 |
+| `org/apache/http/client/methods/CloseableHttpResponse.class` | 0 | `3c81b0bdbc7a5e029191b2e556e30a22e585547a553f0e2be5a928aeeb02b30b` | 0 | 0 |
+| `org/apache/http/client/methods/RequestBuilder$InternalRequest.class` | 0 | `b2b49838fa1d45e4b4c8efc9cdc56fb98bc77fc393b14a8ff80cb681e659856a` | 1 | 2 |
+| `org/apache/http/client/methods/HttpOptions.class` | 0 | `93a3ae5f2d998414b4a21c6e293a89997ce03b878e044766dfefe86d478a2c77` | 1 | 5 |
+| `org/apache/http/client/methods/HttpHead.class` | 0 | `dc1ad05bbdb04cb218bf02c941978161c243a69de7e1e2e5712e7a1331da054c` | 1 | 4 |
+| `org/apache/http/cookie/CookieIdentityComparator.class` | 0 | `887c205c015ee8dd1427901a733af68d0bee399b34c36c6603d0cdd8f2c406b1` | 1 | 3 |
+| `org/apache/http/impl/client/DefaultRedirectHandler.class` | 0 | `5102a773abae50daa8d3ac5c8345ac21de9fc7ee0092f44a6c69fd895bc3bbc7` | 2 | 3 |
+| `org/apache/http/impl/client/MinimalHttpClient$1.class` | 0 | `c1ad9ba7e64b2759cd891aa1f5dd3a0fa987379c9b762bec23e5ca7436af70b0` | 1 | 7 |
+| `org/apache/http/impl/client/InternalHttpClient$1.class` | 0 | `984a27c46090b02db87cccb5a77a14961562d281df5b7421e8c5245dab18d1ce` | 1 | 7 |
+| `org/apache/http/impl/client/DefaultProxyAuthenticationHandler.class` | 0 | `23ef43de32724c91b6de46717483d3bf299cef95f36810e7aedd800717bc0e1a` | 0 | 4 |
+| `org/apache/http/impl/client/CookieSpecRegistries.class` | 0 | `11bcfe6267e30040dcdd5349dfd73f1cdc391d06b91ac46a65abca81509db794` | 0 | 5 |
+| `org/apache/http/impl/client/HttpClients.class` | 0 | `ad3ae6eb054c35e6d8ff26ef1a2ef75a620b8fc0ecdaf7f4f6689dc84160ae7d` | 0 | 6 |
+| `org/apache/http/impl/client/HttpRequestFutureTask.class` | 0 | `dca709f0f768269c43b9e1188f49b4ee88bc24175168c653ff95940dc5a42fd4` | 2 | 8 |
+| `org/apache/http/impl/client/ClientParamsStack.class` | 0 | `abe68c2d2950e553a203e23483185a5e60114f4567e44b22c560337c78c766d9` | 4 | 11 |
+| `org/apache/http/impl/client/AutoRetryHttpClient.class` | 0 | `079cd0d8564972530367dce35a3d9c984c06b99356879e0406b5838d5e4d80ad` | 3 | 14 |
+| `org/apache/http/impl/client/EntityEnclosingRequestWrapper$EntityWrapper.class` | 0 | `d330ca6ceec40e2b1f29f799b132a232fcf5c93730dd5549901e005818b9806a` | 1 | 4 |
+| `org/apache/http/impl/client/ContentEncodingHttpClient.class` | 0 | `f3284c6ae4e0b77c04b849b8f9621e8462b866bed343af112a15be3e9d6a45c0` | 0 | 4 |
+| `org/apache/http/impl/client/SystemDefaultHttpClient.class` | 0 | `3c981c806e4f3be15288dd6e081ba7198ddf78de5939d475e9acc5571084c489` | 0 | 5 |
+| `org/apache/http/impl/client/Clock.class` | 0 | `a97d411efa10bbb037c9526a8a8705172d02a9c5680c4592a4f1419fdfc25072` | 0 | 1 |
+| `org/apache/http/impl/client/CloseableHttpResponseProxy.class` | 0 | `2bcf2a181743e16a5e518b249164bd456a3a643a28379fe17cbacb9a899f8adc` | 2 | 5 |
+| `org/apache/http/impl/client/AbstractHttpClient.class` | 0 | `dc24b7b9d87ab6bf352dff3b4fd7b93a7e1fc3123701215d0a430a9945ee12f2` | 20 | 78 |
+| `org/apache/http/impl/cookie/BasicExpiresHandler.class` | 0 | `00543c2bb8511c347277f59c4db3ea609e79a10311005d0046a28a112c1a231f` | 1 | 3 |
+| `org/apache/http/impl/cookie/BasicSecureHandler.class` | 0 | `0fc9cac8b3297253b41bc29255f011088d2fb661f03b36bdd161ecc5e6a4e0ee` | 0 | 4 |
+| `org/apache/http/impl/cookie/BasicPathHandler.class` | 0 | `a6eeed1071374079c62aaf2e77a103f80700a868673f2ac7a81b1285f2c0380c` | 0 | 6 |
+| `org/apache/http/impl/cookie/AbstractCookieAttributeHandler.class` | 0 | `53fdd055ff4327615ef0149e43f7308a391e03fa0b7fac1247b9d463da037d20` | 0 | 3 |
+| `org/apache/http/impl/cookie/PublicSuffixFilter.class` | 0 | `bc9ca07ada546a89931ddbd48efda733926d9981fa5d7ffc345f202ee61607b6` | 4 | 7 |
+| `org/apache/http/auth/AuthScheme.class` | 0 | `6f041e3c5f522855c4aaf84602f1646748de5a8c5fc04f92734d08b3847938bf` | 0 | 7 |
+| `org/apache/http/conn/ConnectionPoolTimeoutException.class` | 0 | `f4d453d1d80ce11a04738205be12bd708ac8c66d0ad6c9b3d2455098b34bf359` | 1 | 2 |
+| `org/apache/http/conn/HttpInetSocketAddress.class` | 0 | `2f54a441f1438b7d3fd2cfa88f9e6dedbaceb7bbb80136d1aa679e052611f6d6` | 2 | 3 |
+| `org/apache/http/conn/HttpHostConnectException.class` | 0 | `24d90e30da05d4bc47bdd5fc56bc27b947e3297ff78906a8a59df8f04d6b8a99` | 2 | 3 |
+| `org/apache/http/client/utils/Idn.class` | 0 | `418543aeb4535e924999ba135601b9fd90b6a04cf19ed1121d4512dff3c9a87c` | 0 | 1 |
+| `org/apache/http/client/utils/Punycode.class` | 0 | `c04e8f2c9683a4180ac0e7ba666711733d35c33984e657f8a4e55e12f8fca3a3` | 1 | 3 |
+| `org/apache/http/client/entity/DecompressingEntity.class` | 0 | `ecccf904945f177145d701c72b70a0fc74b90f2bc0a82d2e07469e5fe28b7526` | 3 | 6 |
+| `org/apache/http/client/HttpResponseException.class` | 0 | `b7c510cf2b78667d0aa3b9ab97f7fef31aa371f627a6fd15a6e1b022608a4e29` | 3 | 3 |
+| `org/apache/http/client/protocol/ResponseContentEncoding.class` | 0 | `caf9c657578f7540463f8f1c659b2861d09033eea476216d3e94a8755c95ebca` | 3 | 5 |
+| `org/apache/http/client/protocol/RequestAcceptEncoding.class` | 0 | `2d38d3dea11843b0dd378242ce9c8009ad2b3b14465300d6f87d4d6190e22c8d` | 1 | 3 |
+| `org/apache/http/client/protocol/HttpClientContext.class` | 0 | `024a2444ffbe1c29611e4d7fe6d2e8547d9c848493988d52154258ce30f198e6` | 13 | 26 |
+| `org/apache/http/client/protocol/RequestAuthenticationBase$1.class` | 0 | `dedb92f7801410ff623f7ed467d817994fb8cabf7b2f0402a6787133c51b6c29` | 1 | 1 |
+| `org/apache/http/client/protocol/RequestAuthenticationBase.class` | 0 | `9eae137a8d93114610ea0fbce3e53c6cae1cfbe6c47e317b952a721a187e5f6c` | 1 | 4 |
+| `org/apache/http/client/RedirectException.class` | 0 | `e4e0a7130ec257daebd63411e2844dfe8a21b11a09787b4e6eacdab88226e86f` | 1 | 3 |
+| `org/apache/http/client/methods/AbstractExecutionAwareRequest$2.class` | 0 | `3cd01aaeed73d189dbc2eb999d8207faa3183a3a4af935e15ffadaddb207e2dc` | 2 | 2 |
+| `org/apache/http/cookie/SetCookie2.class` | 0 | `02213b15c73ceb9026715004aace3769f284fa7f07de9465a552a5f9c71a20ba` | 0 | 3 |
+| `org/apache/http/cookie/CookieSpecFactory.class` | 0 | `c899d7551db8bad5b0762f2a3d3ff15cfc293746b292481ce828941d7757ce61` | 0 | 1 |
+| `org/apache/http/cookie/CookiePriorityComparator.class` | 0 | `599955d2b7ce9264eebe0bfba0a883f10ac57a022fd55424f439a16fb2b47ae8` | 1 | 5 |
+| `org/apache/http/impl/client/DefaultConnectionKeepAliveStrategy.class` | 0 | `ab21c7c170caba42ca4cf18637d27d48100a090b1fc4ccd8f5714215ed36ed66` | 1 | 3 |
+| `org/apache/http/impl/client/DefaultUserTokenHandler.class` | 0 | `a322da9297a68e50430824622e5e81caa35c5b8163ffbcf88a134716d55a42a0` | 1 | 4 |
+| `org/apache/http/impl/client/SystemDefaultCredentialsProvider.class` | 0 | `87f9757abf33dc9eaeb7562da563c89f636eca8bb37a8954244b07c4a7c47a60` | 2 | 8 |
+| `org/apache/http/impl/client/DefaultRequestDirector.class` | 0 | `550c6f1ce9b2dc9ba0bf11cf00ab54c07bd58e86dc8ca5b886b38e3923f2ef15` | 24 | 16 |
+| `org/apache/http/impl/client/BasicAuthCache.class` | 0 | `030ff422bc417c0089f33b59d7e0fe17d356933ab8adda7125a2f07caf81881f` | 3 | 8 |
+| `org/apache/http/impl/client/DefaultRedirectStrategyAdaptor.class` | 0 | `b9526497aa8c8f13dfe313bd5168585671b11dbeed85d97a5d98bec468974cfb` | 1 | 4 |
+| `org/apache/http/impl/client/HttpClientBuilder$2.class` | 0 | `542a83dbd6b86ebfef983cbb7f677e32f199319dd42159bd69fa35f54ec301c2` | 2 | 2 |
+| `org/apache/http/impl/client/CloseableHttpClient.class` | 0 | `93185b9612d0a5be28da396e6eb785811bcf95095fc07b305e8b523fd2817b69` | 1 | 15 |
+| `org/apache/http/impl/client/DecompressingHttpClient.class` | 0 | `845994e7cf18df63e1bf2a89167330e295cd11325db785454a45a084454a1cab` | 3 | 15 |
+| `org/apache/http/impl/cookie/IgnoreSpecFactory.class` | 0 | `eb5be689863977eda0a3e18ec82ee68a50fe0b45d8bf7cd05b15fecd524f7f87` | 0 | 3 |
+| `org/apache/http/impl/cookie/DefaultCookieSpecProvider$1.class` | 0 | `a9b764650b7e228b80295c1720d6abfdae375fe40bf641ccede66b445757ad57` | 1 | 2 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpecProvider.class` | 0 | `00f94b19d4f8751efbb663cf43a95c2725ff2ccc906a6ab29e4d84234816f900` | 3 | 4 |
+| `org/apache/http/impl/cookie/RFC2965CommentUrlAttributeHandler.class` | 0 | `8f68540041aeafffd72f033bc8291f5a596183033ce88687bff155fe3f569fd7` | 0 | 5 |
+| `org/apache/http/impl/cookie/RFC2965DiscardAttributeHandler.class` | 0 | `109c8cb64d8d64ce3dddb5ea10066335d8e038f5f57c5e4c97b03bc7c221666a` | 0 | 5 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpecBase.class` | 0 | `90be101e614a05e8a8c649ad4fb8a33f25c3e9e27ea757e48da9c653c2b1d548` | 0 | 1 |
+| `org/apache/http/impl/execchain/ConnectionHolder.class` | 0 | `fda1bca5e807fd89c288ad3ae650cc1f82586c0c73c8920c90714934825bc873` | 8 | 12 |
+| `org/apache/http/impl/execchain/MinimalClientExec.class` | 0 | `8846a09c6ae664336ef7429d60208cecf06126a83d314e62c26e188c2fa577bf` | 6 | 3 |
+| `org/apache/http/impl/auth/NTLMEngineException.class` | 0 | `268829e974b4e7537239c3429c476b0524422bd282ff6b152791794344d75ff5` | 1 | 3 |
+| `org/apache/http/impl/auth/NTLMScheme.class` | 0 | `bf3ad426e5df5195b0edf98f8437ed85a3861ca00a4e105665b6b3be37f9522f` | 3 | 9 |
+| `org/apache/http/impl/auth/NTLMScheme$State.class` | 0 | `7a2c4496c38ad22d72942fb79cf95ed22ba2fa67ad4bf5e80bdfdf227493cbc1` | 7 | 4 |
+| `org/apache/http/impl/auth/DigestScheme.class` | 0 | `b50a4fe53c61f48bf8ba951bb96e59e035bf79a584368151cbde81d53bff8943` | 12 | 19 |
+| `org/apache/http/impl/auth/KerberosSchemeFactory.class` | 0 | `4169ec2d996b5f3a5a64adf0d34cb23e18e31f8e596908bd31fbe9a0466e8b1e` | 2 | 7 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$MD4.class` | 0 | `46f371856e2839b74b9c2d9017475946171e0e95e0495094cb86007a787a2e63` | 6 | 7 |
+| `org/apache/http/impl/auth/NegotiateSchemeFactory.class` | 0 | `5074a5c63714127182c53e7418c98fb5574aaa1f7d3984d65f67d0a8f882b0f1` | 2 | 6 |
+| `org/apache/http/impl/auth/GGSSchemeBase.class` | 0 | `55b3cc181d266c5eefdb1d64c3bbf478ecb81d533ea629d51eb29e9a430bdb9a` | 6 | 14 |
+| `org/apache/http/impl/conn/tsccm/PoolEntryRequest.class` | 0 | `e1b9c0007b2b6bd35a35d330636a38a4bf9e3c1a534aa3288796db29c6aad27b` | 0 | 2 |
+| `org/apache/http/impl/conn/tsccm/RouteSpecificPool$1.class` | 0 | `96977260ae3c444b8a04aa8aa71b1e7a85c208d7745645abd7f77ab1e9ff5fdf` | 1 | 2 |
+| `org/apache/http/impl/conn/tsccm/WaitingThreadAborter.class` | 0 | `ec77b85a59a0f11ba936a609f241e3b4dae5d47acce4516de8baea6e45a18fe6` | 2 | 3 |
+| `org/apache/http/impl/conn/tsccm/BasicPoolEntry.class` | 0 | `f8586ed178705770812e0549b8cd3c78e2bdc64571c21a2324691ea57b7bf325` | 4 | 13 |
+| `org/apache/http/impl/conn/tsccm/BasicPoolEntryRef.class` | 0 | `af818582d9352777c15713a8cd49f217be2e6148d012f711b9084863110dbfd8` | 1 | 2 |
+| `org/apache/http/impl/conn/tsccm/RouteSpecificPool.class` | 0 | `03aa580d8c463d40c741c2b1f5d0c11ee46a738e6641cca5e629a9100fa2d4c4` | 7 | 16 |
+| `org/apache/http/impl/conn/SystemDefaultRoutePlanner$1.class` | 0 | `2a56528df1217e7a643caaea2822b0ae67d9339bf7ead4524cfaf4c6f4e0c981` | 1 | 1 |
+| `org/apache/http/impl/conn/DefaultProxyRoutePlanner.class` | 0 | `d2242818a1477da18e559183c4267d03f78c646dd5c3eac6bd4c461392b78ec3` | 1 | 3 |
+| `org/apache/http/impl/conn/BasicHttpClientConnectionManager$1.class` | 0 | `4e583725c44c0b0f6c08e5d6060acba557e85bf2c4545e5fb2c7877d7b4c2810` | 3 | 3 |
+| `org/apache/http/impl/conn/ManagedClientConnectionImpl.class` | 0 | `6fe7404ebfbcacc5b1b00053f763e03d0b31852bfa621bba49e51ba49589c34c` | 5 | 45 |
+| `org/apache/http/impl/conn/AbstractClientConnAdapter.class` | 0 | `5be3235395ca9c2f503388cd0c074bb41fe1c51e65b170bdf207cbe97443ca41` | 5 | 35 |
+| `org/apache/http/impl/conn/DefaultClientConnection.class` | 0 | `8138ab9eb39820f3b7e26ba665edc0e1024537aa84a4313d51f99da3161cdc14` | 8 | 20 |
+| `org/apache/http/impl/conn/LoggingSessionOutputBuffer.class` | 0 | `520740407dcd80291e6ea1c0d19038535c40ffe8c838f8773a07851ac75b1c40` | 3 | 9 |
+| `org/apache/http/impl/conn/HttpPoolEntry.class` | 0 | `f7d9bf457208d87e246fbfe76b0e6e0dfe3d39d9a924e1df6f5a883e3ddf52b4` | 2 | 7 |
+| `org/apache/http/impl/conn/InMemoryDnsResolver.class` | 0 | `03fd7e97fbeefa559822c5b823f5e5448ffa939e18f29902a7d18e80604c2294` | 2 | 3 |
+| `org/apache/http/impl/conn/CPoolEntry.class` | 0 | `f2fe97a87046f715fc18063639569b1d86b33c3fc047e447f7871bab380e78de` | 2 | 8 |
+| `org/apache/http/impl/conn/DefaultSchemePortResolver.class` | 0 | `8799322c8a50649916ef24bbcbafd9a57a1f07907ab10c3cf90046475452307e` | 1 | 3 |
+| `org/apache/http/impl/conn/ProxySelectorRoutePlanner$1.class` | 0 | `ed48a858acdd58e789a85031d7ae456442f30b159305386d9def876df44cbe15` | 1 | 1 |
+| `org/apache/http/impl/conn/SingleClientConnManager$1.class` | 0 | `4b02c748d6cef9078495bcfc2a0258755cd92534382818d07b0ea4b1b7a5b1f2` | 3 | 3 |
+| `org/apache/http/impl/conn/AbstractPooledConnAdapter.class` | 0 | `32c88da6e3bcc2c2f2a8b0205ccad216996e590cd8a39088c700fe4aa4a6a634` | 1 | 15 |
+| `org/apache/http/impl/conn/ProxySelectorRoutePlanner.class` | 0 | `ed15b3767f4fb2457c254982c31499f3cf74f122075854e69f156c1eec1a5261` | 2 | 7 |
+| `org/apache/http/conn/routing/RouteInfo$TunnelType.class` | 0 | `dcc988c24cc6e63687ee00d150aeafafffa2756545d7b3159a15c66760c8092a` | 3 | 4 |
+| `org/apache/http/conn/BasicEofSensorWatcher.class` | 0 | `725deaf7580157ea061ec9d371ee045bdb4b17ecf19be2ed3141cfaeafe12c98` | 2 | 4 |
+| `org/apache/http/conn/socket/ConnectionSocketFactory.class` | 0 | `35f3b7940f5c96317b513ef42d9136004a53a416f8ab0f47e9936a426e42bebc` | 0 | 2 |
+| `org/apache/http/conn/EofSensorInputStream.class` | 0 | `0d52bb52038ae1809a9ba00e1f343489a855a561439177a45f816dfc9be2682a` | 3 | 14 |
+| `org/apache/http/client/utils/CloneUtils.class` | 0 | `f9a92865b38ac95ca2e4311693095ba43020ced9f1987db44c87441a36e46b7a` | 0 | 3 |
+| `org/apache/http/client/utils/DateUtils$DateFormatHolder.class` | 0 | `35b841767a69629aa03faf9ff790983ca73386dc574d2d2ac8499407901904c0` | 1 | 4 |
+| `org/apache/http/client/entity/DeflateInputStream$DeflateStream.class` | 0 | `3e8a4b841eb42eaf4a0d3be8ff651b0adcec5ea6e63dcb2c3e9b1b305364d958` | 1 | 2 |
+| `org/apache/http/client/entity/GzipDecompressingEntity.class` | 0 | `651575cfea71f475355dc5311d5fe987de1e5eb93f6d6dc95da96fa991cc2421` | 0 | 1 |
+| `org/apache/http/client/entity/DeflateDecompressingEntity.class` | 0 | `d4f6d66bff282fa3cc8feae6fbb4d0c7670848b37b69306c6930f5f2fd9f3641` | 0 | 1 |
+| `org/apache/http/client/entity/UrlEncodedFormEntity.class` | 0 | `b119078bf8d5e4155f3b9e73a810b783c0b554b2843c6f4c8fe94973695ece90` | 0 | 4 |
+| `org/apache/http/client/entity/LazyDecompressingInputStream.class` | 0 | `8844a3becc5a4db7ccb5e29dba128278992c298fb9bb5efec15af963a85571f3` | 3 | 9 |
+| `org/apache/http/client/entity/GzipCompressingEntity.class` | 0 | `ed8520615e87bb162973b4b93e3e64e1fcfcd3d59ab1324103745cc406761195` | 1 | 6 |
+| `org/apache/http/client/entity/DeflateInputStream.class` | 0 | `5ba739fd4ac7533472cd54db2d0984ec78e0c0eab59937ce0b528dbc3ed2d5f9` | 1 | 10 |
+| `org/apache/http/client/entity/GZIPInputStreamFactory.class` | 0 | `9b758798e557a13bcadc545970bfc223a1f2ea485ce05c4384cea567fc2b8a9b` | 1 | 4 |
+| `org/apache/http/client/params/HttpClientParams.class` | 0 | `12d8c24c880fdbad2553dff29b47c8f49039cca042f7d33cc3b43e40458f6059` | 0 | 9 |
+| `org/apache/http/client/params/AllClientPNames.class` | 0 | `64c3a2f10197fd1643532040a62f0fd0de1d0f63104a8f1750a54281b9e473ba` | 0 | 0 |
+| `org/apache/http/client/params/ClientPNames.class` | 0 | `dab5da506b80c80db3698b8a492661fdfa155786ab45e35b4b968319b1b84448` | 11 | 0 |
+| `org/apache/http/client/params/CookiePolicy.class` | 0 | `18bb200cca12a158d7bfd581bddcb96933e63df81b5183a16537dced841e7fbf` | 6 | 1 |
+| `org/apache/http/client/params/ClientParamBean.class` | 0 | `55b19c7c4c39e56ca9fd2951416c84dacee80624b02f4639b71d6532086abeff` | 0 | 12 |
+| `org/apache/http/client/HttpClient.class` | 0 | `25188d6e4e0bbe71f26f0e841b2d60c773ea7d2e98185fbb6a0e6aaed88e6e12` | 0 | 10 |
+| `org/apache/http/client/ResponseHandler.class` | 0 | `330a3b77b4c6f3e3bda69e552e96bb437d8296ba7ba8925e118472ac5d2f8428` | 0 | 1 |
+| `org/apache/http/client/config/RequestConfig.class` | 0 | `cc7b117b1bce7c47167151e83b9b4af6a7bca8dcf67e713bd8ca7d3156c59610` | 18 | 26 |
+| `org/apache/http/client/ClientProtocolException.class` | 0 | `d89c2250fa68e6825fcffe6db31d2204329bf6a6719c860c7285bcdec001fdd6` | 1 | 4 |
+| `org/apache/http/client/RequestDirector.class` | 0 | `7ac1ab3faf172e272172b07d3c86556cf8f5c7fb551868b52dba7fd3e0029673` | 0 | 1 |
+| `org/apache/http/client/protocol/ClientContextConfigurer.class` | 0 | `ccfaf8c209f01693913ca5f504428aebf7faefa68c97bb43df4bb99be63eb86e` | 1 | 5 |
+| `org/apache/http/client/methods/HttpPatch.class` | 0 | `9d1377367f9d1c2b95d28daf7d2086d110eaff4236b8d06c66049c3fc242ad3b` | 1 | 4 |
+| `org/apache/http/cookie/CookieSpecProvider.class` | 0 | `5a2b26883186c162843397b0ce2423ea1bbd2508cbfbf2be87f869aace724c42` | 0 | 1 |
+| `org/apache/http/cookie/params/CookieSpecParamBean.class` | 0 | `0d15d60b98817add14b12303d8a857c64007e2c535b07a35c287be40f867f52b` | 0 | 3 |
+| `org/apache/http/impl/client/EntityEnclosingRequestWrapper.class` | 0 | `309c7ff3ba2202c4d4e331f26b6e4ffdb00f2d4b7e2c499f4e6bb649b066fd4d` | 2 | 6 |
+| `org/apache/http/impl/client/DefaultBackoffStrategy.class` | 0 | `4d10b9ca5ff3d647d4e47d76d30821a47773240a936d74c1af3d8c5327f71189` | 0 | 3 |
+| `org/apache/http/impl/client/AbstractResponseHandler.class` | 0 | `ed7f802283d3437b4fac9434cdbbfcfb64176d89dd0d0c3cebef2ee5de6531d8` | 0 | 3 |
+| `org/apache/http/impl/client/InternalHttpClient.class` | 0 | `2861ef5b28712884ed4259cdbc4f02529ca2e19f34fea74e288dfbb863d86e0c` | 10 | 9 |
+| `org/apache/http/impl/client/AuthenticationStrategyAdaptor.class` | 0 | `9e02a687f25e2264023e6eae6647f9f2af2feffb88dadc28f952b591515988fd` | 2 | 8 |
+| `org/apache/http/impl/client/RoutedRequest.class` | 0 | `38cb691a331fac9f1b219beed6b2b9678bfc426b1b05ee607e2e03000b547430` | 2 | 3 |
+| `org/apache/http/impl/client/BasicResponseHandler.class` | 0 | `b00b781d5251eb353dbe75ad8dac2736c3b7c470dca3b7d638a93ab9ad6dc908` | 0 | 5 |
+| `org/apache/http/impl/client/MinimalHttpClient.class` | 0 | `ccb5c0dc18c9f62349fbef32f8b5e55b70e66072d545cd003ab5fc54b0fd1a5a` | 3 | 6 |
+| `org/apache/http/impl/cookie/RFC2109Spec$1.class` | 0 | `948d964254a9f157348939410a17bad7ff3dcbbf6d36e302799b67ca4472b47a` | 0 | 2 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpecProvider$CompatibilityLevel.class` | 0 | `6420ece1f25fe06be4261669923a36e18dd297ebda9f9817827911da819d5703` | 4 | 4 |
+| `org/apache/http/impl/execchain/HttpResponseProxy.class` | 0 | `eae60cce8df4d60c6daf6ec7ec58fe7d4bcbf5f2527364e3856c0492e1afd28d` | 2 | 30 |
+| `org/apache/http/impl/execchain/ResponseEntityProxy.class` | 0 | `4c7680ff9cbb97fe2af98f27406970c23e75487a826c39e7ff43adc8a9a296cc` | 1 | 13 |
+| `org/apache/http/impl/execchain/RetryExec.class` | 0 | `4a83aea6c9f05a13e211a7ef9c26cfff68ca3d7984de3193219e3ca01ba266c2` | 3 | 2 |
+| `org/apache/http/impl/auth/NTLMSchemeFactory.class` | 0 | `731908c518adcc17f2d4bcac0bd9119f9495755ec9a9fb029512faf0dcca47e1` | 0 | 3 |
+| `org/apache/http/impl/auth/SpnegoTokenGenerator.class` | 0 | `2e4578be8f8b85e7ea7055474c9e7b9811758d6bdf99850340e3e0c73727a505` | 0 | 1 |
+| `org/apache/http/impl/auth/NTLMEngineImpl.class` | 0 | `bcf1abb3800c2a3056128c030ad1143f28f7c3a425d2f4cbc8fcdf06d79c31bc` | 40 | 65 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$Mode.class` | 0 | `07586262edddde3c15061948a5c261566a09ac4851a155050d9bac62fa73e5ee` | 3 | 4 |
+| `org/apache/http/impl/auth/HttpAuthenticator.class` | 0 | `fd8b3261ca2bba15a2578f74990c72a7c0fb95c40b5cff8971cce38d47960b9e` | 1 | 7 |
+| `org/apache/http/impl/auth/NegotiateScheme.class` | 0 | `eb28b1a9c6e278305e3530fb5f3bea4ba7910768cc9f8491c032ef57b26e29a7` | 4 | 11 |
+| `org/apache/http/impl/conn/LoggingInputStream.class` | 0 | `4978e38655cc67cf2e351b0f48e5370eb842d8f9ebaebd959deb26843df8639f` | 2 | 10 |
+| `org/apache/http/impl/conn/DefaultHttpRoutePlanner.class` | 0 | `e6632f6ef0ecf746f29426c9ba08afb6b230f9c0c8321ca43c61fd2d4ea1d022` | 1 | 2 |
+| `org/apache/http/impl/conn/tsccm/ThreadSafeClientConnManager$1.class` | 0 | `b25680bbb4049c79d72f7543dab35dccaae30137bdfd58f1678ff22a4c172c09` | 3 | 3 |
+| `org/apache/http/impl/conn/tsccm/ThreadSafeClientConnManager.class` | 0 | `7ad6a124b028bd441795c61eb30225ac19ecae5fc1fbe94a8c37456934a2fec8` | 6 | 24 |
+| `org/apache/http/impl/conn/tsccm/BasicPooledConnAdapter.class` | 0 | `220617ae0b4365d7bd21b452dd62918c88cdef1d5b64ca93b62b121f66e5cf8f` | 0 | 4 |
+| `org/apache/http/impl/conn/tsccm/AbstractConnPool.class` | 0 | `a72c03e967320b88d46d85b4e4f10cbab01c7c6461c01df50dfe44d846780e64` | 8 | 12 |
+| `org/apache/http/impl/conn/PoolingHttpClientConnectionManager.class` | 0 | `5d6e0a982e9135315952006c9097070c6eb41957054ca04d9e242c4821d500e4` | 5 | 52 |
+| `org/apache/http/impl/conn/HttpConnPool.class` | 0 | `fd735956705aadc1858f63c20facb0553d317b065301415ec9f4b55d2cd9bcf0` | 4 | 4 |
+| `org/apache/http/impl/conn/ManagedHttpClientConnectionFactory.class` | 0 | `64995a5485b444d0dd090fbd404c2994dbd1931d0d80383883ec249e46dcaf00` | 9 | 7 |
+| `org/apache/http/impl/conn/SingleClientConnManager.class` | 0 | `11ca806a757bd8c2470c8f69bef261b37f15f98b3cbeb003c757456253d2db4f` | 10 | 14 |
+| `org/apache/http/impl/conn/LoggingSessionInputBuffer.class` | 0 | `08b1171db62a301b8b298f70e8fcfc22f4d6ada048d5b935983802e27cb61c4f` | 4 | 10 |
+| `org/apache/http/impl/conn/PoolingHttpClientConnectionManager$InternalConnectionFactory.class` | 0 | `27172b85696989fc99366800ddaa248cd9e670d56a4e553b197b4de5eb2d1328` | 2 | 3 |
+| `org/apache/http/impl/conn/BasicClientConnectionManager.class` | 0 | `acc747426e4623660267a451901b1ee2a82fdc3500a10b780fc9d4091b86c248` | 8 | 14 |
+| `org/apache/http/impl/conn/IdleConnectionHandler.class` | 0 | `7a71d6c8e85c237bbe13d3c7a25f3e9eee5345a7566229140414a9300e680df7` | 2 | 6 |
+| `org/apache/http/impl/conn/SingleClientConnManager$ConnAdapter.class` | 0 | `a512d03b5b5ea6a75661e80df8032eebd6c94444d9f05612fe389b389be1cb34` | 1 | 1 |
+| `org/apache/http/impl/conn/AbstractPoolEntry.class` | 0 | `46f9b74b5a4117f79262ef261fda1b95285073d6b6bee1dde148389f57cc747e` | 5 | 8 |
+| `org/apache/http/impl/conn/DefaultHttpClientConnectionOperator.class` | 0 | `e5756a132ead04699320f699ae92572f3fb4b69a890648c8a8b67fb8f672ac55` | 5 | 4 |
+| `org/apache/http/conn/routing/HttpRouteDirector.class` | 0 | `c386499c42ff3e5295c09e610b74c5070a8ddc7200465120cba96715b2567d6a` | 7 | 1 |
+| `org/apache/http/conn/MultihomePlainSocketFactory.class` | 0 | `ed32836deff5abe7f3de2948e2f7c95f3c4515ab9840847e0488df9709fea109` | 1 | 6 |
+| `org/apache/http/conn/ConnectTimeoutException.class` | 0 | `09c97097f8d5425900e8bce3053291d38a24e01d263e36bda6608f7186df1a0b` | 2 | 4 |
+| `org/apache/http/conn/ManagedClientConnection.class` | 0 | `c14ca8524afea86d81a4049a91a535c8cf9e09cbd7226539676018b80d6cdd28` | 0 | 13 |
+| `org/apache/http/conn/HttpConnectionFactory.class` | 0 | `ab1114c5170777c315c1dbeea04decc072e2b42cfe596869fbd61d5362ea16f2` | 0 | 1 |
+| `org/apache/http/client/utils/URLEncodedUtils.class` | 0 | `33a534bf18cd4cc83197584fc253b5d1ab18016da4050a4d94720d90cb4ed964` | 15 | 31 |
+| `org/apache/http/client/CredentialsProvider.class` | 0 | `efbf441e9b21389ec8ea72110126638f272b6a9cf0fc5085f39020593fdbcc24` | 0 | 3 |
+| `org/apache/http/client/methods/HttpUriRequest.class` | 0 | `1875635176ab40dcb0f3126f36f55b91ea52ad4fb708b948e864a96edc0a8275` | 0 | 4 |
+| `org/apache/http/client/methods/AbortableHttpRequest.class` | 0 | `0b3be50f99eb78f9ed4abba325172ca05d6869697c592cba9a00e6724d89fc8e` | 0 | 3 |
+| `org/apache/http/client/methods/HttpEntityEnclosingRequestBase.class` | 0 | `6926d432a26dfa4e62c86b24e9c951c2efa696d14ea0aa4db5fc93f97ad0eb18` | 1 | 5 |
+| `org/apache/http/impl/client/AbstractAuthenticationHandler.class` | 0 | `f4072f1108659b5d8fff44aff2e24c6d29dc82c9eed591471243f24c4b7a792b` | 2 | 6 |
+| `org/apache/http/impl/client/RequestWrapper.class` | 0 | `a7088b0673999ff4a83e33c536bcd8756db5785ecabbd2f40e61c4c3132e4077` | 5 | 15 |
+| `org/apache/http/impl/client/AuthenticationStrategyImpl.class` | 0 | `fa66000d24f411118ec03cb58a193fba00d803d6e3d0ed778573ea9f6e2ef38f` | 4 | 9 |
+| `org/apache/http/impl/client/DefaultClientConnectionReuseStrategy.class` | 0 | `b0f20dd73e566cae79b641e7001e81da39a6d7122d44628be47efaa735119d64` | 1 | 3 |
+| `org/apache/http/impl/client/ProxyClient.class` | 0 | `9ff8857dbcf3652b72ccdbb6d196798db3070dcc146c2147ade876792567b71e` | 10 | 7 |
+| `org/apache/http/impl/client/DefaultHttpRequestRetryHandler.class` | 0 | `5d9fee83c33ffabeecc6641ebce10cbe00ff17be37f8101419c0f1a164705700` | 4 | 9 |
+| `org/apache/http/impl/client/FutureRequestExecutionMetrics$DurationCounter.class` | 0 | `9bdcca94c4efdbfcad5813ff8dd5d549eebbce7e63e7397a73854e55b2b045dd` | 2 | 5 |
+| `org/apache/http/impl/client/HttpRequestTaskCallable.class` | 0 | `6d3e37594a6991a6deb5af628485320c334b99b9af954db305cbe11fd3496575` | 10 | 6 |
+| `org/apache/http/impl/client/IdleConnectionEvictor$DefaultThreadFactory.class` | 0 | `24b83abb8052da6547db02f285a9060f3fb5e9230abc09d020c84187615472f3` | 0 | 2 |
+| `org/apache/http/impl/client/BasicCredentialsProvider.class` | 0 | `bd0cc362a5643e742f1d897fd92c9705e504e58a95a190f7c225d3a4b58f72c5` | 1 | 6 |
+| `org/apache/http/impl/client/HttpAuthenticator.class` | 0 | `58a17e4815e998de582b824890aeaa9cc504435d1b9fbdb01f287273c29ccb9f` | 0 | 3 |
+| `org/apache/http/impl/client/StandardHttpRequestRetryHandler.class` | 0 | `d526308683969b538f71861dab930a0279d8af8ac74fb8dec85faeb8b712d18f` | 1 | 3 |
+| `org/apache/http/impl/client/TargetAuthenticationStrategy.class` | 0 | `6ce3ff6ed07df31db167d9fa5ce9042971be46ac9962b03911c26174a9a9e27b` | 1 | 8 |
+| `org/apache/http/impl/client/DefaultServiceUnavailableRetryStrategy.class` | 0 | `8dc537a3e33f7f008267264491a7d57a870114aa1ec1cbc17573d38e0c921043` | 2 | 4 |
+| `org/apache/http/impl/cookie/BasicMaxAgeHandler.class` | 0 | `ec6ed0fb6f7a3473ed251fafd10a873d0ee9d72d53e073231d0a27e1a70a65c9` | 0 | 3 |
+| `org/apache/http/impl/cookie/RFC2965Spec$1.class` | 0 | `04e39195e7ef0d9785c4a21344309af05df95fd0c7dd696159d5411d7912aa2a` | 0 | 2 |
+| `org/apache/http/impl/cookie/RFC2965SpecProvider.class` | 0 | `2edc252cfab724a36fb6dc1f93325f37f00de739280380b25bdd8ea1939b1d69` | 3 | 4 |
+| `org/apache/http/impl/cookie/CookieSpecBase.class` | 0 | `26abce2dc7e7e90f30f9a485cfc3b751f4673e67602ec8431bd020fff61dbb77` | 0 | 8 |
+| `org/apache/http/impl/cookie/IgnoreSpecProvider.class` | 0 | `cd7d4fb2bdd1a47db20c8d6724b3329d1d95c1d49a16e5c653754b4b9d5e5a28` | 1 | 2 |
+| `org/apache/http/impl/cookie/RFC2109DomainHandler.class` | 0 | `5ad06663f4afbc3c0faa43ccd9a268228d177b60e8108c5b3b483e2790b4e910` | 0 | 5 |
+| `org/apache/http/impl/cookie/BasicCommentHandler.class` | 0 | `bd1c8da3ab05fe05272fcbee8fceddc78ec943cdb65e6afac8667e214088a53b` | 0 | 3 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpec.class` | 0 | `bce5ae0bb1f4fcee2ecdffc61b46983af0dddd3e3455ccb59608bf4a3e03a82e` | 11 | 12 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpecProvider$2.class` | 0 | `00b973d912f2a5f425d02f570851995391f1b6d7eae9227cbf4f466d827778a6` | 1 | 1 |
+| `org/apache/http/impl/cookie/DateUtils.class` | 0 | `bde791f9d7e07daff33d18b5be9573a5b7098a172c7fc43340b3787103d81a76` | 4 | 7 |
+| `org/apache/http/impl/cookie/BestMatchSpec.class` | 0 | `10bcd9fe47a2da4b24380428a6849ecf44496b5924335dd3e4a162cab1097c27` | 0 | 3 |
+| `org/apache/http/impl/cookie/BrowserCompatSpecFactory.class` | 0 | `ef6f8bba30f3f6d9306f8b7b8c0d7effefa34efe522e88d2d80df7d1aa77b892` | 2 | 5 |
+| `org/apache/http/impl/cookie/RFC2965VersionAttributeHandler.class` | 0 | `306c0b6f068bd6efa5141cdd1f34ed5072829c83b89979a7f1807ed6b37be5cd` | 0 | 5 |
+| `org/apache/http/impl/cookie/RFC2109SpecProvider.class` | 0 | `4103e031a99cfc925cd246dc5c22dc21da1d28c8096b6d2f5a8b7312a293bd33` | 3 | 4 |
+| `org/apache/http/impl/conn/IdleConnectionHandler$TimeValues.class` | 0 | `e7a901c9ee1a4afa282419371671a53b6e37abc86ab27f7a313086055b0921f4` | 2 | 3 |
+| `org/apache/http/auth/MalformedChallengeException.class` | 0 | `7dde1f1dd561b5605108ac4c2dd67f7563766686f2a8356cd39fa9b09ef624a1` | 1 | 3 |
+| `org/apache/http/auth/NTUserPrincipal.class` | 0 | `b077aa35747aacfc4a0d614158a151868e41459c31c0079dd5b2d5236eb81e92` | 4 | 7 |
+| `org/apache/http/auth/params/AuthPNames.class` | 0 | `51c04262cd9cf4e4d65d3c143da95f2dfe11d17303a2a667530d41d49944f4c9` | 3 | 0 |
+| `org/apache/http/auth/params/AuthParams.class` | 0 | `1911358b80d3f0a600428efd1c4a40ed76854277b1bafc18be854459576c585e` | 0 | 3 |
+| `org/apache/http/auth/AuthOption.class` | 0 | `fbd8492aca789d9b3d1f9d0d33fa7f05b5bc1cb04153a00464d658c45ada51c8` | 2 | 4 |
+| `org/apache/http/auth/AuthSchemeRegistry$1.class` | 0 | `0ce9df51bd7842e4335258f61494f3dbb5697286bf1128552f05e036c079dd49` | 2 | 2 |
+| `org/apache/http/conn/ClientConnectionRequest.class` | 0 | `e5c6fa3148217de65d4edbe8e39d64f990cec755ce45569b78b0be6329378afd` | 0 | 2 |
+| `org/apache/http/conn/ClientConnectionManagerFactory.class` | 0 | `334b16b1fb0f48c497b6fbe27a7c743a36951817b45730d81173e5261f6a2127` | 0 | 1 |
+| `org/apache/http/conn/util/PublicSuffixListParser.class` | 0 | `5e90c48a1f7faacc0a907a1ec7b2bbfe912e13ef0f74bad58213725cd1c6ac12` | 0 | 3 |
+| `org/apache/http/conn/ssl/NoopHostnameVerifier.class` | 0 | `5b64a59e06ab837554381cf6832c7f1f38ffe83b146d0effbff65824ddf93c20` | 1 | 4 |
+| `org/apache/http/conn/ssl/AllowAllHostnameVerifier.class` | 0 | `6a16dd01fbbede2392cbb6aa54c50cfa723ced55e42975f413d96939bf83ae70` | 1 | 4 |
+| `org/apache/http/conn/ssl/SSLContexts.class` | 0 | `c7841c8fcf6b56891e184e3642b6a1985331351cd51751fc2e9dd70c30c46145` | 0 | 4 |
+| `org/apache/http/conn/ssl/SSLConnectionSocketFactory.class` | 0 | `82757ca04817f966b3e82055ad789240f3f810ce4d0bb6f9845df0aa30ccc66e` | 14 | 20 |
+| `org/apache/http/conn/ssl/SubjectName.class` | 0 | `3eaa0546d9aafeace556c9cc253ac7fbccdf11df3a46bb279479b875f2c89179` | 4 | 6 |
+| `org/apache/http/conn/params/ConnPerRoute.class` | 0 | `dce789f4ea114f9f48c6097b5d6f3846902eccd125a4beb622355b0b7db1626b` | 0 | 1 |
+| `org/apache/http/conn/params/ConnRoutePNames.class` | 0 | `094e56512de75dba7ca52f9f6180b27b07cdae2a6c02861eec565869efeac720` | 3 | 0 |
+| `org/apache/http/conn/params/ConnConnectionPNames.class` | 0 | `67558346679a603b6f04f4b8d96a4ea4af788ffa784964669794454eadd2106f` | 1 | 0 |
+| `org/apache/http/conn/params/ConnConnectionParamBean.class` | 0 | `58c87808e46ac6b168d82286a1f694a037cd3f90f2bf58b1e40d3c2567a016fd` | 0 | 2 |
+| `org/apache/http/conn/scheme/LayeredSocketFactory.class` | 0 | `5638f39d4d81bc9fc158e434bbcd425f4334f3a10c0f115f8219db529e5bfa5b` | 0 | 1 |
+| `org/apache/http/conn/scheme/HostNameResolver.class` | 0 | `a13ee96da2920162ec70294f15c6d6f203dca411690b710f9c3539c843933532` | 0 | 1 |
+| `org/apache/http/conn/scheme/SocketFactoryAdaptor.class` | 0 | `1fecae257bb01c5df9869804287cb42063b75645329bb4d13aac4e7f88c38e31` | 1 | 7 |
+| `org/apache/http/conn/scheme/SchemeLayeredSocketFactoryAdaptor.class` | 0 | `2b13f5197217edffd97e273caec08f196d216abe35364e7c89f93f85d920047e` | 1 | 2 |
+| `org/apache/http/conn/routing/RouteInfo.class` | 0 | `88d19ea1b07b19d12d18d3812ec18b8f4a063f234bd0220f24ca159f2fb7ef1c` | 0 | 10 |
+| `org/apache/http/conn/routing/RouteInfo$LayerType.class` | 0 | `ca4b130599a708ef2d56d312a7366853d51b6e1ba781c64e2bfea8df601e801a` | 3 | 4 |
+| `org/apache/http/conn/routing/RouteTracker.class` | 0 | `a6d64f7e16ec5ca83e922cf7f959b64f3c78ec05518347808bae8b59bc4a8623` | 7 | 24 |
+| `org/apache/http/conn/socket/PlainConnectionSocketFactory.class` | 0 | `da0b7d98374a1f6607fba7abb60ab102b2d05d72add05d8774b236aa16c36a57` | 1 | 5 |
+| `org/apache/http/client/utils/DateUtils.class` | 0 | `94b3faa401386e17ffebd0a836258fd949a0db0f6c422630e507f26001983965` | 6 | 8 |
+| `org/apache/http/client/UserTokenHandler.class` | 0 | `19c7858683f0acff91f67ba211e2051c9fc21d3abe56504be6ee4519565a671d` | 0 | 1 |
+| `org/apache/http/client/protocol/RequestClientConnControl.class` | 0 | `62e809d5d20846439d4d41c23736165c94f32ec5145cb0c0f468e1c8a623a29c` | 2 | 2 |
+| `org/apache/http/client/methods/AbstractExecutionAwareRequest$1.class` | 0 | `85141105be1fea76aa51a06fa7cf56aea132ceecb6f105ecd2f93171be709003` | 2 | 2 |
+| `org/apache/http/client/methods/RequestBuilder.class` | 0 | `61b51ce38effcf40409930fba2e6d286db7fe54576e57baa8737b05aafca364e` | 8 | 58 |
+| `org/apache/http/impl/client/NoopUserTokenHandler.class` | 0 | `5589a58362d4cc115cf7b2e5113e9f3e6d708b76be8ee207b4a27335374a8a2a` | 1 | 3 |
+| `org/apache/http/impl/client/ProxyAuthenticationStrategy.class` | 0 | `1e1f7499e113804de9f5ce87ebecffed1037f2b8fb157d7f2e7d2fc2b9b24b5e` | 1 | 8 |
+| `org/apache/http/impl/client/HttpClientBuilder.class` | 0 | `e8e45d6b8e6c2a155d86d7c28ffdd2eea50029034fd0ca7399955e1b0fa0251e` | 53 | 60 |
+| `org/apache/http/impl/client/LaxRedirectStrategy.class` | 0 | `951152e7ffa25c294fdb13891e0459810149ece80d61e63784c4b6ce2c6068fd` | 1 | 2 |
+| `org/apache/http/impl/client/DefaultHttpClient.class` | 0 | `bed7e73d04e6379e2ffc402fbbed1105d706ab4fb3999149c1cbd73fec5f22e4` | 0 | 7 |
+| `org/apache/http/impl/client/IdleConnectionEvictor.class` | 0 | `d0395ad9d8c5d01778a4b1aea5030407f59b1d9e3250532685a7e782bdf427e2` | 6 | 10 |
+| `org/apache/http/impl/cookie/RFC2109Spec.class` | 0 | `d7bbf2f07d56c471b908cbde68195d663083a30c7e9eee39b18f04282b8e5e41` | 2 | 14 |
+| `org/apache/http/impl/cookie/PublicSuffixDomainFilter.class` | 0 | `30d1508f24e7978dcf0ee612ba0751f89eec8d5b8dfecac5a59975432f8c3108` | 3 | 8 |
+| `org/apache/http/impl/cookie/LaxMaxAgeHandler.class` | 0 | `6ad4f738e86c7f9d53d30a3c9b6b6933bd71214df00f7a5da54231e64fda9b17` | 1 | 4 |
+| `org/apache/http/impl/cookie/RFC6265CookieSpecProvider$1.class` | 0 | `176dc15b0f3dc0f3c360a56573cedb630243e417da67d272f9a463f74bfdf201` | 1 | 2 |
+| `org/apache/http/impl/cookie/NetscapeDraftSpec.class` | 0 | `4e4d4a7185648d051ed3a538cd4029563a3bd47caa5d85c8b05fb18203b40d1a` | 1 | 8 |
+| `org/apache/http/impl/conn/ConnectionShutdownException.class` | 0 | `01645ceafd784b1497ad465f50840e9a3160ded8509e7d8c82937ff9156ab155` | 1 | 1 |
+| `org/apache/http/auth/NTCredentials.class` | 0 | `7e7452d908c3101b5a91ffd900e61c601bdc4d9d30d10fa547893778a33642c1` | 4 | 10 |
+| `org/apache/http/auth/AuthProtocolState.class` | 0 | `7c482a86451a89d9f777851ae431d1e3ef95bcff426aa2faa9b7c8ed33d748ef` | 6 | 4 |
+| `org/apache/http/auth/KerberosCredentials.class` | 0 | `2c0fc73f01c01a4842282baaaf395dfe652bf1200d9ade734861e868a195ec92` | 2 | 4 |
+| `org/apache/http/auth/InvalidCredentialsException.class` | 0 | `9b8bfc51fa15d2ad4d866b1bf8dd9c7f6c32c09f27ee0bf749ab0670d328742c` | 1 | 3 |
+| `org/apache/http/auth/UsernamePasswordCredentials.class` | 0 | `46cedc4f095f1c9878b6f982221280c2fb294053af5bd24ec83f6b66e2c12856` | 3 | 8 |
+| `org/apache/http/auth/AuthState.class` | 0 | `549db1633617b4a6ad9ad10fc4fbb7b8a5eae0ffd26bbfeb384582bcd68a4d72` | 5 | 18 |
+| `org/apache/http/conn/util/PublicSuffixMatcherLoader.class` | 0 | `6548bca4defcf40ac8f1abdbf35de524fd371092ddb9b364337844b145ce378c` | 1 | 5 |
+| `org/apache/http/conn/util/PublicSuffixMatcher.class` | 0 | `fc8e6209622297018762742257e1bd71f87a1343c9739b674f2cce717da0babe` | 2 | 9 |
+| `org/apache/http/conn/ssl/DefaultHostnameVerifier$1.class` | 0 | `bd7fc2c825f372f65f73b8369bb8a43c8a0bb7572179417429196d1bf37aa87d` | 1 | 1 |
+| `org/apache/http/conn/ssl/SSLSocketFactory.class` | 0 | `612e302ae705c4ec9e3cbc733eb6c91267b54e7e92cd55159a4911e6f412103e` | 11 | 34 |
+| `org/apache/http/conn/params/ConnManagerParamBean.class` | 0 | `3afb79b70ea76ffd0ab8c5d2f09bda2552f59b569a185e33c193cc5994f89732` | 0 | 4 |
+| `org/apache/http/conn/params/ConnManagerParams$1.class` | 0 | `b019d80e1965cc5f8bd22e4615ca68426712877c7d8e7ebfaed332866e8cc085` | 0 | 2 |
+| `org/apache/http/conn/params/ConnManagerPNames.class` | 0 | `94e963ff5c4a95cce827656586da6d24f5eadda11bac21d90da6dbac2e8f7219` | 3 | 0 |
+| `org/apache/http/conn/params/ConnRouteParamBean.class` | 0 | `07b6f51e6a61ef47534fb05f41f2d8e985243e0c0ce37cbb067aa618bab4719f` | 0 | 4 |
+| `org/apache/http/conn/scheme/LayeredSchemeSocketFactory.class` | 0 | `a2536cf40e26c33189ae9a7bd02b006fcadf28b9e11047af3ac27465ba756122` | 0 | 1 |
+| `org/apache/http/conn/scheme/Scheme.class` | 0 | `1ba67cdc072bbf3cea42bee1c088a3fec8686d1d6524586864d9f25f8eafcdfd` | 5 | 11 |
+| `org/apache/http/conn/SchemePortResolver.class` | 0 | `1eacd277353b77e025f09f051f33b1a1c0d53acaff78e3441bdfad985c2085cb` | 0 | 1 |
+| `org/apache/http/conn/routing/HttpRoutePlanner.class` | 0 | `3c1e88a960f87e0f01d408cf1c4dab3ac56bc1e2afb41c3e8edb0522b8867596` | 0 | 1 |
+| `org/apache/http/conn/ConnectionReleaseTrigger.class` | 0 | `a4d21528c0a4c4f6cbe19e0b7d5d463a8a969c6792fc40ddd4894fe81ebd194d` | 0 | 2 |
+| `org/apache/http/conn/UnsupportedSchemeException.class` | 0 | `12266c458689dc2dbca6830a60f27118bae26ac3277444b45741ae186dfcdafa` | 1 | 1 |
+| `org/apache/http/conn/DnsResolver.class` | 0 | `bc8a5e66027d5d361373301fa728b36cc38a5694fea623f15d7f73575fec40ff` | 0 | 1 |
+| `org/apache/http/conn/OperatedClientConnection.class` | 0 | `c70915aa71d7dd7edd296055fb6a6a5669ef37c414005ba3f5524b7b53e0efae` | 0 | 6 |
+| `org/apache/http/client/utils/HttpClientUtils.class` | 0 | `83dc6a5e083be1a1eec533c9eb5eb9694efd3ccaa5b340b82204da539a7d1af5` | 0 | 4 |
+| `org/apache/http/client/entity/InputStreamFactory.class` | 0 | `8d4e8bd66e842ce2cd292521996448256cb7ca0ac18f4d974acbbe23c0242faf` | 0 | 1 |
+| `org/apache/http/client/protocol/RequestTargetAuthentication.class` | 0 | `a9cdd87d12d9de73264f568f5bb62f79eaf1287e86e22c3758ba772ed068d065` | 0 | 2 |
+| `org/apache/http/client/protocol/ClientContext.class` | 0 | `e8d326987d2814e77f68dc2bc9fcf1c1aef58da996777d9a39cffc72051db223` | 15 | 0 |
+| `org/apache/http/client/protocol/RequestAuthCache.class` | 0 | `f8c5a4e602b8e8e762d180024186e40d3cf250a38ed26334a64be3d34af07f2d` | 1 | 3 |
+| `org/apache/http/client/protocol/ResponseAuthCache$1.class` | 0 | `8271f0f88af96619ef0f41f8ee2debfe53fbdbc56b01771461e5cfc541b0828d` | 1 | 1 |
+| `org/apache/http/client/protocol/RequestProxyAuthentication.class` | 0 | `df24e83353829dc170505f08c0e00ec64c64bb8ddea5f3d8b39fcccca0a4a387` | 0 | 2 |
+| `org/apache/http/client/protocol/ResponseProcessCookies.class` | 0 | `1c38e08e579b85f8c08c4dfc9a8255bb622004eb27b0a1613f73e6b677c9f12b` | 1 | 4 |
+| `org/apache/http/client/methods/HttpGet.class` | 0 | `f7069268b411bc93f4cbb18597307bf449be3a279ac61b791571d19edcc4f301` | 1 | 4 |
+| `org/apache/http/client/methods/HttpRequestWrapper.class` | 0 | `d824fdb313d84112eb7cfa3d356d4d532bfab63f148d45454ec9b92157e59cb6` | 6 | 16 |
+| `org/apache/http/client/methods/HttpTrace.class` | 0 | `9c0da1fe5bb18b00318794cc5fe901adc5b845dfc8e7b7a30db111cae20596f3` | 1 | 4 |
+| `org/apache/http/cookie/params/CookieSpecPNames.class` | 0 | `662e1fd25a094d03c56b3b2f0c71db4f67ec547f6ff1526ca59607cc8d109198` | 2 | 0 |
+| `org/apache/http/impl/client/AIMDBackoffManager.class` | 0 | `bfe433daa735f023b08c61fa7439bac91d2e5c20cb36088b8c1f4588761ef95e` | 7 | 9 |
+| `org/apache/http/impl/client/DefaultTargetAuthenticationHandler.class` | 0 | `7beca53b4a33a1acad23131445137713002b71ca98c873abb199aacce1d2a17f` | 0 | 4 |
+| `org/apache/http/impl/client/SystemClock.class` | 0 | `5d9e8d464ccaa3c3781d1e4fb9730fc1cfffedb9d77f1c88f950956879f1c758` | 0 | 2 |
+| `org/apache/http/impl/cookie/BasicClientCookie2.class` | 0 | `b95b692089bbebbe009bc68cd53487b6dccb755bbbc269aae7b01882703b394b` | 4 | 9 |
+| `org/apache/http/impl/cookie/RFC2965Spec.class` | 0 | `4f959003dfec0da84f968e3162d00df95b0b5b693412e337700a786d8c5c2431` | 0 | 13 |
+| `org/apache/http/impl/cookie/RFC2965DomainAttributeHandler.class` | 0 | `536f1a6daf3d327b5f327e5347005b0666f8f1e418bc025fd08979b628ea016f` | 0 | 6 |
+| `org/apache/http/impl/cookie/RFC2965SpecFactory.class` | 0 | `a9c5ff33a2a3116b08794e93ea13dd89c00a20b444e187722adb85c44c4add7c` | 1 | 4 |
+| `org/apache/http/impl/cookie/RFC2965PortAttributeHandler.class` | 0 | `1813a4a134e13d39336c63598577625d540e0274a56539861454ceb2d0624d81` | 0 | 7 |
+| `org/apache/http/impl/cookie/BasicClientCookie.class` | 0 | `8c40a889df342e3e39b5f8160e375753fa798ecf9795b8ba7b979f8c6c07b0ed` | 11 | 28 |
+| `org/apache/http/impl/cookie/RFC6265StrictSpec.class` | 0 | `823855cbe2f7992232354ca44b0b50e9c931cb83fd5f1f824802f908faa0ff06` | 1 | 4 |
+| `org/apache/http/impl/cookie/DefaultCookieSpecProvider.class` | 0 | `94d113b26e9cf1fd630a22b5afed8fdbda212c8dc11a8b6b55d86d4b84afde79` | 5 | 5 |
+| `org/apache/http/impl/cookie/BrowserCompatSpecFactory$SecurityLevel.class` | 0 | `63ee29823190c12197a4a013938f47561a977969488c58d994634d70edfa6dd2` | 3 | 4 |
+| `org/apache/http/impl/cookie/BestMatchSpecFactory.class` | 0 | `86c8ea8c6e9d70f14dc2a67dede788d2be160daa97197d9074bfed5a5674c396` | 1 | 4 |
+| `org/apache/http/impl/cookie/NetscapeDraftSpecProvider.class` | 0 | `c3d7fa717cf0ef1c25452fd3c8ba49e92bbbec5462a49d5688aa5930f2db7da9` | 2 | 3 |
+| `org/apache/http/impl/cookie/BasicDomainHandler.class` | 0 | `9cf6ac3d7efe6e5ee3bba994e14b888513c7c419251d2085c9f6047026d590fb` | 0 | 6 |
+| `org/apache/http/impl/execchain/ServiceUnavailableRetryExec.class` | 0 | `158da610c65d06953dc7de34a263ce6681b0952253ec26ce06089fab0b572843` | 3 | 2 |
+| `org/apache/http/impl/execchain/ClientExecChain.class` | 0 | `05e3eb24c13714f297bcec6b6bfcfd8b1134e5bd679e21202c6578991e880335` | 0 | 1 |
+| `org/apache/http/impl/execchain/RedirectExec.class` | 0 | `d542ed01e2ad84fdddba65a8b37abc3bd0df3aea7a770db013e03d08a7a231c7` | 4 | 2 |
+| `org/apache/http/impl/execchain/MainClientExec.class` | 0 | `1ef8c8ea2ee04c30b67425f144a2d94035fa03a423113ebec8c0c55471f594ff` | 11 | 7 |
+| `org/apache/http/impl/execchain/RequestEntityProxy.class` | 0 | `93334edbef9e2ad0e16c7a2149df1ad539b679ec526e1888db62d4232a24ab16` | 2 | 16 |
+| `org/apache/http/impl/execchain/TunnelRefusedException.class` | 0 | `b70f9a820f904e49acbe66f8494c5014189d326039a3a513f5a0520df42c4b48` | 2 | 2 |
+| `org/apache/http/impl/execchain/ProtocolExec.class` | 0 | `7777b1a20ec799a477e8344d27382f898c928e4ba46a47bab37247081e997907` | 3 | 3 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$Handle.class` | 0 | `d558f0447c872484e27c434eb5dbe6e232b4bfa85db22ab9c79c39982fd96251` | 7 | 11 |
+| `org/apache/http/impl/auth/HttpEntityDigester.class` | 0 | `faf7e84b2120d7be583c031a921a58953393e46386be89a961241b6cc017d934` | 3 | 5 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$Type1Message.class` | 0 | `302f77ce99b1f2927d4dd35cc04f3cdbc8a240b4554db0b64fe3832c096baefb` | 3 | 5 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$NTLMMessage.class` | 0 | `3a3562c56c984b799dbd06e86887ef301f9da979bd8f8a92ae7ecd7a239f3440` | 2 | 18 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$HMACMD5.class` | 0 | `5af4d3e79cedf2329475e335132557887d87085ffec644a02d74913b90eba3a7` | 3 | 4 |
+| `org/apache/http/impl/auth/KerberosScheme.class` | 0 | `6783d31cdd5f0c4699bdfebae2d538c01f8f6a773041425d3db36323724b17a2` | 1 | 10 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$Type3Message.class` | 0 | `80cecfc7f9942cada6cf2463cbcc7928673af62079a4ea1d9f4984de875748e7` | 11 | 8 |
+| `org/apache/http/impl/auth/DigestSchemeFactory.class` | 0 | `9d51738714af4ef91bfc3f6a9a2161d6ff651061fa14ddce1950ff925e9868da` | 1 | 4 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$CipherGen.class` | 0 | `550c4139f8e079b9161432ca96cecb2f8989cb1741df4adddbb49cd6eecf2486` | 28 | 24 |
+| `org/apache/http/impl/conn/LoggingManagedHttpClientConnection.class` | 0 | `58a71b41d26c78fe46c2f48b328ae0bcdd8c4ff9de7c79e5df578b735e20a836` | 3 | 8 |
+| `org/apache/http/impl/conn/tsccm/ConnPoolByRoute.class` | 0 | `4c8d6d79da518ca95fdbff7791436ac6af030f494626685f540d91274665fe2d` | 13 | 29 |
+| `org/apache/http/impl/conn/tsccm/WaitingThread.class` | 0 | `68d74ce878db1ef42574e5a4c0aba212bbfb3e642cceb3bcb9d2b13ebe33ff2f` | 4 | 7 |
+| `org/apache/http/impl/conn/BasicHttpClientConnectionManager.class` | 0 | `556656e0499df2d11119c86ed1da8013fbb155e62a74799d53b520e08cdb8abf` | 12 | 25 |
+| `org/apache/http/impl/conn/DefaultClientConnectionOperator.class` | 0 | `18e8dade2f8c3d359ddb59471f1b37f2ff54bac1dcf6b84338e737bf6444c12b` | 3 | 8 |
+| `org/apache/http/impl/conn/PoolingClientConnectionManager.class` | 0 | `cf8aba63a335fc7abc1fa8391700bdeb33513673605e9a7e8004d3d0a103a020` | 5 | 28 |
+| `org/apache/http/impl/conn/SystemDefaultDnsResolver.class` | 0 | `8a6040b228feebe19be1c3b27b4c23f1bdadcd7d26ae882d2dc04fbd31a3eae2` | 1 | 3 |
+| `org/apache/http/impl/conn/PoolingHttpClientConnectionManager$2.class` | 0 | `cd11c3de8014607ccc6fb62f2039f72ec73aca374475954b76a8cd4317275255` | 1 | 2 |
+| `org/apache/http/impl/conn/DefaultHttpResponseParser.class` | 0 | `eed95b5315dd146f01207ab0e0c91e7da9d955f2ba0986d68c442f52ee3d90b3` | 3 | 7 |
+| `org/apache/http/impl/conn/PoolingHttpClientConnectionManager$1.class` | 0 | `de4444aa87fd05087da745783cb6c4677bae7c8c56ec3657402095e8d4d1d8d9` | 3 | 3 |
+| `org/apache/http/impl/conn/DefaultManagedHttpClientConnection.class` | 0 | `f6900d27fc1997055daa6b474c081388cb85847e96da79aaf50ef2b09c024c99` | 3 | 10 |
+| `org/apache/http/impl/conn/CPool.class` | 0 | `5468b569b49abf3a71f1be62f6c7f3ce42a065cd0b9414c7d69527b5395bfdc3` | 4 | 8 |
+| `org/apache/http/impl/conn/SystemDefaultRoutePlanner.class` | 0 | `ef71817c40a2b40132bbe7930ab85bba8db15526e6c73682e4cd1b3d4862e785` | 1 | 5 |
+| `org/apache/http/impl/conn/BasicClientConnectionManager$1.class` | 0 | `0d09fa3d603a442c5c1ab19cf6382f71d3f08e741483af9c994369ad97bfd8fb` | 3 | 3 |
+| `org/apache/http/impl/conn/PoolingHttpClientConnectionManager$ConfigData.class` | 0 | `a2ac5c58f0fb646bce307509fa0a88866c5b7968d559b32ece66cd973c1fb5f7` | 4 | 9 |
+| `org/apache/http/impl/conn/Wire.class` | 0 | `240886a605fed0bdb4d5e7789c4beb58a2f19604e427094b6f6b864c7ea3b5a6` | 2 | 14 |
+| `org/apache/http/impl/conn/HttpConnPool$InternalConnFactory.class` | 0 | `a5f711b4b681686bf803231f5f89dd20513fa27f30f7102a11f0ef55270f0f24` | 1 | 3 |
+| `org/apache/http/impl/conn/CPoolProxy.class` | 0 | `4488fc1e11855d4c0af1a4d38ccee045ae8cee95c850887beeea85f81bb0202a` | 1 | 34 |
+| `org/apache/http/impl/conn/SchemeRegistryFactory.class` | 0 | `6210e2fab620df32b881eb30fea2bf4c6d3094ce69b663a6116f54860ab1a312` | 0 | 3 |
+| `org/apache/http/impl/conn/DefaultResponseParser.class` | 0 | `cc7a718db76ee6804d0079d79636477ecfab50ddff10b4b8d81a7ef7d2be612c` | 4 | 3 |
+| `org/apache/http/impl/conn/DefaultHttpResponseParserFactory.class` | 0 | `bb2a1b147282f5ab84b50f81b2a4ae9e112bc8ccc86aee7e964608d631e9f602` | 3 | 5 |
+| `org/apache/http/impl/conn/LoggingOutputStream.class` | 0 | `fecc8668aed7e0cdd407b2375c13055cc3397bda6a0530ca22275701565c9c0f` | 2 | 6 |
+| `org/apache/http/auth/AuthSchemeRegistry.class` | 0 | `59a42b648ae440a35f4cccb3d3e22451200f23314c4a332de23cfefed7a11864` | 1 | 8 |
+| `org/apache/http/auth/params/AuthParamBean.class` | 0 | `b76845ee097e10ea20f166ba14a7db46d34afb33f047d461eefcfad7ffae744b` | 0 | 2 |
+| `org/apache/http/auth/Credentials.class` | 0 | `95f42f89e48a7c9255fc55e405b190acea6140cdf7b6f80828d786ca6ca123c3` | 0 | 2 |
+| `org/apache/http/auth/ContextAwareAuthScheme.class` | 0 | `913a15aa15736ff3495d46832e817677b9305f2e628711687f4e8ee3f647c736` | 0 | 1 |
+| `org/apache/http/auth/ChallengeState.class` | 0 | `e692640276ddf10d782f0df6e27aa35ce1a215e3bffce2c456b0bb255c1ad574` | 3 | 4 |
+| `org/apache/http/auth/AuthSchemeFactory.class` | 0 | `90ef992ffb46a201111dea14f5fcca2a98eefba4a60c1c2b6a7385a35616fa6d` | 0 | 1 |
+| `org/apache/http/auth/AUTH.class` | 0 | `1ca05e04f9303575a42b9e4a5a5deda18e8b0a2d9af9c5d6f5ac248177f9891b` | 4 | 1 |
+| `org/apache/http/auth/BasicUserPrincipal.class` | 0 | `deadabd473cfeb340383c4a1ef26b242e4f400918695378b324610be6ad561ab` | 2 | 5 |
+| `org/apache/http/conn/util/DomainType.class` | 0 | `2588da89b162d2c0f05854d49b70700388a8519d0691cd358081b43e9c1672a5` | 4 | 4 |
+| `org/apache/http/conn/util/DnsUtils.class` | 0 | `ae1e789f1f5bc5d5a7048eb9f05a29d3c4f80f72773ba4e0a4b64924d57925f5` | 0 | 3 |
+| `org/apache/http/conn/ssl/TrustSelfSignedStrategy.class` | 0 | `1f600d4d2cdcba76d060925d070c6f2a4912ecec34ab6052b8c57d83c1746d84` | 1 | 3 |
+| `org/apache/http/conn/ssl/SSLInitializationException.class` | 0 | `77312b50a4e45743dfccad83857c442c8753f0f1786b7513ebdea459e2b72d55` | 1 | 1 |
+| `org/apache/http/conn/ssl/SSLContextBuilder$TrustManagerDelegate.class` | 0 | `6bff18083212efada6efc753487c87d6e52de0c24db90cc0ca8f1d567648452f` | 2 | 4 |
+| `org/apache/http/conn/ssl/TrustStrategy.class` | 0 | `4780ca9bee409b34e08a2cea6189fa7066153de61caf1b62dbe0eb72e724d464` | 0 | 0 |
+| `org/apache/http/conn/ssl/PrivateKeyDetails.class` | 0 | `e29a24c5bb43d618b6cfd111fd80393936090f67e342e1b519f484ba6f34ac71` | 2 | 4 |
+| `org/apache/http/conn/ssl/DefaultHostnameVerifier$HostNameType.class` | 0 | `5a9dddc0bdb8cbaba42618b9dff3947a04a8bd2f8d564924b49f3a076edad8b3` | 5 | 4 |
+| `org/apache/http/conn/ssl/SSLContextBuilder$KeyManagerDelegate.class` | 0 | `09d835e5585b62c17384d11bc27ba4627421fcf03f9975226abda31b4c4474a6` | 2 | 7 |
+| `org/apache/http/conn/ssl/PrivateKeyStrategy.class` | 0 | `bae41aca3f072593d03394c3c1b43aa54502a552925004fc970d3db90b296cba` | 0 | 1 |
+| `org/apache/http/conn/ssl/TrustAllStrategy.class` | 0 | `f9bf83a53b2e5159d236971503a77418f02b1c148c5cb4097ed3275787ac6830` | 1 | 3 |
+| `org/apache/http/conn/ssl/X509HostnameVerifier.class` | 0 | `5961ea1397213ec1e22ece46340cfd933572c59490abcb4fb3ff84c1c6a4f09c` | 0 | 3 |
+| `org/apache/http/conn/ssl/SSLContextBuilder.class` | 0 | `6edbe1e38b4eeae6323a3b13cff3d858f4fa1e069fea05b99a1656f2a736218e` | 6 | 10 |
+| `org/apache/http/conn/params/ConnPerRouteBean.class` | 0 | `6d69a805b77ca519f98772c7915f199db0826986189269e373241a7193f03e56` | 3 | 9 |
+| `org/apache/http/conn/scheme/SocketFactory.class` | 0 | `7a750df4c51d3f9e9a420d87c1e04f9af6076366c78d74b10422d954cf5a0a50` | 0 | 3 |
+| `org/apache/http/conn/scheme/SchemeRegistry.class` | 0 | `176e3027032a4f77a1fa89be1afbc272f8e873f60a9737447c74488b4bb9624b` | 1 | 8 |
+| `org/apache/http/conn/scheme/SchemeSocketFactoryAdaptor.class` | 0 | `71bc6d15a76561053d0794fe6df8ad565fb5d0db7171266859fd4076072c4d0a` | 1 | 7 |
+| `org/apache/http/conn/routing/HttpRoute.class` | 0 | `ebe1db76e702e0719d649c86adec76ce3f23eb79f8c90f034c06969c70147720` | 6 | 24 |
+| `org/apache/http/conn/routing/BasicRouteDirector.class` | 0 | `1500a6c4803ec57f1ed2a402cd9914ec159eecb9df35d61e0a01789b3175d4dd` | 0 | 5 |
+| `org/apache/http/conn/HttpClientConnectionManager.class` | 0 | `c3625da35d8bf83bb163f690d5737ea08afca2fa217d349f33c82c481df780bc` | 0 | 8 |
+| `org/apache/http/conn/HttpClientConnectionOperator.class` | 0 | `e40f026b6ee96246d5f165e8d052560e43c3242d4b67416443d698bbd3125c84` | 0 | 2 |
+| `org/apache/http/conn/HttpRoutedConnection.class` | 0 | `1defb9c924500647a2ab09917e631e7a07d2532ce92da75d303474d216bffd02` | 0 | 3 |
+| `org/apache/http/conn/EofSensorWatcher.class` | 0 | `5683e74c369ed681bb584a8fddd1b07d3470a0720755b8527e850e9fc997b082` | 0 | 3 |
+| `org/apache/http/client/utils/Rfc3492Idn.class` | 0 | `b8030b52af9096f24782b7c1b3cd1cf2f92de1a43ea21558520e1ad7b83a47e6` | 9 | 5 |
+| `org/apache/http/client/CookieStore.class` | 0 | `f33f2edf3a6883ad7f669a3e679f22c3a80b18b23dfe06ffb82b2556208d7b50` | 0 | 4 |
+| `org/apache/http/client/entity/DeflateInputStreamFactory.class` | 0 | `ba4a0459fd184e3c103775117dc7ed08f29717cedb727c27c9fe6b7e7617c913` | 1 | 4 |
+| `org/apache/http/client/protocol/ResponseAuthCache.class` | 0 | `1cd01fac69896b8b9879f8af64609d8bb1ad17b1c9a72d7bce8b44eb71366dd5` | 1 | 5 |
+| `org/apache/http/client/protocol/RequestDefaultHeaders.class` | 0 | `175a2e130b9e38bd754b16cfec7503ee35613b4df98d3c25760447e4648cbf37` | 1 | 3 |
+| `org/apache/http/client/protocol/RequestExpectContinue.class` | 0 | `ae132fd639cd2854ed307a396a36c32d07e60360faa76546310e8f81342cb123` | 0 | 2 |
+| `org/apache/http/client/protocol/RequestAddCookies.class` | 0 | `e71b4ba872a15e8bead2e3889918495e5ff87158f35d84890cd481f335bfdc76` | 1 | 2 |
+| `org/apache/http/client/AuthenticationHandler.class` | 0 | `43b3a6d7de7e0b5bbc5a82e82bb18ce3f00e72f5b71e2d89bdd3ff4723b3146d` | 0 | 3 |
+| `org/apache/http/client/methods/HttpRequestWrapper$HttpEntityEnclosingRequestWrapper.class` | 0 | `9cb4ca1147cde8a8bd320242149d4c2ee9574985fa6f8b5fdaac39b12adad753` | 1 | 4 |
+| `org/apache/http/client/methods/RequestBuilder$InternalEntityEclosingRequest.class` | 0 | `08cd848247c80ead05f8c5e3176c7493fddf69e168988648fb9148de1d878615` | 1 | 2 |
+| `org/apache/http/client/methods/HttpPost.class` | 0 | `19b8f8428e645c3e9acc275453ef299e6e5521b70af59c9937f534dee2995b38` | 1 | 4 |
+| `org/apache/http/client/methods/HttpPut.class` | 0 | `6b5bd2c39e6241d8f74e73ceee4926e7980607cd55c2871d1eb0f4be69c5c855` | 1 | 4 |
+| `org/apache/http/cookie/CommonCookieAttributeHandler.class` | 0 | `6adb6b92a9302abf1bdcebc47c8e1bc2f7d4617dd0b29b6184ff1ee29e32236a` | 0 | 1 |
+| `org/apache/http/impl/client/TunnelRefusedException.class` | 0 | `f9eb320cced94311e5f8116a40080fd7ed566168460d08c35507f54bf80bf82e` | 2 | 2 |
+| `org/apache/http/impl/cookie/DefaultCookieSpec.class` | 0 | `9745bcf74230423912e1f7eea49968744e56d8b8b0ac78fa696e4344dbca78cd` | 3 | 10 |
+| `org/apache/http/impl/cookie/AbstractCookieSpec.class` | 0 | `884cd55ce497ff2a172bbc571349803e68cdc2c167d8036806e2778244b48f8b` | 1 | 7 |
+| `org/apache/http/impl/cookie/IgnoreSpec.class` | 0 | `061a1e107c332b798c9dceb0ebc515932021ae281807df3712964aef87238835` | 0 | 6 |
+| `org/apache/http/impl/cookie/BrowserCompatVersionAttributeHandler.class` | 0 | `56af026d22b28023752daa2c5b903b62c9ca466e25364f2822fda6661eaebe7f` | 0 | 3 |
+| `org/apache/http/impl/cookie/BrowserCompatSpec$1.class` | 0 | `8e42fd73225bcd9001c7f60c2b39595a053040caddbc80908b2a2707d59afe2c` | 0 | 2 |
+| `org/apache/http/impl/cookie/NetscapeDraftSpecFactory.class` | 0 | `3454e079b2390cd63e613c024645f8c7fefd367e1accdee7e842b896df9f4a15` | 1 | 4 |
+| `org/apache/http/impl/cookie/DateParseException.class` | 0 | `4e66abe2ba790d80e729e2ed32be4a997a7e92eb1976c1fcdeda97e3966d3fc8` | 1 | 2 |
+| `org/apache/http/impl/cookie/NetscapeDraftHeaderParser.class` | 0 | `0b8e9980bf8b2eb7836309233992a8cd62d648fd65e24ae10be4bf49e14d4435` | 5 | 4 |
+| `org/apache/http/impl/auth/NTLMEngineImpl$Type2Message.class` | 0 | `2e593298d707f5dce50cf5be711e357be3451ca5dd2f6ab7caa9b5fd4d688003` | 4 | 6 |
+| `org/apache/http/impl/auth/GGSSchemeBase$State.class` | 0 | `4c92435f0bef2ba484c17e9dd0d5ea5f9c59f8029bd431b789f65d211cc41186` | 5 | 4 |
+| `org/apache/http/impl/auth/NTLMEngine.class` | 0 | `9a2374ad2110432e8f4b06c74ed387472b4b827a3365ba98054c4643610c0c88` | 0 | 2 |
+| `org/apache/http/impl/auth/BasicScheme.class` | 0 | `2af293a25018a1b65b89e8540872ca60a16352ad0ba216cf9a332254cd27b45b` | 2 | 11 |
+| `org/apache/http/impl/auth/SPNegoScheme.class` | 0 | `fd6129f61809e55a7d515b2c610443f490838d967c31bbcfd1fd31d71e5db963` | 1 | 10 |
+| `org/apache/http/impl/auth/HttpAuthenticator$1.class` | 0 | `c7b58274b8b38eba7821209930dc1e14b9b5975c4f580820c05a871aa41e5a8e` | 1 | 1 |
+| `org/apache/http/impl/auth/UnsupportedDigestAlgorithmException.class` | 0 | `92b2349c1a53a398828fd614c061c8240ce21fee7039e797cf5fae85f2c3e14b` | 1 | 3 |
+| `org/apache/http/impl/auth/AuthSchemeBase.class` | 0 | `3d52e37af884decc2e8677dd38f6d40d8ad6a9137d5c519c8ec66da739469587` | 1 | 8 |
+| `org/apache/http/impl/auth/RFC2617Scheme.class` | 0 | `ebda195cd85e62cd34b9c6fa65bd31620a8f91ff7f82f9ad53614b063b8a5552` | 3 | 12 |
+| `org/apache/http/impl/auth/BasicSchemeFactory.class` | 0 | `cda6cb91386effb2b8c15a38de35904cd98e272c93a2f1895a0c64b58abd5ab4` | 1 | 4 |
+| `org/apache/http/impl/auth/SPNegoSchemeFactory.class` | 0 | `bd3b393970b69bded5e53df8184c2544d28e02cd2fbb779d44bbbd581bb8e547` | 2 | 7 |
+| `org/apache/http/impl/auth/GGSSchemeBase$1.class` | 0 | `8f63dddb04a52044781c0c2186bc5a51e08ec5e024d48a72d2a43181ff68290b` | 1 | 1 |
+| `org/apache/http/impl/conn/PoolingClientConnectionManager$1.class` | 0 | `e13f99a3a664a06e418e66b5810427486c3013672bdc6801b37718f98f6a51d5` | 2 | 3 |
+| `org/apache/http/impl/conn/SingleClientConnManager$PoolEntry.class` | 0 | `5a37728fa0b62c81489b31d48a3e2d8a0df7dc52ffc3528c1a7c83f40245b14b` | 1 | 3 |
+| `org/apache/http/impl/conn/DefaultRoutePlanner.class` | 0 | `a065712d4578eee70ff3f8dd2b763e24e4ae93c628953d028df57babf9fa45ce` | 1 | 3 |
+| `org/apache/http/impl/conn/tsccm/ConnPoolByRoute$1.class` | 0 | `87bb46979cf2f921dc6bcdd13799f343c1af43a49d219654cbbb555d47a59ada` | 4 | 3 |
+| `org/apache/http/conn/ssl/BrowserCompatHostnameVerifier.class` | 0 | `64d9b6b58f3e5cdff079cca113ebc2fc31bde70d4baf1f5af5102ca5c7890c56` | 1 | 4 |
+| `org/apache/http/conn/ManagedHttpClientConnection.class` | 0 | `bf4276ad781be2a9044f15163c713dedd9aef8823373f6d0363546a4276ca714` | 0 | 4 |
+| `org/apache/http/conn/params/ConnRouteParams.class` | 0 | `5832e171fd50a11ec0e4b412de69f1c7e6e62d82e580d27f23dee254c05335c4` | 2 | 8 |
+| `org/apache/http/conn/scheme/PlainSocketFactory.class` | 0 | `44fb64da714b2e71908bdb3244d9e7f050d752eeb86dd70d9e28c793075834d8` | 1 | 8 |
+| `org/apache/http/conn/scheme/SchemeLayeredSocketFactoryAdaptor2.class` | 0 | `2152787f1b684f99c0533c5cee5bbb3dbdcc82ce2f3c775e03e1771460de9c1d` | 1 | 5 |
+| `org/apache/http/conn/ClientConnectionOperator.class` | 0 | `a183257a19b160379183bc5f511de2374d159815497b85612ccbf48c2da45188` | 0 | 3 |
+| `org/apache/http/conn/ClientConnectionManager.class` | 0 | `ac9a3e9eadcb1b1d1a2c9878e854312e59c998edb01c488fd7e68ea38a6b63a4` | 0 | 6 |
+| `org/apache/http/conn/socket/LayeredConnectionSocketFactory.class` | 0 | `af44f40d81cb24c18b7ec81d0fc660f0c02265a5605176312796f20b73201ae1` | 0 | 1 |

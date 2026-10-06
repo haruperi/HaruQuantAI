@@ -53,4 +53,8 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 | Feature ID | Feature | Status |
 |---|---|---|
 | FEAT-UI-TRANSPORT | Universal UI-host transport: envelope, error mapping, request IDs, domain-client factory, host session startup, shell preference updates | implemented (`transport.ts`, `HostConnection.tsx`, `hostSettings.ts`) |
-| FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX 144.2953 navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`app/workspace/*`) |
+| FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX145 reference navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`app/workspace/*`) |
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

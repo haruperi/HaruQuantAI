@@ -7,7 +7,7 @@ It is UI-only in the current slice — demo fixture data, no build engine.
 
 ## What lives here
 
-- `BuilderWorkspace.tsx` — the SQX-parity dashboard shell: the 51px header
+- `BuilderWorkspace.tsx` — the SQX-style dashboard shell: the 51px header
   with the clickable project name and the Progress / Full settings / Results
   large tabs (Progress is the initial panel), plus the corrected Full settings form and the linked Results workspace.
 - `ProgressDashboard.tsx` — the three-column Progress dashboard and the
@@ -24,14 +24,14 @@ It is UI-only in the current slice — demo fixture data, no build engine.
   cross-check switch tree with Disable all.
 - `ResultsColumn.tsx` — best-strategy result cards with the shared Sample
   selector; clicking a card opens the Results tab.
-- `FitnessEvolutionModal.tsx` — the SQX-parity modal shell (`SqdModal`) and
+- `FitnessEvolutionModal.tsx` — the SQX-style modal shell (`SqdModal`) and
   the Fitness evolution popup.
 - `fixtures.ts` — demo data for the Progress tab (idle/running stats, chart
   series, settings summary values, cross checks, best strategies).
 
-## Donor parity scope (SQX 144.2953)
+## Retained UI scope
 
-The Progress tab parity slice covers (evidence `SQX144-EV-000032..037`):
+The Progress tab parity slice covers (evidence `retained target UI; current donor equivalence unverified`):
 dashboard header and large tabs; the 556px / 500px / flex three-column
 layout; the engine column composition (controls, infinite progress, log
 card, Build stats table with idle values `0`, `0 ms.`, `0 / 0.00 %`,
@@ -62,10 +62,10 @@ execution, engine channels, log feeds, and best-results streams require an
 approved plan under the future workspace/plugin architecture before any UI
 claim of authority.
 
-## Full settings parity slice (SQX 144.2953)
+## Full settings parity slice (SQX145 reference)
 
 The Full settings panel is the donor Advanced settings surface (evidence
-`SQX144-EV-000039..043`, corrected by `SQX144-EV-000055..057`): the "Advanced settings" title, the 10-tab default Build strip (What to build, Genetic options, Data, Trading
+`retained target UI; current donor equivalence unverified`, corrected by `retained target UI; current donor equivalence unverified`): the "Advanced settings" title, the 10-tab default Build strip (What to build, Genetic options, Data, Trading
 options, Building blocks, ATM, Money management, Cross checks (robustness),
 Ranking, Notes), with Parts to improve shown only for Improve existing strategy, per-tab description headers with
 Help links opening the public donor docs, the lock overlay while the mock
@@ -81,10 +81,10 @@ page and its modals were removed as superseded.
 |---|---|---|
 | FEAT-UI-BUILDER_FULLSETTINGS_TAB | Builder Full settings tab SQX parity: Advanced settings shell with conditional Build tabs, bounded cards, shared controls, additional-build-config gear popups and lock overlay — fixture-backed | implemented (`FullSettingsView.tsx`, `settings/*Tab.tsx`, `settings/SettingsControls.tsx`, `settings/settingsFixtures.ts`) |
 
-## Results tab parity slice (SQX 144.2953)
+## Results tab parity slice (SQX145 reference)
 
 The Results panel is the donor RESULTS overlay surface (evidence
-`SQX144-EV-000045..000047`): the "No result chosen" info line, the
+`retained target UI; current donor equivalence unverified`): the "No result chosen" info line, the
 quant-tabs strip (Overview, SP overview, List of trades, Equity chart,
 Trade analysis, Profile chart, Strategy config, Source Code) with the two
 custom analysis tabs (Prop Monte Carlo, Prop analytics; green puzzle icon,
@@ -110,7 +110,7 @@ rows. The default title is Builder. Cards use bounded widths and filled theme
 surfaces, with a narrow Help row, inline spinners and aligned gear rows. The
 Results panel stays inside the panel host instead of covering the header.
 
-Evidence SQX144-EV-000055..000057 corrects the historical default 12-tab and
+Evidence retained target UI; current donor equivalence unverified corrects the historical default 12-tab and
 visible-footer claims in record 000038. That historical record remains intact
 and linked as superseded. Custom analysis is a separate task, not a Build tab.
 Parts to improve is conditional. The footer conclusion is a bounded static-CSS
@@ -150,7 +150,7 @@ export, equity display controls, stored-chart zoom and navigation, profile path
 selection/loading, mock source copy/download/refresh and custom-analysis tab
 create/rename/delete. Results tab navigation preserves local view state; Reload
 resets views. Leaving Results for another Builder panel remounts local state.
-Static evidence additions are `SQX144-EV-000058..000064`.
+Static evidence additions are `retained target UI; current donor equivalence unverified`.
 
 Remaining parity gaps: populated report/chart layouts are independent mock
 approximations, not pixel-diff-verified donor output. SP overview uses a bar chart
@@ -170,3 +170,7 @@ paths remain compatibility exports. Builder keeps Build-specific settings,
 progress and fixtures. This extraction adds no Builder feature or parity claim;
 existing limitations above still apply. Retester and Optimizer consume the shared
 public entrypoint without importing Builder private components.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

@@ -1,0 +1,34 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/PSUtils.jar",
+  "sha256": "03ebfabefe9cb716e29757e64bd020bb78cfa0cb5d6088d622c16a5dc3e35da5",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 5,
+  "duplicate_entries": [],
+  "classes": {
+    "com/jfx/ts/io/PSUtils.class": "8726bb3a0e49e466268a2891dbabdfe486377cdf29f0df1a489c0b0083b5b146"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    "libs/PSUtils.dll": "ebd6434d5f9a6fb79838d9517c148788d5fc24eb4f05cd511cc97e7664552443",
+    "libs/PSUtils_x64.dll": "b74ac9eba1196000f309caf70b6381fc72295b87372bb3898c0928e59d0a86d2",
+    ".classpath": "197c61693b17874bc404ddac46f44be3d19810b6618c6854231c46db4a40bd27",
+    ".project": "0da497084aee50ba558828c54c1c0d2088733bb936283af241160cf7884694c5"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/jfx/ts/io/PSUtils.class",
+      "occurrence": 0,
+      "sha256": "8726bb3a0e49e466268a2891dbabdfe486377cdf29f0df1a489c0b0083b5b146",
+      "member_shard": "docs/dev/evidence/sqx145/members/102/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/102/001.json",
+      "sha256": "af6b9a51ab7011a79826e4dc20de77ec25ab90c698ecf77690ae48c628288529"
+    }
+  ]
+}

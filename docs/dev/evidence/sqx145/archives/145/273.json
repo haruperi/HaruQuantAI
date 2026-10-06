@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskCreatePortfolio/TaskCreatePortfolio.jar",
+  "sha256": "61f5db94abc1289ed53bb2f6cb421330951c8445c7de518d8a479fd424733b38",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/CreatePortfolio/CreatePortfolio.class": "a29c3e0a51a193d220b254a85c5116dca3f78f9607bc2aa4ead61233ddd0fdad"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/CreatePortfolio/CreatePortfolio.class",
+      "occurrence": 0,
+      "sha256": "a29c3e0a51a193d220b254a85c5116dca3f78f9607bc2aa4ead61233ddd0fdad",
+      "member_shard": "docs/dev/evidence/sqx145/members/273/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/273/001.json",
+      "sha256": "ed8e0875667e488c12f02d7736567cba866def732fe711f156331e4fde2c71a0"
+    }
+  ]
+}

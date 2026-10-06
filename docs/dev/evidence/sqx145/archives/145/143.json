@@ -1,0 +1,73 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar",
+  "sha256": "f4d719de679ce6da796373e0342e3c0de70078273ebc0f69ba43a6fab49e7071",
+  "class_count": 7,
+  "unique_class_entries": 7,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher.class": "d0e0865b917bcde23ba47009da6a015d990c39f0bfbb6d12861661d40043f7d6",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1.class": "7c2b1839170a8517849dd1adffac218f88b2feae6a861e401bfd1ffedb7071fd",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor.class": "6792edc13cef075dbb5a8223ff48aaa8ddb85d04bdd0c9585d198849b498c69d",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterPlugin.class": "cf3ef24f543d9dd65fcb0981e64062d9f24524e0aa7a7205244efaa7be7d247d",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet.class": "ffe30d136c4e2d44758738cc3edbf58c50de134aabd36f86243dc5cc0aa7c600",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1.class": "b72082db81223b49e29d7cf8526c61b3e26163862d51724e11296cf21b5859eb",
+    "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader.class": "d6e938a252acf3b9c4cfc6921702f0a8768ada3d20931d082195bf0e0285db44"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/DownloadProgressPublisher.class",
+      "occurrence": 0,
+      "sha256": "d0e0865b917bcde23ba47009da6a015d990c39f0bfbb6d12861661d40043f7d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor$1.class",
+      "occurrence": 0,
+      "sha256": "7c2b1839170a8517849dd1adffac218f88b2feae6a861e401bfd1ffedb7071fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestExecutor.class",
+      "occurrence": 0,
+      "sha256": "6792edc13cef075dbb5a8223ff48aaa8ddb85d04bdd0c9585d198849b498c69d",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterPlugin.class",
+      "occurrence": 0,
+      "sha256": "cf3ef24f543d9dd65fcb0981e64062d9f24524e0aa7a7205244efaa7be7d247d",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTesterServlet.class",
+      "occurrence": 0,
+      "sha256": "ffe30d136c4e2d44758738cc3edbf58c50de134aabd36f86243dc5cc0aa7c600",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader$1.class",
+      "occurrence": 0,
+      "sha256": "b72082db81223b49e29d7cf8526c61b3e26163862d51724e11296cf21b5859eb",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CodeEditor/impl/IndicatorTester/IndicatorTestsDownloader.class",
+      "occurrence": 0,
+      "sha256": "d6e938a252acf3b9c4cfc6921702f0a8768ada3d20931d082195bf0e0285db44",
+      "member_shard": "docs/dev/evidence/sqx145/members/143/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/143/001.json",
+      "sha256": "ac7763d755592ef211a4a941c2b3a7da87de1c543f6d04a3fb67f98a6b536ea6"
+    }
+  ]
+}

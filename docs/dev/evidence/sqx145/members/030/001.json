@@ -1,0 +1,5404 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/geronimo-jms_2.0_spec-1.0-alpha-2.jar",
+  "archive_sha256": "62a109edef3de718b0cb600bf040b4be5e32c683a57ee16f9f8a89537bf5da51",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "javax/jms/BytesMessage.class",
+      "occurrence": 0,
+      "sha256": "5cfbbb0b27e3a2937770e64771808e11924091981a0a39b7e14b55e0a89f5dbe",
+      "name": "javax/jms/BytesMessage",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Message"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getBodyLength",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readBoolean",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readByte",
+          "descriptor": "()B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readUnsignedByte",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readShort",
+          "descriptor": "()S",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readUnsignedShort",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readChar",
+          "descriptor": "()C",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readInt",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readLong",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readFloat",
+          "descriptor": "()F",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readDouble",
+          "descriptor": "()D",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readUTF",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([B)I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([BI)I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBoolean",
+          "descriptor": "(Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "(S)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeChar",
+          "descriptor": "(C)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeInt",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeLong",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeFloat",
+          "descriptor": "(F)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeDouble",
+          "descriptor": "(D)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeUTF",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([BII)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/BytesMessage",
+        "javax/jms/JMSException",
+        "javax/jms/Message"
+      ]
+    },
+    {
+      "entry": "javax/jms/CompletionListener.class",
+      "occurrence": 0,
+      "sha256": "a69baad66265756fdf42cde2f65a42f6109b9230428efa8f81382218b33cb488",
+      "name": "javax/jms/CompletionListener",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onCompletion",
+          "descriptor": "(Ljavax/jms/Message;)V",
+          "access": 1025
+        },
+        {
+          "name": "onException",
+          "descriptor": "(Ljavax/jms/Message;Ljava/lang/Exception;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/CompletionListener"
+      ]
+    },
+    {
+      "entry": "javax/jms/Connection.class",
+      "occurrence": 0,
+      "sha256": "a8936d2fb19c3606573fb4c0e34ae16d58130ca3156c385d13ecb39620c4263b",
+      "name": "javax/jms/Connection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createSession",
+          "descriptor": "(ZI)Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSession",
+          "descriptor": "(I)Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSession",
+          "descriptor": "()Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getClientID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setClientID",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getMetaData",
+          "descriptor": "()Ljavax/jms/ConnectionMetaData;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getExceptionListener",
+          "descriptor": "()Ljavax/jms/ExceptionListener;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setExceptionListener",
+          "descriptor": "(Ljavax/jms/ExceptionListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedDurableConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/Connection",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/ConnectionConsumer.class",
+      "occurrence": 0,
+      "sha256": "91de003b2903ca276d304d38180a08b60f8075910ccd01b9d2abe6105280a743",
+      "name": "javax/jms/ConnectionConsumer",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getServerSessionPool",
+          "descriptor": "()Ljavax/jms/ServerSessionPool;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ConnectionConsumer",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/ConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "d81d99164a0eb04f05900d0e6c3939ec87016a45e998b8978594fee08a3606fd",
+      "name": "javax/jms/ConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createConnection",
+          "descriptor": "()Ljavax/jms/Connection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/Connection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createContext",
+          "descriptor": "()Ljavax/jms/JMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(I)Ljavax/jms/JMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/JMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;I)Ljavax/jms/JMSContext;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ConnectionFactory",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/ConnectionMetaData.class",
+      "occurrence": 0,
+      "sha256": "292b2391eb6f98bb2ca9bdda56823609214897c1deac460b67e315c9c7c607f3",
+      "name": "javax/jms/ConnectionMetaData",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getJMSVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSMajorVersion",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSMinorVersion",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSProviderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getProviderVersion",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getProviderMajorVersion",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getProviderMinorVersion",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSXPropertyNames",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ConnectionMetaData",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/DeliveryMode.class",
+      "occurrence": 0,
+      "sha256": "9ad14ea52d5e608260cf2ac1412de1333f8347805397893d55e3b62c461938c7",
+      "name": "javax/jms/DeliveryMode",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NON_PERSISTENT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PERSISTENT",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/DeliveryMode"
+      ]
+    },
+    {
+      "entry": "javax/jms/Destination.class",
+      "occurrence": 0,
+      "sha256": "6d1f48ef41a8b0b7784871fcb71c2329f204dbf49b1906aa6895a1fb6e39f99b",
+      "name": "javax/jms/Destination",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Destination"
+      ]
+    },
+    {
+      "entry": "javax/jms/ExceptionListener.class",
+      "occurrence": 0,
+      "sha256": "9c41c65ba9b41c4f9a622c4f786238e078d0cf777c591c2a93f4999663daae4a",
+      "name": "javax/jms/ExceptionListener",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onException",
+          "descriptor": "(Ljavax/jms/JMSException;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ExceptionListener"
+      ]
+    },
+    {
+      "entry": "javax/jms/IllegalStateException.class",
+      "occurrence": 0,
+      "sha256": "63bc66cc16ccede6919979999ed34b6d5325beeb81eb2bd3de56d3bdefeb1893",
+      "name": "javax/jms/IllegalStateException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/IllegalStateException",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/IllegalStateRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "68fd575c9b16ecbcd428b53269e8baaacd08597b7ba08aeab0fdb920367fd3fc",
+      "name": "javax/jms/IllegalStateRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/IllegalStateRuntimeException",
+        "javax/jms/JMSRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidClientIDException.class",
+      "occurrence": 0,
+      "sha256": "78029820070881bbc68b0b668913c49ac4a42a8e3fc7e94b1d30125e13ff5e16",
+      "name": "javax/jms/InvalidClientIDException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidClientIDException",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidClientIDRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "0dbbc4a3a346d5f14f2d2f56be856373e7cb9622439a4c06aa6800dae745ce2b",
+      "name": "javax/jms/InvalidClientIDRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidClientIDRuntimeException",
+        "javax/jms/JMSRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidDestinationException.class",
+      "occurrence": 0,
+      "sha256": "6333ea9243c4ec41a47a0a4cbc474c79ae4a3215144b3e95d9720864c650d43b",
+      "name": "javax/jms/InvalidDestinationException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidDestinationException",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidDestinationRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "76a1f61e11862a078463588522d5a235d8119066368f6325680050357b3a8450",
+      "name": "javax/jms/InvalidDestinationRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidDestinationRuntimeException",
+        "javax/jms/JMSRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidSelectorException.class",
+      "occurrence": 0,
+      "sha256": "21107cf816828a5bf1897d3eff58cdbb949903c2422b2aec8aa381274db3c05c",
+      "name": "javax/jms/InvalidSelectorException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidSelectorException",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/InvalidSelectorRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "02ce79fc981552d3f9698275213c6cf873be7a128b16fd9118c6d7376cc0ca24",
+      "name": "javax/jms/InvalidSelectorRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/InvalidSelectorRuntimeException",
+        "javax/jms/JMSRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "bb2e21798afd876a8f6bbdb5e20f497e2b7bf0633fc61e4457f33a3f062184ac",
+      "name": "javax/jms/JMSConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSConnectionFactory"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSConnectionFactoryDefinition.class",
+      "occurrence": 0,
+      "sha256": "d05f93f5dab57698eee9c4fa981add5c3d168c8503cb340b2aea1a40dd8eac6e",
+      "name": "javax/jms/JMSConnectionFactoryDefinition",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "name",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "className",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "resourceAdapter",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "user",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "password",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "clientId",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "properties",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "transactional",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "maxPoolSize",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "minPoolSize",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "description",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "interfaceName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSConnectionFactoryDefinition"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSConnectionFactoryDefinitions.class",
+      "occurrence": 0,
+      "sha256": "9a29bb22df59fef52a30ea73ff8fbe2878942c274340744ac07120639a41740f",
+      "name": "javax/jms/JMSConnectionFactoryDefinitions",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljavax/jms/JMSConnectionFactoryDefinition;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSConnectionFactoryDefinitions"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSConsumer.class",
+      "occurrence": 0,
+      "sha256": "faaed98ad12827b27e986c7317728550833093f27684ff7503daa8dbda2809e8",
+      "name": "javax/jms/JMSConsumer",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "getMessageListener",
+          "descriptor": "()Ljavax/jms/MessageListener;",
+          "access": 1025
+        },
+        {
+          "name": "getMessageSelector",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "receive",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025
+        },
+        {
+          "name": "receive",
+          "descriptor": "(J)Ljavax/jms/Message;",
+          "access": 1025
+        },
+        {
+          "name": "receiveBody",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "receiveBody",
+          "descriptor": "(Ljava/lang/Class;J)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;J)TT;"
+        },
+        {
+          "name": "receiveBodyNoWait",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "receiveNoWait",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025
+        },
+        {
+          "name": "setMessageListener",
+          "descriptor": "(Ljavax/jms/MessageListener;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/JMSConsumer"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSContext.class",
+      "occurrence": 0,
+      "sha256": "12365ed232d3c237886063b982fe310a6e04f0366e285884bc255703bfa76868",
+      "name": "javax/jms/JMSContext",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [
+        {
+          "name": "AUTO_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLIENT_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DUPS_OK_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SESSION_TRANSACTED",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "acknowledge",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;)Ljavax/jms/QueueBrowser;",
+          "access": 1025
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;Ljava/lang/String;)Ljavax/jms/QueueBrowser;",
+          "access": 1025
+        },
+        {
+          "name": "createBytesMessage",
+          "descriptor": "()Ljavax/jms/BytesMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;Z)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(I)Ljavax/jms/JMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "createDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Z)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createMapMessage",
+          "descriptor": "()Ljavax/jms/MapMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createMessage",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025
+        },
+        {
+          "name": "createObjectMessage",
+          "descriptor": "()Ljavax/jms/ObjectMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createObjectMessage",
+          "descriptor": "(Ljava/io/Serializable;)Ljavax/jms/ObjectMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createProducer",
+          "descriptor": "()Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "createQueue",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Queue;",
+          "access": 1025
+        },
+        {
+          "name": "createSharedConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createSharedConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createSharedDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createSharedDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/JMSConsumer;",
+          "access": 1025
+        },
+        {
+          "name": "createStreamMessage",
+          "descriptor": "()Ljavax/jms/StreamMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createTemporaryQueue",
+          "descriptor": "()Ljavax/jms/TemporaryQueue;",
+          "access": 1025
+        },
+        {
+          "name": "createTemporaryTopic",
+          "descriptor": "()Ljavax/jms/TemporaryTopic;",
+          "access": 1025
+        },
+        {
+          "name": "createTextMessage",
+          "descriptor": "()Ljavax/jms/TextMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createTextMessage",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/TextMessage;",
+          "access": 1025
+        },
+        {
+          "name": "createTopic",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Topic;",
+          "access": 1025
+        },
+        {
+          "name": "getAutoStart",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getClientID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getExceptionListener",
+          "descriptor": "()Ljavax/jms/ExceptionListener;",
+          "access": 1025
+        },
+        {
+          "name": "getMetaData",
+          "descriptor": "()Ljavax/jms/ConnectionMetaData;",
+          "access": 1025
+        },
+        {
+          "name": "getSessionMode",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getTransacted",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "recover",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "rollback",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "setAutoStart",
+          "descriptor": "(Z)V",
+          "access": 1025
+        },
+        {
+          "name": "setClientID",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        },
+        {
+          "name": "setExceptionListener",
+          "descriptor": "(Ljavax/jms/ExceptionListener;)V",
+          "access": 1025
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "stop",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "unsubscribe",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/JMSContext"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSDestinationDefinition.class",
+      "occurrence": 0,
+      "sha256": "9707875a719d8971430a85334184d39dce5ac2faced56b1e482ac02ec6ea5d24",
+      "name": "javax/jms/JMSDestinationDefinition",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "interfaceName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "name",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "className",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "resourceAdapter",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "destinationName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "properties",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "description",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSDestinationDefinition"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSDestinationDefinitions.class",
+      "occurrence": 0,
+      "sha256": "0656c8a2ed58828238905c751aca6abcef81b4a199313468c825513976303f07",
+      "name": "javax/jms/JMSDestinationDefinitions",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()[Ljavax/jms/JMSDestinationDefinition;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSDestinationDefinitions"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSException.class",
+      "occurrence": 0,
+      "sha256": "a2c92998fb3822f29b46377ab24e2c72b18d61b33bad5c0766cf26d7ac69ab8a",
+      "name": "javax/jms/JMSException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "errorCode",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "linkedException",
+          "descriptor": "Ljava/lang/Exception;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1b0224c65750c2261f27fd91c2a0c83e52764a40ad6ac8144b2cbf9b7b6ead07",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e96a91abdf76507abc8cc3db656e0a36899ed0faf8f6efa9e7cf59dfa3c3eba8",
+          "code_length": 12
+        },
+        {
+          "name": "getErrorCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getLinkedException",
+          "descriptor": "()Ljava/lang/Exception;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setLinkedException",
+          "descriptor": "(Ljava/lang/Exception;)V",
+          "access": 33,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "javax/jms/JMSException"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSPasswordCredential.class",
+      "occurrence": 0,
+      "sha256": "156469415943c04ac636a8a5eca677a756ec08082f6e8e4ece1183f82adf53db",
+      "name": "javax/jms/JMSPasswordCredential",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "userName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "password",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSPasswordCredential"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSProducer.class",
+      "occurrence": 0,
+      "sha256": "ae1913cd0ddccebdda1f6de7df8ccd95fc725991f97f46e43a2c6696193741c2",
+      "name": "javax/jms/JMSProducer",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "clearProperties",
+          "descriptor": "()Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "getAsync",
+          "descriptor": "()Ljavax/jms/CompletionListener;",
+          "access": 1025
+        },
+        {
+          "name": "getBooleanProperty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "getByteProperty",
+          "descriptor": "(Ljava/lang/String;)B",
+          "access": 1025
+        },
+        {
+          "name": "getDeliveryDelay",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getDeliveryMode",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getDisableMessageID",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getDisableMessageTimestamp",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getDoubleProperty",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1025
+        },
+        {
+          "name": "getFloatProperty",
+          "descriptor": "(Ljava/lang/String;)F",
+          "access": 1025
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "getJMSCorrelationID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getJMSCorrelationIDAsBytes",
+          "descriptor": "()[B",
+          "access": 1025
+        },
+        {
+          "name": "getJMSReplyTo",
+          "descriptor": "()Ljavax/jms/Destination;",
+          "access": 1025
+        },
+        {
+          "name": "getJMSType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getLongProperty",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 1025
+        },
+        {
+          "name": "getObjectProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getPriority",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getPropertyNames",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Set<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getShortProperty",
+          "descriptor": "(Ljava/lang/String;)S",
+          "access": 1025
+        },
+        {
+          "name": "getStringProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getTimeToLive",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "propertyExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;[B)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/util/Map;)Ljavax/jms/JMSProducer;",
+          "access": 1025,
+          "generic_signature": "(Ljavax/jms/Destination;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;)Ljavax/jms/JMSProducer;"
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljavax/jms/Message;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/io/Serializable;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setAsync",
+          "descriptor": "(Ljavax/jms/CompletionListener;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setDeliveryDelay",
+          "descriptor": "(J)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setDeliveryMode",
+          "descriptor": "(I)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setDisableMessageID",
+          "descriptor": "(Z)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setDisableMessageTimestamp",
+          "descriptor": "(Z)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setJMSCorrelationID",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setJMSCorrelationIDAsBytes",
+          "descriptor": "([B)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setJMSReplyTo",
+          "descriptor": "(Ljavax/jms/Destination;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setJMSType",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setPriority",
+          "descriptor": "(I)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;Z)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;B)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;D)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;F)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;I)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;J)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;S)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        },
+        {
+          "name": "setTimeToLive",
+          "descriptor": "(J)Ljavax/jms/JMSProducer;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSProducer"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "9c6ce0a57f4b240e9871bad31991b0513814e46f0341bc6fe4183f6756a7d249",
+      "name": "javax/jms/JMSRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "errorCode",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "15d7a8c03dce8ac355e69421b098e6d3703f08669f3360a17b596c5b4d308c44",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "8caab68245acbf3c5f1c80436dfe78a5836adf82ce1a78e3e9b5743c6bf5d52c",
+          "code_length": 12
+        },
+        {
+          "name": "getErrorCode",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "javax/jms/JMSRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSSecurityException.class",
+      "occurrence": 0,
+      "sha256": "902e9bae1907db3b0fc229d075f155d362e436cc0ed948c08cd6eaca11b9b586",
+      "name": "javax/jms/JMSSecurityException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/JMSSecurityException"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSSecurityRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "f345a3bab48d29085a1e34f8a744b60c5e9334dc7214b0cfe1f62d8a69080316",
+      "name": "javax/jms/JMSSecurityRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/JMSSecurityRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/JMSSessionMode.class",
+      "occurrence": 0,
+      "sha256": "7e9d5ddec8b0a18c85aac3a6776d8e4739944c60d8c63231d80a559f35d4fed5",
+      "name": "javax/jms/JMSSessionMode",
+      "major": 51,
+      "minor": 0,
+      "access": 9729,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/annotation/Annotation"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "value",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/annotation/Annotation",
+        "javax/jms/JMSSessionMode"
+      ]
+    },
+    {
+      "entry": "javax/jms/MapMessage.class",
+      "occurrence": 0,
+      "sha256": "a2f727916894500044f34b21db4b601ece7e547356bbaad65f6aa6d63d092656",
+      "name": "javax/jms/MapMessage",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Message"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getBoolean",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getByte",
+          "descriptor": "(Ljava/lang/String;)B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getShort",
+          "descriptor": "(Ljava/lang/String;)S",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getChar",
+          "descriptor": "(Ljava/lang/String;)C",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getInt",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getLong",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getFloat",
+          "descriptor": "(Ljava/lang/String;)F",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDouble",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getBytes",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getObject",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getMapNames",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setBoolean",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setByte",
+          "descriptor": "(Ljava/lang/String;B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setShort",
+          "descriptor": "(Ljava/lang/String;S)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setChar",
+          "descriptor": "(Ljava/lang/String;C)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setInt",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setLong",
+          "descriptor": "(Ljava/lang/String;J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setFloat",
+          "descriptor": "(Ljava/lang/String;F)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setDouble",
+          "descriptor": "(Ljava/lang/String;D)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setString",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(Ljava/lang/String;[B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setBytes",
+          "descriptor": "(Ljava/lang/String;[BII)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setObject",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "itemExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MapMessage",
+        "javax/jms/Message"
+      ]
+    },
+    {
+      "entry": "javax/jms/Message.class",
+      "occurrence": 0,
+      "sha256": "0f9ada6c6e26b2d638d6cc0d5a33a4e5f85eac59f9ff35ab3498b5ee3ed81af0",
+      "name": "javax/jms/Message",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DEFAULT_DELIVERY_MODE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_PRIORITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_TIME_TO_LIVE",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_DELIVERY_DELAY",
+          "descriptor": "J",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "getJMSMessageID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSMessageID",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSTimestamp",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSTimestamp",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSCorrelationIDAsBytes",
+          "descriptor": "()[B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSCorrelationIDAsBytes",
+          "descriptor": "([B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSCorrelationID",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSCorrelationID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSReplyTo",
+          "descriptor": "()Ljavax/jms/Destination;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSReplyTo",
+          "descriptor": "(Ljavax/jms/Destination;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSDestination",
+          "descriptor": "()Ljavax/jms/Destination;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSDestination",
+          "descriptor": "(Ljavax/jms/Destination;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSDeliveryMode",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSDeliveryMode",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSRedelivered",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSRedelivered",
+          "descriptor": "(Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSExpiration",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSExpiration",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSPriority",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSPriority",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "clearProperties",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "propertyExists",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getBooleanProperty",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getByteProperty",
+          "descriptor": "(Ljava/lang/String;)B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getShortProperty",
+          "descriptor": "(Ljava/lang/String;)S",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getIntProperty",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getLongProperty",
+          "descriptor": "(Ljava/lang/String;)J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getFloatProperty",
+          "descriptor": "(Ljava/lang/String;)F",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDoubleProperty",
+          "descriptor": "(Ljava/lang/String;)D",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getStringProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getObjectProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getPropertyNames",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setBooleanProperty",
+          "descriptor": "(Ljava/lang/String;Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setByteProperty",
+          "descriptor": "(Ljava/lang/String;B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setShortProperty",
+          "descriptor": "(Ljava/lang/String;S)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setIntProperty",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setLongProperty",
+          "descriptor": "(Ljava/lang/String;J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setFloatProperty",
+          "descriptor": "(Ljava/lang/String;F)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setDoubleProperty",
+          "descriptor": "(Ljava/lang/String;D)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setStringProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setObjectProperty",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "acknowledge",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "clearBody",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getJMSDeliveryTime",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setJMSDeliveryTime",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getBody",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "isBodyAssignableTo",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Message"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageConsumer.class",
+      "occurrence": 0,
+      "sha256": "d9e3d53b357d138dc5a5d39a9a87a1eac3efa14994bfe01fbdb261ad56e491b2",
+      "name": "javax/jms/MessageConsumer",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getMessageSelector",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getMessageListener",
+          "descriptor": "()Ljavax/jms/MessageListener;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setMessageListener",
+          "descriptor": "(Ljavax/jms/MessageListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "receive",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "receive",
+          "descriptor": "(J)Ljavax/jms/Message;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "receiveNoWait",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageConsumer"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageEOFException.class",
+      "occurrence": 0,
+      "sha256": "579fe07f321050fb863ea272e329a3b258fe31f2f5356bc1969b50b62e02472a",
+      "name": "javax/jms/MessageEOFException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/MessageEOFException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageFormatException.class",
+      "occurrence": 0,
+      "sha256": "6e53c7b947a82515bc2763cd7311d106723ee7e2df4d027fa1d08fde0c3a7348",
+      "name": "javax/jms/MessageFormatException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/MessageFormatException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageFormatRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "3c50d5af9ab9e1f21ac601d37b48d4bc0c4ff90c30341b8663e1ea5f19255b89",
+      "name": "javax/jms/MessageFormatRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/MessageFormatRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageListener.class",
+      "occurrence": 0,
+      "sha256": "f8264e4ba02805ef5d64b8e385e9f4e6ac62539db69673fdb8fab70b8c0c9862",
+      "name": "javax/jms/MessageListener",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onMessage",
+          "descriptor": "(Ljavax/jms/Message;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/MessageListener"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageNotReadableException.class",
+      "occurrence": 0,
+      "sha256": "66a7619da4f62f320b996cf74172fde7361ab92ea4da3a13e9a66e3c18fe0ca3",
+      "name": "javax/jms/MessageNotReadableException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/MessageNotReadableException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageNotWriteableException.class",
+      "occurrence": 0,
+      "sha256": "064095d7582391c552f924e854ad8a163a65dd3befbf3fbab4220281c3d3978f",
+      "name": "javax/jms/MessageNotWriteableException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/MessageNotWriteableException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageNotWriteableRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "78caf5c60260dcefb01ab23072e6c3c22b3e09f4d0ff222f57f3ca66cc7911ae",
+      "name": "javax/jms/MessageNotWriteableRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/MessageNotWriteableRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/MessageProducer.class",
+      "occurrence": 0,
+      "sha256": "8e4ea3e7e60a35e1af5e88808938024c3fd2a5129eb0fcf427c6b80ff05f4950",
+      "name": "javax/jms/MessageProducer",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setDisableMessageID",
+          "descriptor": "(Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDisableMessageID",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setDisableMessageTimestamp",
+          "descriptor": "(Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDisableMessageTimestamp",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setDeliveryMode",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDeliveryMode",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setPriority",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getPriority",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setTimeToLive",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getTimeToLive",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDestination",
+          "descriptor": "()Ljavax/jms/Destination;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;Ljavax/jms/CompletionListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljavax/jms/Message;Ljavax/jms/CompletionListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;IIJLjavax/jms/CompletionListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Destination;Ljavax/jms/Message;IIJLjavax/jms/CompletionListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getDeliveryDelay",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setDeliveryDelay",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageProducer"
+      ]
+    },
+    {
+      "entry": "javax/jms/ObjectMessage.class",
+      "occurrence": 0,
+      "sha256": "7a341ed7459c0212f5d5b4e69a7df0e647fcab4434867471e6514de4633c372b",
+      "name": "javax/jms/ObjectMessage",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Message"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setObject",
+          "descriptor": "(Ljava/io/Serializable;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getObject",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Message",
+        "javax/jms/ObjectMessage"
+      ]
+    },
+    {
+      "entry": "javax/jms/Queue.class",
+      "occurrence": 0,
+      "sha256": "372a559f18ecb81a582901e53328c59e74a9d2d572d85a272bf79d181d19b899",
+      "name": "javax/jms/Queue",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Destination"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQueueName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Destination",
+        "javax/jms/JMSException",
+        "javax/jms/Queue"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueBrowser.class",
+      "occurrence": 0,
+      "sha256": "767be803ed4a26c6d3305632101759854d8ee67ba17744255bab9546f8f1eb4e",
+      "name": "javax/jms/QueueBrowser",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQueue",
+          "descriptor": "()Ljavax/jms/Queue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getMessageSelector",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getEnumeration",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/QueueBrowser"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueConnection.class",
+      "occurrence": 0,
+      "sha256": "c31c4bfd62ddd798191db5b618760455ca2704874c393193a06fabad9da4237d",
+      "name": "javax/jms/QueueConnection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Connection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createQueueSession",
+          "descriptor": "(ZI)Ljavax/jms/QueueSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Queue;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Connection",
+        "javax/jms/JMSException",
+        "javax/jms/QueueConnection"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "862c2a68cb2ff53e9525a7bb76a74a3d37300cffba2de4aa07fc92ff58cb2239",
+      "name": "javax/jms/QueueConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/ConnectionFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createQueueConnection",
+          "descriptor": "()Ljavax/jms/QueueConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createQueueConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/QueueConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ConnectionFactory",
+        "javax/jms/JMSException",
+        "javax/jms/QueueConnectionFactory"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueReceiver.class",
+      "occurrence": 0,
+      "sha256": "ef34ae0f231f2d005dd0d5da78886b8aeeb215298ef74e3ed55e5b94e0c77219",
+      "name": "javax/jms/QueueReceiver",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/MessageConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQueue",
+          "descriptor": "()Ljavax/jms/Queue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageConsumer",
+        "javax/jms/QueueReceiver"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueRequestor.class",
+      "occurrence": 0,
+      "sha256": "2a510abc562f43135d6bea170ab5ca53cf5a6e7690b1e15e740344a08f5896c2",
+      "name": "javax/jms/QueueRequestor",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "session",
+          "descriptor": "Ljavax/jms/QueueSession;",
+          "access": 2
+        },
+        {
+          "name": "temporaryQueue",
+          "descriptor": "Ljavax/jms/TemporaryQueue;",
+          "access": 2
+        },
+        {
+          "name": "sender",
+          "descriptor": "Ljavax/jms/QueueSender;",
+          "access": 2
+        },
+        {
+          "name": "receiver",
+          "descriptor": "Ljavax/jms/QueueReceiver;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/jms/QueueSession;Ljavax/jms/Queue;)V",
+          "access": 1,
+          "code_sha256": "b582cccaad15a54b82b61ad261b51da1f778cc2c3c7fb9973d824ca47efafa38",
+          "code_length": 59,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "request",
+          "descriptor": "(Ljavax/jms/Message;)Ljavax/jms/Message;",
+          "access": 1,
+          "code_sha256": "edda670a144935ecfaf2b22254631bbb1f7c9f4024ac3adc3ce9a763be3f9ccc",
+          "code_length": 30,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cc536fbcd285fb72b07e529e1761888c2dae49b4f4ba3660dea8aac4eda7d501",
+          "code_length": 19,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setReceiver",
+          "descriptor": "(Ljavax/jms/QueueReceiver;)V",
+          "access": 2,
+          "code_sha256": "6377798f8121adf0407db2372aa220ce41c532ac92844368c39c3a53e012a535",
+          "code_length": 6
+        },
+        {
+          "name": "getReceiver",
+          "descriptor": "()Ljavax/jms/QueueReceiver;",
+          "access": 2,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "setSender",
+          "descriptor": "(Ljavax/jms/QueueSender;)V",
+          "access": 2,
+          "code_sha256": "e7bd3d7dcc637464b3ee1cb064132ca5b3eca7c3bb17297d49f24a681141aae8",
+          "code_length": 6
+        },
+        {
+          "name": "getSender",
+          "descriptor": "()Ljavax/jms/QueueSender;",
+          "access": 2,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "setSession",
+          "descriptor": "(Ljavax/jms/QueueSession;)V",
+          "access": 2,
+          "code_sha256": "426ae263500f080b5cc781296359ccd73b815bb336a838d6718d26512d4563e5",
+          "code_length": 6
+        },
+        {
+          "name": "getSession",
+          "descriptor": "()Ljavax/jms/QueueSession;",
+          "access": 2,
+          "code_sha256": "8d2aec6788db2b05a70890264c04f2cdb831396ab355947b95b7e2e0e5946927",
+          "code_length": 5
+        },
+        {
+          "name": "setTemporaryQueue",
+          "descriptor": "(Ljavax/jms/TemporaryQueue;)V",
+          "access": 2,
+          "code_sha256": "623bb0cc81ce899b5e7cba317018eab9f6cb5d21109001d3462966b419651997",
+          "code_length": 6
+        },
+        {
+          "name": "getTemporaryQueue",
+          "descriptor": "()Ljavax/jms/TemporaryQueue;",
+          "access": 2,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/InvalidDestinationException",
+        "javax/jms/JMSException",
+        "javax/jms/Message",
+        "javax/jms/Queue",
+        "javax/jms/QueueReceiver",
+        "javax/jms/QueueRequestor",
+        "javax/jms/QueueSender",
+        "javax/jms/QueueSession",
+        "javax/jms/TemporaryQueue"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueSender.class",
+      "occurrence": 0,
+      "sha256": "aa349ff599f9ac30a12d5b045d10e63d4bf0444c7b82b8f5b77e6a02672a9ede",
+      "name": "javax/jms/QueueSender",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/MessageProducer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQueue",
+          "descriptor": "()Ljavax/jms/Queue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Queue;Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "send",
+          "descriptor": "(Ljavax/jms/Queue;Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageProducer",
+        "javax/jms/QueueSender"
+      ]
+    },
+    {
+      "entry": "javax/jms/QueueSession.class",
+      "occurrence": 0,
+      "sha256": "a00c8ac9c05c56a2ad141c714974631371a57ec29492c525d7ecce5f9af22a89",
+      "name": "javax/jms/QueueSession",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Session"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createQueue",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Queue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createReceiver",
+          "descriptor": "(Ljavax/jms/Queue;)Ljavax/jms/QueueReceiver;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createReceiver",
+          "descriptor": "(Ljavax/jms/Queue;Ljava/lang/String;)Ljavax/jms/QueueReceiver;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSender",
+          "descriptor": "(Ljavax/jms/Queue;)Ljavax/jms/QueueSender;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;)Ljavax/jms/QueueBrowser;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;Ljava/lang/String;)Ljavax/jms/QueueBrowser;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTemporaryQueue",
+          "descriptor": "()Ljavax/jms/TemporaryQueue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/QueueSession",
+        "javax/jms/Session"
+      ]
+    },
+    {
+      "entry": "javax/jms/ResourceAllocationException.class",
+      "occurrence": 0,
+      "sha256": "e356d54181bc7eb475ccd2d856ad01112ac9f7590fa047fb3f960ac60e0f5aa9",
+      "name": "javax/jms/ResourceAllocationException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/ResourceAllocationException"
+      ]
+    },
+    {
+      "entry": "javax/jms/ResourceAllocationRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "d656a92faec7953d5993329060aed03632db20e3e22c2b84053bcace62e2e443",
+      "name": "javax/jms/ResourceAllocationRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/ResourceAllocationRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/ServerSession.class",
+      "occurrence": 0,
+      "sha256": "d7e804c3e6c974c08c168f60000a411f020266643ffd6787f430184aaa939c71",
+      "name": "javax/jms/ServerSession",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSession",
+          "descriptor": "()Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/ServerSession"
+      ]
+    },
+    {
+      "entry": "javax/jms/ServerSessionPool.class",
+      "occurrence": 0,
+      "sha256": "d98a0cc4921c0511217a572ee4502a0d2232380aefbd3f5a2139e44acc8b2ac0",
+      "name": "javax/jms/ServerSessionPool",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getServerSession",
+          "descriptor": "()Ljavax/jms/ServerSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/ServerSessionPool"
+      ]
+    },
+    {
+      "entry": "javax/jms/Session.class",
+      "occurrence": 0,
+      "sha256": "959afee176a91cd98e4f435a0b3d0a46040d7e3ff1f1d8da2a05f7fbde48a32b",
+      "name": "javax/jms/Session",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable",
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [
+        {
+          "name": "AUTO_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLIENT_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DUPS_OK_ACKNOWLEDGE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SESSION_TRANSACTED",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "createBytesMessage",
+          "descriptor": "()Ljavax/jms/BytesMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createMapMessage",
+          "descriptor": "()Ljavax/jms/MapMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createMessage",
+          "descriptor": "()Ljavax/jms/Message;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createObjectMessage",
+          "descriptor": "()Ljavax/jms/ObjectMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createObjectMessage",
+          "descriptor": "(Ljava/io/Serializable;)Ljavax/jms/ObjectMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createStreamMessage",
+          "descriptor": "()Ljavax/jms/StreamMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTextMessage",
+          "descriptor": "()Ljavax/jms/TextMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTextMessage",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/TextMessage;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getTransacted",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getAcknowledgeMode",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "rollback",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "recover",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getMessageListener",
+          "descriptor": "()Ljavax/jms/MessageListener;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setMessageListener",
+          "descriptor": "(Ljavax/jms/MessageListener;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "createProducer",
+          "descriptor": "(Ljavax/jms/Destination;)Ljavax/jms/MessageProducer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConsumer",
+          "descriptor": "(Ljavax/jms/Destination;Ljava/lang/String;Z)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createQueue",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Queue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTopic",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Topic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Z)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;)Ljavax/jms/QueueBrowser;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createBrowser",
+          "descriptor": "(Ljavax/jms/Queue;Ljava/lang/String;)Ljavax/jms/QueueBrowser;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTemporaryQueue",
+          "descriptor": "()Ljavax/jms/TemporaryQueue;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTemporaryTopic",
+          "descriptor": "()Ljavax/jms/TemporaryTopic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "unsubscribe",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Z)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSharedDurableConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/MessageConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "javax/jms/JMSException",
+        "javax/jms/Session"
+      ]
+    },
+    {
+      "entry": "javax/jms/StreamMessage.class",
+      "occurrence": 0,
+      "sha256": "d229793a66cb0372b9c49beeb6fa3f7568525b940e94cfdd708797e24728377c",
+      "name": "javax/jms/StreamMessage",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Message"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "readBoolean",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readByte",
+          "descriptor": "()B",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readShort",
+          "descriptor": "()S",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readChar",
+          "descriptor": "()C",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readInt",
+          "descriptor": "()I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readLong",
+          "descriptor": "()J",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readFloat",
+          "descriptor": "()F",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readDouble",
+          "descriptor": "()D",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "([B)I",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "readObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBoolean",
+          "descriptor": "(Z)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "(S)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeChar",
+          "descriptor": "(C)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeInt",
+          "descriptor": "(I)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeLong",
+          "descriptor": "(J)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeFloat",
+          "descriptor": "(F)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeDouble",
+          "descriptor": "(D)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeString",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([B)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "([BII)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Message",
+        "javax/jms/StreamMessage"
+      ]
+    },
+    {
+      "entry": "javax/jms/TemporaryQueue.class",
+      "occurrence": 0,
+      "sha256": "079a3743a5fc35d86956cf4a23d7fc08b003f56786bcc672fad2f9f7e384f5ab",
+      "name": "javax/jms/TemporaryQueue",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Queue"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "delete",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Queue",
+        "javax/jms/TemporaryQueue"
+      ]
+    },
+    {
+      "entry": "javax/jms/TemporaryTopic.class",
+      "occurrence": 0,
+      "sha256": "c17b761e1a03c250c9f2c298417e7b30d7540220115c6dd4f400e7a5647f039c",
+      "name": "javax/jms/TemporaryTopic",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Topic"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "delete",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/TemporaryTopic",
+        "javax/jms/Topic"
+      ]
+    },
+    {
+      "entry": "javax/jms/TextMessage.class",
+      "occurrence": 0,
+      "sha256": "6c1e9412f2fa887eba8d220d29285810bd6476184dad60aae038b53bf680eb13",
+      "name": "javax/jms/TextMessage",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Message"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setText",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Message",
+        "javax/jms/TextMessage"
+      ]
+    },
+    {
+      "entry": "javax/jms/Topic.class",
+      "occurrence": 0,
+      "sha256": "00f18ed72fc8ed313c9f4b4a9f005f4c86eae51427606101ba501c0c7e3f8084",
+      "name": "javax/jms/Topic",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Destination"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTopicName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Destination",
+        "javax/jms/JMSException",
+        "javax/jms/Topic"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicConnection.class",
+      "occurrence": 0,
+      "sha256": "6a67e897b066f8cb383f47813a27613bd0854dafb4fe96ac204139088494d577",
+      "name": "javax/jms/TopicConnection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Connection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createTopicSession",
+          "descriptor": "(ZI)Ljavax/jms/TopicSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableConnectionConsumer",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Ljavax/jms/ServerSessionPool;I)Ljavax/jms/ConnectionConsumer;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Connection",
+        "javax/jms/JMSException",
+        "javax/jms/TopicConnection"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "8b589aa349e4318359253563b66b10918bd2950bba793a8c5003ec3d3a4a86a3",
+      "name": "javax/jms/TopicConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/ConnectionFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createTopicConnection",
+          "descriptor": "()Ljavax/jms/TopicConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTopicConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/TopicConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/ConnectionFactory",
+        "javax/jms/JMSException",
+        "javax/jms/TopicConnectionFactory"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicPublisher.class",
+      "occurrence": 0,
+      "sha256": "1175ba63668e45be41e0e2e6d06fbaa956478455fcaf61b9dec86b9a28ff530a",
+      "name": "javax/jms/TopicPublisher",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/MessageProducer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTopic",
+          "descriptor": "()Ljavax/jms/Topic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "publish",
+          "descriptor": "(Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "publish",
+          "descriptor": "(Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "publish",
+          "descriptor": "(Ljavax/jms/Topic;Ljavax/jms/Message;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "publish",
+          "descriptor": "(Ljavax/jms/Topic;Ljavax/jms/Message;IIJ)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageProducer",
+        "javax/jms/TopicPublisher"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicRequestor.class",
+      "occurrence": 0,
+      "sha256": "40c39a541fec6f2950fb7ca00654ad2ff8fb9679b3997f89b435d52787dcd807",
+      "name": "javax/jms/TopicRequestor",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "session",
+          "descriptor": "Ljavax/jms/TopicSession;",
+          "access": 2
+        },
+        {
+          "name": "topic",
+          "descriptor": "Ljavax/jms/Topic;",
+          "access": 2
+        },
+        {
+          "name": "temporaryTopic",
+          "descriptor": "Ljavax/jms/TemporaryTopic;",
+          "access": 2
+        },
+        {
+          "name": "publisher",
+          "descriptor": "Ljavax/jms/TopicPublisher;",
+          "access": 2
+        },
+        {
+          "name": "subscriber",
+          "descriptor": "Ljavax/jms/TopicSubscriber;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/jms/TopicSession;Ljavax/jms/Topic;)V",
+          "access": 1,
+          "code_sha256": "0ee8034c40b9b854342d95e2bd9243de1b2f94536a9e439d9d79a0b18ef2199f",
+          "code_length": 50,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "request",
+          "descriptor": "(Ljavax/jms/Message;)Ljavax/jms/Message;",
+          "access": 1,
+          "code_sha256": "6022f8fc02d708d79337c548412664a8e67ad8beb43f1db585a8b412b70fdbe8",
+          "code_length": 30,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8b7a45789cf29fab9c736872b1ede61b99d2e96bb64f91c164f6237adde9b93f",
+          "code_length": 19,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "setPublisher",
+          "descriptor": "(Ljavax/jms/TopicPublisher;)V",
+          "access": 2,
+          "code_sha256": "963c5f7772c379183a96d29f018a6e837bd172295c297bb73edf61429086d446",
+          "code_length": 6
+        },
+        {
+          "name": "getPublisher",
+          "descriptor": "()Ljavax/jms/TopicPublisher;",
+          "access": 2,
+          "code_sha256": "215514a3ba98d8863bce9e3203285417c77ecd99a4bbfb9b8e6245b3f27a5c82",
+          "code_length": 5
+        },
+        {
+          "name": "setSession",
+          "descriptor": "(Ljavax/jms/TopicSession;)V",
+          "access": 2,
+          "code_sha256": "9f32e6ee360511d051cfeb97fb6a343ddc7d643bef2ec62aba13bf96a338357d",
+          "code_length": 6
+        },
+        {
+          "name": "getSession",
+          "descriptor": "()Ljavax/jms/TopicSession;",
+          "access": 2,
+          "code_sha256": "fa18df45ff64283e28c79af6508af4fb6523d873b37e2136b809cff43992c2e1",
+          "code_length": 5
+        },
+        {
+          "name": "setSubscriber",
+          "descriptor": "(Ljavax/jms/TopicSubscriber;)V",
+          "access": 2,
+          "code_sha256": "6377798f8121adf0407db2372aa220ce41c532ac92844368c39c3a53e012a535",
+          "code_length": 6
+        },
+        {
+          "name": "getSubscriber",
+          "descriptor": "()Ljavax/jms/TopicSubscriber;",
+          "access": 2,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "setTemporaryTopic",
+          "descriptor": "(Ljavax/jms/TemporaryTopic;)V",
+          "access": 2,
+          "code_sha256": "e7bd3d7dcc637464b3ee1cb064132ca5b3eca7c3bb17297d49f24a681141aae8",
+          "code_length": 6
+        },
+        {
+          "name": "getTemporaryTopic",
+          "descriptor": "()Ljavax/jms/TemporaryTopic;",
+          "access": 2,
+          "code_sha256": "5d159aedaf5714f84326c9966981962b7474d34226b625adc14123ec9271eb51",
+          "code_length": 5
+        },
+        {
+          "name": "setTopic",
+          "descriptor": "(Ljavax/jms/Topic;)V",
+          "access": 2,
+          "code_sha256": "426ae263500f080b5cc781296359ccd73b815bb336a838d6718d26512d4563e5",
+          "code_length": 6
+        },
+        {
+          "name": "getTopic",
+          "descriptor": "()Ljavax/jms/Topic;",
+          "access": 2,
+          "code_sha256": "8d2aec6788db2b05a70890264c04f2cdb831396ab355947b95b7e2e0e5946927",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Message",
+        "javax/jms/TemporaryTopic",
+        "javax/jms/TopicPublisher",
+        "javax/jms/TopicRequestor",
+        "javax/jms/TopicSession",
+        "javax/jms/TopicSubscriber"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicSession.class",
+      "occurrence": 0,
+      "sha256": "ca7d94bde273e63ddcaa81cffd9ee5d5a36b5a4dc08e6a84ef88fc6309d22cb6",
+      "name": "javax/jms/TopicSession",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Session"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createTopic",
+          "descriptor": "(Ljava/lang/String;)Ljavax/jms/Topic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Z)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createDurableSubscriber",
+          "descriptor": "(Ljavax/jms/Topic;Ljava/lang/String;Ljava/lang/String;Z)Ljavax/jms/TopicSubscriber;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createPublisher",
+          "descriptor": "(Ljavax/jms/Topic;)Ljavax/jms/TopicPublisher;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTemporaryTopic",
+          "descriptor": "()Ljavax/jms/TemporaryTopic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "unsubscribe",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Session",
+        "javax/jms/TopicSession"
+      ]
+    },
+    {
+      "entry": "javax/jms/TopicSubscriber.class",
+      "occurrence": 0,
+      "sha256": "0a358abc1109f8fa2f57b00a046b0f4f2f217dcb73cc56a1626b45e4f77518bc",
+      "name": "javax/jms/TopicSubscriber",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/MessageConsumer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTopic",
+          "descriptor": "()Ljavax/jms/Topic;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getNoLocal",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/MessageConsumer",
+        "javax/jms/TopicSubscriber"
+      ]
+    },
+    {
+      "entry": "javax/jms/TransactionInProgressException.class",
+      "occurrence": 0,
+      "sha256": "abab78f98caf0f792e37efa882647a46938627b52b22e1e0c4ed907571a8ddf7",
+      "name": "javax/jms/TransactionInProgressException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/TransactionInProgressException"
+      ]
+    },
+    {
+      "entry": "javax/jms/TransactionInProgressRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "11aeaf405caa2bcb0a56d561b45b84093699586bcdac101b510ba754e9c12a69",
+      "name": "javax/jms/TransactionInProgressRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/TransactionInProgressRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/TransactionRolledBackException.class",
+      "occurrence": 0,
+      "sha256": "251ef88bb108617a4e2aea80ea04b4984b750e6d78076eec5b1412cf43fbd8d9",
+      "name": "javax/jms/TransactionRolledBackException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "c9631458efa54a2730f6dedac3e41d42652aaada84976f8f8cd710678c0b86f9",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSException",
+        "javax/jms/TransactionRolledBackException"
+      ]
+    },
+    {
+      "entry": "javax/jms/TransactionRolledBackRuntimeException.class",
+      "occurrence": 0,
+      "sha256": "af04a057718b47eaac023e3ad16f608d4d0217aa3178dff84d8a08332a939860",
+      "name": "javax/jms/TransactionRolledBackRuntimeException",
+      "major": 51,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/jms/JMSRuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cdad265321158188c2f6c10f2af3b92d4509b8fc879cd36fdd048f8d8e58676f",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "javax/jms/JMSRuntimeException",
+        "javax/jms/TransactionRolledBackRuntimeException"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAConnection.class",
+      "occurrence": 0,
+      "sha256": "42a835780ff17abce88ddcb75caef9e521d855ca03fce883b98c30206bd9630b",
+      "name": "javax/jms/XAConnection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Connection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXASession",
+          "descriptor": "()Ljavax/jms/XASession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createSession",
+          "descriptor": "(ZI)Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/Connection",
+        "javax/jms/JMSException",
+        "javax/jms/XAConnection"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "e99c5c67e3691d2aea57b55e166b84ec8374e28b705e6e9730d9ab62816ec23e",
+      "name": "javax/jms/XAConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXAConnection",
+          "descriptor": "()Ljavax/jms/XAConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createXAConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/XAConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createXAContext",
+          "descriptor": "()Ljavax/jms/XAJMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "createXAContext",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/XAJMSContext;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/XAConnectionFactory"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAJMSContext.class",
+      "occurrence": 0,
+      "sha256": "264309ba4262605608dec9f861e7a58eed18be4eafbcb5c2e278f5f7292c56ab",
+      "name": "javax/jms/XAJMSContext",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/JMSContext"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "getContext",
+          "descriptor": "()Ljavax/jms/JMSContext;",
+          "access": 1025
+        },
+        {
+          "name": "getTransacted",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "getXAResource",
+          "descriptor": "()Ljavax/transaction/xa/XAResource;",
+          "access": 1025
+        },
+        {
+          "name": "rollback",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSContext",
+        "javax/jms/XAJMSContext"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAQueueConnection.class",
+      "occurrence": 0,
+      "sha256": "b5f31e84fc20901c907bf215ed71efb02a2134b569925cebfba59547fc6abea4",
+      "name": "javax/jms/XAQueueConnection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/XAConnection",
+        "javax/jms/QueueConnection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXAQueueSession",
+          "descriptor": "()Ljavax/jms/XAQueueSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createQueueSession",
+          "descriptor": "(ZI)Ljavax/jms/QueueSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/QueueConnection",
+        "javax/jms/XAConnection",
+        "javax/jms/XAQueueConnection"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAQueueConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "05bb8034b2910384901b60a0eb52226d043923114fe7bef9521d923feec1ad54",
+      "name": "javax/jms/XAQueueConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/XAConnectionFactory",
+        "javax/jms/QueueConnectionFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXAQueueConnection",
+          "descriptor": "()Ljavax/jms/XAQueueConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createXAQueueConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/XAQueueConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/QueueConnectionFactory",
+        "javax/jms/XAConnectionFactory",
+        "javax/jms/XAQueueConnectionFactory"
+      ]
+    },
+    {
+      "entry": "javax/jms/XAQueueSession.class",
+      "occurrence": 0,
+      "sha256": "2517fcda76af31ec109587520bf6f53745094fdff2261b3b0aad25bea97ddaa4",
+      "name": "javax/jms/XAQueueSession",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/XASession"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getQueueSession",
+          "descriptor": "()Ljavax/jms/QueueSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/XAQueueSession",
+        "javax/jms/XASession"
+      ]
+    },
+    {
+      "entry": "javax/jms/XASession.class",
+      "occurrence": 0,
+      "sha256": "c98761a256eadf373994b3d774d4b5ac35f5a7cd0a1a4c70a8f40cddb3fee9fd",
+      "name": "javax/jms/XASession",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/Session"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getSession",
+          "descriptor": "()Ljavax/jms/Session;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "getXAResource",
+          "descriptor": "()Ljavax/transaction/xa/XAResource;",
+          "access": 1025
+        },
+        {
+          "name": "getTransacted",
+          "descriptor": "()Z",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "rollback",
+          "descriptor": "()V",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/Session",
+        "javax/jms/XASession"
+      ]
+    },
+    {
+      "entry": "javax/jms/XATopicConnection.class",
+      "occurrence": 0,
+      "sha256": "ded4f4bf957408710a8a9fc0177e06d0be6efe525baa230bdd04393fd3706108",
+      "name": "javax/jms/XATopicConnection",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/XAConnection",
+        "javax/jms/TopicConnection"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXATopicSession",
+          "descriptor": "()Ljavax/jms/XATopicSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createTopicSession",
+          "descriptor": "(ZI)Ljavax/jms/TopicSession;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/TopicConnection",
+        "javax/jms/XAConnection",
+        "javax/jms/XATopicConnection"
+      ]
+    },
+    {
+      "entry": "javax/jms/XATopicConnectionFactory.class",
+      "occurrence": 0,
+      "sha256": "8af18d750bef38d56947abd6490988c9d4e4dcad6c1d169e947f66f3abe09c74",
+      "name": "javax/jms/XATopicConnectionFactory",
+      "major": 51,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/jms/XAConnectionFactory",
+        "javax/jms/TopicConnectionFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createXATopicConnection",
+          "descriptor": "()Ljavax/jms/XATopicConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        },
+        {
+          "name": "createXATopicConnection",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/XATopicConnection;",
+          "access": 1025,
+          "throws": [
+            "javax/jms/JMSException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/jms/JMSException",
+        "javax/jms/TopicConnectionFactory",
+        "javax/jms/XAConnectionFactory",
+        "javax/jms/XATopicConnectionFactory"
+      ]
+    }
+  ]
+}

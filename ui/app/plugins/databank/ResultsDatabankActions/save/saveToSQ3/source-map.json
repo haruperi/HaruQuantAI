@@ -1,56 +1,66 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only Save/saveToSQ3 bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/saveToSQ3",
-    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
-    "review":  {
-                   "version":  1,
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan"
-               },
-    "owner":  {
-                  "requirements":  [
-                                       "FR-UI-DATABANK-source-mapping",
-                                       "FR-UI-DATABANK-workflow-preservation",
-                                       "FR-UI-DATABANK-clean-room"
-                                   ],
-                  "domain":  "plugins/databank",
-                  "decision":  "DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP",
-                  "feature":  "FEAT-UI-DATABANK_BUILDER"
-              },
-    "clean_room":  {
-                       "paraphrased_behavior_only":  true,
-                       "contains_personal_data":  false,
-                       "contains_proprietary_source":  false,
-                       "contains_sensitive_data":  false
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultsdatabankactions-save-savetosq3-ui",
-                               "family":  "bounded installed Save artifacts",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultsdatabankactions-save-savetosq3-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural inventory and scoped responsibility inspection",
-                        "inspection_method":  "local SHA-256 inventory and independent target audit",
-                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "efc86be13365dc0c510e31e4e21e65b3f94db4a0d68f625c0d8bd5b5a60532f4",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Structural manifest; not behavioral ledger"
-                        }
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only Save/saveToSQ3 bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/saveToSQ3",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "domain": "plugins/databank",
+    "decision": "DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP",
+    "feature": "FEAT-UI-DATABANK_BUILDER"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-save-savetosq3-ui",
+      "family": "bounded installed Save artifacts",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-save-savetosq3-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveToSQ3/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "Existing independent simulated frontend responsibility or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "02e0a764308c064c2e4cc4d94ab3ab1d014156db07f32c29dfda463c0deaaa15",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent Save menu/dialog/draft/deferred action responsibility Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest; not behavioral ledger"
+    }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ]
 }

@@ -1,0 +1,4212 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/Snippets.jar",
+  "archive_sha256": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "SQ/Columns/Databanks/TotalTradingDays.class",
+      "occurrence": 0,
+      "sha256": "d980a17804e9581dca5024fdfb3e67770c6f4e33bbbfd3b4f08d105c53e14960",
+      "name": "SQ/Columns/Databanks/TotalTradingDays",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MILISECONDS_IN_DAY",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "56fc29c432f4ce7cba4482fdb1eec7630c3d4b81afd6054d266b8f71d4853681",
+          "code_length": 32
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "635c96bb2d2bea106a01d6fddd2932d7c8c9644a6ad42fbf71e6d99eedd6f533",
+          "code_length": 484,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "init",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)LSQ/Columns/Databanks/TotalTradingDays$TempData;",
+          "access": 1,
+          "code_sha256": "87b66a0fcdca3e015e8dccba37a2e799c51e1f21d0678169a534dbd347b4ed81",
+          "code_length": 353,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getCount",
+          "descriptor": "([Z)I",
+          "access": 2,
+          "code_sha256": "c9101564a5248a6b7546c53de0b208f33c2ffaf1c9c8e3a1fa4451ee067a38ae",
+          "code_length": 27
+        },
+        {
+          "name": "getDaysBetween",
+          "descriptor": "(JJ)I",
+          "access": 2,
+          "code_sha256": "a6477ecf12e3162868915287fb75f52f3844a1750b3034a448ed83911e2975b7",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TotalTradingDays",
+        "SQ/Columns/Databanks/TotalTradingDays$TempData",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/StatsTypeCombination",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/TotalTradingMonths.class",
+      "occurrence": 0,
+      "sha256": "5ca804cf56e836ff5a687feae57cdddbfb84db0f0c1c4bffb8a349a4d2f4ded1",
+      "name": "SQ/Columns/Databanks/TotalTradingMonths",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6e68a47059096fded0fd5876a5a465fe39489510969177e6c31e03730998189",
+          "code_length": 33
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "7c081fc96dc15f36e74b855d249e81c6682b6cb43fcbf421e4c4d2a50f774100",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TotalTradingMonths",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/TotalTradingYears.class",
+      "occurrence": 0,
+      "sha256": "c4e3d7a1b39bf3d30fe27f774a54044180dfcb681bc74a00d0366a9759356e04",
+      "name": "SQ/Columns/Databanks/TotalTradingYears",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6e68a47059096fded0fd5876a5a465fe39489510969177e6c31e03730998189",
+          "code_length": 33
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "7c081fc96dc15f36e74b855d249e81c6682b6cb43fcbf421e4c4d2a50f774100",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TotalTradingYears",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/TradesSymmetry.class",
+      "occurrence": 0,
+      "sha256": "07293a493e9d7c918984b379f88b9c2605a73867549594b62f55b9b98da823a0",
+      "name": "SQ/Columns/Databanks/TradesSymmetry",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "461148ee3eff6b820c06f140fb667cbb09618e51106ad6b112d2e6e3b3cf9ce2",
+          "code_length": 51
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "7f970ea09d5fb2381cba3400ce6f5ceaf2960fb3286ef3a2bbecbf83c9bf1dc0",
+          "code_length": 54,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeSymmetry",
+          "descriptor": "(DD)D",
+          "access": 2,
+          "code_sha256": "86f7208f71ac4746342fad61ee38bc17084ef17fc5e5a6628df4017827e29106",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TradesSymmetry",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsTypeCombination",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/TSIndex.class",
+      "occurrence": 0,
+      "sha256": "370bbd7b802b016c554ac98f89cdcdc6c8ad1e46fd9d0716bcd43ab04a325d25",
+      "name": "SQ/Columns/Databanks/TSIndex",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8d24164204e1ec6f48bc662c7763448bc2acf5634de3a7b15bc9260518d184b8",
+          "code_length": 60
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "a199539ccd981ac02d7d63a9da58d4ac20293b2086140636c3529529f9112fca",
+          "code_length": 53,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c1025a44250f7415b419a4fcd82c725005dec7c9d0b67ee8615da6b1d4582b71",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TSIndex",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/String",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/TSWinLossRatio.class",
+      "occurrence": 0,
+      "sha256": "e2b88c627a78393e25599e6091f64f8bc26c672af2e3d48f44ed54201a3470b1",
+      "name": "SQ/Columns/Databanks/TSWinLossRatio",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "51fc7ea8d624b4d2cbf7c7c3a19282f9c758f25a999418cd6f758759f21e2119",
+          "code_length": 35
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "4dbc52b04aae032d91546e9d5d7e8d38812f485850fecc035950b2f74c37b228",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/TSWinLossRatio",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/UlcerIndex.class",
+      "occurrence": 0,
+      "sha256": "a2f48750754b8106e83071a94608d2531c1acb53afe93804b8b7ffc604247fed",
+      "name": "SQ/Columns/Databanks/UlcerIndex",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "712feb8e4168146e97bf65153b0c6e01b32301a23b96ca67019aba42f5918142",
+          "code_length": 31
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "1abfca22911ac2c9dd0a9f4ebd44d8edab2dccb6eeded6408e544fad0df79e22",
+          "code_length": 86,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/UlcerIndex",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/UlcerPerformanceIndex.class",
+      "occurrence": 0,
+      "sha256": "27b0664b148e04c00b0df8dfe7d4c48193e65d75195abd01401eb125d93f26d9",
+      "name": "SQ/Columns/Databanks/UlcerPerformanceIndex",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "DAY_DURATION",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fd92c31239aa521af54ca28653faecc57b316543aef33daa973879fdc9bf6664",
+          "code_length": 72
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "47c5656c6761c42bb8ebb32173f0dbfd2d15c263f1b8f781bbcb36d593d7a94e",
+          "code_length": 45,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeDailyReturn",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)Lit/unimi/dsi/fastutil/doubles/DoubleArrayList;",
+          "access": 2,
+          "code_sha256": "3702e4ba967ce1a5c7b72858afc8ca8a54fe40460777d6af54bbcda1796c42da",
+          "code_length": 347
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "80184c1f2f5761059443789e820c1ccd434092787f91697ab5c09d38f745c0f9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/UlcerPerformanceIndex",
+        "SQ/Functions/StatFunctions",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "it/unimi/dsi/fastutil/doubles/DoubleArrayList",
+        "java/lang/Exception",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/String",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/WinLossRatio.class",
+      "occurrence": 0,
+      "sha256": "a2777ee52c64e304f1cea85219ce2a4f1c7177eb31a4266289e01b062197a4ca",
+      "name": "SQ/Columns/Databanks/WinLossRatio",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "51fc7ea8d624b4d2cbf7c7c3a19282f9c758f25a999418cd6f758759f21e2119",
+          "code_length": 35
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "7cd3505d9110633293bb9004f0f60a26be5cb9a06ffad2ecb8f563bfdc697800",
+          "code_length": 54,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/WinLossRatio",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/WinningPct.class",
+      "occurrence": 0,
+      "sha256": "61c38065f9455e436a30f30191e6019e3ebc570db92a17cfe04e925a73ef6e26",
+      "name": "SQ/Columns/Databanks/WinningPct",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "234e924ed0627fb792f22e046a23ac98d3b5cd93aee94685312eb0c7d77a6b8b",
+          "code_length": 38
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "9a200c0201e27c459f54172c538486b2417fffefe2695a8ac2172f53b3c0caa5",
+          "code_length": 35,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/WinningPct",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/WorstParametersStability.class",
+      "occurrence": 0,
+      "sha256": "fc43663d7bec81ee0164f36e5e7e692fdac52fef68ab8c7ffbb501b991630916",
+      "name": "SQ/Columns/Databanks/WorstParametersStability",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7d320fee509dd9e68ac4ff2570c0407dfd4975ea28fe93fb8aea47f4ce991148",
+          "code_length": 48
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;BBB)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b438069a346fdf54efb56bb4f3a4754b48273c86227119537e4f5af92eb5055b",
+          "code_length": 34,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "942fe2076c1c263324c64844eb49e2820df655bf6c8adc2e590258a5dd817a38",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/WorstParametersStability",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/PlTypes",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "java/lang/Exception",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/WorstYearProfit.class",
+      "occurrence": 0,
+      "sha256": "50a9543e1f359764619c6995dbb48585254c1ffdafa50cb181ba21092e3b8fee",
+      "name": "SQ/Columns/Databanks/WorstYearProfit",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ad056a6f27de563ee7e57eb56e523a35ab6af15c7b0a5ac47a77bd07c5920bb5",
+          "code_length": 26
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "b335d31ff2f9c0d671dda6ed4efe469ea046ac6d979251405b6b5593ec0ae142",
+          "code_length": 199,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/WorstYearProfit",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsTypeCombination",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleMap",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleMap$Entry",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleMap$FastEntrySet",
+        "it/unimi/dsi/fastutil/ints/Int2DoubleOpenHashMap",
+        "it/unimi/dsi/fastutil/objects/ObjectIterator",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/ZProbability.class",
+      "occurrence": 0,
+      "sha256": "69e5b41b6f36040af8db94fbe3051fd902fe3a0b61ea26a1909e1d67edbddc80",
+      "name": "SQ/Columns/Databanks/ZProbability",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1ea10222496ded8f0969c1120fd1854798274c7edb4abf849c63de2f21ef9302",
+          "code_length": 33
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "5606e767802a60ade7779edeba6ef0c408c273f147ec0b1d974808f2824afecd",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "calculateProbabilityFromZ",
+          "descriptor": "(D)D",
+          "access": 2,
+          "code_sha256": "9538c3f8d601c8a719e204dd002a98ccda7ab701b179e927e42db750bfc6e22e",
+          "code_length": 21,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "poz",
+          "descriptor": "(D)D",
+          "access": 2,
+          "code_sha256": "05289775b73494934d9fe3dee1eae5ab7c2d65af783355be0cf4643832368f73",
+          "code_length": 237
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/ZProbability",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Databanks/ZScore.class",
+      "occurrence": 0,
+      "sha256": "85e9ea7380d2902459244b41e1156cc5384077dff88a26e9f023b0c62f391c37",
+      "name": "SQ/Columns/Databanks/ZScore",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/DatabankColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14c6b000c2d3777fe458cd390bf79ac55a225ba6989b4388c5661e88cade18a9",
+          "code_length": 20
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/StatsTypeCombination;Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/SQStats;Lcom/strategyquant/tradinglib/SQStats;)D",
+          "access": 1,
+          "code_sha256": "aaa82bd34e16e120f820ff82e2ec43d62712cbd12b99071168c9f854a4d10e78",
+          "code_length": 14,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "computeZIndex",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;)D",
+          "access": 2,
+          "code_sha256": "b2cc20c2c4301eb19b09963b946b016b487a98cf48529512fafa83ec623112e6",
+          "code_length": 233
+        },
+        {
+          "name": "sign",
+          "descriptor": "(D)D",
+          "access": 2,
+          "code_sha256": "6207ef4f4ba45c38b08cb5b4f7c7d38998fc3be9c86dd58b4daa10d0b57147d2",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Databanks/ZScore",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "java/lang/Exception",
+        "java/lang/Math"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Balance.class",
+      "occurrence": 0,
+      "sha256": "907e7352615cfc5acfe19d37a7e379ff81736b9e2ac38bf542403f51fbe2d61b",
+      "name": "SQ/Columns/Trades/Balance",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "03fa6a97c50edf6b214ccb836ac5e6743ad0cc5a5f40c1eaa7321ebdcd684beb",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Balance",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Exception",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/BarsInTrade.class",
+      "occurrence": 0,
+      "sha256": "4c5fce60f99e8376a04b6eff9fb71138068eacc21262cfa367ab4557e4b57d57",
+      "name": "SQ/Columns/Trades/BarsInTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "03fa6a97c50edf6b214ccb836ac5e6743ad0cc5a5f40c1eaa7321ebdcd684beb",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "510d3a7ab0b33f1788bc7a5aba8ab96474ddb35ea1655b0e6582d593d4a74d6f",
+          "code_length": 8,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/BarsInTrade",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Exception",
+        "java/lang/Short"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/ClosePrice.class",
+      "occurrence": 0,
+      "sha256": "0f6aa5dd81a5b1e34d6bff01790ad264ada4b4eb8f129876dbf711c3d3a7407d",
+      "name": "SQ/Columns/Trades/ClosePrice",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "412863afbd80fae7269da56676e59645b1931c5b7a8f4dc1cde2653d282e5a40",
+          "code_length": 51,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/ClosePrice",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/CloseTime.class",
+      "occurrence": 0,
+      "sha256": "d29d19a1581e59418d815c429e624959e922f8bc89ad1c3a82c9f1bfc8c9b043",
+      "name": "SQ/Columns/Trades/CloseTime",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "221d717453a2d67086e585e1f4f22ff47e851e35a0b8dc87a5f1eeeff467db8e",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "140c85d80f86ec82321aff474f96050ff7558d9933410e959d9e9be1a6f759c8",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/CloseTime",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Long"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/CloseType.class",
+      "occurrence": 0,
+      "sha256": "82c92d45aeceadd9fca96fe9b538f971a88b9926bb2082631a8ac5bd78e110d5",
+      "name": "SQ/Columns/Trades/CloseType",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e35d8b4bdedacd750302676c689449d16f677ed030dedb9ff3a6f83aa8f97eb4",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/CloseType",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ATMExit",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Comment.class",
+      "occurrence": 0,
+      "sha256": "d8efb71a316de0cc045b730b3dff187637d90dda0b509a4b533ee836bc1dd0fb",
+      "name": "SQ/Columns/Trades/Comment",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "03fa6a97c50edf6b214ccb836ac5e6743ad0cc5a5f40c1eaa7321ebdcd684beb",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "65f864d3d3b63b90df535fedf16f3e16a653521e6a509a1280d28e45218de9d2",
+          "code_length": 5
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "02ae20e5612a62452c07ccf1f6081082f0c263f69b2e5948ad9284a1d573a348",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Comment",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/CommSwap.class",
+      "occurrence": 0,
+      "sha256": "e3ee3454c83f4a500a1ba85bbf4b3cf3ef50214677a58d2922def226e3798a01",
+      "name": "SQ/Columns/Trades/CommSwap",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f0047010c9bf17fcdddc4a4cfa554b2a062fa36dee801e10c654296d8a5c15ea",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/CommSwap",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Drawdown.class",
+      "occurrence": 0,
+      "sha256": "8cb42600c0817deb43ec06ea04e9bf04a0e65ef404d985c1dd8a0cc07c464d68",
+      "name": "SQ/Columns/Trades/Drawdown",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Drawdown",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/MAE.class",
+      "occurrence": 0,
+      "sha256": "b9fea28bb3487bbdb5c7c86eecc0f62ed767d4cc5b536dc2630d5adf2613d23a",
+      "name": "SQ/Columns/Trades/MAE",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b3d7a0d3f1f215e012d1e49646e7bc8474d77dff954f7247056ce5d67dd23b64",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/MAE",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/MAEPips.class",
+      "occurrence": 0,
+      "sha256": "7f3a5c0f191a7f5bb82c3e7529bb6d147a87aa7a2fe2efd70c124f64d1beee1a",
+      "name": "SQ/Columns/Trades/MAEPips",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/MAEPips",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/MFE.class",
+      "occurrence": 0,
+      "sha256": "cbfe2721baf890772e3e0987aa59034c179fd95a059c2b4d613ffcbdc7e86f49",
+      "name": "SQ/Columns/Trades/MFE",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/MFE",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/MFEPips.class",
+      "occurrence": 0,
+      "sha256": "4faf80440dcb91c279f1373a7761cba73cc5fea423cbd505e30264c8d061482a",
+      "name": "SQ/Columns/Trades/MFEPips",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/MFEPips",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/NumberOfTrade.class",
+      "occurrence": 0,
+      "sha256": "34871b5f06b0a99ad946dc882fd15a787c5b049b0eab2fb39c58afde2f161b05",
+      "name": "SQ/Columns/Trades/NumberOfTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c497fc1668d599e93f40fbaa30761ed9b4a6bce79a5ab55ee9f8a28aec0991ee",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/NumberOfTrade",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/OpenPrice.class",
+      "occurrence": 0,
+      "sha256": "8f2c663da0110b2aeb57166e8018c1dfb9a940d3d24bae317ec0d5a66a25b3c7",
+      "name": "SQ/Columns/Trades/OpenPrice",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9894279275fd86456fe1c27b57102ea525efb7b6568d0ab7455c02f642185ead",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/OpenPrice",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/OpenTime.class",
+      "occurrence": 0,
+      "sha256": "3e3d117bce8220b7319b19f326aeea9aec5197956ea3916a825d93e81d424cea",
+      "name": "SQ/Columns/Trades/OpenTime",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "221d717453a2d67086e585e1f4f22ff47e851e35a0b8dc87a5f1eeeff467db8e",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "140c85d80f86ec82321aff474f96050ff7558d9933410e959d9e9be1a6f759c8",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/OpenTime",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Long"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/OriginalOpenPrice.class",
+      "occurrence": 0,
+      "sha256": "781211e60a4d89288f17248a266621517f7ad40bcde22ad165ea77dfb9e0a819",
+      "name": "SQ/Columns/Trades/OriginalOpenPrice",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9894279275fd86456fe1c27b57102ea525efb7b6568d0ab7455c02f642185ead",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/OriginalOpenPrice",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/String",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/OriginalOpenTime.class",
+      "occurrence": 0,
+      "sha256": "fb6c5a1c62b77c06ff3416223946448c05009b1c1752ef12dab1bf42aded6ec5",
+      "name": "SQ/Columns/Trades/OriginalOpenTime",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "221d717453a2d67086e585e1f4f22ff47e851e35a0b8dc87a5f1eeeff467db8e",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fdee81eb6e01db4ab87239af47020cd97ddcb50957564ce7543e59127798887a",
+          "code_length": 61
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "04586d581de1d599bedd88397fae7999f031a339f2e9750b46c29d8d37659ad7",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/OriginalOpenTime",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Long"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/PctDrawdown.class",
+      "occurrence": 0,
+      "sha256": "083b3fac9788e1035d28de61cd784ec21940115f17483999046322a8bce77934",
+      "name": "SQ/Columns/Trades/PctDrawdown",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/PctDrawdown",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/ProfitLoss.class",
+      "occurrence": 0,
+      "sha256": "a7d89360beb4ff60e8d9a27d05f017dc228dbd62bbce8cc7e7481fbfb6249801",
+      "name": "SQ/Columns/Trades/ProfitLoss",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e93b04e99e2f7023918cfef553f79bc62fb37fd2b1fb625233c3dd51cd9cde93",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f0047010c9bf17fcdddc4a4cfa554b2a062fa36dee801e10c654296d8a5c15ea",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/ProfitLoss",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/ProfitLossPct.class",
+      "occurrence": 0,
+      "sha256": "e31e6f3eba6e50f11ec5892ae60103079744bfc9c143b8058a852f4440cc6f4a",
+      "name": "SQ/Columns/Trades/ProfitLossPct",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e93b04e99e2f7023918cfef553f79bc62fb37fd2b1fb625233c3dd51cd9cde93",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f0047010c9bf17fcdddc4a4cfa554b2a062fa36dee801e10c654296d8a5c15ea",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/ProfitLossPct",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/ProfitLossPips.class",
+      "occurrence": 0,
+      "sha256": "3c25f167aff0d37631445674c9da4d87eea0abf06e726e22008c064986b461f8",
+      "name": "SQ/Columns/Trades/ProfitLossPips",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e93b04e99e2f7023918cfef553f79bc62fb37fd2b1fb625233c3dd51cd9cde93",
+          "code_length": 19
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f0047010c9bf17fcdddc4a4cfa554b2a062fa36dee801e10c654296d8a5c15ea",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/ProfitLossPips",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/PTLevel.class",
+      "occurrence": 0,
+      "sha256": "74ef0f8b3f3e790a96297eac6e1879855331b58fad2bac7178d1f94bb21d6be7",
+      "name": "SQ/Columns/Trades/PTLevel",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/PTLevel",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/ResultName.class",
+      "occurrence": 0,
+      "sha256": "c21242540a29717c73884a4eb07b8c12ede5d44a386c138debc1d02488fa9fc7",
+      "name": "SQ/Columns/Trades/ResultName",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "65f864d3d3b63b90df535fedf16f3e16a653521e6a509a1280d28e45218de9d2",
+          "code_length": 5
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1e0ce77c4878b6e1563256a60905fa4955363489f4972af2cc1738501ade1477",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/ResultName",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/SampleType.class",
+      "occurrence": 0,
+      "sha256": "f1a26ebd79f29cc7371f091a1a455a0b69eb9b73a6f45b9462fc48f7e11906c8",
+      "name": "SQ/Columns/Trades/SampleType",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "480e22070e316f981a7b7fecae313359e3504814d67700a2969cbe7d874adf5e",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/SampleType",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Byte",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Size.class",
+      "occurrence": 0,
+      "sha256": "83745beef542b1be06ebba0a36a53a66c7341192ed083aaa6242e45aeb7478d5",
+      "name": "SQ/Columns/Trades/Size",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "895522c8c21153c9001cca4be0f10d5061948841396cbfdd61d06d1520ac0d8c",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Size",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/SlippageInMoney.class",
+      "occurrence": 0,
+      "sha256": "d269f7ea82e13eab20fc3848f040c6db03737b4fd134e79ea2f601f50ccdbd6a",
+      "name": "SQ/Columns/Trades/SlippageInMoney",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b70e5d6cc264f15b0f9afbea74546d860a83aafaa49400de30f7a573c96a87b0",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/SlippageInMoney",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/SLLevel.class",
+      "occurrence": 0,
+      "sha256": "604f32afa02dd19133271f2d7ad254e9f671fdf81cc5f8ab1cb8ad83084a13ab",
+      "name": "SQ/Columns/Trades/SLLevel",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/SLLevel",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Float"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Symbol.class",
+      "occurrence": 0,
+      "sha256": "2d617d183cdcd057cbc2dd943ddb17a7925f92f7d26206fb0be6940cab6abd91",
+      "name": "SQ/Columns/Trades/Symbol",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e327e934a82fe7e87f01cce84677f0010d6a9b83e3ae4c0197c52f0535d0d2ae",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "65f864d3d3b63b90df535fedf16f3e16a653521e6a509a1280d28e45218de9d2",
+          "code_length": 5
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f9b9792709c8a94d7075eef0372e3ea9f562ab93725687825b0878fe00e7fcac",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Symbol",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Ticket.class",
+      "occurrence": 0,
+      "sha256": "38878cd1b5c9519400a18cf2e3c8b3858a53ef85ac2f1a1bfc3e651ddd602f8e",
+      "name": "SQ/Columns/Trades/Ticket",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "895522c8c21153c9001cca4be0f10d5061948841396cbfdd61d06d1520ac0d8c",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Ticket",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/TimeInTrade.class",
+      "occurrence": 0,
+      "sha256": "062134a572256a506aff409839f2360b81a8c954bcd5b4bc95c0caf7ef615d4e",
+      "name": "SQ/Columns/Trades/TimeInTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "52b4e36a3f28f56d26f9572f58a98d85d368bbe3600b5865233ee84f15132247",
+          "code_length": 18
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0283d1c2a627ff4cb9e6ef2904d2acc859d8e378864524e46fe4aab0b30d7ec8",
+          "code_length": 8
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "45645de73c277270b388d27c4b2601526aacd0768be54e356d07ac44c430cf6c",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/TimeInTrade",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Integer"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/Trades/Type.class",
+      "occurrence": 0,
+      "sha256": "ad9aee616e35e09982aae3942886692f643e57fe183b2eb2b71520072d63ca51",
+      "name": "SQ/Columns/Trades/Type",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/TradelistColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f24fc47af95e5f38d2b194aa038f1c7f53f1a4781a6db96b69d256a3faf959c",
+          "code_length": 12
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Order;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "895522c8c21153c9001cca4be0f10d5061948841396cbfdd61d06d1520ac0d8c",
+          "code_length": 8
+        },
+        {
+          "name": "getFormattedValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "47fe0d51a7221f50d8e7ee4836309826c003ad89436186148031ce5676b68bb4",
+          "code_length": 202
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/Trades/Type",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/TradelistColumn",
+        "com/strategyquant/tradinglib/table/TableColumn",
+        "java/lang/Byte",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMaxDDbyRun.class",
+      "occurrence": 0,
+      "sha256": "391c9e78f21b9aea1f2398b48e01adbd4b0b220163e0f900d71dbe72c2306a2d",
+      "name": "SQ/Columns/WalkForward/WFMaxDDbyRun",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7e2cbf5e24816c5d1376190153fcc814f70d8cb26d22710249d65594932099fb",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "b8f3ea294a0a70abbcd363ecb080fea05ed6cc67ea2c0ab574d8bb6144b875e5",
+          "code_length": 113
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMaxDDbyRun",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMaxPctDDbyRun.class",
+      "occurrence": 0,
+      "sha256": "29290ac03f1014d34d14714484271f14fe8ff4e2a9b34d9839402f4425f095a0",
+      "name": "SQ/Columns/WalkForward/WFMaxPctDDbyRun",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7e2cbf5e24816c5d1376190153fcc814f70d8cb26d22710249d65594932099fb",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "b8f3ea294a0a70abbcd363ecb080fea05ed6cc67ea2c0ab574d8bb6144b875e5",
+          "code_length": 113
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMaxPctDDbyRun",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMaxProfitByRun.class",
+      "occurrence": 0,
+      "sha256": "018ef158b33664157970e2387bfe6ab9ebbb3ffdd18620ddfa9b1e91cc5e17a8",
+      "name": "SQ/Columns/WalkForward/WFMaxProfitByRun",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9993e540f806424b75e206dc39abfe880e29770b286e6df028bf04908e9b82cd",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "b8f3ea294a0a70abbcd363ecb080fea05ed6cc67ea2c0ab574d8bb6144b875e5",
+          "code_length": 113
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMaxProfitByRun",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMaxProfitByRunInPct.class",
+      "occurrence": 0,
+      "sha256": "1691725b0548b15761cd1c5753717c7e204c2f64433b9a9d4f52a43e62aec795",
+      "name": "SQ/Columns/WalkForward/WFMaxProfitByRunInPct",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9993e540f806424b75e206dc39abfe880e29770b286e6df028bf04908e9b82cd",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "b4e37ba0a9d0b568f61e5dece0e2d9d2f71e2d7b9044f2a34407bd1162d3e281",
+          "code_length": 162
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMaxProfitByRunInPct",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMaxStagnationInPct.class",
+      "occurrence": 0,
+      "sha256": "b0d962f5c25af8b29ae14579eaabe12cc35b3e18c7cb3cf119ac1103bbf0d38b",
+      "name": "SQ/Columns/WalkForward/WFMaxStagnationInPct",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7e2cbf5e24816c5d1376190153fcc814f70d8cb26d22710249d65594932099fb",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "b8f3ea294a0a70abbcd363ecb080fea05ed6cc67ea2c0ab574d8bb6144b875e5",
+          "code_length": 113
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMaxStagnationInPct",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFMinTradesInRun.class",
+      "occurrence": 0,
+      "sha256": "1a865aaa80cee60dceefa5f7ae129edd54e98ae1e3ec456bcdc8f70848ce6fce",
+      "name": "SQ/Columns/WalkForward/WFMinTradesInRun",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9993e540f806424b75e206dc39abfe880e29770b286e6df028bf04908e9b82cd",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "9d323a3a3dc41ad579088b9e2f9864a55943c309b4621514909aca5c9b095ba6",
+          "code_length": 113
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFMinTradesInRun",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFPctOfProfitableRuns.class",
+      "occurrence": 0,
+      "sha256": "74341840e3ac4bcd0adaf658b15dc6ca7ca409328205d9b51aad2c6fabe750e9",
+      "name": "SQ/Columns/WalkForward/WFPctOfProfitableRuns",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9993e540f806424b75e206dc39abfe880e29770b286e6df028bf04908e9b82cd",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "c1530aa01577202607a48fca5ca7220079523601a9f193b0610e66fc25fcf508",
+          "code_length": 86
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFPctOfProfitableRuns",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/SQStats",
+        "com/strategyquant/tradinglib/StatsKey",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardPeriod",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/Columns/WalkForward/WFScore.class",
+      "occurrence": 0,
+      "sha256": "7bdd2081eb43d3521b73fd2dd72e9ec1f7a4b87c971f225a5cd676ad357be021",
+      "name": "SQ/Columns/WalkForward/WFScore",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/WalkForwardColumn",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "54271e97ef8c7bed66f04b4de978b08d85948ecda1b59aa732b832b77dd44bd6",
+          "code_length": 15
+        },
+        {
+          "name": "compute",
+          "descriptor": "(Lcom/strategyquant/tradinglib/WalkForwardResult;)D",
+          "access": 1,
+          "code_sha256": "900130217f3f968e7d3f897df7f3954bc05538c1f7b036fb1dc1982710ca808d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "SQ/Columns/WalkForward/WFScore",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/ValueTypes",
+        "com/strategyquant/tradinglib/WalkForwardColumn",
+        "com/strategyquant/tradinglib/WalkForwardResult"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/Loss.class",
+      "occurrence": 0,
+      "sha256": "21a17e606437359a7f87919feba356de977491613679e28a1b52e372dad77c01",
+      "name": "SQ/CorrelationOf/Loss",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a46c46cc9caa09977bf0974c8cee35b24ffcff36adbcc914a109afae0dda804",
+          "code_length": 19
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "ee2a6703674c51fa2e1f41dc1477931adf855e4d2d7a5a92f1ca5f42e7a3e583",
+          "code_length": 100,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "shouldSkipPeriod",
+          "descriptor": "(DD)Z",
+          "access": 1,
+          "code_sha256": "197047be10cce82c713651fdea0e5fc99a1622ea3fcccae672c8317310723841",
+          "code_length": 18
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/Loss",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "java/lang/Exception",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/NumberOfClosedPositions.class",
+      "occurrence": 0,
+      "sha256": "b664f66eaeb156809861502b4720e9e8e7935942126f18455059c1522987cb3f",
+      "name": "SQ/CorrelationOf/NumberOfClosedPositions",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b1a5217ef99877e9dbe567a6a16e561f61a128ef1b140783c69bd0faf323a373",
+          "code_length": 20
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "dbabfd7350a5d0db41adb78a6ce88407cab55c6e99911a48d13d5515375de7f1",
+          "code_length": 124,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/NumberOfClosedPositions",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "java/lang/Exception",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/NumberOfClosedTrades.class",
+      "occurrence": 0,
+      "sha256": "84f12609cec53572a74ac7e858cf37b64cdb4c1a367805c1a97c4349dd78b413",
+      "name": "SQ/CorrelationOf/NumberOfClosedTrades",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b1a5217ef99877e9dbe567a6a16e561f61a128ef1b140783c69bd0faf323a373",
+          "code_length": 20
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "3227e29c32fda9219561a1dfbabbeb2de1a36061f464dcce482bdb3384bffb94",
+          "code_length": 95,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/NumberOfClosedTrades",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "java/lang/Exception",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/NumberOfOpenPositions.class",
+      "occurrence": 0,
+      "sha256": "12748d437b3ee50b4274967a6cd7e8de306b81bdec8bff9175073f3edd653854",
+      "name": "SQ/CorrelationOf/NumberOfOpenPositions",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b1a5217ef99877e9dbe567a6a16e561f61a128ef1b140783c69bd0faf323a373",
+          "code_length": 20
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "55548a6c4efe0b514e028ceb0cae61f5080c6d5552d5893692c77d2071c1083e",
+          "code_length": 152,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/NumberOfOpenPositions",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/lang/Exception",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/NumberOfOpenTrades.class",
+      "occurrence": 0,
+      "sha256": "e11df1999bda855dfead7faa1b9386f1485628400f4ccb9fa2b265cb67ef17c4",
+      "name": "SQ/CorrelationOf/NumberOfOpenTrades",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b1a5217ef99877e9dbe567a6a16e561f61a128ef1b140783c69bd0faf323a373",
+          "code_length": 20
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "7f1733f306c20a4a3a542cf3a21c09715761db632afc11897531ced73d28bdd5",
+          "code_length": 130,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/NumberOfOpenTrades",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap",
+        "it/unimi/dsi/fastutil/longs/Long2ObjectMap$Entry",
+        "it/unimi/dsi/fastutil/objects/ObjectSortedSet",
+        "java/lang/Exception",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "SQ/CorrelationOf/ProfitLoss.class",
+      "occurrence": 0,
+      "sha256": "0df9abfcdf3287dc1fbc8608dc327adc0a77673605bee511864ed339a36cecf7",
+      "name": "SQ/CorrelationOf/ProfitLoss",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CorrelationType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a46c46cc9caa09977bf0974c8cee35b24ffcff36adbcc914a109afae0dda804",
+          "code_length": 19
+        },
+        {
+          "name": "computePeriods",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;ILcom/strategyquant/lib/TimePeriods;)V",
+          "access": 1,
+          "code_sha256": "ee2a6703674c51fa2e1f41dc1477931adf855e4d2d7a5a92f1ca5f42e7a3e583",
+          "code_length": 100,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/CorrelationOf/ProfitLoss",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "java/lang/Exception",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory"
+      ]
+    },
+    {
+      "entry": "SQ/CustomAnalysis/CorrelationFilter.class",
+      "occurrence": 0,
+      "sha256": "e6300d75b55115cc11a3981a55494ed7130b9edb2d50d49ed8cff03b1683f76e",
+      "name": "SQ/CustomAnalysis/CorrelationFilter",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CustomAnalysisMethod",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1745eea2d9597484b78e555aa8975f98662e099db9c7193303ae64c65e9fc0b6",
+          "code_length": 9
+        },
+        {
+          "name": "filterStrategy",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "processDatabank",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/ArrayList;)Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "8c918391b90c1686b36b148512fe4e387a7ba626fc531614aefadaecf048067b",
+          "code_length": 276,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/ResultsGroup;>;"
+        },
+        {
+          "name": "precomputePeriodsAP",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;ILcom/strategyquant/tradinglib/CorrelationType;)Lcom/strategyquant/tradinglib/correlation/CorrelationPeriods;",
+          "access": 2,
+          "code_sha256": "e88222bbf6d2315bb23cc2681153222f2e4d813f9f7260dfed9766ea5dbd74b7",
+          "code_length": 145,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "lambda$processDatabank$0",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/tradinglib/ResultsGroup;)I",
+          "access": 4106,
+          "code_sha256": "8af8f47e774b28b3412bf93c8f585162963a7e225404d31fc3eb9bfefc491f6f",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "SQ/CustomAnalysis/CorrelationFilter",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/TimePeriod",
+        "com/strategyquant/lib/TimePeriods",
+        "com/strategyquant/tradinglib/CorrelationLib",
+        "com/strategyquant/tradinglib/CorrelationType",
+        "com/strategyquant/tradinglib/CustomAnalysisMethod",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/correlation/CorrelationComputer",
+        "com/strategyquant/tradinglib/correlation/CorrelationPeriodTypes",
+        "com/strategyquant/tradinglib/correlation/CorrelationPeriods",
+        "com/strategyquant/tradinglib/correlation/CorrelationTypes",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList"
+      ]
+    },
+    {
+      "entry": "SQ/CustomAnalysis/OutlierTrade.class",
+      "occurrence": 0,
+      "sha256": "1f1f7b9a600612589d3b21ab9b3ff74f3840d955a7f8f6beb278e63867d7cb3e",
+      "name": "SQ/CustomAnalysis/OutlierTrade",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/CustomAnalysisMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "523ed03ecff15caa41bb54b048bba63942a4b6d3f336fea2c8849aa467fe12fa",
+          "code_length": 9
+        },
+        {
+          "name": "filterStrategy",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/ResultsGroup;)Z",
+          "access": 1,
+          "code_sha256": "2a3e7e2f9b68eaf4511985fb1dd665093efef6acef3fc145cbbb9348013d8da1",
+          "code_length": 377,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8fe9910de9754d8b005e6160fa02cc2c19c5fd059fda3aa320f75f9a715ab32a",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "SQ/CustomAnalysis/OutlierTrade",
+        "[Ljava/lang/String;",
+        "com/strategyquant/tradinglib/CustomAnalysisMethod",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/AcceptedStrategiesPerHour.class",
+      "occurrence": 0,
+      "sha256": "707b7f225cb22bf301d91c36f2eddf146ad7daea5c81a3291e8b01714462084e",
+      "name": "SQ/EngineCharts/AcceptedStrategiesPerHour",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "series",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "projectRunInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/ProjectRunInfo;",
+          "access": 2
+        },
+        {
+          "name": "oldProjectRunInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/ProjectRunInfo;",
+          "access": 2
+        },
+        {
+          "name": "checksSinceLastChange",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6849857eafcebed0b1501bf10138d2ff4743bb04b5a3ce9cfcade86d0d48109e",
+          "code_length": 166
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "499dd832375169faea2dca1fe71e2d41c0c9ef662135bd9f9a63e343763c77f6",
+          "code_length": 117
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "52261347a2216c38265be5cf3d2bd69cdaeefc776ff6462fa255775e209bb2d2",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/AcceptedStrategiesPerHour",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/ProjectRunInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/AverageStrategiesPerHourChart.class",
+      "occurrence": 0,
+      "sha256": "62bba8b23b9e506af6f46516406564eecd69dccdc89556745cc14b5f603b197e",
+      "name": "SQ/EngineCharts/AverageStrategiesPerHourChart",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "series",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "projectRunInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/ProjectRunInfo;",
+          "access": 2
+        },
+        {
+          "name": "oldProjectRunInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/ProjectRunInfo;",
+          "access": 2
+        },
+        {
+          "name": "checksSinceLastChange",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6849857eafcebed0b1501bf10138d2ff4743bb04b5a3ce9cfcade86d0d48109e",
+          "code_length": 166
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "499dd832375169faea2dca1fe71e2d41c0c9ef662135bd9f9a63e343763c77f6",
+          "code_length": 117
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "52261347a2216c38265be5cf3d2bd69cdaeefc776ff6462fa255775e209bb2d2",
+          "code_length": 44
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/AverageStrategiesPerHourChart",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/ProjectRunInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/DatabankFitnessIS.class",
+      "occurrence": 0,
+      "sha256": "a36a4cbfc000c79cd2bfb743d74465e5e5df9efbe71b7876e525ee271538014c",
+      "name": "SQ/EngineCharts/DatabankFitnessIS",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "topAvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bfdf3276819a10535b9fa014cb9c6339fa9314232563dcef86a2156b26b64727",
+          "code_length": 45
+        },
+        {
+          "name": "addValueFromDatabank",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Databank;)V",
+          "access": 2,
+          "code_sha256": "16a6516208d375dd6981bfbb886de4c665d499687ccc561a23e37488aa4e1e17",
+          "code_length": 46
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9a186c06535c5c9c5faa14c4a612021aeaa05afaa2aca7660da6751ad2b89bd8",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/DatabankFitnessIS",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/DatabankFitnessIST.class",
+      "occurrence": 0,
+      "sha256": "4a434216ffa3a69148a6f92d67acb58d5f625d6266699033f4a940e12a8ea790",
+      "name": "SQ/EngineCharts/DatabankFitnessIST",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "topAvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bfdf3276819a10535b9fa014cb9c6339fa9314232563dcef86a2156b26b64727",
+          "code_length": 45
+        },
+        {
+          "name": "addValueFromDatabank",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Databank;)V",
+          "access": 2,
+          "code_sha256": "16a6516208d375dd6981bfbb886de4c665d499687ccc561a23e37488aa4e1e17",
+          "code_length": 46
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9a186c06535c5c9c5faa14c4a612021aeaa05afaa2aca7660da6751ad2b89bd8",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/DatabankFitnessIST",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/DatabankFitnessISV.class",
+      "occurrence": 0,
+      "sha256": "7e9f7f3dd083d8b5cc7e8dc96c4d1a24b96188f22c2072c65e60f44bd00ed81b",
+      "name": "SQ/EngineCharts/DatabankFitnessISV",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "topAvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bfdf3276819a10535b9fa014cb9c6339fa9314232563dcef86a2156b26b64727",
+          "code_length": 45
+        },
+        {
+          "name": "addValueFromDatabank",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Databank;)V",
+          "access": 2,
+          "code_sha256": "16a6516208d375dd6981bfbb886de4c665d499687ccc561a23e37488aa4e1e17",
+          "code_length": 46
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9a186c06535c5c9c5faa14c4a612021aeaa05afaa2aca7660da6751ad2b89bd8",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/DatabankFitnessISV",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/DatabankFitnessOOS.class",
+      "occurrence": 0,
+      "sha256": "f7a63175ecb22c8e2dcc9b6e0639f9f344caef832274f9e816805f0c80b1de16",
+      "name": "SQ/EngineCharts/DatabankFitnessOOS",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "topAvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bfdf3276819a10535b9fa014cb9c6339fa9314232563dcef86a2156b26b64727",
+          "code_length": 45
+        },
+        {
+          "name": "addValueFromDatabank",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Databank;)V",
+          "access": 2,
+          "code_sha256": "16a6516208d375dd6981bfbb886de4c665d499687ccc561a23e37488aa4e1e17",
+          "code_length": 46
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9a186c06535c5c9c5faa14c4a612021aeaa05afaa2aca7660da6751ad2b89bd8",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/DatabankFitnessOOS",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/GeneticEvolutionInfo.class",
+      "occurrence": 0,
+      "sha256": "973e437c269d91ae5e3e45d5f6180ae53acf0b5476267e9a44b8224874011277",
+      "name": "SQ/EngineCharts/GeneticEvolutionInfo",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e7ae7beced2fd247a7bc929e5173bdabec25cd70020965e08fedacd5b7f61088",
+          "code_length": 12
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "10761e8a97f8e3f8e5039da87d5bfe2d65599d0ffa59b7b55ce152c60eabf38d",
+          "code_length": 201
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/GeneticEvolutionInfo",
+        "[Lcom/strategyquant/tradinglib/gp/GPFitnessEvolutionData;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/GeneticInfo",
+        "com/strategyquant/tradinglib/gp/GPFitnessEvolutionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/GenEvoFitnessIS.class",
+      "occurrence": 0,
+      "sha256": "c69cc736d68154be4a6a653b0b09857c9acbaaafc6e9841196680138e218e592",
+      "name": "SQ/EngineCharts/GenEvoFitnessIS",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "best5AvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "08c845dd20a37b08933bfb1eff7b751ac80dd84712c1cd2927dfff29f06c6078",
+          "code_length": 44
+        },
+        {
+          "name": "addValueFromGenEvo",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5a72f9fca6c02ea4e03bfef42540aa4c1a616b34b2dd04e6c5de1be4b1a41eb8",
+          "code_length": 120
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9c88b57451c1c8e58d7873de65e24b55c5a5d43e6a3423db24abba4f245a5d1a",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/GenEvoFitnessIS",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/GeneticInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/gp/GPFitnessEvolutionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/GenEvoFitnessIST.class",
+      "occurrence": 0,
+      "sha256": "0cc82f222b5232009212dd1aea23b9858a8d82497035d69d7659206e2d8c268b",
+      "name": "SQ/EngineCharts/GenEvoFitnessIST",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "best5AvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "08c845dd20a37b08933bfb1eff7b751ac80dd84712c1cd2927dfff29f06c6078",
+          "code_length": 44
+        },
+        {
+          "name": "addValueFromGenEvo",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5a72f9fca6c02ea4e03bfef42540aa4c1a616b34b2dd04e6c5de1be4b1a41eb8",
+          "code_length": 120
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9c88b57451c1c8e58d7873de65e24b55c5a5d43e6a3423db24abba4f245a5d1a",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/GenEvoFitnessIST",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/GeneticInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/gp/GPFitnessEvolutionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/GenEvoFitnessISV.class",
+      "occurrence": 0,
+      "sha256": "f9d988a30270cd4b843617fb14b1505fd20af3a3e464e1b885a2a3898bddb573",
+      "name": "SQ/EngineCharts/GenEvoFitnessISV",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "best5AvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "882507ba80c2c269b5665307395f4ce5d35db3e24f442e3d45fa8a15d4483244",
+          "code_length": 192
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "6cd30dee37a0db5fe257766ba2dc83c4e6c05019eac082f08317bdb6b16bdcaa",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "48f623afba0eb80b97f142c5102b31bcf161d532e5eeefdb62a71602bbf42914",
+          "code_length": 44
+        },
+        {
+          "name": "addValueFromGenEvo",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5ec7c1c5d4b1d233234eb4a014d5b1de56b761d2deaae3d8a9cf3f9c4c17df2c",
+          "code_length": 148
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c4e040ee0305e33c0a8ce38fb68ad30625a2a8fbbf0392c2c709c629195f2efc",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/GenEvoFitnessISV",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/GeneticInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/gp/GPFitnessEvolutionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/GenEvoFitnessOOS.class",
+      "occurrence": 0,
+      "sha256": "c589c1c474b1c02be827d1b3c3db5b4f6ea6abac79d882e1dd67519fdb422437",
+      "name": "SQ/EngineCharts/GenEvoFitnessOOS",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesLineChart;",
+          "access": 2
+        },
+        {
+          "name": "bestSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "best5AvgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "avgSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "eee3e70efddcd2a4c9ec579f554da4f82588ed4ad92c200cdf74c9801bd09aef",
+          "code_length": 204
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "a46f20ea922168f573129226cca8dbf49d8d2ad788726724777468d4288a1075",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "08c845dd20a37b08933bfb1eff7b751ac80dd84712c1cd2927dfff29f06c6078",
+          "code_length": 44
+        },
+        {
+          "name": "addValueFromGenEvo",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3ec0e4318d56673a4a0120865e45552e57d66efe70c486df40169e046070f436",
+          "code_length": 148
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9c88b57451c1c8e58d7873de65e24b55c5a5d43e6a3423db24abba4f245a5d1a",
+          "code_length": 22
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/GenEvoFitnessOOS",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/ChartsConst",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/GeneticInfo",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "com/strategyquant/tradinglib/gp/FitnessCollectionData",
+        "com/strategyquant/tradinglib/gp/GPFitnessEvolutionData",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/HeapMemoryChart.class",
+      "occurrence": 0,
+      "sha256": "a43056ddd00967549f7fdf35b038d30b566df25ba6989b2cde355d4c51fc842b",
+      "name": "SQ/EngineCharts/HeapMemoryChart",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesAreaChart;",
+          "access": 2
+        },
+        {
+          "name": "memoryUsageSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "heapSizeSeries",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "checks",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ec6fdffe83b6bb4b82cea27b2017e008d8db66b8382d99f98abd6935de432a81",
+          "code_length": 225
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "d01c74ea21b37ac672897baf37843695cba6cadc5c8fa5fcd6c307d601b14b51",
+          "code_length": 59
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ba8d08ea2463a0210ccfe2f7e9ded64d5e3a49cbb435fe74df8761996d124eff",
+          "code_length": 72
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/HeapMemoryChart",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesAreaChart",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/management/MemoryMXBean",
+        "java/lang/management/MemoryUsage",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/OffHeapMemoryChart.class",
+      "occurrence": 0,
+      "sha256": "c4a239a2ef47eea809b447675cbef522a7942dbbe35baf3f1be4bec6de3684ac",
+      "name": "SQ/EngineCharts/OffHeapMemoryChart",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chart",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeriesAreaChart;",
+          "access": 2
+        },
+        {
+          "name": "series",
+          "descriptor": "Lcom/strategyquant/tradinglib/TimeSeries;",
+          "access": 2
+        },
+        {
+          "name": "offHeapInfo",
+          "descriptor": "Lcom/strategyquant/lib/MemoryInfo;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "aadf10102edfa6bbf8777b68e230006b2e579d45ee317a07c8a4d8e73fd3ebf7",
+          "code_length": 152
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "20293dc32c1710b076c456fb93a2fe251bc03fe8455daa8cdddc1b93212e393e",
+          "code_length": 33
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b045bfcb647d863abe3005521af9ab6d7e28d558f646ddb2423f5a27ea83bc26",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/OffHeapMemoryChart",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/MemoryInfo",
+        "com/strategyquant/lib/memory/OffHeapMemory",
+        "com/strategyquant/tradinglib/EngineChart",
+        "com/strategyquant/tradinglib/TimeSeries",
+        "com/strategyquant/tradinglib/TimeSeriesAreaChart",
+        "com/strategyquant/tradinglib/TimeSeriesLineChart",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "org/json/JSONObject",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/EngineCharts/OffHeapMemoryInfoChart.class",
+      "occurrence": 0,
+      "sha256": "826eba79a88ebcac134f7865dc6659b00c9c7319f8813af4b3ffd4a7e5e0c8d3",
+      "name": "SQ/EngineCharts/OffHeapMemoryInfoChart",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/EngineChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "offHeapInfo",
+          "descriptor": "Lcom/strategyquant/lib/MemoryInfo;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "58080a113efaeea60e05321a923f83c9b3cd7fbf3ba54b543ad83126f25deadf",
+          "code_length": 23
+        },
+        {
+          "name": "print",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "767a68dd5d172f1ea02eea2f48be216bd7ce77d59bc9e9e7fc6f4aa0386419dc",
+          "code_length": 113
+        },
+        {
+          "name": "addNextValue",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "SQ/EngineCharts/OffHeapMemoryInfoChart",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/MemoryInfo",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/memory/OffHeapMemory",
+        "com/strategyquant/tradinglib/EngineChart",
+        "org/json/JSONArray",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "SQ/ExitMethods/ExitAfterBars$1.class",
+      "occurrence": 0,
+      "sha256": "afd8ce813bd56bf0ee927420411e2ad299db19b8d3b12d4170e04d8e95c9611c",
+      "name": "SQ/ExitMethods/ExitAfterBars$1",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$order",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/ExitMethods/ExitAfterBars;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/ExitMethods/ExitAfterBars;Lcom/strategyquant/tradinglib/ILiveOrder;)V",
+          "access": 0,
+          "code_sha256": "ab79229c8e56ae65c7d0ceefa5a5eff6288a34ac51e87278e01b5f8f5a2e759b",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "1123b331b05cd5336e18bb668b15f665be0c185c2010a99c0142cd359b797868",
+          "code_length": 25,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/ExitMethods/ExitAfterBars",
+        "SQ/ExitMethods/ExitAfterBars$1",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/ExitMethods/ExitAfterBars.class",
+      "occurrence": 0,
+      "sha256": "1635004d1294de2ca960ec5732e1132284ff5cbbd88fb4952aa926cb667c6468",
+      "name": "SQ/ExitMethods/ExitAfterBars",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/ExitMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ExitAfterBars",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setForOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "647ad6591b681b2561f86402903a0f7531fb91452c58945c8b0aee817f1c1aa4",
+          "code_length": 24,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkExitAfterBars",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 2,
+          "code_sha256": "b57688ebea4a5071f693f670413f8dc3933a2ed5631c98734a2e8d181c889576",
+          "code_length": 42,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "computeValue",
+          "descriptor": "(BLcom/strategyquant/tradinglib/StrategyBase;Ljava/lang/String;D)D",
+          "access": 1,
+          "code_sha256": "8631a691a12e130d532d7d7a45b27916476871785095d045d0d0bfd21bb35464",
+          "code_length": 10,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "(ZLcom/strategyquant/tradinglib/StrategyBase;)Lcom/strategyquant/tradinglib/IBlock;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2,
+          "throws": [
+            "com/strategyquant/tradinglib/BlockDefinitionException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/ExitMethods/ExitAfterBars",
+        "SQ/ExitMethods/ExitAfterBars$1",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/UpdateEventTypes",
+        "com/strategyquant/tradinglib/BlockDefinitionException",
+        "com/strategyquant/tradinglib/ExitMethod",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/OrderCloseTypes"
+      ]
+    },
+    {
+      "entry": "SQ/ExitMethods/MoveSL2BE$1.class",
+      "occurrence": 0,
+      "sha256": "f570a8f2460d2856347f60a054db48adbf09a5919bfaf7c952c31e857af3f4f6",
+      "name": "SQ/ExitMethods/MoveSL2BE$1",
+      "major": 69,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/IActionEventListener"
+      ],
+      "fields": [
+        {
+          "name": "val$order",
+          "descriptor": "Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 4112
+        },
+        {
+          "name": "val$Strategy",
+          "descriptor": "Lcom/strategyquant/tradinglib/StrategyBase;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "LSQ/ExitMethods/MoveSL2BE;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(LSQ/ExitMethods/MoveSL2BE;Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 0,
+          "code_sha256": "78c875fe3fb0cf5ac9ec75d31db26ac92f8b231be604fbce1e31625b32aefd78",
+          "code_length": 25,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "OnActionEvent",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "46c75aa2ec6f132df7434d03198844efa13c77c6d812d0bced231f60a4c7a4e7",
+          "code_length": 42,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/ExitMethods/MoveSL2BE",
+        "SQ/ExitMethods/MoveSL2BE$1",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/tradinglib/IActionEventListener",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "SQ/ExitMethods/MoveSL2BE.class",
+      "occurrence": 0,
+      "sha256": "c1beec6c3cfbfb0d3b025d576bd8562bce2865752336de43cb0ed9dd2151c3e3",
+      "name": "SQ/ExitMethods/MoveSL2BE",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/ExitMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MoveSL2BE",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        },
+        {
+          "name": "SL2BEAddPips",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        },
+        {
+          "name": "move2BESL",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "debugTrailingStops",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0c36a29535c4d2f9c2f14c78ec360126df0efd18506e02a33b4817faf9158479",
+          "code_length": 17
+        },
+        {
+          "name": "setForOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "ca75965ff64b1187f65184615eb2f4e3a6862d45580c9586ca2af220e16480a7",
+          "code_length": 44,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "computeValue",
+          "descriptor": "(BLcom/strategyquant/tradinglib/StrategyBase;Ljava/lang/String;D)D",
+          "access": 1,
+          "code_sha256": "5980c53e319dcabe4eeb821f7f865caed701c2218c2f4a0dd6884f9925182846",
+          "code_length": 10,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "checkSL2BE",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/IFormula;Lcom/strategyquant/tradinglib/IFormula;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 4,
+          "code_sha256": "2ccd40d7855846d097dfcecb7cfaf1d0e94a0d91b3bb6c218de2866169ff6dc0",
+          "code_length": 546,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "setExit",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "68796e74b1bee4d3f3fe672b126e74f8668db395303b0e682aa1b5f5a355c605",
+          "code_length": 154,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "(ZLcom/strategyquant/tradinglib/StrategyBase;)Lcom/strategyquant/tradinglib/IBlock;",
+          "access": 1,
+          "code_sha256": "065745c50ea6578c2433eb316e193c9b5f2da410546fd4093590b97b45aa5f4e",
+          "code_length": 26,
+          "throws": [
+            "com/strategyquant/tradinglib/BlockDefinitionException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/ExitMethods/MoveSL2BE",
+        "SQ/ExitMethods/MoveSL2BE$1",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/datalib/UpdateEventTypes",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/BlockDefinitionException",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/ExitMethod",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/StringConcatFactory",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "SQ/ExitMethods/ProfitTarget.class",
+      "occurrence": 0,
+      "sha256": "d2c21f19f93dac5e8f280776103e8c31ddbcd20ca36cd4fabaaef9a1032b4606",
+      "name": "SQ/ExitMethods/ProfitTarget",
+      "major": 69,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/ExitMethod",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ProfitTarget",
+          "descriptor": "Lcom/strategyquant/tradinglib/IFormula;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "setForOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "5b44cf2b65a621932f8868511dc5761edfa0d805854432361e84385c3aa5f95f",
+          "code_length": 87,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "setOrderPTValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 2,
+          "code_sha256": "fb59ff4043ca45e4cf153f915abbb004ab897c13415a66192004dd42f9116be1",
+          "code_length": 158,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "computeValue",
+          "descriptor": "(BLcom/strategyquant/tradinglib/StrategyBase;Ljava/lang/String;D)D",
+          "access": 1,
+          "code_sha256": "b0efb0fece63df32b252054c4e3148c574cf3c2a13660e5c88771078f843b1b6",
+          "code_length": 67,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "setExit",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "b65a0045567c3cbbf680597382541e55607213a1a5c4e6c04c75c8914a71546f",
+          "code_length": 131,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "placeTargetOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;DILcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 2,
+          "code_sha256": "d61e9710be7447da5a1c6540e77e2621eec266c79b707cff5a6eddf18b7a287e",
+          "code_length": 83,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "setInitialExit",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ILiveOrder;Lcom/strategyquant/tradinglib/StrategyBase;)Z",
+          "access": 1,
+          "code_sha256": "32f8b7a25937b20f74570c3ffbac6c729201c9133135f50bc875783553a4e9b7",
+          "code_length": 261,
+          "throws": [
+            "com/strategyquant/datalib/TradingException"
+          ]
+        },
+        {
+          "name": "clone",
+          "descriptor": "(ZLcom/strategyquant/tradinglib/StrategyBase;)Lcom/strategyquant/tradinglib/IBlock;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2,
+          "throws": [
+            "com/strategyquant/tradinglib/BlockDefinitionException"
+          ]
+        }
+      ],
+      "class_references": [
+        "SQ/ExitMethods/ProfitTarget",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/TradingException",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/tradinglib/BlockDefinitionException",
+        "com/strategyquant/tradinglib/ChartData",
+        "com/strategyquant/tradinglib/ExitMethod",
+        "com/strategyquant/tradinglib/IFormula",
+        "com/strategyquant/tradinglib/ILiveOrder",
+        "com/strategyquant/tradinglib/Order",
+        "com/strategyquant/tradinglib/OrderCloseTypes",
+        "com/strategyquant/tradinglib/OrderTypes",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/Trader",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/strategy/MarketData",
+        "java/lang/Math"
+      ]
+    }
+  ]
+}

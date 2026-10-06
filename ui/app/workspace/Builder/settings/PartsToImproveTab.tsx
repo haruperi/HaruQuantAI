@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { SqdCheckbox, SqdFieldset, SqdSelect } from './SettingsControls';
 import { partsToImproveActions, partsToImproveDefaults, type PartsToImproveState } from './settingsFixtures';
 
-/** "Parts to improve" tab (donor evidence SQX144-EV-000040). */
+/** "Parts to improve" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function PartsToImproveTab() {
   const [state, setState] = useState<PartsToImproveState>(partsToImproveDefaults);
   const patch = (part: Partial<PartsToImproveState>) => setState(current => ({ ...current, ...part }));

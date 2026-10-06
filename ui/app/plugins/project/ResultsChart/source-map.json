@@ -1,157 +1,190 @@
 {
-    "schema_version":  1,
-    "scope":  "Frontend-only ResultsChart bounded structural traceability",
-    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart",
-    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsChart",
-    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
-    "review":  {
-                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
-                   "state":  "owner-approved-plan",
-                   "version":  1
-               },
-    "owner":  {
-                  "domain":  "plugins/project",
-                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
-                  "decision":  "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
-                  "requirements":  [
-                                       "FR-UI-PROJECT-source-mapping",
-                                       "FR-UI-PROJECT-workflow-preservation",
-                                       "FR-UI-PROJECT-clean-room"
-                                   ]
-              },
-    "clean_room":  {
-                       "contains_proprietary_source":  false,
-                       "contains_sensitive_data":  false,
-                       "contains_personal_data":  false,
-                       "paraphrased_behavior_only":  true
-                   },
-    "source_catalog":  [
-                           {
-                               "id":  "sqx-resultschart-ui",
-                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart",
-                               "family":  "bounded installed frontend plugin artifacts"
-                           }
-                       ],
-    "sources":  [
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/chart.html",
-                        "relative_path":  "chart.html",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "e576a0be32c80962f259c5b6df991524f6aef12704b74bc445a147758ac4d9f4",
-                        "target":  "chart.tsx",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js",
-                        "relative_path":  "module.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "independently authored structural counterpart",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "0b92134dc25c43de576240937ed62807c830fa977f38ddcfa83f9d436ce2d633",
-                        "target":  "module.ts",
-                        "classification":  "counterpart",
-                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChart.jar",
-                        "relative_path":  "ResultsChart.jar",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "33cca54b95a76fd447a1664d2def1b46d9f2da1f429c788df6c0b76597a793ba",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend binary excluded from frontend-only scope."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartCtrl.js",
-                        "relative_path":  "ResultsChartCtrl.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "c8f306b5bd0b8dc919b43324900720a808fa387b3d3e323d7ea3069d5e779b96",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Current local trade controls remain explicit shared TradesChart support; donor live-chart lifecycle not implemented."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js",
-                        "relative_path":  "ResultsChartService.js",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "d353212821d829b512de660c8add9eba755e918265790435cf77a6a3d53ffbe4",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Backend/chart/report/view persistence operations absent; no services implemented."
-                    },
-                    {
-                        "catalog_id":  "sqx-resultschart-ui",
-                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/styles.css",
-                        "relative_path":  "styles.css",
-                        "location":  "whole-file structural identity",
-                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
-                        "relation":  "explicit artifact exclusion",
-                        "access_date":  "2026-10-06",
-                        "sha256":  "b93dbf1717c7dce257b3e666023d6d641efcccc2f5fad9aaa5088e329109c824",
-                        "target":  null,
-                        "classification":  "excluded",
-                        "limitation":  "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted."
-                    }
-                ],
-    "target_only":  [
-                        {
-                            "path":  "source-map.json",
-                            "reason":  "Structural manifest, not behavioral ledger"
-                        },
-                        {
-                            "path":  "README.md",
-                            "reason":  "Coordinator-owned documentation/ownership"
-                        }
-                    ],
-    "retained_support":  [
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
-                                 "reason":  "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
-                                 "reason":  "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
-                                 "reason":  "Shared independent synthetic plots and TradesChart controls retained"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
-                                 "reason":  "Shared result capability flags and mock contracts"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
-                                 "reason":  "Shared conditional visibility/order/defaults"
-                             },
-                             {
-                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
-                                 "reason":  "Shared session analysis rename/delete/export modal behavior retained"
-                             }
-                         ],
-    "limitations":  [
-                        "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
-                        "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
-                        "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
-                        "Structure and mock responsibilities do not establish SQX runtime parity."
-                    ]
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsChart bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsChart",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "decision": "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultschart-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart",
+      "family": "bounded installed frontend plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/chart.html",
+      "relative_path": "chart.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "21a7f3fe3dc811ac9cbe6fb2cba419146a22d3b691740ddf824772ed47cc18eb",
+      "target": "chart.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "481060a330d1645a3a120dd7af4ed90f9401d1c63f9b2495e809d5e9542761c9",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent precomputed mock presentation only; donor runtime parity not established. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChart.jar",
+      "relative_path": "ResultsChart.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "e7806d3052e6f1d1df42c1237e7a28f443f42d66c44a526893de285635bde1e2",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartCtrl.js",
+      "relative_path": "ResultsChartCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "48e61630ddda0c4acad049bd84cc23b1a129667825319a9ca05476284487c13d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Current local trade controls remain explicit shared TradesChart support; donor live-chart lifecycle not implemented. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js",
+      "relative_path": "ResultsChartService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9cbdc9b316eeb57d8f827e63c84b14dc52b283d4f363bd7d97eb58dc0b02dd20",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/chart/report/view persistence operations absent; no services implemented. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultschart-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsChart/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "5d08694574735210ab4de15a4eafd081bf8592f68d5f0b644eceaaae0d3052fb",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned documentation/ownership"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
+      "reason": "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+      "reason": "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independent synthetic plots and TradesChart controls retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+      "reason": "Shared result capability flags and mock contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+      "reason": "Shared conditional visibility/order/defaults"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
+      "reason": "Shared session analysis rename/delete/export modal behavior retained"
+    }
+  ],
+  "limitations": [
+    "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
+    "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
+    "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
+    "Structure and mock responsibilities do not establish SQX runtime parity.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

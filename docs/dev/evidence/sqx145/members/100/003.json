@@ -1,0 +1,5225 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/poi-ooxml-3.11.jar",
+  "archive_sha256": "02db7dd9db4a71bd48452aee87e5691bae2a0f26e7fea264a8f271a42d32599e",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$21.class",
+      "occurrence": 0,
+      "sha256": "807825727c666f10f15632a6f3e454e1f9a492fe36ef3fd52213a7812a2c0cdb",
+      "name": "org/apache/poi/xslf/model/geom/Formula$21",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$21"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$22.class",
+      "occurrence": 0,
+      "sha256": "8f34bd1b40d38df17c19f3c09ca58ef513ff6f9e2c1c8b8f42e378d66f322307",
+      "name": "org/apache/poi/xslf/model/geom/Formula$22",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$22"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$23.class",
+      "occurrence": 0,
+      "sha256": "2e9a1f51f699e7009325546a8e50ef6e476d63b0f671954d0ff43b2d352b388e",
+      "name": "org/apache/poi/xslf/model/geom/Formula$23",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$23"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$24.class",
+      "occurrence": 0,
+      "sha256": "d7651d6d0900d44a05b0ca2dbb2788981a369150a9c7d18cf720b9ad7d78e835",
+      "name": "org/apache/poi/xslf/model/geom/Formula$24",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$24"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$25.class",
+      "occurrence": 0,
+      "sha256": "2eb1c68c8933b5264cec8cf037a5a4828cfc0eea580e0907b5bd7d269386a4c0",
+      "name": "org/apache/poi/xslf/model/geom/Formula$25",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$25"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$26.class",
+      "occurrence": 0,
+      "sha256": "bea0e458b1466f78e6e315d7aa4e580adb56f1402709738e82f77796542ebc18",
+      "name": "org/apache/poi/xslf/model/geom/Formula$26",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "6e574d860e94db1663acfeac0641286c2e745658bda66db66bce8792dbd07369",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "java/lang/Math",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$26"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$27.class",
+      "occurrence": 0,
+      "sha256": "3dc04f29bcd5064bbeb0285e0889c2eef93a4fc285e21b21a6e204a96ca0dfac",
+      "name": "org/apache/poi/xslf/model/geom/Formula$27",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "370d3a74f072746a0cf0304754ad835a6a7a811485137aaaead72a32392696e6",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$27"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$28.class",
+      "occurrence": 0,
+      "sha256": "2da1950e46d6be5cc4350833b9a45ce2d502bf61ad3e202214f10c66de9d3b45",
+      "name": "org/apache/poi/xslf/model/geom/Formula$28",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df0d5741780ae6403a9d046765541fc452bbf5aae0fbec4d76d55c83ccc9956a",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$28"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$29.class",
+      "occurrence": 0,
+      "sha256": "974eb42fd8e731f47b983368cee2c23e9295ca31db10b53ec5ea8ee12eadffe7",
+      "name": "org/apache/poi/xslf/model/geom/Formula$29",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "370d3a74f072746a0cf0304754ad835a6a7a811485137aaaead72a32392696e6",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$29"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$3.class",
+      "occurrence": 0,
+      "sha256": "276ce4a5ded1548f771329280bea9c58f762bc992e0d15261831fdb79ae69995",
+      "name": "org/apache/poi/xslf/model/geom/Formula$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "ed4b9b022d1dee543729de3da3fde0eebf2abff90ecf1a2abbb587c4086a4a08",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$3"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$30.class",
+      "occurrence": 0,
+      "sha256": "b41332cdf4e6921f19934fa646a8d43c4ebc7e4cd7059a1476b480b2c778d32a",
+      "name": "org/apache/poi/xslf/model/geom/Formula$30",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$30"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$31.class",
+      "occurrence": 0,
+      "sha256": "a92b1355310d51bc5a2eaf53d8a0642f91e6a2f46becda381ed6c6e46d8dd490",
+      "name": "org/apache/poi/xslf/model/geom/Formula$31",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$31"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$32.class",
+      "occurrence": 0,
+      "sha256": "d167683634084107b9e284ef33e1a735bcd7375368047bc0df4d06f84115adcd",
+      "name": "org/apache/poi/xslf/model/geom/Formula$32",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$32"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$33.class",
+      "occurrence": 0,
+      "sha256": "f25e7fc471f36c8406fc8f38301c87eaba90114de03dbfd37bd1f89d936a721a",
+      "name": "org/apache/poi/xslf/model/geom/Formula$33",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$33"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$34.class",
+      "occurrence": 0,
+      "sha256": "15799041f1ccdc1afdb3f821d88ad842cbc6e6e442f10b297376ac138a948681",
+      "name": "org/apache/poi/xslf/model/geom/Formula$34",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$34"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$35.class",
+      "occurrence": 0,
+      "sha256": "3c8333d579ed7fcc9312d6bf5162e4403b8ce97a71b622f32efa9713f7f62436",
+      "name": "org/apache/poi/xslf/model/geom/Formula$35",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$35"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$36.class",
+      "occurrence": 0,
+      "sha256": "9134599f1b5afb73ca410ce68c2ac61ab9c3d3ed607b5cfa10be02f00bdebc65",
+      "name": "org/apache/poi/xslf/model/geom/Formula$36",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$36"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$37.class",
+      "occurrence": 0,
+      "sha256": "5b3352563addee05231af6ff8db0f206449da019e18119a801fec636dec613c4",
+      "name": "org/apache/poi/xslf/model/geom/Formula$37",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df5e63da7c9f7aa4804697dfd2dc5031930a22717a5429989549d13bbf83e830",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$37"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$4.class",
+      "occurrence": 0,
+      "sha256": "0ee1bf859976af65f7243bf557e01d91fff64cbcc873291bda697881e86f1ef8",
+      "name": "org/apache/poi/xslf/model/geom/Formula$4",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "ed4b9b022d1dee543729de3da3fde0eebf2abff90ecf1a2abbb587c4086a4a08",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$4"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$5.class",
+      "occurrence": 0,
+      "sha256": "c493a324ceeca6270e51557488da843dc956c781ca1ea92f39a1bd8d9fdb850c",
+      "name": "org/apache/poi/xslf/model/geom/Formula$5",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "3e1d516db1a1994794fafe8780db60a688a0a61dba708626e531311eae556210",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$5"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$6.class",
+      "occurrence": 0,
+      "sha256": "66fd963b08d0062e05c73a8876cf21491c636f7841b68fafc546e56a1d97925d",
+      "name": "org/apache/poi/xslf/model/geom/Formula$6",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "ed4b9b022d1dee543729de3da3fde0eebf2abff90ecf1a2abbb587c4086a4a08",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$6"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$7.class",
+      "occurrence": 0,
+      "sha256": "30363a0cd09d8aa0d0c4dcd37b84785ee36a6eaeeb44cd54efb7171afb089b3c",
+      "name": "org/apache/poi/xslf/model/geom/Formula$7",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "ed4b9b022d1dee543729de3da3fde0eebf2abff90ecf1a2abbb587c4086a4a08",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$7"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$8.class",
+      "occurrence": 0,
+      "sha256": "497f7322b706486d234276a062369be41bc6717f453bac3f069c471b4a948f13",
+      "name": "org/apache/poi/xslf/model/geom/Formula$8",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "ed4b9b022d1dee543729de3da3fde0eebf2abff90ecf1a2abbb587c4086a4a08",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$8"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula$9.class",
+      "occurrence": 0,
+      "sha256": "c205dce1ea46b6a4d7aa7903ecd63cf8ea8d06b3c606653c0596fe694e55678c",
+      "name": "org/apache/poi/xslf/model/geom/Formula$9",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 0,
+          "code_sha256": "df0d5741780ae6403a9d046765541fc452bbf5aae0fbec4d76d55c83ccc9956a",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/Rectangle2D",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$9"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Formula.class",
+      "occurrence": 0,
+      "sha256": "bf063a1ca763e08536ae22ef7be05e203048e8a69a089714057a340e5633772a",
+      "name": "org/apache/poi/xslf/model/geom/Formula",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "builtInFormulas",
+          "descriptor": "Ljava/util/Map;",
+          "access": 8,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/apache/poi/xslf/model/geom/Formula;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1024
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9f8c9c5b8e938ea24684489d859f8e72a91a3253becb2a5403342dd0658c317f",
+          "code_length": 677
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Formula$1",
+        "org/apache/poi/xslf/model/geom/Formula$10",
+        "org/apache/poi/xslf/model/geom/Formula$11",
+        "org/apache/poi/xslf/model/geom/Formula$12",
+        "org/apache/poi/xslf/model/geom/Formula$13",
+        "org/apache/poi/xslf/model/geom/Formula$14",
+        "org/apache/poi/xslf/model/geom/Formula$15",
+        "org/apache/poi/xslf/model/geom/Formula$16",
+        "org/apache/poi/xslf/model/geom/Formula$17",
+        "org/apache/poi/xslf/model/geom/Formula$18",
+        "org/apache/poi/xslf/model/geom/Formula$19",
+        "org/apache/poi/xslf/model/geom/Formula$2",
+        "org/apache/poi/xslf/model/geom/Formula$20",
+        "org/apache/poi/xslf/model/geom/Formula$21",
+        "org/apache/poi/xslf/model/geom/Formula$22",
+        "org/apache/poi/xslf/model/geom/Formula$23",
+        "org/apache/poi/xslf/model/geom/Formula$24",
+        "org/apache/poi/xslf/model/geom/Formula$25",
+        "org/apache/poi/xslf/model/geom/Formula$26",
+        "org/apache/poi/xslf/model/geom/Formula$27",
+        "org/apache/poi/xslf/model/geom/Formula$28",
+        "org/apache/poi/xslf/model/geom/Formula$29",
+        "org/apache/poi/xslf/model/geom/Formula$3",
+        "org/apache/poi/xslf/model/geom/Formula$30",
+        "org/apache/poi/xslf/model/geom/Formula$31",
+        "org/apache/poi/xslf/model/geom/Formula$32",
+        "org/apache/poi/xslf/model/geom/Formula$33",
+        "org/apache/poi/xslf/model/geom/Formula$34",
+        "org/apache/poi/xslf/model/geom/Formula$35",
+        "org/apache/poi/xslf/model/geom/Formula$36",
+        "org/apache/poi/xslf/model/geom/Formula$37",
+        "org/apache/poi/xslf/model/geom/Formula$4",
+        "org/apache/poi/xslf/model/geom/Formula$5",
+        "org/apache/poi/xslf/model/geom/Formula$6",
+        "org/apache/poi/xslf/model/geom/Formula$7",
+        "org/apache/poi/xslf/model/geom/Formula$8",
+        "org/apache/poi/xslf/model/geom/Formula$9"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Guide.class",
+      "occurrence": 0,
+      "sha256": "4901d4c454be3d816bfcf60edda7ee7169a3b39742a9ccdc0deee0d8b53bda1f",
+      "name": "org/apache/poi/xslf/model/geom/Guide",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/xslf/model/geom/Formula",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "fmla",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "expr",
+          "descriptor": "Lorg/apache/poi/xslf/model/geom/Expression;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGeomGuide;)V",
+          "access": 1,
+          "code_sha256": "9021e88d65121a0f290a75397f9c11be7e2c6dc0d49807c0ba0b9fd0181dcb2b",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d3dd2b80918f3551142051e5b588ac72e4e557983040476d153ae3de6ba3aef1",
+          "code_length": 23
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getFormula",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 0,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "6c1688b8b6991d1f0622c5db58b5cca7ec4d56acf1d8d9d2208a521d69cf1813",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/ExpressionParser",
+        "org/apache/poi/xslf/model/geom/Formula",
+        "org/apache/poi/xslf/model/geom/Guide",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGeomGuide"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/IAdjustableShape.class",
+      "occurrence": 0,
+      "sha256": "8e7b170481cef9e20616aa47552bbf0789e5b5f38409aaa941af24da72ee462a",
+      "name": "org/apache/poi/xslf/model/geom/IAdjustableShape",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getAdjustValue",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/model/geom/Guide;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/IAdjustableShape"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/IfElseExpression.class",
+      "occurrence": 0,
+      "sha256": "056cc848ff2fce4b2978f4b2083ca0a795522a2f06db108775a885d455d45eef",
+      "name": "org/apache/poi/xslf/model/geom/IfElseExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "c5b02270a90f6bc452aa619c4011e964aaba0d2ec5008c42ebb407bae3d1dadb",
+          "code_length": 32
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "aff59e3e7aa24599718b3793255ed30c96cdd06cfd6811a320c0ed2a6558b528",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/IfElseExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/LineToCommand.class",
+      "occurrence": 0,
+      "sha256": "1d61b4bf204cc820c0c306def3bbcf09ab7bd4f68e299442a8bf436e18b48d9c",
+      "name": "org/apache/poi/xslf/model/geom/LineToCommand",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/PathCommand"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D;)V",
+          "access": 0,
+          "code_sha256": "10390e6601cee1a9b2f597d216110a6b5ae1108d6e1f7a9ca64f73736b1cbb72",
+          "code_length": 31
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5148d0360462d2055eb5d56f3c4c50d977c955f7a924feec61f165977906d716",
+          "code_length": 15
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lorg/apache/poi/xslf/model/geom/Context;)V",
+          "access": 1,
+          "code_sha256": "8965a4706faf7ee49f4fd811db3570b7c8efa2828deafc9d6ba121322c23f95d",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/GeneralPath",
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/LineToCommand",
+        "org/apache/poi/xslf/model/geom/PathCommand",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/LiteralValueExpression.class",
+      "occurrence": 0,
+      "sha256": "9b56fbbed53e778ea50f533e9390ef56e013f8df2888ee923d2e49d3cbef5ce7",
+      "name": "org/apache/poi/xslf/model/geom/LiteralValueExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "ae7fc33ec8e3a219a1b0ecd2a3e610cdc63b784259995f816e84449fd4017069",
+          "code_length": 14
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "b4025855340f2ee5ed8c06d44cddd2688020d0c5d006c3a5fdbd77647e6f6799",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/LiteralValueExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/MaxExpression.class",
+      "occurrence": 0,
+      "sha256": "093b7816f5b618cfdc57ce9cd18d9f42f689ccdc73486702946533bebb32bf82",
+      "name": "org/apache/poi/xslf/model/geom/MaxExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "b14968869c770e5285ed7bbae43aa10d68d9546cb55f6bd3960cfb5aa236d0d2",
+          "code_length": 23
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "52ef1b028cd1fa2efa35f79d76fef3756d2b044165d5e792500a4626da2b96e4",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/MaxExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/MinExpression.class",
+      "occurrence": 0,
+      "sha256": "948191d2a8a05c7e12c0e5bbe8185e522a7683a7889d0659ea0d2c1774ef1c8b",
+      "name": "org/apache/poi/xslf/model/geom/MinExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "b14968869c770e5285ed7bbae43aa10d68d9546cb55f6bd3960cfb5aa236d0d2",
+          "code_length": 23
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "52ef1b028cd1fa2efa35f79d76fef3756d2b044165d5e792500a4626da2b96e4",
+          "code_length": 26
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/MinExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/ModExpression.class",
+      "occurrence": 0,
+      "sha256": "88d2a3e8cc8b7c17269d776f34d21e251a417bdf90e39a22a4d2a9c23b6969c1",
+      "name": "org/apache/poi/xslf/model/geom/ModExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "c5b02270a90f6bc452aa619c4011e964aaba0d2ec5008c42ebb407bae3d1dadb",
+          "code_length": 32
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "fcde28e532531b55fc67d7e061e7cf075006d86eedfc1afa8bdec835c8939d38",
+          "code_length": 48
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/ModExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/MoveToCommand.class",
+      "occurrence": 0,
+      "sha256": "90772c5047c368ef437260160e2c133565bed78bc3f6e6ee81d4d9b2255913df",
+      "name": "org/apache/poi/xslf/model/geom/MoveToCommand",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/PathCommand"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D;)V",
+          "access": 0,
+          "code_sha256": "10390e6601cee1a9b2f597d216110a6b5ae1108d6e1f7a9ca64f73736b1cbb72",
+          "code_length": 31
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5148d0360462d2055eb5d56f3c4c50d977c955f7a924feec61f165977906d716",
+          "code_length": 15
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lorg/apache/poi/xslf/model/geom/Context;)V",
+          "access": 1,
+          "code_sha256": "8965a4706faf7ee49f4fd811db3570b7c8efa2828deafc9d6ba121322c23f95d",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/GeneralPath",
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/MoveToCommand",
+        "org/apache/poi/xslf/model/geom/PathCommand",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/MultiplyDivideExpression.class",
+      "occurrence": 0,
+      "sha256": "12c50da6601168107a85554d03b12c8c90915a43ff80bf4fbc2354d1c08881de",
+      "name": "org/apache/poi/xslf/model/geom/MultiplyDivideExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "c5b02270a90f6bc452aa619c4011e964aaba0d2ec5008c42ebb407bae3d1dadb",
+          "code_length": 32
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "c2ad15b6fb4a956891ba9c5d8941b3381b6c176a523065e5fe1482f3fab5c630",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/MultiplyDivideExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Outline.class",
+      "occurrence": 0,
+      "sha256": "e279f5e5fc576fba649a68faeaa69176ac92f46800ed08e247fbe7f809753338",
+      "name": "org/apache/poi/xslf/model/geom/Outline",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "shape",
+          "descriptor": "Ljava/awt/Shape;",
+          "access": 2
+        },
+        {
+          "name": "path",
+          "descriptor": "Lorg/apache/poi/xslf/model/geom/Path;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/Shape;Lorg/apache/poi/xslf/model/geom/Path;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getPath",
+          "descriptor": "()Lorg/apache/poi/xslf/model/geom/Path;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getOutline",
+          "descriptor": "()Ljava/awt/Shape;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/Outline"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/Path.class",
+      "occurrence": 0,
+      "sha256": "7733aa01b911fd7d279a2b69ef79ead73b001caff03661bc0fbf763a42507bc3",
+      "name": "org/apache/poi/xslf/model/geom/Path",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "commands",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/apache/poi/xslf/model/geom/PathCommand;>;"
+        },
+        {
+          "name": "_fill",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "_stroke",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "_w",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "_h",
+          "descriptor": "J",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "024d54397d66462cb9cb3b597ef6876bb26401fe5fee8d51f94cdf074215a71f",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZZ)V",
+          "access": 1,
+          "code_sha256": "98f31200262e9b50f46e4d54d71f92a41d5db370142bd5bdd8782ea9cda93dd0",
+          "code_length": 40
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTPath2D;)V",
+          "access": 1,
+          "code_sha256": "db622ba3bec751c2d4cee6cdc6868630a1eed23f1b9500ddefd4b772991233d9",
+          "code_length": 437
+        },
+        {
+          "name": "addCommand",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/PathCommand;)V",
+          "access": 1,
+          "code_sha256": "66797ad546ffaaf47e8409090208fbe1dfdb3a890795c917996dfd8b4544e928",
+          "code_length": 12
+        },
+        {
+          "name": "getPath",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)Ljava/awt/geom/GeneralPath;",
+          "access": 1,
+          "code_sha256": "9b0528a1113b7c34b2614cceb57b7650efdf569ab06b5499b8953cd0006fa7b1",
+          "code_length": 52
+        },
+        {
+          "name": "isStroked",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "isFilled",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4fce3ac993307fea4f13f3b8101b4f9d26d1d5dcb8688de8f4b6d40580c02414",
+          "code_length": 5
+        },
+        {
+          "name": "getW",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7862e3371b40f0d820e0d62a3c9da9cd135c14c83ca401bb612935ab0ce7a476",
+          "code_length": 5
+        },
+        {
+          "name": "getH",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "297da201021403b620439dd24bf3368088499bd2b6307926a0d465041feaaa95",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "java/awt/geom/GeneralPath",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/poi/xslf/model/geom/ArcToCommand",
+        "org/apache/poi/xslf/model/geom/ClosePathCommand",
+        "org/apache/poi/xslf/model/geom/CurveToCommand",
+        "org/apache/poi/xslf/model/geom/LineToCommand",
+        "org/apache/poi/xslf/model/geom/MoveToCommand",
+        "org/apache/poi/xslf/model/geom/Path",
+        "org/apache/poi/xslf/model/geom/PathCommand",
+        "org/apache/poi/xslf/model/geom/QuadToCommand",
+        "org/apache/xmlbeans/XmlObject",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2D",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DArcTo",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DClose",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DCubicBezierTo",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DLineTo",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DMoveTo",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPath2DQuadBezierTo",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPathFillMode",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPathFillMode$Enum"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/PathCommand.class",
+      "occurrence": 0,
+      "sha256": "268de81f38e3a94553d3c2185cd128962fb7f707e0458cf9bc26133c1e4c88e5",
+      "name": "org/apache/poi/xslf/model/geom/PathCommand",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lorg/apache/poi/xslf/model/geom/Context;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/PathCommand"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/PinExpression.class",
+      "occurrence": 0,
+      "sha256": "1803aea8404cc05281aee838a6d1ff5686a74efef0f6db0bdd53bef7e65b33e2",
+      "name": "org/apache/poi/xslf/model/geom/PinExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "c5b02270a90f6bc452aa619c4011e964aaba0d2ec5008c42ebb407bae3d1dadb",
+          "code_length": 32
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "a17836b813c7e0109dbc47ee787537c7deaadafcabfa064c54d606609adf5162",
+          "code_length": 52
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/PinExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/PresetGeometries.class",
+      "occurrence": 0,
+      "sha256": "112c081db04a864d998843e2ee039f21bb069a466f85970bb8d6134b33109f6c",
+      "name": "org/apache/poi/xslf/model/geom/PresetGeometries",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/util/LinkedHashMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_inst",
+          "descriptor": "Lorg/apache/poi/xslf/model/geom/PresetGeometries;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "acbe4c6871f0f4a64f4904782ce9c81957db223cb07a4c4ca9e2b1f42704dee5",
+          "code_length": 32
+        },
+        {
+          "name": "read",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 2,
+          "code_sha256": "7ed2303681913e13ffe427b47a22d16158de7edcca463a456957db756f7f1b69",
+          "code_length": 116,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lorg/apache/poi/xslf/model/geom/PresetGeometries;",
+          "access": 9,
+          "code_sha256": "32f2a39476b1fd1ef2b1474120a480895d3b18e3c4d02f13127d05d793765f75",
+          "code_length": 20
+        }
+      ],
+      "generic_signature": "Ljava/util/LinkedHashMap<Ljava/lang/String;Lorg/apache/poi/xslf/model/geom/CustomGeometry;>;",
+      "class_references": [
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "java/io/InputStream",
+        "java/io/PrintStream",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/LinkedHashMap",
+        "org/apache/poi/xslf/model/geom/CustomGeometry",
+        "org/apache/poi/xslf/model/geom/PresetGeometries",
+        "org/apache/poi/xslf/usermodel/XMLSlideShow",
+        "org/apache/xmlbeans/XmlObject",
+        "org/apache/xmlbeans/XmlObject$Factory",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTCustomGeometry2D",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTCustomGeometry2D$Factory",
+        "org/w3c/dom/Node"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/QuadToCommand.class",
+      "occurrence": 0,
+      "sha256": "b9f6005b5b675968c352fddc430b3b02fdf7ce202724db18397a2d043d029b91",
+      "name": "org/apache/poi/xslf/model/geom/QuadToCommand",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/PathCommand"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg4",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D;)V",
+          "access": 0,
+          "code_sha256": "6ed65b65d4771d668d9184ac396e31229f9fe1dbca8faf7a40d250ad8820ce8d",
+          "code_length": 57
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/awt/geom/GeneralPath;Lorg/apache/poi/xslf/model/geom/Context;)V",
+          "access": 1,
+          "code_sha256": "1c62d08de5bf8a60028998f2228c81a7b11fa102d5ab162731881e6a975228bd",
+          "code_length": 55
+        }
+      ],
+      "class_references": [
+        "java/awt/geom/GeneralPath",
+        "java/lang/Object",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/PathCommand",
+        "org/apache/poi/xslf/model/geom/QuadToCommand",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTAdjPoint2D"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/SinArcTanExpression.class",
+      "occurrence": 0,
+      "sha256": "13ae65aac69ef653093ad3ead9ab778edc89a797618b725417e7208999e7fc0c",
+      "name": "org/apache/poi/xslf/model/geom/SinArcTanExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg3",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "c5b02270a90f6bc452aa619c4011e964aaba0d2ec5008c42ebb407bae3d1dadb",
+          "code_length": 32
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "2d8ce7a4446ab1d5c86daf000e68cdcc8f04422ea76835846502507e8476da35",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/SinArcTanExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/SinExpression.class",
+      "occurrence": 0,
+      "sha256": "d404d60066288722ef3a0c3e9b25a5846065a30096835c254fb28ced63034267",
+      "name": "org/apache/poi/xslf/model/geom/SinExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "b14968869c770e5285ed7bbae43aa10d68d9546cb55f6bd3960cfb5aa236d0d2",
+          "code_length": 23
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "ecc5e0d9a1261e7a27ee14e2a46d1a78830fc65915a97c5198886c2cafdc7ea0",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/SinExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/SqrtExpression.class",
+      "occurrence": 0,
+      "sha256": "200a8cf35344fe8709568c952dd7111d13745c24ac7c775e8ac5b33bae8bf3b8",
+      "name": "org/apache/poi/xslf/model/geom/SqrtExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "ae7fc33ec8e3a219a1b0ecd2a3e610cdc63b784259995f816e84449fd4017069",
+          "code_length": 14
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "946ce06edf71c9fff72a6dc7d1fe39c897d5f603de46a0c8a1fabba4a6c00e5d",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/SqrtExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/model/geom/TanExpression.class",
+      "occurrence": 0,
+      "sha256": "209f262306814328b173f64b460b68ec550c8b3474487c4685f3cb899509cae7",
+      "name": "org/apache/poi/xslf/model/geom/TanExpression",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/Expression"
+      ],
+      "fields": [
+        {
+          "name": "arg1",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "arg2",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/regex/Matcher;)V",
+          "access": 0,
+          "code_sha256": "b14968869c770e5285ed7bbae43aa10d68d9546cb55f6bd3960cfb5aa236d0d2",
+          "code_length": 23
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Lorg/apache/poi/xslf/model/geom/Context;)D",
+          "access": 1,
+          "code_sha256": "a6a18a7e91621c8df7d657c8fb6051c97b3cbe0b754a214ec570019a6199bb81",
+          "code_length": 34
+        }
+      ],
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/regex/Matcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/Expression",
+        "org/apache/poi/xslf/model/geom/TanExpression"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingParagraph.class",
+      "occurrence": 0,
+      "sha256": "0c742292894d213f600d53ec14957d064567953fbff2a2546ae8d827c2d04413",
+      "name": "org/apache/poi/xslf/usermodel/DrawingParagraph",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "p",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraph;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraph;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getText",
+          "descriptor": "()Ljava/lang/CharSequence;",
+          "access": 1,
+          "code_sha256": "9e8606479edba3b59031c0b870aa09051ac164568bc052d738588b53008bd767",
+          "code_length": 95
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/poi/xslf/usermodel/DrawingParagraph",
+        "org/apache/xmlbeans/XmlCursor",
+        "org/apache/xmlbeans/XmlObject",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTRegularTextRun",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTextLineBreak",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraph"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingTable.class",
+      "occurrence": 0,
+      "sha256": "d81a47d5c21ae8525cdd3d7647d1c6ff688513020e01e8e3ee32d5c8fa2a9381",
+      "name": "org/apache/poi/xslf/usermodel/DrawingTable",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "table",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTable;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTable;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getRows",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/DrawingTableRow;",
+          "access": 1,
+          "code_sha256": "9f70904449b96b5d48fecebf7d6636dc479552eeeca12f0511c2f07110650600",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/DrawingTableRow;",
+        "[Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableRow;",
+        "java/lang/Object",
+        "org/apache/poi/xslf/usermodel/DrawingTable",
+        "org/apache/poi/xslf/usermodel/DrawingTableRow",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTable"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingTableCell.class",
+      "occurrence": 0,
+      "sha256": "35ed1b43b0747ad3ad41a35051545d0eab1509b237565fd3a45bc0b0ea3a905d",
+      "name": "org/apache/poi/xslf/usermodel/DrawingTableCell",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cell",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableCell;",
+          "access": 18
+        },
+        {
+          "name": "drawingTextBody",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/DrawingTextBody;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableCell;)V",
+          "access": 1,
+          "code_sha256": "ddae9985a692a2cef54a8273b5436231d55751bb7e3ed855cf1403bef74bb7c6",
+          "code_length": 30
+        },
+        {
+          "name": "getTextBody",
+          "descriptor": "()Lorg/apache/poi/xslf/usermodel/DrawingTextBody;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/poi/xslf/usermodel/DrawingTableCell",
+        "org/apache/poi/xslf/usermodel/DrawingTextBody",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTableCell"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingTableRow.class",
+      "occurrence": 0,
+      "sha256": "7efbbd2fb9533e6925fb87f88579030871adca2c112b5cbacd75de69eda3720c",
+      "name": "org/apache/poi/xslf/usermodel/DrawingTableRow",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "row",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableRow;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableRow;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getCells",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/DrawingTableCell;",
+          "access": 1,
+          "code_sha256": "9f70904449b96b5d48fecebf7d6636dc479552eeeca12f0511c2f07110650600",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/DrawingTableCell;",
+        "[Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTableCell;",
+        "java/lang/Object",
+        "org/apache/poi/xslf/usermodel/DrawingTableCell",
+        "org/apache/poi/xslf/usermodel/DrawingTableRow",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTableRow"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingTextBody.class",
+      "occurrence": 0,
+      "sha256": "58a9a41993c16dfd6456b366b6058aa9025c6e2a969be378105e1f79a6bd99a5",
+      "name": "org/apache/poi/xslf/usermodel/DrawingTextBody",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "textBody",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextBody;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextBody;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10
+        },
+        {
+          "name": "getParagraphs",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/DrawingParagraph;",
+          "access": 1,
+          "code_sha256": "9f70904449b96b5d48fecebf7d6636dc479552eeeca12f0511c2f07110650600",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/DrawingParagraph;",
+        "[Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraph;",
+        "java/lang/Object",
+        "org/apache/poi/xslf/usermodel/DrawingParagraph",
+        "org/apache/poi/xslf/usermodel/DrawingTextBody",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTextBody"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/DrawingTextPlaceholder.class",
+      "occurrence": 0,
+      "sha256": "fc348d0ab07f9fdb20a441e51420f9de17f0ab15b2a07eb19d806238f6efdf38",
+      "name": "org/apache/poi/xslf/usermodel/DrawingTextPlaceholder",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/xslf/usermodel/DrawingTextBody",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "placeholder",
+          "descriptor": "Lorg/openxmlformats/schemas/presentationml/x2006/main/CTPlaceholder;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextBody;Lorg/openxmlformats/schemas/presentationml/x2006/main/CTPlaceholder;)V",
+          "access": 1,
+          "code_sha256": "cc8acab599fdd79263a144811a0504ac1222aebd56d044d11bcca35ac8e3f1da",
+          "code_length": 11
+        },
+        {
+          "name": "getPlaceholderType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d2b6330c3a86d88225e5195488b464ffaf9dfe1c56d5c627d3cecd38afa4ec7a",
+          "code_length": 13
+        },
+        {
+          "name": "getPlaceholderTypeEnum",
+          "descriptor": "()Lorg/openxmlformats/schemas/presentationml/x2006/main/STPlaceholderType$Enum;",
+          "access": 1,
+          "code_sha256": "3fb1df2ba234aac81302c30da0ce8601f5a77d1b4aba3a2fa3729100b29448ca",
+          "code_length": 10
+        },
+        {
+          "name": "isPlaceholderCustom",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b68aeb5852e85ebc67e29f7b684c2aad44ffe44cf3f32c4ef9d6793fc7f4fa1e",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "org/apache/poi/xslf/usermodel/DrawingTextBody",
+        "org/apache/poi/xslf/usermodel/DrawingTextPlaceholder",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTPlaceholder",
+        "org/openxmlformats/schemas/presentationml/x2006/main/STPlaceholderType",
+        "org/openxmlformats/schemas/presentationml/x2006/main/STPlaceholderType$Enum"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/LineCap.class",
+      "occurrence": 0,
+      "sha256": "82830994f919a462c8a54fc26641f80711e635a18de7f80013bbf45ea4ce4e55",
+      "name": "org/apache/poi/xslf/usermodel/LineCap",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ROUND",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 16409
+        },
+        {
+          "name": "SQUARE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 16409
+        },
+        {
+          "name": "FLAT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/LineCap;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/LineCap;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/LineCap;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/LineCap"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/LineDash.class",
+      "occurrence": 0,
+      "sha256": "c257c68e55ef9a2ed81f541632078c52d417d635981b579031ab26cd60af8751",
+      "name": "org/apache/poi/xslf/usermodel/LineDash",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SOLID",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "DASH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "LG_DASH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "DASH_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "LG_DASH_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "LG_DASH_DOT_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "SYS_DASH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "SYS_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "SYS_DASH_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "SYS_DASH_DOT_DOT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/LineDash;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4e05e4091b5669a7c04d8a12c867cb5d28c590524922f1f2567852b233e4eeae",
+          "code_length": 228
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/LineDash;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/LineDash;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/LineDash"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/LineDecoration.class",
+      "occurrence": 0,
+      "sha256": "fc38326f3f0d776686376604f10f78be70bae735d54debb1917ca7047dd3f3f2",
+      "name": "org/apache/poi/xslf/usermodel/LineDecoration",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "TRIANGLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "STEALTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "DIAMOND",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "OVAL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "ARROW",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a2379a0d04ba332bc09778f3fcaaeb79d96df13f17600922b9eb27d073d2e846",
+          "code_length": 123
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/LineDecoration;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/LineDecoration;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/LineDecoration"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/LineEndLength.class",
+      "occurrence": 0,
+      "sha256": "c74b4b45161edd6d4ea49efd5739086aa90d723340f3e26d812d697061b7dcef",
+      "name": "org/apache/poi/xslf/usermodel/LineEndLength",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SMALL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 16409
+        },
+        {
+          "name": "MEDIUM",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 16409
+        },
+        {
+          "name": "LARGE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/LineEndLength;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/LineEndLength;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/LineEndLength"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/LineEndWidth.class",
+      "occurrence": 0,
+      "sha256": "077e02d02f198dff0b2a502b4f51e37012c761af5b33bd09432dadd6e0b5d98e",
+      "name": "org/apache/poi/xslf/usermodel/LineEndWidth",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "SMALL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 16409
+        },
+        {
+          "name": "MEDIUM",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 16409
+        },
+        {
+          "name": "LARGE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/LineEndWidth;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/LineEndWidth;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/LineEndWidth"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/ListAutoNumber.class",
+      "occurrence": 0,
+      "sha256": "58a04ca30c9f41926feead033ed62d82f523a25d42bc5679cedd213d43c5ecfc",
+      "name": "org/apache/poi/xslf/usermodel/ListAutoNumber",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ALPHA_LC_PARENT_BOTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ALPHA_UC_PARENT_BOTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ALPHA_LC_PARENT_R",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ALPHA_UC_PARENT_R",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ALPHA_LC_PERIOD",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ALPHA_UC_PERIOD",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ARABIC_PARENT_BOTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ARABIC_PARENT_R",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ARABIC_PERIOD",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ARABIC_PLAIN",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_LC_PARENT_BOTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_UC_PARENT_BOTH",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_LC_PARENT_R",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_UC_PARENT_R",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_LC_PERIOD",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "ROMAN_UC_PERIOD",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "CIRCLE_NUM_DB_PLAIN",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "CIRCLE_NUM_WD_BLACK_PLAIN",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "CIRCLE_NUM_WD_WHITE_PLAIN",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "322f1e8632fcf22506067e93778b406f1a2795a1f162b7ba6653fddf97c965c1",
+          "code_length": 396
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/ListAutoNumber;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/ListAutoNumber;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/ListAutoNumber"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/Placeholder.class",
+      "occurrence": 0,
+      "sha256": "2d0b109a533f3b8092fe26b55efa1d91194964a1239f5869d1b150fa133c28d7",
+      "name": "org/apache/poi/xslf/usermodel/Placeholder",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TITLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "BODY",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "CENTERED_TITLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "SUBTITLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "DATETIME",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "SLIDE_NUMBER",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "FOOTER",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "HEADER",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "CONTENT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "CHART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "TABLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "CLIP_ART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "DGM",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "MEDIA",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "SLIDE_IMAGE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "PICTURE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/Placeholder;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "81c9cb662090439126dbba5dfee8b625fc0c42cfb65182568e565b9cfd9d725d",
+          "code_length": 333
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/Placeholder;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/Placeholder;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/Placeholder"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$1.class",
+      "occurrence": 0,
+      "sha256": "aba88b6c6ab5f8aac994ad63ecce41b5cf4c2c2969ca9a2b40f1d7d36c6cd5d6",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/RenderableShape;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/RenderableShape;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;)I",
+          "access": 1,
+          "code_sha256": "c5a3bd207fb5dfcf8e1dadd663a2dea33eb7b609d4e93b0ea11d2ed5a0a1091b",
+          "code_length": 28
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "5857e3098f84ec905fdb313a49e27b1bd813d362c6f19fc26914c95f4ba61e8a",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$1",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$2.class",
+      "occurrence": 0,
+      "sha256": "f1db9bcf348380e3701e1b40f3487a6355b3e48043fb01914f7a598275c1c39a",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;)I",
+          "access": 1,
+          "code_sha256": "5ca5feea716a3f81e196571a15556fcd2b4aef0c9ddf9ed0616e2a127e431c80",
+          "code_length": 28
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "609efd4d2c5bc928342f48cc9d5e3a4598a14432bfbca6b54708fe27a472f458",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$2",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$3.class",
+      "occurrence": 0,
+      "sha256": "705c843dd9ea9068f1587567448adde5e028a44830bf31b09d9153e5be1347a3",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$3",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;)I",
+          "access": 1,
+          "code_sha256": "5ca5feea716a3f81e196571a15556fcd2b4aef0c9ddf9ed0616e2a127e431c80",
+          "code_length": 28
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "609efd4d2c5bc928342f48cc9d5e3a4598a14432bfbca6b54708fe27a472f458",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$3",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$4.class",
+      "occurrence": 0,
+      "sha256": "e059b3f45d3744604e320c8e3bb8bf36189915e3733433d34b868ec4a03b9ac9",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$4",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/poi/xslf/model/PropertyFetcher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$graphics",
+          "descriptor": "Ljava/awt/Graphics2D;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/RenderableShape;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/RenderableShape;Ljava/awt/Graphics2D;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "fetch",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSimpleShape;)Z",
+          "access": 1,
+          "code_sha256": "7695dacc0e0acbe5e67cd09afd2092ae0893f60bb64ab778f734d6d61b93e2c3",
+          "code_length": 50
+        }
+      ],
+      "generic_signature": "Lorg/apache/poi/xslf/model/PropertyFetcher<Ljava/awt/Paint;>;",
+      "class_references": [
+        "java/awt/Paint",
+        "org/apache/poi/xslf/model/PropertyFetcher",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$4",
+        "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTShapeProperties"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$5.class",
+      "occurrence": 0,
+      "sha256": "ebd48af25862dd1f92afce7c6cdaaad84b4e11e8f55d3bc90fcd1ec5af7e80eb",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$5",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/apache/poi/xslf/model/PropertyFetcher",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$graphics",
+          "descriptor": "Ljava/awt/Graphics2D;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/RenderableShape;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/RenderableShape;Ljava/awt/Graphics2D;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "fetch",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSimpleShape;)Z",
+          "access": 1,
+          "code_sha256": "861e7143a7ceddc201c1e5890acc63b7fa96c3c0277667abb0268533ae488bfa",
+          "code_length": 59
+        }
+      ],
+      "generic_signature": "Lorg/apache/poi/xslf/model/PropertyFetcher<Ljava/awt/Paint;>;",
+      "class_references": [
+        "org/apache/poi/xslf/model/PropertyFetcher",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$5",
+        "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTLineProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTShapeProperties"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$6.class",
+      "occurrence": 0,
+      "sha256": "80373465178a490688d3cff656b890c792eebedef56e37c708b78f94263f5018",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$6",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/poi/xslf/model/geom/IAdjustableShape"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/RenderableShape;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/RenderableShape;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "getAdjustValue",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/model/geom/Guide;",
+          "access": 1,
+          "code_sha256": "28fbe9c5b28acda9d53c3434896a39fe144aacd96730844def616f4ee3239128",
+          "code_length": 89
+        }
+      ],
+      "class_references": [
+        "[Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGeomGuide;",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/poi/xslf/model/geom/Guide",
+        "org/apache/poi/xslf/model/geom/IAdjustableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$6",
+        "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGeomGuide",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGeomGuideList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPresetGeometry2D",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTShapeProperties"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape$7.class",
+      "occurrence": 0,
+      "sha256": "00b181d2109d9f4a536854f6abeb88bfd16b372997ebf2a6b86178c94c452066",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape$7",
+      "major": 50,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$org$apache$poi$xslf$usermodel$LineDash",
+          "descriptor": "[I",
+          "access": 4120
+        },
+        {
+          "name": "$SwitchMap$org$apache$poi$xslf$usermodel$LineCap",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e999b174488f80c16471bc54e6077806428838c68f9c11897219f26f59fca3c9",
+          "code_length": 156
+        }
+      ],
+      "class_references": [
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "org/apache/poi/xslf/usermodel/LineCap",
+        "org/apache/poi/xslf/usermodel/LineDash",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$7"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/RenderableShape.class",
+      "occurrence": 0,
+      "sha256": "8f4baa63f779fcbf4f69ed860401066f0cb9e7d7905f3d150d22724a815da35a",
+      "name": "org/apache/poi/xslf/usermodel/RenderableShape",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NO_PAINT",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 25
+        },
+        {
+          "name": "_shape",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/XSLFSimpleShape;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSimpleShape;)V",
+          "access": 1,
+          "code_sha256": "5a9721c3e786506fec6881816be1c4f77163a607d1d7a38631870d41cc931594",
+          "code_length": 10
+        },
+        {
+          "name": "selectPaint",
+          "descriptor": "(Ljava/awt/Graphics2D;Lorg/apache/xmlbeans/XmlObject;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;Lorg/apache/poi/openxml4j/opc/PackagePart;)Ljava/awt/Paint;",
+          "access": 1,
+          "code_sha256": "ad9dd89ae9efe1780cf69ba02c1e8e572cf0b6394ecaf40bb7c8cb2bf3d3358f",
+          "code_length": 216
+        },
+        {
+          "name": "createTexturePaint",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTBlipFillProperties;Ljava/awt/Graphics2D;Lorg/apache/poi/openxml4j/opc/PackagePart;)Ljava/awt/Paint;",
+          "access": 2,
+          "code_sha256": "3415a1c894e195704df5537370524baaa005dafbd94bf86ce18d51417ec6db06",
+          "code_length": 176
+        },
+        {
+          "name": "createLinearGradientPaint",
+          "descriptor": "(Ljava/awt/Graphics2D;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientFillProperties;Ljava/awt/geom/Rectangle2D;Lorg/apache/poi/xslf/usermodel/XSLFTheme;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;)Ljava/awt/Paint;",
+          "access": 2,
+          "code_sha256": "419e88b0476420e4192eb3c4218bc89aba284410f64eb1ea50f1b46b0e042117",
+          "code_length": 571
+        },
+        {
+          "name": "toRadialGradientPaint",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientFillProperties;Ljava/awt/geom/Rectangle2D;Lorg/apache/poi/xslf/usermodel/XSLFTheme;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;)Ljava/awt/Paint;",
+          "access": 10,
+          "code_sha256": "19d43b7d62eea68a3b801bea1d7950429c1455330057cc7e4190dd7f9b2753b2",
+          "code_length": 89
+        },
+        {
+          "name": "createRadialGradientPaint",
+          "descriptor": "(Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientFillProperties;Ljava/awt/geom/Rectangle2D;Lorg/apache/poi/xslf/usermodel/XSLFTheme;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;)Ljava/awt/Paint;",
+          "access": 10,
+          "code_sha256": "556ab47d9c94b038e3b989330f98fa8c2f5e958316d4161cc8e3dea2239aa93e",
+          "code_length": 288
+        },
+        {
+          "name": "snapToAnchor",
+          "descriptor": "(Ljava/awt/geom/Point2D;Ljava/awt/geom/Rectangle2D;)V",
+          "access": 10,
+          "code_sha256": "be14309ec6f8fec2a9adf1a231272f784039450f231684214662ef698ee5a080",
+          "code_length": 123
+        },
+        {
+          "name": "getPaint",
+          "descriptor": "(Ljava/awt/Graphics2D;Lorg/apache/xmlbeans/XmlObject;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;)Ljava/awt/Paint;",
+          "access": 0,
+          "code_sha256": "2662013672628449260acfe369e9e230080a41afc3b0e7ee4bb82716c5bdb511",
+          "code_length": 84
+        },
+        {
+          "name": "getFillPaint",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/awt/Paint;",
+          "access": 0,
+          "code_sha256": "d6c35db574b5af7fc3363bee58701969b4a565255a1d1a777e9a8deede8d7de8",
+          "code_length": 220
+        },
+        {
+          "name": "getLinePaint",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/awt/Paint;",
+          "access": 1,
+          "code_sha256": "6f3a75ade86d1c0977998978386476885638792b56b8c537082ba03d82b3e651",
+          "code_length": 147
+        },
+        {
+          "name": "getDashPattern",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/LineDash;F)[F",
+          "access": 10,
+          "code_sha256": "2c0b910b4a05645d371abe84d03dba0298957244d484574b3fa1ac6be906ccf0",
+          "code_length": 235
+        },
+        {
+          "name": "applyStroke",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/awt/Stroke;",
+          "access": 1,
+          "code_sha256": "093ddd3be9a4d28cdf8f4c72e236bd1401883fab4f964e742d04b28c6c24d334",
+          "code_length": 146
+        },
+        {
+          "name": "render",
+          "descriptor": "(Ljava/awt/Graphics2D;)V",
+          "access": 1,
+          "code_sha256": "758b01ba1d2d77403af559c0449c3d44885702a99efdd85766e80776b94bd10e",
+          "code_length": 252
+        },
+        {
+          "name": "computeOutlines",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/util/Collection;",
+          "access": 2,
+          "code_sha256": "1811465234fddceb6db2482da0d7351d75c11d0a2e162ebff3ff2c58196624d8",
+          "code_length": 298,
+          "generic_signature": "(Ljava/awt/Graphics2D;)Ljava/util/Collection<Lorg/apache/poi/xslf/model/geom/Outline;>;"
+        },
+        {
+          "name": "getAnchor",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "e70707818fd939a8b85566ed051b4c56351c0165c318f5615dd622cdaccf4c77",
+          "code_length": 42
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/RenderableShape;)Lorg/apache/poi/xslf/usermodel/XSLFSimpleShape;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b11268e1f2c5e19762b90de97536d22117f06ab33c3ae06216f2e3a48017834d",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "[F",
+        "[Ljava/awt/Color;",
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "[Lorg/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop;",
+        "java/awt/AlphaComposite",
+        "java/awt/BasicStroke",
+        "java/awt/Color",
+        "java/awt/GradientPaint",
+        "java/awt/Graphics2D",
+        "java/awt/Paint",
+        "java/awt/RenderingHints",
+        "java/awt/RenderingHints$Key",
+        "java/awt/Shape",
+        "java/awt/TexturePaint",
+        "java/awt/geom/AffineTransform",
+        "java/awt/geom/Point2D",
+        "java/awt/geom/Point2D$Double",
+        "java/awt/geom/Rectangle2D",
+        "java/awt/geom/Rectangle2D$Double",
+        "java/awt/image/BufferedImage",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Enum",
+        "java/lang/Exception",
+        "java/lang/Float",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/reflect/Constructor",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "org/apache/poi/openxml4j/opc/PackagePart",
+        "org/apache/poi/openxml4j/opc/PackageRelationship",
+        "org/apache/poi/xslf/model/PropertyFetcher",
+        "org/apache/poi/xslf/model/geom/Context",
+        "org/apache/poi/xslf/model/geom/CustomGeometry",
+        "org/apache/poi/xslf/model/geom/Outline",
+        "org/apache/poi/xslf/model/geom/Path",
+        "org/apache/poi/xslf/usermodel/LineCap",
+        "org/apache/poi/xslf/usermodel/LineDash",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/RenderableShape$1",
+        "org/apache/poi/xslf/usermodel/RenderableShape$2",
+        "org/apache/poi/xslf/usermodel/RenderableShape$3",
+        "org/apache/poi/xslf/usermodel/RenderableShape$4",
+        "org/apache/poi/xslf/usermodel/RenderableShape$5",
+        "org/apache/poi/xslf/usermodel/RenderableShape$6",
+        "org/apache/poi/xslf/usermodel/RenderableShape$7",
+        "org/apache/poi/xslf/usermodel/XSLFColor",
+        "org/apache/poi/xslf/usermodel/XSLFImageRenderer",
+        "org/apache/poi/xslf/usermodel/XSLFRenderingHint",
+        "org/apache/poi/xslf/usermodel/XSLFShadow",
+        "org/apache/poi/xslf/usermodel/XSLFSheet",
+        "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+        "org/apache/poi/xslf/usermodel/XSLFTheme",
+        "org/apache/xmlbeans/XmlObject",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTAlphaModulateFixedEffect",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBackgroundFillStyleList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBaseStyles",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBlip",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBlipFillProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTFillStyleList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientFillProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientFillProperties$Factory",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientStop",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTGradientStopList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTLineStyleList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTLinearShadeProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTNoFillProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTOfficeStyleSheet",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPathShadeProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTShapeStyle",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTSolidColorFillProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTStyleMatrix",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTStyleMatrixReference",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPathShadeType",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPathShadeType$Enum"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/SlideLayout.class",
+      "occurrence": 0,
+      "sha256": "c278ad147844c45ab5bcdfd95bdc56bf8d0b972b0fbf55fba361832988cc8a35",
+      "name": "org/apache/poi/xslf/usermodel/SlideLayout",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TITLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TEXT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_COL_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TBL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TEXT_AND_CHART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "CHART_AND_TEXT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "DGM",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "CHART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TX_AND_CLIP_ART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "CLIP_ART_AND_TEXT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TITLE_ONLY",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "BLANK",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TX_AND_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "OBJ_AND_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "OBJ_ONLY",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TITLE_AND_CONTENT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TX_AND_MEDIA",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "MEDIA_AND_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "OBJ_OVER_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TX_OVER_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TX_AND_TWO_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_OBJ_AND_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_OBJ_OVER_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "FOUR_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "VERT_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "CLIP_ART_AND_VERT_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "VERT_TITLE_AND_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "VERT_TITLE_AND_TX_OVER_CHART",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "OBJ_AND_TWO_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_OBJ_AND_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "CUST",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "SECTION_HEADER",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "TWO_TX_TWO_OBJ",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "OBJ_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "PIC_TX",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "665d8b3af323e7406af5dee3c4dfa7c4b31fac43cc6ee9c42be3a40773d3e826",
+          "code_length": 753
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/SlideLayout;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/SlideLayout;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/SlideLayout"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/TextAlign.class",
+      "occurrence": 0,
+      "sha256": "663a0061c691938b40aa91726e4dc9549c85bcd4649f3af578e0bef65ea12355",
+      "name": "org/apache/poi/xslf/usermodel/TextAlign",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LEFT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "CENTER",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "RIGHT",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "JUSTIFY",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "JUSTIFY_LOW",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "DIST",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "THAI_DIST",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/TextAlign;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ee1bb7c6814a186cd31ae2fcac38ba61171e408b2980b4afcc7fbdaceadc52ae",
+          "code_length": 144
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/TextAlign;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/TextAlign;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/TextAlign"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/TextAutofit.class",
+      "occurrence": 0,
+      "sha256": "e4537c8fa9f770f083a9f67034ffbff8fc9234a21eb39e7053986ef615a8b793",
+      "name": "org/apache/poi/xslf/usermodel/TextAutofit",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 16409
+        },
+        {
+          "name": "NORMAL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 16409
+        },
+        {
+          "name": "SHAPE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/TextAutofit;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/TextAutofit;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/TextAutofit"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/TextCap.class",
+      "occurrence": 0,
+      "sha256": "a2a6eb79ef041f8ac1b1c2247a1275daf036955981d9301e20fda2144d80c8af",
+      "name": "org/apache/poi/xslf/usermodel/TextCap",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NONE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 16409
+        },
+        {
+          "name": "SMALL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 16409
+        },
+        {
+          "name": "ALL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/TextCap;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f543941a1e0c892872743287bcea112f5c783bb8ae2679115a787084efdc77c0",
+          "code_length": 65
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/TextCap;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/TextCap;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/TextCap"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/TextDirection.class",
+      "occurrence": 0,
+      "sha256": "59879223f8ea971b5794c6e914fbbdb158cf15622d0c30dcb90059af6b94fc05",
+      "name": "org/apache/poi/xslf/usermodel/TextDirection",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "HORIZONTAL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 16409
+        },
+        {
+          "name": "VERTICAL",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 16409
+        },
+        {
+          "name": "VERTICAL_270",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 16409
+        },
+        {
+          "name": "STACKED",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/TextDirection;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d82b4a62a69f833b83aa4761241628f87b88afa4ef11f0a951ce53a504994dea",
+          "code_length": 84
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/TextDirection;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/TextDirection;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/TextDirection"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/TextFragment.class",
+      "occurrence": 0,
+      "sha256": "2fc34a94d2c80cb8f5e0c778691e336a2f90a3799610af109d0be71b61d02034",
+      "name": "org/apache/poi/xslf/usermodel/TextFragment",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_layout",
+          "descriptor": "Ljava/awt/font/TextLayout;",
+          "access": 16
+        },
+        {
+          "name": "_str",
+          "descriptor": "Ljava/text/AttributedString;",
+          "access": 16
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/awt/font/TextLayout;Ljava/text/AttributedString;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "draw",
+          "descriptor": "(Ljava/awt/Graphics2D;DD)V",
+          "access": 0,
+          "code_sha256": "befdc7ccde51e9499cbedea186d37de8487be34a3eaae909e1f49c70c392cba8",
+          "code_length": 80
+        },
+        {
+          "name": "getHeight",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "b23a16a9ba4e2028d09c421185f39b9542b380874e6d76e476c8a93150a536c7",
+          "code_length": 36
+        },
+        {
+          "name": "getWidth",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "b68ee531c7ab47d3bbd9a878a58935aec3e0d1048c06d287f470031f19e4acfd",
+          "code_length": 8
+        },
+        {
+          "name": "getString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "6a555f92d78300db51f686a3c377b33980949b6c8af7afc135f409e8366134f8",
+          "code_length": 62
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f94a1621250278fa17d950bdbec771f4c9eb28cc6f75ff4f25316fed605efe9a",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/awt/Graphics2D",
+        "java/awt/RenderingHints",
+        "java/awt/RenderingHints$Key",
+        "java/awt/font/TextLayout",
+        "java/lang/Class",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/text/AttributedCharacterIterator",
+        "java/text/AttributedString",
+        "org/apache/poi/xslf/usermodel/TextFragment",
+        "org/apache/poi/xslf/usermodel/XSLFRenderingHint"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/VerticalAlignment.class",
+      "occurrence": 0,
+      "sha256": "28d5956edce9662bcea1f78fb622ed144698392631bac6b71a03a6aee5bbc219",
+      "name": "org/apache/poi/xslf/usermodel/VerticalAlignment",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "TOP",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 16409
+        },
+        {
+          "name": "MIDDLE",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 16409
+        },
+        {
+          "name": "BOTTOM",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 16409
+        },
+        {
+          "name": "JUSTIFIED",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 16409
+        },
+        {
+          "name": "DISTRIBUTED",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+          "access": 9,
+          "code_sha256": "3ca7e880ae814018b5db87be78d3a40fddc6cc540fa28779c12b558b09fc0128",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "dbea9c37e077f601ef6fcf03ddf52070813be3e8100cbad66592e44d175e7556",
+          "code_length": 103
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lorg/apache/poi/xslf/usermodel/VerticalAlignment;>;",
+      "class_references": [
+        "[Lorg/apache/poi/xslf/usermodel/VerticalAlignment;",
+        "java/lang/Enum",
+        "org/apache/poi/xslf/usermodel/VerticalAlignment"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XMLSlideShow.class",
+      "occurrence": 0,
+      "sha256": "93ea5728e3f2a73abe3394daf4905f49846bc7792cc9b15a960fc2e209f9aae5",
+      "name": "org/apache/poi/xslf/usermodel/XMLSlideShow",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/POIXMLDocument",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_logger",
+          "descriptor": "Lorg/apache/poi/util/POILogger;",
+          "access": 10
+        },
+        {
+          "name": "_presentation",
+          "descriptor": "Lorg/openxmlformats/schemas/presentationml/x2006/main/CTPresentation;",
+          "access": 2
+        },
+        {
+          "name": "_slides",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/apache/poi/xslf/usermodel/XSLFSlide;>;"
+        },
+        {
+          "name": "_masters",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/apache/poi/xslf/usermodel/XSLFSlideMaster;>;"
+        },
+        {
+          "name": "_pictures",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/apache/poi/xslf/usermodel/XSLFPictureData;>;"
+        },
+        {
+          "name": "_tableStyles",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/XSLFTableStyles;",
+          "access": 2
+        },
+        {
+          "name": "_notesMaster",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/XSLFNotesMaster;",
+          "access": 2
+        },
+        {
+          "name": "_commentAuthors",
+          "descriptor": "Lorg/apache/poi/xslf/usermodel/XSLFCommentAuthors;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a1cb2dd63d76ca82ba520c78f40439c6adb2fb8ffcab23060f564c1992bc669e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/openxml4j/opc/OPCPackage;)V",
+          "access": 1,
+          "code_sha256": "d9cea73ab6e42e94c6f6a6c4933c1624755cd71f7dbe0963a59df75e74d35c1e",
+          "code_length": 53
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "beb1283326bcd8a6e90d23209255d27ce96b15c8e0da18abdd5d1aba22dd5acd",
+          "code_length": 9,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "empty",
+          "descriptor": "()Lorg/apache/poi/openxml4j/opc/OPCPackage;",
+          "access": 24,
+          "code_sha256": "e8f030f76d9c6d241de0a7dc7950e9a357ff69e68797648b7de6072f7a27668b",
+          "code_length": 38
+        },
+        {
+          "name": "_getXSLFSlideShow",
+          "descriptor": "()Lorg/apache/poi/xslf/XSLFSlideShow;",
+          "access": 1,
+          "code_sha256": "0d3107cdd00939c30e494ab37e4e54f8ce1bfb74720cd48b444211f9bdacff61",
+          "code_length": 12,
+          "throws": [
+            "org/apache/poi/openxml4j/exceptions/OpenXML4JException",
+            "java/io/IOException",
+            "org/apache/xmlbeans/XmlException"
+          ]
+        },
+        {
+          "name": "onDocumentRead",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "92eac99d870e2c24090d017d7399205a039e3690be0c008ea9e5b66d7704c82c",
+          "code_length": 352,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "39170feb4d1becc0000adf2966264fd3ac7b8aba7881fd4b3c051b6177a4cc5d",
+          "code_length": 74,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getAllEmbedds",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "fd78c86820253283bd2274e1d96cbdeef13f9cefdbf12e5839da48c98e6c4cbb",
+          "code_length": 16,
+          "throws": [
+            "org/apache/poi/openxml4j/exceptions/OpenXML4JException"
+          ],
+          "generic_signature": "()Ljava/util/List<Lorg/apache/poi/openxml4j/opc/PackagePart;>;"
+        },
+        {
+          "name": "getAllPictures",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8979c54bf19be3cd34ab78101f0f84e804b3853cf1f1c757abc2aa6e7006b06d",
+          "code_length": 93,
+          "generic_signature": "()Ljava/util/List<Lorg/apache/poi/xslf/usermodel/XSLFPictureData;>;"
+        },
+        {
+          "name": "createSlide",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSlideLayout;)Lorg/apache/poi/xslf/usermodel/XSLFSlide;",
+          "access": 1,
+          "code_sha256": "5760c3a9ec4598010b92df8496fbc1fff48449555f80d8ba9c0403c9c158e1ef",
+          "code_length": 212
+        },
+        {
+          "name": "createSlide",
+          "descriptor": "()Lorg/apache/poi/xslf/usermodel/XSLFSlide;",
+          "access": 1,
+          "code_sha256": "e843c3d5be3123fa3ae893e8669f68e52246d27bf16d1fcd80c46293c7df4248",
+          "code_length": 63
+        },
+        {
+          "name": "getNotesSlide",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSlide;)Lorg/apache/poi/xslf/usermodel/XSLFNotes;",
+          "access": 1,
+          "code_sha256": "a3d87345bd062987a99bb262043b92681765a19b5cb75c26046cf99c36b3764e",
+          "code_length": 17
+        },
+        {
+          "name": "createNotesSlide",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSlide;)Lorg/apache/poi/xslf/usermodel/XSLFNotes;",
+          "access": 2,
+          "code_sha256": "0266213e2a200ed3dfe12202de30f70ac156e73d24eb432a1e3a15a918127d83",
+          "code_length": 183
+        },
+        {
+          "name": "createNotesMaster",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ec8330e4ee7ec9d96f50c469aaa0ea642c7faf9c5b147ff0e8adb9dc6a61f27f",
+          "code_length": 314
+        },
+        {
+          "name": "getNotesMaster",
+          "descriptor": "()Lorg/apache/poi/xslf/usermodel/XSLFNotesMaster;",
+          "access": 1,
+          "code_sha256": "b954722806cddcf9516c3cbd8b3fa97826de825b67fcdbf4ae44782983e293cf",
+          "code_length": 5
+        },
+        {
+          "name": "getSlideMasters",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/XSLFSlideMaster;",
+          "access": 1,
+          "code_sha256": "6925976577cc6333a9b592d79323c3e895608dcdd0559f4e8ed7a1b018c1fcf5",
+          "code_length": 30
+        },
+        {
+          "name": "getSlides",
+          "descriptor": "()[Lorg/apache/poi/xslf/usermodel/XSLFSlide;",
+          "access": 1,
+          "code_sha256": "8b5f66651e0bb537d11a968c6ba93173ae0f7d8d93112ec98d3b3c48c755585f",
+          "code_length": 25
+        },
+        {
+          "name": "getCommentAuthors",
+          "descriptor": "()Lorg/apache/poi/xslf/usermodel/XSLFCommentAuthors;",
+          "access": 1,
+          "code_sha256": "85964d32967b3f4f97b0258fadd90eacddf672f2b753b5bfc55aa8f4fab8c4c3",
+          "code_length": 5
+        },
+        {
+          "name": "setSlideOrder",
+          "descriptor": "(Lorg/apache/poi/xslf/usermodel/XSLFSlide;I)V",
+          "access": 1,
+          "code_sha256": "456ce3a7f40be77f86337fa33408daa239b6ba0d27c0a6b6fa2801c6c04b6e48",
+          "code_length": 130
+        },
+        {
+          "name": "removeSlide",
+          "descriptor": "(I)Lorg/apache/poi/xslf/usermodel/XSLFSlide;",
+          "access": 1,
+          "code_sha256": "9db69cdf7e89681bc29287ff5ee316b886b6d80759f45b9b0ddfe0d0ea022a09",
+          "code_length": 36
+        },
+        {
+          "name": "getPageSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "08b136615af35d924d4087ca84a9b6c160f9fed27152a8345f5c7f3d5dfa87a9",
+          "code_length": 44
+        },
+        {
+          "name": "setPageSize",
+          "descriptor": "(Ljava/awt/Dimension;)V",
+          "access": 1,
+          "code_sha256": "62f18316c340f47c5ef52b14a0d58bc0aa56d27293c2576ad79e7f6edbb723c1",
+          "code_length": 41
+        },
+        {
+          "name": "getCTPresentation",
+          "descriptor": "()Lorg/openxmlformats/schemas/presentationml/x2006/main/CTPresentation;",
+          "access": 1,
+          "code_sha256": "b3cd15da2b7c2041a0b0821d667e487737d3004b06bd3a3d10954898a3eaa9ce",
+          "code_length": 5
+        },
+        {
+          "name": "addPicture",
+          "descriptor": "([BI)I",
+          "access": 1,
+          "code_sha256": "57829bae5572f636aaec8bda01147edaefd5735620b43bc9a7abb6bc71e75277",
+          "code_length": 118
+        },
+        {
+          "name": "findPictureData",
+          "descriptor": "([B)Lorg/apache/poi/xslf/usermodel/XSLFPictureData;",
+          "access": 0,
+          "code_sha256": "61d9dc7de3cf4ac485403728e644462ea28abab2d7f04269a4bfd9fd5371aa15",
+          "code_length": 56
+        },
+        {
+          "name": "getTableStyles",
+          "descriptor": "()Lorg/apache/poi/xslf/usermodel/XSLFTableStyles;",
+          "access": 1,
+          "code_sha256": "15838c8c2da38de3025f9e7f6fa3ebb2e5822d1f333d1a7c1400b5a247d6bf55",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultParagraphStyle",
+          "descriptor": "(I)Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraphProperties;",
+          "access": 0,
+          "code_sha256": "4d61d08a209a69b44176ad006c177de6d7ff277854f871c79cbcffa7fbe73572",
+          "code_length": 51
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "01d40417dd8bb4e23b224dd017e1b16d1c79792b64cbd597f787de6ab3757cc5",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Lorg/apache/poi/xslf/usermodel/XSLFSlide;",
+        "[Lorg/apache/poi/xslf/usermodel/XSLFSlideMaster;",
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "[Lorg/openxmlformats/schemas/presentationml/x2006/main/CTSlideIdListEntry;",
+        "java/awt/Dimension",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/regex/Pattern",
+        "javax/xml/namespace/QName",
+        "org/apache/poi/POIXMLDocument",
+        "org/apache/poi/POIXMLDocumentPart",
+        "org/apache/poi/POIXMLException",
+        "org/apache/poi/POIXMLRelation",
+        "org/apache/poi/openxml4j/exceptions/OpenXML4JException",
+        "org/apache/poi/openxml4j/opc/OPCPackage",
+        "org/apache/poi/openxml4j/opc/PackagePart",
+        "org/apache/poi/openxml4j/opc/PackageRelationship",
+        "org/apache/poi/openxml4j/opc/TargetMode",
+        "org/apache/poi/util/IOUtils",
+        "org/apache/poi/util/POILogFactory",
+        "org/apache/poi/util/POILogger",
+        "org/apache/poi/util/PackageHelper",
+        "org/apache/poi/util/Units",
+        "org/apache/poi/xslf/XSLFSlideShow",
+        "org/apache/poi/xslf/usermodel/SlideLayout",
+        "org/apache/poi/xslf/usermodel/XMLSlideShow",
+        "org/apache/poi/xslf/usermodel/XSLFCommentAuthors",
+        "org/apache/poi/xslf/usermodel/XSLFFactory",
+        "org/apache/poi/xslf/usermodel/XSLFNotes",
+        "org/apache/poi/xslf/usermodel/XSLFNotesMaster",
+        "org/apache/poi/xslf/usermodel/XSLFPictureData",
+        "org/apache/poi/xslf/usermodel/XSLFRelation",
+        "org/apache/poi/xslf/usermodel/XSLFSlide",
+        "org/apache/poi/xslf/usermodel/XSLFSlideLayout",
+        "org/apache/poi/xslf/usermodel/XSLFSlideMaster",
+        "org/apache/poi/xslf/usermodel/XSLFTableStyles",
+        "org/apache/poi/xslf/usermodel/XSLFTheme",
+        "org/apache/xmlbeans/SchemaType",
+        "org/apache/xmlbeans/XmlException",
+        "org/apache/xmlbeans/XmlOptions",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTextParagraphProperties",
+        "org/openxmlformats/schemas/officeDocument/x2006/relationships/STRelationshipId",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTNotesMasterIdList",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTNotesMasterIdListEntry",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTPresentation",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideIdList",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideIdListEntry",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideMasterIdList",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideMasterIdListEntry",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideSize",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTSlideSize$Factory",
+        "org/openxmlformats/schemas/presentationml/x2006/main/PresentationDocument",
+        "org/openxmlformats/schemas/presentationml/x2006/main/PresentationDocument$Factory"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFAutoShape.class",
+      "occurrence": 0,
+      "sha256": "1fa56588a378cdaec7328d89bead46b7fffe75a70678b755e439b2d514f9f73d",
+      "name": "org/apache/poi/xslf/usermodel/XSLFAutoShape",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/xslf/usermodel/XSLFTextShape",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/presentationml/x2006/main/CTShape;Lorg/apache/poi/xslf/usermodel/XSLFSheet;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lorg/openxmlformats/schemas/presentationml/x2006/main/CTShape;Lorg/apache/poi/xslf/usermodel/XSLFSheet;)Lorg/apache/poi/xslf/usermodel/XSLFAutoShape;",
+          "access": 8,
+          "code_sha256": "f2b114fbd8a926c737cffd1865b14e3cf835695eace3e167793651b0120c05df",
+          "code_length": 63
+        },
+        {
+          "name": "prototype",
+          "descriptor": "(I)Lorg/openxmlformats/schemas/presentationml/x2006/main/CTShape;",
+          "access": 8,
+          "code_sha256": "ea4035f099ea999118cdd6f06341dbc3cf856756273194ee7d85bf4a8dbe807f",
+          "code_length": 104
+        },
+        {
+          "name": "getTextBody",
+          "descriptor": "(Z)Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTextBody;",
+          "access": 4,
+          "code_sha256": "3ac017a8ca54f4a12b6acb6cb7d861a6a55f0621264ca0855a6977b3718f5bcb",
+          "code_length": 46
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "42da5ed00d51466fbeacd8c0f34f06d6fc744d69ba95d39e19917d27925d1e20",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/poi/xslf/usermodel/XSLFAutoShape",
+        "org/apache/poi/xslf/usermodel/XSLFFreeformShape",
+        "org/apache/poi/xslf/usermodel/XSLFTextBox",
+        "org/apache/poi/xslf/usermodel/XSLFTextShape",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTNonVisualDrawingProps",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTNonVisualDrawingShapeProps",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPresetGeometry2D",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTShapeProperties",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTextBody",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STShapeType",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STShapeType$Enum",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTShape",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTShape$Factory",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTShapeNonVisual"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFBackground.class",
+      "occurrence": 0,
+      "sha256": "7f187598be2ea4aa91835ec3086da15170de63a90d42865c62752f7a34982491",
+      "name": "org/apache/poi/xslf/usermodel/XSLFBackground",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/openxmlformats/schemas/presentationml/x2006/main/CTBackground;Lorg/apache/poi/xslf/usermodel/XSLFSheet;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "getAnchor",
+          "descriptor": "()Ljava/awt/geom/Rectangle2D;",
+          "access": 1,
+          "code_sha256": "f05fa21a2bc7c65922c9ca0b1bb62d03a9e357cc707855145cfdc0c610f912bf",
+          "code_length": 29
+        },
+        {
+          "name": "draw",
+          "descriptor": "(Ljava/awt/Graphics2D;)V",
+          "access": 1,
+          "code_sha256": "17d6ff37488aa7bcfd10ef8ef4945cfcd3d076f591b3efcefb2350ce7a71a403",
+          "code_length": 26
+        },
+        {
+          "name": "getPaint",
+          "descriptor": "(Ljava/awt/Graphics2D;)Ljava/awt/Paint;",
+          "access": 0,
+          "code_sha256": "3f8cf189afb133be8c5d1277b0a729811c14252e442c7815d4eed6bac9a1ff6e",
+          "code_length": 155
+        },
+        {
+          "name": "getFillColor",
+          "descriptor": "()Ljava/awt/Color;",
+          "access": 1,
+          "code_sha256": "6cec2be11bd9ff09557011f3a2b4574a14cd86a8d5a9b5017e1775e1939830be",
+          "code_length": 20
+        },
+        {
+          "name": "getXfrm",
+          "descriptor": "()Lorg/openxmlformats/schemas/drawingml/x2006/main/CTTransform2D;",
+          "access": 0,
+          "code_sha256": "f3827bcdc82b5ac4f54de659c3f40e32b12673345ae7de4a5a57ef26790bc775",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "java/awt/Color",
+        "java/awt/Dimension",
+        "java/awt/Graphics2D",
+        "java/awt/Paint",
+        "java/awt/geom/Rectangle2D",
+        "java/awt/geom/Rectangle2D$Double",
+        "org/apache/poi/xslf/usermodel/RenderableShape",
+        "org/apache/poi/xslf/usermodel/XMLSlideShow",
+        "org/apache/poi/xslf/usermodel/XSLFBackground",
+        "org/apache/poi/xslf/usermodel/XSLFSheet",
+        "org/apache/poi/xslf/usermodel/XSLFSimpleShape",
+        "org/apache/poi/xslf/usermodel/XSLFTheme",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBackgroundFillStyleList",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTBaseStyles",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTOfficeStyleSheet",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTStyleMatrix",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTStyleMatrixReference",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTransform2D",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTTransform2D$Factory",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTBackground"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFChart.class",
+      "occurrence": 0,
+      "sha256": "8b2f85b369c85101630956da005be194fe39c8a3f65dd171b6d232be682d4217",
+      "name": "org/apache/poi/xslf/usermodel/XSLFChart",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "org/apache/poi/POIXMLDocumentPart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chartSpace",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/chart/CTChartSpace;",
+          "access": 2
+        },
+        {
+          "name": "chart",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/chart/CTChart;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/openxml4j/opc/PackagePart;Lorg/apache/poi/openxml4j/opc/PackageRelationship;)V",
+          "access": 4,
+          "code_sha256": "eec710cec3710b2b1277f4f9e40702f88254578623f32608566c5895596a3c3e",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/xmlbeans/XmlException"
+          ]
+        },
+        {
+          "name": "getCTChartSpace",
+          "descriptor": "()Lorg/openxmlformats/schemas/drawingml/x2006/chart/CTChartSpace;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getCTChart",
+          "descriptor": "()Lorg/openxmlformats/schemas/drawingml/x2006/chart/CTChart;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "commit",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "6104cd86bad9d2ae2b32d6ec8550f289639c60d64dcf77c048f4ced169175374",
+          "code_length": 114,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/util/HashMap",
+        "java/util/Map",
+        "javax/xml/namespace/QName",
+        "org/apache/poi/POIXMLDocumentPart",
+        "org/apache/poi/openxml4j/opc/PackagePart",
+        "org/apache/poi/xslf/usermodel/XSLFChart",
+        "org/apache/xmlbeans/SchemaType",
+        "org/apache/xmlbeans/XmlException",
+        "org/apache/xmlbeans/XmlOptions",
+        "org/openxmlformats/schemas/drawingml/x2006/chart/CTChartSpace",
+        "org/openxmlformats/schemas/drawingml/x2006/chart/ChartSpaceDocument",
+        "org/openxmlformats/schemas/drawingml/x2006/chart/ChartSpaceDocument$Factory"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFColor.class",
+      "occurrence": 0,
+      "sha256": "9d970fa1fd89d8f3322124b4e158117b8b8039996c87bdf4eb2a690087e22471",
+      "name": "org/apache/poi/xslf/usermodel/XSLFColor",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_xmlObject",
+          "descriptor": "Lorg/apache/xmlbeans/XmlObject;",
+          "access": 2
+        },
+        {
+          "name": "_color",
+          "descriptor": "Ljava/awt/Color;",
+          "access": 2
+        },
+        {
+          "name": "_phClr",
+          "descriptor": "Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;",
+          "access": 2
+        },
+        {
+          "name": "presetColors",
+          "descriptor": "Ljava/util/Map;",
+          "access": 24,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/awt/Color;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlObject;Lorg/apache/poi/xslf/usermodel/XSLFTheme;Lorg/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor;)V",
+          "access": 1,
+          "code_sha256": "f7d290d20e0e4b278f2d944aa59d793fd8af69a993f37362435896672e984bfc",
+          "code_length": 25
+        },
+        {
+          "name": "getXmlObject",
+          "descriptor": "()Lorg/apache/xmlbeans/XmlObject;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getColor",
+          "descriptor": "()Ljava/awt/Color;",
+          "access": 1,
+          "code_sha256": "5c39b356195dfa8a254724261acf0bb5470cda89e1377522871b526312a96eb4",
+          "code_length": 20
+        },
+        {
+          "name": "applyColorTransform",
+          "descriptor": "(Ljava/awt/Color;)Ljava/awt/Color;",
+          "access": 2,
+          "code_sha256": "2becd34b172ea4dac15f2dc922338aff10caae6c35bbe25799effc0292e5f3d7",
+          "code_length": 138
+        },
+        {
+          "name": "toColor",
+          "descriptor": "(Lorg/apache/xmlbeans/XmlObject;Lorg/apache/poi/xslf/usermodel/XSLFTheme;)Ljava/awt/Color;",
+          "access": 0,
+          "code_sha256": "172fb491d5454f4f249dbd14b9bd89f9eef69ee3a05f52cd023c5b09cae8da9d",
+          "code_length": 483
+        },
+        {
+          "name": "getPercentageValue",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 2,
+          "code_sha256": "de7b802c7b37ee1eb7b0d651a605fcd8ec02efb63d8b06dbdcf012f7396b3d3d",
+          "code_length": 147
+        },
+        {
+          "name": "getAngleValue",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 2,
+          "code_sha256": "8d0320da4406729ebaaa0b262a8f3cbf2b6f8fb698408d461b093bee6898a84f",
+          "code_length": 145
+        },
+        {
+          "name": "getAlpha",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "6f0e289c7800e5349d34e40a7876bd31186565601ba21b07cfcb9ef70ac06ee1",
+          "code_length": 7
+        },
+        {
+          "name": "getAlphaMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "f77c244eb341334fe9462352a6cfe29b4b50b64897838869c5f8321066554519",
+          "code_length": 7
+        },
+        {
+          "name": "getAlphaOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "44f42e144854bb7ae4d8345a2ff52a05f51cd9150555be73ef299c0dee4e0530",
+          "code_length": 7
+        },
+        {
+          "name": "getHue",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "0544984aeb6c699f4627fd913c426b0f6ee9981fee8e2ef14b5bb48702307fe1",
+          "code_length": 7
+        },
+        {
+          "name": "getHueMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "0f28a930551f94197eeb5394934d6aed283d2967f168e4b65c57568cf2d94b72",
+          "code_length": 7
+        },
+        {
+          "name": "getHueOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "6941518f92a9d5589f1ef7148163fea9754e3d2ec932a03a4ed15f306e97015e",
+          "code_length": 7
+        },
+        {
+          "name": "getLum",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "b21a1e31b80b32f769272018e639c4c112b2c99a1a486632a46ed009a440fbce",
+          "code_length": 7
+        },
+        {
+          "name": "getLumMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "25faa1ed28068a4da3361b6c1f45ebe7869b303d0f027a805effcc1cf6ba55ff",
+          "code_length": 7
+        },
+        {
+          "name": "getLumOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "47f2b556e911cf5450fd9573fea9dbd351c8b906e42a6754abd9a246f1d82de5",
+          "code_length": 7
+        },
+        {
+          "name": "getSat",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "3721d539087da44a6129c47acbdc6f9ec0b1561569d8fce1eea47c795c77c04b",
+          "code_length": 7
+        },
+        {
+          "name": "getSatMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "9e2b8caa1fb882217c885b0b625cc5f677a6ff74f31c13b2770b1680487c574b",
+          "code_length": 7
+        },
+        {
+          "name": "getSatOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "53149464852f0cbdf95e66409052236d1be5215df6302005dc9be9d1b9ed392f",
+          "code_length": 7
+        },
+        {
+          "name": "getRed",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "ad48eab62e20ba74b315daf187e9843644169cf82f499af8bc9de8e68420560a",
+          "code_length": 7
+        },
+        {
+          "name": "getRedMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "0a1ba053e1e228baf1f7957a48747e03e96d145ae87e8a9da2ac9dd61f651ccb",
+          "code_length": 7
+        },
+        {
+          "name": "getRedOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "cba50c55950b24f09e33f8cc9292e7899baaf24c21d178cd5a0036c47f2c2c36",
+          "code_length": 7
+        },
+        {
+          "name": "getGreen",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "0656a26abf769c6656cd073e07d016e4a17ebff32a7094446cf3a17283c99b27",
+          "code_length": 7
+        },
+        {
+          "name": "getGreenMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "65fae8e2420e1be797e8875593a645702b1f3d32aa2f63460ba65ba8ae308f5e",
+          "code_length": 7
+        },
+        {
+          "name": "getGreenOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "3695e6d5ea767bcad98cd1a53dd0c3c9a479976126e9c74941cbd2071540c8b0",
+          "code_length": 7
+        },
+        {
+          "name": "getBlue",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "322ae707b4a4603c431e2f37588e7e2514c4b835aa313946425ee640732d0f81",
+          "code_length": 7
+        },
+        {
+          "name": "getBlueMod",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "74e7ac2f940167803833486a5f5e345b1cb9c7173ef8b6ad112ac1dc46955fd8",
+          "code_length": 7
+        },
+        {
+          "name": "getBlueOff",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "096927342440d75149241497199413429842744970acb9050b6cd673572773d5",
+          "code_length": 7
+        },
+        {
+          "name": "getShade",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "49d812c1399b163ea6ab7b3411d0b897f9037a19ce3f97db879bb65f7abe532a",
+          "code_length": 7
+        },
+        {
+          "name": "getTint",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "e0f6c9944aea84cacfc644cb7891220d413cec879fd88a7ddfd06979f1403a4b",
+          "code_length": 7
+        },
+        {
+          "name": "modulateLuminanace",
+          "descriptor": "(Ljava/awt/Color;II)Ljava/awt/Color;",
+          "access": 10,
+          "code_sha256": "985ce4986e1d35e5d891d6995df7e20218c127b7037340ae8fd2724e9132d376",
+          "code_length": 158
+        },
+        {
+          "name": "shade",
+          "descriptor": "(Ljava/awt/Color;I)Ljava/awt/Color;",
+          "access": 10,
+          "code_sha256": "4e05eff0860f9a00240080e7ef33fbd3a30370e7b6560d059453327394ffdc86",
+          "code_length": 48
+        },
+        {
+          "name": "tint",
+          "descriptor": "(Ljava/awt/Color;I)Ljava/awt/Color;",
+          "access": 10,
+          "code_sha256": "d92e79ce52feb5c1f20efe69919c7b7cdc0e64085929ae9db5fcac511222b12f",
+          "code_length": 92
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3cd2b1cd392612ebcf1c24e3bed746ec8c2044129a6083621a317dcb74a49c49",
+          "code_length": 3589
+        }
+      ],
+      "class_references": [
+        "[Lorg/apache/xmlbeans/XmlObject;",
+        "java/awt/Color",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Map",
+        "org/apache/poi/xslf/usermodel/XSLFColor",
+        "org/apache/poi/xslf/usermodel/XSLFTheme",
+        "org/apache/xmlbeans/XmlObject",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTHslColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTPresetColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTSRgbColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTScRgbColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTSchemeColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/CTSystemColor",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPresetColorVal",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STPresetColorVal$Enum",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STSchemeColorVal",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STSchemeColorVal$Enum",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STSystemColorVal",
+        "org/openxmlformats/schemas/drawingml/x2006/main/STSystemColorVal$Enum",
+        "org/w3c/dom/NamedNodeMap",
+        "org/w3c/dom/Node"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFCommentAuthors.class",
+      "occurrence": 0,
+      "sha256": "bcf535479347798591de1c09f09fad49e582c2c9e8837b11bada1fe238333f4e",
+      "name": "org/apache/poi/xslf/usermodel/XSLFCommentAuthors",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/POIXMLDocumentPart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_authors",
+          "descriptor": "Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthorList;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e8074ea82f7309f8428a21d3c5dff4d124287718edbfc674cf86ed5637e512d1",
+          "code_length": 19
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/openxml4j/opc/PackagePart;Lorg/apache/poi/openxml4j/opc/PackageRelationship;)V",
+          "access": 0,
+          "code_sha256": "4c5616f6cc5e9fbd022a9f4e9dde0d5dc8225d29a461e42a150ef1cbf87927a1",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/xmlbeans/XmlException"
+          ]
+        },
+        {
+          "name": "getCTCommentAuthorsList",
+          "descriptor": "()Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthorList;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getAuthorById",
+          "descriptor": "(J)Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthor;",
+          "access": 1,
+          "code_sha256": "e47ecc9d2be29bd10fe8128f4cdd1795f5b5322e6bf4fb7788ebbe300ee9b0a4",
+          "code_length": 53
+        }
+      ],
+      "class_references": [
+        "[Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthor;",
+        "java/io/IOException",
+        "org/apache/poi/POIXMLDocumentPart",
+        "org/apache/poi/openxml4j/opc/PackagePart",
+        "org/apache/poi/xslf/usermodel/XSLFCommentAuthors",
+        "org/apache/xmlbeans/XmlException",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthor",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTCommentAuthorList",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CmAuthorLstDocument",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CmAuthorLstDocument$Factory"
+      ]
+    },
+    {
+      "entry": "org/apache/poi/xslf/usermodel/XSLFComments.class",
+      "occurrence": 0,
+      "sha256": "0bf4875eb478c8edaf46859b1d34bafea4e7dad4bd9cf93c173fbbfdb766b987",
+      "name": "org/apache/poi/xslf/usermodel/XSLFComments",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/apache/poi/POIXMLDocumentPart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_comments",
+          "descriptor": "Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentList;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e8074ea82f7309f8428a21d3c5dff4d124287718edbfc674cf86ed5637e512d1",
+          "code_length": 19
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/poi/openxml4j/opc/PackagePart;Lorg/apache/poi/openxml4j/opc/PackageRelationship;)V",
+          "access": 0,
+          "code_sha256": "4c5616f6cc5e9fbd022a9f4e9dde0d5dc8225d29a461e42a150ef1cbf87927a1",
+          "code_length": 28,
+          "throws": [
+            "java/io/IOException",
+            "org/apache/xmlbeans/XmlException"
+          ]
+        },
+        {
+          "name": "getCTCommentsList",
+          "descriptor": "()Lorg/openxmlformats/schemas/presentationml/x2006/main/CTCommentList;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "getNumberOfComments",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ad8273b81a9d55065a01d05f60a88bb6599a91f4ac104780e26bb3ab1ca16b46",
+          "code_length": 10
+        },
+        {
+          "name": "getCommentAt",
+          "descriptor": "(I)Lorg/openxmlformats/schemas/presentationml/x2006/main/CTComment;",
+          "access": 1,
+          "code_sha256": "33fdd3e50d07bcd2e8e0909eabd50c5faa3506a04a0b09c4c13a31ee8679256a",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "org/apache/poi/POIXMLDocumentPart",
+        "org/apache/poi/openxml4j/opc/PackagePart",
+        "org/apache/poi/xslf/usermodel/XSLFComments",
+        "org/apache/xmlbeans/XmlException",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CTCommentList",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CmLstDocument",
+        "org/openxmlformats/schemas/presentationml/x2006/main/CmLstDocument$Factory"
+      ]
+    }
+  ]
+}

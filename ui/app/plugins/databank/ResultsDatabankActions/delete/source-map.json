@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsDatabankActions/delete bounded traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/delete",
-  "source_head": "41932db60c0f4076d1deb1640a981b08e9f25240",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_152853_databank-actions-delete-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,23 +28,28 @@
   "source_catalog": [
     {
       "id": "sqx-resultsdatabankactions-delete-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
       "family": "bounded installed Delete action frontend artifact"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsdatabankactions-delete-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js",
       "relative_path": "module.js",
       "location": "lines 1-47; action registration/selection/confirmation boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "9166eb3bed0369c20819e1d4d71e0234109c118287b9869a41970fcba1abc894",
+      "sha256": "fc6257806c4d55c27e8a4a5f3cca2e6b427835792b4da60b0751e60dbae6a308",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structure only; target mock does not reproduce donor guards/all-token/progress/backend behavior"
+      "limitation": "Structure only; target mock does not reproduce donor guards/all-token/progress/backend behavior Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -52,5 +57,10 @@
       "path": "source-map.json",
       "reason": "Bounded structural manifest; not behavioral ledger"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

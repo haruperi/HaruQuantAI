@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ResultsChart/ResultsChart.jar",
+  "sha256": "e7806d3052e6f1d1df42c1237e7a28f443f42d66c44a526893de285635bde1e2",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Results/impl/Chart/ChartServlet.class": "cbc3b5927023cfebcd907de509c47d21547e13f7e25bf874d23da9c9d0e11b3d",
+    "com/strategyquant/plugin/Results/impl/Chart/ChartServletPlugin.class": "210949208fc6e6f5723240607b8fe38cc69563b3d35822ffb8d1c77913aefb38"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Chart/ChartServlet.class",
+      "occurrence": 0,
+      "sha256": "cbc3b5927023cfebcd907de509c47d21547e13f7e25bf874d23da9c9d0e11b3d",
+      "member_shard": "docs/dev/evidence/sqx145/members/200/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Results/impl/Chart/ChartServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "210949208fc6e6f5723240607b8fe38cc69563b3d35822ffb8d1c77913aefb38",
+      "member_shard": "docs/dev/evidence/sqx145/members/200/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/200/001.json",
+      "sha256": "9081517db10fe15da8c4baf123bd077ad8d29820a3f3b79b261a9db86f81bc14"
+    }
+  ]
+}

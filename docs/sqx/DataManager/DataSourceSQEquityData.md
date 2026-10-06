@@ -1,222 +1,46 @@
 # DataSourceSQEquityData.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar`.
-- SHA-256: `4775cfdc7055c32fb6368e60d4e755f8e1c1e71945b316994b0db3038251107c`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **5**; non-nested: **2**; nested/anonymous: **3**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar`.
+- **SHA-256:** `872584251e604ec4d6dc7a8837a5a674fc30daef5251891090d1fb0b85365e53`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 5 raw entries; 5 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA`, P04; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [178.json](../../dev/evidence/sqx145/archives/145/178.json).
 
-The `DataManager` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/178/001.json) — SHA-256 `910602a4d5dcdccbaeee2bbe4735c17614f8624b3f6e142ba03b4541991fae10`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.DataSource.impl.SQEquityData`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C8d605cfe6a2a["SQEquityDataPlugin"] {
-        -servlet
-        -dataContext
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getHandler()
-        +call()
-    }
-    class C7398371c2d84["SQEquityDataServlet"] {
-        -JOB_PREFIX
-        -Log
-        -canceled
-        #execute()
-    }
-    class C1b6b4448b67b["IProgram"]
-    class C249b5c671b1a["IServletPlugin"]
-    class C8900f90ae594["HttpJSONServlet"]
-    C249b5c671b1a <|.. C8d605cfe6a2a : declared interface
-    C1b6b4448b67b <|.. C8d605cfe6a2a : declared interface
-    C8d605cfe6a2a ..> C7398371c2d84 : field type
-    C8900f90ae594 <|-- C7398371c2d84 : declared extends
+    class C0["SQEquityDataPlugin"]
+    class C1["SQEquityDataServlet"]
+    class E0["IServletPlugin"]
+    E0 <|.. C0
+    class E1["IProgram"]
+    E1 <|.. C0
+    class E2["HttpJSONServlet"]
+    E2 <|-- C1
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C8d605cfe6a2a` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` (this JAR) | this diagram |
-| `C7398371c2d84` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | this diagram |
-| `C1b6b4448b67b` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | referenced external type |
-| `C249b5c671b1a` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | referenced external type |
-| `C8900f90ae594` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | class | non-nested |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | class | non-nested |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | class | nested/anonymous |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | class | nested/anonymous |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | class | nested/anonymous |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | [`com.strategyquant.pluginlib.program.IProgram`](../Shared/SQPluginLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / field declaration: `private com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet servlet;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `org.eclipse.jetty.servlet.ServletContextHandler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / field declaration: `private org.eclipse.jetty.servlet.ServletContextHandler dataContext;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / method signature: `public java.lang.String getProduct();`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;`<br>`public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `org.eclipse.jetty.server.Handler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / method signature: `public org.eclipse.jetty.server.Handler getHandler();` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` | `java.lang.Object` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin` / method signature: `public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | extends | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / class declaration: `public class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / field declaration: `private static final java.lang.String JOB_PREFIX;`<br>`private java.lang.String exchangesResponse;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onGetExchanges() throws java.lang.Exception;`<br>`private java.lang.String onAdd(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onAddCancel() throws java.lang.Exception;`<br>`private void subscriptionCheck(java.lang.String[], boolean) throws java.lang.Exception;`<br>`private java.lang.String onLookup(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdate() throws java.lang.Exception;`<br>`private java.lang.String performUpdate(java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.lang.Exception;`<br>`private java.lang.String onVerifySubscription(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateAll() throws java.lang.Exception;`<br>`private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private static java.lang.String lambda$performUpdate$2(com.strategyquant.datalib.DataInfo);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onAdd(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onLookup(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onVerifySubscription(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`static void access$000(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;`<br>`private java.lang.String onGetExchanges() throws java.lang.Exception;`<br>`private java.lang.String onAdd(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onAddCancel() throws java.lang.Exception;`<br>`private void subscriptionCheck(java.lang.String[], boolean) throws java.lang.Exception;`<br>`private java.lang.String onLookup(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdate() throws java.lang.Exception;`<br>`private java.lang.String performUpdate(java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.lang.Exception;`<br>`private java.lang.String onVerifySubscription(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;`<br>`private java.lang.String onUpdateAll() throws java.lang.Exception;`<br>`private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | `java.util.ArrayList` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `private java.lang.String performUpdate(java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | [`com.strategyquant.datalib.DataInfo`](../Shared/SQDataLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `private java.lang.String performUpdate(java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.lang.Exception;`<br>`private boolean isDownloadAllowed(com.strategyquant.datalib.DataInfo);`<br>`private static java.lang.String lambda$performUpdate$2(com.strategyquant.datalib.DataInfo);`<br>`private static boolean lambda$performUpdate$1(com.strategyquant.datalib.DataInfo);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` | [`com.strategyquant.datalib.historyData.dto.TickerDto`](../Shared/SQDataLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` / method signature: `private static com.strategyquant.datalib.historyData.dto.TickerDto lambda$_onAdd$0(com.strategyquant.datalib.historyData.dto.TickerDto);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | `java.lang.Thread` (not resolved in scoped archives) | extends | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` / class declaration: `class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1 extends java.lang.Thread` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` / field declaration: `final java.util.Map val$args;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` / method signature: `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` / field declaration: `final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1` / method signature: `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet, java.util.Map);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | [`com.strategyquant.datalib.data.InstrumentValueEvaluator`](../Shared/SQDataLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` / class declaration: `class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2 implements com.strategyquant.datalib.data.InstrumentValueEvaluator` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` / field declaration: `final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` / method signature: `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | [`com.strategyquant.datalib.historyData.dto.TickerDto`](../Shared/SQDataLib.md) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` / method signature: `public double getTickStep(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public double getTickSize(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public double getPointValue(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public byte getInstrumentType(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public java.lang.String getDescriptions(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public double getOrderSizeMultiplier(com.strategyquant.datalib.historyData.dto.TickerDto);`<br>`public double getOrderSizeStep(com.strategyquant.datalib.historyData.dto.TickerDto);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2` / method signature: `public java.lang.String getDescriptions(com.strategyquant.datalib.historyData.dto.TickerDto);` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | [`com.strategyquant.datalib.data.BatchProgressController`](../Shared/SQDataLib.md) | implements | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / class declaration: `class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3 implements com.strategyquant.datalib.data.BatchProgressController` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `org.json.JSONObject` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / field declaration: `final org.json.JSONObject val$progress;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `java.util.Set` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / field declaration: `final java.util.Set val$symbolsSet;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / field declaration: `final java.lang.String[] val$symbols;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / method signature: `public void updateProgress(int, int, java.lang.String) throws java.lang.Exception;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet` (this JAR) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / field declaration: `final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;` |
-| `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3` / method signature: `public void updateProgress(int, int, java.lang.String) throws java.lang.Exception;` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin,com.strategyquant.pluginlib.program.IProgram
-    private com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet servlet;
-    private org.eclipse.jetty.servlet.ServletContextHandler dataContext;
-    public com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataPlugin();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public org.eclipse.jetty.server.Handler getHandler();
-    public java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet</summary>
-
-```text
-public class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet
-    private static final java.lang.String JOB_PREFIX;
-    private static final org.slf4j.Logger Log;
-    private boolean canceled;
-    private java.lang.String exchangesResponse;
-    public com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet();
-    protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String) throws java.lang.Exception;
-    private java.lang.String onGetExchanges() throws java.lang.Exception;
-    private java.lang.String onAdd(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private void _onAdd(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onAddCancel() throws java.lang.Exception;
-    private void subscriptionCheck(java.lang.String[], boolean) throws java.lang.Exception;
-    private java.lang.String onLookup(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private java.lang.String onUpdate() throws java.lang.Exception;
-    private java.lang.String performUpdate(java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.lang.Exception;
-    private boolean isDownloadAllowed(com.strategyquant.datalib.DataInfo);
-    private java.lang.String onVerifySubscription(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private java.lang.String onUpdateDataAction(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private java.lang.String onUpdateAll() throws java.lang.Exception;
-    private java.lang.String onUpdateSelected(java.util.Map<java.lang.String, java.lang.String[]>) throws java.lang.Exception;
-    private static java.lang.String lambda$performUpdate$2(com.strategyquant.datalib.DataInfo);
-    private static boolean lambda$performUpdate$1(com.strategyquant.datalib.DataInfo);
-    private static com.strategyquant.datalib.historyData.dto.TickerDto lambda$_onAdd$0(com.strategyquant.datalib.historyData.dto.TickerDto);
-    static void access$000(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet, java.util.Map);
-    static boolean access$100(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1</summary>
-
-```text
-class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1 extends java.lang.Thread
-    final java.util.Map val$args;
-    final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;
-    com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$1(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet, java.util.Map);
-    public void run();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2</summary>
-
-```text
-class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2 implements com.strategyquant.datalib.data.InstrumentValueEvaluator
-    final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;
-    com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$2(com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet);
-    public double getTickStep(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public double getTickSize(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public double getPointValue(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public byte getInstrumentType(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public java.lang.String getDescriptions(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public double getOrderSizeMultiplier(com.strategyquant.datalib.historyData.dto.TickerDto);
-    public double getOrderSizeStep(com.strategyquant.datalib.historyData.dto.TickerDto);
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3</summary>
-
-```text
-class com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3 implements com.strategyquant.datalib.data.BatchProgressController
-    final int val$batchSizeForUse;
-    final org.json.JSONObject val$progress;
-    final java.util.Set val$symbolsSet;
-    final java.lang.String[] val$symbols;
-    final com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet this$0;
-    com.strategyquant.plugin.DataSource.impl.SQEquityData.SQEquityDataServlet$3();
-    public void updateProgress(int, int, java.lang.String) throws java.lang.Exception;
-    public boolean isCancel();
-    public void finished();
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataPlugin.class` | 0 | `3a1272edff033bc31cd9711135b4b0dd5734abbcade67627442b8dd1dd983a0b` | 2 | 6 |
+| `com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$1.class` | 0 | `48b9e0ec28bf83790673a5f77de2832b22f39f59384cf56d60ac3f876ffffe0d` | 2 | 2 |
+| `com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$2.class` | 0 | `00588885266ceb41e610eacd152c00dc2eee7fc05466e90c854aea42582aac31` | 1 | 8 |
+| `com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet$3.class` | 0 | `a194cdf86fa5f86cc458839946b868cae86bc5355ca7001c321de36d34ab7d25` | 5 | 4 |
+| `com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet.class` | 0 | `04fb97dc645da6db700f788ac06b176e58b254a610292ab893809e6bfb43c3c1` | 4 | 22 |

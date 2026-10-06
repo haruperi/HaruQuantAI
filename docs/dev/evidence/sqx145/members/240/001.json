@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilder.jar",
+  "archive_sha256": "7d7c8fe7fbc77d52f1aed81a06f8e9104f2d3cbca10e19a9fcba5fdc68177161",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderPlugin.class",
+      "occurrence": 0,
+      "sha256": "58b60fe4f9fa8ebdf36caa675dcb6102c997ef3a84902d32676940e77ad3e60d",
+      "name": "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "10b9e6d7a2dc193820ff7acf4ef5c08f2240c387b20ab10cdee7728e73928870",
+          "code_length": 64
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "403d3e8dd35e53075d24ae58bb64e523fdfc8cf579bb1c8d808b70800c6df414",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "590a1d6729fbdd7b8201ab0f5840a0fa5f9aacab285d5dac4bd0821590c2a51d",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "d12607c24a098f8c60cdcf7939f3c31588e4f8f546cbc47bbbf4eda5c6f2490c",
+          "code_length": 123
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2a4536d99e48a19a9124f05b5ce23ce77c5aacc0a234307523a056da7ae17dfc",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8ebba3235efc4bf25c026930d8d57f83ef46ef40ee02fa358cce1743393297b2",
+          "code_length": 6
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "618f23d86b4d162efadc284674dce712935f9cddc686012ab0fb3de86d4c79e2",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1d02a4afb1e8b3f35976f9f8c26e50f09eca91a5ff9255f9f1f8b58f08410018",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderPlugin",
+        "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderServlet",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterSettings",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderServlet.class",
+      "occurrence": 0,
+      "sha256": "0b8240482c045d06af1779e98628dd8861f8b822ceed8f4fed72809dd6c12070",
+      "name": "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "ce2ee66f6331eac7a155c96ed2a44972558b1af46a754aba0aefedc94548cfcf",
+          "code_length": 98,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "getNumberOfPossiblePortfolios",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0d99305ccdd9382fa0dab349b32b0094d7deb9eb350f6944a591030bf3519406",
+          "code_length": 102,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getDatabank",
+          "descriptor": "(Ljava/util/Map;)Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2,
+          "code_sha256": "9ce8ae370419d6370fdad98063e30843387bf14c5bd797fe1f579dab40af18e5",
+          "code_length": 72,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Lcom/strategyquant/tradinglib/Databank;"
+        },
+        {
+          "name": "getFitnessTypes",
+          "descriptor": "()Lorg/json/JSONArray;",
+          "access": 1,
+          "code_sha256": "8ae8fb2c61fbadf5fd3884dc51169156eeb1966c30061385540fbbcae819792f",
+          "code_length": 199,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "sampleTypeKey",
+          "descriptor": "(B)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "37caf0f6c6fc119f0477e05e5b3c0250a1a267a6a1cb00764ee815db845a1a8d",
+          "code_length": 37
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "5622eee5a40aa644c3eab9425df8229a8375852d5a797a141741fcc7150943e2",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/plugin/Settings/impl/AutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilderServlet",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitness",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterFitnessList",
+        "com/strategyquant/tradinglib/portfolioMaster/PortfolioMasterUtils",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

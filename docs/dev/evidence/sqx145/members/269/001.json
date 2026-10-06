@@ -1,0 +1,875 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskAutomaticRetest/TaskAutomaticRetest.jar",
+  "archive_sha256": "be3c69292d3dd949a7324a7527d105ea1320c7b02493ee6be00b1cc013ac73b1",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob.class",
+      "occurrence": 0,
+      "sha256": "27cedbb6d1908f510803c1ab6794e1ac98e10f649e4f49c1fb6ac22b4697ca89",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "backtestRunner",
+          "descriptor": "Lcom/strategyquant/tradinglib/backtestrunner/BacktestRunner;",
+          "access": 2
+        },
+        {
+          "name": "project",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/SQProject;",
+          "access": 2
+        },
+        {
+          "name": "strategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "params",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/tradinglib/project/ILastEventListener;)V",
+          "access": 1,
+          "code_sha256": "34558f2a209b62d8db5350f062501ba10ffaa3ba5e093fdb11a750554a1682d0",
+          "code_length": 96,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/tradinglib/project/ILastEventListener;)V"
+        },
+        {
+          "name": "initializeBacktestData",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "46782eb7db66ab776f8803c93d797c088f4b675c66854bd038784f2b0c86da59",
+          "code_length": 72,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;",
+          "access": 1,
+          "code_sha256": "fc5ea5ac4cd9f0310ba7efb26b3b30755f14bf0127cc96a45188260bd131db93",
+          "code_length": 88,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "b6ba4dfdc3f6b17bfcff37b27c1b7afd1d1022359f0c4a20e7d294bce7cb7997",
+          "code_length": 16
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "cc13eee240bd7c552e309f18914a24523fc6e13f7e66bade969a62bfe0ef8afd",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "98e38753c98872c835f289b68c7c186b49d0856c922683f677785a4b23e1c22a",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Lcom/strategyquant/tradinglib/backtestrunner/BacktestResult;>;",
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/backtest/BacktestDataInitializer",
+        "com/strategyquant/tradinglib/backtest/LoadDataProgressEngine",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestRunner",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestSettings",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/project/StopPauseEngine",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1.class",
+      "occurrence": 0,
+      "sha256": "398015d0b44d4a48c790c9bc10486110b43ca3bcc15577bf6a7e0939ca13fed3",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/gridlib/client/IGridMessageListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "messageReceived",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 1,
+          "code_sha256": "1725b0bca55cd5b6be3eeb8317b1af32aad2e2d29023ef4777a69f8bd1e3ebb7",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/IGridMessageListener",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2.class",
+      "occurrence": 0,
+      "sha256": "fede7ff3b8184b04701242822b8816698bccd6a3d7c3f891fc9663652376e30b",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/TimerTask",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6991aa06e39d431ccdd582e813a1871177cd88a4d9e111f055efd498c8226b77",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2",
+        "java/lang/Exception",
+        "java/util/TimerTask",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask.class",
+      "occurrence": 0,
+      "sha256": "3a1c0202d0d129722ec5070111800a02f56b7b9655d0bf2060875f047be6c3a9",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/IProgressStatusListener"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "LOCK_AUTORETEST",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "projectRunInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/ProjectRunInfo;",
+          "access": 2
+        },
+        {
+          "name": "inputDatabank",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "outputDatabank",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "databankRecordKeys",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "lastProcessedIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastFinishedIndex",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicInteger;",
+          "access": 2
+        },
+        {
+          "name": "gridClient",
+          "descriptor": "Lcom/strategyquant/gridlib/client/GridClient;",
+          "access": 2
+        },
+        {
+          "name": "jobGroupID",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "jobCount",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "taskErrorInfo",
+          "descriptor": "Lcom/strategyquant/tradinglib/exception/TaskErrorInfo;",
+          "access": 2
+        },
+        {
+          "name": "retestBatchSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "originalRetestBatchSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "singleThreadedOptimizations",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "projectStartTime",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "deleteFailedStrategies",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "forceRunCrossChecks",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "jobsCreationTimer",
+          "descriptor": "Ljava/util/Timer;",
+          "access": 2
+        },
+        {
+          "name": "strategyData",
+          "descriptor": "Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;",
+          "access": 2
+        },
+        {
+          "name": "settingsPlugins",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/task/settings/ISettingTabPlugin;>;"
+        },
+        {
+          "name": "useCrossChecks",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "evaluateAllCrossChecks",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "crossChecks",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;>;"
+        },
+        {
+          "name": "backtestMode",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "createsSubJobs",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "warningsBadStrategies",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "caMethod",
+          "descriptor": "Lcom/strategyquant/tradinglib/CustomAnalysisMethod;",
+          "access": 2
+        },
+        {
+          "name": "caInputArgs",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "caFilter",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "combinations",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "916b4889485e98af05d7fea024d8c750abb58485cd124ac18ece485aa92acce1",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "8f14d857f9a4d24afa291ed886f179d1fcdc7f317d19ef5efa2abf64796e2a0a",
+          "code_length": 95,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "beforeStart",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "6cea74aa2e2ebdf05c9bd3fa2efe30134873efee9baf26275ce6078fd70cdf5f",
+          "code_length": 312,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "recognizeCustomAnalysisMethod",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "23f122c610816fe90aaf679955a70ba9f20748638f7988e846e74a160b35075e",
+          "code_length": 46
+        },
+        {
+          "name": "initParams",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "3f737fbdbe8d47a282901a5dab21a7ea998e016510c368a044ec5af855679df7",
+          "code_length": 129,
+          "throws": [
+            "org/jdom2/JDOMException",
+            "java/io/IOException",
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "recognizeBacktestMode",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "09c54bd1b4156989ce095f3e08086e33bb1460a75565c8ec1b5324ba476e8cec",
+          "code_length": 70
+        },
+        {
+          "name": "computeOptimalBatchSize",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9c045d369075696f3116ef85662b915022f3c040533f29b2d0020cf8e6724d80",
+          "code_length": 142,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "53e4652cdcfd249235145c708cbd5eb25d1f7f6e838e8870628e435f6252f9fd",
+          "code_length": 139,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "checkAllFinished",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "a73fb02f2e9254421f9acca1c62cbc77dc5368ffbbddacbd6b917550e04f6cea",
+          "code_length": 139
+        },
+        {
+          "name": "submitNextJob",
+          "descriptor": "()V",
+          "access": 34,
+          "code_sha256": "c50eddedf1b135ebb08f36f7fb24f7ac63096eff9b41a2a4eb91ff8760ad87e8",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createSerialJobs",
+          "descriptor": "()V",
+          "access": 34,
+          "code_sha256": "018fdfb050360edd85e592783fd92feb9b1965022f68ce0e47ec638eff00212b",
+          "code_length": 124,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createNewBatch",
+          "descriptor": "(I)Z",
+          "access": 34,
+          "code_sha256": "508f3da488201afdc2d9cb8d6437098f3afe9dede58a53e378391746cd1c6f08",
+          "code_length": 464,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getParams",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "45119cbd7085d25f5473d12da4a0992457eb30e137a5bfe8a3de06c67fbf5ee3",
+          "code_length": 478,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Ljava/util/List<Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;>;"
+        },
+        {
+          "name": "shouldReadSettings",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "644debd15e9f9d0bf72d2cf18aa264cbac1f1641e2b8ddf135213c15473eba47",
+          "code_length": 200
+        },
+        {
+          "name": "retestFinished",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "84c3cb7923509f652696689948f2dce597759a21fa6202d22721976f0d2f1858",
+          "code_length": 9
+        },
+        {
+          "name": "processMessage",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/GridMessage;)V",
+          "access": 4,
+          "code_sha256": "46aa6a48098af80b1736520404b81cebce31756caf04c3fd974d1531e2e17d4f",
+          "code_length": 970
+        },
+        {
+          "name": "printNewStrategyToLog",
+          "descriptor": "(Lcom/strategyquant/gridlib/client/JobDetails;Ljava/lang/String;Ljava/lang/String;Lcom/strategyquant/tradinglib/backtestrunner/DurationStats;)V",
+          "access": 2,
+          "code_sha256": "47b040aaa2d6a17ee8c75cdb6f922a338a15fb4a0098f68b0e0bd2a1d96fe844",
+          "code_length": 249
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f6b38433ca7fc11a1ec97db6a581c694a1eede8326b1833dbe5dc4f5dd7aba84",
+          "code_length": 4
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "30091c8c510d8e03258baa7e10feda428697fcefaea3988fc7e809513c2bbd70",
+          "code_length": 4
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "0f76c25360a4a8cb08f996648f7238bb8d573d70436be7494ca7c0e13097bc84",
+          "code_length": 7
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "5c7a2c2c7a09641931d1de7162184529be76e94810a42797ba7b233ff0f63e61",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c45a7945d1dad7aef9bff76d68e0cfe2f83f7e2fbdefbad037b066ede063765",
+          "code_length": 49
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "683ded0462fb821000fcaa481a6e70f3eb1ccd0c502d029441e6d03a01c7b268",
+          "code_length": 8
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "7cdac0d078979b27422f5182260692a0fef28b754b8eb695990acf1deb05056e",
+          "code_length": 19
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "7d9041091ce567c4ec3fae0d231f9db3a1c49c8a89544243bd8c382755990248",
+          "code_length": 5
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "6c4a246586dc5158db0e107210b75baee0dfd8b705b8cf9e943e6f9e33262202",
+          "code_length": 172
+        },
+        {
+          "name": "setLastEvent",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a2f69f6d22cab1a7830ad43b9674a86e020d0c5cb4551fddaf895934fe7ed7d2",
+          "code_length": 16
+        },
+        {
+          "name": "onStatusChanged",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "5491d2a35f685f094cd444482d03d116f2ba5966cd3beab72021ce463c1f8a5e",
+          "code_length": 6
+        },
+        {
+          "name": "progressStatusChanged",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "46f259997e6af250b198214590c8d0d43feabe78268354fac0b6a384f3e9a844",
+          "code_length": 56
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;)I",
+          "access": 4104,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask;I)Z",
+          "access": 4104,
+          "code_sha256": "eb9cd2ec24fe271eeb660b6ffce890d7d4507346071b41487b6723c0c44e3436",
+          "code_length": 6,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "65dffd93f0a2860a8af3fb8e3114372f65f9979466e973eccf13f58e5415ba09",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/gridlib/client/GridClient",
+        "com/strategyquant/gridlib/client/GridMessage",
+        "com/strategyquant/gridlib/client/JobDetails",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/gridlib/client/SQGrid",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/memory/MemoryUsageChecker",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/CustomAnalysisMethod",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ProjectRunInfo",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/backtest/AutoRetestStrategyConfigModifier",
+        "com/strategyquant/tradinglib/backtest/BacktestModes",
+        "com/strategyquant/tradinglib/backtestrunner/BacktestResult",
+        "com/strategyquant/tradinglib/backtestrunner/DurationStats",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/customanalysis/CustomAnalysisInfo",
+        "com/strategyquant/tradinglib/databank/RecordNotFoundException",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/IProgressStatusListener",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/strategy/StrategyMerger",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/SettingError",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "java/io/IOException",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/OutOfMemoryError",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Timer",
+        "java/util/UUID",
+        "java/util/concurrent/atomic/AtomicInteger",
+        "org/jdom2/Element",
+        "org/jdom2/JDOMException",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation.class",
+      "occurrence": 0,
+      "sha256": "1bf19ac9ebade81942473ef5f63c7b55d31a8cdd82cd786272769add67d86622",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "timeframe",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator.class",
+      "occurrence": 0,
+      "sha256": "75b13c86f60a02cfeab471106ec40c50db37db70fc5c720a593d4334efa49490",
+      "name": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getVariations",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "3a7eb27d70a10d4588d7d1f6695c4c85761bd2c5516db002ad4e9fd3429e48a8",
+          "code_length": 190,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;)Ljava/util/List<Lcom/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation;>;"
+        },
+        {
+          "name": "transformStockGroups",
+          "descriptor": "([Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "ae9b2ce63a0c6c70596d6a23d8fd908f19167d2f00a619f0afe022981dba6603",
+          "code_length": 241
+        },
+        {
+          "name": "getCartesian",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "1b3e17d18df953591db1cede06edd46b4061e16ba55fbbc99d0b970bd0be057d",
+          "code_length": 161,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Ljava/util/List<TT;>;>;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        },
+        {
+          "name": "getMainSymbol",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b6ae9fe4586014da4ce5ee8b3077826c80bb5143f75489604fff5410a8354ca6",
+          "code_length": 71
+        },
+        {
+          "name": "getSettingXMLVariations",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/jdom2/Element;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "6a45145bea51ac9356343ebe70ccf9ae0c1e2c1c2eff7d7698baaa9e9e7cc9df",
+          "code_length": 714,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lorg/jdom2/Element;Lorg/jdom2/Element;)Ljava/util/List<Lorg/jdom2/Element;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a79852be10f29c297d50ab44f7b1bb2c9298df3b1293a0c246d6b6cc6d0a5849",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/basket/BasketDto",
+        "com/strategyquant/datalib/basket/BasketOfStocksManager",
+        "com/strategyquant/datalib/basket/StockDto",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator",
+        "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Set",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

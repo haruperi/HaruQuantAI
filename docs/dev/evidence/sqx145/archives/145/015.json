@@ -1,0 +1,964 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/commons-codec-1.17.1.jar",
+  "sha256": "f9f6cb103f2ddc3c99a9d80ada2ae7bf0685111fd6bffccb72033d1da4e6ff23",
+  "class_count": 115,
+  "unique_class_entries": 115,
+  "resource_count": 133,
+  "duplicate_entries": [],
+  "classes": {
+    "org/apache/commons/codec/BinaryDecoder.class": "e787206a7e78fc027c7ae718149d202e99d0b63b3b6dafdeab1171d3901ee633",
+    "org/apache/commons/codec/BinaryEncoder.class": "ecefcd5e6d0df88f5526a11d8acd5f47b5e6a507a44e266775bb203bcf86e56f",
+    "org/apache/commons/codec/CharEncoding.class": "0f1d3f22fc9b37aa6e22381211c24bf988b8b21cf49ffadf184fb9514e8be104",
+    "org/apache/commons/codec/Charsets.class": "52381f6d769c6d3d9b7f5f2ceef1ac983c41a1bff392d85397a30d53d3e2ddca",
+    "org/apache/commons/codec/CodecPolicy.class": "b7a9ebac61c67e04167ac71ebd80efb5bdc47d8347976de4dde2b5f1685796a4",
+    "org/apache/commons/codec/Decoder.class": "0788f0ab04345a2b90c19c0b0c6623a9bf51dff0eaa63ef6bcf5415a5c823657",
+    "org/apache/commons/codec/DecoderException.class": "693e22f2336829c083a1a1f9d100e62f55563baa85c5a2d54a022c28f187fc46",
+    "org/apache/commons/codec/Encoder.class": "d54418809d138b33583ff676973ce3546d2fe7f023dffdfcfa8d47bdcb61dba0",
+    "org/apache/commons/codec/EncoderException.class": "04451cf267f1f99a143a460e75a9c60e0b9849cc56cfc584d7e84a4ea16130e7",
+    "org/apache/commons/codec/Resources.class": "6e787ef29e59198bf8014d867244a6a40d9367aa7accb3619c5cc1d86c305d4a",
+    "org/apache/commons/codec/StringDecoder.class": "bdd24eb36fcc874b562508ae3a4128a382de65d1bf89351bfef48e94c7794c67",
+    "org/apache/commons/codec/StringEncoder.class": "d898b4fa22365550836c2008835660707f6f9d1efefca381c12c718107606881",
+    "org/apache/commons/codec/StringEncoderComparator.class": "a208b27d12f252d465386fdf6e28bbd08d0d873b4110593cb94a0decf062ecaa",
+    "org/apache/commons/codec/binary/Base16.class": "6eaa0d35228289c2b206172faedf7ad9054bc6d6427c1571383f3b4607e90508",
+    "org/apache/commons/codec/binary/Base16InputStream.class": "2f69678c8a4071cfc54812c129c351d3e24842fad4d9f35eb789a830a94eac8c",
+    "org/apache/commons/codec/binary/Base16OutputStream.class": "87abf386f60fcf762174164d065578f7e4d8895668100141c491ec4dcb4efcae",
+    "org/apache/commons/codec/binary/Base32$1.class": "29f8bf0ab8f2a9b22d80f4c5640a55ffdc80e4a73b2b166ce562440775d88851",
+    "org/apache/commons/codec/binary/Base32$Builder.class": "334c04b61149ac9ff1cc68ffa39ae5955ed9b9e2cc6becc6f4b8a9e373af1397",
+    "org/apache/commons/codec/binary/Base32.class": "91c530ab455aa9ffbd7bcb62d4f2b873d2b8efab045657c51ddda0023265ecf9",
+    "org/apache/commons/codec/binary/Base32InputStream.class": "c672749bed7cac26a993eb31b485753d293cc41412f5ff8e1098cc459fc20f40",
+    "org/apache/commons/codec/binary/Base32OutputStream.class": "db17f327fb8783229b1487e7f3cfbeecef40ebf8862a200abfdc149ea3e8ae61",
+    "org/apache/commons/codec/binary/Base64$1.class": "f758f9b4e0bec0f5fdb07d2af90dcde5410be940305fc3359bc9c9c583d8649f",
+    "org/apache/commons/codec/binary/Base64$Builder.class": "2073698e4d000fe9faf5282646b6b71d0b575b9c524f855cfbcbf7155fdad7cd",
+    "org/apache/commons/codec/binary/Base64.class": "7985285c1f09f76230bb84605bf22f7c000125fb2b76b24552993df7215296fd",
+    "org/apache/commons/codec/binary/Base64InputStream.class": "15e3146ae4a80c466c4ccfa8d8c79c1689d4ecaedd49f0bd79fe6317f85b35ef",
+    "org/apache/commons/codec/binary/Base64OutputStream.class": "b2250aa8c6c54564826535ca2d3d28ff933450223b81109c8601e76d38330898",
+    "org/apache/commons/codec/binary/BaseNCodec$AbstractBuilder.class": "35ed29a867eda82234c939f4e92c15b3bd8f8a0df296c8a37fc0b2aac1db2297",
+    "org/apache/commons/codec/binary/BaseNCodec$Context.class": "17b55615770c4d14a5537b9ea582b7adbc08864b9a50d3f9542b5ffbf0d75457",
+    "org/apache/commons/codec/binary/BaseNCodec.class": "aa1b5892b652c4b8c590826b0fe78bd18fd9de4fbfa13ac4de750095ecab38f7",
+    "org/apache/commons/codec/binary/BaseNCodecInputStream.class": "29f41d6f52d8eecea01dcee21f4769c7479d06c6a0211331f114d6e8ebc41778",
+    "org/apache/commons/codec/binary/BaseNCodecOutputStream.class": "96ba7f54e5a5f2ec1165300bb5000db11b250b048890730ef753b98ec911f178",
+    "org/apache/commons/codec/binary/BinaryCodec.class": "0238f0556a4a6d2648d33d0b0de09ffcbce16be08d4f86d7a2907cddf2fd4762",
+    "org/apache/commons/codec/binary/CharSequenceUtils.class": "3f7f69c7910fd4f3dd189d1e2c513ac8b54f9af547347ce8a2d6faf3df0bc2dc",
+    "org/apache/commons/codec/binary/Hex.class": "2dcd9dcdefd88e40ad23fc472718fd5e8aa1a45b00fd91f346d7b8d27081570a",
+    "org/apache/commons/codec/binary/StringUtils.class": "c0e3620c30dafcff241f10a7c3d9f22f0ed468ffeca27a88c9c951f9f98ac8c3",
+    "org/apache/commons/codec/binary/package-info.class": "adb0a4acc9f1887fa21fb54f923d90d3deb0e2ffecdeaf1a9eb714f9b0558bed",
+    "org/apache/commons/codec/cli/Digest.class": "74466164a2a050754b33242c6ac5d5240454e09cc22763a50e0535e2021d848a",
+    "org/apache/commons/codec/cli/package-info.class": "3b5573d41df018f18fbff3aae60ef9900a2d1f98c9750cacec1f71108d295fcc",
+    "org/apache/commons/codec/digest/B64.class": "eea8a9a247edb0df503d98fab95e9b076288fc88e926499cb68483a345b918e5",
+    "org/apache/commons/codec/digest/Blake3$1.class": "20ecf70e06a153a698dcb367581e1f246df723a94b5f62cf345cf0ba07ba96a6",
+    "org/apache/commons/codec/digest/Blake3$ChunkState.class": "b1504905dc4e1e3bfc7448bc3aa8c71c73dbaa07ceafb5c85b936a158c7c0e23",
+    "org/apache/commons/codec/digest/Blake3$EngineState.class": "ac59634cf6b6f659a39ac7a6828847232469769c794f010467cf382619634126",
+    "org/apache/commons/codec/digest/Blake3$Output.class": "a1c19efc5fb918dab0f7d5e85ce4bfb6accd0ea929921f3f9114593473b6888d",
+    "org/apache/commons/codec/digest/Blake3.class": "ccb473dc8752409db3fca08697e6ac2b1d795af5fd4a33c46cf0077cfb3945ac",
+    "org/apache/commons/codec/digest/Crypt.class": "280b4c2393340c2c62a621799cafda168dffd77d08da56f02da50a42d75f4e25",
+    "org/apache/commons/codec/digest/DigestUtils.class": "a190c385f50c338b9e6a1395b4191d62e610b631ddff206c5ba68470b869ef24",
+    "org/apache/commons/codec/digest/HmacAlgorithms.class": "dc1b4c9b651fa37d82b6cea0c889e6279f419c24f7dfe36b25a27da8696a3537",
+    "org/apache/commons/codec/digest/HmacUtils.class": "1a632575083eac6b75abb99c89f2a9d32b27832c11ab6c413e1683c5c43bf2ec",
+    "org/apache/commons/codec/digest/Md5Crypt.class": "fa76e9b71d96e0241736869348a8a5e8fc2a45775da3ab69058f31e3d4403bc7",
+    "org/apache/commons/codec/digest/MessageDigestAlgorithms.class": "3a67daef664bf1743842e4a0eea2376bd0047b852b5c1fa3096142a8b69fb6a4",
+    "org/apache/commons/codec/digest/MurmurHash2.class": "2c4a93e6f84117372dd203c9c2a59d7db40d4e436e8ea6bbed0e25a735cad182",
+    "org/apache/commons/codec/digest/MurmurHash3$IncrementalHash32.class": "23841b5139dedc8c708ed562447925c2028b89cbc8f5a018c24434cf0efce18c",
+    "org/apache/commons/codec/digest/MurmurHash3$IncrementalHash32x86.class": "12d5040a87f634b67ede851eef5c2410ba5659eef12b86617cabe5622ca67b21",
+    "org/apache/commons/codec/digest/MurmurHash3.class": "750ee0741ad5c3d75433ca6ca2524f04c4db39204b1d76beb0656e7ca38f03e5",
+    "org/apache/commons/codec/digest/PureJavaCrc32.class": "31b325aa8e6049774ea7f99c084fe0bf13c66138d97091c7b5e071daaef164e7",
+    "org/apache/commons/codec/digest/PureJavaCrc32C.class": "69445f722ddb1e129f2be87f4ff51eabf65de50771c5ea698b79b557b7fd8e2e",
+    "org/apache/commons/codec/digest/Sha2Crypt.class": "1f6fc76548440bf976404448f21ae710ac5410f5c428b74fd5e7a2c3d032d382",
+    "org/apache/commons/codec/digest/UnixCrypt.class": "76e0af9c9430e67ea44604e1f36e937e601f90ce9e8ed59dae8995c21a6b0cff",
+    "org/apache/commons/codec/digest/XXHash32.class": "f9262afcb84488c9330f87868d2477f507a6dc6c9afeb72e1420a4eed2ec1d23",
+    "org/apache/commons/codec/digest/package-info.class": "b077ffa96cd3084bae97084bf4ea835239bfe9a8bb829ce50664e9750fa04b7f",
+    "org/apache/commons/codec/language/AbstractCaverphone.class": "0cce8214749bcbce519e4dca027624e75a18edda78e526f086a432a799a91330",
+    "org/apache/commons/codec/language/Caverphone.class": "b29af972ebae18edca20d600f216e8a17316b9a4ebe33870fa6e7fe5e4b4d60a",
+    "org/apache/commons/codec/language/Caverphone1.class": "725d2096bee7b3f3ba3b63618527aa10de7893ca43ed6a76fc6385b0b8d5e810",
+    "org/apache/commons/codec/language/Caverphone2.class": "10339f6ced381c1a9fc6e8f64492d93df733a2e469b387e6e34f0bb954ec351e",
+    "org/apache/commons/codec/language/ColognePhonetic$CologneBuffer.class": "c2e32292642c8fa4feedc6bb16f123ac28ea6bd30a5d90e10e4997f2e6916766",
+    "org/apache/commons/codec/language/ColognePhonetic$CologneInputBuffer.class": "aa0d315a0894e540baf9115909a24a5f1e70c80356aa17e2d9f71d310e154797",
+    "org/apache/commons/codec/language/ColognePhonetic$CologneOutputBuffer.class": "ce3a6caca7a7db5a935b9a4459859911d3a75b49e7f56002bd5ebcb58843920d",
+    "org/apache/commons/codec/language/ColognePhonetic.class": "02bad6bcc21a0b236592317357429c9c77f77acd9402c29ec0787f4c3bcbefe4",
+    "org/apache/commons/codec/language/DaitchMokotoffSoundex$1.class": "1513db400a56cb7e85911141503f1b2198d31109d61222ad90139b67dd200ecd",
+    "org/apache/commons/codec/language/DaitchMokotoffSoundex$Branch.class": "2736ac034421c820dddf10869e22c4b5c2bb3672b3801815ed87fe3371e7ece9",
+    "org/apache/commons/codec/language/DaitchMokotoffSoundex$Rule.class": "6de6555c30230eba98a6d8f86db9cdc7059b06e2ffe1cd485c8577c10d83f157",
+    "org/apache/commons/codec/language/DaitchMokotoffSoundex.class": "271f6ba09fe992a36bca7a95609146734f2ccebab04f4a042919d70751b0eadb",
+    "org/apache/commons/codec/language/DoubleMetaphone$DoubleMetaphoneResult.class": "2f600181d8e921bcee76241cc02a23a0bb6767ed3f257a748f294dd3fd042784",
+    "org/apache/commons/codec/language/DoubleMetaphone.class": "9e2837a991dd8fc7aa2854b3d27780e75b8bbd8b10426b5628ddd7a08404d5f8",
+    "org/apache/commons/codec/language/MatchRatingApproachEncoder.class": "ced180a730f599313cdcd107d694c1bed5a60489c9e99f210b0d53cd90399811",
+    "org/apache/commons/codec/language/Metaphone.class": "61f43730e9f84f3d5114872e1c5eeb27ce49717e2afb03bf51ae83a55e91d5b8",
+    "org/apache/commons/codec/language/Nysiis.class": "f350fd156c3278693cd8a0861d0c0f45786df427b7c9f04c30408409ff8dffab",
+    "org/apache/commons/codec/language/RefinedSoundex.class": "03b47732fc4640dd806aaf1ce59de125e7ef137ef5056b6f38c4e5ec470af947",
+    "org/apache/commons/codec/language/Soundex.class": "fcaabafdad94023fa045c046a66d20f8c678e7d7fb8133e4aeb967fd0092d357",
+    "org/apache/commons/codec/language/SoundexUtils.class": "db0a3d87091d2d572939de0bd08b71abe4e9d430d37617daba0defa9d3ebf0d3",
+    "org/apache/commons/codec/language/bm/BeiderMorseEncoder.class": "9c38381535b4645773a2ffff936b452ec0cf4c3479db8e9f042d4b13f6dda9ad",
+    "org/apache/commons/codec/language/bm/Lang$1.class": "9ba04eb9b1cc329ed20891272f4de05701f45123dd11b722646cd983923e9ab6",
+    "org/apache/commons/codec/language/bm/Lang$LangRule.class": "1b93d3f4de7978d8eeaad78a5beb20f41599810071905d040ac394efbccfd2f6",
+    "org/apache/commons/codec/language/bm/Lang.class": "66069725be28635ac5294e6eb18df9e8b4240695d917b5e5f12aedcdb6838c18",
+    "org/apache/commons/codec/language/bm/Languages$1.class": "25f2b9439571e9610e515f19c16a0206503b5a3e46068ab2e040543fabcc16bf",
+    "org/apache/commons/codec/language/bm/Languages$2.class": "e649a449a432005ae7a23624e32d582c3794a25b20acd0cff112000e0c0b78b0",
+    "org/apache/commons/codec/language/bm/Languages$LanguageSet.class": "4cd307229f7dc50ad8555c94d32db0b7ef22975873195441a1dca49cddedfb6b",
+    "org/apache/commons/codec/language/bm/Languages$SomeLanguages.class": "9bb4e25ed80bb3a73f26268730091017ea7128884f02c4d5007c2c4af9eb8b5b",
+    "org/apache/commons/codec/language/bm/Languages.class": "295ec0c6e99d1c2d7003c966988a884ee0b0ffc4dd0ce127f56a44b0708559e2",
+    "org/apache/commons/codec/language/bm/NameType.class": "305170d49312b454a2c8e792ce40fce02f419c60c9596e088374ef4ceb460772",
+    "org/apache/commons/codec/language/bm/PhoneticEngine$1.class": "aee7e32c71bb5a0127959a7dd77a63db89e6f0f098b773de8db86bc355186cd6",
+    "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder.class": "1b29e603623d2b8122e6182bcfb6905e888d38d43488614e6f551bf0a61a002a",
+    "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication.class": "33158a36556c6dcb2cf428dc3f1720df2e1558d8a8337b59835f78b973081c78",
+    "org/apache/commons/codec/language/bm/PhoneticEngine.class": "73bcc2780b930206ea703fb1fc9d008fc5338228e86a345c0261bba86826d947",
+    "org/apache/commons/codec/language/bm/ResourceConstants.class": "e7f7265311fb522e97014bc2b0fc13927342dd00aa693631425aef2352ea6579",
+    "org/apache/commons/codec/language/bm/Rule$1.class": "9135526b00226995c31d2494e8fb39554c61d0c4978dd769b5d3bfaa4a9c9bbf",
+    "org/apache/commons/codec/language/bm/Rule$2.class": "b0ee963885df9867b2304323ae45638f6d1afb817fc42468a17dbdc6f662b0f9",
+    "org/apache/commons/codec/language/bm/Rule$Phoneme.class": "9b339f66cb421362a159b2e0c0b7668b1ad227b2c40de9634328c5a1eb9a88d8",
+    "org/apache/commons/codec/language/bm/Rule$PhonemeExpr.class": "330903c153d134a58e325e59b8133fc32974514d14ad9f0dc3f8f0a40edd42db",
+    "org/apache/commons/codec/language/bm/Rule$PhonemeList.class": "c8d40feacfad59c7419a263665db84463c9cb07a7492c30bad97a396d964c478",
+    "org/apache/commons/codec/language/bm/Rule$RPattern.class": "b0b76a7c4bf59857a4ae74ad0804b586c3ab3d8142a42efec24692ffacdd0b42",
+    "org/apache/commons/codec/language/bm/Rule.class": "cc947723dc3300d229c510ac5f6dd4eb1f0b9924b9a3e80317cee7bb5d7ed428",
+    "org/apache/commons/codec/language/bm/RuleType.class": "61d088eadabba257c2af289cb8cad9a880907441354a820e96d867acf1daf00f",
+    "org/apache/commons/codec/language/bm/package-info.class": "219dfa42b0f1a2e56bc16431328ce5ec9f609db1210763373db8b37dbc300a69",
+    "org/apache/commons/codec/language/package-info.class": "df4ca0890d7c91a566ad295cb72d79393fe777e208f20f81e7b8ec2b6e181ea0",
+    "org/apache/commons/codec/net/BCodec.class": "546c7926ae6d5f8e108e1d2d7c54577ae2038df26bd58d6030929161ee45f692",
+    "org/apache/commons/codec/net/PercentCodec.class": "5176804b57181097e695ece21ba3c3b72239900a79f3a449af0d5d808348fa69",
+    "org/apache/commons/codec/net/QCodec.class": "0423e10c1a974e36afc99951172740dd38cdae417b2e380d2a61c7e76fef0fc3",
+    "org/apache/commons/codec/net/QuotedPrintableCodec.class": "1b330bedee14d40c211d40a8ddb440a39d306abc4b9a4626bb0397477b9172aa",
+    "org/apache/commons/codec/net/RFC1522Codec.class": "f5b7af8b8dda37eb6a84f49c8a6e1b0eaf3e32d1a5fbb328fc8b27f81606e6e3",
+    "org/apache/commons/codec/net/URLCodec.class": "29e1a53f0b5ab109eda10d6742c799043eeeb1c70000eb646766e914caeff735",
+    "org/apache/commons/codec/net/Utils.class": "e61541e860c1b722d37118264ab7b482a2d102036f1ea115d888966180163da3",
+    "org/apache/commons/codec/net/package-info.class": "ebc27f6cd7a4dbc4c9f573d72c3db10c373dc7044ea593228c74e84dd825f831",
+    "org/apache/commons/codec/package-info.class": "2ee921e00c3d48ffec7ba47038211de41307aabfbe7bd9ab212bcee017d4a5e6",
+    "META-INF/versions/9/module-info.class": "1bcf6b75638aac9283d03f904c2f28d9949e85a045364c91c9a5aa0011c36812"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "f1b38b04b4aa4c3b5e61cbba439d5fc5cc11c0c7493f9018f170555b79dc1777",
+    "META-INF/LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "META-INF/NOTICE.txt": "fc5bececcc4708ba23267644c1dbca212cfb015f21713f8080f99e441592d2e2",
+    "org/apache/commons/codec/language/bm/ash_approx_any.txt": "ad6c75e0e50b51f807d73a3d3ef46a6f666a891cb4953cc357a5d305e61e30ab",
+    "org/apache/commons/codec/language/bm/ash_approx_common.txt": "da5b7febc70f860f91bcccca37c29a619a23442cc80b9cd98ad884e16d6c9854",
+    "org/apache/commons/codec/language/bm/ash_approx_cyrillic.txt": "a29917ea4c00bdd216db31d36205ef3829d0fb76926d189fcd8260d3700d4c57",
+    "org/apache/commons/codec/language/bm/ash_approx_english.txt": "53739bd27868292338606ef7a1fd209b6253d35e94d7a4afb031769498d60d64",
+    "org/apache/commons/codec/language/bm/ash_approx_french.txt": "19650e4ab69678bb849028900e4c2e867f75229c4447a0fcbf5a5bd6b3bd69c3",
+    "org/apache/commons/codec/language/bm/ash_approx_german.txt": "cfc7c1ef41209af89b676ba46a183060b93dedcab1e7d730f6253f48f5af0ea9",
+    "org/apache/commons/codec/language/bm/ash_approx_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/ash_approx_hungarian.txt": "6bd249910726949afa4e5a9623ec3999151c3ef43843714a90003cfb11350309",
+    "org/apache/commons/codec/language/bm/ash_approx_polish.txt": "5f56627d50d4ef0e3c8c76225d3e72fd95c8c90ae629d65d32f202f792d5912a",
+    "org/apache/commons/codec/language/bm/ash_approx_romanian.txt": "900bcb8b852ce9738f85efacda91bbcaf0192d662f2fa996ebbe34e115801736",
+    "org/apache/commons/codec/language/bm/ash_approx_russian.txt": "b908b81325099091067ecbaab232db0215b61ebd6899d0f7d989a013363a7cb3",
+    "org/apache/commons/codec/language/bm/ash_approx_spanish.txt": "6bd249910726949afa4e5a9623ec3999151c3ef43843714a90003cfb11350309",
+    "org/apache/commons/codec/language/bm/ash_exact_any.txt": "bc6b6b423e6af997ce45348e17f3a0d6a18617cfe67b50bdb501cc97258c3d35",
+    "org/apache/commons/codec/language/bm/ash_exact_approx_common.txt": "a1f947e071423aa5c24360484f85b7139f7a3ffe77d2089e367ca152743d1a19",
+    "org/apache/commons/codec/language/bm/ash_exact_common.txt": "fc3558377839a10375bb40146d9d12ec9b37487223023cc0769946aed24f352f",
+    "org/apache/commons/codec/language/bm/ash_exact_cyrillic.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_exact_english.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_exact_french.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_exact_german.txt": "32674f342f7c8b73fe831f46b0537df0a2b9d43c45fcded7617ddf28495c0e2a",
+    "org/apache/commons/codec/language/bm/ash_exact_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/ash_exact_hungarian.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_exact_polish.txt": "d04d6e8ea4ed593f478fe1ff150a1f57ac30557c13f9f019fcf2b1658b6ff49e",
+    "org/apache/commons/codec/language/bm/ash_exact_romanian.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_exact_russian.txt": "34bfa509511f7517a628330cca7c5e51464ab4eef953834054f684d02e11ffc7",
+    "org/apache/commons/codec/language/bm/ash_exact_spanish.txt": "265d93b530f2f0b3b2b602afda6e912370c0b01c06df4a2987119f6320bffb44",
+    "org/apache/commons/codec/language/bm/ash_hebrew_common.txt": "ad11a0f537e90b0893e8624e0c997dd8e2ece13dfe8b90b366d3a773f829bee5",
+    "org/apache/commons/codec/language/bm/ash_lang.txt": "93bc49f227498c3151f4f132363256429e700eece2b72e3d3bc5b7fd857cc22a",
+    "org/apache/commons/codec/language/bm/ash_languages.txt": "ee736888a0725497a11c74cca309ee21d520d5ad64b5541250e8f1da9138fe97",
+    "org/apache/commons/codec/language/bm/ash_rules_any.txt": "bdb60c3901ab057f4c94b384b302a0bdd7a6012ac07cf4edb87bd37b9283d17b",
+    "org/apache/commons/codec/language/bm/ash_rules_cyrillic.txt": "361bc87691da6bfda59ff416ce61c922aae811944669fd05f537ac629eefed84",
+    "org/apache/commons/codec/language/bm/ash_rules_english.txt": "7c28986e7dc911d8798ebe9f26b93d0487e632482fc5348363cd8ef94dac1a5e",
+    "org/apache/commons/codec/language/bm/ash_rules_french.txt": "234f4b1eeacea6c814af4494c155799c21387f2b3ce61c47f0f5e90e9592802a",
+    "org/apache/commons/codec/language/bm/ash_rules_german.txt": "00b0a4baf27ff74f992f39ff875df7b694efe7218f228734695b4b0817575758",
+    "org/apache/commons/codec/language/bm/ash_rules_hebrew.txt": "1e36828bd90a0721b6513f6f687eac503dc8c1a37824ae6e6d8d496344620194",
+    "org/apache/commons/codec/language/bm/ash_rules_hungarian.txt": "a247af30ac47cbaa87cc9458fe33a9fa101424d77565c7ca012b4e8b923a369d",
+    "org/apache/commons/codec/language/bm/ash_rules_polish.txt": "047bf7630b038e180ac407dc6bedb45ebbc42c01a7c9be7b17845c4e9b15f250",
+    "org/apache/commons/codec/language/bm/ash_rules_romanian.txt": "212f03c2a1c539a08d4664107b107bddced3a461b6d5362335c0c1039dd88d7c",
+    "org/apache/commons/codec/language/bm/ash_rules_russian.txt": "9d9904d23ec6031ff620967766cf72a06f5aa9ac958ebc9ab6c4956a19c2c76b",
+    "org/apache/commons/codec/language/bm/ash_rules_spanish.txt": "c9e410a8a5c0965b39e39362a904bd107239bbfe0176348e003423e5e4812aa0",
+    "org/apache/commons/codec/language/bm/gen_approx_any.txt": "a72bbd45de8a31aa3ceaaa06513896c4abb59bc76ef945811a3edc63b55451d4",
+    "org/apache/commons/codec/language/bm/gen_approx_arabic.txt": "838a47e6f968189a4a882b82220654ca219450956d2cf0ae0336d342894c598f",
+    "org/apache/commons/codec/language/bm/gen_approx_common.txt": "edf03e4f49c343d45b63ea9c3d470b6baf95a3688c5723ad1e85bdfb860e3314",
+    "org/apache/commons/codec/language/bm/gen_approx_cyrillic.txt": "f9a750d48156d8e8e1d94c8ed34dbf596c24efe945123d6e808af069dee2599a",
+    "org/apache/commons/codec/language/bm/gen_approx_czech.txt": "e52b12a250fa593f99ca8a06e02b18a091518a1e6b66fd496e78a7db3888cc43",
+    "org/apache/commons/codec/language/bm/gen_approx_dutch.txt": "e52b12a250fa593f99ca8a06e02b18a091518a1e6b66fd496e78a7db3888cc43",
+    "org/apache/commons/codec/language/bm/gen_approx_english.txt": "53739bd27868292338606ef7a1fd209b6253d35e94d7a4afb031769498d60d64",
+    "org/apache/commons/codec/language/bm/gen_approx_french.txt": "1d9d34f64e5d8d3009749d9d818c0583463ee89f08c0f7d2b0544a4316acad47",
+    "org/apache/commons/codec/language/bm/gen_approx_german.txt": "4330f43e087759d3616b02eb362074aed94698cb4d4f848a6e58f2532c5b0aeb",
+    "org/apache/commons/codec/language/bm/gen_approx_greek.txt": "e52b12a250fa593f99ca8a06e02b18a091518a1e6b66fd496e78a7db3888cc43",
+    "org/apache/commons/codec/language/bm/gen_approx_greeklatin.txt": "dffa002d397f85134af0350cc2fa75f1eddfd75a2a18be5a5761e3c80781f12e",
+    "org/apache/commons/codec/language/bm/gen_approx_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_approx_hungarian.txt": "f827f54af6560a4c6d615618433457e1c9dc06c78c7683dee6d4187cdbcd8c83",
+    "org/apache/commons/codec/language/bm/gen_approx_italian.txt": "f827f54af6560a4c6d615618433457e1c9dc06c78c7683dee6d4187cdbcd8c83",
+    "org/apache/commons/codec/language/bm/gen_approx_polish.txt": "d062343f0330e121c684e3e6943f7775855c78e965b043a839a4dba87336d4d8",
+    "org/apache/commons/codec/language/bm/gen_approx_portuguese.txt": "e52b12a250fa593f99ca8a06e02b18a091518a1e6b66fd496e78a7db3888cc43",
+    "org/apache/commons/codec/language/bm/gen_approx_romanian.txt": "4e35dd86b22d8d011287b19aba8b1d4af9e8c63ebdf27d0899e8d9edf4d4b1ed",
+    "org/apache/commons/codec/language/bm/gen_approx_russian.txt": "15e71e33faf7bb4558fd3f64ec9e38111bb04852343bc4a89b09ae127279caf0",
+    "org/apache/commons/codec/language/bm/gen_approx_spanish.txt": "ca9391f883011b749197fbbc79776777d957dd5f55749d9a600c1d229f80b8df",
+    "org/apache/commons/codec/language/bm/gen_approx_turkish.txt": "e52b12a250fa593f99ca8a06e02b18a091518a1e6b66fd496e78a7db3888cc43",
+    "org/apache/commons/codec/language/bm/gen_exact_any.txt": "cf8da3ee51d478dce1ff6fa1ccef2f65411308d47703f920423cc1172266623e",
+    "org/apache/commons/codec/language/bm/gen_exact_approx_common.txt": "948f6d4355ac74011cccd7bd54ec3bce4a29ea26c5d4518f019cdc1dcef27285",
+    "org/apache/commons/codec/language/bm/gen_exact_arabic.txt": "891a20110c50fd5dd6c34ba71c11207e2e11948c3cca5f1554b3c934644f5a05",
+    "org/apache/commons/codec/language/bm/gen_exact_common.txt": "6a943ca8cf3f7bed1ff516de9a3ecf44f13c801d3dc967803b1b6a95ae45d372",
+    "org/apache/commons/codec/language/bm/gen_exact_cyrillic.txt": "fd5517e98eebfbe1f979ec21f9749e9d6cafd3e6798e5f31c173a0be08c025e5",
+    "org/apache/commons/codec/language/bm/gen_exact_czech.txt": "fd5517e98eebfbe1f979ec21f9749e9d6cafd3e6798e5f31c173a0be08c025e5",
+    "org/apache/commons/codec/language/bm/gen_exact_dutch.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_english.txt": "fd5517e98eebfbe1f979ec21f9749e9d6cafd3e6798e5f31c173a0be08c025e5",
+    "org/apache/commons/codec/language/bm/gen_exact_french.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_german.txt": "abe0c2b293dde37d051c84c0a60194b8c3038f399411b60f0706dcddfadb0bdf",
+    "org/apache/commons/codec/language/bm/gen_exact_greek.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_greeklatin.txt": "8784c2b1d8b8e206e3dfce6eda4f3dec800a1bc213dc4f4dc0cb09a8132a542c",
+    "org/apache/commons/codec/language/bm/gen_exact_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_hungarian.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_italian.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_polish.txt": "6d805f7fc3172f02f11240b9043fedc535d0729a105f218205ddbcee3245781a",
+    "org/apache/commons/codec/language/bm/gen_exact_portuguese.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_romanian.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_exact_russian.txt": "34bfa509511f7517a628330cca7c5e51464ab4eef953834054f684d02e11ffc7",
+    "org/apache/commons/codec/language/bm/gen_exact_spanish.txt": "b3388ed5a9817dfa7172b1061cd2003068623c5b794b4d25a221225c893eddf2",
+    "org/apache/commons/codec/language/bm/gen_exact_turkish.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/gen_hebrew_common.txt": "4a989b869f2293590c21af2305da6588966aee6d3bde431b3e49123904b11bcf",
+    "org/apache/commons/codec/language/bm/gen_lang.txt": "705d3b0eca3803ab2764f00b4cf9b2a68f9ec2201a7b340d6893412361022d95",
+    "org/apache/commons/codec/language/bm/gen_languages.txt": "b3165adaa36026c29338dc8d8f351cebc7423731465e1d6422f27d6778494c7d",
+    "org/apache/commons/codec/language/bm/gen_rules_any.txt": "d23d576829821edd7de13f6734eca746a767dd6d565a4cd18e33d9736df0d0ac",
+    "org/apache/commons/codec/language/bm/gen_rules_arabic.txt": "82b707c79998031bda269fd7c1192ea1a9670c03ead09ee77a77ce4feca12c38",
+    "org/apache/commons/codec/language/bm/gen_rules_cyrillic.txt": "0c8158127f19bd0e683bf883ab2fb7eb4c173a34ee51ab6752f56c932ab125e8",
+    "org/apache/commons/codec/language/bm/gen_rules_czech.txt": "84de9e152412cd6129340590372571fedb14876054b5df3b82a2a36564fcd619",
+    "org/apache/commons/codec/language/bm/gen_rules_dutch.txt": "9921e75dbbc942d2572a8660b0979329639e8707ffa9bb1de6b7d1a7a9955c2b",
+    "org/apache/commons/codec/language/bm/gen_rules_english.txt": "bcfb8723cbf3966b09ba0dc6f3dbbdc7882869c4e7af160f803c2f0519785a22",
+    "org/apache/commons/codec/language/bm/gen_rules_french.txt": "b5f12b085cfb4896a91020f901bc16e6f3164f0641e683b0d205a730560274b3",
+    "org/apache/commons/codec/language/bm/gen_rules_german.txt": "453d474ab996523a2f09a1c5897d8e3e1b4c045061227c052792f982e1c3c8b7",
+    "org/apache/commons/codec/language/bm/gen_rules_greek.txt": "6b56c5d8a9b6270f8777cce5f1b0860390aa218f7e2b43eeb1d7cbdb38778830",
+    "org/apache/commons/codec/language/bm/gen_rules_greeklatin.txt": "06122f03fe879f2ef78b0b76bf1412eb170c69fa828f40d7e7b907856656446e",
+    "org/apache/commons/codec/language/bm/gen_rules_hebrew.txt": "a570f37f45f35f2e409b1173d955d83adc878da8187f899db930d5d19f89a5f1",
+    "org/apache/commons/codec/language/bm/gen_rules_hungarian.txt": "16ba7cf79bf85089dc29fd92eff6358c893bc6aef85e6396dd29af7c41a4f611",
+    "org/apache/commons/codec/language/bm/gen_rules_italian.txt": "99155dedf0caeaae4212877d0b90da52e0252812eee4ab06a9aaf5393b94afb0",
+    "org/apache/commons/codec/language/bm/gen_rules_polish.txt": "e4e0eb610a8bccf71d39cd0e10b2c51e4d1f132a052d183c749511464ed51fc9",
+    "org/apache/commons/codec/language/bm/gen_rules_portuguese.txt": "0c51c2cc22988516b03f6afdd5699897b7cafe2b3e5d3676ab101941fbfd92dc",
+    "org/apache/commons/codec/language/bm/gen_rules_romanian.txt": "75ee26f3c6bf6cafc2258be21b820952e2e07c192919e34fd717dd81b0a2f4ad",
+    "org/apache/commons/codec/language/bm/gen_rules_russian.txt": "ded105c857167c2ba8c44ced7cee000d6bcd7823a4851b698f8ea540115a7f37",
+    "org/apache/commons/codec/language/bm/gen_rules_spanish.txt": "e7253c7c1ab7e46d29c85792be68c15a7bdb8937c364043f4c4c658d08f76a6b",
+    "org/apache/commons/codec/language/bm/gen_rules_turkish.txt": "1800bab9aee6be5f57838bfaaf071009841c1af93d5dd22789e1a7643d199261",
+    "org/apache/commons/codec/language/bm/lang.txt": "610a754f03e8838e1bdf8fc2f905cddae41d97142c54bf90e01f5582f8b5f7ba",
+    "org/apache/commons/codec/language/bm/sep_approx_any.txt": "47661c92b7bd2a3dbff0b19f2342281076f2877fab2592a0c076a555a813947f",
+    "org/apache/commons/codec/language/bm/sep_approx_common.txt": "7f3ea2985fd4b1b5e0f5a6544a47ab632497a7853b691aef5e6bd7320fcaa3a6",
+    "org/apache/commons/codec/language/bm/sep_approx_french.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_approx_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_approx_italian.txt": "b6165dbda3d972b5c54b2191409a2c04ac35fc7dba0abf5ddf3c9ae13f9a98a0",
+    "org/apache/commons/codec/language/bm/sep_approx_portuguese.txt": "21d632279772ae8983832220505bcf0c6fb500f4ffade0f9908306d018710f13",
+    "org/apache/commons/codec/language/bm/sep_approx_spanish.txt": "21d632279772ae8983832220505bcf0c6fb500f4ffade0f9908306d018710f13",
+    "org/apache/commons/codec/language/bm/sep_exact_any.txt": "df3f63b3946b8d5f05c4977ee5ab488da8162f4ad8cafa7a81cd8731b4954cb8",
+    "org/apache/commons/codec/language/bm/sep_exact_approx_common.txt": "232f59750f9dedcf0bc2af194d16a1f434a56a0ace0415fe67924b73c7e22a32",
+    "org/apache/commons/codec/language/bm/sep_exact_common.txt": "c3654ad436be18536fef3e3872db7255659c413bfc9b5ad446b1467b68c8b8c0",
+    "org/apache/commons/codec/language/bm/sep_exact_french.txt": "9ddcb79875c3a49259e98faf98433c7d8c29e368dedea7155c9ff7171016857d",
+    "org/apache/commons/codec/language/bm/sep_exact_hebrew.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_exact_italian.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_exact_portuguese.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_exact_spanish.txt": "d54f26f806ec83a34beaa033cbd110a9204f853045bf9050a3050146b52ec50b",
+    "org/apache/commons/codec/language/bm/sep_hebrew_common.txt": "f54d8a4d50ac4331b34a9a6d6466108e8d462f590d83b88130cb439f760a74e8",
+    "org/apache/commons/codec/language/bm/sep_lang.txt": "f3b5f5fda135f0b1d3016b67eea126a9415c50d3b169ee4fa9bd8dd0143fa9f5",
+    "org/apache/commons/codec/language/bm/sep_languages.txt": "9cc12d4172e415642b4105d96717d9c9b28abca8abfb61b6443f4e9c47adaf87",
+    "org/apache/commons/codec/language/bm/sep_rules_any.txt": "a334356decf81c182682d8e0d03e1727ab45a068446ed11c96809167aca1877f",
+    "org/apache/commons/codec/language/bm/sep_rules_french.txt": "2a3cbe347fda0df595e3110959c49656c6ec6b6f3b7af69a67d5590f0729699b",
+    "org/apache/commons/codec/language/bm/sep_rules_hebrew.txt": "545919eeecaee7301ff14afe69c88faf0277f3568c154032be204d3ff0d9da68",
+    "org/apache/commons/codec/language/bm/sep_rules_italian.txt": "3b4d253710d0c9dd5649594047c8e10763094c10b7b518cfd84048c122255f9b",
+    "org/apache/commons/codec/language/bm/sep_rules_portuguese.txt": "8a1e06755eba82e40de80beecdcabc01d8a0e9a547f1eabb35346e526bcf90b2",
+    "org/apache/commons/codec/language/bm/sep_rules_spanish.txt": "57654b4355e47b908556126a8cf10f9a77dc49e5bf3b179e9797b4e9b47f88ed",
+    "org/apache/commons/codec/language/dmrules.txt": "90ff9e9c775e01444f19dec3f8444eaa6d39fdeca77d0eaf4ddcb970a43687f7",
+    "META-INF/maven/commons-codec/commons-codec/pom.xml": "7fa0db4d8150daf932958b8aea89ee24abb4d18e2316a5de535278fc131512a0",
+    "META-INF/maven/commons-codec/commons-codec/pom.properties": "547810993812788c102be4037f5940e1965d26f0c9507e3ffe690ed3b18a8b3b"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/apache/commons/codec/BinaryDecoder.class",
+      "occurrence": 0,
+      "sha256": "e787206a7e78fc027c7ae718149d202e99d0b63b3b6dafdeab1171d3901ee633",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/BinaryEncoder.class",
+      "occurrence": 0,
+      "sha256": "ecefcd5e6d0df88f5526a11d8acd5f47b5e6a507a44e266775bb203bcf86e56f",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/CharEncoding.class",
+      "occurrence": 0,
+      "sha256": "0f1d3f22fc9b37aa6e22381211c24bf988b8b21cf49ffadf184fb9514e8be104",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/Charsets.class",
+      "occurrence": 0,
+      "sha256": "52381f6d769c6d3d9b7f5f2ceef1ac983c41a1bff392d85397a30d53d3e2ddca",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/CodecPolicy.class",
+      "occurrence": 0,
+      "sha256": "b7a9ebac61c67e04167ac71ebd80efb5bdc47d8347976de4dde2b5f1685796a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/Decoder.class",
+      "occurrence": 0,
+      "sha256": "0788f0ab04345a2b90c19c0b0c6623a9bf51dff0eaa63ef6bcf5415a5c823657",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/DecoderException.class",
+      "occurrence": 0,
+      "sha256": "693e22f2336829c083a1a1f9d100e62f55563baa85c5a2d54a022c28f187fc46",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/Encoder.class",
+      "occurrence": 0,
+      "sha256": "d54418809d138b33583ff676973ce3546d2fe7f023dffdfcfa8d47bdcb61dba0",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/EncoderException.class",
+      "occurrence": 0,
+      "sha256": "04451cf267f1f99a143a460e75a9c60e0b9849cc56cfc584d7e84a4ea16130e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/Resources.class",
+      "occurrence": 0,
+      "sha256": "6e787ef29e59198bf8014d867244a6a40d9367aa7accb3619c5cc1d86c305d4a",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/StringDecoder.class",
+      "occurrence": 0,
+      "sha256": "bdd24eb36fcc874b562508ae3a4128a382de65d1bf89351bfef48e94c7794c67",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/StringEncoder.class",
+      "occurrence": 0,
+      "sha256": "d898b4fa22365550836c2008835660707f6f9d1efefca381c12c718107606881",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/StringEncoderComparator.class",
+      "occurrence": 0,
+      "sha256": "a208b27d12f252d465386fdf6e28bbd08d0d873b4110593cb94a0decf062ecaa",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base16.class",
+      "occurrence": 0,
+      "sha256": "6eaa0d35228289c2b206172faedf7ad9054bc6d6427c1571383f3b4607e90508",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base16InputStream.class",
+      "occurrence": 0,
+      "sha256": "2f69678c8a4071cfc54812c129c351d3e24842fad4d9f35eb789a830a94eac8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base16OutputStream.class",
+      "occurrence": 0,
+      "sha256": "87abf386f60fcf762174164d065578f7e4d8895668100141c491ec4dcb4efcae",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base32$1.class",
+      "occurrence": 0,
+      "sha256": "29f8bf0ab8f2a9b22d80f4c5640a55ffdc80e4a73b2b166ce562440775d88851",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base32$Builder.class",
+      "occurrence": 0,
+      "sha256": "334c04b61149ac9ff1cc68ffa39ae5955ed9b9e2cc6becc6f4b8a9e373af1397",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base32.class",
+      "occurrence": 0,
+      "sha256": "91c530ab455aa9ffbd7bcb62d4f2b873d2b8efab045657c51ddda0023265ecf9",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base32InputStream.class",
+      "occurrence": 0,
+      "sha256": "c672749bed7cac26a993eb31b485753d293cc41412f5ff8e1098cc459fc20f40",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base32OutputStream.class",
+      "occurrence": 0,
+      "sha256": "db17f327fb8783229b1487e7f3cfbeecef40ebf8862a200abfdc149ea3e8ae61",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base64$1.class",
+      "occurrence": 0,
+      "sha256": "f758f9b4e0bec0f5fdb07d2af90dcde5410be940305fc3359bc9c9c583d8649f",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base64$Builder.class",
+      "occurrence": 0,
+      "sha256": "2073698e4d000fe9faf5282646b6b71d0b575b9c524f855cfbcbf7155fdad7cd",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base64.class",
+      "occurrence": 0,
+      "sha256": "7985285c1f09f76230bb84605bf22f7c000125fb2b76b24552993df7215296fd",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base64InputStream.class",
+      "occurrence": 0,
+      "sha256": "15e3146ae4a80c466c4ccfa8d8c79c1689d4ecaedd49f0bd79fe6317f85b35ef",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Base64OutputStream.class",
+      "occurrence": 0,
+      "sha256": "b2250aa8c6c54564826535ca2d3d28ff933450223b81109c8601e76d38330898",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BaseNCodec$AbstractBuilder.class",
+      "occurrence": 0,
+      "sha256": "35ed29a867eda82234c939f4e92c15b3bd8f8a0df296c8a37fc0b2aac1db2297",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BaseNCodec$Context.class",
+      "occurrence": 0,
+      "sha256": "17b55615770c4d14a5537b9ea582b7adbc08864b9a50d3f9542b5ffbf0d75457",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BaseNCodec.class",
+      "occurrence": 0,
+      "sha256": "aa1b5892b652c4b8c590826b0fe78bd18fd9de4fbfa13ac4de750095ecab38f7",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BaseNCodecInputStream.class",
+      "occurrence": 0,
+      "sha256": "29f41d6f52d8eecea01dcee21f4769c7479d06c6a0211331f114d6e8ebc41778",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BaseNCodecOutputStream.class",
+      "occurrence": 0,
+      "sha256": "96ba7f54e5a5f2ec1165300bb5000db11b250b048890730ef753b98ec911f178",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/BinaryCodec.class",
+      "occurrence": 0,
+      "sha256": "0238f0556a4a6d2648d33d0b0de09ffcbce16be08d4f86d7a2907cddf2fd4762",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/CharSequenceUtils.class",
+      "occurrence": 0,
+      "sha256": "3f7f69c7910fd4f3dd189d1e2c513ac8b54f9af547347ce8a2d6faf3df0bc2dc",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/Hex.class",
+      "occurrence": 0,
+      "sha256": "2dcd9dcdefd88e40ad23fc472718fd5e8aa1a45b00fd91f346d7b8d27081570a",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/StringUtils.class",
+      "occurrence": 0,
+      "sha256": "c0e3620c30dafcff241f10a7c3d9f22f0ed468ffeca27a88c9c951f9f98ac8c3",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/binary/package-info.class",
+      "occurrence": 0,
+      "sha256": "adb0a4acc9f1887fa21fb54f923d90d3deb0e2ffecdeaf1a9eb714f9b0558bed",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/cli/Digest.class",
+      "occurrence": 0,
+      "sha256": "74466164a2a050754b33242c6ac5d5240454e09cc22763a50e0535e2021d848a",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/cli/package-info.class",
+      "occurrence": 0,
+      "sha256": "3b5573d41df018f18fbff3aae60ef9900a2d1f98c9750cacec1f71108d295fcc",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/B64.class",
+      "occurrence": 0,
+      "sha256": "eea8a9a247edb0df503d98fab95e9b076288fc88e926499cb68483a345b918e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Blake3$1.class",
+      "occurrence": 0,
+      "sha256": "20ecf70e06a153a698dcb367581e1f246df723a94b5f62cf345cf0ba07ba96a6",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Blake3$ChunkState.class",
+      "occurrence": 0,
+      "sha256": "b1504905dc4e1e3bfc7448bc3aa8c71c73dbaa07ceafb5c85b936a158c7c0e23",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Blake3$EngineState.class",
+      "occurrence": 0,
+      "sha256": "ac59634cf6b6f659a39ac7a6828847232469769c794f010467cf382619634126",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Blake3$Output.class",
+      "occurrence": 0,
+      "sha256": "a1c19efc5fb918dab0f7d5e85ce4bfb6accd0ea929921f3f9114593473b6888d",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Blake3.class",
+      "occurrence": 0,
+      "sha256": "ccb473dc8752409db3fca08697e6ac2b1d795af5fd4a33c46cf0077cfb3945ac",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Crypt.class",
+      "occurrence": 0,
+      "sha256": "280b4c2393340c2c62a621799cafda168dffd77d08da56f02da50a42d75f4e25",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/DigestUtils.class",
+      "occurrence": 0,
+      "sha256": "a190c385f50c338b9e6a1395b4191d62e610b631ddff206c5ba68470b869ef24",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/HmacAlgorithms.class",
+      "occurrence": 0,
+      "sha256": "dc1b4c9b651fa37d82b6cea0c889e6279f419c24f7dfe36b25a27da8696a3537",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/HmacUtils.class",
+      "occurrence": 0,
+      "sha256": "1a632575083eac6b75abb99c89f2a9d32b27832c11ab6c413e1683c5c43bf2ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Md5Crypt.class",
+      "occurrence": 0,
+      "sha256": "fa76e9b71d96e0241736869348a8a5e8fc2a45775da3ab69058f31e3d4403bc7",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/MessageDigestAlgorithms.class",
+      "occurrence": 0,
+      "sha256": "3a67daef664bf1743842e4a0eea2376bd0047b852b5c1fa3096142a8b69fb6a4",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/MurmurHash2.class",
+      "occurrence": 0,
+      "sha256": "2c4a93e6f84117372dd203c9c2a59d7db40d4e436e8ea6bbed0e25a735cad182",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/MurmurHash3$IncrementalHash32.class",
+      "occurrence": 0,
+      "sha256": "23841b5139dedc8c708ed562447925c2028b89cbc8f5a018c24434cf0efce18c",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/MurmurHash3$IncrementalHash32x86.class",
+      "occurrence": 0,
+      "sha256": "12d5040a87f634b67ede851eef5c2410ba5659eef12b86617cabe5622ca67b21",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/MurmurHash3.class",
+      "occurrence": 0,
+      "sha256": "750ee0741ad5c3d75433ca6ca2524f04c4db39204b1d76beb0656e7ca38f03e5",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/PureJavaCrc32.class",
+      "occurrence": 0,
+      "sha256": "31b325aa8e6049774ea7f99c084fe0bf13c66138d97091c7b5e071daaef164e7",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/PureJavaCrc32C.class",
+      "occurrence": 0,
+      "sha256": "69445f722ddb1e129f2be87f4ff51eabf65de50771c5ea698b79b557b7fd8e2e",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/Sha2Crypt.class",
+      "occurrence": 0,
+      "sha256": "1f6fc76548440bf976404448f21ae710ac5410f5c428b74fd5e7a2c3d032d382",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/UnixCrypt.class",
+      "occurrence": 0,
+      "sha256": "76e0af9c9430e67ea44604e1f36e937e601f90ce9e8ed59dae8995c21a6b0cff",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/XXHash32.class",
+      "occurrence": 0,
+      "sha256": "f9262afcb84488c9330f87868d2477f507a6dc6c9afeb72e1420a4eed2ec1d23",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/digest/package-info.class",
+      "occurrence": 0,
+      "sha256": "b077ffa96cd3084bae97084bf4ea835239bfe9a8bb829ce50664e9750fa04b7f",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/AbstractCaverphone.class",
+      "occurrence": 0,
+      "sha256": "0cce8214749bcbce519e4dca027624e75a18edda78e526f086a432a799a91330",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Caverphone.class",
+      "occurrence": 0,
+      "sha256": "b29af972ebae18edca20d600f216e8a17316b9a4ebe33870fa6e7fe5e4b4d60a",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Caverphone1.class",
+      "occurrence": 0,
+      "sha256": "725d2096bee7b3f3ba3b63618527aa10de7893ca43ed6a76fc6385b0b8d5e810",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Caverphone2.class",
+      "occurrence": 0,
+      "sha256": "10339f6ced381c1a9fc6e8f64492d93df733a2e469b387e6e34f0bb954ec351e",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/ColognePhonetic$CologneBuffer.class",
+      "occurrence": 0,
+      "sha256": "c2e32292642c8fa4feedc6bb16f123ac28ea6bd30a5d90e10e4997f2e6916766",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/ColognePhonetic$CologneInputBuffer.class",
+      "occurrence": 0,
+      "sha256": "aa0d315a0894e540baf9115909a24a5f1e70c80356aa17e2d9f71d310e154797",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/ColognePhonetic$CologneOutputBuffer.class",
+      "occurrence": 0,
+      "sha256": "ce3a6caca7a7db5a935b9a4459859911d3a75b49e7f56002bd5ebcb58843920d",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/ColognePhonetic.class",
+      "occurrence": 0,
+      "sha256": "02bad6bcc21a0b236592317357429c9c77f77acd9402c29ec0787f4c3bcbefe4",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DaitchMokotoffSoundex$1.class",
+      "occurrence": 0,
+      "sha256": "1513db400a56cb7e85911141503f1b2198d31109d61222ad90139b67dd200ecd",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DaitchMokotoffSoundex$Branch.class",
+      "occurrence": 0,
+      "sha256": "2736ac034421c820dddf10869e22c4b5c2bb3672b3801815ed87fe3371e7ece9",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DaitchMokotoffSoundex$Rule.class",
+      "occurrence": 0,
+      "sha256": "6de6555c30230eba98a6d8f86db9cdc7059b06e2ffe1cd485c8577c10d83f157",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DaitchMokotoffSoundex.class",
+      "occurrence": 0,
+      "sha256": "271f6ba09fe992a36bca7a95609146734f2ccebab04f4a042919d70751b0eadb",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DoubleMetaphone$DoubleMetaphoneResult.class",
+      "occurrence": 0,
+      "sha256": "2f600181d8e921bcee76241cc02a23a0bb6767ed3f257a748f294dd3fd042784",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/DoubleMetaphone.class",
+      "occurrence": 0,
+      "sha256": "9e2837a991dd8fc7aa2854b3d27780e75b8bbd8b10426b5628ddd7a08404d5f8",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/MatchRatingApproachEncoder.class",
+      "occurrence": 0,
+      "sha256": "ced180a730f599313cdcd107d694c1bed5a60489c9e99f210b0d53cd90399811",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Metaphone.class",
+      "occurrence": 0,
+      "sha256": "61f43730e9f84f3d5114872e1c5eeb27ce49717e2afb03bf51ae83a55e91d5b8",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Nysiis.class",
+      "occurrence": 0,
+      "sha256": "f350fd156c3278693cd8a0861d0c0f45786df427b7c9f04c30408409ff8dffab",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/RefinedSoundex.class",
+      "occurrence": 0,
+      "sha256": "03b47732fc4640dd806aaf1ce59de125e7ef137ef5056b6f38c4e5ec470af947",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/Soundex.class",
+      "occurrence": 0,
+      "sha256": "fcaabafdad94023fa045c046a66d20f8c678e7d7fb8133e4aeb967fd0092d357",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/SoundexUtils.class",
+      "occurrence": 0,
+      "sha256": "db0a3d87091d2d572939de0bd08b71abe4e9d430d37617daba0defa9d3ebf0d3",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/001.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/BeiderMorseEncoder.class",
+      "occurrence": 0,
+      "sha256": "9c38381535b4645773a2ffff936b452ec0cf4c3479db8e9f042d4b13f6dda9ad",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang$1.class",
+      "occurrence": 0,
+      "sha256": "9ba04eb9b1cc329ed20891272f4de05701f45123dd11b722646cd983923e9ab6",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang$LangRule.class",
+      "occurrence": 0,
+      "sha256": "1b93d3f4de7978d8eeaad78a5beb20f41599810071905d040ac394efbccfd2f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Lang.class",
+      "occurrence": 0,
+      "sha256": "66069725be28635ac5294e6eb18df9e8b4240695d917b5e5f12aedcdb6838c18",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$1.class",
+      "occurrence": 0,
+      "sha256": "25f2b9439571e9610e515f19c16a0206503b5a3e46068ab2e040543fabcc16bf",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$2.class",
+      "occurrence": 0,
+      "sha256": "e649a449a432005ae7a23624e32d582c3794a25b20acd0cff112000e0c0b78b0",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$LanguageSet.class",
+      "occurrence": 0,
+      "sha256": "4cd307229f7dc50ad8555c94d32db0b7ef22975873195441a1dca49cddedfb6b",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages$SomeLanguages.class",
+      "occurrence": 0,
+      "sha256": "9bb4e25ed80bb3a73f26268730091017ea7128884f02c4d5007c2c4af9eb8b5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Languages.class",
+      "occurrence": 0,
+      "sha256": "295ec0c6e99d1c2d7003c966988a884ee0b0ffc4dd0ce127f56a44b0708559e2",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/NameType.class",
+      "occurrence": 0,
+      "sha256": "305170d49312b454a2c8e792ce40fce02f419c60c9596e088374ef4ceb460772",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$1.class",
+      "occurrence": 0,
+      "sha256": "aee7e32c71bb5a0127959a7dd77a63db89e6f0f098b773de8db86bc355186cd6",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$PhonemeBuilder.class",
+      "occurrence": 0,
+      "sha256": "1b29e603623d2b8122e6182bcfb6905e888d38d43488614e6f551bf0a61a002a",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine$RulesApplication.class",
+      "occurrence": 0,
+      "sha256": "33158a36556c6dcb2cf428dc3f1720df2e1558d8a8337b59835f78b973081c78",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/PhoneticEngine.class",
+      "occurrence": 0,
+      "sha256": "73bcc2780b930206ea703fb1fc9d008fc5338228e86a345c0261bba86826d947",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/ResourceConstants.class",
+      "occurrence": 0,
+      "sha256": "e7f7265311fb522e97014bc2b0fc13927342dd00aa693631425aef2352ea6579",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$1.class",
+      "occurrence": 0,
+      "sha256": "9135526b00226995c31d2494e8fb39554c61d0c4978dd769b5d3bfaa4a9c9bbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$2.class",
+      "occurrence": 0,
+      "sha256": "b0ee963885df9867b2304323ae45638f6d1afb817fc42468a17dbdc6f662b0f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$Phoneme.class",
+      "occurrence": 0,
+      "sha256": "9b339f66cb421362a159b2e0c0b7668b1ad227b2c40de9634328c5a1eb9a88d8",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$PhonemeExpr.class",
+      "occurrence": 0,
+      "sha256": "330903c153d134a58e325e59b8133fc32974514d14ad9f0dc3f8f0a40edd42db",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$PhonemeList.class",
+      "occurrence": 0,
+      "sha256": "c8d40feacfad59c7419a263665db84463c9cb07a7492c30bad97a396d964c478",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule$RPattern.class",
+      "occurrence": 0,
+      "sha256": "b0b76a7c4bf59857a4ae74ad0804b586c3ab3d8142a42efec24692ffacdd0b42",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/Rule.class",
+      "occurrence": 0,
+      "sha256": "cc947723dc3300d229c510ac5f6dd4eb1f0b9924b9a3e80317cee7bb5d7ed428",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/RuleType.class",
+      "occurrence": 0,
+      "sha256": "61d088eadabba257c2af289cb8cad9a880907441354a820e96d867acf1daf00f",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/bm/package-info.class",
+      "occurrence": 0,
+      "sha256": "219dfa42b0f1a2e56bc16431328ce5ec9f609db1210763373db8b37dbc300a69",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/language/package-info.class",
+      "occurrence": 0,
+      "sha256": "df4ca0890d7c91a566ad295cb72d79393fe777e208f20f81e7b8ec2b6e181ea0",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/BCodec.class",
+      "occurrence": 0,
+      "sha256": "546c7926ae6d5f8e108e1d2d7c54577ae2038df26bd58d6030929161ee45f692",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/PercentCodec.class",
+      "occurrence": 0,
+      "sha256": "5176804b57181097e695ece21ba3c3b72239900a79f3a449af0d5d808348fa69",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/QCodec.class",
+      "occurrence": 0,
+      "sha256": "0423e10c1a974e36afc99951172740dd38cdae417b2e380d2a61c7e76fef0fc3",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/QuotedPrintableCodec.class",
+      "occurrence": 0,
+      "sha256": "1b330bedee14d40c211d40a8ddb440a39d306abc4b9a4626bb0397477b9172aa",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/RFC1522Codec.class",
+      "occurrence": 0,
+      "sha256": "f5b7af8b8dda37eb6a84f49c8a6e1b0eaf3e32d1a5fbb328fc8b27f81606e6e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/URLCodec.class",
+      "occurrence": 0,
+      "sha256": "29e1a53f0b5ab109eda10d6742c799043eeeb1c70000eb646766e914caeff735",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/Utils.class",
+      "occurrence": 0,
+      "sha256": "e61541e860c1b722d37118264ab7b482a2d102036f1ea115d888966180163da3",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/net/package-info.class",
+      "occurrence": 0,
+      "sha256": "ebc27f6cd7a4dbc4c9f573d72c3db10c373dc7044ea593228c74e84dd825f831",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "org/apache/commons/codec/package-info.class",
+      "occurrence": 0,
+      "sha256": "2ee921e00c3d48ffec7ba47038211de41307aabfbe7bd9ab212bcee017d4a5e6",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "1bcf6b75638aac9283d03f904c2f28d9949e85a045364c91c9a5aa0011c36812",
+      "member_shard": "docs/dev/evidence/sqx145/members/015/002.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/015/001.json",
+      "sha256": "f45ab526425a0989f132487eae3c0e0dd5e6a1605595fa645b91446b11137077"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/015/002.json",
+      "sha256": "546dedbea00bd62085333f862efacae0f4b79fb6840e957b1ce37e4c424e9412"
+    }
+  ]
+}

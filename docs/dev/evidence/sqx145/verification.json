@@ -1,0 +1,24 @@
+{
+  "executed_at": "2026-10-06T19:42:45.251597+00:00",
+  "completed_at": "2026-10-06T19:43:34.126022+00:00",
+  "links_checked": 3438,
+  "phase_tasks": 366,
+  "json_files_parsed": 1176,
+  "archives_reconciled": 289,
+  "raw_class_entries": 51713,
+  "distinct_class_names": 51373,
+  "duplicate_class_extras": 8,
+  "member_shards": 874,
+  "class_member_occurrences_reparsed": 51713,
+  "distinct_class_payloads_reparsed": 51586,
+  "declared_fr_seeds_resolved": 807,
+  "static_resource_hashes_verified": 13919,
+  "ui_source_hashes_verified": 437,
+  "candidate_files": 1691,
+  "issues": [],
+  "limits": [
+    "Static identity/structure verification; no donor runtime or numerical parity.",
+    "Class metadata reproducibly reparsed with the capture parser; this is not independent algorithm validation.",
+    "Mermaid structure checked from parsed hierarchy; rendering remains unverified."
+  ]
+}

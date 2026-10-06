@@ -1,0 +1,4862 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$CURRENCY$_CURRENCY.class",
+      "occurrence": 0,
+      "sha256": "b489b1fd1695ccfd4aecb74c94905840435c1b35e2be2c9c4b95f6dc285210a9",
+      "name": "com/sun/jna/platform/win32/OaIdl$CURRENCY$_CURRENCY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Lo",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "Hi",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY$_CURRENCY",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONG",
+        "com/sun/jna/platform/win32/WinDef$ULONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$CURRENCY.class",
+      "occurrence": 0,
+      "sha256": "71a04a75e0e41cb3d78412874afd708083b868fb26e65232e49a4ef95a67b245",
+      "name": "com/sun/jna/platform/win32/OaIdl$CURRENCY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "currency",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$CURRENCY$_CURRENCY;",
+          "access": 1
+        },
+        {
+          "name": "int64",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONGLONG;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY$_CURRENCY",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONGLONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DATE$ByReference.class",
+      "occurrence": 0,
+      "sha256": "8877d77c10b9911096a27d87afcb00b3e3526429d61ea6e23cb8e162dc9f4623",
+      "name": "com/sun/jna/platform/win32/OaIdl$DATE$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$DATE",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DATE",
+        "com/sun/jna/platform/win32/OaIdl$DATE$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DATE.class",
+      "occurrence": 0,
+      "sha256": "7701c76ed2fd55a8fbba97bd28a56dfe20811c00e1434f9054854b5bc2a0f147",
+      "name": "com/sun/jna/platform/win32/OaIdl$DATE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MILLISECONDS_PER_DAY",
+          "descriptor": "D",
+          "access": 26
+        },
+        {
+          "name": "date",
+          "descriptor": "D",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "2a88f748111cfef441c20dc70a9237846d5572ef8290cffca03e39b72e0487e6",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/Date;)V",
+          "access": 1,
+          "code_sha256": "ca0a47c7d668eca2be1b9a15cf56724e3e054ed908defe4c7c41a5ac2b4ef8be",
+          "code_length": 10
+        },
+        {
+          "name": "getAsJavaDate",
+          "descriptor": "()Ljava/util/Date;",
+          "access": 1,
+          "code_sha256": "76078c807c758d4d9d70b8fc5cba5daea8fe1a6f61126799c3052e1b7c70f479",
+          "code_length": 99
+        },
+        {
+          "name": "setFromJavaDate",
+          "descriptor": "(Ljava/util/Date;)V",
+          "access": 1,
+          "code_sha256": "f38e7c9126eff06042707057fa978d7294d2742d7cd675f212024f0ddfcd5b07",
+          "code_length": 66
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DATE",
+        "com/sun/jna/platform/win32/OaIdl$DATE$ByReference",
+        "com/sun/jna/platform/win32/OleAuto",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/ptr/DoubleByReference",
+        "java/lang/Math",
+        "java/util/Calendar"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL$ByReference.class",
+      "occurrence": 0,
+      "sha256": "305ba2c4b7546726f68b798d28a0d3a8f8bf03382e8338e6f9b3a4829817de15",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1$_DECIMAL1_DECIMAL.class",
+      "occurrence": 0,
+      "sha256": "c44b207758fd4f1a37202b51892f17ce9a5abd7d6060536afce37fdfaa5f32c7",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1$_DECIMAL1_DECIMAL",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "scale",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$BYTE;",
+          "access": 1
+        },
+        {
+          "name": "sign",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$BYTE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1$_DECIMAL1_DECIMAL",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$BYTE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1.class",
+      "occurrence": 0,
+      "sha256": "5eb6f26cec04247b75cd8e1f30124188c3f07ab5bd94a96d0e4db0736681f075",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "signscale",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$USHORT;",
+          "access": 1
+        },
+        {
+          "name": "decimal1_DECIMAL",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1$_DECIMAL1_DECIMAL;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "43ee9ba84331741c16c59249ce19e8e96e88eef028ec96bf5fe9b39e5f8537e3",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a114d70b3b9da52864b41bc162571c0792afeb4d112ea3403e01bdc8eb0a3a03",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1$_DECIMAL1_DECIMAL",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$USHORT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2$_DECIMAL2_DECIMAL.class",
+      "occurrence": 0,
+      "sha256": "ea1082396078e7fd02462ba46eab3cabeded4cf90819a37c1435b1bae9b71801",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2$_DECIMAL2_DECIMAL",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Lo32",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$BYTE;",
+          "access": 1
+        },
+        {
+          "name": "Mid32",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$BYTE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2$_DECIMAL2_DECIMAL",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$BYTE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2.class",
+      "occurrence": 0,
+      "sha256": "df52d35883e41a2987f21ed01b36f67948f47ad77403b1fc471c96c7c0a0aed4",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Lo64",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONGLONG;",
+          "access": 1
+        },
+        {
+          "name": "decimal2_DECIMAL",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2$_DECIMAL2_DECIMAL;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "43ee9ba84331741c16c59249ce19e8e96e88eef028ec96bf5fe9b39e5f8537e3",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a114d70b3b9da52864b41bc162571c0792afeb4d112ea3403e01bdc8eb0a3a03",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2$_DECIMAL2_DECIMAL",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$ULONGLONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DECIMAL.class",
+      "occurrence": 0,
+      "sha256": "22466f2c72399f07cdfd2d4391248016df6cbfc84a70bd2ae05873fa318764b7",
+      "name": "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "wReserved",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "decimal1",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1;",
+          "access": 1
+        },
+        {
+          "name": "Hi32",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "decimal2",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL1",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL$_DECIMAL2"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DESCKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "063218c145a3511a0786927c3dba14d2135f164b477cb176ba4df48277828dff",
+      "name": "com/sun/jna/platform/win32/OaIdl$DESCKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$DESCKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DESCKIND",
+        "com/sun/jna/platform/win32/OaIdl$DESCKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DESCKIND.class",
+      "occurrence": 0,
+      "sha256": "8f1916e202909362df6d7459f83315eaf0a190113db236e855a0e8451a035387",
+      "name": "com/sun/jna/platform/win32/OaIdl$DESCKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "DESCKIND_NONE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DESCKIND_FUNCDESC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DESCKIND_VARDESC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DESCKIND_TYPECOMP",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DESCKIND_IMPLICITAPPOBJ",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DESCKIND_MAX",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f171e6a7a5622d7feb5112a2f9913f6713f9cbf7a7e3557451c18114e9581692",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DESCKIND",
+        "com/sun/jna/platform/win32/OaIdl$DESCKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DISPID.class",
+      "occurrence": 0,
+      "sha256": "a02cb40448b2899e970ea0a632e6cc2c35a7f90f7d896205ddfcb5cd7d7f0c55",
+      "name": "com/sun/jna/platform/win32/OaIdl$DISPID",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinDef$LONG",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "af2cdd886f6052173aeba19f359748943e1e8cfcbdb805789fcd526bee8a9882",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e40e2357e9ada1f9998b0cec9826b2870ed94664250bd914e2b90c6d9e5e26a4",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DISPID",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$DISPIDByReference.class",
+      "occurrence": 0,
+      "sha256": "5c10913d981effe4996fdcef38abb3f218066c1424aa8bf99ea979fa75bda8c1",
+      "name": "com/sun/jna/platform/win32/OaIdl$DISPIDByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ac5e86a510aec7606b67eff7d7728a8dc0c3771a6427cba40751482be7dc1a5b",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$DISPID;)V",
+          "access": 1,
+          "code_sha256": "8c863666f36a11d318602623a3a08d68dc58fa32e531e800f11d7c319cb24a98",
+          "code_length": 13
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$DISPID;)V",
+          "access": 1,
+          "code_sha256": "d967e047723ed788804277e8084bf430e7eb390591dd668c7fe94a8f91a95fa8",
+          "code_length": 13
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 1,
+          "code_sha256": "758ad9c5ef027eaa76830c0a3666a522ce8f85ddeaf6b44da2152073860da285",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DISPID",
+        "com/sun/jna/platform/win32/OaIdl$DISPIDByReference",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "917cc04734ed5a078d86d8b561a6f5ac0db17f3bdc78be91bfe66feb925d0e15",
+      "name": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "c0725e79cb676ff4d90e458dd68cbc47c22cc20af908df5dfcbb8311bbbb333b",
+      "name": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC.class",
+      "occurrence": 0,
+      "sha256": "09508d72c19ce3d4ef55dbf82b5c5622b7997399764810a92c54c48761c6dc88",
+      "name": "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "idldesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$IDLDESC;",
+          "access": 1
+        },
+        {
+          "name": "paramdesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$PARAMDESC;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "4046018d0192a03185bb83c88ec1015c259c06ed5c591dba39c5243fb3010a3c",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$PARAMDESC;)V",
+          "access": 1,
+          "code_sha256": "8198abb8c6633f4e3b4779047e928520bdaad3845e6b3c450c80fcd09db4aba8",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$IDLDESC;)V",
+          "access": 1,
+          "code_sha256": "0dfd23b872322e5a5bf9daa70b0d1a895fb630b61b69f3c6f485085017d27bc0",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ELEMDESC.class",
+      "occurrence": 0,
+      "sha256": "3c84498085eeb27377803cfdf4c90a6ea59794cf69793dea36d47c461184a566",
+      "name": "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tdesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC;",
+          "access": 1
+        },
+        {
+          "name": "_elemdesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC$_ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$EXCEPINFO$ByReference.class",
+      "occurrence": 0,
+      "sha256": "0e5386d7aa0b3ca67c3a5fbae4e5e7b9c6f8624d96a4ed450267c6002088463c",
+      "name": "com/sun/jna/platform/win32/OaIdl$EXCEPINFO$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$EXCEPINFO",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$EXCEPINFO",
+        "com/sun/jna/platform/win32/OaIdl$EXCEPINFO$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$EXCEPINFO.class",
+      "occurrence": 0,
+      "sha256": "afea7f15723a931527f40562ffe1092d9abbe4a2e5bbb1862cdc498c0a467ba5",
+      "name": "com/sun/jna/platform/win32/OaIdl$EXCEPINFO",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "wCode",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wReserved",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "bstrSource",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$BSTR;",
+          "access": 1
+        },
+        {
+          "name": "bstrDescription",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$BSTR;",
+          "access": 1
+        },
+        {
+          "name": "bstrHelpFile",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$BSTR;",
+          "access": 1
+        },
+        {
+          "name": "dwHelpContext",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "pvReserved",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$PVOID;",
+          "access": 1
+        },
+        {
+          "name": "pfnDeferredFillIn",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$EXCEPINFO$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "scode",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$SCODE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$EXCEPINFO",
+        "com/sun/jna/platform/win32/OaIdl$EXCEPINFO$ByReference",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$BSTR",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$PVOID",
+        "com/sun/jna/platform/win32/WinDef$SCODE",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference.class",
+      "occurrence": 0,
+      "sha256": "246e1329fbf5c415373ae537f6c108b761dfd3f3528728d875f28f392ad254b2",
+      "name": "com/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ElemDescArg.class",
+      "occurrence": 0,
+      "sha256": "dfaa051bba6decd1b09efaecba92835e49ca073ae0b32193f9d540f86e3ee3ac",
+      "name": "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "elemDescArg",
+          "descriptor": "[Lcom/sun/jna/platform/win32/OaIdl$ELEMDESC;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "161a255e98b9f527ed83efbcdb43c0eecd4adb1c9fc201f9d4a1ac82ee422b16",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "009e2d86db1691aa5ac04756e04f365e69281c3fe64235219a8dad40287c1fef",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$FUNCDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "1d106ddfd64f12f2ddbafe861cba4db66cdbaf05ca9d9a640194df25c98c5717",
+      "name": "com/sun/jna/platform/win32/OaIdl$FUNCDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$FUNCDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$FUNCDESC",
+        "com/sun/jna/platform/win32/OaIdl$FUNCDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$FUNCDESC.class",
+      "occurrence": 0,
+      "sha256": "773ce845fe9720fb9b882e40ebc04b8690b4eb7c3484fe63bb471342742acb11",
+      "name": "com/sun/jna/platform/win32/OaIdl$FUNCDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "memid",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 1
+        },
+        {
+          "name": "lprgscode",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "lprgelemdescParam",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "funckind",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$FUNCKIND;",
+          "access": 1
+        },
+        {
+          "name": "invkind",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$INVOKEKIND;",
+          "access": 1
+        },
+        {
+          "name": "callconv",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$CALLCONV;",
+          "access": 1
+        },
+        {
+          "name": "cParams",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$SHORT;",
+          "access": 1
+        },
+        {
+          "name": "cParamsOpt",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$SHORT;",
+          "access": 1
+        },
+        {
+          "name": "oVft",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$SHORT;",
+          "access": 1
+        },
+        {
+          "name": "cScodes",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$SHORT;",
+          "access": 1
+        },
+        {
+          "name": "elemdescFunc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ELEMDESC;",
+          "access": 1
+        },
+        {
+          "name": "wFuncFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f056853541eec56963696fa6a8e240732178b8b0468f394d2755633d6cf6af34",
+          "code_length": 45
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$CALLCONV",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$FUNCDESC",
+        "com/sun/jna/platform/win32/OaIdl$FUNCDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$SHORT",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$FUNCKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "accb42f7c264e552dfc211e48d69fa00b63aea9ef193d7adf929c0760c525f29",
+      "name": "com/sun/jna/platform/win32/OaIdl$FUNCKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$FUNCKIND.class",
+      "occurrence": 0,
+      "sha256": "daba86452f4be6abdd24fb427739568d27074bbd670fc7c1b34484c1d5a01e1a",
+      "name": "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FUNC_VIRTUAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FUNC_PUREVIRTUAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FUNC_NONVIRTUAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FUNC_STATIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FUNC_DISPATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$HREFTYPE.class",
+      "occurrence": 0,
+      "sha256": "ebee3535d7c90c76e226404287bb4eb2790ced5b971a774b46795d7055d77735",
+      "name": "com/sun/jna/platform/win32/OaIdl$HREFTYPE",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinDef$DWORD",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPE",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$HREFTYPEByReference.class",
+      "occurrence": 0,
+      "sha256": "2498d2cf481019d97d4ade237e638a271cefe183ea8ac694b3c7e516a649a6c7",
+      "name": "com/sun/jna/platform/win32/OaIdl$HREFTYPEByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/WinDef$DWORDByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9245ebb977edface5bd85690889100d9eeccea8f803468694eaa6931d37f2716",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORD;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$HREFTYPE;)V",
+          "access": 1,
+          "code_sha256": "915635066ed2bd0c91e16dfa55b4d789ca30accff3c1a21f566aeffa7b892ca9",
+          "code_length": 13
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$HREFTYPE;",
+          "access": 1,
+          "code_sha256": "c96e6f91bcd5d826513fee953a58ee175a9a4c89b15f58f141cfece9bcc97b92",
+          "code_length": 17
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 4161,
+          "code_sha256": "0a5936f52db42734289c603aa1efb4ee9db89fcd49db99dabe1b3a050c71776c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPE",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPEByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$DWORDByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$IDLDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "8f84b118d6c549a647248927a54de8742188f8d68bad7a894dde9d75f0a5e2d0",
+      "name": "com/sun/jna/platform/win32/OaIdl$IDLDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$IDLDESC;)V",
+          "access": 1,
+          "code_sha256": "538edb8f8087270366c3b72b0ff4e53e3b5137bea534e48fd8a70566e90bd733",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$ULONG_PTR",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$USHORT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$IDLDESC.class",
+      "occurrence": 0,
+      "sha256": "7003835b1cc8c0d6824c60fc0f27ba34f49d6c2d8e05dead0f18cbca149404a2",
+      "name": "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "dwReserved",
+          "descriptor": "Lcom/sun/jna/platform/win32/BaseTSD$ULONG_PTR;",
+          "access": 1
+        },
+        {
+          "name": "wIDLFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$USHORT;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/BaseTSD$ULONG_PTR;Lcom/sun/jna/platform/win32/WinDef$USHORT;)V",
+          "access": 1,
+          "code_sha256": "b97d216eb58cdcc217b17c97ccea36990b18ed1690541044939a9f4a37700eba",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/BaseTSD",
+        "com/sun/jna/platform/win32/BaseTSD$ULONG_PTR",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$USHORT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$INVOKEKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "53e5ae78045b7975f0d62cadef16a0850512f9ea364d48762e8b01cc43f47857",
+      "name": "com/sun/jna/platform/win32/OaIdl$INVOKEKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$INVOKEKIND.class",
+      "occurrence": 0,
+      "sha256": "38681e9479fdbb37d932acd4da76eace7c600cf1df54a2a3c67cf51ddc4f47f8",
+      "name": "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "INVOKE_FUNC",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$INVOKEKIND;",
+          "access": 25
+        },
+        {
+          "name": "INVOKE_PROPERTYGET",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$INVOKEKIND;",
+          "access": 25
+        },
+        {
+          "name": "INVOKE_PROPERTYPUT",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$INVOKEKIND;",
+          "access": 25
+        },
+        {
+          "name": "INVOKE_PROPERTYPUTREF",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$INVOKEKIND;",
+          "access": 25
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "df21edaf663d48089cdbec2be54ebf0fa38e7e04f7ac87272be3943aae5c38a4",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$LIBFLAGS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7a5dc8cfcd6b1def0bbb6bc97ef01cfe895fc9dd89e4fd4d32eef6f1ea2b7544",
+      "name": "com/sun/jna/platform/win32/OaIdl$LIBFLAGS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$LIBFLAGS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$LIBFLAGS",
+        "com/sun/jna/platform/win32/OaIdl$LIBFLAGS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$LIBFLAGS.class",
+      "occurrence": 0,
+      "sha256": "0486fe3f6a1c49a3898908bb4e26483dca0639e12d563f7c240dda9ce734385a",
+      "name": "com/sun/jna/platform/win32/OaIdl$LIBFLAGS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "LIBFLAG_FRESTRICTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LIBFLAG_FCONTROL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LIBFLAG_FHIDDEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "LIBFLAG_FHASDISKIMAGE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a1a8dc461abf1768846b89c7cc46e398e636564a845570cb9f534f0e0c921baf",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$LIBFLAGS",
+        "com/sun/jna/platform/win32/OaIdl$LIBFLAGS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$MEMBERID.class",
+      "occurrence": 0,
+      "sha256": "c0f7e50e406f3996692ca4b2f3b5b8cac084428a6b4a155f445b682714806cfa",
+      "name": "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$DISPID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "af2cdd886f6052173aeba19f359748943e1e8cfcbdb805789fcd526bee8a9882",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DISPID",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$MEMBERIDByReference.class",
+      "occurrence": 0,
+      "sha256": "3fbd51c33d714622aeae77e94090c094c72e207f55ef63ded41d344383d6d9af",
+      "name": "com/sun/jna/platform/win32/OaIdl$MEMBERIDByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ac5e86a510aec7606b67eff7d7728a8dc0c3771a6427cba40751482be7dc1a5b",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;)V",
+          "access": 1,
+          "code_sha256": "8c863666f36a11d318602623a3a08d68dc58fa32e531e800f11d7c319cb24a98",
+          "code_length": 13
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;)V",
+          "access": 1,
+          "code_sha256": "d967e047723ed788804277e8084bf430e7eb390591dd668c7fe94a8f91a95fa8",
+          "code_length": 13
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 1,
+          "code_sha256": "758ad9c5ef027eaa76830c0a3666a522ce8f85ddeaf6b44da2152073860da285",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERIDByReference",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$PARAMDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "b3a7b7ab29ce9add9c3830041138be3e0df390eb54f6f8f268dd01dc5dcaf197",
+      "name": "com/sun/jna/platform/win32/OaIdl$PARAMDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$PARAMDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$PARAMDESC.class",
+      "occurrence": 0,
+      "sha256": "0d4be6862c01b38dede891d0cbe510792e9689cca139bc7c2dbbad81643bcf6a",
+      "name": "com/sun/jna/platform/win32/OaIdl$PARAMDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pparamdescex",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "wParamFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$USHORT;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$USHORT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX$ByReference.class",
+      "occurrence": 0,
+      "sha256": "731104a757f50a948bb941cda37e76f541b2dce46d5732785a839cfebe8e26e1",
+      "name": "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX.class",
+      "occurrence": 0,
+      "sha256": "13d1b7db046cf7962d649bfbfade6445526e346cff80705fc8c1b7cc36202af7",
+      "name": "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cBytes",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "varDefaultValue",
+          "descriptor": "Lcom/sun/jna/platform/win32/Variant$VariantArg;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX$ByReference",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VariantArg",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$ULONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference.class",
+      "occurrence": 0,
+      "sha256": "b69bede9d9ce503838010f7542286db3094bdfe17e266cd06209c67acda25881",
+      "name": "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SAFEARRAY.class",
+      "occurrence": 0,
+      "sha256": "4809d0d3bf332b4255012aee65eb53fecfbdc32398cfd37d304db616a342356b",
+      "name": "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [
+        "java/io/Closeable"
+      ],
+      "fields": [
+        {
+          "name": "cDims",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$USHORT;",
+          "access": 1
+        },
+        {
+          "name": "fFeatures",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$USHORT;",
+          "access": 1
+        },
+        {
+          "name": "cbElements",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "cLocks",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "pvData",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$PVOID;",
+          "access": 1
+        },
+        {
+          "name": "rgsabound",
+          "descriptor": "[Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2bb9a89a91de6be3f7b1d21bfe8393563ee03cc3b3f6d0b68499e38be5a5beb3",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "37815658b91aac5bb602195aadade8dce1a20511a1ca73f977b40f066a983ee8",
+          "code_length": 28
+        },
+        {
+          "name": "read",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e4a282fae9b56022e5bd9a58d4a11f3299c64b3e2bc11a125033e5cd33914949",
+          "code_length": 62
+        },
+        {
+          "name": "createSafeArray",
+          "descriptor": "([I)Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference;",
+          "access": 137,
+          "code_sha256": "b208568efef85d188d84bd142f0711b2ba08fdb3bfe19d8dd8afb48b34f0503b",
+          "code_length": 14
+        },
+        {
+          "name": "createSafeArray",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WTypes$VARTYPE;[I)Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference;",
+          "access": 137,
+          "code_sha256": "9a3cacce343db25075d907a2365d07eec996cd7d8a6ddda790100d3d6836c9c3",
+          "code_length": 92
+        },
+        {
+          "name": "putElement",
+          "descriptor": "(Ljava/lang/Object;[I)V",
+          "access": 129,
+          "code_sha256": "e45e4c2b270f5dbf655de31ee2241233ff8c56305d0e6ec812746181e31e83d8",
+          "code_length": 873
+        },
+        {
+          "name": "getElement",
+          "descriptor": "([I)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "93651c1c3c133989784dbbe25445ee431012e11b0d78a23065f4abfed5ef16b7",
+          "code_length": 871
+        },
+        {
+          "name": "ptrOfIndex",
+          "descriptor": "([I)Lcom/sun/jna/Pointer;",
+          "access": 129,
+          "code_sha256": "feac5eca94b72058f5cb866a1045dd3936cf26a8000d489d60329713b37cc975",
+          "code_length": 70
+        },
+        {
+          "name": "destroy",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "403bb39b70ed430697db12093e6353c04fcb963b8fd35e3deb446cc28ddbff94",
+          "code_length": 15
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "47cb8a908ded5d87e5575bcde028fe19d722d9def3a7828275d9e2e616d68023",
+          "code_length": 5
+        },
+        {
+          "name": "getLBound",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "9a0bbb4e2b342bbe4f337947193f3d4f7f8b6ec31a58ff0b0532d50ca826d8a4",
+          "code_length": 49
+        },
+        {
+          "name": "getUBound",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "885c6b564aad17077dd7ce1b16cb5c1f632122d2e090a76ef01a81253e947cd8",
+          "code_length": 49
+        },
+        {
+          "name": "getDimensionCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "b81a0bb7cad0101e793bde96200930c0ae6bb8a5312a40f428b085189c1f0c19",
+          "code_length": 13
+        },
+        {
+          "name": "accessData",
+          "descriptor": "()Lcom/sun/jna/Pointer;",
+          "access": 1,
+          "code_sha256": "c4d78ed298018ac0bbfceaf451197363372701ac1e1ed26a8d8f6c20be1b2651",
+          "code_length": 28
+        },
+        {
+          "name": "unaccessData",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "45aa19f87e1c488864e491afc95a3854847d9bfee8b2935db082d6952ee0cf5d",
+          "code_length": 15
+        },
+        {
+          "name": "lock",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1dc5963ccf65b5b9c6d79f5bd50b7cf8a1aa1ea6cb0bc0348f194464c01c91f2",
+          "code_length": 15
+        },
+        {
+          "name": "unlock",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "ffa36488f126410de0b2450ab13c67a24b6bcbf35e73ab1deff01605d315e733",
+          "code_length": 15
+        },
+        {
+          "name": "redim",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "8b3f5238422229c956acd2e8d17438292cc3a9572670a3dc9373049f53e3323a",
+          "code_length": 24
+        },
+        {
+          "name": "getVarType",
+          "descriptor": "()Lcom/sun/jna/platform/win32/WTypes$VARTYPE;",
+          "access": 1,
+          "code_sha256": "196dcfce4957ba3fb898552277f0a8ad41008334d0c3fa8b4488ae6f8ac7f136",
+          "code_length": 28
+        },
+        {
+          "name": "getElemsize",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "44c903c6ab3d0ef8ea7fba2d52beaa2597e929e9a551a9f070c2f96e7a5fe561",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND;",
+        "[Lcom/sun/jna/platform/win32/WinDef$LONG;",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/COM/COMUtils",
+        "com/sun/jna/platform/win32/COM/Dispatch",
+        "com/sun/jna/platform/win32/COM/Unknown",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY",
+        "com/sun/jna/platform/win32/OaIdl$DATE",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+        "com/sun/jna/platform/win32/OleAuto",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VARIANT",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$BSTR",
+        "com/sun/jna/platform/win32/WTypes$VARTYPE",
+        "com/sun/jna/platform/win32/WTypes$VARTYPEByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONG",
+        "com/sun/jna/platform/win32/WinDef$LONGByReference",
+        "com/sun/jna/platform/win32/WinDef$PVOID",
+        "com/sun/jna/platform/win32/WinDef$SCODE",
+        "com/sun/jna/platform/win32/WinDef$UINT",
+        "com/sun/jna/platform/win32/WinDef$ULONG",
+        "com/sun/jna/platform/win32/WinDef$USHORT",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/io/Closeable",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Number",
+        "java/lang/Object",
+        "java/lang/Short",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "514d7f86c7989b5f0e9cc2d37f479d0749753058a04cdf656fe90ea4d4ac69d3",
+      "name": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND.class",
+      "occurrence": 0,
+      "sha256": "f102ccbd92edc11e0db04022b6b5ad360fb160ef175e7d84d2458874b7216935",
+      "name": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cElements",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "lLbound",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LONG;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "55d1f4e9457b52e7658f6c5eee552cd82a2b1b7a073f81cee8d9e9c6615de310",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LONG",
+        "com/sun/jna/platform/win32/WinDef$ULONG"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYByReference.class",
+      "occurrence": 0,
+      "sha256": "314bb4db75b6819ff6601ae9c33e83ddabf99565cb95a0053da7578368932f51",
+      "name": "com/sun/jna/platform/win32/OaIdl$SAFEARRAYByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [
+        {
+          "name": "pSAFEARRAY",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference;)V",
+          "access": 1,
+          "code_sha256": "94d055d9711e9f22b202d00c6a6c79a5a565941422abf562657033edd627b5c3",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SYSKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "2367fa3845cfaf905ff031d8c7231b3aa31109d68057d88ed59478e2f5b20fdd",
+      "name": "com/sun/jna/platform/win32/OaIdl$SYSKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$SYSKIND.class",
+      "occurrence": 0,
+      "sha256": "4bd3ff581cee019118b0959c209a12d8dfd289d6fe85239ac1a28b0d151f191d",
+      "name": "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "SYS_WIN16",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SYS_WIN32",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SYS_MAC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SYS_WIN64",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f171e6a7a5622d7feb5112a2f9913f6713f9cbf7a7e3557451c18114e9581692",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference.class",
+      "occurrence": 0,
+      "sha256": "f484b9629c51478d397263cf47e30895e5f94b86ba495fb2a10c26cc06422e85",
+      "name": "com/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$ScodeArg.class",
+      "occurrence": 0,
+      "sha256": "406f4b1be636f73a3b9499acd46d1ec6a5fea0bd00cea04641e44430088d5b2f",
+      "name": "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "scodeArg",
+          "descriptor": "[Lcom/sun/jna/platform/win32/WinDef$SCODE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "161a255e98b9f527ed83efbcdb43c0eecd4adb1c9fc201f9d4a1ac82ee422b16",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "009e2d86db1691aa5ac04756e04f365e69281c3fe64235219a8dad40287c1fef",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$SCODE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TLIBATTR$ByReference.class",
+      "occurrence": 0,
+      "sha256": "2693d79d79a7fc332223b656a8185845f77545e4dd87c3033a5c7bdd7ab9261a",
+      "name": "com/sun/jna/platform/win32/OaIdl$TLIBATTR$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$TLIBATTR",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TLIBATTR",
+        "com/sun/jna/platform/win32/OaIdl$TLIBATTR$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TLIBATTR.class",
+      "occurrence": 0,
+      "sha256": "ecfa8ca00cfa5f1f78e3dd1cc6b307ad69a4449678f9687712004b3c10756296",
+      "name": "com/sun/jna/platform/win32/OaIdl$TLIBATTR",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "guid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 1
+        },
+        {
+          "name": "lcid",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LCID;",
+          "access": 1
+        },
+        {
+          "name": "syskind",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$SYSKIND;",
+          "access": 1
+        },
+        {
+          "name": "wMajorVerNum",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wMinorVerNum",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wLibFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+        "com/sun/jna/platform/win32/OaIdl$TLIBATTR",
+        "com/sun/jna/platform/win32/OaIdl$TLIBATTR$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LCID",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEATTR$ByReference.class",
+      "occurrence": 0,
+      "sha256": "885e8719e2824959d4d4c263d9ebeae5265c588289c9dcc429d7a68b6c869ef6",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEATTR$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$TYPEATTR",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TYPEATTR",
+        "com/sun/jna/platform/win32/OaIdl$TYPEATTR$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEATTR.class",
+      "occurrence": 0,
+      "sha256": "6f57f580604bdb96111b459da5d0c70801408b0d11fd415e6ed7141f04c63928",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEATTR",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "guid",
+          "descriptor": "Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 1
+        },
+        {
+          "name": "lcid",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$LCID;",
+          "access": 1
+        },
+        {
+          "name": "dwReserved",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$DWORD;",
+          "access": 1
+        },
+        {
+          "name": "memidConstructor",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 1
+        },
+        {
+          "name": "memidDestructor",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 1
+        },
+        {
+          "name": "lpstrSchema",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$LPOLESTR;",
+          "access": 1
+        },
+        {
+          "name": "cbSizeInstance",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$ULONG;",
+          "access": 1
+        },
+        {
+          "name": "typekind",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$TYPEKIND;",
+          "access": 1
+        },
+        {
+          "name": "cFuncs",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "cVars",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "cImplTypes",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "cbSizeVft",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "cbAlignment",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wTypeFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wMajorVerNum",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "wMinorVerNum",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "tdescAlias",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC;",
+          "access": 1
+        },
+        {
+          "name": "idldescType",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$IDLDESC;",
+          "access": 1
+        },
+        {
+          "name": "TYPEFLAGS_FAPPOBJECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FCANCREATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FLICENSED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FPREDECLID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FHIDDEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FCONTROL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FDUAL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FNONEXTENSIBLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FOLEAUTOMATION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FRESTRICTED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FAGGREGATABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FREPLACEABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FDISPATCHABLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FREVERSEBIND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TYPEFLAGS_FPROXY",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "bd57fbbbd4b701b391dc056d8fdde260bfc1a4a3e964fb8de9e5b78f7a2670db",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+        "com/sun/jna/platform/win32/OaIdl$TYPEATTR",
+        "com/sun/jna/platform/win32/OaIdl$TYPEATTR$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$LPOLESTR",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$LCID",
+        "com/sun/jna/platform/win32/WinDef$ULONG",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "adb5128da69980d9a086cbdf6cd708a0b9e4b1c0bc2e83d0e9568d6a82a12478",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC.class",
+      "occurrence": 0,
+      "sha256": "bc354bf228c0828cf56d8740ec99a65f6da1177d7d9790ac5d0004f957315a21",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lptdesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "lpadesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ARRAYDESC$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "hreftype",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$HREFTYPE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1fffe7fd3cd897dffdda14fb86cc0ac7070b6d668e7a0aef557caf3551735236",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "2292559e2c7d98560ce24d8f71e0c0bade6b0ec7d2c0526cf5d9cf272ff208f1",
+          "code_length": 16
+        },
+        {
+          "name": "getLptdesc",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference;",
+          "access": 1,
+          "code_sha256": "83bf588135488bfc449b870d44d34ed3eeeeaeb3719d628dbacbd672f6483212",
+          "code_length": 15
+        },
+        {
+          "name": "getLpadesc",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$ARRAYDESC$ByReference;",
+          "access": 1,
+          "code_sha256": "fbb2ee2f798629cd50032ff7468c9df717e4cb506e0e991eae6e7ffab0a05879",
+          "code_length": 15
+        },
+        {
+          "name": "getHreftype",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$HREFTYPE;",
+          "access": 1,
+          "code_sha256": "d0769ac032eb1528c0352e03af02919b02661335f50c457b12142a0a2be66827",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ARRAYDESC",
+        "com/sun/jna/platform/win32/OaIdl$ARRAYDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPE",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEDESC.class",
+      "occurrence": 0,
+      "sha256": "727b325ec007747176566f7490a73f82df1aec667511c4a60c402fc4081cc6b6",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_typedesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC;",
+          "access": 1
+        },
+        {
+          "name": "vt",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$VARTYPE;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e607b2825be0b5d3b84a45346e08e0c1388a068eca0dff82ed79bf4726ea7cf4",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "76e54b9b7cff2a16c239269476e2650ae501551905ab7cf1fca57dec84ebbf8a",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC;Lcom/sun/jna/platform/win32/WTypes$VARTYPE;)V",
+          "access": 1,
+          "code_sha256": "b97d216eb58cdcc217b17c97ccea36990b18ed1690541044939a9f4a37700eba",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC$_TYPEDESC",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$VARTYPE"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "d00df53e6c257cb28508d7e29a57d5341484a4ac6a6dd90eea221df545504dd6",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$TYPEKIND;)V",
+          "access": 1,
+          "code_sha256": "6ad31e4cb2dd9cc7de761ff308b939a5d80ae913ed2f520bbde810822493945c",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$TYPEKIND.class",
+      "occurrence": 0,
+      "sha256": "2f56c350881f2112a86c3673d64a5ccce634083427fde6d69e6b40b1725e23b3",
+      "name": "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "TKIND_ENUM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_RECORD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_MODULE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_INTERFACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_DISPATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_COCLASS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_ALIAS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_UNION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "TKIND_MAX",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "f171e6a7a5622d7feb5112a2f9913f6713f9cbf7a7e3557451c18114e9581692",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "696dccac94029b45e71a73915658763500b67fbcb3f3b2cb92711c710410e3d9",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$VARDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC$ByReference.class",
+      "occurrence": 0,
+      "sha256": "7512c0aa523117a9c7175b40c091da6bb701a67e440a4bbf52606e744502afc5",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC.class",
+      "occurrence": 0,
+      "sha256": "e6b53ebd3fb6398e94b223e535c7f6b1a2337bfec306ff1b10adc6323bbb2477",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Union",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "oInst",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "lpvarValue",
+          "descriptor": "Lcom/sun/jna/platform/win32/Variant$VARIANT$ByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1fffe7fd3cd897dffdda14fb86cc0ac7070b6d668e7a0aef557caf3551735236",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "2292559e2c7d98560ce24d8f71e0c0bade6b0ec7d2c0526cf5d9cf272ff208f1",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT$ByReference;)V",
+          "access": 1,
+          "code_sha256": "6f9d07687660c130788fbaa70de323339155b6874bda8e2a626f2206a4cbcdaf",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/NativeLong;)V",
+          "access": 1,
+          "code_sha256": "980eed45d8b1d1ceb54d87b5c4a035541a5ff907cd7a13ef2b9f8f0ad6159f77",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Union",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC$ByReference",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VARIANT",
+        "com/sun/jna/platform/win32/Variant$VARIANT$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARDESC.class",
+      "occurrence": 0,
+      "sha256": "2027490ee44989e159cea4d8227ee62701a3e17eea8eb0f4e518ba9d2121abfe",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARDESC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "memid",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 1
+        },
+        {
+          "name": "lpstrSchema",
+          "descriptor": "Lcom/sun/jna/platform/win32/WTypes$LPOLESTR;",
+          "access": 1
+        },
+        {
+          "name": "_vardesc",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC;",
+          "access": 1
+        },
+        {
+          "name": "elemdescVar",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$ELEMDESC;",
+          "access": 1
+        },
+        {
+          "name": "wVarFlags",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$WORD;",
+          "access": 1
+        },
+        {
+          "name": "varkind",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$VARKIND;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "d22d80d8aa9cf07c492c50a725a69220a3544ebde1b28d0cf7d7e5fbe9da8b52",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC$_VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$LPOLESTR",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$WORD"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL.class",
+      "occurrence": 0,
+      "sha256": "b297809e8ca24e99dca275fba4be7c19d1ef712072ff383ce0ba0649abab85e3",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/IntegerType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "SIZE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "4121d7737dcbb1a21a56b6f4ba04fe60d5eac70c9e44fe6d1bcc4ca6a2aa90a1",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "f94389e4eaa19d390d879927956b53b394c8a9e3fd44b244a03cf38a2298ffc1",
+          "code_length": 16
+        },
+        {
+          "name": "booleanValue",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4533653dca9940783fa1b66c0a4181d9e1a8ded6a27caedf9a81993913be7f60",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/IntegerType",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOLByReference.class",
+      "occurrence": 0,
+      "sha256": "dc8d13984ee844d953dc4ed7de4e974e3d2b46ca9f08b3fe896d8e044315c7f5",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOLByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9245ebb977edface5bd85690889100d9eeccea8f803468694eaa6931d37f2716",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;)V",
+          "access": 1,
+          "code_sha256": "a30a504b9e177c386ade0ed12ef68998e43c25976a904fa9e482230557c178bd",
+          "code_length": 11
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;)V",
+          "access": 1,
+          "code_sha256": "30cb9864931408634b448af1488939a0b60596c74fecc405823cfa63d239b3a1",
+          "code_length": 13
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;",
+          "access": 1,
+          "code_sha256": "a58f6f7248ef55dd5dbd45ee898c0583cdcb7d7c4afd56b2bb49d9f731079585",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOLByReference",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARKIND$ByReference.class",
+      "occurrence": 0,
+      "sha256": "71a0160aeb772e4f61a90db2b8be6d6bc104ae0ca2deffabf742b8b33a70d2d4",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARKIND$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$VARKIND",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$VARKIND.class",
+      "occurrence": 0,
+      "sha256": "af4d09d2843475f935b70d285351aff428779a3ad67961dc77dc6669b55dc196",
+      "name": "com/sun/jna/platform/win32/OaIdl$VARKIND",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VAR_PERINSTANCE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VAR_STATIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VAR_CONST",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VAR_DISPATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "value",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "1d3d4b3aff4fdb4452f17e0f683075957641b3685b515542feef375f279513d3",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOL.class",
+      "occurrence": 0,
+      "sha256": "a53ad24838dd44746fd8aea42e75b1dddf4ea7b072eb718b0761d23b5bb3e2ca",
+      "name": "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOL",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+        "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOL"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOLByReference.class",
+      "occurrence": 0,
+      "sha256": "d4478733b3c5b019f789c764318a42043c1f5d05e49a9fde0f4265ab5fcf3f21",
+      "name": "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOLByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9245ebb977edface5bd85690889100d9eeccea8f803468694eaa6931d37f2716",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;)V",
+          "access": 1,
+          "code_sha256": "a30a504b9e177c386ade0ed12ef68998e43c25976a904fa9e482230557c178bd",
+          "code_length": 11
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;)V",
+          "access": 1,
+          "code_sha256": "30cb9864931408634b448af1488939a0b60596c74fecc405823cfa63d239b3a1",
+          "code_length": 13
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/win32/OaIdl$VARIANT_BOOL;",
+          "access": 1,
+          "code_sha256": "a58f6f7248ef55dd5dbd45ee898c0583cdcb7d7c4afd56b2bb49d9f731079585",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+        "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOLByReference",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdl.class",
+      "occurrence": 0,
+      "sha256": "1db5d210572b00138fcd33983c8765b0a83a6a2b3604c66ace591253e4512b1f",
+      "name": "com/sun/jna/platform/win32/OaIdl",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "DATE_OFFSET",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "DISPID_COLLECT",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_CONSTRUCTOR",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_DESTRUCTOR",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_EVALUATE",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_NEWENUM",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_PROPERTYPUT",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_UNKNOWN",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "DISPID_VALUE",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 25
+        },
+        {
+          "name": "MEMBERID_NIL",
+          "descriptor": "Lcom/sun/jna/platform/win32/OaIdl$MEMBERID;",
+          "access": 25
+        },
+        {
+          "name": "FADF_AUTO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_STATIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_EMBEDDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_FIXEDSIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_RECORD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_HAVEIID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_HAVEVARTYPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_BSTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_DISPATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_VARIANT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_RESERVED",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "71fa69374ad59b5fcb1d7ba4c4d1aa3ccc4897e143d6ef9a77969dafada839f5",
+          "code_length": 132
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$ARRAYDESC",
+        "com/sun/jna/platform/win32/OaIdl$BINDPTR",
+        "com/sun/jna/platform/win32/OaIdl$CALLCONV",
+        "com/sun/jna/platform/win32/OaIdl$CURRENCY",
+        "com/sun/jna/platform/win32/OaIdl$DATE",
+        "com/sun/jna/platform/win32/OaIdl$DECIMAL",
+        "com/sun/jna/platform/win32/OaIdl$DESCKIND",
+        "com/sun/jna/platform/win32/OaIdl$DISPID",
+        "com/sun/jna/platform/win32/OaIdl$DISPIDByReference",
+        "com/sun/jna/platform/win32/OaIdl$ELEMDESC",
+        "com/sun/jna/platform/win32/OaIdl$EXCEPINFO",
+        "com/sun/jna/platform/win32/OaIdl$ElemDescArg",
+        "com/sun/jna/platform/win32/OaIdl$FUNCDESC",
+        "com/sun/jna/platform/win32/OaIdl$FUNCKIND",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPE",
+        "com/sun/jna/platform/win32/OaIdl$HREFTYPEByReference",
+        "com/sun/jna/platform/win32/OaIdl$IDLDESC",
+        "com/sun/jna/platform/win32/OaIdl$INVOKEKIND",
+        "com/sun/jna/platform/win32/OaIdl$LIBFLAGS",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERID",
+        "com/sun/jna/platform/win32/OaIdl$MEMBERIDByReference",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESC",
+        "com/sun/jna/platform/win32/OaIdl$PARAMDESCEX",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYByReference",
+        "com/sun/jna/platform/win32/OaIdl$SYSKIND",
+        "com/sun/jna/platform/win32/OaIdl$ScodeArg",
+        "com/sun/jna/platform/win32/OaIdl$TLIBATTR",
+        "com/sun/jna/platform/win32/OaIdl$TYPEATTR",
+        "com/sun/jna/platform/win32/OaIdl$TYPEDESC",
+        "com/sun/jna/platform/win32/OaIdl$TYPEKIND",
+        "com/sun/jna/platform/win32/OaIdl$VARDESC",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOL",
+        "com/sun/jna/platform/win32/OaIdl$VARIANT_BOOLByReference",
+        "com/sun/jna/platform/win32/OaIdl$VARKIND",
+        "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOL",
+        "com/sun/jna/platform/win32/OaIdl$_VARIANT_BOOLByReference",
+        "java/lang/Object",
+        "java/util/Date"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OaIdlUtil.class",
+      "occurrence": 0,
+      "sha256": "ea2bb9d6b78937ff7e38a01d9a9753abd856559884fb9f420746ec5f5ece076d",
+      "name": "com/sun/jna/platform/win32/OaIdlUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "toPrimitiveArray",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Z)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "5a3dc5f0a1461da286e30aa5476897775dc26fc592dc7b1ba9f5965ab295cc66",
+          "code_length": 483
+        },
+        {
+          "name": "toPrimitiveArray",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;[I[II[I)V",
+          "access": 10,
+          "code_sha256": "5b11b192e3dd975866115ebfa6c7ba5021c12a92e77812dd81bfce856233211b",
+          "code_length": 830
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DATE",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdlUtil",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VARIANT",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$BSTR",
+        "com/sun/jna/platform/win32/WTypes$VARTYPE",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$SCODE",
+        "java/lang/Boolean",
+        "java/lang/Byte",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/Short",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Array"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/ObjBase.class",
+      "occurrence": 0,
+      "sha256": "6367f3bbac92deaf99f0c5312ed4f13e77c01e7801ff82e703eca1d3aa74965f",
+      "name": "com/sun/jna/platform/win32/ObjBase",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CLSCTX_INPROC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLSCTX_ALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CLSCTX_SERVER",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [],
+      "class_references": [
+        "com/sun/jna/platform/win32/ObjBase",
+        "com/sun/jna/platform/win32/WTypes",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Ole32.class",
+      "occurrence": 0,
+      "sha256": "1cb59f13a8f41f47e40fd56ba0d3182303af3859517fdcca0b13b0fb4005e215",
+      "name": "com/sun/jna/platform/win32/Ole32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Ole32;",
+          "access": 25
+        },
+        {
+          "name": "COINIT_APARTMENTTHREADED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COINIT_MULTITHREADED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COINIT_DISABLE_OLE1DDE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "COINIT_SPEED_OVER_MEMORY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RPC_C_AUTHN_LEVEL_DEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RPC_C_AUTHN_WINNT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RPC_C_IMP_LEVEL_IMPERSONATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RPC_C_AUTHZ_NONE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RPC_C_AUTHN_LEVEL_CALL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EOAC_NONE",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "CoCreateGuid",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "StringFromGUID2",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;[CI)I",
+          "access": 1025
+        },
+        {
+          "name": "IIDFromString",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/Guid$GUID;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoInitialize",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$LPVOID;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoInitializeEx",
+          "descriptor": "(Lcom/sun/jna/Pointer;I)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoInitializeSecurity",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$SECURITY_DESCRIPTOR;ILcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;IILcom/sun/jna/Pointer;ILcom/sun/jna/Pointer;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoSetProxyBlanket",
+          "descriptor": "(Lcom/sun/jna/platform/win32/COM/Unknown;IILcom/sun/jna/platform/win32/WTypes$LPOLESTR;IILcom/sun/jna/Pointer;I)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoUninitialize",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "CoCreateInstance",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;Lcom/sun/jna/Pointer;ILcom/sun/jna/platform/win32/Guid$GUID;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CLSIDFromProgID",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/Guid$CLSID$ByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CLSIDFromString",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/win32/Guid$CLSID$ByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoTaskMemAlloc",
+          "descriptor": "(J)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "CoTaskMemRealloc",
+          "descriptor": "(Lcom/sun/jna/Pointer;J)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "CoTaskMemFree",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1025
+        },
+        {
+          "name": "CoGetMalloc",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORD;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "GetRunningObjectTable",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORD;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CreateBindCtx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$DWORD;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "CoIsHandlerConnected",
+          "descriptor": "(Lcom/sun/jna/Pointer;)Z",
+          "access": 1025
+        },
+        {
+          "name": "OleInitialize",
+          "descriptor": "(Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "OleUninitialize",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "OleFlushClipboard",
+          "descriptor": "()Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "OleRun",
+          "descriptor": "(Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$CLSID",
+        "com/sun/jna/platform/win32/Guid$CLSID$ByReference",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/Ole32",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$LPOLESTR",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$DWORD",
+        "com/sun/jna/platform/win32/WinDef$LPVOID",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/platform/win32/WinNT$SECURITY_DESCRIPTOR",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Ole32Util.class",
+      "occurrence": 0,
+      "sha256": "2b3efaafd8a465b32b4825dad229aebfa55501dcb45c014c4420003962f2313c",
+      "name": "com/sun/jna/platform/win32/Ole32Util",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getGUIDFromString",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 9,
+          "code_sha256": "2bb1246b893273bbe2015294fdddd5f4fce5c6c9dc3c5e2286fcdf1c200496f5",
+          "code_length": 43
+        },
+        {
+          "name": "getStringFromGUID",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "496faf8c71d6bf27b7fbdd360cea093d23e947a9f95f4370c507a1aeaaa16a4d",
+          "code_length": 59
+        },
+        {
+          "name": "generateGUID",
+          "descriptor": "()Lcom/sun/jna/platform/win32/Guid$GUID;",
+          "access": 9,
+          "code_sha256": "ced6a98b65720982110aa953fbb85d0b7914b1657efa66d0c89dce8944013abd",
+          "code_length": 42
+        }
+      ],
+      "class_references": [
+        "[C",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/Ole32",
+        "com/sun/jna/platform/win32/Ole32Util",
+        "com/sun/jna/platform/win32/W32Errors",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "java/lang/Object",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OleAuto$DISPPARAMS$ByReference.class",
+      "occurrence": 0,
+      "sha256": "bb8445212d4993d34808a0f3e4c0cdaa030fdc6a8cbe8503a0eca5e592674beb",
+      "name": "com/sun/jna/platform/win32/OleAuto$DISPPARAMS$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/win32/OleAuto$DISPPARAMS",
+      "interfaces": [
+        "com/sun/jna/Structure$ByReference"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$ByReference",
+        "com/sun/jna/platform/win32/OleAuto",
+        "com/sun/jna/platform/win32/OleAuto$DISPPARAMS",
+        "com/sun/jna/platform/win32/OleAuto$DISPPARAMS$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OleAuto$DISPPARAMS.class",
+      "occurrence": 0,
+      "sha256": "95a3062cd7f6f8383d80998252bdaf87bbc991a5779b141186ea4d1e55629375",
+      "name": "com/sun/jna/platform/win32/OleAuto$DISPPARAMS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rgvarg",
+          "descriptor": "Lcom/sun/jna/platform/win32/Variant$VariantArg$ByReference;",
+          "access": 1
+        },
+        {
+          "name": "rgdispidNamedArgs",
+          "descriptor": "Lcom/sun/jna/Pointer;",
+          "access": 1
+        },
+        {
+          "name": "cArgs",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1
+        },
+        {
+          "name": "cNamedArgs",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "getRgdispidNamedArgs",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+          "access": 1,
+          "code_sha256": "211199d36a6de97d23eac70f5df501857c459a8707e75536f0fd7b61003754b0",
+          "code_length": 76
+        },
+        {
+          "name": "setRgdispidNamedArgs",
+          "descriptor": "([Lcom/sun/jna/platform/win32/OaIdl$DISPID;)V",
+          "access": 1,
+          "code_sha256": "abfb3918162e9d1f9a837ce4e9cef56b9fc7a21a16c137196d612d2ba3268a10",
+          "code_length": 82
+        },
+        {
+          "name": "getArgs",
+          "descriptor": "()[Lcom/sun/jna/platform/win32/Variant$VARIANT;",
+          "access": 1,
+          "code_sha256": "dba656f2ff984ee1eb440aa402a3f202d015545ad115a8d2496c9d7001aa6a82",
+          "code_length": 34
+        },
+        {
+          "name": "setArgs",
+          "descriptor": "([Lcom/sun/jna/platform/win32/Variant$VARIANT;)V",
+          "access": 1,
+          "code_sha256": "ddd901d7b545943d4c2ee6be84260166dc47029eb6d3a9d3ab19bbcd046103ce",
+          "code_length": 36
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "35fdfc158bfd005bfd802e198801bb74dbbe0e17578fc2a67c8a66ee2d5902d5",
+          "code_length": 36
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "15a5415a7e4deeab43c0c6497499d670a8148dd3586dc421cd6c056b9d725a77",
+          "code_length": 41
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Lcom/sun/jna/platform/win32/OaIdl$DISPID;",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$DISPID",
+        "com/sun/jna/platform/win32/OleAuto",
+        "com/sun/jna/platform/win32/OleAuto$DISPPARAMS",
+        "com/sun/jna/platform/win32/OleAuto$DISPPARAMS$ByReference",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VARIANT",
+        "com/sun/jna/platform/win32/Variant$VariantArg",
+        "com/sun/jna/platform/win32/Variant$VariantArg$ByReference",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$UINT"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OleAuto.class",
+      "occurrence": 0,
+      "sha256": "ab34e16616b20a97fe28c2ec83095d8cd49026aea489dd9064cc57c99969ce3d",
+      "name": "com/sun/jna/platform/win32/OleAuto",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/OleAuto;",
+          "access": 25
+        },
+        {
+          "name": "DISPATCH_METHOD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPATCH_PROPERTYGET",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPATCH_PROPERTYPUT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DISPATCH_PROPERTYPUTREF",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_AUTO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_STATIC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_EMBEDDED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_FIXEDSIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_RECORD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_HAVEIID",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_HAVEVARTYPE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_BSTR",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_UNKNOWN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_DISPATCH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_VARIANT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "FADF_RESERVED",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_NOVALUEPROP",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_ALPHABOOL",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_NOUSEROVERRIDE",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_CALENDAR_HIJRI",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_LOCALBOOL",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_CALENDAR_THAI",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_CALENDAR_GREGORIAN",
+          "descriptor": "S",
+          "access": 25
+        },
+        {
+          "name": "VARIANT_USE_NLS",
+          "descriptor": "S",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "SysAllocString",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/win32/WTypes$BSTR;",
+          "access": 1025
+        },
+        {
+          "name": "SysFreeString",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WTypes$BSTR;)V",
+          "access": 1025
+        },
+        {
+          "name": "SysStringByteLen",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WTypes$BSTR;)I",
+          "access": 1025
+        },
+        {
+          "name": "SysStringLen",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WTypes$BSTR;)I",
+          "access": 1025
+        },
+        {
+          "name": "VariantInit",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT$ByReference;)V",
+          "access": 1025
+        },
+        {
+          "name": "VariantInit",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT;)V",
+          "access": 1025
+        },
+        {
+          "name": "VariantCopy",
+          "descriptor": "(Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/win32/Variant$VARIANT;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "VariantClear",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "VariantChangeType",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT;Lcom/sun/jna/platform/win32/Variant$VARIANT;SLcom/sun/jna/platform/win32/WTypes$VARTYPE;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "VariantChangeType",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Variant$VARIANT$ByReference;Lcom/sun/jna/platform/win32/Variant$VARIANT$ByReference;SLcom/sun/jna/platform/win32/WTypes$VARTYPE;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayCreate",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WTypes$VARTYPE;Lcom/sun/jna/platform/win32/WinDef$UINT;[Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND;)Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayPutElement",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;[Lcom/sun/jna/platform/win32/WinDef$LONG;Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetUBound",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Lcom/sun/jna/platform/win32/WinDef$UINT;Lcom/sun/jna/platform/win32/WinDef$LONGByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetLBound",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Lcom/sun/jna/platform/win32/WinDef$UINT;Lcom/sun/jna/platform/win32/WinDef$LONGByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetElement",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;[Lcom/sun/jna/platform/win32/WinDef$LONG;Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayPtrOfIndex",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;[Lcom/sun/jna/platform/win32/WinDef$LONG;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayLock",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayUnlock",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayDestroy",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayRedim",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetVartype",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Lcom/sun/jna/platform/win32/WTypes$VARTYPEByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetDim",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayAccessData",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayUnaccessData",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SafeArrayGetElemsize",
+          "descriptor": "(Lcom/sun/jna/platform/win32/OaIdl$SAFEARRAY;)Lcom/sun/jna/platform/win32/WinDef$UINT;",
+          "access": 1025
+        },
+        {
+          "name": "GetActiveObject",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;Lcom/sun/jna/platform/win32/WinDef$PVOID;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "LoadRegTypeLib",
+          "descriptor": "(Lcom/sun/jna/platform/win32/Guid$GUID;IILcom/sun/jna/platform/win32/WinDef$LCID;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "LoadTypeLib",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/ptr/PointerByReference;)Lcom/sun/jna/platform/win32/WinNT$HRESULT;",
+          "access": 1025
+        },
+        {
+          "name": "SystemTimeToVariantTime",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinBase$SYSTEMTIME;Lcom/sun/jna/ptr/DoubleByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "VariantTimeToSystemTime",
+          "descriptor": "(DLcom/sun/jna/platform/win32/WinBase$SYSTEMTIME;)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/Guid",
+        "com/sun/jna/platform/win32/Guid$GUID",
+        "com/sun/jna/platform/win32/OaIdl",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAY$ByReference",
+        "com/sun/jna/platform/win32/OaIdl$SAFEARRAYBOUND",
+        "com/sun/jna/platform/win32/OleAuto",
+        "com/sun/jna/platform/win32/OleAuto$DISPPARAMS",
+        "com/sun/jna/platform/win32/Variant",
+        "com/sun/jna/platform/win32/Variant$VARIANT",
+        "com/sun/jna/platform/win32/Variant$VARIANT$ByReference",
+        "com/sun/jna/platform/win32/WTypes",
+        "com/sun/jna/platform/win32/WTypes$BSTR",
+        "com/sun/jna/platform/win32/WTypes$VARTYPE",
+        "com/sun/jna/platform/win32/WTypes$VARTYPEByReference",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$SYSTEMTIME",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$LCID",
+        "com/sun/jna/platform/win32/WinDef$LONG",
+        "com/sun/jna/platform/win32/WinDef$LONGByReference",
+        "com/sun/jna/platform/win32/WinDef$PVOID",
+        "com/sun/jna/platform/win32/WinDef$UINT",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HRESULT",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OpenGL32.class",
+      "occurrence": 0,
+      "sha256": "d67bb9b99f07d6ba9501e100b995e968413203091f98eaea819ea701f31577fc",
+      "name": "com/sun/jna/platform/win32/OpenGL32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/OpenGL32;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "glGetString",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "wglCreateContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HDC;)Lcom/sun/jna/platform/win32/WinDef$HGLRC;",
+          "access": 1025
+        },
+        {
+          "name": "wglGetCurrentContext",
+          "descriptor": "()Lcom/sun/jna/platform/win32/WinDef$HGLRC;",
+          "access": 1025
+        },
+        {
+          "name": "wglMakeCurrent",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HDC;Lcom/sun/jna/platform/win32/WinDef$HGLRC;)Z",
+          "access": 1025
+        },
+        {
+          "name": "wglDeleteContext",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HGLRC;)Z",
+          "access": 1025
+        },
+        {
+          "name": "wglGetProcAddress",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/OpenGL32",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HDC",
+        "com/sun/jna/platform/win32/WinDef$HGLRC",
+        "com/sun/jna/win32/StdCallLibrary",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/OpenGL32Util.class",
+      "occurrence": 0,
+      "sha256": "95fe606fea875b08745a589bc8deec33646088afe93173a1678975948f2a4396",
+      "name": "com/sun/jna/platform/win32/OpenGL32Util",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "wglGetProcAddress",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/Function;",
+          "access": 9,
+          "code_sha256": "f4979abe4d199ca6331dc672f7b3ec18e2cdefd98d9bdb9909a146e3dfb40677",
+          "code_length": 23
+        },
+        {
+          "name": "countGpusNV",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "c18d56f251fc466f249363c8c1fc85e8d18ee11e5e2ab8d37e449efe5aa59b15",
+          "code_length": 236
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Function",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/win32/GDI32",
+        "com/sun/jna/platform/win32/OpenGL32",
+        "com/sun/jna/platform/win32/OpenGL32Util",
+        "com/sun/jna/platform/win32/User32",
+        "com/sun/jna/platform/win32/User32Util",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HDC",
+        "com/sun/jna/platform/win32/WinDef$HGLRC",
+        "com/sun/jna/platform/win32/WinDef$HGLRCByReference",
+        "com/sun/jna/platform/win32/WinDef$HINSTANCE",
+        "com/sun/jna/platform/win32/WinDef$HMENU",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinDef$LPVOID",
+        "com/sun/jna/platform/win32/WinGDI",
+        "com/sun/jna/platform/win32/WinGDI$PIXELFORMATDESCRIPTOR",
+        "com/sun/jna/platform/win32/WinGDI$PIXELFORMATDESCRIPTOR$ByReference",
+        "java/lang/Boolean",
+        "java/lang/Integer",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Pdh$PDH_COUNTER_PATH_ELEMENTS.class",
+      "occurrence": 0,
+      "sha256": "49ce8f62e625f8f54ae6acf202f9287ac2ffc4abf6acfc1e4445a2dadf2f0095",
+      "name": "com/sun/jna/platform/win32/Pdh$PDH_COUNTER_PATH_ELEMENTS",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "szMachineName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "szObjectName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "szInstanceName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "szParentInstance",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "dwInstanceIndex",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "szCounterName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Pdh",
+        "com/sun/jna/platform/win32/Pdh$PDH_COUNTER_PATH_ELEMENTS"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/win32/Pdh$PDH_RAW_COUNTER.class",
+      "occurrence": 0,
+      "sha256": "fe3da1cebedc134945c944dc8578b2be06dc74b84c9ca5f2956cb6c6becb63fc",
+      "name": "com/sun/jna/platform/win32/Pdh$PDH_RAW_COUNTER",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CStatus",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "TimeStamp",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinBase$FILETIME;",
+          "access": 1
+        },
+        {
+          "name": "FirstValue",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "SecondValue",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "MultiCount",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/win32/Pdh",
+        "com/sun/jna/platform/win32/Pdh$PDH_RAW_COUNTER",
+        "com/sun/jna/platform/win32/WinBase",
+        "com/sun/jna/platform/win32/WinBase$FILETIME"
+      ]
+    }
+  ]
+}

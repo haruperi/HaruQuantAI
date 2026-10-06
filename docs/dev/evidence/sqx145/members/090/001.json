@@ -1,0 +1,1967 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.jar",
+  "archive_sha256": "e144b9e11b70d2c0090ab0ccf32432e78f8311910f31b6a304d9cb90a2e02e17",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AnnotationReflectionHelper.class",
+      "occurrence": 0,
+      "sha256": "3c1f92826b7c0746ed8624c22e2ed3f5f4c86e63450318868d3355ef99e2e69c",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AnnotationReflectionHelper",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "forNameOrNull",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 9,
+          "code_sha256": "27d7f939c903756485548beec04cfe1796bd563956a055bd7578919bf4e11030",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/ClassLoader;Ljava/lang/String;)Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;"
+        },
+        {
+          "name": "bindAnnotationElementMethod",
+          "descriptor": "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/util/function/Function;",
+          "access": 9,
+          "code_sha256": "1ae025984f3f8d03d78659a5bd66606a67d1a933c623986e732342fa0af923f0",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Throwable"
+          ],
+          "generic_signature": "<A::Ljava/lang/annotation/Annotation;T:Ljava/lang/Object;>(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/Class<+Ljava/lang/annotation/Annotation;>;Ljava/lang/String;Ljava/lang/Class<TT;>;)Ljava/util/function/Function<TA;TT;>;"
+        },
+        {
+          "name": "lambda$bindAnnotationElementMethod$0",
+          "descriptor": "(Ljava/lang/invoke/MethodHandle;Ljava/lang/annotation/Annotation;)Ljava/lang/Object;",
+          "access": 4106,
+          "code_sha256": "15b9962e2325faae23da356b06e3ee2b42c4eb65d9ccd2df3f499e44ffadf6fc",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AnnotationReflectionHelper",
+        "java/lang/Class",
+        "java/lang/ClassCastException",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/annotation/Annotation",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandle",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/invoke/MethodType"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding.class",
+      "occurrence": 0,
+      "sha256": "fafb8ee7ef7d799e410f5b2a9c66e1d9110aae693c5d464f0e3fb9832e689465",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "apply",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1.class",
+      "occurrence": 0,
+      "sha256": "27d149d8efde6d119b7060731f78cd7ee3d34fb8f7481829e8a1b7c76de4e4a9",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[I",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([I)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "220e2f813a145f622f02253ecae4d525f19694106061c09ba696af5c220cbbba",
+          "code_length": 11
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Long;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1",
+        "java/lang/Long",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2.class",
+      "occurrence": 0,
+      "sha256": "4e3c8e19e20ad12b912f4f2032591ff2e49d8ebebb21293d2cbca6f804a6010e",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[Ljava/lang/Integer;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Integer;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "f1164447bc6cea6f65c556a386c2dd5d035f793a3eeb30dc836bf340a0e0a741",
+          "code_length": 23
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "961a13151a96c518fae83f90d43bf2ad3910bc5636318010567fd2d4647ad3b8",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Long;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3.class",
+      "occurrence": 0,
+      "sha256": "74e6a93ef6b3294f2ae90d5799549970bea54edda092f9ce187726e9d063ce05",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[J",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([J)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "6eab2ca5a9a185cce0a5d0ef08abfbdc8364bc2af4ebb91ba28237a11ad9143b",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Long;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3",
+        "java/lang/Long",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4.class",
+      "occurrence": 0,
+      "sha256": "c85ea815d812985b40b3407697a084a9256a60ebf6694824a0301e7f19abb64e",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[F",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([F)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "dba04a60455620518aa734009dc0e75ccde4de34637ed79769c4d872c6e2fc4d",
+          "code_length": 11
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Double;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4",
+        "java/lang/Double",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5.class",
+      "occurrence": 0,
+      "sha256": "7515f4bff7dd4ffd02ac6c8a33b9244f8258f2b19427c4c102271805a4117adc",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[Ljava/lang/Float;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Float;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "f1164447bc6cea6f65c556a386c2dd5d035f793a3eeb30dc836bf340a0e0a741",
+          "code_length": 23
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "961a13151a96c518fae83f90d43bf2ad3910bc5636318010567fd2d4647ad3b8",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Double;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6.class",
+      "occurrence": 0,
+      "sha256": "bf1e20a224570325eefc04c681f5bf590d5937e78ef8f4dc9b785a699a66f1ea",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[D",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([D)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "fc7edb590ef033f2939886a7c74e208fce69ac0f3545397d4556cab63db7f0c8",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Double;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6",
+        "java/lang/Double",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7.class",
+      "occurrence": 0,
+      "sha256": "3e64126fcccd059fa0eefcdfff37104159584431a6ff1caac7930a91474c21f5",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[Z",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Z)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "236c46abc3a57d670765ac9c0c3380bb68263d726f4ec03f819b3c7f3ce8f218",
+          "code_length": 10
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/Boolean;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7",
+        "java/lang/Boolean",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8.class",
+      "occurrence": 0,
+      "sha256": "8885f14057beb1b028405d17c9b7d614df7ee55148c6c6bec276b4dfd8bfdd88",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$array",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1988ccec2df06dd6ab002ff7af8890b3ad631a671064a58face063d4de45d2c9",
+          "code_length": 20
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ecf18576ba15bac8355b83aae93bdefa8d88990cdc62cb419c925b7986b37c",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "aada7c05f97f812e41a8948d15cf4fbcb2c170696cd4eb2080154cf85bb4d120",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<Ljava/lang/String;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/AbstractList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9.class",
+      "occurrence": 0,
+      "sha256": "56ec3fa6b850f483a3482ff01287b1887c2a0c0f949c5ed978c741627872cbbc",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/util/AbstractList",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$list",
+          "descriptor": "Ljava/util/List;",
+          "access": 4112
+        },
+        {
+          "name": "val$mapping",
+          "descriptor": "Ljava/util/function/Function;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;Ljava/util/function/Function;)V",
+          "access": 0,
+          "code_sha256": "77ae0877894dfc92c0c70c59c0291f12dd76b3e35be8ab6e1bc3402297af584f",
+          "code_length": 15
+        },
+        {
+          "name": "get",
+          "descriptor": "(I)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c67f4e35780b1403a7ad4408a4e5b4fb3b320ebf6fad423feb251c50ec806897",
+          "code_length": 30,
+          "generic_signature": "(I)TU;"
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "f4a50d98029f43adfdf24c9003660d14c6e94f494433ec92b3f7ada6eab45bf4",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/util/AbstractList<TU;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9",
+        "java/lang/Object",
+        "java/util/AbstractList",
+        "java/util/List",
+        "java/util/function/Function"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory.class",
+      "occurrence": 0,
+      "sha256": "d421d0881032ae714cf43fd614058077c5e9bcf1dd644a104a904880b04cf5af",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createBinding",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 8,
+          "code_sha256": "c6e3faa1c2581ca7a5b728ff9104d83125f5151c170815b771fce717ec27a5a0",
+          "code_length": 182
+        },
+        {
+          "name": "isArrayType",
+          "descriptor": "(Ljava/lang/reflect/Type;)Z",
+          "access": 10,
+          "code_sha256": "6dd6e38b9aa501be50e81b3a395cf435795eabe24838a301c2a560259e3e1a12",
+          "code_length": 17
+        },
+        {
+          "name": "resolveListComponentType",
+          "descriptor": "(Ljava/lang/reflect/Type;)Ljava/util/Optional;",
+          "access": 10,
+          "code_sha256": "9afd4edda12ca4fcb278cbfa12f986af96fde3eb4d46e2355299a291d193b749",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/reflect/Type;)Ljava/util/Optional<Ljava/lang/reflect/Type;>;"
+        },
+        {
+          "name": "arrayBinding",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "8c76633544477234a6daf6c05f480543fd53e44f3c69f2d69b7dc703fa5352bd",
+          "code_length": 154
+        },
+        {
+          "name": "listBinding",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "a013193c0dc726cb32408dd84d07608573311d7088cb24b83a9fd2b092b9bd98",
+          "code_length": 119
+        },
+        {
+          "name": "intArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "54bf21db41d656bafd19fab34abc28f0e16d1ea7fe4ca97ea7670e8e8e740dd5",
+          "code_length": 12
+        },
+        {
+          "name": "boxedIntegerArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "c7202e945cbb28dd50a76ff39effcbc1ef3347f42b6c3e0e625b9d711f14d399",
+          "code_length": 12
+        },
+        {
+          "name": "longArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "909249bcbf3f03f2048c9c43af9982bb711a4fd0e5ad8c77103e582f211e942e",
+          "code_length": 12
+        },
+        {
+          "name": "floatArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "451f0655863a11c9f2d197d37766349d3fd9f00f99a21424095674fd19e15fc2",
+          "code_length": 12
+        },
+        {
+          "name": "boxedFloatArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "637b49caf85110c5fa649049853a85a4083151ffe56bbbcaa492ade929fc5264",
+          "code_length": 12
+        },
+        {
+          "name": "doubleArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "11a30cc4b0ab47344041ecbd4c514f5edf475877a8e9032a6498fbfc46056bc6",
+          "code_length": 12
+        },
+        {
+          "name": "booleanArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "3020f3c7f526abd5971c9555809f2e259174e128880d45b7f460d80bf6deb158",
+          "code_length": 12
+        },
+        {
+          "name": "defaultArrayBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "8afb2c8dd9581db1cfc2f7f3db1dff18bfbf8001dce7f0955e71bf5366fe494d",
+          "code_length": 12
+        },
+        {
+          "name": "mappedListBinding",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Ljava/util/function/Function;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "8837811834f409c1597d5e6c91c49ca87e6cf3267f0ce68d2ce1a5939e7842a0",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(Lio/opentelemetry/api/common/AttributeKey<Ljava/util/List<TU;>;>;Ljava/util/function/Function<TT;TU;>;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;"
+        },
+        {
+          "name": "defaultListBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "04f9561bdc76025c43b5cebf02ccc48c00aeb30b699c727f066d0b78db8b4e55",
+          "code_length": 15
+        },
+        {
+          "name": "defaultBinding",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 10,
+          "code_sha256": "f46cdd4fccf392033233a0fd966fa824f9a5bf3dd377d29d656a89551be51a10",
+          "code_length": 12
+        },
+        {
+          "name": "lambda$defaultBinding$26",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "c9e8d512845d00f368496ac9db96585e5bfb3e848f43e1f4c2631f0cb6650045",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$mappedListBinding$25",
+          "descriptor": "(Ljava/util/function/Function;Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "63db0bec01bdeee77f9ff8e3a4109b5fcb101aea9ce2f967958034c06ba183c4",
+          "code_length": 29
+        },
+        {
+          "name": "lambda$defaultArrayBinding$24",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "9d8af055cf9e3fd69fecd33b80c7a4e0676ebfeca0294245ddc2380f0ca8bb3e",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$booleanArrayBinding$23",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "dca4f04a2ed5d745307e779c3f3fdf674a1d5596ac3ab2aca5510fad4849cc45",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$doubleArrayBinding$22",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "dc6e6d86ff429c62b4b0f5412c3d32c4b17093abf6201722490927a576ad4e98",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$boxedFloatArrayBinding$21",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "42ad7657f588ce416b351c8422794e371976b56264071dae3207d8166b1e8f1d",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$floatArrayBinding$20",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "94c07976821f0c1b9d02c6e0a9718075bc788f883b2bd81f1d4b1a8b45720df0",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$longArrayBinding$19",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "7ea52bd7f1f383bdfaa2e9a602bb778fb10e3718ac29f6edd42504c34c734dd4",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$boxedIntegerArrayBinding$18",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "24e60e86953afae515fba1827693c15c3525de069de7df5c75d871d068035e8f",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$intArrayBinding$17",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "2fe86bff6d0e5bbe47c18a72ff189b30ae3abd518fd1a8fda291ccdf25758e57",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$listBinding$16",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "e5f1829a1d534f312812b0706a13dae24e5dec8f1711dc95a87938edf5710c71",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$listBinding$15",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "e5f1829a1d534f312812b0706a13dae24e5dec8f1711dc95a87938edf5710c71",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$listBinding$14",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "e5f1829a1d534f312812b0706a13dae24e5dec8f1711dc95a87938edf5710c71",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$listBinding$13",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "e5f1829a1d534f312812b0706a13dae24e5dec8f1711dc95a87938edf5710c71",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$arrayBinding$12",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "7dfc8231b40945cbcda2a7bab6920fe68c4f570749ae60756f8d05c91f5c4098",
+          "code_length": 16
+        },
+        {
+          "name": "lambda$arrayBinding$11",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "426aed6f3aad762a78a8d8ba6ed70f6b74fd7c4efb68c9424801485d493a52a2",
+          "code_length": 16
+        },
+        {
+          "name": "lambda$arrayBinding$10",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "c8834afa72be3605c90847224b1bc24013d5ed83973f956f7f403a17c970541f",
+          "code_length": 16
+        },
+        {
+          "name": "lambda$arrayBinding$9",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "f1094d2f1cbf26823fe1cd460aaddc7ae0682575830efbafa85f28fd5aa70696",
+          "code_length": 16
+        },
+        {
+          "name": "lambda$resolveListComponentType$8",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;)Ljava/lang/reflect/Type;",
+          "access": 4106,
+          "code_sha256": "ba5a0c8bda93c66fd89cbb450a09b44da13518ac8987d2848077f8fa27a5a84c",
+          "code_length": 7
+        },
+        {
+          "name": "lambda$createBinding$7",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 4106,
+          "code_sha256": "0d312c78e31b5793c1d6c5bfbfca7746228cce2dc928e3bd802ffdc8f7f988bf",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$createBinding$6",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 4106,
+          "code_sha256": "05d260e44168079ccabcec47c3c2a1075436a3dce880e0227a6cd7e57a0fb5b7",
+          "code_length": 6
+        },
+        {
+          "name": "lambda$createBinding$5",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "7576462677ca6efd48e59a84bceb1a3506a1eb9614007f3ae85a69b7678d8aa5",
+          "code_length": 19
+        },
+        {
+          "name": "lambda$createBinding$4",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "213580be4428f6314d0ceed277cb01485629288a55d15c1019986172f97d52da",
+          "code_length": 19
+        },
+        {
+          "name": "lambda$createBinding$3",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "5f962875f9dbd770296cf12449a73e827a1eb2fb5507e82c93730b991fd587ad",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$createBinding$2",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "b19bc09bf66efef5bdd06bc87563e655bb3f480e8f75cfde02b08459acaeacd4",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$createBinding$1",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "f78d7b1df08232ec89572b5a06fd61b9fc11587073ed1855457257315381315c",
+          "code_length": 13
+        },
+        {
+          "name": "lambda$createBinding$0",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributeKey;Lio/opentelemetry/api/common/AttributesBuilder;Ljava/lang/Object;)V",
+          "access": 4106,
+          "code_sha256": "376148278335e1d5984cdcfcd27b0f5dfe1ea3cfb07291634edb6ed5b402ded4",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "[D",
+        "[F",
+        "[I",
+        "[J",
+        "[Ljava/lang/Boolean;",
+        "[Ljava/lang/Double;",
+        "[Ljava/lang/Float;",
+        "[Ljava/lang/Integer;",
+        "[Ljava/lang/Long;",
+        "[Ljava/lang/Object;",
+        "[Ljava/lang/String;",
+        "[Z",
+        "io/opentelemetry/api/common/AttributeKey",
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$1",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$2",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$3",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$4",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$5",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$6",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$7",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$8",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory$9",
+        "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Float",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Arrays",
+        "java/util/List",
+        "java/util/Optional"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "6841e5896a2852ee87cd6d10378424c8e0444a468a305a5a2ce6f607538a5cf7",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+      "major": 52,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;[Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "bind",
+          "descriptor": "(Ljava/lang/reflect/Method;Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;",
+          "access": 9,
+          "code_sha256": "0ca4bf14e0f6ffd03d5bf6bffe7264504339cec370b892114241f6e705ca4bff",
+          "code_length": 109
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "[Ljava/lang/reflect/Parameter;",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindingFactory",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/Method",
+        "java/lang/reflect/Parameter"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "3b7fbca4891c78fda71b76aad1bd6685b0440805de07294249820abfd02be326",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings"
+      ],
+      "fields": [
+        {
+          "name": "parent",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;",
+          "access": 18
+        },
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "binding",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;ILio/opentelemetry/instrumentation/api/annotation/support/AttributeBinding;)V",
+          "access": 1,
+          "code_sha256": "6c91de324dce0b215f4702129514bf16abbf97c6562d30111042e6fea85e8d0d",
+          "code_length": 20
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;[Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "cf50818bf3dd4783917715d54f465a0059a7925324731be3e9424f5383a62a42",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBinding",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/CombinedAttributeBindings",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings.class",
+      "occurrence": 0,
+      "sha256": "b605b203fe3692b81bd900b5a9365b8ce0996b4b4f3faa2f44a4481329a9498c",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+          "access": 9,
+          "code_sha256": "e6257d33773ffb7a33735e3283315933ca226af36ab1aeb9b4b1f1c00db0eed1",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+          "access": 9,
+          "code_sha256": "6778b0d75fb932b92a5cabe69e8c0ce33bf7fd6ef8a39545faa3ebc77a61f7db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "898f5d3f85cf0aa77bdce22f0650c1270e9828b23c7412d06714f8d67d05db4f",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;[Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+          "access": 4106,
+          "code_sha256": "9d4cc08a9068864ff64558fd2437c387fea506d39f3dec1d29c434e43f2b9833",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "057f971812ca91d7908fbfc49eb6dd129708edc4c836c28a7780b7ce01bc1d42",
+          "code_length": 20
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;>;Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;",
+      "class_references": [
+        "[Lio/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings;",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/EmptyAttributeBindings",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor.class",
+      "occurrence": 0,
+      "sha256": "033d5d630ea664841f87f51119e05f69b86b94719e341926693ba5eeb2dad72c",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/Object;)[Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TREQUEST;)[Ljava/lang/Object;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodCache.class",
+      "occurrence": 0,
+      "sha256": "1a865640c15887d436441edb7e30c2b6cae68b3e3fb10349e0bbbd905bf30f94",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/MethodCache",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/ClassValue",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/internal/cache/Cache"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "computeIfAbsent",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/util/function/Function;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c5cf34ca434210c5586f152a81eb71b0b7660be4f32e0581245e7eaeff45aceb",
+          "code_length": 19,
+          "generic_signature": "(Ljava/lang/reflect/Method;Ljava/util/function/Function<-Ljava/lang/reflect/Method;+TV;>;)TV;"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/reflect/Method;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "973d51c052b4ee77bd20b6cae72e58a3ecaec5134a7a718d6c5d9a8d5a0ddf61",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/reflect/Method;)TV;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "e356bdbf12c5c4c432f0145a6510032d71ccd295cc60c305e1544ced63f368fb",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/reflect/Method;TV;)V"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/reflect/Method;)V",
+          "access": 1,
+          "code_sha256": "eac6c87555c71e9866f872df654a500e56b6ed4a6cdfe0bca7b064e88632f61e",
+          "code_length": 19
+        },
+        {
+          "name": "computeValue",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Map;",
+          "access": 4,
+          "code_sha256": "7658b8243a0092c4eb10fa2281488207a7cac2c54139dc70cb9f846f9653734b",
+          "code_length": 8,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Map<Ljava/lang/reflect/Method;TV;>;"
+        },
+        {
+          "name": "computeValue",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "96b82a9ad4c5becb267588b69ffa94b10c41c329f10e669fba11324a9a087728",
+          "code_length": 6
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "f0acefe4a71204a82b8f69a9aa56a4730d0b0359cd44625d7ba428e6a05cdae8",
+          "code_length": 9
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4161,
+          "code_sha256": "e5ac8deb01f0beb5d6179e1cca3d411b06d5b6ab8dc69b9bda034422bb6a5bdf",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "c6f35dadaa82fc7d6de94b244578cbe8bf515cbbdaff476cfe5986e0b78410ab",
+          "code_length": 9
+        },
+        {
+          "name": "computeIfAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/function/Function;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9888eb4349d340824f465ae668570f0e9f3647a82bc2d226070658f3276b3958",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<V:Ljava/lang/Object;>Ljava/lang/ClassValue<Ljava/util/Map<Ljava/lang/reflect/Method;TV;>;>;Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/reflect/Method;TV;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodCache",
+        "io/opentelemetry/instrumentation/api/internal/cache/Cache",
+        "java/lang/ClassValue",
+        "java/lang/reflect/Method",
+        "java/util/Map",
+        "java/util/concurrent/ConcurrentHashMap"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor.class",
+      "occurrence": 0,
+      "sha256": "fbbaed04a00d153cb889ecf860aca089373873cc342bf8876857f2e96236525a",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/reflect/Method;",
+          "access": 1025,
+          "generic_signature": "(TREQUEST;)Ljava/lang/reflect/Method;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "2e3b1f265e5b1c7d58a01f421b1d6e1b3f79f0536749e0784b9ce68dd70055a3",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor"
+      ],
+      "fields": [
+        {
+          "name": "methodExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "methodArgumentsExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor<TREQUEST;>;"
+        },
+        {
+          "name": "cache",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/reflect/Method;Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;>;"
+        },
+        {
+          "name": "parameterAttributeNamesExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor;)Lio/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "fc4d8e764cacaa48f190e1d27ae5812c255566e27007d3be3831eb7c8c801f90",
+          "code_length": 18,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor<TREQUEST;>;Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor<TREQUEST;>;)Lio/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor;Lio/opentelemetry/instrumentation/api/internal/cache/Cache;)V",
+          "access": 0,
+          "code_sha256": "511e17aee393fbeeee824864f2d98e172e2710862afa5f0d348c40c2b4e9653a",
+          "code_length": 26,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/annotation/support/MethodExtractor<TREQUEST;>;Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor<TREQUEST;>;Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/reflect/Method;Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;>;)V"
+        },
+        {
+          "name": "onStart",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "9bddf8879d30061c7ec8f2c575f5a03027b04459db72a4fbfc6e555f0517e9e4",
+          "code_length": 67,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;)V"
+        },
+        {
+          "name": "onEnd",
+          "descriptor": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "(Lio/opentelemetry/api/common/AttributesBuilder;Lio/opentelemetry/context/Context;TREQUEST;TRESPONSE;Ljava/lang/Throwable;)V"
+        },
+        {
+          "name": "lambda$onStart$0",
+          "descriptor": "(Ljava/lang/reflect/Method;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;",
+          "access": 4098,
+          "code_sha256": "e3fc8fb219424186df750c47237e20c16a53d4ee7981726d47f0af1c12224ddc",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor<TREQUEST;TRESPONSE;>;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodArgumentsExtractor",
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodCache",
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodExtractor",
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodSpanAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/instrumenter/AttributesExtractor",
+        "io/opentelemetry/instrumentation/api/internal/cache/Cache",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/reflect/Method"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor.class",
+      "occurrence": 0,
+      "sha256": "adcdfc5a8c9f9619b052f018714dda3accb1688df3c1a22c6e8930bb97f3a408",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/reflect/Method;[Ljava/lang/reflect/Parameter;)[Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass.class",
+      "occurrence": 0,
+      "sha256": "474d2bbee0f8cb1bdf53a7f92531b44682943ac66838e799bea6e5238e06431b",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rawClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "typeArguments",
+          "descriptor": "[Ljava/lang/reflect/Type;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "of",
+          "descriptor": "(Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+          "access": 9,
+          "code_sha256": "7728e677097e738f3eb64758eb1f396749b1890a918320012417feeb3dc2728f",
+          "code_length": 75
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;[Ljava/lang/reflect/Type;)V",
+          "access": 2,
+          "code_sha256": "b7fb3b984571e7db7666484cce7ad531d8a5af039d6fe41c4283a477742cec0d",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/Class<*>;[Ljava/lang/reflect/Type;)V"
+        },
+        {
+          "name": "getRawClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "5136ec714e63e3c9e21a7f5cdd62b8fed5a8e8258758f9ed53f72e624491087b",
+          "code_length": 5,
+          "generic_signature": "()Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "getActualTypeArguments",
+          "descriptor": "()[Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "ee1a0ec0723cae69ec53d206daea205c14cdb7567b34a7d8190043431aadb5b5",
+          "code_length": 11
+        },
+        {
+          "name": "getParameterizedSuperclass",
+          "descriptor": "()Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+          "access": 1,
+          "code_sha256": "2f1cc0df9e9b15e39e123c168d3497ba21fdf233dbb46bf3fa8d5cc50240a781",
+          "code_length": 12
+        },
+        {
+          "name": "getParameterizedInterfaces",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+          "access": 1,
+          "code_sha256": "06fda5112ca3201743f3c0d1be5d4a44886b47dc8b409590837f5e18f14ddd44",
+          "code_length": 40
+        },
+        {
+          "name": "findParameterizedSuperclass",
+          "descriptor": "(Ljava/lang/Class;)Ljava/util/Optional;",
+          "access": 1,
+          "code_sha256": "704b8d4e08e0b3b61614e5ba1d42f94263dd13cf5b8d66ed629a4a7af7dd5263",
+          "code_length": 11,
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/util/Optional<Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;>;"
+        },
+        {
+          "name": "findParameterizedSuperclassImpl",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;Ljava/lang/Class;)Ljava/util/Optional;",
+          "access": 10,
+          "code_sha256": "affef28b5fcbc2cd049b4fa2d69dfebc731380057a2de5d853b6a364c1ead8e5",
+          "code_length": 87,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;Ljava/lang/Class<*>;)Ljava/util/Optional<Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;>;"
+        },
+        {
+          "name": "resolveSuperTypeActualTypeArguments",
+          "descriptor": "(Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+          "access": 2,
+          "code_sha256": "a745ee063f2602b1568c9b06769696d0a2e9001c92e63bc9d2656e6749c26c2c",
+          "code_length": 41
+        },
+        {
+          "name": "resolveSuperTypeActualTypeArguments",
+          "descriptor": "(Ljava/lang/reflect/ParameterizedType;[Ljava/lang/reflect/TypeVariable;[Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+          "access": 10,
+          "code_sha256": "db4b3cb9c6efdc12facae599353f178dc7b1a22b61b352113887da59835b1ac6",
+          "code_length": 77,
+          "generic_signature": "(Ljava/lang/reflect/ParameterizedType;[Ljava/lang/reflect/TypeVariable<*>;[Ljava/lang/reflect/Type;)Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;"
+        },
+        {
+          "name": "mapTypeVariableToActualTypeArgument",
+          "descriptor": "(Ljava/lang/reflect/TypeVariable;[Ljava/lang/reflect/TypeVariable;[Ljava/lang/reflect/Type;)Ljava/lang/reflect/Type;",
+          "access": 10,
+          "code_sha256": "e3a628b690c8d0a06546c2e28f51e381e4fb810aae8a68625b7bd61fd0dd9825",
+          "code_length": 30,
+          "generic_signature": "(Ljava/lang/reflect/TypeVariable<*>;[Ljava/lang/reflect/TypeVariable<*>;[Ljava/lang/reflect/Type;)Ljava/lang/reflect/Type;"
+        },
+        {
+          "name": "equalsTypeVariable",
+          "descriptor": "(Ljava/lang/reflect/TypeVariable;Ljava/lang/reflect/TypeVariable;)Z",
+          "access": 10,
+          "code_sha256": "4a26793a3da55bc2750cf16d035a950bb693ddecdf1febc128ad155f34f9c030",
+          "code_length": 61,
+          "generic_signature": "(Ljava/lang/reflect/TypeVariable<*>;Ljava/lang/reflect/TypeVariable<*>;)Z"
+        }
+      ],
+      "class_references": [
+        "[Lio/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass;",
+        "[Ljava/lang/reflect/Type;",
+        "io/opentelemetry/instrumentation/api/annotation/support/ParameterizedClass",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/reflect/GenericDeclaration",
+        "java/lang/reflect/ParameterizedType",
+        "java/lang/reflect/TypeVariable",
+        "java/util/Objects",
+        "java/util/Optional"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor.class",
+      "occurrence": 0,
+      "sha256": "55df53809046705f135728b3f71ee2568ad79f3a25e73901a92bae343f84c8c5",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cache",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/reflect/Method;Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;>;"
+        },
+        {
+          "name": "parameterAttributeNamesExtractor",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;)Lio/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor;",
+          "access": 9,
+          "code_sha256": "c1368e6be5a232566eab867c0e0db4d5b288214db885c586b7e8b1c3361c3991",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/internal/cache/Cache;)V",
+          "access": 0,
+          "code_sha256": "3bdb40a860e3714789816f5e0fc4c2d3245fcd282a1805ec5a9cf956f0b43bde",
+          "code_length": 15,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/annotation/support/ParameterAttributeNamesExtractor;Lio/opentelemetry/instrumentation/api/internal/cache/Cache<Ljava/lang/reflect/Method;Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Ljava/lang/reflect/Method;[Ljava/lang/Object;)Lio/opentelemetry/api/common/Attributes;",
+          "access": 1,
+          "code_sha256": "bc7724bb3da983ca5f54684cce1f6d82538cb02c34a2413d077aa3b8df9ce615",
+          "code_length": 51
+        },
+        {
+          "name": "lambda$extract$0",
+          "descriptor": "(Ljava/lang/reflect/Method;)Lio/opentelemetry/instrumentation/api/annotation/support/AttributeBindings;",
+          "access": 4098,
+          "code_sha256": "d9f3cb9d1ed6177f26695322a0044f6ca25e3077705de817738acd068654b54b",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/api/common/Attributes",
+        "io/opentelemetry/api/common/AttributesBuilder",
+        "io/opentelemetry/instrumentation/api/annotation/support/AttributeBindings",
+        "io/opentelemetry/instrumentation/api/annotation/support/MethodCache",
+        "io/opentelemetry/instrumentation/api/annotation/support/SpanAttributesExtractor",
+        "io/opentelemetry/instrumentation/api/internal/cache/Cache",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies.class",
+      "occurrence": 0,
+      "sha256": "7382b06addd5d20c5ea093e916a1ac78a55f30c3f8c6019d63c81ac89eb40f2e",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "instance",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies;",
+          "access": 74
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "internalSetStrategiesStorage",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies;)V",
+          "access": 9,
+          "code_sha256": "7efa1e765e2a8b7ce877a3590d980f8e496196375baa4e7e4262fddd19103c01",
+          "code_length": 5
+        },
+        {
+          "name": "instance",
+          "descriptor": "()Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies;",
+          "access": 9,
+          "code_sha256": "2348a00b1bce4e94fac5e43a55d59451786d0567556e0db76853e3b1c4485565",
+          "code_length": 20
+        },
+        {
+          "name": "registerStrategy",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V",
+          "access": 1025
+        },
+        {
+          "name": "unregisterStrategy",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V",
+          "access": 1025
+        },
+        {
+          "name": "resolveStrategy",
+          "descriptor": "(Ljava/lang/Class;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl.class",
+      "occurrence": 0,
+      "sha256": "b6054a75d23d483ea61ab19e7bd05967b5b9ced1d6d8707fd004266df6d34685",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "strategies",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "12a551d736150f28ea9b501e3869d50486ee5cd2c0c2d0ef68d67ca329b75970",
+          "code_length": 23
+        },
+        {
+          "name": "registerStrategy",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V",
+          "access": 1,
+          "code_sha256": "6f281a36c33c17eeff9bbcb59627e3c9130323c7fa50150b7b0e7b7a65fd32b6",
+          "code_length": 18
+        },
+        {
+          "name": "unregisterStrategy",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V",
+          "access": 1,
+          "code_sha256": "6551a4ee3d6e68dfbf915f6c72c2a78df2d680a42c2b7a57d5ea81845bc3c4f8",
+          "code_length": 12
+        },
+        {
+          "name": "resolveStrategy",
+          "descriptor": "(Ljava/lang/Class;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;",
+          "access": 1,
+          "code_sha256": "d053bb6bdda13b32859a2d27eb265757c829c2a4af9feee7c74f09eaa6f1f42f",
+          "code_length": 46,
+          "generic_signature": "(Ljava/lang/Class<*>;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategiesImpl",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Objects",
+        "java/util/concurrent/CopyOnWriteArrayList"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy.class",
+      "occurrence": 0,
+      "sha256": "3d6a0498d7e51d22060562472a3dde9e5872c3098ee81491d8427a7364e74840",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "supports",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "end",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Lio/opentelemetry/context/Context;TREQUEST;Ljava/lang/Object;Ljava/lang/Class<TRESPONSE;>;)Ljava/lang/Object;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport.class",
+      "occurrence": 0,
+      "sha256": "80c12958aa47808565790c525dd920e8322daae034c1fc68346079e2d09ba844",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "instrumenter",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;",
+          "access": 18,
+          "generic_signature": "Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "responseType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<TRESPONSE;>;"
+        },
+        {
+          "name": "asyncType",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "asyncOperationEndStrategy",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Ljava/lang/Class;Ljava/lang/Class;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport;",
+          "access": 9,
+          "code_sha256": "298040d58a693fe3659f95095e430d8413b2888b916390d2714519d555103d17",
+          "code_length": 18,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Ljava/lang/Class<TRESPONSE;>;Ljava/lang/Class<*>;)Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport<TREQUEST;TRESPONSE;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Ljava/lang/Class;Ljava/lang/Class;Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V",
+          "access": 2,
+          "code_sha256": "8bbf9bc6cb3ce67a64b54773e96ea7a7e4ce59069a329722709de184bf70213d",
+          "code_length": 26,
+          "generic_signature": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Ljava/lang/Class<TRESPONSE;>;Ljava/lang/Class<*>;Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;)V"
+        },
+        {
+          "name": "asyncEnd",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Throwable;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "777b3bfcadce89f65a3a4a264674e778ae60a3b4810d401f05deb07d06a18d2e",
+          "code_length": 78,
+          "generic_signature": "<ASYNC:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TREQUEST;TASYNC;Ljava/lang/Throwable;)TASYNC;"
+        },
+        {
+          "name": "tryToGetResponse",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "062b7d0e00c149eef619b96dcbc0f1f04f1815250d3b8cbeb392459ac4842ade",
+          "code_length": 16,
+          "generic_signature": "<RESPONSE:Ljava/lang/Object;>(Ljava/lang/Class<TRESPONSE;>;Ljava/lang/Object;)TRESPONSE;"
+        }
+      ],
+      "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategies",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport",
+        "io/opentelemetry/instrumentation/api/instrumenter/Instrumenter",
+        "java/lang/Class",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy.class",
+      "occurrence": 0,
+      "sha256": "424b8e3d85079d7f408f83ff9c14bb1c8c65bca0255772da15c4d4ef136e71ba",
+      "name": "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+          "access": 9,
+          "code_sha256": "e6257d33773ffb7a33735e3283315933ca226af36ab1aeb9b4b1f1c00db0eed1",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+          "access": 9,
+          "code_sha256": "6778b0d75fb932b92a5cabe69e8c0ce33bf7fd6ef8a39545faa3ebc77a61f7db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "898f5d3f85cf0aa77bdce22f0650c1270e9828b23c7412d06714f8d67d05db4f",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "supports",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 1,
+          "code_sha256": "1f4e69278e4b9caaab7971106c9f96451bf5a6073392dc81a4b68ef3eaad45f2",
+          "code_length": 18,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "end",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3abf122f1afd687dbb412b7f0af44801b84926787ccb1d492e6e2e3f1f586b51",
+          "code_length": 60,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Lio/opentelemetry/context/Context;TREQUEST;Ljava/lang/Object;Ljava/lang/Class<TRESPONSE;>;)Ljava/lang/Object;"
+        },
+        {
+          "name": "tryToEndSynchronously",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/util/concurrent/CompletableFuture;Ljava/lang/Class;)Z",
+          "access": 10,
+          "code_sha256": "b0056a4574ab5cb58fe0ca0c5770366b10a5104ff494bd4b9b1725a5a7a64319",
+          "code_length": 45,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Lio/opentelemetry/context/Context;TREQUEST;Ljava/util/concurrent/CompletableFuture<*>;Ljava/lang/Class<TRESPONSE;>;)Z"
+        },
+        {
+          "name": "endWhenComplete",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/util/concurrent/CompletionStage;Ljava/lang/Class;)Ljava/util/concurrent/CompletionStage;",
+          "access": 10,
+          "code_sha256": "e6116d73207541b5ad3be43131084cd3eaa863f50f02fd6de12d1fed4712de05",
+          "code_length": 17,
+          "generic_signature": "<REQUEST:Ljava/lang/Object;RESPONSE:Ljava/lang/Object;>(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter<TREQUEST;TRESPONSE;>;Lio/opentelemetry/context/Context;TREQUEST;Ljava/util/concurrent/CompletionStage<*>;Ljava/lang/Class<TRESPONSE;>;)Ljava/util/concurrent/CompletionStage<*>;"
+        },
+        {
+          "name": "lambda$endWhenComplete$0",
+          "descriptor": "(Lio/opentelemetry/instrumentation/api/instrumenter/Instrumenter;Lio/opentelemetry/context/Context;Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Throwable;)V",
+          "access": 4106,
+          "code_sha256": "c439917be300166d92f0b1610ed66a9f515f2817ff5a8e8908af4e1da7c078ef",
+          "code_length": 15
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+          "access": 4106,
+          "code_sha256": "9d4cc08a9068864ff64558fd2437c387fea506d39f3dec1d29c434e43f2b9833",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8e48e1e81463e669f05073124c092f6d21d2b211e47b88beb3f2a1b8cb8a0fb7",
+          "code_length": 20
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;>;Lio/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy;",
+      "class_references": [
+        "[Lio/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy;",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/AsyncOperationEndSupport",
+        "io/opentelemetry/instrumentation/api/annotation/support/async/Jdk8AsyncOperationEndStrategy",
+        "io/opentelemetry/instrumentation/api/instrumenter/Instrumenter",
+        "java/lang/Enum",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/concurrent/CompletableFuture",
+        "java/util/concurrent/CompletionStage"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,657 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+  "archive_sha256": "ae170dfb47e1a0b7bacebb47b8575ac7a33976d613784c84a96abf5507a38a3f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataPlugin.class",
+      "occurrence": 0,
+      "sha256": "94df4557a43ca39b691a1bd644383abaf2d866a7e28a8358fa79cc2fafed6f63",
+      "name": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;",
+          "access": 2
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "14405c8f610897a370d4a1de4a58f91361953b6e24cbdd585263d759f6e6c92b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "b51d211d99fe7ba4c86a0ba62b3aeabf7826ba81f4fe3b2ace1af1011bb07301",
+          "code_length": 53
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "bbd2d29a6d1c8fd70adc7ffc4f8fbb9cdafb0135ae428c02484b217602f22202",
+          "code_length": 24,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataPlugin",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Map",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1.class",
+      "occurrence": 0,
+      "sha256": "5f57b3c00371829d61715de615ca79326137136439b33085a02743b21dd774bb",
+      "name": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$args",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2a5bd147df9bd1f0e10f51ab6a6b087c99b95d9f15b8975ebafddf26daf54f5e",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2.class",
+      "occurrence": 0,
+      "sha256": "8bc4d85547b88ca6862a402383dfc9489c2562f073d3fb6821ded94fb1089f9b",
+      "name": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/datalib/data/InstrumentValueEvaluator"
+      ],
+      "fields": [
+        {
+          "name": "val$commodityMap",
+          "descriptor": "Ljava/util/Map;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;Ljava/util/Map;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "getTickStep",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)D",
+          "access": 1,
+          "code_sha256": "26e29ef3343eaba252148866ecfe679cb1f60ce3675a73a3ad024ed2c6c1c896",
+          "code_length": 25
+        },
+        {
+          "name": "getTickSize",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)D",
+          "access": 1,
+          "code_sha256": "f6f2bc2b82aa009266a6982169e9ebec89024ba810f6ccb1dfa4676ce34e6aff",
+          "code_length": 25
+        },
+        {
+          "name": "getPointValue",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)D",
+          "access": 1,
+          "code_sha256": "148d2bbcc52130865d451691413a175cfb340bb2d50161a1be08cf0254e21966",
+          "code_length": 25
+        },
+        {
+          "name": "getInstrumentType",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)B",
+          "access": 1,
+          "code_sha256": "f18d61aed72043aaf474c45978b2a4b795d5647404fe570b815c33e6252d08a0",
+          "code_length": 24
+        },
+        {
+          "name": "getDescriptions",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "22eaebff3e6079d4c4dffd2846cd867ef0a37830ba8e2492c648fa0e845c78da",
+          "code_length": 3
+        },
+        {
+          "name": "getOrderSizeMultiplier",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)D",
+          "access": 1,
+          "code_sha256": "89a4729414a84dd6e542d6e876e4b0f9e82189e8c342ea8ea2a367d2dbf68390",
+          "code_length": 25
+        },
+        {
+          "name": "getOrderSizeStep",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)D",
+          "access": 1,
+          "code_sha256": "e773d0052c8fb70e2c51b70ac5f931dce0e3bfba599f5afe5f0296c8938d881b",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/data/InstrumentValueEvaluator",
+        "com/strategyquant/datalib/historyData/dto/CommodityDto",
+        "com/strategyquant/datalib/historyData/dto/TickerDto",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/math/BigDecimal",
+        "java/util/Map"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3.class",
+      "occurrence": 0,
+      "sha256": "d26f1f1486cbe9b724a6b684cc3e1418efc75f955dc4811c796ed817e6d46f83",
+      "name": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/datalib/data/BatchProgressController"
+      ],
+      "fields": [
+        {
+          "name": "val$batchSizeForUse",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$progress",
+          "descriptor": "Lorg/json/JSONObject;",
+          "access": 4112
+        },
+        {
+          "name": "val$symbolsSet",
+          "descriptor": "Ljava/util/Set;",
+          "access": 4112
+        },
+        {
+          "name": "val$symbols",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;ILorg/json/JSONObject;Ljava/util/Set;[Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "dedb1edae71f3ffba1010fc93bb73c89154d2a5fedd4c5b9d3054d7310c183ba",
+          "code_length": 32,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "updateProgress",
+          "descriptor": "(IILjava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "ae411cda69f36248b1ea14b15e2ec2c8fac61a2eadfe361f4042cbf5997c7d6d",
+          "code_length": 199,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isCancel",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "9650a46583073be5294019b13ebe5b51a744077027f2fef19c83dee7f1691ccc",
+          "code_length": 8
+        },
+        {
+          "name": "finished",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/data/BatchProgressController",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Set",
+        "org/json/JSONObject"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet.class",
+      "occurrence": 0,
+      "sha256": "91ca356c42989923e2b1830ada1db91aa606e150bb35dd57698da1cd16f15f15",
+      "name": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "JOB_PREFIX",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "canceled",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "exchangesResponse",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "62edf679051c15919f7c19dce9520e632e5fad581d8d2f99ae681376e0c9443d",
+          "code_length": 15
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "44898ca538d7e8deea6ee83a159fa510892a36257a29522d4c732916f2f73635",
+          "code_length": 403,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onGetExchanges",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "6d85adf900a468e20855dc2e731bbfe6cac2deaf469668e799462dc51f524ab7",
+          "code_length": 103,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onAdd",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2c2b4e2b457229aaf1248574a99dc99ed5cda9ad845c0fc691554ba86af01f28",
+          "code_length": 84,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "_onAdd",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 2,
+          "code_sha256": "ba9c59ea290c5d22f18962f52e33dd01412e46122e202cfb988f5ecfa567f955",
+          "code_length": 968,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "onAddCancel",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bf33ddf1365507a24cb3bc6ecb51a901d34fbfc707dbaaf6ea128b1a2042447e",
+          "code_length": 35,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "subscriptionCheck",
+          "descriptor": "([Ljava/lang/String;Ljava/util/Map;Z)V",
+          "access": 2,
+          "code_sha256": "9c66b8c794d78a0eb83616395f301d8afaa34be849274c24e94b18392b87f91d",
+          "code_length": 137,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "([Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Lcom/strategyquant/datalib/historyData/dto/TickerDto;>;Z)V"
+        },
+        {
+          "name": "onLookup",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "0e963f8d9da3cdf13518a28539e33449b4372f5a7a1219972276b4468e76b712",
+          "code_length": 337,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdate",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d2d33fed75425aa673ad3ca70b4bd583d1ed02cfb48392d0e45e2c45210ca2c0",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onUpdateBr",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "36ff86fc82e6397bcf4714d5e2de2a018bbf43ef2c8ad4b3661183e591db3650",
+          "code_length": 80,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "performUpdate",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "f7135d6493ede4d6c93e1445a63802d268722b9724d4eb8e107c51d6ea1910c9",
+          "code_length": 281,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/List<Lcom/strategyquant/datalib/DataInfo;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "isDownloadAllowed",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;Ljava/util/Map;)Z",
+          "access": 2,
+          "code_sha256": "bd4b24bec13277bcc462b353408222d2222d0609284dda7238fef29a9414f388",
+          "code_length": 55,
+          "throws": [
+            "org/apache/http/client/ClientProtocolException",
+            "java/lang/IllegalStateException",
+            "java/security/NoSuchAlgorithmException",
+            "java/io/IOException",
+            "org/jdom2/JDOMException",
+            "java/sql/SQLException"
+          ],
+          "generic_signature": "(Lcom/strategyquant/datalib/DataInfo;Ljava/util/Map<Ljava/lang/String;Lcom/strategyquant/datalib/historyData/dto/TickerDto;>;)Z"
+        },
+        {
+          "name": "onVerifySubscription",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "327489f76acd3b8851f752444e0275e52ad9e70318043319cfd20d4be2d6599a",
+          "code_length": 70,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateDataAction",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "dd79e511fcf5beaa03219feb628d37d9e78dfde07a30025347162bf436fb6e8a",
+          "code_length": 238,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onUpdateAll",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9a41e1438c194f03f1dbea9ffd1e808decc4e9b1af1ff10f535659254130c537",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onUpdateSelected",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "49f6e5709bfb6ccc2034bf1c5ca28ee37166c44a570fabe863313f8f19070aca",
+          "code_length": 97,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;Ljava/util/Map;)V",
+          "access": 4104,
+          "code_sha256": "ffdde2c0cd5acd083e3102d935aceaa0a77ca01ed92d9bb824e792167a0a2489",
+          "code_length": 6
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet;)Z",
+          "access": 4104,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$performUpdate$1",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)Lcom/strategyquant/datalib/historyData/dto/TickerDto;",
+          "access": 4106,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "lambda$performUpdate$0",
+          "descriptor": "(Lcom/strategyquant/datalib/DataInfo;)Ljava/lang/String;",
+          "access": 4106,
+          "code_sha256": "dd53a1c4521e72ef5c74c2f19c82d86816a9e1d4ee398dcdbb69320854e6ee60",
+          "code_length": 5
+        },
+        {
+          "name": "lambda$onLookup$0",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)Z",
+          "access": 4106,
+          "code_sha256": "c8d49ddf2afbb99abc5ef3a5e939176a6cd03f2602fa5d361ff2a4a637e3b322",
+          "code_length": 26
+        },
+        {
+          "name": "lambda$_onAdd$1",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/TickerDto;)Lcom/strategyquant/datalib/historyData/dto/TickerDto;",
+          "access": 4106,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "lambda$_onAdd$0",
+          "descriptor": "(Lcom/strategyquant/datalib/historyData/dto/CommodityDto;)Lcom/strategyquant/datalib/historyData/dto/CommodityDto;",
+          "access": 4106,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a0101dc613f85ac124de8d5accfd04a46d1ab13b627ddc09ed6163170017a1de",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/DataInfo",
+        "com/strategyquant/datalib/TimeframeManager",
+        "com/strategyquant/datalib/consts/BarTimeTypes",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/datalib/data/DukasDataManager",
+        "com/strategyquant/datalib/historyData/TickerFilterDto",
+        "com/strategyquant/datalib/historyData/dto/CommodityDto",
+        "com/strategyquant/datalib/historyData/dto/TickerDto",
+        "com/strategyquant/datalib/historyData/dto/TickerKind",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/historyData/DataSources",
+        "com/strategyquant/lib/historyData/HistoryDataSubscription",
+        "com/strategyquant/model/IdName",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$1",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$2",
+        "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet$3",
+        "com/strategyquant/tradinglib/data/download/DownloadDispatcher",
+        "com/strategyquant/tradinglib/historyData/HistoryDataManager",
+        "com/strategyquant/tradinglib/historyData/MarketDtoToJsonTransformer",
+        "com/strategyquant/tradinglib/historyData/TickerDtoToJsonTransformer",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerAddProgressSender",
+        "com/strategyquant/tradinglib/project/websocket/DataManagerDataProgress",
+        "com/strategyquant/tradinglib/project/websocket/DataUpdateTypes",
+        "com/strategyquant/tradinglib/project/websocket/MultiProgressListener",
+        "com/strategyquant/tradinglib/project/websocket/SQWebSocketManager",
+        "com/strategyquant/tradinglib/project/websocket/WSDataObjects",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/IOException",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/security/NoSuchAlgorithmException",
+        "java/sql/SQLException",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream",
+        "org/apache/http/client/ClientProtocolException",
+        "org/jdom2/JDOMException",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

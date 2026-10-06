@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SaverPDF/SaverPDF.jar",
+  "sha256": "030ecc3ebcef0358672b151f15c848d0194ac6375bd018d39bedda723f714e81",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Saver/impl/PDF/PDFReportPlugin.class": "84a4913a894e842853ecca3e8b4cc8979ed6ca71736e6ba745fcc7e77497e20b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Saver/impl/PDF/PDFReportPlugin.class",
+      "occurrence": 0,
+      "sha256": "84a4913a894e842853ecca3e8b4cc8979ed6ca71736e6ba745fcc7e77497e20b",
+      "member_shard": "docs/dev/evidence/sqx145/members/224/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/224/001.json",
+      "sha256": "9b1b352e24ceb611fd7b59474c91869ebbaf7c32806a488458f2e7910c4b82dc"
+    }
+  ]
+}

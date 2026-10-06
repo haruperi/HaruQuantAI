@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppOptimizer/AppOptimizer.jar",
+  "sha256": "bde1b68ded4bd092c9bfa5554be07dc02a0dcc0f026db8f26f5026e6cf3c6872",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/Optimizer/OptimizerAppPlugin.class": "670a9a8e1204fd3829884aabab74241fae84394713e5ac47a787053bd1c38c55"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/Optimizer/OptimizerAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "670a9a8e1204fd3829884aabab74241fae84394713e5ac47a787053bd1c38c55",
+      "member_shard": "docs/dev/evidence/sqx145/members/132/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/132/001.json",
+      "sha256": "15470844669cec7fd6c2c92991df30edc922e1f0ac83082873daca327386e5af"
+    }
+  ]
+}

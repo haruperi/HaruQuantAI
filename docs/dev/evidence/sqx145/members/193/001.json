@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
+  "archive_sha256": "fdfae28061c503d76a141611891151148f4f5940541ae2ab331c9023b260a909",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Loader/impl/SQ4/SQ4LoaderPlugin.class",
+      "occurrence": 0,
+      "sha256": "3d5e3fb4739e983f2c11f12238fb07bc96e7e278c792683bdcf5a8ce6538645e",
+      "name": "com/strategyquant/plugin/Loader/impl/SQ4/SQ4LoaderPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/results/file/ILoaderPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "extensions",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "xmlOutputter",
+          "descriptor": "Lorg/jdom2/output/XMLOutputter;",
+          "access": 2
+        },
+        {
+          "name": "SLOW_LOAD_MS",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bd14eb86ca4e311888942cc6c4e1ad113b971a016484b0715462cd263b82d385",
+          "code_length": 19
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3d42e25276a899ef9e801ad70778e18b5d1ed2d642b5f0da323e254f72177c7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFileExtensions",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9cc43d46539f7c1035d51971fe98dd6bce4f35e3c3dc680b1e6647ecc0acd4ce",
+          "code_length": 4
+        },
+        {
+          "name": "load",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1,
+          "code_sha256": "51b88024cc437df8ecdafdee51b04ea1974841e0b3f27de4c52b46407c2435c5",
+          "code_length": 37,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadSQWFile",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/String;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2,
+          "code_sha256": "4ff62e6aee16fa9e1b81816925144a73b6d7ecc9f326c0c708fe89c476daeea7",
+          "code_length": 211,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadSQ4File",
+          "descriptor": "(Ljava/lang/String;ZLjava/lang/String;Ljava/lang/String;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2,
+          "code_sha256": "ecfe7f2bd89ce924e3fb4f56e50dd237dfbbdbb06a45031752f1e202e8482ec5",
+          "code_length": 816,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "logLoadPhases",
+          "descriptor": "(Ljava/lang/String;IJJJJJJJ)V",
+          "access": 2,
+          "code_sha256": "a36f21b45926af21fcfcff7c7ce440de083392fc70fdc0d6beb71e1a03d5ecae",
+          "code_length": 225
+        },
+        {
+          "name": "recognizeVersion",
+          "descriptor": "(Ljava/util/jar/JarFile;Ljava/util/jar/JarEntry;)I",
+          "access": 2,
+          "code_sha256": "359cbf7895495dcc674646190899df0d4a33f3132517b593bcc3fc0b77b11266",
+          "code_length": 86
+        },
+        {
+          "name": "fixOldSettingsResultKeys",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "loadLastSettings",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "bb3b63aa9f0b1efbead05dd1cb3dee52c5439ed67cb2a54bfae6873419f897a5",
+          "code_length": 55,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadOptimizationProfile",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "62edf312697827a5f24dbe6ce161412ef92201cc6257427781bd8e1f8672878d",
+          "code_length": 119,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadCrossCheckData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "84adb235d68afb612df2f22c75576506340375e8bf03fdf061f04af50a64f8f3",
+          "code_length": 90,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadResultsData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "2c4ab032d6f884627d3e5025dc0099346bbe2efae9a55253ad80305ddaa15b1a",
+          "code_length": 171,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadDailyEquityDataOldFormat",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Result;Ljava/lang/String;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "ffebe8777ccd26dedd45565568882f00d77a9dbe0bc54c633877655804e11e1f",
+          "code_length": 49,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadDailyEquityData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Result;Ljava/lang/String;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "02df2919992e4055cd6cb2ad32f84368b546865780af66aef261d78d16eef965",
+          "code_length": 59,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadOrders",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;Ljava/util/jar/JarFile;)V",
+          "access": 2,
+          "code_sha256": "1261776d13888ad126fb8818fd1f736971f6556e5a7f8e71d7494d02c8f3f9fa",
+          "code_length": 79,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "finishLoad",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 1,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9b8a0b043b80ecef42323e67770234e4a5d703cc95a17e0a5e66b83697036be1",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/lib/whitelabel/AbstractBroker",
+        "com/strategyquant/plugin/Loader/impl/SQ4/SQ4LoaderPlugin",
+        "com/strategyquant/pluginlib/SQPluginManager",
+        "com/strategyquant/security/IDataProtector",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/crosscheck/ICrossCheck",
+        "com/strategyquant/tradinglib/dailyEquity/DailyEquity",
+        "com/strategyquant/tradinglib/optimization/OptimizationProfile",
+        "com/strategyquant/tradinglib/results/file/ILoaderPlugin",
+        "com/strategyquant/tradinglib/strategy/xml/SQ3StrategyConverter",
+        "com/strategyquant/tradinglib/strategy/xml/StrategyFixer",
+        "java/io/BufferedReader",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/ObjectInput",
+        "java/io/ObjectInputStream",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/nio/charset/StandardCharsets",
+        "java/nio/file/Files",
+        "java/util/ArrayList",
+        "java/util/Enumeration",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/UUID",
+        "java/util/jar/JarEntry",
+        "java/util/jar/JarFile",
+        "net/lingala/zip4j/core/ZipFile",
+        "net/lingala/zip4j/exception/ZipException",
+        "net/lingala/zip4j/model/FileHeader",
+        "org/jdom2/Element",
+        "org/jdom2/output/Format",
+        "org/jdom2/output/XMLOutputter",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 /**
- * SQX-parity Builder "Full settings" demo state (UI-BUILDER-SETTINGS-005).
+ * SQX-style Builder "Full settings" demo state (UI-BUILDER-SETTINGS-005).
  * Tab registry, descriptions, help URLs, and default values follow the
- * installed donor sources (evidence SQX144-EV-000038..043); numeric defaults
+ * installed donor sources (evidence retained target UI; current donor equivalence unverified); numeric defaults
  * come from the donor's installed Build task template (genetic evolution:
  * 100 generations / 100 population / 4 islands). Everything is local fixture
  * truth — no engine or persistence claims.
@@ -16,7 +16,7 @@ export interface SettingsTabMeta {
 
 const DOCS = 'https://strategyquant.com/doc/strategyquant';
 
-/** Build-task settings tabs; Parts to improve is conditional (SQX144-EV-000055..056). */
+/** Build-task settings tabs; Parts to improve is conditional (retained target UI; current donor equivalence unverified). */
 export const settingsTabs: SettingsTabMeta[] = [
   { id: 'what-to-build', title: 'What to build', help: 'Choose what kind of strategy to build, its style, build mode, number of conditions in a strategy and Stop Loss + Profit Target ranges.', helpUrl: `${DOCS}/what-to-build/` },
   { id: 'parts-to-improve', title: 'Parts to improve', help: 'Configure which parts of the strategy should be improved. You can further configure if you want to replace the whole part, or add new blocks to it.', helpUrl: `${DOCS}/parts-to-improve/` },

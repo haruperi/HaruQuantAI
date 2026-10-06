@@ -1,0 +1,82 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jPowerShell-3.0.jar",
+  "sha256": "706451f6a1ff22cf477957bb280593d81d1a975263c3ff2ba1bab15b749a6168",
+  "class_count": 8,
+  "unique_class_entries": 8,
+  "resource_count": 4,
+  "duplicate_entries": [],
+  "classes": {
+    "com/profesorfalken/jpowershell/OSDetector.class": "74626c26922f4d11ea69ccdba6eaf242dd7b4713769b761a30fdb0709a6ac2ef",
+    "com/profesorfalken/jpowershell/PowerShell.class": "146c5708448936c1a8f837c0b4e2bd99048b2b758216349059a7bdeb7c478e21",
+    "com/profesorfalken/jpowershell/PowerShellCodepage.class": "256806f68ad766401bb50afcc077b1e14c359724a9a0d8d5ce5d98b5fe2ae56e",
+    "com/profesorfalken/jpowershell/PowerShellCommandProcessor.class": "8ba5a958875311b4d32d7b21dae9d40e59381ad1a0291be15fac800eb87c9402",
+    "com/profesorfalken/jpowershell/PowerShellConfig.class": "2e685b5078a9a19520b0c95bb6858a6800f1ada84112f132fc62b3372420e916",
+    "com/profesorfalken/jpowershell/PowerShellNotAvailableException.class": "e38ef8d301c9f9a0fc332c50c0f566aa14980a80c970329f4aa16c9524f171d1",
+    "com/profesorfalken/jpowershell/PowerShellResponse.class": "427f5ea41281707daff5dabd8f9fed586c01e82fe6f0f19e18919a50748b4ca1",
+    "com/profesorfalken/jpowershell/PowerShellResponseHandler.class": "e61b1e643e830ade477a860d55691b3565a927857354833ffbdde12a0cd454ec"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "0526b3742d42e95a839a47b6b841993938a5722a1187de7edb97efa2468b9bf7",
+    "jpowershell.properties": "e6b8b77e1ac4ad7279c571a1e24ca298b28a9d7d2a11a3a8acabe39cabf47a73",
+    "META-INF/maven/com.profesorfalken/jPowerShell/pom.xml": "1e77a2eceae1bb8a4865305c4d2e74dd0685dcd11b59b49113f69dc728cbc5de",
+    "META-INF/maven/com.profesorfalken/jPowerShell/pom.properties": "fb4a23e35e9a92ccdfd3e5de5df902d52e21c03f0fe8e77ce5ac779f0bdcce80"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/profesorfalken/jpowershell/OSDetector.class",
+      "occurrence": 0,
+      "sha256": "74626c26922f4d11ea69ccdba6eaf242dd7b4713769b761a30fdb0709a6ac2ef",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShell.class",
+      "occurrence": 0,
+      "sha256": "146c5708448936c1a8f837c0b4e2bd99048b2b758216349059a7bdeb7c478e21",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellCodepage.class",
+      "occurrence": 0,
+      "sha256": "256806f68ad766401bb50afcc077b1e14c359724a9a0d8d5ce5d98b5fe2ae56e",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellCommandProcessor.class",
+      "occurrence": 0,
+      "sha256": "8ba5a958875311b4d32d7b21dae9d40e59381ad1a0291be15fac800eb87c9402",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellConfig.class",
+      "occurrence": 0,
+      "sha256": "2e685b5078a9a19520b0c95bb6858a6800f1ada84112f132fc62b3372420e916",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellNotAvailableException.class",
+      "occurrence": 0,
+      "sha256": "e38ef8d301c9f9a0fc332c50c0f566aa14980a80c970329f4aa16c9524f171d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellResponse.class",
+      "occurrence": 0,
+      "sha256": "427f5ea41281707daff5dabd8f9fed586c01e82fe6f0f19e18919a50748b4ca1",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    },
+    {
+      "entry": "com/profesorfalken/jpowershell/PowerShellResponseHandler.class",
+      "occurrence": 0,
+      "sha256": "e61b1e643e830ade477a860d55691b3565a927857354833ffbdde12a0cd454ec",
+      "member_shard": "docs/dev/evidence/sqx145/members/063/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/063/001.json",
+      "sha256": "153e7bd686612bede722fa3c40998bb2ce005eed20f329d6f8c59b80a8ef8ff0"
+    }
+  ]
+}

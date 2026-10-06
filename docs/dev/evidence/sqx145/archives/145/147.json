@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckMonteCarloManipulation/CrossCheckMonteCarloManipulation.jar",
+  "sha256": "9e1b43294ccf3a6fa2e9fbda63a6e1d2089982050dc3f31267793e16425e6688",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloManipulation/MonteCarloManipulationPlugin.class": "4875eb9583bc01fc996c63cdebe864e623a8c8eee342c190f4fd392bb49282f9",
+    "com/strategyquant/plugin/CrossCheck/impl/MonteCarloManipulation/MonteCarloManipulationServlet.class": "37ffde6a1595a79567a5a11326a7993259c9309df6cc8b0ece561ebef5344dcf"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloManipulation/MonteCarloManipulationPlugin.class",
+      "occurrence": 0,
+      "sha256": "4875eb9583bc01fc996c63cdebe864e623a8c8eee342c190f4fd392bb49282f9",
+      "member_shard": "docs/dev/evidence/sqx145/members/147/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloManipulation/MonteCarloManipulationServlet.class",
+      "occurrence": 0,
+      "sha256": "37ffde6a1595a79567a5a11326a7993259c9309df6cc8b0ece561ebef5344dcf",
+      "member_shard": "docs/dev/evidence/sqx145/members/147/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/147/001.json",
+      "sha256": "720e54d5ace1a8d16328b1085f5f16348f7e21861babef4b95470149b891ae64"
+    }
+  ]
+}

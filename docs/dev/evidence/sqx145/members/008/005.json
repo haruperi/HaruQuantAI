@@ -1,0 +1,3333 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/artemis-core-client-1.5.0.jar",
+  "archive_sha256": "14d38e4e405f3b597dfa23a82544664140dcd67e86bbc174e2b7d1c59770087f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/apache/activemq/artemis/utils/DeflaterReader.class",
+      "occurrence": 0,
+      "sha256": "8b2da1b1a0ae7ecc40fd1f44214174b304470fd6019899de73b8d3b5dacf1073",
+      "name": "org/apache/activemq/artemis/utils/DeflaterReader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "deflater",
+          "descriptor": "Ljava/util/zip/Deflater;",
+          "access": 18
+        },
+        {
+          "name": "isFinished",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "compressDone",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "input",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 2
+        },
+        {
+          "name": "bytesRead",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Ljava/util/concurrent/atomic/AtomicLong;)V",
+          "access": 1,
+          "code_sha256": "3bdd2f60e087a73236517693d2a7fc537e6a350cdc85b3da1329653dc5374d0f",
+          "code_length": 36
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a1b9442caa76b48cff9fe875c1c3005c398f822e08362de9ae9d37820225da7f",
+          "code_length": 63,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "3d6695c3be52d965c833181b25a847e248dbe67a856e69a5aee6f1135b161a0c",
+          "code_length": 178,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "closeStream",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "56e8243ba1a28741201bd1bc82ede747f824c74e4554618fdf11c693375984cd",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTotalSize",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ca46575194a1685fb1e5dc7794cfb7701579d45cc4c7e5a4fb06c24a4a420809",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/atomic/AtomicLong",
+        "java/util/zip/Deflater",
+        "org/apache/activemq/artemis/utils/DeflaterReader"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/FutureLatch.class",
+      "occurrence": 0,
+      "sha256": "e051377a58a51cf5d90f3eff978c30418de25081a23378b96446fb481d67cefc",
+      "name": "org/apache/activemq/artemis/utils/FutureLatch",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "latch",
+          "descriptor": "Ljava/util/concurrent/CountDownLatch;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "681f751919d072929288a3d7176ece5f14f7647281a7ea5a33fcb282d8fce666",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e2f4db7a9e5470c18171f81a9c555e393eb76b4f2910aba93e507a1cf4b14d45",
+          "code_length": 17
+        },
+        {
+          "name": "await",
+          "descriptor": "(J)Z",
+          "access": 1,
+          "code_sha256": "6fb67798ff62c5b336a7ac63b6a3c803361d413f3100812fb00fb54bb15516e1",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d4644299373e1bdc4d7fa5733d77379b9982717a830b9749264aba5cc34af74b",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c01b6add9aabbcce7563dfcf0a14f6a586f682cdb162770d243e827340e8f301",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/CountDownLatch",
+        "java/util/concurrent/TimeUnit",
+        "org/apache/activemq/artemis/utils/FutureLatch"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/IDGenerator.class",
+      "occurrence": 0,
+      "sha256": "96a92f005954d8666eef8ba28e541ce20c91b661322a3c6f2e84d29a2a1a5610",
+      "name": "org/apache/activemq/artemis/utils/IDGenerator",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "generateID",
+          "descriptor": "()J",
+          "access": 1025
+        },
+        {
+          "name": "getCurrentID",
+          "descriptor": "()J",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/IDGenerator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/InflaterReader.class",
+      "occurrence": 0,
+      "sha256": "7c705a15d160e9547773af90d9b6efac61559d9775fc924582a77906733e1269",
+      "name": "org/apache/activemq/artemis/utils/InflaterReader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "inflater",
+          "descriptor": "Ljava/util/zip/Inflater;",
+          "access": 2
+        },
+        {
+          "name": "input",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 2
+        },
+        {
+          "name": "readBuffer",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "pointer",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "b6fd3f75bbd3871672c3b9a99b30d1adf07b83d9b2044385f498e8eade59a61d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;I)V",
+          "access": 1,
+          "code_sha256": "bad7f6f57d946c204afb20c70126ea67dc622eb4fe4b2f29703d84d2d6ee0187",
+          "code_length": 33
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "014349a7931be56454e9067e5f95a02ba96ad17dc4d76ddc71735fc4f67bc14e",
+          "code_length": 106,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "doRead",
+          "descriptor": "([BII)I",
+          "access": 2,
+          "code_sha256": "ef7d863d84abe4d3ed20b1c42e0649c6566740792ff37e1f2eeae6b29a235dbd",
+          "code_length": 164,
+          "throws": [
+            "java/util/zip/DataFormatException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/util/zip/DataFormatException",
+        "java/util/zip/Inflater",
+        "org/apache/activemq/artemis/utils/InflaterReader"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/InflaterWriter.class",
+      "occurrence": 0,
+      "sha256": "6857695d5ff06623fb764171770cd4cbf03e954ac24f22451a05b7100f7fab9b",
+      "name": "org/apache/activemq/artemis/utils/InflaterWriter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "inflater",
+          "descriptor": "Ljava/util/zip/Inflater;",
+          "access": 18
+        },
+        {
+          "name": "output",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "writeBuffer",
+          "descriptor": "[B",
+          "access": 18
+        },
+        {
+          "name": "writePointer",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "outputBuffer",
+          "descriptor": "[B",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "af5c211e0acea3748c42434a15807ac24c0ee93812c69f4c57323251896ad60a",
+          "code_length": 48
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "55e819d068ec8d0b11ce25cf9177fff7af5138dbece1f06cf5852ac70e9dad2e",
+          "code_length": 69,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "85530eadf663ebb44a1a9d844e6b2646b824b8ea64965a02adaf94e9fb402700",
+          "code_length": 99,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "doWrite",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0ea37ac7e050b8584d7125015d0c9aae1fb8b6914e3262534ae6a6a4e58d5f14",
+          "code_length": 56,
+          "throws": [
+            "java/util/zip/DataFormatException",
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/util/zip/DataFormatException",
+        "java/util/zip/Inflater",
+        "org/apache/activemq/artemis/utils/InflaterWriter"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/JNDIUtil.class",
+      "occurrence": 0,
+      "sha256": "3ff9c5c88c6fa54909cc20f224cc6180ae46cb7444b47fd4c8009ecedbfc0a5f",
+      "name": "org/apache/activemq/artemis/utils/JNDIUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createContext",
+          "descriptor": "(Ljavax/naming/Context;Ljava/lang/String;)Ljavax/naming/Context;",
+          "access": 9,
+          "code_sha256": "03535e35ffda7b92c7f3ebccf3a4092db0652e58e5b1b7b35d56359f01a95d6b",
+          "code_length": 101,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        },
+        {
+          "name": "tearDownRecursively",
+          "descriptor": "(Ljavax/naming/Context;)V",
+          "access": 9,
+          "code_sha256": "fe08eee73900c0cfbb6295826737db6f5e11daa899321d5b87405f6c898ff0db",
+          "code_length": 66,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "rebind",
+          "descriptor": "(Ljavax/naming/Context;Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "aa1b8600a5b597d41112bcde460158efd55a4313b55660e948823674c11c85a3",
+          "code_length": 76,
+          "throws": [
+            "javax/naming/NamingException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/StringTokenizer",
+        "javax/naming/Binding",
+        "javax/naming/Context",
+        "javax/naming/NameNotFoundException",
+        "javax/naming/NamingEnumeration",
+        "javax/naming/NamingException",
+        "org/apache/activemq/artemis/utils/JNDIUtil"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/JsonLoader$1.class",
+      "occurrence": 0,
+      "sha256": "3aac9977a847d7188c7ead632b653d283092d859ddefb18279f6507f31486992",
+      "name": "org/apache/activemq/artemis/utils/JsonLoader$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 1,
+          "code_sha256": "dc2259217bc99a78e63abc600ff25ed89840cc9e5ac1e74bc7e9bf8c043f53cc",
+          "code_length": 41
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljavax/json/spi/JsonProvider;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/security/PrivilegedAction",
+        "javax/json/spi/JsonProvider",
+        "org/apache/activemq/artemis/utils/JsonLoader",
+        "org/apache/activemq/artemis/utils/JsonLoader$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/JsonLoader.class",
+      "occurrence": 0,
+      "sha256": "4415c18dcb0655ef610b9f8466234021aeb1067cdeec5ed4f8b2ddedbd25f1c1",
+      "name": "org/apache/activemq/artemis/utils/JsonLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "provider",
+          "descriptor": "Ljavax/json/spi/JsonProvider;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "loadProvider",
+          "descriptor": "()Ljavax/json/spi/JsonProvider;",
+          "access": 10,
+          "code_sha256": "4eda1fd4d4caf248db3cc90b3b3e3675171f9069c06d04310b1359235ca9e926",
+          "code_length": 14
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/stream/JsonParser;",
+          "access": 9,
+          "code_sha256": "6b0d38f05d8c305b9ae12c28c62e9f919749f7669b36fab4609ef51c92f845d2",
+          "code_length": 8
+        },
+        {
+          "name": "createParser",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/stream/JsonParser;",
+          "access": 9,
+          "code_sha256": "bc760c7d91da42af82aada494ddb355dd1fc43c0c35582402c3dcc6ca01382e5",
+          "code_length": 8
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/stream/JsonGenerator;",
+          "access": 9,
+          "code_sha256": "53079d32e96829655c6a2bc861d8505101c1889999b9b81feca913c9a3768bd6",
+          "code_length": 8
+        },
+        {
+          "name": "createGenerator",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/stream/JsonGenerator;",
+          "access": 9,
+          "code_sha256": "083c99b8bc8c4dd3ab96bd93efbfa0438eed7dd4f53dbab260765c33c67b4fe1",
+          "code_length": 8
+        },
+        {
+          "name": "createParserFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonParserFactory;",
+          "access": 9,
+          "code_sha256": "b7fff89d59a61689324c58849f807616cd826f6903a9465b62e256545cb3ef7c",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonParserFactory;"
+        },
+        {
+          "name": "createGeneratorFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/stream/JsonGeneratorFactory;",
+          "access": 9,
+          "code_sha256": "00afb1c081e31a62ee7a25941f5b9268396e63d0e28b08fa71436528b8e77d08",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/stream/JsonGeneratorFactory;"
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/Writer;)Ljavax/json/JsonWriter;",
+          "access": 9,
+          "code_sha256": "3ddd4b5e435c3619a7396585cf6385896166c69913f80fd991127a955f517604",
+          "code_length": 8
+        },
+        {
+          "name": "createWriter",
+          "descriptor": "(Ljava/io/OutputStream;)Ljavax/json/JsonWriter;",
+          "access": 9,
+          "code_sha256": "ec2cdf610f7943b03351e756b67497bf901433ef91e545e1fb15cbeb5e62112a",
+          "code_length": 8
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/Reader;)Ljavax/json/JsonReader;",
+          "access": 9,
+          "code_sha256": "957a83dc428b80fd86c047418a811ba8dd2db5057c181beabb99cb405f511bca",
+          "code_length": 8
+        },
+        {
+          "name": "createReader",
+          "descriptor": "(Ljava/io/InputStream;)Ljavax/json/JsonReader;",
+          "access": 9,
+          "code_sha256": "b82fa3e3cce04a48121c24a52875ff0c43083a8affa57e77f4340585218f5d0d",
+          "code_length": 8
+        },
+        {
+          "name": "createReaderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonReaderFactory;",
+          "access": 9,
+          "code_sha256": "ae724afec054acde2aa235364f0d749a9d75db92ba170aa6cf3670fa28a031ba",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonReaderFactory;"
+        },
+        {
+          "name": "createWriterFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonWriterFactory;",
+          "access": 9,
+          "code_sha256": "aec3f9453375edc58244c451e199a663a94eb463d759f4de0fa8cc9f2adb0f6a",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonWriterFactory;"
+        },
+        {
+          "name": "createArrayBuilder",
+          "descriptor": "()Ljavax/json/JsonArrayBuilder;",
+          "access": 9,
+          "code_sha256": "26d2d9d78ea233ee0425da71cb6b0d71decfa13d2d8091d3fe0f31bad5e8e795",
+          "code_length": 7
+        },
+        {
+          "name": "createObjectBuilder",
+          "descriptor": "()Ljavax/json/JsonObjectBuilder;",
+          "access": 9,
+          "code_sha256": "feefe5abbcd998c9e3874c305240564527f9524cda9889460c11df33a978edc2",
+          "code_length": 7
+        },
+        {
+          "name": "createBuilderFactory",
+          "descriptor": "(Ljava/util/Map;)Ljavax/json/JsonBuilderFactory;",
+          "access": 9,
+          "code_sha256": "735469362a244215018b0f98b7fc64816893f890e79549b7338021866385aada",
+          "code_length": 8,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;*>;)Ljavax/json/JsonBuilderFactory;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "87997427abe6265f33ff27d07e15ff49517aca0dc47b90d6046b1f7142e16c50",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/security/AccessController",
+        "javax/json/spi/JsonProvider",
+        "org/apache/activemq/artemis/utils/JsonLoader",
+        "org/apache/activemq/artemis/utils/JsonLoader$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/LinkedList.class",
+      "occurrence": 0,
+      "sha256": "aaec95fa4ab818f4403271fca58e409b8f16880f742e0abb1ce91e62491d9c91",
+      "name": "org/apache/activemq/artemis/utils/LinkedList",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "addHead",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TE;)V"
+        },
+        {
+          "name": "addTail",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1025,
+          "generic_signature": "(TE;)V"
+        },
+        {
+          "name": "poll",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TE;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 1025,
+          "generic_signature": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator<TE;>;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/LinkedList"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/LinkedListImpl$Iterator.class",
+      "occurrence": 0,
+      "sha256": "284e8c21279384de663d7a5c5f18b73c68fb783225f874ff26f95ed1f51c702b",
+      "name": "org/apache/activemq/artemis/utils/LinkedListImpl$Iterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/LinkedListIterator"
+      ],
+      "fields": [
+        {
+          "name": "last",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 0,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "current",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 0,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "repeat",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl;)V",
+          "access": 0,
+          "code_sha256": "d5dfefaf367faa2b12ec88edb698a59ecdfce308e7ee3880ddcb01010caab99b",
+          "code_length": 49
+        },
+        {
+          "name": "repeat",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cd57ce0c9cbc38ba8e2014e09eba6b4ad7b69a404cb91b0bfb59300bbe1b76cf",
+          "code_length": 6
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0fdb2a6753951d1f654c6ab62d30b4915af948ec98b1aefaffd9ca2b28e12adc",
+          "code_length": 31
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "228011216e4991ab742e3bafc4b34a5ebce1dcda9dfc0dac167a766966071240",
+          "code_length": 109,
+          "generic_signature": "()TE;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0d27ef30536c98b108de60534780ea092a3e194171ff5cffaff0000e0f426656",
+          "code_length": 50
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "45144d61201f3b234f46b4d737a580066ab554eb331c3bc7639f07b1c8380841",
+          "code_length": 9
+        },
+        {
+          "name": "nudged",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;)V",
+          "access": 1,
+          "code_sha256": "339bdfd0d759591b8d7ce761a87d6241f69aae08c076f9e999247ba4962b68f6",
+          "code_length": 85,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;)V"
+        },
+        {
+          "name": "getNode",
+          "descriptor": "()Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 2,
+          "code_sha256": "6794a6199997a85752d48fc6a6b0798bcdc19d1d606b5240658895783fe464fe",
+          "code_length": 55,
+          "generic_signature": "()Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "canAdvance",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "d5172e401e4963001077b4d0848cfb05708ed75ca5b0ace3257adcd0668dfca9",
+          "code_length": 64
+        },
+        {
+          "name": "advance",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "6ced85eec42bec3f48e9bfdafd9d4875ce0ae5134cca23fb9725ca0360d4ec09",
+          "code_length": 63
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/LinkedListIterator<TE;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/NoSuchElementException",
+        "org/apache/activemq/artemis/utils/LinkedListImpl",
+        "org/apache/activemq/artemis/utils/LinkedListImpl$Iterator",
+        "org/apache/activemq/artemis/utils/LinkedListImpl$Node",
+        "org/apache/activemq/artemis/utils/LinkedListIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/LinkedListImpl$Node.class",
+      "occurrence": 0,
+      "sha256": "82e1fc73cb4e56ae1f23a6e51faf416e7c1e153ef560bbd1538dcfccfb6340b9",
+      "name": "org/apache/activemq/artemis/utils/LinkedListImpl$Node",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "next",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 0,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "prev",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 0,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "val",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TE;"
+        },
+        {
+          "name": "iterCount",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(TE;)V"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b0e96fbe2c14c271fa4b78835503d9dc50a2a28d47b58b8a5a611081aabdc531",
+          "code_length": 23
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/apache/activemq/artemis/utils/LinkedListImpl",
+        "org/apache/activemq/artemis/utils/LinkedListImpl$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/LinkedListImpl.class",
+      "occurrence": 0,
+      "sha256": "dad97ebe786786ec0ea016d1fe277111a7480c9d9bad856cbf332b8a67d9aad2",
+      "name": "org/apache/activemq/artemis/utils/LinkedListImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/LinkedList"
+      ],
+      "fields": [
+        {
+          "name": "INITIAL_ITERATOR_ARRAY_SIZE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "head",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 18,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "tail",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 2,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "iters",
+          "descriptor": "[Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;",
+          "access": 66,
+          "generic_signature": "[Lorg/apache/activemq/artemis/utils/LinkedListImpl<TE;>.Iterator;"
+        },
+        {
+          "name": "numIters",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "nextIndex",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2f5f492b532d7604bc332525139009af5691d76295bf1f12e8caad7512b6b33b",
+          "code_length": 32
+        },
+        {
+          "name": "addHead",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "ca44f5a43f92d00d62da5265dd48b208e7fdc8b962fb692062d3a14c2909d5b6",
+          "code_length": 70,
+          "generic_signature": "(TE;)V"
+        },
+        {
+          "name": "addTail",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "6021027b2c498af489abb62017814815b91245f186b7ff8a86376d227081b8f9",
+          "code_length": 56,
+          "generic_signature": "(TE;)V"
+        },
+        {
+          "name": "poll",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "96487c24db4fb5719032609bdd7a935ec5552d3fa18079a356f08c7716362ca4",
+          "code_length": 27,
+          "generic_signature": "()TE;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7134a78a5b94f6c8d8c56d7b7756c27db9a4a57428f8cd652de906398b0700ec",
+          "code_length": 19
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "2ad01858457e03a189abd6a15f4e3cd0779d9c0d9e5c686467387584975d81bb",
+          "code_length": 5
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 1,
+          "code_sha256": "49366203ca9dc5bfac140b15647db95078d725b9e00a11e13d44161be1f57436",
+          "code_length": 9,
+          "generic_signature": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator<TE;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "816186b36a9d6ea4a664056e362ffc61e235b78a7b9f30c7e89fc80201087cac",
+          "code_length": 55
+        },
+        {
+          "name": "numIters",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d552d13807b271628d872c674ff149a9cdc140fb15c1a26a3fe346b558e7795c",
+          "code_length": 5
+        },
+        {
+          "name": "createIteratorArray",
+          "descriptor": "(I)[Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;",
+          "access": 2,
+          "code_sha256": "d7d8e5319678ff52943d6c8e185154c2c885058ec6fb61951c29305e34cb0538",
+          "code_length": 10,
+          "generic_signature": "(I)[Lorg/apache/activemq/artemis/utils/LinkedListImpl<TE;>.Iterator;"
+        },
+        {
+          "name": "removeAfter",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;)V",
+          "access": 2,
+          "code_sha256": "f27b640ab57371dc3d3fef539af126daa024c60792051caefb04581fe463f90a",
+          "code_length": 74,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;)V"
+        },
+        {
+          "name": "nudgeIterators",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;)V",
+          "access": 34,
+          "code_sha256": "82939bc39c857b14b584600255c07b39e83938f5f1a1f0d7855fff8c78a8646c",
+          "code_length": 33,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node<TE;>;)V"
+        },
+        {
+          "name": "addIter",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;)V",
+          "access": 34,
+          "code_sha256": "763b4d65a738369f215ee6cd8eaafee9391596fe49c5a8a677cee87c0b7e4cda",
+          "code_length": 50,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl<TE;>.Iterator;)V"
+        },
+        {
+          "name": "resize",
+          "descriptor": "(I)V",
+          "access": 34,
+          "code_sha256": "23a7b456a395956ee43b7010cb36e8dd02fbbdb494e9c0ae4a8d72addfaf1fab",
+          "code_length": 26
+        },
+        {
+          "name": "removeIter",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;)V",
+          "access": 34,
+          "code_sha256": "dfecad3806f9a029251252fad98c2b2adf7fa6cdded5ae2c2f4474e5388bf3a8",
+          "code_length": 128,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl<TE;>.Iterator;)V"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl;)Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;",
+          "access": 4104,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl;Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;)V",
+          "access": 4104,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl;Lorg/apache/activemq/artemis/utils/LinkedListImpl$Node;)V",
+          "access": 4104,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/LinkedListImpl;Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;)V",
+          "access": 4104,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Object;>Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/LinkedList<TE;>;",
+      "class_references": [
+        "[Lorg/apache/activemq/artemis/utils/LinkedListImpl$Iterator;",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/reflect/Array",
+        "org/apache/activemq/artemis/utils/LinkedList",
+        "org/apache/activemq/artemis/utils/LinkedListImpl",
+        "org/apache/activemq/artemis/utils/LinkedListImpl$Iterator",
+        "org/apache/activemq/artemis/utils/LinkedListImpl$Node"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/LinkedListIterator.class",
+      "occurrence": 0,
+      "sha256": "763367bfedc095caa88ffb56b8cb93454388cb4de18fa377dd43f48d4803495a",
+      "name": "org/apache/activemq/artemis/utils/LinkedListIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator",
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "repeat",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<E:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/Iterator<TE;>;Ljava/lang/AutoCloseable;",
+      "class_references": [
+        "java/lang/AutoCloseable",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/apache/activemq/artemis/utils/LinkedListIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/MemorySize$ObjectFactory.class",
+      "occurrence": 0,
+      "sha256": "53169fdf9cbc1428853e00bee268145f553eea3b02d302a1a8a3e247a20cdf89",
+      "name": "org/apache/activemq/artemis/utils/MemorySize$ObjectFactory",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createObject",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/MemorySize",
+        "org/apache/activemq/artemis/utils/MemorySize$ObjectFactory"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/MemorySize.class",
+      "occurrence": 0,
+      "sha256": "6770f5b7383c8457a5f5f7b13a01ef3afa131255bc8b5bc06298b662c26d184e",
+      "name": "org/apache/activemq/artemis/utils/MemorySize",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "numberOfObjects",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newObject",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/MemorySize$ObjectFactory;)Ljava/lang/Object;",
+          "access": 10,
+          "code_sha256": "86134944c090ee0d915f501e54089b10623bfbb6e79ff22a1e1395acf4c373b9",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "is64bitArch",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "2e7049bdd339328f5b25ee31c20aa2a39a15f8b623b7735ed71571a5bb055475",
+          "code_length": 25
+        },
+        {
+          "name": "calculateSize",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/MemorySize$ObjectFactory;)I",
+          "access": 9,
+          "code_sha256": "5507f091ae42acea1fa06fffc77995a9a480999ecdd5def258e0ef6bb58b75c6",
+          "code_length": 154,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getMemorySize",
+          "descriptor": "(Ljava/lang/Runtime;)J",
+          "access": 10,
+          "code_sha256": "14344494ed6795b3f4c9f06357ba8cd73add51f2b2eec0221a76fbf069953901",
+          "code_length": 26
+        },
+        {
+          "name": "forceGC",
+          "descriptor": "()V",
+          "access": 10,
+          "code_sha256": "34ad451887d710e4c108aa742d90480df3591594d16d66baa82a8ee150f8731a",
+          "code_length": 39
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/ref/WeakReference",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientLogger",
+        "org/apache/activemq/artemis/utils/MemorySize",
+        "org/apache/activemq/artemis/utils/MemorySize$ObjectFactory"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$1.class",
+      "occurrence": 0,
+      "sha256": "c2e9858bbe9f6fdb7bfb7b2d540a3e70c50c17d4de0fe456fa031a8e518aa86d",
+      "name": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedExceptionAction"
+      ],
+      "fields": [
+        {
+          "name": "val$desc",
+          "descriptor": "Ljava/io/ObjectStreamClass;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;Ljava/io/ObjectStreamClass;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "9a28afbc7c699408bb270f53729d6944fc2600db4301f5c55dd27354a0e12416",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a8151f3f9037491e6c7cfdd4dc8724be4a9a148d800e46cc5277eddb67301504",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedExceptionAction<Ljava/lang/Class;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/security/PrivilegedExceptionAction",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$2.class",
+      "occurrence": 0,
+      "sha256": "084e5aa87489ea4e8dd3384d03164df3c90f45bcfa5078f4130e94264201560b",
+      "name": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedExceptionAction"
+      ],
+      "fields": [
+        {
+          "name": "val$interfaces",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;[Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "9a28afbc7c699408bb270f53729d6944fc2600db4301f5c55dd27354a0e12416",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a8151f3f9037491e6c7cfdd4dc8724be4a9a148d800e46cc5277eddb67301504",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedExceptionAction<Ljava/lang/Class;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/security/PrivilegedExceptionAction",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$2"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader.class",
+      "occurrence": 0,
+      "sha256": "512873a2d9d467b4656f3091fe7b9d1df84fc4919d7458e47765267a22dc9dbb",
+      "name": "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/ObjectInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CATCH_ALL_WILDCARD",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "WHITELIST_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "BLACKLIST_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "whiteList",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "blackList",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "d37206e96bea34774791533c1ae2d7b2f3f6333bfb0114c229b026e1047fa816",
+          "code_length": 52,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getWhiteList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "eb8576196606a7ee563f2b59ea1f67650e3da0c92cc670a471d63ce3e6e6fabf",
+          "code_length": 10
+        },
+        {
+          "name": "getBlackList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5ac7bcbe61b55606ee0b4838f0ffda7c198949f85aa31b1f0e2d165658e4eab2",
+          "code_length": 10
+        },
+        {
+          "name": "setWhiteList",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "7ed5a9fa57f6374980264c57ef35265d791d474fca7accc95ec1948cbe331f0c",
+          "code_length": 11
+        },
+        {
+          "name": "setBlackList",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "06bcc9ca38423c9db0c83e7fbf4f645df4d884ba1c80d15a9c983bc60188d24d",
+          "code_length": 11
+        },
+        {
+          "name": "resolveClass",
+          "descriptor": "(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;",
+          "access": 4,
+          "code_sha256": "1d0ac023928eeac43bd2fbefd48e74a29dda281dfea08b507de39df37219059b",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "resolveProxyClass",
+          "descriptor": "([Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 4,
+          "code_sha256": "436d39740d71d1b8bda8ecdb7e39014475b19559c73b1ac9aaebd08625781ec1",
+          "code_length": 35,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "resolveClass0",
+          "descriptor": "(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;",
+          "access": 2,
+          "code_sha256": "ec47b1512e3c0126ae98333b9a3fec711ab959a3860605f613b31b0d226551c8",
+          "code_length": 51,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "resolveProxyClass0",
+          "descriptor": "([Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 2,
+          "code_sha256": "190ecb48c296d1612fba7e30d4f4a0ba4b3f4d1ca149edddcb2ffefc29fcae63",
+          "code_length": 129,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "unwrapException",
+          "descriptor": "(Ljava/security/PrivilegedActionException;)Ljava/lang/RuntimeException;",
+          "access": 2,
+          "code_sha256": "dde04c187f8e467373162ce4daa250e3de03b92e448a8e4fa8d55422618b4d2d",
+          "code_length": 62,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "checkSecurity",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Class;",
+          "access": 2,
+          "code_sha256": "1ca25e610dfb1d2a22296284f17c83a199f5a496d57339d180456f82dceb4626",
+          "code_length": 98,
+          "throws": [
+            "java/lang/ClassNotFoundException"
+          ],
+          "generic_signature": "(Ljava/lang/Class<*>;)Ljava/lang/Class<*>;"
+        },
+        {
+          "name": "isTrustedType",
+          "descriptor": "(Ljava/lang/Class;)Z",
+          "access": 2,
+          "code_sha256": "aad7b9328121a6d6050d0b729663532be4736e09c4311a50f295f523e501ebd1",
+          "code_length": 152,
+          "generic_signature": "(Ljava/lang/Class<*>;)Z"
+        },
+        {
+          "name": "isClassOrPackageMatch",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "40466aacf525a715f4a6b9bad9cf55125822721be7f12f980d72a1162012e52e",
+          "code_length": 51
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;Ljava/io/ObjectStreamClass;)Ljava/lang/Class;",
+          "access": 4104,
+          "code_sha256": "f0c6a9ba9793aafb772e2fb118bec6af1965c8be886c0e6ae88a245e3894dbca",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader;[Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 4104,
+          "code_sha256": "b2ea10cb9ea684d6466759de2f928a5cc59516dcaa63fc5b4f607796dd744688",
+          "code_length": 6,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Class;",
+        "[Ljava/lang/String;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectStreamClass",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Error",
+        "java/lang/IllegalAccessError",
+        "java/lang/IllegalArgumentException",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/reflect/Modifier",
+        "java/lang/reflect/Proxy",
+        "java/security/AccessController",
+        "java/security/PrivilegedActionException",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$1",
+        "org/apache/activemq/artemis/utils/ObjectInputStreamWithClassLoader$2",
+        "org/apache/activemq/artemis/utils/StringUtil"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/PriorityLinkedList.class",
+      "occurrence": 0,
+      "sha256": "c956ac81e09546eeae693eb57a3252c9c7b3db7381598f22a8496eb8af8c2296",
+      "name": "org/apache/activemq/artemis/utils/PriorityLinkedList",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "addHead",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 1025,
+          "generic_signature": "(TT;I)V"
+        },
+        {
+          "name": "addTail",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 1025,
+          "generic_signature": "(TT;I)V"
+        },
+        {
+          "name": "poll",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 1025,
+          "generic_signature": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator<TT;>;"
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/PriorityLinkedList"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/PriorityLinkedListImpl$PriorityLinkedListIterator.class",
+      "occurrence": 0,
+      "sha256": "75572ad5defb2950a5e202d11b73621e7a2e65ef09280fdc1cda97d626108634",
+      "name": "org/apache/activemq/artemis/utils/PriorityLinkedListImpl$PriorityLinkedListIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/LinkedListIterator"
+      ],
+      "fields": [
+        {
+          "name": "index",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cachedIters",
+          "descriptor": "[Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 18,
+          "generic_signature": "[Lorg/apache/activemq/artemis/utils/LinkedListIterator<TT;>;"
+        },
+        {
+          "name": "lastIter",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 2,
+          "generic_signature": "Lorg/apache/activemq/artemis/utils/LinkedListIterator<TT;>;"
+        },
+        {
+          "name": "resetCount",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 64
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;)V",
+          "access": 0,
+          "code_sha256": "9117bc53760ea0d5c70dcad962d43ee3a037becc8509767adae4b6bf0a0e3174",
+          "code_length": 52
+        },
+        {
+          "name": "finalize",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "01df2bf9da0b00c927c893cf3cc66d7210d2065b09580939e3697155a69feb1c",
+          "code_length": 5
+        },
+        {
+          "name": "repeat",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "791a55e745008e01a5955948a6f7f4b0d4c7ffa89dde0ebe7f521842f2e1061f",
+          "code_length": 25
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fe7d7c688c2792053cf77fc73eef593e2050639b2cb7718a169f3add1fc093e6",
+          "code_length": 56
+        },
+        {
+          "name": "checkReset",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0d1710e9f8d4054bcddb6137e058af169def1b28b1dd88336b63c4b4d25b96d0",
+          "code_length": 37
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b48438f6fc3dab8ee30ceb01fc0612cbbb5ae0451600613e864be3707dfc0b45",
+          "code_length": 115
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d949ce53e7f04e0d138a19989ea2967e3d4040ddaabbf0c61064b6730bbc8bee",
+          "code_length": 25,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6ecc46fc18b0ba8aa7fc48ecc467be8808fd23ff07f4910ba974c397d27ee241",
+          "code_length": 75
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/LinkedListIterator<TT;>;",
+      "class_references": [
+        "[Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+        "java/lang/Object",
+        "java/util/NoSuchElementException",
+        "org/apache/activemq/artemis/utils/LinkedListImpl",
+        "org/apache/activemq/artemis/utils/LinkedListIterator",
+        "org/apache/activemq/artemis/utils/PriorityLinkedListImpl",
+        "org/apache/activemq/artemis/utils/PriorityLinkedListImpl$PriorityLinkedListIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/PriorityLinkedListImpl.class",
+      "occurrence": 0,
+      "sha256": "c782ad95641f2996d3d2b0e3b63fecd431d8c25380db0c5c277bbfff02bfc394",
+      "name": "org/apache/activemq/artemis/utils/PriorityLinkedListImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/PriorityLinkedList"
+      ],
+      "fields": [
+        {
+          "name": "levels",
+          "descriptor": "[Lorg/apache/activemq/artemis/utils/LinkedListImpl;",
+          "access": 4,
+          "generic_signature": "[Lorg/apache/activemq/artemis/utils/LinkedListImpl<TT;>;"
+        },
+        {
+          "name": "size",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastReset",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "highestPriority",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastPriority",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "7f5dbed34e4d0ecf0f5283ab46603cd9a95251592166fd5784fdaaf2c0c27361",
+          "code_length": 54
+        },
+        {
+          "name": "checkHighest",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "702d45489ad42979feef32665f0223a024302fca02d24f4353e23310eb355efc",
+          "code_length": 62
+        },
+        {
+          "name": "addHead",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 1,
+          "code_sha256": "3f1c08fc28bfbdf43480b33e6b58613afd8d3960a40078d82254ae042195d6e9",
+          "code_length": 26,
+          "generic_signature": "(TT;I)V"
+        },
+        {
+          "name": "addTail",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 1,
+          "code_sha256": "e66d1577173bba1967dec657640d4a32d817e3d4526cea7d9e2fe7184f1bfae3",
+          "code_length": 26,
+          "generic_signature": "(TT;I)V"
+        },
+        {
+          "name": "poll",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "40d586b79c18c12f5dbfc6990dbe99335c9ebadb0915d6abeaac60150be9f785",
+          "code_length": 80,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "592e1ec735a4bc765fdcd4f052536e002347519ee1d497a025e57c2d3d98ff7c",
+          "code_length": 37
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9d5151d594e5413ba9d8d60f8eab5c37437fa4314a40019dd8ec798dae6b24e6",
+          "code_length": 5
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "b161d04e707d3f90f8a1895421bd8ab135e9cc144d24b99d705c685dce8facb6",
+          "code_length": 13
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator;",
+          "access": 1,
+          "code_sha256": "0e210aee1d96de41aca7f2e21a502d3fe9dba3b526b944eb1df5feeb956bd557",
+          "code_length": 9,
+          "generic_signature": "()Lorg/apache/activemq/artemis/utils/LinkedListIterator<TT;>;"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;)I",
+          "access": 4104,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;)I",
+          "access": 4104,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "access$102",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;I)I",
+          "access": 4104,
+          "code_sha256": "f4318f46cfcc7a14673cd5c6020a2756667e1c4465c26165e42f7b3232611682",
+          "code_length": 7
+        },
+        {
+          "name": "access$210",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/PriorityLinkedListImpl;)I",
+          "access": 4104,
+          "code_sha256": "155cee0aad7f6e95697719566cce2deec74c40651594d7b666b00d17b0b2146c",
+          "code_length": 12
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/PriorityLinkedList<TT;>;",
+      "class_references": [
+        "[Lorg/apache/activemq/artemis/utils/LinkedListImpl;",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/reflect/Array",
+        "org/apache/activemq/artemis/utils/LinkedListImpl",
+        "org/apache/activemq/artemis/utils/PriorityLinkedList",
+        "org/apache/activemq/artemis/utils/PriorityLinkedListImpl",
+        "org/apache/activemq/artemis/utils/PriorityLinkedListImpl$PriorityLinkedListIterator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SecurityFormatter.class",
+      "occurrence": 0,
+      "sha256": "316406d294ccdc6ef9b752295129fda69b4e5f7df3932031954b3c2d00a6214f",
+      "name": "org/apache/activemq/artemis/utils/SecurityFormatter",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "createSecurity",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/util/Set;",
+          "access": 9,
+          "code_sha256": "dbbc86836b69e9be4cf3ae60435501d2c56a5d3bbaad9839777b279c1a86ab88",
+          "code_length": 281,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/util/Set<Lorg/apache/activemq/artemis/core/security/Role;>;"
+        },
+        {
+          "name": "toList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 10,
+          "code_sha256": "1499a40e109cac3af44688fba9785e28af6b2e90539c5ef6cf15c052c93fd673",
+          "code_length": 73,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/apache/activemq/artemis/core/security/Role",
+        "org/apache/activemq/artemis/utils/SecurityFormatter"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SimpleIDGenerator.class",
+      "occurrence": 0,
+      "sha256": "b948e82cf74379d5b12e0e3147fc3e484aa7de9405f5275ceb46d6392d1ace18",
+      "name": "org/apache/activemq/artemis/utils/SimpleIDGenerator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/IDGenerator"
+      ],
+      "fields": [
+        {
+          "name": "idSequence",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "wrapped",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "51a3c9cdacb3c5d665953c860f48d5a42fb96ce7b0f494d9870244da7badba36",
+          "code_length": 10
+        },
+        {
+          "name": "generateID",
+          "descriptor": "()J",
+          "access": 33,
+          "code_sha256": "59192a7c3791eb98911a92b306493788d4af1a175aeaca1f1009be5a4799809a",
+          "code_length": 47
+        },
+        {
+          "name": "getCurrentID",
+          "descriptor": "()J",
+          "access": 33,
+          "code_sha256": "e84a025869597cbce52cccd11bebf62f6e628f6fe5ce66bc18b1110ccd63e03b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/IDGenerator",
+        "org/apache/activemq/artemis/utils/SimpleIDGenerator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SizeFormatterUtil.class",
+      "occurrence": 0,
+      "sha256": "a46fc0b2ed13cf894fd5af5c4e7fdd5a3ae0181915dc7cad6947cc94ae59a0ee",
+      "name": "org/apache/activemq/artemis/utils/SizeFormatterUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "oneKiB",
+          "descriptor": "J",
+          "access": 10
+        },
+        {
+          "name": "oneMiB",
+          "descriptor": "J",
+          "access": 10
+        },
+        {
+          "name": "oneGiB",
+          "descriptor": "J",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "sizeof",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "7b3d86de72ba6343abb95fa21bc10650ab156efbdc2362a4ed20c1956f7cab56",
+          "code_length": 100
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "4d0b86b94c5db11741edbb95180293468dd1ff139433675e4c5daa0594e3d510",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/apache/activemq/artemis/utils/SizeFormatterUtil"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference.class",
+      "occurrence": 0,
+      "sha256": "42841caab45ca10989ca498ebc9c51316428c157ede6dbe797ad6afd9335f0fe",
+      "name": "org/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/ref/SoftReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "used",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/SoftValueHashMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "getUsed",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "f982d9dd65b730ecf929f713debf6e7bbf462b130509e8c934c67fddd48ac604",
+          "code_length": 5
+        },
+        {
+          "name": "used",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0a18a2e962aef23c67255563cff336d4387f6b4416eb82ea9eb822fd923ceaf3",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap;Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;)V",
+          "access": 0,
+          "code_sha256": "137dae82452a82374ab8046ab41f8597d108237d8ac640d7a26b197314126492",
+          "code_length": 25,
+          "generic_signature": "(TK;TV;)V"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9e8b17874f617b3daa005309c21af3a076fc82ffea8a46c12c9081a74c5a0bea",
+          "code_length": 40
+        }
+      ],
+      "generic_signature": "Ljava/lang/ref/SoftReference<TV;>;",
+      "class_references": [
+        "java/lang/StringBuilder",
+        "java/lang/ref/SoftReference",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SoftValueHashMap$ComparatorAgregated.class",
+      "occurrence": 0,
+      "sha256": "fb50373324cb784eb7429ee3de39d9782585068f002bca1e3fb583380633e6c8",
+      "name": "org/apache/activemq/artemis/utils/SoftValueHashMap$ComparatorAgregated",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/apache/activemq/artemis/utils/SoftValueHashMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference;Lorg/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference;)I",
+          "access": 1,
+          "code_sha256": "a0faaa022403041f99471584bdcb113a8c8d8dcbd4b279e83437b03be9c5bad2",
+          "code_length": 55,
+          "generic_signature": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap<TK;TV;>.AggregatedSoftReference;Lorg/apache/activemq/artemis/utils/SoftValueHashMap<TK;TV;>.AggregatedSoftReference;)I"
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "609efd4d2c5bc928342f48cc9d5e3a4598a14432bfbca6b54708fe27a472f458",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/apache/activemq/artemis/utils/SoftValueHashMap<TK;TV;>.AggregatedSoftReference;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$ComparatorAgregated"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SoftValueHashMap$EntryElement.class",
+      "occurrence": 0,
+      "sha256": "8fde408ab0fdb432898b854c0de4d90fe5ab9ec2c57bcdd25b340b029ef6dc20",
+      "name": "org/apache/activemq/artemis/utils/SoftValueHashMap$EntryElement",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 16,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "value",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 64,
+          "generic_signature": "TV;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15,
+          "generic_signature": "(TK;TV;)V"
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()TK;"
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "f485c9cf162d4f209655e9d8a3a07fd318de970c8d67aee48b1fcf2ba14b9c62",
+          "code_length": 7,
+          "generic_signature": "(TV;)TV;"
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/Map$Entry<TK;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$EntryElement"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache.class",
+      "occurrence": 0,
+      "sha256": "6f1240d3880e1522102f8f8a9c3db6b196ecca264cee518568fcc9e33e682b4e",
+      "name": "org/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isLive",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/SoftValueHashMap.class",
+      "occurrence": 0,
+      "sha256": "bded08d9fafdb36c80dc638e2760e32af66cb307247ee3c4cb8150adc53722b0",
+      "name": "org/apache/activemq/artemis/utils/SoftValueHashMap",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/jboss/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "refQueue",
+          "descriptor": "Ljava/lang/ref/ReferenceQueue;",
+          "access": 18,
+          "generic_signature": "Ljava/lang/ref/ReferenceQueue<TV;>;"
+        },
+        {
+          "name": "mapDelegate",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<TK;Lorg/apache/activemq/artemis/utils/SoftValueHashMap<TK;TV;>.AggregatedSoftReference;>;"
+        },
+        {
+          "name": "usedCounter",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        },
+        {
+          "name": "maxElements",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d63960b792f9b4a0c44362a507ab5ca0ccb7ca15dfeb551bd5defdcaaff8f559",
+          "code_length": 44
+        },
+        {
+          "name": "setMaxElements",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "f80481a85b69bf225a28b200cc34076c0e8f2af17b0e8444040c25395659bbda",
+          "code_length": 10
+        },
+        {
+          "name": "getMaxEelements",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "ed3b55cc5ceb92625108258378510b7804add7f1c8309b29defb1113950297fa",
+          "code_length": 5
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "7abc8e9d6b51c7957729c4f3905c4ba2b6068db022c7359b67fea58f8a1b3281",
+          "code_length": 14
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d66011db9e3b831143af51c530cf523fa41e6af9b6def4bb50d77201b9ea7ee3",
+          "code_length": 14
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "6f6f7b0d3579ad8a081abefeba23d61f29b05060b26e465ca756ed46b8e070cf",
+          "code_length": 15
+        },
+        {
+          "name": "containsValue",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "de2d46d157db7ed09823631bf37ae6d7478e2fdcc2069e24b4d86ccfb0f99247",
+          "code_length": 68
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;",
+          "access": 1,
+          "code_sha256": "d79aab5c9f7f9e903a7356f9eac6c7aa390b001eef7e2293b4504bc94e2704c1",
+          "code_length": 36,
+          "generic_signature": "(Ljava/lang/Object;)TV;"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;)Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;",
+          "access": 1,
+          "code_sha256": "79038c943deabef9d5633a62c1e1a9b007c36248064bd54fa2021255214e123f",
+          "code_length": 51,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "checkCacheSize",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "aa495812d3ef428a77909c5b1c87911072ae59f17b21b66053db7b579f2ca486",
+          "code_length": 229
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;",
+          "access": 1,
+          "code_sha256": "dedec2de7165cf3e429e437c63991cf0cf8f00a6cfcd4c59eaf68299b6e2bc87",
+          "code_length": 32,
+          "generic_signature": "(Ljava/lang/Object;)TV;"
+        },
+        {
+          "name": "putAll",
+          "descriptor": "(Ljava/util/Map;)V",
+          "access": 1,
+          "code_sha256": "12e59c10161ec41022c9e605d7fbb98b2c05dfcf84dae945b015eeeb562a784c",
+          "code_length": 59,
+          "generic_signature": "(Ljava/util/Map<+TK;+TV;>;)V"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "002b5def26377d7b25770b2d72ec0764297486a89dcc1fe649648626788bd931",
+          "code_length": 10
+        },
+        {
+          "name": "keySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "42a9b5fc9b5bb2460d10ca5ff514d2f1ef70885dbdf0463cd8a39b19b2ffda29",
+          "code_length": 14,
+          "generic_signature": "()Ljava/util/Set<TK;>;"
+        },
+        {
+          "name": "values",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "5a7629b8fc838591e8cafa70e3d7d1027ef25b67c7b82fec36ea18a77162c0e5",
+          "code_length": 72,
+          "generic_signature": "()Ljava/util/Collection<TV;>;"
+        },
+        {
+          "name": "entrySet",
+          "descriptor": "()Ljava/util/Set;",
+          "access": 1,
+          "code_sha256": "41b714f66bc6fa09fa237ebffb11cf05311d80f398d72f5c87a005d59eb3adcc",
+          "code_length": 93,
+          "generic_signature": "()Ljava/util/Set<Ljava/util/Map$Entry<TK;TV;>;>;"
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "406bfb3981d269f73496e21d0ed4883c8aa920d970c28cc278f6e6fea096c7e1",
+          "code_length": 15
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "05124113824866b10ebc58019c6b4b82f1fd8f40b5102bbe77bcc2a4a06eb5d9",
+          "code_length": 10
+        },
+        {
+          "name": "processQueue",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5cf874dfffd3e4fb4d57faef24d1390acf17ed58c03e3449afe21cbd742f13ab",
+          "code_length": 47
+        },
+        {
+          "name": "createReference",
+          "descriptor": "(Ljava/lang/Object;Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;)Lorg/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference;",
+          "access": 2,
+          "code_sha256": "caf880a7952a47223fc16e75669032ba08bc8705f6413aff3517333c98b661e3",
+          "code_length": 13,
+          "generic_signature": "(TK;TV;)Lorg/apache/activemq/artemis/utils/SoftValueHashMap<TK;TV;>.AggregatedSoftReference;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "ad0976cd9086c125ae4edc18bbcd1d1218e676d881f8ed794cfd354e4d0cdda9",
+          "code_length": 6
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "0abfa4721bd787ce5b3103a2e0250a1d110a00e5f7ac0d77ab5b4e6ed6b28f32",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "994cbc8430511c527157b59e479386533b7deabcbbba2e5ae7508e52e5ebc4b6",
+          "code_length": 6
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap;)Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 4104,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lorg/apache/activemq/artemis/utils/SoftValueHashMap;)Ljava/lang/ref/ReferenceQueue;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "843ba2b7ac6d39a459832779edd8c1c6653266acddde9ac73bdf0da48de479bf",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V::Lorg/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache;>Ljava/lang/Object;Ljava/util/Map<TK;TV;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/ref/ReferenceQueue",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/TreeSet",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$AggregatedSoftReference",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$ComparatorAgregated",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$EntryElement",
+        "org/apache/activemq/artemis/utils/SoftValueHashMap$ValueCache",
+        "org/jboss/logging/Logger"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/StringUtil.class",
+      "occurrence": 0,
+      "sha256": "5c14cece5b03fbed2a5e29bfa2c30ca45ba1fcc06104f930dcbd6bdbe6a71f50",
+      "name": "org/apache/activemq/artemis/utils/StringUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "joinStringList",
+          "descriptor": "(Ljava/util/List;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "32bb042a0dd86f24d9df27661ec1372bbbebd090a580eaaef02e544dd1ab3f85",
+          "code_length": 61,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "splitStringList",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "545085fc8a95e6ecbc489d47c089f9943a021bd796b82bcf65b612ff4c4cdef3",
+          "code_length": 34,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/apache/activemq/artemis/utils/StringUtil"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/TimeAndCounterIDGenerator.class",
+      "occurrence": 0,
+      "sha256": "d815df3e153bb1fc522ccc9bc35920bd7d7a8570027646da177bcd8b95108971",
+      "name": "org/apache/activemq/artemis/utils/TimeAndCounterIDGenerator",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/IDGenerator"
+      ],
+      "fields": [
+        {
+          "name": "BITS_TO_MOVE",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "MASK_TIME",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "ID_MASK",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "TIME_ID_MASK",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "counter",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 18
+        },
+        {
+          "name": "wrapped",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "tmMark",
+          "descriptor": "J",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6513d8a0e240af7dfe2672e33accc37835561bbb12e8ad66ff84f34a8b49f996",
+          "code_length": 26
+        },
+        {
+          "name": "generateID",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "a44d60fae0d4dd9c50518271ecebdfe86290422b2f83c8679bb5daab088127ba",
+          "code_length": 65
+        },
+        {
+          "name": "getCurrentID",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "1999973686416ed2d46b9925d0ff03794004a522d61fc4ae3124437ce9bec78e",
+          "code_length": 8
+        },
+        {
+          "name": "getInternalTimeMark",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "b8722b4872d1b46407d2f8d750ae990cdded76105b5a8126c2274bb7e037e659",
+          "code_length": 5
+        },
+        {
+          "name": "setInternalID",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "cc7c0a7dc2865eec344d01f0ddc942b00e3edbbd013e7d667306a8555477f543",
+          "code_length": 14
+        },
+        {
+          "name": "setInternalDate",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "9a17f97fe5fe1abcae6c210066a31325224675d0563773ec9041fcd76640f335",
+          "code_length": 24
+        },
+        {
+          "name": "refresh",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "7f4a7ceb26719daa1f8e643ecb4440193e437a0414bfff16f569f61cf895badc",
+          "code_length": 41
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fb7e51c56503d7ec3c2d9517b9a5f381777cd3164c06a85d886628d114993f47",
+          "code_length": 62
+        },
+        {
+          "name": "newTM",
+          "descriptor": "()J",
+          "access": 2,
+          "code_sha256": "7be47670c6f5c37aa175593e88fc0e98969f90aef3bb7d3bc175706f30fa39e1",
+          "code_length": 11
+        },
+        {
+          "name": "hex",
+          "descriptor": "(J)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "d2c85e47a6399e1dd546032e85d1519af61adb260f55573c896efa832a9812bf",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/concurrent/atomic/AtomicLong",
+        "org/apache/activemq/artemis/utils/IDGenerator",
+        "org/apache/activemq/artemis/utils/TimeAndCounterIDGenerator"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/TokenBucketLimiter.class",
+      "occurrence": 0,
+      "sha256": "14d5fda934075c34a9c07b41033649f2350d0a40a159b336ba6ba885d619f0f3",
+      "name": "org/apache/activemq/artemis/utils/TokenBucketLimiter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getRate",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "isSpin",
+          "descriptor": "()Z",
+          "access": 1025
+        },
+        {
+          "name": "limit",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/apache/activemq/artemis/utils/TokenBucketLimiter"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/TokenBucketLimiterImpl.class",
+      "occurrence": 0,
+      "sha256": "085521fed8acc0e470ff7b7e241a930c18ac8a7654ee2bd285b8d259ab6cdeb4",
+      "name": "org/apache/activemq/artemis/utils/TokenBucketLimiterImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/apache/activemq/artemis/utils/TokenBucketLimiter"
+      ],
+      "fields": [
+        {
+          "name": "rate",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "window",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "spin",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "last",
+          "descriptor": "J",
+          "access": 66
+        },
+        {
+          "name": "tokens",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IZ)V",
+          "access": 1,
+          "code_sha256": "def8ce62b9542b956a441b203565d93c47693316e2f6cefdfcd97f53f9952a58",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IZLjava/util/concurrent/TimeUnit;I)V",
+          "access": 1,
+          "code_sha256": "900d746c1d39daba36a884436480a6b552430a34e5d78e939b13bdca8b43d6ef",
+          "code_length": 26
+        },
+        {
+          "name": "getRate",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "isSpin",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "limit",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "96775f39a105360c1faa2b1447597cbde0fafb9172907f0c8717fa1b8b8b2734",
+          "code_length": 32
+        },
+        {
+          "name": "check",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "f0ed82ac58ce25432e14016e7d79ef4442ea1adea64798dfc1906acbfa2129fb",
+          "code_length": 70
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/concurrent/TimeUnit",
+        "org/apache/activemq/artemis/utils/TokenBucketLimiter",
+        "org/apache/activemq/artemis/utils/TokenBucketLimiterImpl"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/VersionLoader$1.class",
+      "occurrence": 0,
+      "sha256": "5d4f8c2b15f1acf86e7c54d0c109b5e99817fad48ee699146f3116b7a4bb1edf",
+      "name": "org/apache/activemq/artemis/utils/VersionLoader$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "68ac62a6b200ac07e65d525b9e7fd14e5460646de4d1c2ab7143fdce01e665e5",
+          "code_length": 6
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a8151f3f9037491e6c7cfdd4dc8724be4a9a148d800e46cc5277eddb67301504",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "java/security/PrivilegedAction",
+        "org/apache/activemq/artemis/utils/VersionLoader",
+        "org/apache/activemq/artemis/utils/VersionLoader$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/VersionLoader$2.class",
+      "occurrence": 0,
+      "sha256": "efecb8760858d8ccc888e44f9002ec8a00dfbb06514d9a20c5cf16704de88d27",
+      "name": "org/apache/activemq/artemis/utils/VersionLoader$2",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/apache/activemq/artemis/core/version/Version;Lorg/apache/activemq/artemis/core/version/Version;)I",
+          "access": 1,
+          "code_sha256": "659088c5acbbd29f4fe9e4c5ea935be3c4366d7985df0e6d701d05fedf37847f",
+          "code_length": 14
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "3d194ab7ea49e829ad898786d3577cc2c4e56603f3124bafb82337ca4e0700cf",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/apache/activemq/artemis/core/version/Version;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Comparator",
+        "org/apache/activemq/artemis/core/version/Version",
+        "org/apache/activemq/artemis/utils/VersionLoader",
+        "org/apache/activemq/artemis/utils/VersionLoader$2"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/VersionLoader.class",
+      "occurrence": 0,
+      "sha256": "6bdd03358768147c101045eee111b9b93bf6de449d64b3e3e882347ec907047f",
+      "name": "org/apache/activemq/artemis/utils/VersionLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "VERSION_PROP_FILE_KEY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "DEFAULT_PROP_FILE_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "PROP_FILE_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "versions",
+          "descriptor": "[Lorg/apache/activemq/artemis/core/version/Version;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getClientVersions",
+          "descriptor": "()[Lorg/apache/activemq/artemis/core/version/Version;",
+          "access": 9,
+          "code_sha256": "9b3a9a21cc74fa9174d884e9049c98b6097aea32f24f462dc69a19f1675d991f",
+          "code_length": 39
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Lorg/apache/activemq/artemis/core/version/Version;",
+          "access": 9,
+          "code_sha256": "1e25ce8e261103d715f5ed3924b1b8e1b2dcc3a3b8b45e8dbbc295d9d523df90",
+          "code_length": 41
+        },
+        {
+          "name": "getClasspathString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "e853a23150790740604d846fbb2c254a4977c8ad99dc51278591a2085ebd1276",
+          "code_length": 70
+        },
+        {
+          "name": "load",
+          "descriptor": "()[Lorg/apache/activemq/artemis/core/version/Version;",
+          "access": 10,
+          "code_sha256": "a9ace5cdcf83190b52b887d6786c8c410b2443720706281f94d27305200a1902",
+          "code_length": 303
+        },
+        {
+          "name": "parseCompatibleVersionList",
+          "descriptor": "(Ljava/lang/String;)[I",
+          "access": 10,
+          "code_sha256": "922774238b43df1f402bfb755b83da43a696b6d85853b80140943c84845f8536",
+          "code_length": 290,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d5b7c7d6cf7b2fb57e93d69b0bc264d8afd593e59ab4a95f7dcab1841963318c",
+          "code_length": 76
+        }
+      ],
+      "class_references": [
+        "[I",
+        "[Ljava/net/URL;",
+        "[Lorg/apache/activemq/artemis/core/version/Version;",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Character",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/net/URL",
+        "java/net/URLClassLoader",
+        "java/security/AccessController",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/List",
+        "java/util/Properties",
+        "java/util/StringTokenizer",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientLogger",
+        "org/apache/activemq/artemis/core/version/Version",
+        "org/apache/activemq/artemis/core/version/impl/VersionImpl",
+        "org/apache/activemq/artemis/utils/VersionLoader",
+        "org/apache/activemq/artemis/utils/VersionLoader$1",
+        "org/apache/activemq/artemis/utils/VersionLoader$2"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/XidCodecSupport.class",
+      "occurrence": 0,
+      "sha256": "745f8cd970cafd4e8b5bd611d07880fd8b22564dc276c82201456ecb43502d38",
+      "name": "org/apache/activemq/artemis/utils/XidCodecSupport",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "encodeXid",
+          "descriptor": "(Ljavax/transaction/xa/Xid;Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)V",
+          "access": 9,
+          "code_sha256": "963dcd063b87e33bc55c5ccbe464d3ba7306ce75ad10cd50a91ae5d56156e05d",
+          "code_length": 63
+        },
+        {
+          "name": "decodeXid",
+          "descriptor": "(Lorg/apache/activemq/artemis/api/core/ActiveMQBuffer;)Ljavax/transaction/xa/Xid;",
+          "access": 9,
+          "code_sha256": "1929c92fa00cca4f7208f4a56f539bde9bbcc75b4c17caba01b520f641f88c48",
+          "code_length": 54
+        },
+        {
+          "name": "getXidEncodeLength",
+          "descriptor": "(Ljavax/transaction/xa/Xid;)I",
+          "access": 9,
+          "code_sha256": "a41e435fc39c98b0cfb791562f253d7f9711cf3aff4b75891992377a184d6409",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/transaction/xa/Xid",
+        "org/apache/activemq/artemis/api/core/ActiveMQBuffer",
+        "org/apache/activemq/artemis/core/transaction/impl/XidImpl",
+        "org/apache/activemq/artemis/utils/DataConstants",
+        "org/apache/activemq/artemis/utils/XidCodecSupport"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/XMLUtil$1.class",
+      "occurrence": 0,
+      "sha256": "3edbeabd17f452d38aa22bf7cdd45cfd9c03c66c06cee3bcd06170658f87412d",
+      "name": "org/apache/activemq/artemis/utils/XMLUtil$1",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$resourceName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "aeb0be62b5df2616b123d9e51fa4e759c4398da9f4d545f1d31b998b977a1167",
+          "code_length": 8
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "17217c6b850261a41f6fc6f0f65b178af92d6382393313c4dd7732ab214b347f",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/security/PrivilegedAction<Ljava/net/URL;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/security/PrivilegedAction",
+        "org/apache/activemq/artemis/utils/ClassloadingUtil",
+        "org/apache/activemq/artemis/utils/XMLUtil",
+        "org/apache/activemq/artemis/utils/XMLUtil$1"
+      ]
+    },
+    {
+      "entry": "org/apache/activemq/artemis/utils/XMLUtil.class",
+      "occurrence": 0,
+      "sha256": "028a7792c9088ed48a37870381078d6d8022b0a89c5e746ada6e8b122856accd",
+      "name": "org/apache/activemq/artemis/utils/XMLUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Lorg/jboss/logging/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "stringToElement",
+          "descriptor": "(Ljava/lang/String;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "0d812332ef906f74e330a4efca30d525f8699e1d6729c054b1527a71cad501b2",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "urlToElement",
+          "descriptor": "(Ljava/net/URL;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "7ff9d0ec3712e1ed7074ffbfec3e4decd8986500f74b84fe78644f650ff01168",
+          "code_length": 15,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "readerToString",
+          "descriptor": "(Ljava/io/Reader;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "18cb2a7c1df77d585ee1c879011b98a6d10b19c6fa9a5ce1e92be8806ddc6e8d",
+          "code_length": 33,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "readerToElement",
+          "descriptor": "(Ljava/io/Reader;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "584a96793da5c9df0253c543bb8454c45d8c61be7ea89419747f77218888f981",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "elementToString",
+          "descriptor": "(Lorg/w3c/dom/Node;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2d12f45a0518eb24aa434ccb1660b422dbd969b8949e3a94573e324264e3af50",
+          "code_length": 355
+        },
+        {
+          "name": "getTextContent",
+          "descriptor": "(Lorg/w3c/dom/Node;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "768eb76434c6500e30d107cfe9fad18a16ff2c2bd500edafb11d448a86a5e90f",
+          "code_length": 97
+        },
+        {
+          "name": "assertEquivalent",
+          "descriptor": "(Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)V",
+          "access": 9,
+          "code_sha256": "498f94e1501c90ff795d2a6e4564c776247297b376f37a61376aea0dd8acd84c",
+          "code_length": 403
+        },
+        {
+          "name": "stripCDATA",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "2040d80cba5e76bde6d334b947c6f0259cfff878ffa9aa15dd1456706ad04b02",
+          "code_length": 52
+        },
+        {
+          "name": "replaceSystemProps",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "8072b453729c6c73b7f45fb926a251b6fe70e5acf2ee0b582222b33cd64ca89f",
+          "code_length": 154
+        },
+        {
+          "name": "parseLong",
+          "descriptor": "(Lorg/w3c/dom/Node;)J",
+          "access": 9,
+          "code_sha256": "86c747093dd5c5d0d6ba21e56307427b5970f46f4acf297ca72bb095d66db542",
+          "code_length": 27
+        },
+        {
+          "name": "parseInt",
+          "descriptor": "(Lorg/w3c/dom/Node;)I",
+          "access": 9,
+          "code_sha256": "9c4a8826b53787722a3fae1cd79ce9994b33f48fe9ba924b59f3a9b9bcc78c6c",
+          "code_length": 27
+        },
+        {
+          "name": "parseBoolean",
+          "descriptor": "(Lorg/w3c/dom/Node;)Z",
+          "access": 9,
+          "code_sha256": "8569a8b62c78c4dab9170e8b79c046259241b977d0a0353293454b293d92538f",
+          "code_length": 27
+        },
+        {
+          "name": "parseDouble",
+          "descriptor": "(Lorg/w3c/dom/Node;)D",
+          "access": 9,
+          "code_sha256": "3561952c13dc9963c98e9780172802d2379574820fa04b7179e6e58516d01898",
+          "code_length": 27
+        },
+        {
+          "name": "validate",
+          "descriptor": "(Lorg/w3c/dom/Node;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "3a5ae9a70524df68d94c67b4463ce727af7c2a6e3425d23af576f7f22ad23cd6",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "filter",
+          "descriptor": "(Lorg/w3c/dom/NodeList;[S)Ljava/util/List;",
+          "access": 10,
+          "code_sha256": "2ca22886cee9ed0e79d89d2cf93602e5b28745f95685583ae6bc670402dcd377",
+          "code_length": 96,
+          "generic_signature": "(Lorg/w3c/dom/NodeList;[S)Ljava/util/List<Lorg/w3c/dom/Node;>;"
+        },
+        {
+          "name": "findResource",
+          "descriptor": "(Ljava/lang/String;)Ljava/net/URL;",
+          "access": 10,
+          "code_sha256": "881fa16c61ef9f67279a1010cb08db0cbd65bceb6dd6280759baada12f0665b7",
+          "code_length": 15
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3f2b8c0d5033390c6aa58fa9837b717e6a327766dee90964b14ce4bba0808806",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[S",
+        "java/io/InputStreamReader",
+        "java/io/Reader",
+        "java/io/StringReader",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NumberFormatException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/net/URL",
+        "java/security/AccessController",
+        "java/util/ArrayList",
+        "java/util/List",
+        "javax/xml/XMLConstants",
+        "javax/xml/parsers/DocumentBuilder",
+        "javax/xml/parsers/DocumentBuilderFactory",
+        "javax/xml/transform/dom/DOMSource",
+        "javax/xml/validation/Schema",
+        "javax/xml/validation/SchemaFactory",
+        "javax/xml/validation/Validator",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientLogger",
+        "org/apache/activemq/artemis/core/client/ActiveMQClientMessageBundle",
+        "org/apache/activemq/artemis/utils/XMLUtil",
+        "org/apache/activemq/artemis/utils/XMLUtil$1",
+        "org/jboss/logging/Logger",
+        "org/w3c/dom/Document",
+        "org/w3c/dom/NamedNodeMap",
+        "org/w3c/dom/Node",
+        "org/w3c/dom/NodeList",
+        "org/xml/sax/InputSource",
+        "org/xml/sax/SAXException"
+      ]
+    }
+  ]
+}

@@ -14,8 +14,8 @@ limitations are owned by the ProjectWorkbench README.
 
 ## Evidence and preview boundaries
 
-SQX144-EV-000068..070 record mode choices and the profile/sequential result
-registrations. SQX144-EV-000072 retains the unresolved Trading options visibility
+retained target UI; current donor equivalence unverified record mode choices and the profile/sequential result
+registrations. retained target UI; current donor equivalence unverified retains the unresolved Trading options visibility
 question: the task declaration includes Optimize but product annotations omit
 OPTIMIZER. Showing this tab here is provisional target composition, not a donor fact.
 
@@ -33,3 +33,7 @@ Browser coverage includes four modes, preset apply/cancel, parameter errors,
 file metadata, matrix selection, sequential preview action, mock cancellation,
 workspace isolation and databank activation. Screenshots include dark/light and
 80% CSS zoom; this is not a browser-native zoom equivalence check.
+
+## SQX145 reference qualification
+
+Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.

@@ -1,0 +1,1014 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
+  "archive_sha256": "026673159e7365b15e877ecd9123bf4187f49218d4db3855a6c0fed6a3735bc5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/ConfigVerifier.class",
+      "occurrence": 0,
+      "sha256": "a22a72aea65c7dcf83621e06261a8600fce4ddb5a38d130acca731b714736a25",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/ConfigVerifier",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "verifyConfig",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "940f2b59205c79de580643ec0ec96d21adf9097a25384802908f5cad60f1462c",
+          "code_length": 37,
+          "generic_signature": "(Lorg/jdom2/Element;)Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "checkDataConfig",
+          "descriptor": "(Ljava/util/ArrayList;Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "08dcdfe4d399e086b458bf7b3163349792429b4004a03b60a8a0c7c66c120842",
+          "code_length": 425,
+          "generic_signature": "(Ljava/util/ArrayList<Ljava/lang/String;>;Lorg/jdom2/Element;)V"
+        },
+        {
+          "name": "checkChart",
+          "descriptor": "(Lorg/jdom2/Element;IILjava/util/ArrayList;)V",
+          "access": 2,
+          "code_sha256": "2faac8c6707b71243ef4546ad24a5326db3ee772300eb68a55aabdd6bada7b28",
+          "code_length": 205,
+          "generic_signature": "(Lorg/jdom2/Element;IILjava/util/ArrayList<Ljava/lang/String;>;)V"
+        },
+        {
+          "name": "checkDate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ILjava/util/ArrayList;)Z",
+          "access": 2,
+          "code_sha256": "e127561d535b4a137e55c164e3603fc6cabcab515e07586646d0376965872a30",
+          "code_length": 97,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;ILjava/util/ArrayList<Ljava/lang/String;>;)Z"
+        },
+        {
+          "name": "getBacktestLabel",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "45cbd6821e606e1af75eaf2d62bca88d8a2a200425e27af69b93986c96e0221a",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/plugin/Task/impl/Optimize/ConfigVerifier",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/text/ParseException",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Element"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1.class",
+      "occurrence": 0,
+      "sha256": "a2472a6b024520e81b8954da8a732e13a03e502116ff2fdeffb5fb53e34c1184",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/INewResultListener"
+      ],
+      "fields": [
+        {
+          "name": "val$originalStrategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "newResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 1,
+          "code_sha256": "3c90ef94ebc4b31a33d2f7a82401d2b9d29516746b887477bbbf6a7586f3f7d7",
+          "code_length": 13,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/INewResultListener",
+        "java/lang/Exception",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2.class",
+      "occurrence": 0,
+      "sha256": "6a0bd132348766032a1f55cef96e91f11871b57b0859b3c08b3140f821d9c5e8",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/IEngineLogListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "processMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "536687ba1f169f293f3dd569806354c23321b40b50d13242a09c9ba370bed47c",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/IEngineLogListener",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3.class",
+      "occurrence": 0,
+      "sha256": "8239021218b643e3af377cb063249b97bcd2c2a6b52e9d0533075d46954bc381",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/IStepsListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "step",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a5c56958dc3556c2f98e50fe815e07ec6abb21eb6c77c5ee8a9c412672ce81c0",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/IStepsListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4.class",
+      "occurrence": 0,
+      "sha256": "d602fea00de389026ea25f2f174072fe9bf7ecbc3155443b52ea59d769a52496",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/INewResultListener"
+      ],
+      "fields": [
+        {
+          "name": "val$originalStrategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "b484179115bd98f0121ab7843ec3492289baced52a8fe252e66163b61a869e65",
+          "code_length": 15,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "newResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 1,
+          "code_sha256": "f40b0550a1b09386d0a27831389699404a972ab4adbada5a1fc3bd570b0c8f98",
+          "code_length": 27,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/optimization/INewResultListener",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5.class",
+      "occurrence": 0,
+      "sha256": "795ca01dd010879807cfe27b24d7a1c66389ebbf3d4064f39fd4bb0049c46ae7",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/IEngineLogListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "processMessage",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "536687ba1f169f293f3dd569806354c23321b40b50d13242a09c9ba370bed47c",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/IEngineLogListener",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6.class",
+      "occurrence": 0,
+      "sha256": "9e9402571d0f51dc9554b1085cb6524f26df7fcbd60dd5fcb51a85874ce446e3",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/IStepsListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "step",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "a5c56958dc3556c2f98e50fe815e07ec6abb21eb6c77c5ee8a9c412672ce81c0",
+          "code_length": 33
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/IStepsListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7.class",
+      "occurrence": 0,
+      "sha256": "6431d87a07d46e6a82a1624e6686a8fbddcfb083e2a69dbfe69fb4e12981876c",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/optimization/ISequentialOptimizationCompleteListener"
+      ],
+      "fields": [
+        {
+          "name": "val$originalStrategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$settings",
+          "descriptor": "Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;Ljava/lang/String;Lcom/strategyquant/lib/SettingsMap;)V",
+          "access": 0,
+          "code_sha256": "d4876b454dd4442e647c3de87ce28f52fb5d0d9e2134b250d698d8c25f7e50c8",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "onFinish",
+          "descriptor": "(ZLcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 1,
+          "code_sha256": "90e5ed24bb7d91edc10e48da90e04121dc520b26eddd7f595fc8094eec1c490c",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/tradinglib/optimization/ISequentialOptimizationCompleteListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData.class",
+      "occurrence": 0,
+      "sha256": "6acd3fc35bf43e904c518e5fb68bdbc14c6d5e37dde96f8b295a8e9ffab2a941",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "strategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "elStrategyXml",
+          "descriptor": "Lorg/jdom2/Element;",
+          "access": 0
+        },
+        {
+          "name": "dateGenerated",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask.class",
+      "occurrence": 0,
+      "sha256": "fc084a144fff13724cdbd648b1af949d6588481f2ce6c31739006472b8cf0496",
+      "name": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+      "interfaces": [
+        "com/strategyquant/tradinglib/project/ILastEventListener"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "LOCK_OPTIMIZETASK",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "optimizationSettings",
+          "descriptor": "Lcom/strategyquant/tradinglib/optimization/OptimizationSettings;",
+          "access": 2
+        },
+        {
+          "name": "inputDatabank",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "outputDatabank",
+          "descriptor": "Lcom/strategyquant/tradinglib/Databank;",
+          "access": 2
+        },
+        {
+          "name": "strategies",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "fitnessFunction",
+          "descriptor": "Lcom/strategyquant/tradinglib/fitnessfunction/IFitnessFunction;",
+          "access": 2
+        },
+        {
+          "name": "tradingOptions",
+          "descriptor": "Lcom/strategyquant/tradinglib/options/TradingOptions;",
+          "access": 2
+        },
+        {
+          "name": "atm",
+          "descriptor": "Lcom/strategyquant/tradinglib/ATM;",
+          "access": 2
+        },
+        {
+          "name": "paramSettings",
+          "descriptor": "Lcom/strategyquant/tradinglib/optimization/ParametersSettings;",
+          "access": 2
+        },
+        {
+          "name": "taskSettings",
+          "descriptor": "Lorg/jdom2/Element;",
+          "access": 2
+        },
+        {
+          "name": "totalSteps",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "progressPercent",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastProcessedIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "cumulativeSteps",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "optimizedStrategies",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "caMethod",
+          "descriptor": "Lcom/strategyquant/tradinglib/CustomAnalysisMethod;",
+          "access": 2
+        },
+        {
+          "name": "caInputArgs",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "caFilter",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "lastSettingsXml",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "conditionsChecker",
+          "descriptor": "Lcom/strategyquant/tradinglib/conditions/ConditionsChecker;",
+          "access": 4
+        },
+        {
+          "name": "dismissalReason",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "dismissalMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "engine",
+          "descriptor": "Lcom/strategyquant/tradinglib/optimization/SequentialOptimizationEngine;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "25be2d651c06e54341e3d32390bcc8375d7187b946cb95b0ae77341ff0ce5114",
+          "code_length": 7,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)V",
+          "access": 1,
+          "code_sha256": "52d43ecbab32548adc2446041a6efe8e9c513d3be59ca13ee856aa5252630bbd",
+          "code_length": 67,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fc1647563a60ad9d9945b92a5d8b05e7901bbdacd3449a2454192a9fc4782ada",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e18d96c27d5d66aefe93e1c813b217384db11f89e4de077a048afe0b89a1ea43",
+          "code_length": 6
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/project/ProgressEngine;)Lcom/strategyquant/tradinglib/taskImpl/ISQTask;",
+          "access": 1,
+          "code_sha256": "5dba25d66f7e60212497e2895a1ce46ff8808cbc378449fb5efc2a2b2ef82b62",
+          "code_length": 20,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "beforeStart",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "0607d5ec3b4c0bb4ecacd1647d07063a444bf3de053b5e327ff5d52de9094a38",
+          "code_length": 357,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "recognizeCustomAnalysisMethod",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "1111e86d3d79b6eda80611d255911d92233b92dbebc31b82b0cf50c28c4eb94e",
+          "code_length": 46
+        },
+        {
+          "name": "somethingToOptimize",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "04cebb439faed9bdd6e21cab0cb0f8f89fdb9b1de34a6bb7672b55da989a1e69",
+          "code_length": 76,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initializeBacktestData",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ea84f97841f1b3bc41a6685146120bef6450b480d92711a93f9bfdc5cf93606b",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "start",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a987f8dc17ee3fa79a25235a0c45b2bbf11673a7a9f02595fdab8d9e0e7cca02",
+          "code_length": 540,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getStrategyToOptimize",
+          "descriptor": "(Ljava/io/File;)Lcom/strategyquant/tradinglib/ResultsGroup;",
+          "access": 2,
+          "code_sha256": "127601dce0f46aa5b79a5c08ebe5b2e35835b38ca4e3049582a0ded97093a74e",
+          "code_length": 154
+        },
+        {
+          "name": "getStrategyData",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;)Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData;",
+          "access": 2,
+          "code_sha256": "7c8602a3ab161702cc3f888a6af636b914cffcee785cfb0eafa59bc7895303da",
+          "code_length": 44,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "setDatabankFilter",
+          "descriptor": "(Lcom/strategyquant/tradinglib/Databank;)V",
+          "access": 4,
+          "code_sha256": "e9ca98af8b9313d357dc270473198c975792e5d84d17407e5741cb61229e0c0e",
+          "code_length": 127
+        },
+        {
+          "name": "optimizeStrategy",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData;)V",
+          "access": 2,
+          "code_sha256": "7a2c3e0458f64b3ab07e1d424dbc4f1f28e2acf341dd0ebea091b8144a1bf05b",
+          "code_length": 514,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runStandardOptimization",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;Ljava/lang/String;Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData;)V",
+          "access": 2,
+          "code_sha256": "8547a2f53d5ad6afc2353086624bf7a164728e32bf6bf417a1c4e5fc914429be",
+          "code_length": 111,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "updateIndexByFitness",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)V",
+          "access": 2,
+          "code_sha256": "eeb52715f613babe2ca2b8611878c7b4e56364b844f652715eeb18a9007df3c9",
+          "code_length": 55
+        },
+        {
+          "name": "shouldUpdateFitnessByIndex",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "49dcfb4269909f3f9ab85690d2e425a087e57d0b36139893fb92bf1bcc17f069",
+          "code_length": 46
+        },
+        {
+          "name": "runSequentialOptimization",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;Ljava/lang/String;Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData;)V",
+          "access": 2,
+          "code_sha256": "f7b23710274217b0abf8b56122c3858c47f9daeab805476fbad4dfa8ef889995",
+          "code_length": 273,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onFinishSeqOpt",
+          "descriptor": "(ZLjava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 2,
+          "code_sha256": "9dad0a788c95c357b6d097f7147143c057cd9594e03b341ed862ca4304e58d0c",
+          "code_length": 630
+        },
+        {
+          "name": "checkSequentialOptConditions",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Lcom/strategyquant/lib/SettingsMap;)Z",
+          "access": 4,
+          "code_sha256": "3e4c20a4feef88e7b99cb275f87b0e23a3491c9fada85777332b07d650d43792",
+          "code_length": 167
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "1fabecb2c721d3e6ad0379399ef32d8a4fd654d3fc081a9b4a13dea9542b6617",
+          "code_length": 3397
+        },
+        {
+          "name": "prepareSettings",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData;)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 2,
+          "code_sha256": "7718e9cae5c5b9ef4a0015f8302496341329d99acfe7bb0a9b91ba06b6db9b34",
+          "code_length": 949,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getRunningStatus",
+          "descriptor": "()I",
+          "access": 4,
+          "code_sha256": "9641677ff296b3204d40b5fcd261aa90c97c5504551e6a0e284468f551458955",
+          "code_length": 8
+        },
+        {
+          "name": "updateProjectInfo",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "d671fbf209b4b0ba6375ba811d79abf090ec7b75652b34539734bf3c40921f0d",
+          "code_length": 338
+        },
+        {
+          "name": "getPluginFolderName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "dbf11876817e943f1e24912235f3f8a0eaeba185839269fdadb8365ecfce6b99",
+          "code_length": 4
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getSettings",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "901a2e28127c6f285841f064eba04f9f23ab1313034bdc6d2addde1a03e8b929",
+          "code_length": 49
+        },
+        {
+          "name": "getUsedDatabanks",
+          "descriptor": "()[Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "0257d17d024395067af20ea6cb7d41395b331a2a1413632a883849b9d3eefcb2",
+          "code_length": 19
+        },
+        {
+          "name": "getOutputDatabank",
+          "descriptor": "()Lcom/strategyquant/tradinglib/Databank;",
+          "access": 4,
+          "code_sha256": "3016925ae75ef2ac12c40b3a925c65becdc191e86549a82b194e0b76cdac6a99",
+          "code_length": 5
+        },
+        {
+          "name": "logTaskFinished",
+          "descriptor": "(Lcom/strategyquant/tradinglib/project/ProjectGlobalLog;)V",
+          "access": 1,
+          "code_sha256": "9a5325ebe937a10cdc1184faa36497568bfe47aa713f34cc8e7d9f82e6faf350",
+          "code_length": 54
+        },
+        {
+          "name": "setLastEvent",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "153eed8fa34f75c06c3aa97e810a052e4df92e8ebb00a02f8b47aa279f3dbeac",
+          "code_length": 16
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4104,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "access$102",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;I)I",
+          "access": 4104,
+          "code_sha256": "469fbf8757b03cb1ece1ae605e8e9deaa9bca5e04f5fc3bc09edb21767d54a1b",
+          "code_length": 7
+        },
+        {
+          "name": "access$200",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)I",
+          "access": 4104,
+          "code_sha256": "f71c0e37ea3da5d4fd1a485105c71cfe89cdd2a717078a1b00ea19e11626bf1b",
+          "code_length": 5
+        },
+        {
+          "name": "access$300",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;I)V",
+          "access": 4104,
+          "code_sha256": "2e2e56f148e9306cd18f5f3d609c25482d91160dda1d90824db247b56354af20",
+          "code_length": 6
+        },
+        {
+          "name": "access$400",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;)Lcom/strategyquant/tradinglib/project/ProgressEngine;",
+          "access": 4104,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "access$500",
+          "descriptor": "(Lcom/strategyquant/plugin/Task/impl/Optimize/OptimizeTask;ZLjava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults;Lcom/strategyquant/tradinglib/ResultsGroup;)V",
+          "access": 4104,
+          "code_sha256": "e81e8af03fe4caa711c775924635c97c26f03aa7fb76c6b4175560106a2fc592",
+          "code_length": 14
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e52561515cd9b59065a798514cb0e1af86ae352c71f007f3ecdff1e7aa079e3f",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/basket/BasketDto",
+        "com/strategyquant/datalib/basket/BasketOfStocksManager",
+        "com/strategyquant/datalib/basket/StockDto",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/datalib/data/DataManager",
+        "com/strategyquant/gridlib/client/RunningStatus",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQUtils",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/TaskStoppedException",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/app/MainApp",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/license/LicenseInfo",
+        "com/strategyquant/lib/memory/MemoryUsageChecker",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7",
+        "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/ATM",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/CommissionsMethod",
+        "com/strategyquant/tradinglib/CustomAnalysisMethod",
+        "com/strategyquant/tradinglib/Databank",
+        "com/strategyquant/tradinglib/ParametrizationTypes",
+        "com/strategyquant/tradinglib/ProjectRunInfo",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/SwapMethod",
+        "com/strategyquant/tradinglib/TradingOption",
+        "com/strategyquant/tradinglib/Variable",
+        "com/strategyquant/tradinglib/Variables",
+        "com/strategyquant/tradinglib/WalkForwardResult",
+        "com/strategyquant/tradinglib/backtest/BacktestDataInitializer",
+        "com/strategyquant/tradinglib/backtest/LoadDataProgressEngine",
+        "com/strategyquant/tradinglib/backtestrunner/DurationStats",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/conditions/ConditionsChecker",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckDataNotExistException",
+        "com/strategyquant/tradinglib/customanalysis/CustomAnalysisInfo",
+        "com/strategyquant/tradinglib/databank/OptimizeDatabankFilter",
+        "com/strategyquant/tradinglib/engine/ChartSetups",
+        "com/strategyquant/tradinglib/engine/stockpicker/StockpickerBacktestEngine",
+        "com/strategyquant/tradinglib/fitnessfunction/IFitnessFunction",
+        "com/strategyquant/tradinglib/optimization/OptimizationConst",
+        "com/strategyquant/tradinglib/optimization/OptimizationEngine",
+        "com/strategyquant/tradinglib/optimization/OptimizationParams",
+        "com/strategyquant/tradinglib/optimization/OptimizationSettings",
+        "com/strategyquant/tradinglib/optimization/OptimizationTypes",
+        "com/strategyquant/tradinglib/optimization/Parameter",
+        "com/strategyquant/tradinglib/optimization/ParametersSettings",
+        "com/strategyquant/tradinglib/optimization/SequentialOptimizationEngine",
+        "com/strategyquant/tradinglib/optimization/SequentialOptimizationSettings",
+        "com/strategyquant/tradinglib/optimization/WalkForwardMatrixResult",
+        "com/strategyquant/tradinglib/optimization/WalkForwardParametersStability",
+        "com/strategyquant/tradinglib/options/TradingOptions",
+        "com/strategyquant/tradinglib/project/Databanks",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/ProgressEngine",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/project/ProjectEngine",
+        "com/strategyquant/tradinglib/project/ProjectGlobalLog",
+        "com/strategyquant/tradinglib/project/ProjectResources",
+        "com/strategyquant/tradinglib/project/SQProject",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/robustnesstests/SequentialOptimizationResults",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/taskImpl/AbstractTask",
+        "com/strategyquant/tradinglib/taskImpl/TaskException",
+        "com/strategyquant/tradinglib/util/RngUtils",
+        "it/unimi/dsi/fastutil/ints/Int2IntOpenHashMap",
+        "java/io/File",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/OutOfMemoryError",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "org/jdom2/Element",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

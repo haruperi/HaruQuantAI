@@ -1,0 +1,38 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckWhatIf/CrossCheckWhatIf.jar",
+  "sha256": "21b7eef300135c7899bd4d235582a036ba9a9b0ad436d6fa3de533fddc1d1820",
+  "class_count": 2,
+  "unique_class_entries": 2,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/CrossCheck/impl/WhatIf/WhatIfPlugin.class": "8062463971bd6f64ffb2d0b3df41ce7a8d7a5bfe376559daa35b5b67e484d184",
+    "com/strategyquant/plugin/CrossCheck/impl/WhatIf/WhatIfServlet.class": "a0386cfed0f5e291f7df5ebacd01e51f548ee43b32c7c8603d81e17b12693a03"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/WhatIf/WhatIfPlugin.class",
+      "occurrence": 0,
+      "sha256": "8062463971bd6f64ffb2d0b3df41ce7a8d7a5bfe376559daa35b5b67e484d184",
+      "member_shard": "docs/dev/evidence/sqx145/members/155/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/WhatIf/WhatIfServlet.class",
+      "occurrence": 0,
+      "sha256": "a0386cfed0f5e291f7df5ebacd01e51f548ee43b32c7c8603d81e17b12693a03",
+      "member_shard": "docs/dev/evidence/sqx145/members/155/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/155/001.json",
+      "sha256": "15bf8f1122893779fe0a385a2d494d46b2f7fe3577cd9f2211fe366eaef9cc10"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ConnectionTest/ConnectionTest.jar",
+  "sha256": "175ebc8fc349e53672ad787cf9f873591b70695af8fbbd4dab05c0d8779e5e26",
+  "class_count": 3,
+  "unique_class_entries": 3,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1.class": "5d5ba898ab7d2da0dfe6c16419f3ac8beaf47f805356e43af9f70f0f21256a91",
+    "com/strategyquant/plugin/Connection/impl/Test/TestConnection.class": "70c2ddbbf1d28b68a8f52818fd29fce97ac4bcbe8f6001b9659dd42f969b87e1",
+    "com/strategyquant/plugin/Connection/impl/Test/TestConnectionPlugin.class": "2425f0f2928fed31ccb6e3a34ad1577d38d9025faa5292f12259ca0776ba6061"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1.class",
+      "occurrence": 0,
+      "sha256": "5d5ba898ab7d2da0dfe6c16419f3ac8beaf47f805356e43af9f70f0f21256a91",
+      "member_shard": "docs/dev/evidence/sqx145/members/146/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnection.class",
+      "occurrence": 0,
+      "sha256": "70c2ddbbf1d28b68a8f52818fd29fce97ac4bcbe8f6001b9659dd42f969b87e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/146/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnectionPlugin.class",
+      "occurrence": 0,
+      "sha256": "2425f0f2928fed31ccb6e3a34ad1577d38d9025faa5292f12259ca0776ba6061",
+      "member_shard": "docs/dev/evidence/sqx145/members/146/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/146/001.json",
+      "sha256": "fe02ef43f51aeaa5abd464295a40965024f69b6076323d479fe1cae00cbe2f66"
+    }
+  ]
+}

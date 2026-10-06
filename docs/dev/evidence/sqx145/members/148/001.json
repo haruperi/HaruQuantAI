@@ -1,0 +1,936 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/CrossCheckMonteCarloRetest/CrossCheckMonteCarloRetest.jar",
+  "archive_sha256": "e2f5937574171309bcfb4dc9ada19eff0195f767383e614187b06a71a941c43b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult.class",
+      "occurrence": 0,
+      "sha256": "851c5007b29a91a93f7cd35ceec8b361f0491a8687604e68a1caeea15fb0ee74",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "rr",
+          "descriptor": "Lcom/strategyquant/tradinglib/robustnesstests/RobustnessResults;",
+          "access": 2
+        },
+        {
+          "name": "durationStats",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "dismissalMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "dismissalReason",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/robustnesstests/RobustnessResults;Lcom/strategyquant/tradinglib/backtestrunner/DurationStats;)V",
+          "access": 1,
+          "code_sha256": "bb88e49048472c130e613848178e60c66ad267faadaca06fc24389e1515c3add",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;ILcom/strategyquant/tradinglib/backtestrunner/DurationStats;)V",
+          "access": 1,
+          "code_sha256": "a563f01f00976414d135559f7a00130dbe88f36a309c6493b2ea9b499e07f355",
+          "code_length": 20
+        },
+        {
+          "name": "getRR",
+          "descriptor": "()Lcom/strategyquant/tradinglib/robustnesstests/RobustnessResults;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "getDismissalMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult",
+        "java/io/Serializable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1.class",
+      "occurrence": 0,
+      "sha256": "9625da3fdb24f1b9b81dd3a7c65f7d127e3e6084bd915ae0bfbf8d285dcf28ad",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/backtestrunner/IBacktestProgressListener"
+      ],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;)V",
+          "access": 0,
+          "code_sha256": "0f128366463ee1bcaa2cbbd3ad67226c501db8e1a667eb970e45c12c87e1da41",
+          "code_length": 10
+        },
+        {
+          "name": "setProgress",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "increaseProgressStep",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1",
+        "com/strategyquant/tradinglib/backtestrunner/IBacktestProgressListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2.class",
+      "occurrence": 0,
+      "sha256": "aadd9f2254f3f0308f62118c4aae26c4c36b5532e67880542278315bddcec675",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/robustnesstests/DataModifierCallback"
+      ],
+      "fields": [
+        {
+          "name": "val$method",
+          "descriptor": "Lcom/strategyquant/tradinglib/MonteCarloRetest;",
+          "access": 4112
+        },
+        {
+          "name": "val$rng",
+          "descriptor": "Lcom/strategyquant/lib/IRandomGenerator;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;Lcom/strategyquant/tradinglib/MonteCarloRetest;Lcom/strategyquant/lib/IRandomGenerator;)V",
+          "access": 0,
+          "code_sha256": "d4876b454dd4442e647c3de87ce28f52fb5d0d9e2134b250d698d8c25f7e50c8",
+          "code_length": 20,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "modifyData",
+          "descriptor": "(Lcom/strategyquant/datalib/TickEvent;)V",
+          "access": 1,
+          "code_sha256": "a2859c3bbf1c8585f16dcadaec89811cc38c4ba6d0e2b93f9b8d6a877c542cd4",
+          "code_length": 20
+        },
+        {
+          "name": "modifyOHLCData",
+          "descriptor": "(Lcom/strategyquant/datalib/data/io/VersatileData;)V",
+          "access": 1,
+          "code_sha256": "1dc86ed5e48c161e5e13e51355e268067495e726e7ee4e5b2938bf5fcdb493ea",
+          "code_length": 20
+        },
+        {
+          "name": "modifyData",
+          "descriptor": "(Lcom/strategyquant/datalib/TickEvent;D)V",
+          "access": 1,
+          "code_sha256": "e9e58e936d10131418a8c90b07bd92ca54264e22decef1b42d1fa515dade3868",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2",
+        "com/strategyquant/tradinglib/MonteCarloRetest",
+        "com/strategyquant/tradinglib/robustnesstests/DataModifierCallback",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob.class",
+      "occurrence": 0,
+      "sha256": "20ed06c55319a2481b3592ce19fae44e14dcdbbf80ba2eb1fe7de022eecc042d",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/gridlib/client/GridJob",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "lastEventListener",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/ILastEventListener;",
+          "access": 2
+        },
+        {
+          "name": "index",
+          "descriptor": "J",
+          "access": 2
+        },
+        {
+          "name": "strategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "parentStopPauseEngine",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/StopPauseEngine;",
+          "access": 2
+        },
+        {
+          "name": "resultSettings",
+          "descriptor": "Lcom/strategyquant/lib/SettingsMap;",
+          "access": 2
+        },
+        {
+          "name": "mcSettings",
+          "descriptor": "Lcom/strategyquant/lib/SettingsMap;",
+          "access": 2
+        },
+        {
+          "name": "mainBacktestPrecision",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "globalATR",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "symbolsMap",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/SymbolsMap;",
+          "access": 2
+        },
+        {
+          "name": "useFullSample",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "backtestPrecision",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(JLjava/lang/String;Ljava/lang/String;Ljava/util/Map;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/tradinglib/project/ILastEventListener;IDLcom/strategyquant/tradinglib/results/SymbolsMap;)V",
+          "access": 1,
+          "code_sha256": "1d1120dd9395e68aadc8e11707717ffc0f07e1dd82ede086a94ee53644f739ad",
+          "code_length": 126,
+          "generic_signature": "(JLjava/lang/String;Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/tradinglib/project/ILastEventListener;IDLcom/strategyquant/tradinglib/results/SymbolsMap;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;",
+          "access": 1,
+          "code_sha256": "250bb6b2564b868ca806b2efbbde945823f2f33338a70383b8bc8fdc2dce129b",
+          "code_length": 641,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isRandomizeHistoryUsed",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;Ljava/util/ArrayList;)Z",
+          "access": 2,
+          "code_sha256": "a2c1f9416112b6eb62fd56435ed35d29ba9f506cc8e0ac7aa21a06d21c26c15d",
+          "code_length": 55,
+          "generic_signature": "(Lcom/strategyquant/tradinglib/ChartSetup;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/MonteCarloRetest;>;)Z"
+        },
+        {
+          "name": "filterInSampleOnly",
+          "descriptor": "(Lcom/strategyquant/tradinglib/OrdersList;Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 2,
+          "code_sha256": "f680e189fa469e9043f132a54e15d0d7ecd0f77b732143a49da69bca8166b93b",
+          "code_length": 17
+        },
+        {
+          "name": "cloneSettings",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4,
+          "code_sha256": "1bccda0a672240b229693af82a1ec8ec8e7666a298ac0246e840b4631a1f0cb2",
+          "code_length": 72,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "cloneValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "aaf61eb5c3d3b2a7b1623015ea9c9ca85afabc311f1f739933d88332edff6bbc",
+          "code_length": 67,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "cffc42700962ee70d8950fb3a260862154d240db933c36dc498d82be05f929b5",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;)D",
+          "access": 4104,
+          "code_sha256": "c6a80478add7a7af2afa5683db925d363340473c9ece5cea7919c19f131a7875",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "830fab19759df7f9765591e26fab461dec2077587b2571740c3f9ae530f08f78",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/gridlib/client/GridJob<Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;>;",
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/ChartDef",
+        "com/strategyquant/datalib/InstrumentInfo",
+        "com/strategyquant/datalib/consts/DataTypes",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/lib/IRandomGenerator",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/random/MersenneTwisterRng",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$1",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob$2",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/ChartSetup",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/MonteCarloRetest",
+        "com/strategyquant/tradinglib/MonteCarloTestTypes",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/StrategyBase",
+        "com/strategyquant/tradinglib/backtestrunner/DurationStats",
+        "com/strategyquant/tradinglib/crosscheck/MCResultsComputer",
+        "com/strategyquant/tradinglib/engine/AbstractBacktestEngine",
+        "com/strategyquant/tradinglib/engine/BacktestEngine",
+        "com/strategyquant/tradinglib/engine/stockpicker/StockpickerBacktestEngine",
+        "com/strategyquant/tradinglib/options/TradingOptions",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/StopPauseEngine",
+        "com/strategyquant/tradinglib/simulator/Engines",
+        "com/strategyquant/tradinglib/simulator/ITradingSimulator",
+        "com/strategyquant/tradinglib/simulator/impl/TraderSimulators",
+        "java/io/Serializable",
+        "java/lang/Boolean",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1.class",
+      "occurrence": 0,
+      "sha256": "2179241078a49bc3be495996df029a6f2b3351f2670d53ca6c376ebea6a1c52b",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "val$strategyName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4112
+        },
+        {
+          "name": "val$resultSettings",
+          "descriptor": "Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4112
+        },
+        {
+          "name": "val$lastEventListener",
+          "descriptor": "Lcom/strategyquant/tradinglib/project/ILastEventListener;",
+          "access": 4112
+        },
+        {
+          "name": "val$mainBacktestPrecision",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$globalATR",
+          "descriptor": "D",
+          "access": 4112
+        },
+        {
+          "name": "val$symbolsMap",
+          "descriptor": "Lcom/strategyquant/tradinglib/results/SymbolsMap;",
+          "access": 4112
+        },
+        {
+          "name": "val$useFullSample",
+          "descriptor": "Z",
+          "access": 4112
+        },
+        {
+          "name": "val$backtestPrecision",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$simulationResults",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 4112
+        },
+        {
+          "name": "val$result",
+          "descriptor": "Lcom/strategyquant/tradinglib/Result;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin;Lcom/strategyquant/tradinglib/project/StopPauseEngine;Lcom/strategyquant/gridlib/client/GridJob;ZLjava/lang/String;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/project/ILastEventListener;IDLcom/strategyquant/tradinglib/results/SymbolsMap;ZILjava/util/ArrayList;Lcom/strategyquant/tradinglib/Result;)V",
+          "access": 0,
+          "code_sha256": "28debd42a61786b5dadcf0952673ab977a2d9506f4dfd7064929efcda3972c4d",
+          "code_length": 74,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "createJobsBatch",
+          "descriptor": "(ILcom/strategyquant/gridlib/client/GridClient;)Ljava/util/ArrayList;",
+          "access": 4,
+          "code_sha256": "121329e7d0144eeae49eb0b268f82fc4ab45cc6ced3d3676facfab4843de42c4",
+          "code_length": 57,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(ILcom/strategyquant/gridlib/client/GridClient;)Ljava/util/ArrayList<Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;>;"
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;Lcom/strategyquant/gridlib/client/JobDetails;)V",
+          "access": 4,
+          "code_sha256": "9a61b239e993adaf3ddf2280d75c5d17b2f664537f55f97485908946a544eaab",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onError",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Exception;)V",
+          "access": 4,
+          "code_sha256": "2c6b75131aabfa7abdc83986578ab8d5f9950e6f4f3efcd8f8391ee2acb63383",
+          "code_length": 13
+        },
+        {
+          "name": "processResult",
+          "descriptor": "(Ljava/io/Serializable;Lcom/strategyquant/gridlib/client/JobDetails;)V",
+          "access": 4164,
+          "code_sha256": "78e8c45d6d5233253960cc55969d35ec3ede3ede7f500eb289fe0c9ac5e9c872",
+          "code_length": 10,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "Lcom/strategyquant/tradinglib/simplegrid/SimpleGridEngine<Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;>;",
+      "class_references": [
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1",
+        "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+        "java/lang/Exception",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin.class",
+      "occurrence": 0,
+      "sha256": "99a486f00fb9bc3ade973d63692a99cb942778ee1db1a2e70dc0ffa105e90a45",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/crosscheck/MonteCarloCrossCheckMethod",
+      "interfaces": [
+        "com/strategyquant/tradinglib/servlet/IServletPlugin"
+      ],
+      "fields": [
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "numberOfSimulations",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "lastIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "useFullSample",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "backtestPrecision",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c56a5991b836e22b302d16b33ab5f76ea4184852cfb14cbee828e4b6e6b63e96",
+          "code_length": 5
+        },
+        {
+          "name": "clone",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;)Lcom/strategyquant/tradinglib/crosscheck/ICrossCheck;",
+          "access": 1,
+          "code_sha256": "1e21c5e3161c3cf3f0304f76174be19cc86ed385a02ababb0301acad13f2e599",
+          "code_length": 53
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1fc8794e005aeef7383fa62a67a55d726e506e8f3f1809a824cf133c83faba31",
+          "code_length": 4
+        },
+        {
+          "name": "getShortName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "aa382dac2141381498562cbe83a640599ce62392e7824f4fd549fd99f1be907c",
+          "code_length": 6
+        },
+        {
+          "name": "getDescription",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cafdd0c71a29c229e5119c409e50b17c0a16b895b5fec3eacde98766072a84bf",
+          "code_length": 6
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "af41f71bc48f65acc5cb7e864d189b48e5745e633d286bd2812de31536526e3b",
+          "code_length": 3
+        },
+        {
+          "name": "getType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5a369fafbffccf10642b69d8a628333e0ce28c9bf5b5b34cb74abb0b05a44d8",
+          "code_length": 4
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "e89005f7eea25f59d0a25a3128f41d7e323a0ade711b258748309f4b4844cd2e",
+          "code_length": 56
+        },
+        {
+          "name": "getNumberOfSimulations",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "doesRetest",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "doesForEverySetup",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "320c607aab4e350df2c642384fdea9c804d28764162fe889a11a259974e00450",
+          "code_length": 20
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "492169933a2690071ba06e91e1e13faa43df7210b0f0d3fb55f84f88ef26c7bd",
+          "code_length": 151,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runTest",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;IDLcom/strategyquant/gridlib/client/GridJob;ZLcom/strategyquant/tradinglib/project/ILastEventListener;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "53f5e3feea2e6a3e9a8df8a69f9c1000ae4bddd6e53195240e81280bb546c774",
+          "code_length": 487,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "runOnGrid",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;ILcom/strategyquant/tradinglib/Result;Lcom/strategyquant/tradinglib/results/SymbolsMap;DLjava/lang/String;Lcom/strategyquant/gridlib/client/GridJob;Lcom/strategyquant/tradinglib/project/ILastEventListener;ZZI)Ljava/util/ArrayList;",
+          "access": 2,
+          "code_sha256": "1ff388d873a9e521bc65016fec1c1e05b7a50061f72afa854f250f99acb969f4",
+          "code_length": 62,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Lcom/strategyquant/lib/SettingsMap;ILcom/strategyquant/tradinglib/Result;Lcom/strategyquant/tradinglib/results/SymbolsMap;DLjava/lang/String;Lcom/strategyquant/gridlib/client/GridJob;Lcom/strategyquant/tradinglib/project/ILastEventListener;ZZI)Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/robustnesstests/RobustnessResults;>;"
+        },
+        {
+          "name": "processMCResult",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;Lcom/strategyquant/gridlib/client/JobDetails;Ljava/util/ArrayList;Lcom/strategyquant/tradinglib/Result;)V",
+          "access": 4,
+          "code_sha256": "7db0f156550e4db56216af85b2bdce970b443ee02a86f73829fd79976cb36be1",
+          "code_length": 147,
+          "generic_signature": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult;Lcom/strategyquant/gridlib/client/JobDetails;Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/robustnesstests/RobustnessResults;>;Lcom/strategyquant/tradinglib/Result;)V"
+        },
+        {
+          "name": "createBatch",
+          "descriptor": "(Ljava/lang/String;ILcom/strategyquant/gridlib/client/GridClient;JLcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/project/ILastEventListener;IDLcom/strategyquant/tradinglib/results/SymbolsMap;ZI)Ljava/util/ArrayList;",
+          "access": 4,
+          "code_sha256": "daaab6152912cf4a270597c372db00c92159385c0d5163ffd30972428809a27d",
+          "code_length": 148,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;ILcom/strategyquant/gridlib/client/GridClient;JLcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/tradinglib/project/ILastEventListener;IDLcom/strategyquant/tradinglib/results/SymbolsMap;ZI)Ljava/util/ArrayList<Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob;>;"
+        },
+        {
+          "name": "getJobSettings",
+          "descriptor": "(Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/lib/SettingsMap;ZI)Ljava/util/Map;",
+          "access": 10,
+          "code_sha256": "6e04b985c4dd346c74d2b45398ccb4250ef0ae6f3ae39b1cae261c045bbdbc99",
+          "code_length": 58,
+          "generic_signature": "(Lcom/strategyquant/lib/SettingsMap;Lcom/strategyquant/lib/SettingsMap;ZI)Ljava/util/Map<Ljava/lang/String;Ljava/io/Serializable;>;"
+        },
+        {
+          "name": "getChartSetups",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ChartSetup;)Lcom/strategyquant/tradinglib/engine/ChartSetups;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "printSettings",
+          "descriptor": "(Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2b596ab2b04c289dc71681510db00fed9adf64ea0ab2ba705761c9a3c5ea943a",
+          "code_length": 447,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "printWeightedGoals",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getMetricsForFitness",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/strategyquant/tradinglib/optimization/MetricForFitness;>;"
+        },
+        {
+          "name": "getMetricValue",
+          "descriptor": "(Lcom/strategyquant/tradinglib/ResultsGroup;BBLjava/lang/String;)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getBadStrategyReason",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "8278412f86ae7ea9395348af693931f2d210cb9ee2306ba95a3ef44bafcbc396",
+          "code_length": 4
+        },
+        {
+          "name": "doesCreateSubjobs",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin;)I",
+          "access": 4104,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Lcom/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin;)Lcom/strategyquant/lib/SettingsMap;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/consts/Precisions",
+        "com/strategyquant/gridlib/client/GridJob",
+        "com/strategyquant/gridlib/client/JobDetails",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/SQTime",
+        "com/strategyquant/lib/SettingsMap",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCJobResult",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MCRetestJob",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestPlugin$1",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet",
+        "com/strategyquant/tradinglib/BadStrategyException",
+        "com/strategyquant/tradinglib/Directions",
+        "com/strategyquant/tradinglib/MonteCarloRetest",
+        "com/strategyquant/tradinglib/OrdersList",
+        "com/strategyquant/tradinglib/Result",
+        "com/strategyquant/tradinglib/ResultsGroup",
+        "com/strategyquant/tradinglib/SampleTypes",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/conditions/Condition",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckTypes",
+        "com/strategyquant/tradinglib/crosscheck/MonteCarloCrossCheckMethod",
+        "com/strategyquant/tradinglib/project/ILastEventListener",
+        "com/strategyquant/tradinglib/project/ProjectConfigHelper",
+        "com/strategyquant/tradinglib/results/SpecialValues",
+        "com/strategyquant/tradinglib/results/SymbolsMap",
+        "com/strategyquant/tradinglib/robustnesstests/RobustnessOrdersValues",
+        "com/strategyquant/tradinglib/robustnesstests/RobustnessResults",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/simplegrid/SimpleGridEngine",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/slf4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet.class",
+      "occurrence": 0,
+      "sha256": "7ff5dd1d58b849a475c760a74d33f0a20c03d3d7a703d067039abbfbd1bc30f4",
+      "name": "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "db13975ae9f95a7fe4bd271a1cbec72244e9770c40c2a31b23b793ea9382b681",
+          "code_length": 163,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "33ad7cec7ff33ab13ef34e37cdcf93668902d408faacf017aa9cc1fac9e8d408",
+          "code_length": 202,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onFitnessGetConfidenceLevels",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "fd4a2484d27dec21410e0e90b3bd0b3b23f9c0f008132900329235886c896b95",
+          "code_length": 82,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onFitnessList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "659d27537c1129b956a25e5af70a59934559f147fc684b51a3ab6dc22742b1aa",
+          "code_length": 303,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7c10aac6b32a5001515b58a6fdde6d7521de7c6122f6aea41388258064990ef9",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[I",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/plugin/CrossCheck/impl/MonteCarloRetest/MonteCarloRetestServlet",
+        "com/strategyquant/tradinglib/DatabankColumn",
+        "com/strategyquant/tradinglib/MonteCarloRetest",
+        "com/strategyquant/tradinglib/crosscheck/CrossCheckMethod",
+        "com/strategyquant/tradinglib/databank/DatabankColumns",
+        "com/strategyquant/tradinglib/montecarlo/retest/MonteCarloRetestList",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/List",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

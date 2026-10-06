@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
+  "sha256": "7798ced63fad323cb8591dcc4f0075a610147b27ccc9522a202e990e4ba8f57d",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/MoneyManagement/MoneyManagementSettingsPlugin.class": "8b0f539e7dc39852c907dbea5de20aff9e1c26b0be332cb54a6d84394b7acf16"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/MoneyManagement/MoneyManagementSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "8b0f539e7dc39852c907dbea5de20aff9e1c26b0be332cb54a6d84394b7acf16",
+      "member_shard": "docs/dev/evidence/sqx145/members/254/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/254/001.json",
+      "sha256": "ae699f0ea2ce6d93b4ff661f5368dfc26843d990dcea0695797fb13f7cc4b2ab"
+    }
+  ]
+}

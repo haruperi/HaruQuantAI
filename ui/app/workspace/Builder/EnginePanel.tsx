@@ -6,8 +6,8 @@ import { FitnessEvolutionModal, SqdModal } from './FitnessEvolutionModal';
 import type { EngineRunStatus, ProgressStats } from './fixtures';
 
 /**
- * SQX-parity engine column of the Builder Progress tab (donor evidence
- * SQX144-EV-000034/035). Stop/Pause/Start flow on the left of the control
+ * SQX-style engine column of the Builder Progress tab (donor evidence
+ * retained target UI; current donor equivalence unverified). Stop/Pause/Start flow on the left of the control
  * card while the config dropdowns and the fitness-evolution launcher float
  * right; below are the infinite progress bar, the Task line, the engine log
  * with its three log actions, the Build stats table with Detailed popups,

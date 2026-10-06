@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ProjectDatabanks pane structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ProjectDatabanks",
-  "source_head": "44810150b8257909b0149e5c9b3372c95ebd7d97",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_142122_project-databanks-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,101 +28,136 @@
   "source_catalog": [
     {
       "id": "sqx-projectdatabanks-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
       "family": "installed plugin UI artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankCtrl.js",
       "relative_path": "DatabankCtrl.js",
       "location": "lines 1-733; named controller pane/grid composition",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "a11653b3ad6cfd068ecf87f09ab399fc707197c4913bad9e94f8afcf8593fb94",
+      "sha256": "37f15dc877ee70f4ba35619848249e1ad2c9485838b7979c04909cf3981e936f",
       "target": "DatabankCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
       "relative_path": "DatabanksCtrl.js",
       "location": "lines 1-666; named controller pane/grid composition",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "9c5d0eb2c98f12a0804d2c37cea2069902b340d0e564fa383b1b68b95c071cd0",
+      "sha256": "c7c40d363324330c06a2bf8fed2819f3da614dfab18548064850a863f195b07d",
       "target": "DatabanksCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js",
       "relative_path": "DatabankService.js",
       "location": "lines 1-1120; pane/grid service declarations",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "92fa6885bd1ec6e3549087d5f1439e34e870580c05a4b151f5f58d15b4cbf618",
+      "sha256": "0689b0ce2d26978ea01ca1a7e4141d86627b2e5cc7fbfdabeb4d1e8ded0fc980",
       "target": "DatabankService.ts",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/module.js",
       "relative_path": "module.js",
       "location": "lines 1-14; module event registration",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "5d087bc1330091602de0a2b90f82b3e0ca7edc6e55d0bea5230a6670b27f4269",
+      "sha256": "ed1f594eec659542e13b1ed8a5ceb1efe9ad290d8c48e5214e23511af39f41cc",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/styles.css",
       "relative_path": "styles.css",
       "location": "lines 1-171; pane stylesheet declarations",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "09ab526e3e80059aa2ddf59158eb5a8a1de75fcd365a97219ea7438a2f63179c",
+      "sha256": "ac3e4bb48ffadded697e9c6f15d204c08d74d1ed2084cd0f106bc7d95f82c0df",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databank.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databank.html",
       "relative_path": "views/databank.html",
       "location": "lines 1-15; pane/header/grid template",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "a3c3d2eddafa1f161adfb1bf524baa87cfd6f0814d1268fd055a55b512c890b0",
+      "sha256": "19303986314999f45ccdf6ca0a0d4e361046433ecf896d46fef6613d69f5dff5",
       "target": "views/databank.tsx",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectdatabanks-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databanks.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databanks.html",
       "relative_path": "views/databanks.html",
       "location": "lines 1-112; pane/header/grid template",
-      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target counterpart; current composition preserved",
       "access_date": "2026-10-06",
-      "sha256": "c5fcf2668bb1961359c709d68178b56307a683665d2f5b0e9a28368acac6ea95",
+      "sha256": "e7c6ddc628fdf8f8a33a4b7a86710051b538cf584d580958ac0f52a1438a0706",
       "target": "views/databanks.tsx",
       "classification": "counterpart",
-      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -205,5 +240,10 @@
     "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_152853_databank-actions-delete-alignment/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
-  }
+  },
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ]
 }

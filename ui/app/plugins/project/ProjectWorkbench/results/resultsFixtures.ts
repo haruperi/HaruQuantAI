@@ -1,7 +1,7 @@
 /**
  * Fixtures for the Builder Results tab parity (FEAT-UI-BUILDER_RESULTS_TAB).
  *
- * Donor evidence: SQX144-EV-000045..000047. Tab registry positions come from
+ * Donor evidence: retained target UI; current donor equivalence unverified. Tab registry positions come from
  * the ResultsTab plugin registrations; strings come from the RESULTS app
  * templates and language constants. Backend-driven option lists (sample
  * percentage items, MM types, demo custom-analysis tabs) ship as fixtures.

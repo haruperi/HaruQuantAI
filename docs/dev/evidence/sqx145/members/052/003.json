@@ -1,0 +1,2450 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jdom-2.0.0.jar",
+  "archive_sha256": "4a8817acf7f719e4bcfbcaf96250defff4cc87b4c20634c6eaa96ee04fd38bfe",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/jdom2/util/IteratorIterable.class",
+      "occurrence": 0,
+      "sha256": "d61e11ab58f03133ea9b0d6ee53767568a0e2b7be8181531e98d441c770cec05",
+      "name": "org/jdom2/util/IteratorIterable",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable",
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Iterable<TT;>;Ljava/util/Iterator<TT;>;",
+      "class_references": [
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "org/jdom2/util/IteratorIterable"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack$1.class",
+      "occurrence": 0,
+      "sha256": "1ab012a43ddf28f8da18b43c998017418024a6858917b1bf583c7a2a5398ff44",
+      "name": "org/jdom2/util/NamespaceStack$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/jdom2/Namespace;Lorg/jdom2/Namespace;)I",
+          "access": 1,
+          "code_sha256": "df8587f04edf4398ff842087dd60c5cce8af2b1973488519ab38ceb6b4564269",
+          "code_length": 12
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "46b87983c3b52081cee336b621cf46e5b2497ad76bb93c6c359bb24f32a67a4c",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Comparator",
+        "org/jdom2/Namespace",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$1"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack$BackwardWalker.class",
+      "occurrence": 0,
+      "sha256": "2a6cba6f86e81091901bfa38a104b55c58626ead0e82854b9919e568538dba67",
+      "name": "org/jdom2/util/NamespaceStack$BackwardWalker",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "namespaces",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 18
+        },
+        {
+          "name": "cursor",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "88cbef17312db4055c3ee2be19c3622128e0cbae025296f7c3d75fbbeccfd35f",
+          "code_length": 23
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "1474e6a6ced4dada077975c8e4ffb22bcd46b965a98a0bc49466f132ad1f7f37",
+          "code_length": 13
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "2e41f3683e2b56032aeaddd1b18506d0f96cf72be31fca1011b53f2084cdf6ad",
+          "code_length": 34
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f90685f769e77e9770d5f5c5fcbb1f42d5cf9131aaac74d52c6661a8394e945c",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$BackwardWalker"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack$EmptyIterable.class",
+      "occurrence": 0,
+      "sha256": "e18ea715389e1d3c27f2c47303f670559644d68af0710e9763e2c194613ea1bf",
+      "name": "org/jdom2/util/NamespaceStack$EmptyIterable",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable",
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "f99858239d4e38fd12a7d76d1d7ffce3bd311a43bc78a96befa18329790f7b28",
+          "code_length": 2,
+          "generic_signature": "()Ljava/util/Iterator<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "6aa108a3066cd17f6b2daf7f64322880af1157b4c8087d353d21b556b0faeea1",
+          "code_length": 10
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e05c32ee6b7aa337748bd72743152da6452f963e9f5ee176c80aeb93d16f91d6",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "0a5936f52db42734289c603aa1efb4ee9db89fcd49db99dabe1b3a050c71776c",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jdom2/util/NamespaceStack$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;Ljava/util/Iterator<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$1",
+        "org/jdom2/util/NamespaceStack$EmptyIterable"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack$ForwardWalker.class",
+      "occurrence": 0,
+      "sha256": "10948128b88d3155f2c25aa9cbcc2264106636839ef2210fc12252c717a4f43d",
+      "name": "org/jdom2/util/NamespaceStack$ForwardWalker",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "namespaces",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 18
+        },
+        {
+          "name": "cursor",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "33d4bc7f52a76f0f5601c2cbdf7b5c4cf7e7d95cee89f8cafdf1b0cbd2f731ae",
+          "code_length": 15
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2307321095aa0589306ab978ac3691527a71c934eca7c4b6c665b6c3865c4c0d",
+          "code_length": 18
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "c790aeea51585abc49f3d49fb3d9587a82683fe0c9fc6b481a7fe0d3d12821d2",
+          "code_length": 39
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f90685f769e77e9770d5f5c5fcbb1f42d5cf9131aaac74d52c6661a8394e945c",
+          "code_length": 10
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$ForwardWalker"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack$NamespaceIterable.class",
+      "occurrence": 0,
+      "sha256": "582567e79dbe4367eef91964bd47e72b3203cd2421b33d4ae8eb0d9d23a43f6e",
+      "name": "org/jdom2/util/NamespaceStack$NamespaceIterable",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "forward",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "namespaces",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/jdom2/Namespace;Z)V",
+          "access": 1,
+          "code_sha256": "6cdd1146b45ac79335f051090bbf78fad2a89dd156862f3f9d0c4ddfe74416c7",
+          "code_length": 15
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "6c943ba1822cb06b43ce26f82446880aace24d0e7b4835aadd75fe1b74a6e4a8",
+          "code_length": 33,
+          "generic_signature": "()Ljava/util/Iterator<Lorg/jdom2/Namespace;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$BackwardWalker",
+        "org/jdom2/util/NamespaceStack$ForwardWalker",
+        "org/jdom2/util/NamespaceStack$NamespaceIterable"
+      ]
+    },
+    {
+      "entry": "org/jdom2/util/NamespaceStack.class",
+      "occurrence": 0,
+      "sha256": "041dc419fbd8fc0df82c327244628063852df13773050fd18d1a674c53160e15",
+      "name": "org/jdom2/util/NamespaceStack",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "EMPTY",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 26
+        },
+        {
+          "name": "EMPTYITER",
+          "descriptor": "Ljava/lang/Iterable;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "NSCOMP",
+          "descriptor": "Ljava/util/Comparator;",
+          "access": 26,
+          "generic_signature": "Ljava/util/Comparator<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "DEFAULTSEED",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 26
+        },
+        {
+          "name": "added",
+          "descriptor": "[[Lorg/jdom2/Namespace;",
+          "access": 2
+        },
+        {
+          "name": "scope",
+          "descriptor": "[[Lorg/jdom2/Namespace;",
+          "access": 2
+        },
+        {
+          "name": "depth",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "binarySearch",
+          "descriptor": "([Lorg/jdom2/Namespace;IILorg/jdom2/Namespace;)I",
+          "access": 26,
+          "code_sha256": "c0b10e995c73f308119dfc5edeedd8e1a8eab672e811063884f9b02e51e116d1",
+          "code_length": 78
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f8a0561329a0318a7b5300c44ef76c70a4acbf1a8fadd71c1df1a90599896347",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "7d6bac484044f7c0870dcf5a85f13ffe7f8142b34c93b4e4cbca6460bc6ddc5e",
+          "code_length": 66
+        },
+        {
+          "name": "checkNamespace",
+          "descriptor": "(Ljava/util/List;Lorg/jdom2/Namespace;[Lorg/jdom2/Namespace;)[Lorg/jdom2/Namespace;",
+          "access": 26,
+          "code_sha256": "6219aa352efc1bb5f72b386cb695912edf4f13ddf6ab16f550845233f82a0496",
+          "code_length": 146,
+          "generic_signature": "(Ljava/util/List<Lorg/jdom2/Namespace;>;Lorg/jdom2/Namespace;[Lorg/jdom2/Namespace;)[Lorg/jdom2/Namespace;"
+        },
+        {
+          "name": "push",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "b15796f485fdfc0fe43784ae042e0c7fd6e9295ab6e1d8c97727de5982d72d47",
+          "code_length": 182
+        },
+        {
+          "name": "push",
+          "descriptor": "(Lorg/jdom2/Attribute;)V",
+          "access": 1,
+          "code_sha256": "7409d389f2d4fa37abcab9d31048aa20996442a06a3e1bc8ce4d12c968cd3d19",
+          "code_length": 39
+        },
+        {
+          "name": "pushStack",
+          "descriptor": "(Lorg/jdom2/Namespace;[Lorg/jdom2/Namespace;Ljava/util/List;)V",
+          "access": 18,
+          "code_sha256": "993882d40e900d6c8d974a14c25731abadbe8ab4142e65dd19d02f901152aa91",
+          "code_length": 269,
+          "generic_signature": "(Lorg/jdom2/Namespace;[Lorg/jdom2/Namespace;Ljava/util/List<Lorg/jdom2/Namespace;>;)V"
+        },
+        {
+          "name": "pop",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0ee835aaa6d3d4de678f0a78a6e1bb651ff56d8ac7d04eb0e1347ca7b5100f00",
+          "code_length": 48
+        },
+        {
+          "name": "addedForward",
+          "descriptor": "()Ljava/lang/Iterable;",
+          "access": 1,
+          "code_sha256": "db182823c5c0663505fe27ef44fd697160346f158ec61d7fbb2243f4b8168de5",
+          "code_length": 35,
+          "generic_signature": "()Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "addedReverse",
+          "descriptor": "()Ljava/lang/Iterable;",
+          "access": 1,
+          "code_sha256": "cd43d937a7fa0dcb2f024721d3065e8e26c345cb90a5d1f3c2b8b2ac35f308d3",
+          "code_length": 35,
+          "generic_signature": "()Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "33a3c6b813594de6e8fa44e0cb9f7c76eae3568d186c865adc09172986833bb0",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/Iterator<Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "getScope",
+          "descriptor": "()[Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "0c19992c917d609332814cf0ab588aeabbf6d0b051bd869109ff32873c677624",
+          "code_length": 26
+        },
+        {
+          "name": "isInScope",
+          "descriptor": "(Lorg/jdom2/Namespace;)Z",
+          "access": 1,
+          "code_sha256": "0486c8a0a6b21d7fa07fb38964513bb4da28847d9b2df7a27933083b91c1105a",
+          "code_length": 69
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "47df4ff853c0a94b8385a9fe4c19314589e6bd4af287a25673c68a54de875f77",
+          "code_length": 48
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/lang/Iterable<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "[Lorg/jdom2/Namespace;",
+        "[[Lorg/jdom2/Namespace;",
+        "java/lang/IllegalStateException",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Comparator",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Attribute",
+        "org/jdom2/Element",
+        "org/jdom2/Namespace",
+        "org/jdom2/internal/ArrayCopy",
+        "org/jdom2/util/NamespaceStack",
+        "org/jdom2/util/NamespaceStack$1",
+        "org/jdom2/util/NamespaceStack$BackwardWalker",
+        "org/jdom2/util/NamespaceStack$EmptyIterable",
+        "org/jdom2/util/NamespaceStack$ForwardWalker",
+        "org/jdom2/util/NamespaceStack$NamespaceIterable"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPath$XPathString.class",
+      "occurrence": 0,
+      "sha256": "942d07863e6b3b65e081a236a4e0300c3292d3383f81dbf3e49919d9c950ac0e",
+      "name": "org/jdom2/xpath/XPath$XPathString",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "xPath",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "b38a861265f2a4a3349a288df8cf126a830e625aa0e146d3c75a047a06c22c76",
+          "code_length": 15
+        },
+        {
+          "name": "readResolve",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "57e9c15af40bdd552c715e87a8daf65ca2ad6aa02b333a8908e1b6141e214455",
+          "code_length": 51,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/InvalidObjectException",
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/jdom2/JDOMException",
+        "org/jdom2/xpath/XPath",
+        "org/jdom2/xpath/XPath$XPathString"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPath.class",
+      "occurrence": 0,
+      "sha256": "7f885fda017a8fed0a2332b28fa91cb94cdad62e45a55aed4b4fa8b341f7cac8",
+      "name": "org/jdom2/xpath/XPath",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Serializable"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "XPATH_CLASS_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "DEFAULT_XPATH_CLASS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "JDOM_OBJECT_MODEL_URI",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "constructor",
+          "descriptor": "Ljava/lang/reflect/Constructor;",
+          "access": 10,
+          "generic_signature": "Ljava/lang/reflect/Constructor<+Lorg/jdom2/xpath/XPath;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/xpath/XPath;",
+          "access": 9,
+          "code_sha256": "5567a55b5fc00391583ee23afe0e7b610d0208124483c68139530c1697abacf2",
+          "code_length": 140,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "setXPathClass",
+          "descriptor": "(Ljava/lang/Class;)V",
+          "access": 9,
+          "code_sha256": "2109f610c6202b0274c49159d3466fdc8567f09c69bf88b6a3486ca463d8904d",
+          "code_length": 105,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ],
+          "generic_signature": "(Ljava/lang/Class<+Lorg/jdom2/xpath/XPath;>;)V"
+        },
+        {
+          "name": "selectNodes",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 1025,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<*>;"
+        },
+        {
+          "name": "selectSingleNode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "numberValueOf",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Number;",
+          "access": 1025,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1025
+        },
+        {
+          "name": "addNamespace",
+          "descriptor": "(Lorg/jdom2/Namespace;)V",
+          "access": 1025
+        },
+        {
+          "name": "addNamespace",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f1b2ef9561c8ac73e5e3f062a90a498ef66ef201e847a3d5ab7d9abcb09fb039",
+          "code_length": 10
+        },
+        {
+          "name": "getXPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "selectNodes",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "c527ee94838ba32e82d04eadbdf93623e2639405413661c46f8d82db8b2fcbee",
+          "code_length": 9,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/util/List<*>;"
+        },
+        {
+          "name": "selectSingleNode",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 9,
+          "code_sha256": "4ff701dd75a58823b4ce9bbffdda703d0ce9e2ac2f73403b3794615f42038815",
+          "code_length": 9,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "writeReplace",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 20,
+          "code_sha256": "3bbca2bea93fddad46ac5a562d4af4a8691630045fd58b0cbcfd5da7547ce6d4",
+          "code_length": 12,
+          "throws": [
+            "java/io/ObjectStreamException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f33a9c31d97d8da01a55f1bf12b3d0ab4315d67476891318fed67e5588d27d0b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/ObjectStreamException",
+        "java/io/Serializable",
+        "java/lang/Class",
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Modifier",
+        "org/jdom2/JDOMException",
+        "org/jdom2/Namespace",
+        "org/jdom2/xpath/XPath",
+        "org/jdom2/xpath/XPath$XPathString"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPathBuilder.class",
+      "occurrence": 0,
+      "sha256": "8bd70a6ef221933e06c533f9fa31a6a9bb4bdeda4f0d6673fd386bc5d9e3cdcc",
+      "name": "org/jdom2/xpath/XPathBuilder",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "filter",
+          "descriptor": "Lorg/jdom2/filter/Filter;",
+          "access": 18,
+          "generic_signature": "Lorg/jdom2/filter/Filter<TT;>;"
+        },
+        {
+          "name": "expression",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "variables",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;"
+        },
+        {
+          "name": "namespaces",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jdom2/Namespace;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;)V",
+          "access": 1,
+          "code_sha256": "a461b2377057a5481933e2fd7b719056c71824ae7195452d49e176166cae3d82",
+          "code_length": 43,
+          "generic_signature": "(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;)V"
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "78234bbd0e6491a66342905efb913d4b400cfb987655bc32ff5b5140ac605e82",
+          "code_length": 52
+        },
+        {
+          "name": "setNamespace",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "96d15cbfee207d280926d2e6b2bd9bf666f932098e22f0a614a7ed17cc54b9f0",
+          "code_length": 38
+        },
+        {
+          "name": "setNamespace",
+          "descriptor": "(Lorg/jdom2/Namespace;)Z",
+          "access": 1,
+          "code_sha256": "4213b997f5ebc600f4a4ad4fa497e868689dc76953b961de8cbfcb594ce14ecb",
+          "code_length": 86
+        },
+        {
+          "name": "setNamespaces",
+          "descriptor": "(Ljava/util/Collection;)Z",
+          "access": 1,
+          "code_sha256": "4fb674c33a5b9e4f499d37a56c4fa3f98bc055d218a429066225202e64234ff4",
+          "code_length": 59,
+          "generic_signature": "(Ljava/util/Collection<Lorg/jdom2/Namespace;>;)Z"
+        },
+        {
+          "name": "getVariable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e60af8697d9b9c33882d98f2711175a61b04c86d39bfc403c06b28ff273e19d2",
+          "code_length": 34
+        },
+        {
+          "name": "getNamespace",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "e59b1bb7af700614e6492316c8df7d7949a0562a4ef9ca876911591558c82f9d",
+          "code_length": 50
+        },
+        {
+          "name": "getFilter",
+          "descriptor": "()Lorg/jdom2/filter/Filter;",
+          "access": 1,
+          "code_sha256": "d73222d33f4bf7535a8b02b0d2cf70e7ffd05ba27d7c971ea11dda6b6a31b84a",
+          "code_length": 5,
+          "generic_signature": "()Lorg/jdom2/filter/Filter<TT;>;"
+        },
+        {
+          "name": "getExpression",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "compileWith",
+          "descriptor": "(Lorg/jdom2/xpath/XPathFactory;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "be55f9ec58495bdadd053b44bb5ce9e2ff7b636937314ca8932fd557b75e64ce",
+          "code_length": 74,
+          "generic_signature": "(Lorg/jdom2/xpath/XPathFactory;)Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "[Lorg/jdom2/Namespace;",
+        "java/lang/IllegalArgumentException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Collection",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "org/jdom2/Namespace",
+        "org/jdom2/xpath/XPathBuilder",
+        "org/jdom2/xpath/XPathFactory"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPathDiagnostic.class",
+      "occurrence": 0,
+      "sha256": "6cd212e8595862f400a344d465b0061e61f880845fe967c5ff940a241528550c",
+      "name": "org/jdom2/xpath/XPathDiagnostic",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getContext",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getXPathExpression",
+          "descriptor": "()Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1025,
+          "generic_signature": "()Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "getResult",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "getFilteredResults",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getRawResults",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "isFirstOnly",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/jdom2/xpath/XPathDiagnostic"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPathExpression.class",
+      "occurrence": 0,
+      "sha256": "f6714d2d2d562779bd1e467a1e80cacd4b2bd8c3931302f4c51f6fd2e0018be7",
+      "name": "org/jdom2/xpath/XPathExpression",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Cloneable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "clone",
+          "descriptor": "()Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1025,
+          "generic_signature": "()Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "getExpression",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespace",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/Namespace;",
+          "access": 1025
+        },
+        {
+          "name": "getNamespaces",
+          "descriptor": "()[Lorg/jdom2/Namespace;",
+          "access": 1025
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Namespace;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getVariable",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Namespace;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getVariable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1025
+        },
+        {
+          "name": "getFilter",
+          "descriptor": "()Lorg/jdom2/filter/Filter;",
+          "access": 1025,
+          "generic_signature": "()Lorg/jdom2/filter/Filter<TT;>;"
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "evaluateFirst",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Object;)TT;"
+        },
+        {
+          "name": "diagnose",
+          "descriptor": "(Ljava/lang/Object;Z)Lorg/jdom2/xpath/XPathDiagnostic;",
+          "access": 1025,
+          "generic_signature": "(Ljava/lang/Object;Z)Lorg/jdom2/xpath/XPathDiagnostic<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Cloneable;",
+      "class_references": [
+        "java/lang/Cloneable",
+        "java/lang/Object",
+        "org/jdom2/xpath/XPathExpression"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPathFactory.class",
+      "occurrence": 0,
+      "sha256": "3bca230cf695ffbc75f7119419b32d4136396f6519bb577275fac1331951fe23",
+      "name": "org/jdom2/xpath/XPathFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "EMPTYNS",
+          "descriptor": "[Lorg/jdom2/Namespace;",
+          "access": 26
+        },
+        {
+          "name": "defaultreference",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicReference;",
+          "access": 26,
+          "generic_signature": "Ljava/util/concurrent/atomic/AtomicReference<Lorg/jdom2/xpath/XPathFactory;>;"
+        },
+        {
+          "name": "DEFAULTFACTORY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "instance",
+          "descriptor": "()Lorg/jdom2/xpath/XPathFactory;",
+          "access": 25,
+          "code_sha256": "bcfcad74f0f925703aef194979fe32cb6129576c6020a85ddd82f10188b629f5",
+          "code_length": 62
+        },
+        {
+          "name": "newInstance",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/xpath/XPathFactory;",
+          "access": 25,
+          "code_sha256": "9e5b6329f05e2f0b5e32cd55def532e11a4dc2fed819dbbb7072e38f84daa470",
+          "code_length": 11
+        },
+        {
+          "name": "compile",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;Ljava/util/Map;[Lorg/jdom2/Namespace;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1153,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;[Lorg/jdom2/Namespace;)Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "compile",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;Ljava/util/Map;Ljava/util/Collection;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "da5535dd84c660395b667c391b2bf6b73d2fa60712429fe8093df15e7720a4bb",
+          "code_length": 21,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/util/Collection<Lorg/jdom2/Namespace;>;)Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "compile",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "fe59ddadf907526225bedf3c9011b1e92ca09c6a29931fa9fa1f2a28a34e613a",
+          "code_length": 11,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;)Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "compile",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "075751ceae5e5b5a5b8307e0369bd26e1ac4e6577fcd8fb0bd8e6b12807ed87a",
+          "code_length": 13,
+          "generic_signature": "(Ljava/lang/String;)Lorg/jdom2/xpath/XPathExpression<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "f18b4392aee8ee958561184d1ad5dea140ccf186c7e5114a6e4668c2a90ad937",
+          "code_length": 27
+        }
+      ],
+      "class_references": [
+        "[Lorg/jdom2/Namespace;",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/util/Collection",
+        "java/util/concurrent/atomic/AtomicReference",
+        "org/jdom2/Namespace",
+        "org/jdom2/filter/Filters",
+        "org/jdom2/internal/ReflectionConstructor",
+        "org/jdom2/xpath/XPathFactory",
+        "org/jdom2/xpath/jaxen/JaxenXPathFactory"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/XPathHelper.class",
+      "occurrence": 0,
+      "sha256": "8dc9009ae1d88c9f3242768ce8616a8b069bf7a1d779e36605f8776c0b4e1a1a",
+      "name": "org/jdom2/xpath/XPathHelper",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getPositionPath",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/List;Ljava/lang/String;Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 10,
+          "code_sha256": "3d43b526af128dfc47bc7319701f57fa7b8445188418808d3cbc4620290859b8",
+          "code_length": 83,
+          "generic_signature": "(Ljava/lang/Object;Ljava/util/List<*>;Ljava/lang/String;Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;"
+        },
+        {
+          "name": "getSingleStep",
+          "descriptor": "(Lorg/jdom2/NamespaceAware;Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 26,
+          "code_sha256": "04581a122bf2729329d305726a2e4cc0470b411e6da89f47d34a73d301d5f8d6",
+          "code_length": 367
+        },
+        {
+          "name": "getRelativeElementPath",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/jdom2/Element;Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;",
+          "access": 10,
+          "code_sha256": "ac6a777dbdce0dbb80fc4d7801cb1c9e052837e86e930d794615c23a3cd23407",
+          "code_length": 178
+        },
+        {
+          "name": "locate",
+          "descriptor": "(Lorg/jdom2/Element;Ljava/util/List;)I",
+          "access": 10,
+          "code_sha256": "01b3fd452f50c4eef2a74057ea7b868ccd3225ea1d1426a49b4d9c33854a5f63",
+          "code_length": 29,
+          "generic_signature": "(Lorg/jdom2/Element;Ljava/util/List<Lorg/jdom2/Element;>;)I"
+        },
+        {
+          "name": "getRelativePath",
+          "descriptor": "(Lorg/jdom2/Content;Lorg/jdom2/Content;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "81fa80ebc1d8bea55ed9224948d01d5325cb07330e89c733d133450eb7a03ec2",
+          "code_length": 142
+        },
+        {
+          "name": "getRelativePath",
+          "descriptor": "(Lorg/jdom2/Content;Lorg/jdom2/Attribute;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a7bfaae8769bbd9df499602cefcba44c84d2911ff41b798faee9f9ee82347d1c",
+          "code_length": 78
+        },
+        {
+          "name": "getRelativePath",
+          "descriptor": "(Lorg/jdom2/Attribute;Lorg/jdom2/Attribute;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "76a0918f178c50d384516e44f4c0b14d795b4482c8db51758dfcd96f3e19cd14",
+          "code_length": 79
+        },
+        {
+          "name": "getRelativePath",
+          "descriptor": "(Lorg/jdom2/Attribute;Lorg/jdom2/Content;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "a4a4acddf94be6720a39ce072ac6b4900ea615cf4229e91aafc3070b56c85e30",
+          "code_length": 79
+        },
+        {
+          "name": "getAbsolutePath",
+          "descriptor": "(Lorg/jdom2/Content;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "0c9dc502125046c9e1e811d86ee61ee88023432cb28e376636acbe1325de269a",
+          "code_length": 127
+        },
+        {
+          "name": "getAbsolutePath",
+          "descriptor": "(Lorg/jdom2/Attribute;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b93b25557bd5887fc9600cd3987c6ef74d79a3ac7d07df6faa551c18c0163833",
+          "code_length": 108
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/Attribute",
+        "org/jdom2/Comment",
+        "org/jdom2/Content",
+        "org/jdom2/Element",
+        "org/jdom2/Namespace",
+        "org/jdom2/NamespaceAware",
+        "org/jdom2/ProcessingInstruction",
+        "org/jdom2/Text",
+        "org/jdom2/filter/Filters",
+        "org/jdom2/xpath/XPathHelper"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JDOM2Navigator.class",
+      "occurrence": 0,
+      "sha256": "546a15ae592d903388d2b592a6abeff7c4b698b5e567691c401c47e905b69cbd",
+      "name": "org/jdom2/xpath/jaxen/JDOM2Navigator",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/jdom2/xpath/jaxen/JDOMCoreNavigator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "org/jdom2/xpath/jaxen/JDOM2Navigator",
+        "org/jdom2/xpath/jaxen/JDOMCoreNavigator"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JDOMCoreNavigator.class",
+      "occurrence": 0,
+      "sha256": "9b01e33bf4630093b3a38d6f554eb33f1a83c66509fb3630226e2fbf8abbc665",
+      "name": "org/jdom2/xpath/jaxen/JDOMCoreNavigator",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/jaxen/DefaultNavigator",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "emtnsmap",
+          "descriptor": "Ljava/util/IdentityHashMap;",
+          "access": 130,
+          "generic_signature": "Ljava/util/IdentityHashMap<Lorg/jdom2/Element;[Lorg/jdom2/xpath/jaxen/NamespaceContainer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "68721a1185a50c0e38c3e389484ba1f4b2089a382faaa7443f3c1a56d28fe75e",
+          "code_length": 8
+        },
+        {
+          "name": "parseXPath",
+          "descriptor": "(Ljava/lang/String;)Lorg/jaxen/XPath;",
+          "access": 17,
+          "code_sha256": "efc10adf4c1e48be9fb1eeb73d96cb612305a3fc108b47d5c9a290e36b1478eb",
+          "code_length": 10,
+          "throws": [
+            "org/jaxen/saxpath/SAXPathException"
+          ]
+        },
+        {
+          "name": "getDocument",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "848ee81d75920aba0731647cc8ae8e36f993a2b28217bb4c132af8465fcb88f1",
+          "code_length": 72,
+          "throws": [
+            "org/jaxen/FunctionCallException"
+          ]
+        },
+        {
+          "name": "isText",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "097eff9a026b19130be3ba0730a3bc9f4298daf5ec3cbfac1240acf7284e6c8a",
+          "code_length": 5
+        },
+        {
+          "name": "isProcessingInstruction",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "817f8da80a24cc111392cf2ac444b4c276eb47c7a65e7c33c9c732e243271297",
+          "code_length": 5
+        },
+        {
+          "name": "isNamespace",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "93d714fca05aa0eefa0d22638eafe54b8a331ebd95938a8e455b3bde9e31c402",
+          "code_length": 5
+        },
+        {
+          "name": "isElement",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "52d1f45f90481d9b44089b387dbaf5f3c0167c1cd4816923eecd789d2fbaf4fa",
+          "code_length": 5
+        },
+        {
+          "name": "isDocument",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "c976b62fe07aae1c0571a77bac3d27619acbaf3df9129752e91775b987f08ac0",
+          "code_length": 5
+        },
+        {
+          "name": "isComment",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "c7a2b9c66b1bd4f33e3684d502992aedbb68cbd9d41e2baa0249b0eac4c66133",
+          "code_length": 5
+        },
+        {
+          "name": "isAttribute",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "8436bec4a713519a97ccfe7d81e24266658e321cd1b87af83ccc15b2c49936ad",
+          "code_length": 5
+        },
+        {
+          "name": "getTextStringValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "3d674de1e4cf32e129602eb13f3c224e5152c3e3cd9ad36a9d87599d10c9b35f",
+          "code_length": 8
+        },
+        {
+          "name": "getNamespaceStringValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "73bb3edac5150ffdb1b63ec4d95085aa38711e529e6985688576d01ead72ba09",
+          "code_length": 11
+        },
+        {
+          "name": "getNamespacePrefix",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "f8652cd67431760d4977166abbddc258379431cbfc01451922fe61e3593b1634",
+          "code_length": 11
+        },
+        {
+          "name": "recurseElementText",
+          "descriptor": "(Lorg/jdom2/Element;Ljava/lang/StringBuilder;)V",
+          "access": 18,
+          "code_sha256": "c93e4bcbcdfebb34d1dbecc3249b27d0fb5f7985608333476f62e2fe5a2841ef",
+          "code_length": 76
+        },
+        {
+          "name": "getElementStringValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "e70e6729063b24616f38e86939c51ec6107917bf158695d436b6abca051a392a",
+          "code_length": 22
+        },
+        {
+          "name": "getElementQName",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "d3a93555f6ec7bf9b0881e4e2e4421aefc1c4b136d8096c51306ca34b3a35d0c",
+          "code_length": 53
+        },
+        {
+          "name": "getElementNamespaceUri",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "3eae0d8753b68c4c3a7b429b572c5040600c96b6b10229708a3d29a4e2c4c0dc",
+          "code_length": 8
+        },
+        {
+          "name": "getElementName",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "439c61177363d217041a0df63f4b3ff477c1101c268d7277b6b7b9b368149bf2",
+          "code_length": 8
+        },
+        {
+          "name": "getCommentStringValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "8cc05db43411d86d6dd9587c2ef7743343c12130d52c2614d78f953662ca7ad7",
+          "code_length": 8
+        },
+        {
+          "name": "getAttributeStringValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "25f2c0f2a7640e6bf3e35ef89b08d0f7a02b1eda18dd37e234280abe8d250911",
+          "code_length": 8
+        },
+        {
+          "name": "getAttributeQName",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "d55dd7965e1e84a95272ae2b4300a0201d204aecd9bf160933c14458fb7e7f6c",
+          "code_length": 50
+        },
+        {
+          "name": "getAttributeNamespaceUri",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "9656dc47645947f37a71c8c37f78ebdacefd1a489ce8d9a4181f1a96ef000972",
+          "code_length": 8
+        },
+        {
+          "name": "getAttributeName",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "ef10429edc96b9a70002f6b41f9402ea1c05a79a1a0aaf90f2db7fd2ee5cc879",
+          "code_length": 8
+        },
+        {
+          "name": "getProcessingInstructionTarget",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "6a6501ac982bf5cd548a21d5bebfaa520d5ea9c95ebb98e820d4855f34c21416",
+          "code_length": 8
+        },
+        {
+          "name": "getProcessingInstructionData",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "66e3c0f06583a6de8a5b80e75ca561e89399e80b68d5e96b429023e44d59d8f6",
+          "code_length": 8
+        },
+        {
+          "name": "getDocumentNode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "f51554e44ad40a19dc086cf308f315b787115716de79a612ba7e9c7f9933e7b9",
+          "code_length": 50
+        },
+        {
+          "name": "getParentNode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "6173be63296693b05da1567f82fbdf96bef3ee618c29b6fcb0d8c49b4af5393e",
+          "code_length": 56,
+          "throws": [
+            "org/jaxen/UnsupportedAxisException"
+          ]
+        },
+        {
+          "name": "getAttributeAxisIterator",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "8f305d6adbe9ac765ac7676f4e9230d09c1acab529bbcb713ad6119ab7a77891",
+          "code_length": 35,
+          "throws": [
+            "org/jaxen/UnsupportedAxisException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/Iterator<*>;"
+        },
+        {
+          "name": "getChildAxisIterator",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "4ab938c46ef6de940cf943c95c23e219c6407b70fbdd2da29033db87591cb9b3",
+          "code_length": 26,
+          "throws": [
+            "org/jaxen/UnsupportedAxisException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/Iterator<*>;"
+        },
+        {
+          "name": "getNamespaceAxisIterator",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "d5d1b600b503a1fd581c5cf6af9ad038b83283b7607e140f949cddbafee98351",
+          "code_length": 125,
+          "throws": [
+            "org/jaxen/UnsupportedAxisException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/Iterator<*>;"
+        },
+        {
+          "name": "getParentAxisIterator",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/Iterator;",
+          "access": 17,
+          "code_sha256": "0978eaf0b4b5c4c92f0caea6e6b5081bd0b61c6533ec0a6baa8a5ebdade57ee9",
+          "code_length": 70,
+          "throws": [
+            "org/jaxen/UnsupportedAxisException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/Iterator<*>;"
+        },
+        {
+          "name": "readObject",
+          "descriptor": "(Ljava/io/ObjectInputStream;)V",
+          "access": 2,
+          "code_sha256": "442a89071178f59b1ec11f894893b0f2370ce20e2917d759517b466c96caca0a",
+          "code_length": 16,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "writeObject",
+          "descriptor": "(Ljava/io/ObjectOutputStream;)V",
+          "access": 2,
+          "code_sha256": "e829913632391b8e20ae53feeff4fb17b783807ec79e7d65bfe1878c9113d76d",
+          "code_length": 5,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Lorg/jdom2/xpath/jaxen/NamespaceContainer;",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/io/ObjectOutputStream",
+        "java/lang/ClassNotFoundException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/IdentityHashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jaxen/BaseXPath",
+        "org/jaxen/DefaultNavigator",
+        "org/jaxen/FunctionCallException",
+        "org/jaxen/JaxenConstants",
+        "org/jaxen/UnsupportedAxisException",
+        "org/jaxen/saxpath/SAXPathException",
+        "org/jaxen/util/SingleObjectIterator",
+        "org/jdom2/Attribute",
+        "org/jdom2/Comment",
+        "org/jdom2/Content",
+        "org/jdom2/Document",
+        "org/jdom2/Element",
+        "org/jdom2/JDOMException",
+        "org/jdom2/Namespace",
+        "org/jdom2/Parent",
+        "org/jdom2/ProcessingInstruction",
+        "org/jdom2/Text",
+        "org/jdom2/input/SAXBuilder",
+        "org/jdom2/xpath/jaxen/JDOMCoreNavigator",
+        "org/jdom2/xpath/jaxen/NamespaceContainer"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JDOMNavigator.class",
+      "occurrence": 0,
+      "sha256": "e0cadd8aa10b6f54f5975d85aa084488a887fec54f4bcecd630c07c5408fc2c7",
+      "name": "org/jdom2/xpath/jaxen/JDOMNavigator",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "org/jdom2/xpath/jaxen/JDOMCoreNavigator",
+      "interfaces": [
+        "org/jaxen/NamespaceContext"
+      ],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "nsFromContext",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        },
+        {
+          "name": "nsFromUser",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "07b03827efea17be9500c0a7aa317d38cc1d93a8d71dd30b14218113e9ab2d5c",
+          "code_length": 27
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "c55d367e39a2c6acc314734af0cfd3e910868cb94524e5880e344e7f5759ed48",
+          "code_length": 12
+        },
+        {
+          "name": "setContext",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 0,
+          "code_sha256": "3c0c48b04a61f5d8fcde579a3522458f566e0a64ae44fe0277cc7354b3a42bd7",
+          "code_length": 100
+        },
+        {
+          "name": "includeNamespace",
+          "descriptor": "(Lorg/jdom2/Namespace;)V",
+          "access": 0,
+          "code_sha256": "32e1f5d4685b1b7785c4874f8490e65d099d51f725fd65c9187bed1cd304151d",
+          "code_length": 17
+        },
+        {
+          "name": "translateNamespacePrefixToUri",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5c6b734ed983f6724d851384f6bc55f1f7e0ec625091b0906859b680e7a7a648",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/String",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jaxen/NamespaceContext",
+        "org/jdom2/Element",
+        "org/jdom2/Namespace",
+        "org/jdom2/NamespaceAware",
+        "org/jdom2/xpath/jaxen/JDOMCoreNavigator",
+        "org/jdom2/xpath/jaxen/JDOMNavigator",
+        "org/jdom2/xpath/jaxen/NamespaceContainer"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JDOMXPath.class",
+      "occurrence": 0,
+      "sha256": "8230f8fbae14ee0afc4986f3d5e0a778625e57d289c95099f18cccc025d9e7fe",
+      "name": "org/jdom2/xpath/jaxen/JDOMXPath",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jdom2/xpath/XPath",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "xPath",
+          "descriptor": "Lorg/jaxen/XPath;",
+          "access": 130
+        },
+        {
+          "name": "navigator",
+          "descriptor": "Lorg/jdom2/xpath/jaxen/JDOMNavigator;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "unWrapNS",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 26,
+          "code_sha256": "d6c5ba44854940ea0d397beff6dcd405674a02dd6cf4a29e92fca2602b681528",
+          "code_length": 17
+        },
+        {
+          "name": "unWrap",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 26,
+          "code_sha256": "78a1803456e93b381a83c24b2a4c3c5ac99c9f0b270e2974e3a6c62e4a9dc8eb",
+          "code_length": 49,
+          "generic_signature": "(Ljava/util/List<*>;)Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3bd9c83c74426512db6a751d70572babd68297be8d2e3743700aa89b896e23bd",
+          "code_length": 21,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "selectNodes",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "9941d6949d5b914fd28277e6f6742fd0cfd46b6f1590a3b4d02e6b42902ae5a5",
+          "code_length": 88,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ],
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<*>;"
+        },
+        {
+          "name": "selectSingleNode",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "678ff65c7b4cd17bf660f82714df92b0da33454c176bed0e639814056feb9188",
+          "code_length": 88,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "763c99c9e3ddf4df15a294c8de0cbea9c2102a716b9707727c4a73b1a4b13c42",
+          "code_length": 85,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "numberValueOf",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Number;",
+          "access": 1,
+          "code_sha256": "e4f400840b42bc8a5c1a135d619074b65aea4fb9a4912ef7e8fb81916a13b246",
+          "code_length": 85,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "64c3dfbcad8640c59031ae9d26a63b933826972d2c54ba94a8b83fd629f533c1",
+          "code_length": 28,
+          "throws": [
+            "java/lang/IllegalArgumentException"
+          ]
+        },
+        {
+          "name": "addNamespace",
+          "descriptor": "(Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "907dec3b9816064fcec13cf8cb1e99bb03a6487318599caeba66667d708334d4",
+          "code_length": 9
+        },
+        {
+          "name": "getXPath",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "41c9b9be1756aea562b7d9ff6a62b9260693d2a90fb6cfb6fd60ba5912440109",
+          "code_length": 8
+        },
+        {
+          "name": "setXPath",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "304c76a07a3de225093851ed094f6f1a897b49c1681c372480980f1f5031b3ac",
+          "code_length": 67,
+          "throws": [
+            "org/jdom2/JDOMException"
+          ]
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9289d32fee0da4bb5ad2123ff79b4b899f4ad5e7830476ca0661b0ec47198014",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jaxen/BaseXPath",
+        "org/jaxen/JaxenException",
+        "org/jaxen/SimpleVariableContext",
+        "org/jaxen/XPath",
+        "org/jdom2/JDOMException",
+        "org/jdom2/xpath/XPath",
+        "org/jdom2/xpath/jaxen/JDOMNavigator",
+        "org/jdom2/xpath/jaxen/JDOMXPath",
+        "org/jdom2/xpath/jaxen/NamespaceContainer"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JaxenCompiled.class",
+      "occurrence": 0,
+      "sha256": "3b6d379b6ba2833e1683386bf31c7474a65458b14b68101216f61a156e792b45",
+      "name": "org/jdom2/xpath/jaxen/JaxenCompiled",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/jdom2/xpath/util/AbstractXPathCompiled",
+      "interfaces": [
+        "org/jaxen/NamespaceContext",
+        "org/jaxen/VariableContext"
+      ],
+      "fields": [
+        {
+          "name": "xPath",
+          "descriptor": "Lorg/jaxen/XPath;",
+          "access": 18
+        },
+        {
+          "name": "navigator",
+          "descriptor": "Lorg/jdom2/xpath/jaxen/JDOM2Navigator;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "unWrapNS",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 26,
+          "code_sha256": "d6c5ba44854940ea0d397beff6dcd405674a02dd6cf4a29e92fca2602b681528",
+          "code_length": 17
+        },
+        {
+          "name": "unWrap",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 26,
+          "code_sha256": "78a1803456e93b381a83c24b2a4c3c5ac99c9f0b270e2974e3a6c62e4a9dc8eb",
+          "code_length": 49,
+          "generic_signature": "(Ljava/util/List<*>;)Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;Ljava/util/Map;[Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "ccec85485854077f60aeff227b1082ca3a265cb13e6a9f2dbfdec8e1cdba3c93",
+          "code_length": 96,
+          "generic_signature": "(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;[Lorg/jdom2/Namespace;)V"
+        },
+        {
+          "name": "translateNamespacePrefixToUri",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d8ece707da82fd8b679530137666113985da5285aa5df5b5ed92e5ce8adf103a",
+          "code_length": 9
+        },
+        {
+          "name": "getVariableValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d0fe9b50d8fbeeb6741a26bc26681a105829397bb1527ee0429c5d5550e84c94",
+          "code_length": 85,
+          "throws": [
+            "org/jaxen/UnresolvableException"
+          ]
+        },
+        {
+          "name": "evaluateRawAll",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "38a139773cbb7b057ea79bd1fd8ac9e7132ca3f051f31a1367bfac3513e2e0f3",
+          "code_length": 26,
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<*>;"
+        },
+        {
+          "name": "evaluateRawFirst",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "0f5fe0c8a73424bbf64639f02ed4d8a795aaaad9ee738c9bd6fc9e03654fc055",
+          "code_length": 26
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/jdom2/xpath/util/AbstractXPathCompiled<TT;>;Lorg/jaxen/NamespaceContext;Lorg/jaxen/VariableContext;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jaxen/BaseXPath",
+        "org/jaxen/JaxenException",
+        "org/jaxen/NamespaceContext",
+        "org/jaxen/UnresolvableException",
+        "org/jaxen/VariableContext",
+        "org/jaxen/XPath",
+        "org/jdom2/Namespace",
+        "org/jdom2/xpath/jaxen/JDOM2Navigator",
+        "org/jdom2/xpath/jaxen/JaxenCompiled",
+        "org/jdom2/xpath/jaxen/NamespaceContainer",
+        "org/jdom2/xpath/util/AbstractXPathCompiled"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/JaxenXPathFactory.class",
+      "occurrence": 0,
+      "sha256": "3f5d7eeb8b2cff7972dc8c6f83dc615323af0bebcca1753c1db590b012924bca",
+      "name": "org/jdom2/xpath/jaxen/JaxenXPathFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/jdom2/xpath/XPathFactory",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compile",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;Ljava/util/Map;[Lorg/jdom2/Namespace;)Lorg/jdom2/xpath/XPathExpression;",
+          "access": 129,
+          "code_sha256": "9d89b8e9c323b47a564b9c0eda1f266d6b37b565315c92bbeeb0df36093c8de8",
+          "code_length": 13,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;[Lorg/jdom2/Namespace;)Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        }
+      ],
+      "class_references": [
+        "org/jdom2/xpath/XPathFactory",
+        "org/jdom2/xpath/jaxen/JaxenCompiled",
+        "org/jdom2/xpath/jaxen/JaxenXPathFactory"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/jaxen/NamespaceContainer.class",
+      "occurrence": 0,
+      "sha256": "6463c2e2e7bd1170a4a88ebb5e986b95fdd21804bd0ebdbab41d603fc8169365",
+      "name": "org/jdom2/xpath/jaxen/NamespaceContainer",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ns",
+          "descriptor": "Lorg/jdom2/Namespace;",
+          "access": 18
+        },
+        {
+          "name": "emt",
+          "descriptor": "Lorg/jdom2/Element;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jdom2/Namespace;Lorg/jdom2/Element;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getNamespace",
+          "descriptor": "()Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getParentElement",
+          "descriptor": "()Lorg/jdom2/Element;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b631e8712f1dfdd2b4314295fc4cd2ef59755f6bea4ec516e1d1f58d5cc0c73b",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "org/jdom2/Namespace",
+        "org/jdom2/xpath/jaxen/NamespaceContainer"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/util/AbstractXPathCompiled$1.class",
+      "occurrence": 0,
+      "sha256": "6e7f02d6a56546624a763ece360638eb3ca09ece7adc53dcaf626b104c709220",
+      "name": "org/jdom2/xpath/util/AbstractXPathCompiled$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/jdom2/xpath/util/AbstractXPathCompiled",
+        "org/jdom2/xpath/util/AbstractXPathCompiled$1"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/util/AbstractXPathCompiled$NamespaceComparator.class",
+      "occurrence": 0,
+      "sha256": "5691b6792e5f3303d9ea1de01333589b10dec9c24ae31b2748799746c42f00fa",
+      "name": "org/jdom2/xpath/util/AbstractXPathCompiled$NamespaceComparator",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Comparator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Lorg/jdom2/Namespace;Lorg/jdom2/Namespace;)I",
+          "access": 1,
+          "code_sha256": "22108b194ee9b9ef57db948668761481a8f574de74aeb4d4730339db22b3cf52",
+          "code_length": 12
+        },
+        {
+          "name": "compare",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "609efd4d2c5bc928342f48cc9d5e3a4598a14432bfbca6b54708fe27a472f458",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/jdom2/xpath/util/AbstractXPathCompiled$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Comparator<Lorg/jdom2/Namespace;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Comparator",
+        "org/jdom2/Namespace",
+        "org/jdom2/xpath/util/AbstractXPathCompiled",
+        "org/jdom2/xpath/util/AbstractXPathCompiled$1",
+        "org/jdom2/xpath/util/AbstractXPathCompiled$NamespaceComparator"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/util/AbstractXPathCompiled.class",
+      "occurrence": 0,
+      "sha256": "b42fea87e0088e8458a652316021e8da38edaaa7e3c0e1fec0c1d77fc7ec787d",
+      "name": "org/jdom2/xpath/util/AbstractXPathCompiled",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jdom2/xpath/XPathExpression"
+      ],
+      "fields": [
+        {
+          "name": "NSSORT",
+          "descriptor": "Lorg/jdom2/xpath/util/AbstractXPathCompiled$NamespaceComparator;",
+          "access": 26
+        },
+        {
+          "name": "xnamespaces",
+          "descriptor": "Ljava/util/Map;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Lorg/jdom2/Namespace;>;"
+        },
+        {
+          "name": "xvariables",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map<Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;>;"
+        },
+        {
+          "name": "xquery",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "xfilter",
+          "descriptor": "Lorg/jdom2/filter/Filter;",
+          "access": 18,
+          "generic_signature": "Lorg/jdom2/filter/Filter<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/filter/Filter;Ljava/util/Map;[Lorg/jdom2/Namespace;)V",
+          "access": 1,
+          "code_sha256": "430c62138ab93aae7a18e7a5fbfc90cc1928a72c47ae6778f78d521d4fa1ef1f",
+          "code_length": 618,
+          "generic_signature": "(Ljava/lang/String;Lorg/jdom2/filter/Filter<TT;>;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;[Lorg/jdom2/Namespace;)V"
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "4e7272c2b873260dfff0cb4d4c0894439f0e85850858959bf0b8d641c54672de",
+          "code_length": 174,
+          "generic_signature": "()Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "getExpression",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "85964d32967b3f4f97b0258fadd90eacddf672f2b753b5bfc55aa8f4fab8c4c3",
+          "code_length": 5
+        },
+        {
+          "name": "getNamespace",
+          "descriptor": "(Ljava/lang/String;)Lorg/jdom2/Namespace;",
+          "access": 17,
+          "code_sha256": "3c58c42d9a270f52da4d3992b5967aa981243f9dd3e1fccef1673288b9e5d0b5",
+          "code_length": 52
+        },
+        {
+          "name": "getNamespaces",
+          "descriptor": "()[Lorg/jdom2/Namespace;",
+          "access": 1,
+          "code_sha256": "0f300887778cb1213630d14214d6f25061b3679b1275399cdb022590e24eeeee",
+          "code_length": 39
+        },
+        {
+          "name": "getVariable",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Namespace;)Ljava/lang/Object;",
+          "access": 17,
+          "code_sha256": "393fbdfada591052c8088227b5fe9923e6e97998e86b2b7091f9fc0d89a96abf",
+          "code_length": 147
+        },
+        {
+          "name": "getVariable",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "bef3c92f043a9069a352e8b8a5729a1484e2554bd51a8ab5973e7ff784c88f5d",
+          "code_length": 56
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Lorg/jdom2/Namespace;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fb3c5c1da116fb4440c5c9396a1f4906b918affc307864bb1ee95373f373f914",
+          "code_length": 35
+        },
+        {
+          "name": "setVariable",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9d9f386eccc827a615c8310f835d8b4ecf9dc25b36d7f7a6b19171130f307c6f",
+          "code_length": 58
+        },
+        {
+          "name": "getFilter",
+          "descriptor": "()Lorg/jdom2/filter/Filter;",
+          "access": 17,
+          "code_sha256": "5da6e334e36bda837ba180438bd217523b5eafd4a06ee7083400188ca9cf62dc",
+          "code_length": 5,
+          "generic_signature": "()Lorg/jdom2/filter/Filter<TT;>;"
+        },
+        {
+          "name": "evaluate",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "3dfa0fe9bf806a15780596df5701a96a8cfa14a27415845a3e56c664b49fb4c8",
+          "code_length": 15,
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "evaluateFirst",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fbf2fbe51586f97dfb84d0c9442f128013e4e61ec7d653bd1e0b8b51024b6a03",
+          "code_length": 23,
+          "generic_signature": "(Ljava/lang/Object;)TT;"
+        },
+        {
+          "name": "diagnose",
+          "descriptor": "(Ljava/lang/Object;Z)Lorg/jdom2/xpath/XPathDiagnostic;",
+          "access": 1,
+          "code_sha256": "8c3bffc2d06c448c7a5220fb04becc7b48884189bcadc0479fb815d0bf3e9cbf",
+          "code_length": 33,
+          "generic_signature": "(Ljava/lang/Object;Z)Lorg/jdom2/xpath/XPathDiagnostic<TT;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b61f1246ba1ab1e51e32595485e0d996bc4e9380c14c2e029eaaf7417d7433bd",
+          "code_length": 91
+        },
+        {
+          "name": "evaluateRawAll",
+          "descriptor": "(Ljava/lang/Object;)Ljava/util/List;",
+          "access": 1028,
+          "generic_signature": "(Ljava/lang/Object;)Ljava/util/List<*>;"
+        },
+        {
+          "name": "evaluateRawFirst",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1028
+        },
+        {
+          "name": "clone",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "86a8bda70a79f969e6482ebf6931860bbd57ec93f0ea5d005472c45544cc3c44",
+          "code_length": 5,
+          "throws": [
+            "java/lang/CloneNotSupportedException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fa1fe63f0194a145b04d50be22f83ead5cff1747ba7abad9024224589b0d1943",
+          "code_length": 12
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/jdom2/xpath/XPathExpression<TT;>;",
+      "class_references": [
+        "[Lorg/jdom2/Namespace;",
+        "java/lang/CloneNotSupportedException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/Integer",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "org/jdom2/Namespace",
+        "org/jdom2/Verifier",
+        "org/jdom2/filter/Filter",
+        "org/jdom2/xpath/XPathExpression",
+        "org/jdom2/xpath/util/AbstractXPathCompiled",
+        "org/jdom2/xpath/util/AbstractXPathCompiled$1",
+        "org/jdom2/xpath/util/AbstractXPathCompiled$NamespaceComparator",
+        "org/jdom2/xpath/util/XPathDiagnosticImpl"
+      ]
+    },
+    {
+      "entry": "org/jdom2/xpath/util/XPathDiagnosticImpl.class",
+      "occurrence": 0,
+      "sha256": "ffce83d03f14485e4dc08a77d1255cd1abced641c1c809a2c9e31b25ff528b2c",
+      "name": "org/jdom2/xpath/util/XPathDiagnosticImpl",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/jdom2/xpath/XPathDiagnostic"
+      ],
+      "fields": [
+        {
+          "name": "dcontext",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "dxpath",
+          "descriptor": "Lorg/jdom2/xpath/XPathExpression;",
+          "access": 18,
+          "generic_signature": "Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "draw",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "dfiltered",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "dresult",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "dfirstonly",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Lorg/jdom2/xpath/XPathExpression;Ljava/util/List;Z)V",
+          "access": 1,
+          "code_sha256": "296b886b8add3a54607ec44eedb52b60140d3cda54d65a9c01ff161f1eeb0ac9",
+          "code_length": 176,
+          "generic_signature": "(Ljava/lang/Object;Lorg/jdom2/xpath/XPathExpression<TT;>;Ljava/util/List<*>;Z)V"
+        },
+        {
+          "name": "getContext",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8147cff25932a21b9f3fd88c09486c0907181365574bf2fabbe0ffbdb9e6a923",
+          "code_length": 5
+        },
+        {
+          "name": "getXPathExpression",
+          "descriptor": "()Lorg/jdom2/xpath/XPathExpression;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5,
+          "generic_signature": "()Lorg/jdom2/xpath/XPathExpression<TT;>;"
+        },
+        {
+          "name": "getResult",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "getFilteredResults",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "f004ac5c9a79ceb4989373b8d7a89a7792ae03a8d6f888a8ec88a93074c9b64a",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "getRawResults",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Object;>;"
+        },
+        {
+          "name": "isFirstOnly",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "085d62d93a457d88051367c4c81bf8948ab7fc917da3af7cb444191f1f83a702",
+          "code_length": 98
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/jdom2/xpath/XPathDiagnostic<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/jdom2/filter/Filter",
+        "org/jdom2/xpath/XPathDiagnostic",
+        "org/jdom2/xpath/XPathExpression",
+        "org/jdom2/xpath/util/XPathDiagnosticImpl"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/mcp-json-0.17.2.jar",
+  "archive_sha256": "6df99ef400836bd213d63895684eb066d36e1a9b759bd38342c32a6b9b0b6e4f",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonMapperSupplier.class",
+      "occurrence": 0,
+      "sha256": "fa578ef33837fcbc9a9033cc8e6c0de74e96902a9e75a7f6993285efb568ae0d",
+      "name": "io/modelcontextprotocol/json/McpJsonMapperSupplier",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/function/Supplier"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/function/Supplier<Lio/modelcontextprotocol/json/McpJsonMapper;>;",
+      "class_references": [
+        "io/modelcontextprotocol/json/McpJsonMapperSupplier",
+        "java/lang/Object",
+        "java/util/function/Supplier"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaInternal.class",
+      "occurrence": 0,
+      "sha256": "d9056e4a2b4ad96430149b782e3a16624defb682d02b8f11216eb7c79657035e",
+      "name": "io/modelcontextprotocol/json/schema/JsonSchemaInternal",
+      "major": 61,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defaultValidator",
+          "descriptor": "Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultValidator",
+          "descriptor": "()Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 8,
+          "code_sha256": "e29327d4a71c4672a058ee3e1336eccf50f5810669aa8a37df0457a9c1ea4535",
+          "code_length": 16
+        },
+        {
+          "name": "createDefaultValidator",
+          "descriptor": "()Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 8,
+          "code_sha256": "a1802d51c77aef123b98dea89cc1fc83698d295029394ad8926037e83ea21038",
+          "code_length": 56
+        },
+        {
+          "name": "addException",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Exception;)V",
+          "access": 10,
+          "code_sha256": "4469fee85f7198e3d293d05812e6ad6aa5c464bbdfa05682c56daaac137a08b1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/concurrent/atomic/AtomicReference<Ljava/lang/IllegalStateException;>;Ljava/lang/Exception;)V"
+        },
+        {
+          "name": "lambda$addException$3",
+          "descriptor": "(Ljava/lang/Exception;Ljava/lang/IllegalStateException;)Ljava/lang/IllegalStateException;",
+          "access": 4106,
+          "code_sha256": "6a6c327c34004d9c8706e8166e18e8a94e233a57d1ca36818b230081bb453cdd",
+          "code_length": 22
+        },
+        {
+          "name": "lambda$createDefaultValidator$2",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/IllegalStateException;",
+          "access": 4106,
+          "code_sha256": "9234e0e36983cd5ec5f203fc8cd0610ceb4c4f70324b95bc015e5f480d181e3b",
+          "code_length": 25
+        },
+        {
+          "name": "lambda$createDefaultValidator$1",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Lio/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier;)Ljava/util/stream/Stream;",
+          "access": 4106,
+          "code_sha256": "f043cc831608dcead6a703625948fdfcb810c33d5ad081e1e43e6266ed81ee72",
+          "code_length": 23
+        },
+        {
+          "name": "lambda$createDefaultValidator$0",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Ljava/util/ServiceLoader$Provider;)Ljava/util/stream/Stream;",
+          "access": 4106,
+          "code_sha256": "977932c7589bd0d7f896aab6ad74eaaca46453055de18a573d9585cb160bd432",
+          "code_length": 25
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c8a68704d07f854e62a285ae2351a5d769bd32be5640db83afd081df0134707e",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaInternal",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Optional",
+        "java/util/ServiceLoader",
+        "java/util/ServiceLoader$Provider",
+        "java/util/concurrent/atomic/AtomicReference",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidator.class",
+      "occurrence": 0,
+      "sha256": "b4ab17b4a858e4168edba948c37b9e9aa1fdeab7aca117cee2c44e3c47f6a1e0",
+      "name": "io/modelcontextprotocol/json/schema/JsonSchemaValidator",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "validate",
+          "descriptor": "(Ljava/util/Map;Ljava/lang/Object;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/Object;>;Ljava/lang/Object;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;"
+        },
+        {
+          "name": "createDefault",
+          "descriptor": "()Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 9,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4
+        },
+        {
+          "name": "getDefault",
+          "descriptor": "()Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;",
+          "access": 9,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaInternal",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse.class",
+      "occurrence": 0,
+      "sha256": "d3df0a5b44b147d76a31c94f0b787df5c82ae489fcb84f106993a7648d8ab7a3",
+      "name": "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse",
+      "major": 61,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Record",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "valid",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "errorMessage",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "jsonStructuredOutput",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ZLjava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d25d5b87c2bcc299e32b119527330de2ffa31356d07fe61b9c9168f8d955b439",
+          "code_length": 20
+        },
+        {
+          "name": "asValid",
+          "descriptor": "(Ljava/lang/String;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;",
+          "access": 9,
+          "code_sha256": "fe9f3dd83e3848f267c11cb80931ebddc8667c21e435f48b05e57eb098d57cef",
+          "code_length": 11
+        },
+        {
+          "name": "asInvalid",
+          "descriptor": "(Ljava/lang/String;)Lio/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse;",
+          "access": 9,
+          "code_sha256": "116c6e558f2ec57d9984934eabb05622449dd9e823209eec0535897250caa130",
+          "code_length": 11
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "1e877f875ebe633a2ffffbb6a90d9ad618c98f92ed012b7fb8440b981713b5bc",
+          "code_length": 7
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 17,
+          "code_sha256": "c94e051237d4cb2165818ceac1415b7d8fbdb77f42535af97fedb1dc6a2efa73",
+          "code_length": 7
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 17,
+          "code_sha256": "737bfc15dcbc6d64a873f14aecd4f8f14bb285ad4cf58ae27eaa0dd9dcb0fa83",
+          "code_length": 8
+        },
+        {
+          "name": "valid",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "errorMessage",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d0cf9f922ab010f8c80625ee6685ff3cb0a085a2217bde1a5d580997c5014bcb",
+          "code_length": 5
+        },
+        {
+          "name": "jsonStructuredOutput",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator",
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidator$ValidationResponse",
+        "java/lang/Record",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/runtime/ObjectMethods"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier.class",
+      "occurrence": 0,
+      "sha256": "657d9a5def6f2ccaf259ee948c6e06b6e8aa270f95f54ce385f5617a022ff008",
+      "name": "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/function/Supplier"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/function/Supplier<Lio/modelcontextprotocol/json/schema/JsonSchemaValidator;>;",
+      "class_references": [
+        "io/modelcontextprotocol/json/schema/JsonSchemaValidatorSupplier",
+        "java/lang/Object",
+        "java/util/function/Supplier"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonInternal.class",
+      "occurrence": 0,
+      "sha256": "eaf94b264f865e6cc6c120e9b09eca3709ebbe83c64a1aa8607f455b462341f8",
+      "name": "io/modelcontextprotocol/json/McpJsonInternal",
+      "major": 61,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defaultJsonMapper",
+          "descriptor": "Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultMapper",
+          "descriptor": "()Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 8,
+          "code_sha256": "e29327d4a71c4672a058ee3e1336eccf50f5810669aa8a37df0457a9c1ea4535",
+          "code_length": 16
+        },
+        {
+          "name": "createDefaultMapper",
+          "descriptor": "()Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 8,
+          "code_sha256": "a1802d51c77aef123b98dea89cc1fc83698d295029394ad8926037e83ea21038",
+          "code_length": 56
+        },
+        {
+          "name": "addException",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Ljava/lang/Exception;)V",
+          "access": 10,
+          "code_sha256": "4469fee85f7198e3d293d05812e6ad6aa5c464bbdfa05682c56daaac137a08b1",
+          "code_length": 12,
+          "generic_signature": "(Ljava/util/concurrent/atomic/AtomicReference<Ljava/lang/IllegalStateException;>;Ljava/lang/Exception;)V"
+        },
+        {
+          "name": "lambda$addException$3",
+          "descriptor": "(Ljava/lang/Exception;Ljava/lang/IllegalStateException;)Ljava/lang/IllegalStateException;",
+          "access": 4106,
+          "code_sha256": "6a6c327c34004d9c8706e8166e18e8a94e233a57d1ca36818b230081bb453cdd",
+          "code_length": 22
+        },
+        {
+          "name": "lambda$createDefaultMapper$2",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;)Ljava/lang/IllegalStateException;",
+          "access": 4106,
+          "code_sha256": "9234e0e36983cd5ec5f203fc8cd0610ceb4c4f70324b95bc015e5f480d181e3b",
+          "code_length": 25
+        },
+        {
+          "name": "lambda$createDefaultMapper$1",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Lio/modelcontextprotocol/json/McpJsonMapperSupplier;)Ljava/util/stream/Stream;",
+          "access": 4106,
+          "code_sha256": "f043cc831608dcead6a703625948fdfcb810c33d5ad081e1e43e6266ed81ee72",
+          "code_length": 23
+        },
+        {
+          "name": "lambda$createDefaultMapper$0",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;Ljava/util/ServiceLoader$Provider;)Ljava/util/stream/Stream;",
+          "access": 4106,
+          "code_sha256": "9f5ccdaf6b649d574da8e417116588291be44a30ab209e72caee954fbe3ebf74",
+          "code_length": 25
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c8a68704d07f854e62a285ae2351a5d769bd32be5640db83afd081df0134707e",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/McpJsonInternal",
+        "io/modelcontextprotocol/json/McpJsonMapper",
+        "io/modelcontextprotocol/json/McpJsonMapperSupplier",
+        "java/lang/Exception",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/Optional",
+        "java/util/ServiceLoader",
+        "java/util/ServiceLoader$Provider",
+        "java/util/concurrent/atomic/AtomicReference",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/McpJsonMapper.class",
+      "occurrence": 0,
+      "sha256": "e625202251154d75cb493ea23967896b780dff8e8013de996b700fa06081ab90",
+      "name": "io/modelcontextprotocol/json/McpJsonMapper",
+      "major": 61,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "readValue",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "([BLjava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>([BLjava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "(Ljava/lang/String;Lio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;Lio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "readValue",
+          "descriptor": "([BLio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>([BLio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "convertValue",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Object;Ljava/lang/Class<TT;>;)TT;"
+        },
+        {
+          "name": "convertValue",
+          "descriptor": "(Ljava/lang/Object;Lio/modelcontextprotocol/json/TypeRef;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Object;Lio/modelcontextprotocol/json/TypeRef<TT;>;)TT;"
+        },
+        {
+          "name": "writeValueAsString",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/String;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeValueAsBytes",
+          "descriptor": "(Ljava/lang/Object;)[B",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getDefault",
+          "descriptor": "()Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 9,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4
+        },
+        {
+          "name": "createDefault",
+          "descriptor": "()Lio/modelcontextprotocol/json/McpJsonMapper;",
+          "access": 9,
+          "code_sha256": "b814b70ab3ae5c73dde3e22e89b9e81cc1598cb5227f4ba8fe0bb2abb40b4625",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "io/modelcontextprotocol/json/McpJsonInternal",
+        "io/modelcontextprotocol/json/McpJsonMapper",
+        "java/io/IOException",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/modelcontextprotocol/json/TypeRef.class",
+      "occurrence": 0,
+      "sha256": "2fc4f10fbc5669f6bec86bf05cd144ddc02c0365afff850a0d5c7a7572a4fa1c",
+      "name": "io/modelcontextprotocol/json/TypeRef",
+      "major": 61,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/reflect/Type;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "3e483ff4a5483913a31610315ecd2575f6537ff82aa5fd69ee29455ce6ad7de7",
+          "code_length": 45
+        },
+        {
+          "name": "getType",
+          "descriptor": "()Ljava/lang/reflect/Type;",
+          "access": 1,
+          "code_sha256": "0f5cdc4799996e0209bb41d6911e611ea1618e67c003ef3e10158301018e74d1",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/modelcontextprotocol/json/TypeRef",
+        "java/lang/Class",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/reflect/ParameterizedType",
+        "java/lang/reflect/Type"
+      ]
+    }
+  ]
+}

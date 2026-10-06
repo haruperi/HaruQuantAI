@@ -1,7 +1,7 @@
 import { TOOLS, useNotesController } from './NotesCtrl';
 
 /**
- * "Notes" tab (donor evidence SQX144-EV-000043): Save button, rich-text
+ * "Notes" tab (donor evidence retained target UI; current donor equivalence unverified): Save button, rich-text
  * toolbar (bold, italic, underline, align left/center/right, indent
  * more/less, horizontal rule, ordered/unordered list, link) and a
  * contenteditable area. Basic browser formatting only — no editor engine.

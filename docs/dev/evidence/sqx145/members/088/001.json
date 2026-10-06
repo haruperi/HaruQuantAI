@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-common-1.61.0.jar",
+  "archive_sha256": "618bd894feb3f65a563209603d27cbab534310be22705f78c525fc0e799e8e91",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/common/ComponentLoader.class",
+      "occurrence": 0,
+      "sha256": "db3d1b27828f5967745a5b1852dc14d846035f447ee76b9a8e72584ad1a6671d",
+      "name": "io/opentelemetry/common/ComponentLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "load",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Iterable;",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Ljava/lang/Iterable<TT;>;"
+        },
+        {
+          "name": "forClassLoader",
+          "descriptor": "(Ljava/lang/ClassLoader;)Lio/opentelemetry/common/ComponentLoader;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9
+        },
+        {
+          "name": "loadList",
+          "descriptor": "(Lio/opentelemetry/common/ComponentLoader;Ljava/lang/Class;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "5ed3e50acdf9f5305177b8ad64dfb97060044599e594ca5ac04ea10157f7cbdf",
+          "code_length": 36,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lio/opentelemetry/common/ComponentLoader;Ljava/lang/Class<TT;>;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/common/ComponentLoader",
+        "io/opentelemetry/common/ServiceLoaderComponentLoader",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/List",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/common/ServiceLoaderComponentLoader.class",
+      "occurrence": 0,
+      "sha256": "ad4b16105c60853c501b63710de705d4dd05e80e209741c6ad3786b92ca4546b",
+      "name": "io/opentelemetry/common/ServiceLoaderComponentLoader",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/common/ComponentLoader"
+      ],
+      "fields": [
+        {
+          "name": "classLoader",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/ClassLoader;)V",
+          "access": 0,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "load",
+          "descriptor": "(Ljava/lang/Class;)Ljava/lang/Iterable;",
+          "access": 1,
+          "code_sha256": "1d29d2660de6a397bd08af0e08b2b86d4ef24c0d6f01344da31272198f8eb7ed",
+          "code_length": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;)Ljava/lang/Iterable<TT;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d6a38b2fc29a331b39e16ac65b1efe3ca6cb8a8ab766cbb5747087ab2b460e1b",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/common/ComponentLoader",
+        "io/opentelemetry/common/ServiceLoaderComponentLoader",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ServiceLoader"
+      ]
+    }
+  ]
+}

@@ -1,57 +1,36 @@
-# Results: SQX JAR references
+# Results — current donor archives
 
-[All workspaces](../README.md)
+[All archives](../README.md)
 
-This folder groups donor archives for research. Except for inspected App registrations, backend ownership is inferred. Shared components can be consumed by multiple workspaces; these documents do not prescribe HaruQuantAI architecture.
-
-## Canonical JAR documents
-
-| JAR | Class entries | Declaration families |
-| --- | ---: | --- |
-| [AppResults.jar](AppResults.md) | 1 | `com.strategyquant.plugin.App.impl.Results` |
-| [DashboardResults.jar](DashboardResults.md) | 2 | `com.strategyquant.plugin.Dashboard.impl.Results` |
-| [DatabankFilterByCorrelation.jar](DatabankFilterByCorrelation.md) | 2 | `com.strategyquant.plugin.Databank.impl.FilterByCorrelation` |
-| [DatabankRename.jar](DatabankRename.md) | 2 | `com.strategyquant.plugin.Databank.impl.Rename` |
-| [EquityChartBenchmark.jar](EquityChartBenchmark.md) | 3 | `com.strategyquant.plugin.EquityChart.impl.Benchmark` |
-| [EquityChartDailyChart.jar](EquityChartDailyChart.md) | 1 | `com.strategyquant.plugin.EquityChart.impl.DailyChart` |
-| [EquityChartDrawdown.jar](EquityChartDrawdown.md) | 1 | `com.strategyquant.plugin.EquityChart.impl.Drawdown` |
-| [EquityChartVolatility.jar](EquityChartVolatility.md) | 1 | `com.strategyquant.plugin.EquityChart.impl.Volatility` |
-| [EquityChartVolume.jar](EquityChartVolume.md) | 1 | `com.strategyquant.plugin.EquityChart.impl.Volume` |
-| [ResultsChart.jar](ResultsChart.md) | 2 | `com.strategyquant.plugin.Results.impl.Chart` |
-| [ResultsDatabankActions.jar](ResultsDatabankActions.md) | 3 | `com.strategyquant.plugin.Results.impl.DatabankActions` |
-| [ResultsDatabankViews.jar](ResultsDatabankViews.md) | 2 | `com.strategyquant.plugin.Results.impl.DatabankViews` |
-| [ResultsEquityChart.jar](ResultsEquityChart.md) | 2 | `com.strategyquant.plugin.Results.impl.EquityChart` |
-| [ResultsExplore.jar](ResultsExplore.md) | 2 | `com.strategyquant.plugin.Results.impl.Explore` |
-| [ResultsOptimizationProfile.jar](ResultsOptimizationProfile.md) | 12 | `com.strategyquant.plugin.Results.impl.OptimizationProfile`, `com.strategyquant.plugin.Results.impl.OptimizationProfile.charts`, `com.strategyquant.plugin.Results.impl.OptimizationProfile.results` |
-| [ResultsOverview.jar](ResultsOverview.md) | 2 | `com.strategyquant.plugin.Results.impl.Overview` |
-| [ResultsPlugins.jar](ResultsPlugins.md) | 2 | `com.strategyquant.plugin.Results.impl.Plugins` |
-| [ResultsPortfolioCorrelation.jar](ResultsPortfolioCorrelation.md) | 13 | `com.strategyquant.plugin.Results.impl.PortfolioCorrelation`, `com.strategyquant.plugin.Results.impl.PortfolioCorrelation.correlation`, `com.strategyquant.plugin.Results.impl.PortfolioCorrelation.overlappingTrades` |
-| [ResultsProfileChart.jar](ResultsProfileChart.md) | 2 | `com.strategyquant.plugin.Results.impl.ProfileChart` |
-| [ResultsRobustnessTests.jar](ResultsRobustnessTests.md) | 7 | `com.strategyquant.plugin.Results.impl.RobustnessTests`, `com.strategyquant.plugin.Results.impl.RobustnessTests.views` |
-| [ResultsSPOverview.jar](ResultsSPOverview.md) | 5 | `com.strategyquant.plugin.Results.impl.SPOverview` |
-| [ResultsSequentialOptimization.jar](ResultsSequentialOptimization.md) | 2 | `com.strategyquant.plugin.Results.impl.SequentialOptimization` |
-| [ResultsSourceCode.jar](ResultsSourceCode.md) | 2 | `com.strategyquant.plugin.Results.impl.SourceCode` |
-| [ResultsStockpicker.jar](ResultsStockpicker.md) | 2 | `com.strategyquant.plugin.Results.impl.Stockpicker` |
-| [ResultsStrategyConfig.jar](ResultsStrategyConfig.md) | 2 | `com.strategyquant.plugin.Results.impl.StrategyConfig` |
-| [ResultsSysParamPermutation.jar](ResultsSysParamPermutation.md) | 2 | `com.strategyquant.plugin.Results.impl.SysParamPermutation` |
-| [ResultsTradeAnalysis.jar](ResultsTradeAnalysis.md) | 3 | `com.strategyquant.plugin.Results.impl.TradeAnalysis` |
-| [ResultsTradeList.jar](ResultsTradeList.md) | 2 | `com.strategyquant.plugin.Results.impl.TradeList` |
-| [ResultsTradelistViews.jar](ResultsTradelistViews.md) | 2 | `com.strategyquant.plugin.Results.impl.TradelistViews` |
-| [ResultsWalkForward.jar](ResultsWalkForward.md) | 5 | `com.strategyquant.plugin.Results.impl.WalkForward`, `com.strategyquant.plugin.Results.impl.WalkForward.views` |
-
-## Workspace registration evidence
-
-- Observed NavigationPlugin in `SQX_REFERENCE_ROOT/internal/plugins/AppResults/module.js`: title `Results`, app code `RESULTS`, hidden registration `True`. SHA-256 `42cc52c94aa2d7254ce4daea288a0ada674237c2c3ce562a4a953ec16b799607`; inspected 2026-10-05 by direct text, at NavigationPlugin object. Registration does not prove runtime/license availability.
-
-## Referenced archives outside this group
-
-These links are supported by superclass/interface/member-type references in the inspected declarations. They are declaration dependencies, not a runtime call graph.
-
-- [SQDataLib.jar](../Shared/SQDataLib.md) - `Shared`.
-- [SQPluginLib.jar](../Shared/SQPluginLib.md) - `Shared`.
-- [SQTradingLib.jar](../Shared/SQTradingLib.md) - `Shared`.
-- [SQWebGUILib.jar](../Shared/SQWebGUILib.md) - `Shared`.
-
-## Limits
-
-No method bodies, algorithms, event order, failure behavior or parity are established by a class diagram. Exact behavior needs separate donor inspection and isolated runtime fixtures. Source locators and fingerprints are in each archive document; no ledger IDs are allocated while the authoritative ledger/schema are absent.
+| JAR | Proposed feature | Phase | Raw classes |
+| --- | --- | --- | ---: |
+| [AppResults.md](AppResults.md) | `FEAT-RESULTS-APP-RESULTS` | P08 | 1 |
+| [DashboardResults.md](DashboardResults.md) | `FEAT-BUILDER-DASHBOARD-RESULTS` | P09 | 2 |
+| [DatabankFilterByCorrelation.md](DatabankFilterByCorrelation.md) | `FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION` | P08 | 2 |
+| [DatabankRename.md](DatabankRename.md) | `FEAT-RESULTS-DATABANK-RENAME` | P08 | 2 |
+| [EquityChartBenchmark.md](EquityChartBenchmark.md) | `FEAT-RESULTS-EQUITY-CHART-BENCHMARK` | P08 | 3 |
+| [EquityChartDailyChart.md](EquityChartDailyChart.md) | `FEAT-RESULTS-EQUITY-CHART-DAILY-CHART` | P08 | 1 |
+| [EquityChartDrawdown.md](EquityChartDrawdown.md) | `FEAT-RESULTS-EQUITY-CHART-DRAWDOWN` | P08 | 1 |
+| [EquityChartVolatility.md](EquityChartVolatility.md) | `FEAT-RESULTS-EQUITY-CHART-VOLATILITY` | P08 | 1 |
+| [EquityChartVolume.md](EquityChartVolume.md) | `FEAT-RESULTS-EQUITY-CHART-VOLUME` | P08 | 1 |
+| [ResultsChart.md](ResultsChart.md) | `FEAT-RESULTS-RESULTS-CHART` | P08 | 2 |
+| [ResultsDatabankActions.md](ResultsDatabankActions.md) | `FEAT-RESULTS-RESULTS-DATABANK-ACTIONS` | P08 | 3 |
+| [ResultsDatabankViews.md](ResultsDatabankViews.md) | `FEAT-RESULTS-RESULTS-DATABANK-VIEWS` | P08 | 2 |
+| [ResultsEquityChart.md](ResultsEquityChart.md) | `FEAT-RESULTS-RESULTS-EQUITY-CHART` | P08 | 2 |
+| [ResultsExplore.md](ResultsExplore.md) | `FEAT-RESULTS-RESULTS-EXPLORE` | P08 | 3 |
+| [ResultsOptimizationProfile.md](ResultsOptimizationProfile.md) | `FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE` | P10 | 12 |
+| [ResultsOverview.md](ResultsOverview.md) | `FEAT-RESULTS-RESULTS-OVERVIEW` | P08 | 2 |
+| [ResultsPlugins.md](ResultsPlugins.md) | `FEAT-RESULTS-RESULTS-PLUGINS` | P08 | 2 |
+| [ResultsPortfolioCorrelation.md](ResultsPortfolioCorrelation.md) | `FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION` | P12 | 13 |
+| [ResultsProfileChart.md](ResultsProfileChart.md) | `FEAT-OPTIMIZER-RESULTS-PROFILE-CHART` | P10 | 2 |
+| [ResultsRobustnessTests.md](ResultsRobustnessTests.md) | `FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS` | P11 | 7 |
+| [ResultsSPOverview.md](ResultsSPOverview.md) | `FEAT-RESULTS-RESULTS-SP-OVERVIEW` | P08 | 5 |
+| [ResultsSequentialOptimization.md](ResultsSequentialOptimization.md) | `FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION` | P10 | 2 |
+| [ResultsSourceCode.md](ResultsSourceCode.md) | `FEAT-AUTHORING-RESULTS-SOURCE-CODE` | P07 | 2 |
+| [ResultsStockpicker.md](ResultsStockpicker.md) | `FEAT-RESULTS-RESULTS-STOCKPICKER` | P08 | 2 |
+| [ResultsStrategyConfig.md](ResultsStrategyConfig.md) | `FEAT-RESULTS-RESULTS-STRATEGY-CONFIG` | P08 | 2 |
+| [ResultsSysParamPermutation.md](ResultsSysParamPermutation.md) | `FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION` | P10 | 2 |
+| [ResultsTradeAnalysis.md](ResultsTradeAnalysis.md) | `FEAT-RESULTS-RESULTS-TRADE-ANALYSIS` | P08 | 3 |
+| [ResultsTradeList.md](ResultsTradeList.md) | `FEAT-RESULTS-RESULTS-TRADE-LIST` | P08 | 2 |
+| [ResultsTradelistViews.md](ResultsTradelistViews.md) | `FEAT-RESULTS-RESULTS-TRADELIST-VIEWS` | P08 | 2 |
+| [ResultsWalkForward.md](ResultsWalkForward.md) | `FEAT-OPTIMIZER-RESULTS-WALK-FORWARD` | P10 | 5 |

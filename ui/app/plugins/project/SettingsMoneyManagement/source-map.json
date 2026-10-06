@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only SettingsMoneyManagement recursive bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsMoneyManagement",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,88 +28,118 @@
   "source_catalog": [
     {
       "id": "sqx-settingsmoneymanagement-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement",
       "family": "bounded installed project-settings frontend artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "7dea73acb0c278dfaf6b9d24de42331699fe55d97bfb7d891e7d590b0cb004fe",
+      "sha256": "b616c2cf58e999433a9ea220b672a45d390969ea8a1da7a4c75f84b9492b68d7",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementCtrl.js",
       "relative_path": "MoneyManagementCtrl.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "83427a60cf0748a1f988a95759e4c0e5e2a97ce1cd0e5eda8e13a52d804711f3",
+      "sha256": "13613eb9727264e2d215533be10e72c386c54d954fe3730d368695d22584f95d",
       "target": "MoneyManagementCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementService.js",
       "relative_path": "MoneyManagementService.js",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "2b3efc3a882e74711ec3b02ce855979154650612d45bfadb12e005080bb771cf",
+      "sha256": "74cd297e26201ae53328cc6a3ef85844a683795ff46a59f0c6f8c6059ecf0aa0",
       "target": null,
       "classification": "excluded",
-      "limitation": "Native remote/schema/XML load-save service has no assigned target counterpart; shared independent defaults and local drafts remain explicit target support."
+      "limitation": "Native remote/schema/XML load-save service has no assigned target counterpart; shared independent defaults and local drafts remain explicit target support. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
       "relative_path": "SettingsMoneyManagement.jar",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "justified exclusion from existing responsibilities",
       "access_date": "2026-10-06",
-      "sha256": "d67b40d82bf1925b5b1cb8b47c4aa57c7956dea074d2138b9700da38a431045b",
+      "sha256": "7798ced63fad323cb8591dcc4f0075a610147b27ccc9522a202e990e4ba8f57d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary outside approved frontend-only scope."
+      "limitation": "Backend binary outside approved frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0c7c95e4dd17ab0748b13b4b0b578dcaa6b5f33385e54e43855fe8c876b41ad3",
+      "sha256": "34af2d5eff0fa1d81ea2f18fe8a8fdaa3a19d60177b2d93c10eaeab21292b356",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Coordinator-owned existing exclusive style subset; creation and cascade verification pending integration."
+      "limitation": "Coordinator-owned existing exclusive style subset; creation and cascade verification pending integration. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-settingsmoneymanagement-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/views/moneyManagement.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/views/moneyManagement.html",
       "relative_path": "views/moneyManagement.html",
       "location": "whole-file structural identity and scoped frontend responsibility boundary",
-      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "1da46c2b4897093a2be1598203811d0ff9660dc9610720a3d8119fa4f2560159",
+      "sha256": "9c1642ef5677efd5e1a26c663c07d7866fd6552be2e950b9f8088f3f38a92bdc",
       "target": "views/moneyManagement.tsx",
       "classification": "counterpart",
-      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity."
+      "limitation": "Independently authored retained prototype responsibility; no native runtime or quantitative parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -131,6 +161,9 @@
   "limitations": [
     "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity.",
     "Existing local state/defaults/form primitives and simulation limitations retained.",
-    "Coordinator CSS, registry and facade integration pending."
-  ]
+    "Coordinator CSS, registry and facade integration pending.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

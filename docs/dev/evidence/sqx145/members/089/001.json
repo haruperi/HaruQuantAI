@@ -1,0 +1,3177 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/opentelemetry-context-1.61.0.jar",
+  "archive_sha256": "2325b9b9081e506b5b58c54053109aa446f774e233e90511dc17fd8b20500558",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "io/opentelemetry/context/ArrayBasedContext.class",
+      "occurrence": 0,
+      "sha256": "d402753d3e71870e500e03e5abbb08addd7db91a7b446be04915db4476ad65f3",
+      "name": "io/opentelemetry/context/ArrayBasedContext",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/Context"
+      ],
+      "fields": [
+        {
+          "name": "ROOT",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 26
+        },
+        {
+          "name": "entries",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "root",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 8,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 2,
+          "code_sha256": "00f28aec0c0253222bad81b0924a71598e13dcb5c9d78d96a40e12123763245c",
+          "code_length": 10
+        },
+        {
+          "name": "get",
+          "descriptor": "(Lio/opentelemetry/context/ContextKey;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6d8762585e681c99797853dcfe6c84e23ab3c3b0c3e2734e80b14fb2d803ba4b",
+          "code_length": 40,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lio/opentelemetry/context/ContextKey<TV;>;)TV;"
+        },
+        {
+          "name": "with",
+          "descriptor": "(Lio/opentelemetry/context/ContextKey;Ljava/lang/Object;)Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "d767591ea3ae9f3d3d7de0329830d155ea0c20ebb47f3a4132d97d470cf8e1bb",
+          "code_length": 108,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lio/opentelemetry/context/ContextKey<TV;>;TV;)Lio/opentelemetry/context/Context;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e14c279688fda653b57437d8229a449f81315ed9cd0cb4288406db1a435c5760",
+          "code_length": 89
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9cad1f76c1262dc6135de5a5c4f05b9c3bc1a5203c3f2cb3eee12ddb6ef70c1e",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "io/opentelemetry/context/ArrayBasedContext",
+        "io/opentelemetry/context/Context",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/Context.class",
+      "occurrence": 0,
+      "sha256": "45ab704c479326094e1201689409737a263ca44cea735f440a8a2f6a0832c9dd",
+      "name": "io/opentelemetry/context/Context",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "current",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 9,
+          "code_sha256": "769425b14dcd47b8e7d63a607a84484bd95f0da939ab2a6e465366af67890b31",
+          "code_length": 21
+        },
+        {
+          "name": "root",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 9,
+          "code_sha256": "ea36859870437c7aec68e78da8c211ce656331c88dbbd63ab363b346154bcbee",
+          "code_length": 9
+        },
+        {
+          "name": "taskWrapping",
+          "descriptor": "(Ljava/util/concurrent/Executor;)Ljava/util/concurrent/Executor;",
+          "access": 9,
+          "code_sha256": "582b7c8220bf8204a5011e58456e0eb020a7f10de84000628d5eeaf030ff328b",
+          "code_length": 7
+        },
+        {
+          "name": "taskWrapping",
+          "descriptor": "(Ljava/util/concurrent/ExecutorService;)Ljava/util/concurrent/ExecutorService;",
+          "access": 9,
+          "code_sha256": "5515c9e968236a04c648d954e7abe490d193b5e62856aaf7fe77d1cb51c76657",
+          "code_length": 18
+        },
+        {
+          "name": "taskWrapping",
+          "descriptor": "(Ljava/util/concurrent/ScheduledExecutorService;)Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 9,
+          "code_sha256": "66f777afc46a8ef3d943ac8cbf78a0bfd4a511aaa7961dc1ed4f9dfc121d5faf",
+          "code_length": 18
+        },
+        {
+          "name": "get",
+          "descriptor": "(Lio/opentelemetry/context/ContextKey;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lio/opentelemetry/context/ContextKey<TV;>;)TV;"
+        },
+        {
+          "name": "with",
+          "descriptor": "(Lio/opentelemetry/context/ContextKey;Ljava/lang/Object;)Lio/opentelemetry/context/Context;",
+          "access": 1025,
+          "generic_signature": "<V:Ljava/lang/Object;>(Lio/opentelemetry/context/ContextKey<TV;>;TV;)Lio/opentelemetry/context/Context;"
+        },
+        {
+          "name": "with",
+          "descriptor": "(Lio/opentelemetry/context/ImplicitContextKeyed;)Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "8eacde279b272b2c334efd17e234ccb47562a1bb43af89120b43a20038365963",
+          "code_length": 8
+        },
+        {
+          "name": "makeCurrent",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 1,
+          "code_sha256": "054c890ebea6acd5ac546f091bc3a50c6b5ce7455198817550f15fa7466675e3",
+          "code_length": 10
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Runnable;",
+          "access": 1,
+          "code_sha256": "2eed7faaf9d84ea227fc58e3bd49171299d983226d43aafa873f84ac123460ac",
+          "code_length": 8
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Callable;",
+          "access": 1,
+          "code_sha256": "384c1a896569aac7600eba0e08e38ab386fa52163a96bb2207fc7c323107540f",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Callable<TT;>;"
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/util/concurrent/Executor;)Ljava/util/concurrent/Executor;",
+          "access": 1,
+          "code_sha256": "38007fefd005469f34b0bb97db86996c029c320c934681f42a07b6e3343a1460",
+          "code_length": 8
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/util/concurrent/ExecutorService;)Ljava/util/concurrent/ExecutorService;",
+          "access": 1,
+          "code_sha256": "10f4423f600d7757dae643173da0e74ef4aceb2a43b53f692d58b8dea4962bbc",
+          "code_length": 19
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Ljava/util/concurrent/ScheduledExecutorService;)Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 1,
+          "code_sha256": "81cee9e4a691e93427d0e17f3edb9196d8ce26256fbce82784e66a16815b55a3",
+          "code_length": 19
+        },
+        {
+          "name": "wrapFunction",
+          "descriptor": "(Ljava/util/function/Function;)Ljava/util/function/Function;",
+          "access": 1,
+          "code_sha256": "e243e4cc8e7918489b7834d69b4cb40db70555b6c5634f10ab736166ebe679fe",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(Ljava/util/function/Function<TT;TU;>;)Ljava/util/function/Function<TT;TU;>;"
+        },
+        {
+          "name": "wrapFunction",
+          "descriptor": "(Ljava/util/function/BiFunction;)Ljava/util/function/BiFunction;",
+          "access": 1,
+          "code_sha256": "bda4c001b697f0c178ccd1f251ffdd0ceb9f85599045da9c86515306336925ce",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;V:Ljava/lang/Object;>(Ljava/util/function/BiFunction<TT;TU;TV;>;)Ljava/util/function/BiFunction<TT;TU;TV;>;"
+        },
+        {
+          "name": "wrapConsumer",
+          "descriptor": "(Ljava/util/function/Consumer;)Ljava/util/function/Consumer;",
+          "access": 1,
+          "code_sha256": "7e831039c80b4bb552336ad130aaaf4c36a7e638f62ca335efc1fd9e7a25b72a",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/function/Consumer<TT;>;)Ljava/util/function/Consumer<TT;>;"
+        },
+        {
+          "name": "wrapConsumer",
+          "descriptor": "(Ljava/util/function/BiConsumer;)Ljava/util/function/BiConsumer;",
+          "access": 1,
+          "code_sha256": "358521908b575a6f5a702e41b80e3dbd511a0dc1db6feb9af0574dc67a85c9ac",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;U:Ljava/lang/Object;>(Ljava/util/function/BiConsumer<TT;TU;>;)Ljava/util/function/BiConsumer<TT;TU;>;"
+        },
+        {
+          "name": "wrapSupplier",
+          "descriptor": "(Ljava/util/function/Supplier;)Ljava/util/function/Supplier;",
+          "access": 1,
+          "code_sha256": "9db345d3fbe01fa61e9f4ddc1458e9dee77d4110c15d4b64db72b8d565be3f45",
+          "code_length": 8,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/function/Supplier<TT;>;)Ljava/util/function/Supplier<TT;>;"
+        },
+        {
+          "name": "lambda$wrapSupplier$8",
+          "descriptor": "(Ljava/util/function/Supplier;)Ljava/lang/Object;",
+          "access": 4098,
+          "code_sha256": "359dcd1864c968771a8cae51a022475e40156211c65699449748c42ce08c6186",
+          "code_length": 50
+        },
+        {
+          "name": "lambda$wrapConsumer$7",
+          "descriptor": "(Ljava/util/function/BiConsumer;Ljava/lang/Object;Ljava/lang/Object;)V",
+          "access": 4098,
+          "code_sha256": "7e0cd67a39503ea8c3ae0ae94a9e415666f1db8933548242f74a8408f592e179",
+          "code_length": 61
+        },
+        {
+          "name": "lambda$wrapConsumer$6",
+          "descriptor": "(Ljava/util/function/Consumer;Ljava/lang/Object;)V",
+          "access": 4098,
+          "code_sha256": "14a8fc91cf553115258a51efc18bf2d4121ff41443259120a17aff7d3a348a23",
+          "code_length": 55
+        },
+        {
+          "name": "lambda$wrapFunction$5",
+          "descriptor": "(Ljava/util/function/BiFunction;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4098,
+          "code_sha256": "c6ad80d0b651e26717604ca3cbd27f043e6c08102e9a25680f7c4bdb36ef4c0d",
+          "code_length": 62
+        },
+        {
+          "name": "lambda$wrapFunction$4",
+          "descriptor": "(Ljava/util/function/Function;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4098,
+          "code_sha256": "1735830a8f5f6cd98a6054acc6764c27231401e40ab4c4de9cfe1df41240141b",
+          "code_length": 56
+        },
+        {
+          "name": "lambda$wrap$3",
+          "descriptor": "(Ljava/util/concurrent/Executor;Ljava/lang/Runnable;)V",
+          "access": 4098,
+          "code_sha256": "a7cadf82ce802ecccbafcdd20b559e73af3378769c50df5b6440f66e17c0f5a7",
+          "code_length": 14
+        },
+        {
+          "name": "lambda$wrap$2",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/lang/Object;",
+          "access": 4098,
+          "code_sha256": "ae71f5c6d535da133fe236508dd572c97373b477b5678a03b39e761c58f37210",
+          "code_length": 50,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "lambda$wrap$1",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 4098,
+          "code_sha256": "c172b95c8b88ff06eb5abe263e1e6d07e7317726fe428b444aad4e692847f25a",
+          "code_length": 51
+        },
+        {
+          "name": "lambda$taskWrapping$0",
+          "descriptor": "(Ljava/util/concurrent/Executor;Ljava/lang/Runnable;)V",
+          "access": 4106,
+          "code_sha256": "efdcba63c976795fee0c74cd6e81eb3f8abfda196ce9fa66e0deb2a5ef1db659",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ContextExecutorService",
+        "io/opentelemetry/context/ContextScheduledExecutorService",
+        "io/opentelemetry/context/ContextStorage",
+        "io/opentelemetry/context/CurrentContextExecutorService",
+        "io/opentelemetry/context/CurrentContextScheduledExecutorService",
+        "io/opentelemetry/context/ImplicitContextKeyed",
+        "io/opentelemetry/context/Scope",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Throwable",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/util/concurrent/Callable",
+        "java/util/concurrent/Executor",
+        "java/util/function/BiConsumer",
+        "java/util/function/BiFunction",
+        "java/util/function/Consumer",
+        "java/util/function/Function",
+        "java/util/function/Supplier"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextExecutorService.class",
+      "occurrence": 0,
+      "sha256": "386419f7d745dd494a7acf8875f2c08e17c022b52cbc65185b19e8db69a2571d",
+      "name": "io/opentelemetry/context/ContextExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "io/opentelemetry/context/ForwardingExecutorService",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "context",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/util/concurrent/ExecutorService;)V",
+          "access": 0,
+          "code_sha256": "fbfeae798b04357a5af5413e840c3ae3ab6f4438f0368bfbea522bb80e1742a8",
+          "code_length": 11
+        },
+        {
+          "name": "context",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 16,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "8453655d18968558e7e305a11907ff0647b4b52be97a54c762f271a5417bcfca",
+          "code_length": 20,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/Object;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "d22a7db8dba0ff24e4a3679937d75127ad4402ae36b5077adeda7b78028f9e6e",
+          "code_length": 21,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Runnable;TT;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "94ce309f75315279ce47dfa8b693373bb0dc50761ab5b8d995026ff440ce1ef9",
+          "code_length": 20,
+          "generic_signature": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future<*>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "4cb71f40bbbaf062a9f1697ed6bef53cc64a14eadf9e79387ea39af6d01e642a",
+          "code_length": 18,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "9a2b7baec92c11b96dafac6c4262be4affa0e78eac0e034b855a2bbabd5e40c1",
+          "code_length": 21,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "2cd3f28e6f0628124353564f9f4ba8f7d37268ac58a6fa01709fc4eb8d7e0e77",
+          "code_length": 18,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)TT;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "17f8455995bc29382be5302500b50fef1ab34e60dfc3c00c5c1bf1759ce8f070",
+          "code_length": 21,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException",
+            "java/util/concurrent/TimeoutException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 1,
+          "code_sha256": "94df68fce77b0bff0b224f0c0aaf1db86d2349d8908bb8027a164db53ba92c09",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ContextExecutorService",
+        "io/opentelemetry/context/ForwardingExecutorService",
+        "java/lang/InterruptedException",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/TimeoutException"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextKey.class",
+      "occurrence": 0,
+      "sha256": "16a7f165679e05a781d9867f97b0672a0a753620380a5667587d860bce63500a",
+      "name": "io/opentelemetry/context/ContextKey",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "named",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/context/ContextKey;",
+          "access": 9,
+          "code_sha256": "ac8847915e17694b48d3c10234b0a4f8f8d3763837b98913ae8219a2672b3432",
+          "code_length": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/String;)Lio/opentelemetry/context/ContextKey<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/context/ContextKey",
+        "io/opentelemetry/context/DefaultContextKey",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextScheduledExecutorService.class",
+      "occurrence": 0,
+      "sha256": "98075901cc67ef2c0878335d6f175e2f45c4c3cf5583e98eaf26f34a58b3981e",
+      "name": "io/opentelemetry/context/ContextScheduledExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "io/opentelemetry/context/ContextExecutorService",
+      "interfaces": [
+        "java/util/concurrent/ScheduledExecutorService"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/util/concurrent/ScheduledExecutorService;)V",
+          "access": 0,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "delegate",
+          "descriptor": "()Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 0,
+          "code_sha256": "7337631b62d9ec2fa4e972daddd428d89f5ffa824a3042755da004cb8c6fa237",
+          "code_length": 8
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "f33062c1690634ad32baa1e84c21891d0be4ef606d452dd2aaf979e2b78f2a90",
+          "code_length": 23,
+          "generic_signature": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "8ae4c78ade40f3fbb1707694a250169c1f92beec7039253e34b32a6822c908b4",
+          "code_length": 23,
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TV;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<TV;>;"
+        },
+        {
+          "name": "scheduleAtFixedRate",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "278751b03f622a8f8aa9188756f0fae60cd537eca596c6816618bd60fa3065bd",
+          "code_length": 25,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "scheduleWithFixedDelay",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "b4d36f30f5403c2665fee111f247b136e8217abd55038c22985501178febc35a",
+          "code_length": 25,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "delegate",
+          "descriptor": "()Ljava/util/concurrent/ExecutorService;",
+          "access": 4160,
+          "code_sha256": "ee92d8f8f4f2cb079968db2998c7cdb91aa84488e763e42565ef4525a5b47dd2",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ContextExecutorService",
+        "io/opentelemetry/context/ContextScheduledExecutorService",
+        "java/util/concurrent/ScheduledExecutorService"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextStorage.class",
+      "occurrence": 0,
+      "sha256": "859e0d2baa0190db85ab2a8b056465439d3b56cef7364bb2a466f331521ce84c",
+      "name": "io/opentelemetry/context/ContextStorage",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lio/opentelemetry/context/ContextStorage;",
+          "access": 9,
+          "code_sha256": "ef008e5abaa44a84d0778ab14b25ed4e78caef32e9a118bc6cade74c55731a79",
+          "code_length": 4
+        },
+        {
+          "name": "defaultStorage",
+          "descriptor": "()Lio/opentelemetry/context/ContextStorage;",
+          "access": 9,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "addWrapper",
+          "descriptor": "(Ljava/util/function/Function;)V",
+          "access": 9,
+          "code_sha256": "964607ade730f3e625f279f862215eff61d2eabd84de0a9564cdca5e305468e3",
+          "code_length": 5,
+          "generic_signature": "(Ljava/util/function/Function<-Lio/opentelemetry/context/ContextStorage;+Lio/opentelemetry/context/ContextStorage;>;)V"
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Scope;",
+          "access": 1025
+        },
+        {
+          "name": "current",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 1025
+        },
+        {
+          "name": "root",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "84a6b9c727a79dd3787233617ada4d27a6f6fcad3ca4763b9dae23e250145171",
+          "code_length": 4
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/ArrayBasedContext",
+        "io/opentelemetry/context/ContextStorage",
+        "io/opentelemetry/context/ContextStorageWrappers",
+        "io/opentelemetry/context/LazyStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextStorageProvider.class",
+      "occurrence": 0,
+      "sha256": "2d05cb902c49a3484f596fe39b25d92c04dc20655cb3973a192312299d27a35f",
+      "name": "io/opentelemetry/context/ContextStorageProvider",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lio/opentelemetry/context/ContextStorage;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/ContextStorageProvider",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ContextStorageWrappers.class",
+      "occurrence": 0,
+      "sha256": "1cf6c56bdb95085a44cc1e9523fc5ed73a0edf39f0305d64b846b00d2206d3dd",
+      "name": "io/opentelemetry/context/ContextStorageWrappers",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "log",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "storageInitialized",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "wrappers",
+          "descriptor": "Ljava/util/List;",
+          "access": 26,
+          "generic_signature": "Ljava/util/List<Ljava/util/function/Function<-Lio/opentelemetry/context/ContextStorage;+Lio/opentelemetry/context/ContextStorage;>;>;"
+        },
+        {
+          "name": "mutex",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "addWrapper",
+          "descriptor": "(Ljava/util/function/Function;)V",
+          "access": 8,
+          "code_sha256": "9b07c57623343e440c93e22b269c34e8ba0a457fe84aae216d509882d775061b",
+          "code_length": 54,
+          "generic_signature": "(Ljava/util/function/Function<-Lio/opentelemetry/context/ContextStorage;+Lio/opentelemetry/context/ContextStorage;>;)V"
+        },
+        {
+          "name": "getWrappers",
+          "descriptor": "()Ljava/util/List;",
+          "access": 8,
+          "code_sha256": "a56135582716ac6de996ff8d2d6c167745e3a5ab539edc2aa529c707ee30e50d",
+          "code_length": 17,
+          "generic_signature": "()Ljava/util/List<Ljava/util/function/Function<-Lio/opentelemetry/context/ContextStorage;+Lio/opentelemetry/context/ContextStorage;>;>;"
+        },
+        {
+          "name": "setStorageInitialized",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "8fa1d9972800a01900e189db82864c622ca67c198b89e5b7972d0c63d4f74309",
+          "code_length": 21
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "dfac3bc831b8fa54bbc8eb584942673c0e4c3037f1c5e183e65704b055e8cc37",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "11f1ed8eea1a704e512dfbd7629b62cd00882952a6580fd1b3fb1e3d6a192122",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/ContextStorageWrappers",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/CurrentContextExecutorService.class",
+      "occurrence": 0,
+      "sha256": "db6cfd56d17a57e920ce7aecdbbd096053f27e33dbb5edbcfedb9fc6534f245d",
+      "name": "io/opentelemetry/context/CurrentContextExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "io/opentelemetry/context/ForwardingExecutorService",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ExecutorService;)V",
+          "access": 0,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/util/concurrent/Callable;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "dd1ac0e38d057b6ee18aecdf16c8eafb6f4d13f61ac4a268e013762299a52d07",
+          "code_length": 19,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TT;>;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;Ljava/lang/Object;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "07aa96ea38e28212d689cbff513240bfcc1342b277eb9c3df3a55a4a5eb080e3",
+          "code_length": 20,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Runnable;TT;)Ljava/util/concurrent/Future<TT;>;"
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "9e9e467c6f800e7168f02fdb48b81fa317bb605a518271f89f83eda9e6581901",
+          "code_length": 19,
+          "generic_signature": "(Ljava/lang/Runnable;)Ljava/util/concurrent/Future<*>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "b123ec688b39eb25fa360d02440aa14eb733ecbdbe3115bac703422b7f7e7e1f",
+          "code_length": 17,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAll",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "16371916e458e1398b6254cad227643bb5f7895654a30ccdb58102628615153c",
+          "code_length": 20,
+          "throws": [
+            "java/lang/InterruptedException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/List<Ljava/util/concurrent/Future<TT;>;>;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0579865f790c5383c7b18f279ce6de04df7f0cacc7615b3e222928682c06501f",
+          "code_length": 17,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)TT;"
+        },
+        {
+          "name": "invokeAny",
+          "descriptor": "(Ljava/util/Collection;JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e6b7ff67740e0f8f4b6b725be96a03e2a407f62054fee25f6f99ce9091817be8",
+          "code_length": 20,
+          "throws": [
+            "java/lang/InterruptedException",
+            "java/util/concurrent/ExecutionException",
+            "java/util/concurrent/TimeoutException"
+          ],
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;JLjava/util/concurrent/TimeUnit;)TT;"
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/Runnable;)V",
+          "access": 1,
+          "code_sha256": "2838aa980cf5dd8d32bd641723e4329a12c1a219754d9f01734c3d58dc2cf2de",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/CurrentContextExecutorService",
+        "io/opentelemetry/context/ForwardingExecutorService",
+        "java/lang/InterruptedException",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/TimeoutException"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/CurrentContextScheduledExecutorService.class",
+      "occurrence": 0,
+      "sha256": "5336b5dafa28cabab0f70800e23f1374ce2ca89717d8af12d220a33970fcc372",
+      "name": "io/opentelemetry/context/CurrentContextScheduledExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "io/opentelemetry/context/CurrentContextExecutorService",
+      "interfaces": [
+        "java/util/concurrent/ScheduledExecutorService"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/ScheduledExecutorService;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ScheduledExecutorService;)V",
+          "access": 0,
+          "code_sha256": "a70c45600dfb0e6bb6b3ff2da6b948db92ac901a87772878359a0c803e836537",
+          "code_length": 11
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "a4e580dbc0156334c765fe0b0ef04ef4f66f6a649584d335158cf80a7d426564",
+          "code_length": 22,
+          "generic_signature": "(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "schedule",
+          "descriptor": "(Ljava/util/concurrent/Callable;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "79579d723ffe8dafff5db668489ae1248959682503834ad571c433433bd612e1",
+          "code_length": 22,
+          "generic_signature": "<V:Ljava/lang/Object;>(Ljava/util/concurrent/Callable<TV;>;JLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<TV;>;"
+        },
+        {
+          "name": "scheduleAtFixedRate",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "6cee72de48f68acde43e0416fdab3e2eaa530ca945dc09dbc664e116e4c08f98",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        },
+        {
+          "name": "scheduleWithFixedDelay",
+          "descriptor": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture;",
+          "access": 1,
+          "code_sha256": "ac9d758fb8755bfa2887925c5cb458339525c0ed4a5677b0e945ed49f056c09d",
+          "code_length": 16,
+          "generic_signature": "(Ljava/lang/Runnable;JJLjava/util/concurrent/TimeUnit;)Ljava/util/concurrent/ScheduledFuture<*>;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/CurrentContextExecutorService",
+        "io/opentelemetry/context/CurrentContextScheduledExecutorService",
+        "java/util/concurrent/ScheduledExecutorService"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/DefaultContextKey.class",
+      "occurrence": 0,
+      "sha256": "92e43ae140ed655b9371ece37feb5fda80a8e75bd727bd03623fbafa3b001956",
+      "name": "io/opentelemetry/context/DefaultContextKey",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/ContextKey"
+      ],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/context/ContextKey<TT;>;",
+      "class_references": [
+        "io/opentelemetry/context/ContextKey",
+        "io/opentelemetry/context/DefaultContextKey",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ForwardingExecutorService.class",
+      "occurrence": 0,
+      "sha256": "dd667c2bbbb386845c408527d5f4272bbde36d8266f4ba8738442e4df06b6f76",
+      "name": "io/opentelemetry/context/ForwardingExecutorService",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ExecutorService"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Ljava/util/concurrent/ExecutorService;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ExecutorService;)V",
+          "access": 4,
+          "code_sha256": "9edc539eff98a11be5f63d950f84b10c44a548bdd7d3b30279e5bdf2ceeb34c0",
+          "code_length": 10
+        },
+        {
+          "name": "delegate",
+          "descriptor": "()Ljava/util/concurrent/ExecutorService;",
+          "access": 0,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "shutdown",
+          "descriptor": "()V",
+          "access": 17,
+          "code_sha256": "720f57c366931ac5f407ea0c0a9bf53d47c20f177c3327a79ab310f627505038",
+          "code_length": 10
+        },
+        {
+          "name": "shutdownNow",
+          "descriptor": "()Ljava/util/List;",
+          "access": 17,
+          "code_sha256": "8ad0155d15a03522b7f294360a23a993575c87614ebdb6ed50d084a7fbb1aea8",
+          "code_length": 10,
+          "generic_signature": "()Ljava/util/List<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "isShutdown",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "c42b06a435e0f62b6974fd4aa71d1592ce50604250728183f24c3831f60ddf9f",
+          "code_length": 10
+        },
+        {
+          "name": "isTerminated",
+          "descriptor": "()Z",
+          "access": 17,
+          "code_sha256": "681568f8db21f6c05f4c75c6de9e1a38344eae4450c37ebd6e4edc2746f6d296",
+          "code_length": 10
+        },
+        {
+          "name": "awaitTermination",
+          "descriptor": "(JLjava/util/concurrent/TimeUnit;)Z",
+          "access": 17,
+          "code_sha256": "21ec800ec1613badc6d5cf06953b57f81527fb09e6ca640d04437c3edfb0cc5e",
+          "code_length": 12,
+          "throws": [
+            "java/lang/InterruptedException"
+          ]
+        },
+        {
+          "name": "wrap",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/util/Collection;)Ljava/util/Collection;",
+          "access": 12,
+          "code_sha256": "6a1327fa8243bf234c5f6cec5a6bcff3849cb74f147a615e102659f1aae9a9c1",
+          "code_length": 55,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;)Ljava/util/Collection<+Ljava/util/concurrent/Callable<TT;>;>;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ForwardingExecutorService",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/Callable",
+        "java/util/concurrent/ExecutorService"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ImplicitContextKeyed.class",
+      "occurrence": 0,
+      "sha256": "1edeb2d42677dda70d01c32d00a30db2d861a8516ff25e22c24beff6b2153e80",
+      "name": "io/opentelemetry/context/ImplicitContextKeyed",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "makeCurrent",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 1,
+          "code_sha256": "29c2e167d9e38ffe7ce902209993e478d6a06839de7aa617f5f595117b30b315",
+          "code_length": 15
+        },
+        {
+          "name": "storeInContext",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Context;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ImplicitContextKeyed",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/LazyStorage.class",
+      "occurrence": 0,
+      "sha256": "58bfa610d583b011230f21527a86cfdc7da54d6314d264355f132eba6fe309f4",
+      "name": "io/opentelemetry/context/LazyStorage",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "CONTEXT_STORAGE_PROVIDER_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ENFORCE_DEFAULT_STORAGE_VALUE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "ENABLE_STRICT_CONTEXT_PROVIDER_PROPERTY",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "storage",
+          "descriptor": "Lio/opentelemetry/context/ContextStorage;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "get",
+          "descriptor": "()Lio/opentelemetry/context/ContextStorage;",
+          "access": 8,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "createStorage",
+          "descriptor": "(Ljava/util/concurrent/atomic/AtomicReference;)Lio/opentelemetry/context/ContextStorage;",
+          "access": 8,
+          "code_sha256": "a141d54e04d8bb8310869d06fe513fbdb56d3004725369e82cca173c700394de",
+          "code_length": 294,
+          "generic_signature": "(Ljava/util/concurrent/atomic/AtomicReference<Ljava/lang/Throwable;>;)Lio/opentelemetry/context/ContextStorage;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "ec32a7f9a21e58f98af7d13731e2b1e27ea885099cdb47dbf5a085a4ee657897",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "595f60960ec19dacb41035720bdefe2f62da166b237d2752aaa157dba99eaca0",
+          "code_length": 111
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/common/ComponentLoader",
+        "io/opentelemetry/context/ContextStorage",
+        "io/opentelemetry/context/ContextStorageProvider",
+        "io/opentelemetry/context/ContextStorageWrappers",
+        "io/opentelemetry/context/LazyStorage",
+        "io/opentelemetry/context/StrictContextStorage",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/IllegalStateException",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/concurrent/atomic/AtomicReference",
+        "java/util/function/Function",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/Scope.class",
+      "occurrence": 0,
+      "sha256": "f1b5208939c25b7168efb650957ad2db6625c402dbdd6ceffb2346fe27cd8c47",
+      "name": "io/opentelemetry/context/Scope",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "noop",
+          "descriptor": "()Lio/opentelemetry/context/Scope;",
+          "access": 9,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage$NoopScope",
+        "java/lang/AutoCloseable",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/StrictContextStorage$CallerStackTrace.class",
+      "occurrence": 0,
+      "sha256": "9baeb8d35e5e2edf7f6d4e0c62f9fff21a27bcdbe67749b818f106c5889ad9e6",
+      "name": "io/opentelemetry/context/StrictContextStorage$CallerStackTrace",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Throwable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "threadName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 16
+        },
+        {
+          "name": "threadId",
+          "descriptor": "J",
+          "access": 16
+        },
+        {
+          "name": "context",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 16
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 64
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/Context;)V",
+          "access": 0,
+          "code_sha256": "54bb992326943931ae488a78c3c9cb8e31335c06b918fa92c56b05489440e557",
+          "code_length": 68
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/StrictContextStorage",
+        "io/opentelemetry/context/StrictContextStorage$CallerStackTrace",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/StrictContextStorage$PendingScopes.class",
+      "occurrence": 0,
+      "sha256": "7f0673dc0bb7f3782381e7df696b7b925b6e32a3cba0399f79ddeb2e3ede6c6d",
+      "name": "io/opentelemetry/context/StrictContextStorage$PendingScopes",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "map",
+          "descriptor": "Ljava/util/concurrent/ConcurrentHashMap;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentHashMap<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<Lio/opentelemetry/context/Scope;>;Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "()Lio/opentelemetry/context/StrictContextStorage$PendingScopes;",
+          "access": 8,
+          "code_sha256": "9961a2359cbb030d2777ba6af274f7af2ba22b14f7423f943a7de0ab7d7ba745",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ConcurrentHashMap;)V",
+          "access": 0,
+          "code_sha256": "2a2bdb9459c13ccb6bc824fa33cdd340fd7fbf40410779ded5867ec4b541e0ff",
+          "code_length": 47,
+          "generic_signature": "(Ljava/util/concurrent/ConcurrentHashMap<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<Lio/opentelemetry/context/Scope;>;Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;>;)V"
+        },
+        {
+          "name": "drainPendingCallers",
+          "descriptor": "()Ljava/util/List;",
+          "access": 0,
+          "code_sha256": "9c5331b62c459927f7c369948191ea3bdec98369ed7ce49262da4a0e37a2c57e",
+          "code_length": 43,
+          "generic_signature": "()Ljava/util/List<Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;>;"
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8744d44d373213bd5815da01bfca832543c2ad7fcc1f439a4300858b9b6a49e6",
+          "code_length": 65
+        },
+        {
+          "name": "lambda$drainPendingCallers$0",
+          "descriptor": "(Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;)Z",
+          "access": 4106,
+          "code_sha256": "e57883ba53a4af2de46a7f31649961c7bb87a4627a1c2cd43e64121e58aa8b36",
+          "code_length": 13
+        }
+      ],
+      "generic_signature": "Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap<Lio/opentelemetry/context/Scope;Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;>;",
+      "class_references": [
+        "io/opentelemetry/context/StrictContextStorage",
+        "io/opentelemetry/context/StrictContextStorage$CallerStackTrace",
+        "io/opentelemetry/context/StrictContextStorage$PendingScopes",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+        "java/lang/InterruptedException",
+        "java/lang/Thread",
+        "java/lang/invoke/LambdaMetafactory",
+        "java/lang/invoke/MethodHandles",
+        "java/lang/invoke/MethodHandles$Lookup",
+        "java/lang/ref/Reference",
+        "java/util/Collection",
+        "java/util/List",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/logging/Level",
+        "java/util/logging/Logger",
+        "java/util/stream/Collectors",
+        "java/util/stream/Stream"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/StrictContextStorage$StrictScope.class",
+      "occurrence": 0,
+      "sha256": "0d59e5e8f8f436d51567ed8567e87f6bf85da0b581f75f08523d72d87bf0a70d",
+      "name": "io/opentelemetry/context/StrictContextStorage$StrictScope",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/Scope"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Lio/opentelemetry/context/Scope;",
+          "access": 16
+        },
+        {
+          "name": "caller",
+          "descriptor": "Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;",
+          "access": 16
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/context/StrictContextStorage;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/StrictContextStorage;Lio/opentelemetry/context/Scope;Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;)V",
+          "access": 0,
+          "code_sha256": "cec29c183a56fa3a349bb43d9eeae443c33147f10d7f17fedba1b3475c77a363",
+          "code_length": 30
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3c431501429201e2777232e3b65d59284bedb22d443eb04e814649a63d6a25f0",
+          "code_length": 269
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "360ddddc8cf02d16f1dbb012075d298a7b441b87ae6a189815fce13c883183ab",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/StackTraceElement;",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/context/StrictContextStorage",
+        "io/opentelemetry/context/StrictContextStorage$CallerStackTrace",
+        "io/opentelemetry/context/StrictContextStorage$PendingScopes",
+        "io/opentelemetry/context/StrictContextStorage$StrictScope",
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/StackTraceElement",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/StrictContextStorage.class",
+      "occurrence": 0,
+      "sha256": "8bc0109703d856ad3de459258130537c315c180913a349357ab85d99ae22c8de",
+      "name": "io/opentelemetry/context/StrictContextStorage",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/ContextStorage",
+        "java/lang/AutoCloseable"
+      ],
+      "fields": [
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "delegate",
+          "descriptor": "Lio/opentelemetry/context/ContextStorage;",
+          "access": 18
+        },
+        {
+          "name": "pendingScopes",
+          "descriptor": "Lio/opentelemetry/context/StrictContextStorage$PendingScopes;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/context/ContextStorage;)Lio/opentelemetry/context/StrictContextStorage;",
+          "access": 8,
+          "code_sha256": "5f4170d5c1fc79f7009bcd866ce05bfba931ce43e015d96b23998fdc16be5b2d",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/ContextStorage;)V",
+          "access": 2,
+          "code_sha256": "8e79ceae6a8fe628f9c142eb6d08a63d58a9ef72920a4c68d75958a438edc8fd",
+          "code_length": 17
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Scope;",
+          "access": 1,
+          "code_sha256": "98afa1330c1eaae7e6064095851baaf558c6671760c85fa107f43609747327cd",
+          "code_length": 227
+        },
+        {
+          "name": "current",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "4f48cfb52d7a45b5f29992f42dfe69f2daf7e625aea70ffa42ad8aed1a9406bb",
+          "code_length": 10
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c344095b22bd5eba835ee2d4256406b413e7a027d4e4fe55d73d19e37b3b9687",
+          "code_length": 104
+        },
+        {
+          "name": "callerError",
+          "descriptor": "(Lio/opentelemetry/context/StrictContextStorage$CallerStackTrace;)Ljava/lang/AssertionError;",
+          "access": 8,
+          "code_sha256": "1d4f50ff59ae955f308b0fc1922f8cfe2dd1a7789c32550fe68c13903265f9e2",
+          "code_length": 57
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lio/opentelemetry/context/StrictContextStorage;)Lio/opentelemetry/context/StrictContextStorage$PendingScopes;",
+          "access": 4104,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Ljava/util/logging/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cb160902667f809ac0e1915d9d5f0165bdd36fceb0039e1dbc08b49f91567541",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/StackTraceElement;",
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ContextStorage",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/context/StrictContextStorage",
+        "io/opentelemetry/context/StrictContextStorage$CallerStackTrace",
+        "io/opentelemetry/context/StrictContextStorage$PendingScopes",
+        "io/opentelemetry/context/StrictContextStorage$StrictScope",
+        "java/lang/AssertionError",
+        "java/lang/AutoCloseable",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/lang/StackTraceElement",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ThreadLocalContextStorage$1.class",
+      "occurrence": 0,
+      "sha256": "dcdeea27805e41c3c42d79e3ddc95b6454075b14acf9f46780bbd21d692d5b0e",
+      "name": "io/opentelemetry/context/ThreadLocalContextStorage$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ThreadLocalContextStorage$NoopScope.class",
+      "occurrence": 0,
+      "sha256": "739e9e204df78cf07670c3273e801bd8df7290fbbdaa2485fe539a6476b78866",
+      "name": "io/opentelemetry/context/ThreadLocalContextStorage$NoopScope",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "io/opentelemetry/context/Scope"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+          "access": 9,
+          "code_sha256": "e6257d33773ffb7a33735e3283315933ca226af36ab1aeb9b4b1f1c00db0eed1",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+          "access": 9,
+          "code_sha256": "6778b0d75fb932b92a5cabe69e8c0ce33bf7fd6ef8a39545faa3ebc77a61f7db",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "898f5d3f85cf0aa77bdce22f0650c1270e9828b23c7412d06714f8d67d05db4f",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+          "access": 4106,
+          "code_sha256": "9d4cc08a9068864ff64558fd2437c387fea506d39f3dec1d29c434e43f2b9833",
+          "code_length": 11
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "057f971812ca91d7908fbfc49eb6dd129708edc4c836c28a7780b7ce01bc1d42",
+          "code_length": 20
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;>;Lio/opentelemetry/context/Scope;",
+      "class_references": [
+        "[Lio/opentelemetry/context/ThreadLocalContextStorage$NoopScope;",
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage$NoopScope",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ThreadLocalContextStorage$ScopeImpl.class",
+      "occurrence": 0,
+      "sha256": "73db83688ffedaffe4f9b0b19cef87317cc12f7a553100f492f18bc0e597df65",
+      "name": "io/opentelemetry/context/ThreadLocalContextStorage$ScopeImpl",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/Scope"
+      ],
+      "fields": [
+        {
+          "name": "beforeAttach",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        },
+        {
+          "name": "toAttach",
+          "descriptor": "Lio/opentelemetry/context/Context;",
+          "access": 18
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/ThreadLocalContextStorage;Lio/opentelemetry/context/Context;Lio/opentelemetry/context/Context;)V",
+          "access": 2,
+          "code_sha256": "35264d840cede5c36f339f75d716197f39aef808a83d0a3fb503732616506e5b",
+          "code_length": 20
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0f216a774b2d4226a4dcd49dbcc97448c8bb1d15f0dcb0e6e3bc52c07b7ab342",
+          "code_length": 51
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/ThreadLocalContextStorage;Lio/opentelemetry/context/Context;Lio/opentelemetry/context/Context;Lio/opentelemetry/context/ThreadLocalContextStorage$1;)V",
+          "access": 4096,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Scope",
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage$1",
+        "io/opentelemetry/context/ThreadLocalContextStorage$ScopeImpl",
+        "java/lang/Object",
+        "java/lang/ThreadLocal",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/ThreadLocalContextStorage.class",
+      "occurrence": 0,
+      "sha256": "cba29164a046780c769c0cc0a178486987e966f5fc87047e45f1b549b2f84466",
+      "name": "io/opentelemetry/context/ThreadLocalContextStorage",
+      "major": 52,
+      "minor": 0,
+      "access": 16432,
+      "superclass": "java/lang/Enum",
+      "interfaces": [
+        "io/opentelemetry/context/ContextStorage"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 16409
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 26
+        },
+        {
+          "name": "THREAD_LOCAL_STORAGE",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/ThreadLocal<Lio/opentelemetry/context/Context;>;"
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 9,
+          "code_sha256": "7e400b1657b51f32024dad4ec4c36944a6243b7df56c92b41a756c7fcd9a8358",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 9,
+          "code_sha256": "2a930021555160d308abc161950046b67bc2d479bca61a7193d6780662fc9031",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "44d9d922785bd16b8c63cca25416ea051cc0a678a0b650d04a1c3ee774f1475f",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "attach",
+          "descriptor": "(Lio/opentelemetry/context/Context;)Lio/opentelemetry/context/Scope;",
+          "access": 1,
+          "code_sha256": "2a574244a0e0fcf9880b38cdd3673d66c3aee9835312cd6bfe0130761e0c1113",
+          "code_length": 41
+        },
+        {
+          "name": "current",
+          "descriptor": "()Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "fdf6c67a8649f0e676f7bd67866a393196172f86ef7b962ef6977d8347be7d65",
+          "code_length": 10
+        },
+        {
+          "name": "$values",
+          "descriptor": "()[Lio/opentelemetry/context/ThreadLocalContextStorage;",
+          "access": 4106,
+          "code_sha256": "a42d63bffa25a972e6368677e4c2ed64743562870589eb8fa8e7bbed11a2a39e",
+          "code_length": 11
+        },
+        {
+          "name": "access$100",
+          "descriptor": "()Ljava/lang/ThreadLocal;",
+          "access": 4104,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "access$200",
+          "descriptor": "()Ljava/util/logging/Logger;",
+          "access": 4104,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6b7bdaa227ec2e358f84143cadc78e12525dba0f10e4cd534ee8d2b4c254b870",
+          "code_length": 41
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lio/opentelemetry/context/ThreadLocalContextStorage;>;Lio/opentelemetry/context/ContextStorage;",
+      "class_references": [
+        "[Lio/opentelemetry/context/ThreadLocalContextStorage;",
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/ContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage",
+        "io/opentelemetry/context/ThreadLocalContextStorage$1",
+        "io/opentelemetry/context/ThreadLocalContextStorage$NoopScope",
+        "io/opentelemetry/context/ThreadLocalContextStorage$ScopeImpl",
+        "java/lang/Class",
+        "java/lang/Enum",
+        "java/lang/ThreadLocal",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/package-info.class",
+      "occurrence": 0,
+      "sha256": "217c1341cc02ff18e0b96c96fcc113e5c7a373972beabd97a893f7ad682f50a4",
+      "name": "io/opentelemetry/context/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/context/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1.class",
+      "occurrence": 0,
+      "sha256": "42f41efa385c3d00c16766e5ab63f0414f10000e6f3cd371151b012ae22f3bf7",
+      "name": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1",
+      "major": 52,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$EntryIterator.class",
+      "occurrence": 0,
+      "sha256": "4c349427b847f75e5ae46fd6050b82ad86da68e95cfdb0e7f75bdbb63813e62d",
+      "name": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$EntryIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "iterator",
+          "descriptor": "Ljava/util/Iterator;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Iterator<Ljava/util/Map$Entry<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;>;"
+        },
+        {
+          "name": "nextEntry",
+          "descriptor": "Ljava/util/Map$Entry;",
+          "access": 2,
+          "generic_signature": "Ljava/util/Map$Entry<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;"
+        },
+        {
+          "name": "nextKey",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;Ljava/util/Iterator;)V",
+          "access": 2,
+          "code_sha256": "3863ace1cf2621dea9050d7847c7ed1c842c33c9383dda7a6b7fec018ac4f3f2",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/Iterator<Ljava/util/Map$Entry<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;>;)V"
+        },
+        {
+          "name": "findNext",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "a49dca07f7c7e373e9beb3aabece332c7ca43bdf54144082496eea2f115c190a",
+          "code_length": 66
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d802f8d36a272c396f360d7788a2b6e428c7649c0eab7a1ec54826a16b4da4f7",
+          "code_length": 13
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/util/Map$Entry;",
+          "access": 1,
+          "code_sha256": "7fbe014fee64413d134fb2c38d92af21b80e199a5c46198bd503f8bf7433ae3a",
+          "code_length": 49,
+          "generic_signature": "()Ljava/util/Map$Entry<TK;TV;>;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "80e06f8744e154024210d7110fe84c4595745e069c0b63ed10f03372af38b359",
+          "code_length": 8
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a33151440a6f814911e7f3e2f903a1e1c13567c61d930aabfe89a301d12299f9",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;Ljava/util/Iterator;Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1;)V",
+          "access": 4096,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Iterator<Ljava/util/Map$Entry<TK;TV;>;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$EntryIterator",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$SimpleEntry",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/NoSuchElementException"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$SimpleEntry.class",
+      "occurrence": 0,
+      "sha256": "111ffaa674543f46e4e68b66d7a9b11a2fe2dcfe9ba542c29ae887810146fe4b",
+      "name": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$SimpleEntry",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Map$Entry"
+      ],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "entry",
+          "descriptor": "Ljava/util/Map$Entry;",
+          "access": 16,
+          "generic_signature": "Ljava/util/Map$Entry<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;"
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;Ljava/lang/Object;Ljava/util/Map$Entry;)V",
+          "access": 2,
+          "code_sha256": "35264d840cede5c36f339f75d716197f39aef808a83d0a3fb503732616506e5b",
+          "code_length": 20,
+          "generic_signature": "(TK;Ljava/util/Map$Entry<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;)V"
+        },
+        {
+          "name": "getKey",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5,
+          "generic_signature": "()TK;"
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fecf4011c32892f2b4bee5f235545cf634ff0e6a5cdaf7226c7481f551ac3211",
+          "code_length": 10,
+          "generic_signature": "()TV;"
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "67be2060acc3dc1423234e2afd3d64455891d8b349895397dcd5194075faf419",
+          "code_length": 23,
+          "generic_signature": "(TV;)TV;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap;Ljava/lang/Object;Ljava/util/Map$Entry;Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1;)V",
+          "access": 4096,
+          "code_sha256": "b1b01d99d5f80906a167cebe6882aa6ba79fe2fb0d9ccf8bab73be2a768e5596",
+          "code_length": 8
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Ljava/util/Map$Entry<TK;TV;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$SimpleEntry",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey.class",
+      "occurrence": 0,
+      "sha256": "d9ab3c9ee9b2d22c8f88d5bb620556f66b5f265660f3ba307ec85b435ed17514",
+      "name": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+      "major": 52,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/ref/WeakReference",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hashCode",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)V",
+          "access": 0,
+          "code_sha256": "314cebcfbcd4c032298fe017ee2b2dad047ebcd89dc5b40766fa727a9703c967",
+          "code_length": 15,
+          "generic_signature": "(TK;Ljava/lang/ref/ReferenceQueue<-TK;>;)V"
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "aceda4608e5634858ac4549a55517bda00affa5bf68ea34f6900b22cd5e1c892",
+          "code_length": 5
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "bda688a481fab8bf1e66dbfc9eec0810eb78570c975f90086205a1d46e1cb771",
+          "code_length": 33
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "10b2219d1bfcf787ca70e952f9037ae81ec143e0ab5a963d0d2bd744e6b1ffd5",
+          "code_length": 8
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;>Ljava/lang/ref/WeakReference<TK;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/System",
+        "java/lang/ref/WeakReference"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap.class",
+      "occurrence": 0,
+      "sha256": "53fe2eb636176afe6e72f4510a2e09df0b3c125056a50b46140f2fb79fab9d57",
+      "name": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+      "major": 52,
+      "minor": 0,
+      "access": 1056,
+      "superclass": "java/lang/ref/ReferenceQueue",
+      "interfaces": [
+        "java/lang/Runnable",
+        "java/lang/Iterable"
+      ],
+      "fields": [
+        {
+          "name": "target",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 16,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "8be36d6241481f2aa744705cb8bf58543a3d2d603628b0a2626b73949973458c",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/concurrent/ConcurrentMap;)V",
+          "access": 4,
+          "code_sha256": "4effd65f4e480ace1891995bfc69d44f836c73aa08a75455f51bc5a15fb0c580",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/concurrent/ConcurrentMap<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;)V"
+        },
+        {
+          "name": "getLookupKey",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1028,
+          "generic_signature": "(TK;)TL;"
+        },
+        {
+          "name": "resetLookupKey",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 1028,
+          "generic_signature": "(TL;)V"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "dee06b04eae434273635292336c1a6a6f552ec6ad677f831354edb554dbe9d4d",
+          "code_length": 92,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "getIfPresent",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "789564a4caedf8209e6e2013fd6f9d044d1d49436d32d5c1f0209fe37cc21577",
+          "code_length": 46,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "4d681d3a9833f1b025a27ce64827ff820008cb238859ba547f8f88a14c8cb08a",
+          "code_length": 46,
+          "generic_signature": "(TK;)Z"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d4b7251bcd37ebfb1b0af31a8894a2463ac0ff925cf02437215153aaa5f02539",
+          "code_length": 36,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "putIfAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "1333f10d80190cc3f9c44e2165a34be1b7e8cdd3b50b1429755cecb3123c5164",
+          "code_length": 83,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "putIfProbablyAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "fe425894fba42d093a0b56055678289881c05884c38435c995edc3722712591e",
+          "code_length": 36,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "9f772f21a29357339dc180eaa263aebfc6cf8b650388fedc58279e4ba24a1a60",
+          "code_length": 46,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4b77d17ef9e398c9ed55b03a07723cb75e0f23b4219fbe4f306a33d341c98ad4",
+          "code_length": 10
+        },
+        {
+          "name": "defaultValue",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "expungeStaleEntries",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "70b2d4830f8653d5bafcf8abc89c03515a4a0d597cb15d1d1736a33128fec1ab",
+          "code_length": 24
+        },
+        {
+          "name": "approximateSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d9eb97543ba566cde1f534070fffd0d6a9c24df045f9e6bc31a9c89ba192bde4",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "8c60f9cf520ece264b0255d782ecc5dfac2785aa28f3b2a20f5be2ff77e2ae61",
+          "code_length": 28
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "134ce6ac0708b7f1f2e410d3136664366664211883923e84a0d9142cc2d15c87",
+          "code_length": 24,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/util/Map$Entry<TK;TV;>;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "45b74e071f96c60af60d4af7f92eb8ccd7867dfc14da9124d33fd098be1f30fe",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;L:Ljava/lang/Object;>Ljava/lang/ref/ReferenceQueue<TK;>;Ljava/lang/Runnable;Ljava/lang/Iterable<Ljava/util/Map$Entry<TK;TV;>;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$1",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$EntryIterator",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$SimpleEntry",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "java/lang/InterruptedException",
+        "java/lang/Iterable",
+        "java/lang/NullPointerException",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/lang/ref/Reference",
+        "java/lang/ref/ReferenceQueue",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$1.class",
+      "occurrence": 0,
+      "sha256": "e29c1076f8ae593e3c8794e0156f4383f087c4649a2ad79cdd279c5c18e97e43",
+      "name": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/ThreadLocal",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "initialValue",
+          "descriptor": "()Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey;",
+          "access": 4,
+          "code_sha256": "73e40e814ff7272e1b735faea0e40f8009d2c8a4abd92a228bdb0575518d8e75",
+          "code_length": 8,
+          "generic_signature": "()Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<*>;"
+        },
+        {
+          "name": "initialValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "1a20ced2a167aa6f1c3323e65e84f2c6172eac8b54d23e041136702aa0fb3f27",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/ThreadLocal<Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<*>;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$1",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey",
+        "java/lang/ThreadLocal"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey.class",
+      "occurrence": 0,
+      "sha256": "65aced16f6578fce8ec413645fc5874a8ddd51c4513e9259f6365b380827b333",
+      "name": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "key",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2,
+          "generic_signature": "TK;"
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "withValue",
+          "descriptor": "(Ljava/lang/Object;)Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey;",
+          "access": 0,
+          "code_sha256": "fe83f6fa7e498cd4b087ca530130a4aecb23329e344e7c249cca00764ef163ff",
+          "code_length": 15,
+          "generic_signature": "(TK;)Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<TK;>;"
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "be207fe32c80de261f11f05476f868fee0e399e6a03fa4b05aea5350bf81a7c4",
+          "code_length": 11
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "175101cd8f45f558e63cdac286fa7e1238a90db4009c54a5986a4c822bfaff60",
+          "code_length": 47
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4cd7596f3f9ecdc28dab0ea226a415307717e5905327759aaf103abfcbb2c4cd",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey",
+        "java/lang/Object",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$WithInlinedExpunction.class",
+      "occurrence": 0,
+      "sha256": "ef65f0ab4f76c66d916d2108f17afd4a0e001f72437bf761158f54748a03a08e",
+      "name": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$WithInlinedExpunction",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "af2cdd886f6052173aeba19f359748943e1e8cfcbdb805789fcd526bee8a9882",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "96428fb293ad5f79ab4506524747fafa2eec09a72d6cb9ed02c667e7b1af2a63",
+          "code_length": 10,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "b945b8dfcbfb2cea75c17821edd2be3cb1812d5a7c201c1bd25b996bfa82c8a4",
+          "code_length": 10,
+          "generic_signature": "(TK;)Z"
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e2e48ba06c9124860ed982583f4dae70ad6c1d707fb6910a3629cdcbc125a79c",
+          "code_length": 11,
+          "generic_signature": "(TK;TV;)TV;"
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3f5edd595defd4aeff06115527ebcba1439d4cb15909689c2bc7e7fca4453a94",
+          "code_length": 10,
+          "generic_signature": "(TK;)TV;"
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "185d5b25881a3225dbbeffffd097334daa9d9813b0720aab3e5c36967fabf815",
+          "code_length": 9,
+          "generic_signature": "()Ljava/util/Iterator<Ljava/util/Map$Entry<TK;TV;>;>;"
+        },
+        {
+          "name": "approximateSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4d048b02f808bf0f2f788ffeb8a1ad40a78a9178b2c3cbd33c8d0e6d2aaa3687",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "eed59d207c43e310b69b8ea990faa939cbfcb81ebe8a4880f2b17ad9f4a286fd",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "b0b3c961354a719b6f22cdd7aed9174c706358a80cfc86fa3080eba2c6a78a32",
+          "code_length": 5
+        },
+        {
+          "name": "expungeStaleEntries",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "39d214aec40999e81a9543e9729a9fc9128c32e31e0858693d0e49c15625bf6d",
+          "code_length": 5
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "dfac3bc831b8fa54bbc8eb584942673c0e4c3037f1c5e183e65704b055e8cc37",
+          "code_length": 5
+        },
+        {
+          "name": "putIfProbablyAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "0e95dcde868a0971ad5b9f0c6b2656652f82d63ec0841a84ab4dc703d8f56a7f",
+          "code_length": 7
+        },
+        {
+          "name": "putIfAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "42061a3de9f173e824b12624f7a6ea863fee49d65ac45d8cf8e732c0f00fdd0a",
+          "code_length": 7
+        },
+        {
+          "name": "getIfPresent",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f2fe31d0b1b3c9d853cb79569492b3917be0e1ff87fbc4731f8e714f65be3d57",
+          "code_length": 6
+        },
+        {
+          "name": "resetLookupKey",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4164,
+          "code_sha256": "7337f18e7b1885fba87aea9e15dba93986c328c86279041e47db1a58631b12f4",
+          "code_length": 9
+        },
+        {
+          "name": "getLookupKey",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "d3ceefbe92c4919ddf635fc812a43f3ca2cd8325655b7ac45e03cb4cef176b81",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap<TK;TV;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$WithInlinedExpunction",
+        "java/util/Map",
+        "java/util/Map$Entry"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap.class",
+      "occurrence": 0,
+      "sha256": "56e644e98a59182154314aa1eafbda6a0caf4caa1a22746aff201e94a2e8ca1d",
+      "name": "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOOKUP_KEY_CACHE",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 26,
+          "generic_signature": "Ljava/lang/ThreadLocal<Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<*>;>;"
+        },
+        {
+          "name": "ID",
+          "descriptor": "Ljava/util/concurrent/atomic/AtomicLong;",
+          "access": 26
+        },
+        {
+          "name": "thread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 18
+        },
+        {
+          "name": "reuseKeys",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "5af8f218129358420eb48d4c3cf5c2c937816664fb4be30516647894f9cea9cb",
+          "code_length": 14
+        },
+        {
+          "name": "isPersistentClassLoader",
+          "descriptor": "(Ljava/lang/ClassLoader;)Z",
+          "access": 10,
+          "code_sha256": "0f4c700c8847fb35a6c4d31254defe804d8a9ab6fa6e5032ce2143d78866ffda",
+          "code_length": 30
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZZ)V",
+          "access": 1,
+          "code_sha256": "6a2641db5b45271db711445b45110c35686b8ea69834767fb70ff82c7155b9a0",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ZZLjava/util/concurrent/ConcurrentMap;)V",
+          "access": 1,
+          "code_sha256": "3a31f5f8774671d61d5831a79acd4eda942ea3d154327a933d88bd066797b491",
+          "code_length": 89,
+          "generic_signature": "(ZZLjava/util/concurrent/ConcurrentMap<Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey<TK;>;TV;>;)V"
+        },
+        {
+          "name": "getLookupKey",
+          "descriptor": "(Ljava/lang/Object;)Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey;",
+          "access": 4,
+          "code_sha256": "0b3bdfeb020284d58055c268fc9f2476a9e582982a5a497564918409a98a112a",
+          "code_length": 34,
+          "generic_signature": "(TK;)Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<TK;>;"
+        },
+        {
+          "name": "resetLookupKey",
+          "descriptor": "(Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey;)V",
+          "access": 4,
+          "code_sha256": "eac2dea2da01ae6d33e9ad422f7ff7c5e3efc834719d747a69830e650a435dbb",
+          "code_length": 5,
+          "generic_signature": "(Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<TK;>;)V"
+        },
+        {
+          "name": "getCleanerThread",
+          "descriptor": "()Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "467a97148fa9d245fc85693c97f83c6dab9a7e191883cab77106c605b83a67ca",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4161,
+          "code_sha256": "fb49fb119e186f8a48035154724714cecafdcf3ecc361be5e8de4eac075fe4ce",
+          "code_length": 5
+        },
+        {
+          "name": "iterator",
+          "descriptor": "()Ljava/util/Iterator;",
+          "access": 4161,
+          "code_sha256": "5624eb296ac39b203ccdfba0d062085cc9ea0050772ae706aa06450937707efa",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "22f503efa3ff3f0a960f8f498b7c6b1a6b23ea9b2e49b6df90a5ba51607114db",
+          "code_length": 5
+        },
+        {
+          "name": "approximateSize",
+          "descriptor": "()I",
+          "access": 4161,
+          "code_sha256": "e6ae9992803f42d7622f77e6f3bf9771078d9fc4d407fd4e75a68333debe30cb",
+          "code_length": 5
+        },
+        {
+          "name": "expungeStaleEntries",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "7247511213e77ca910fdbf15695fff10b95d8d3803016c4060985d4088290778",
+          "code_length": 5
+        },
+        {
+          "name": "clear",
+          "descriptor": "()V",
+          "access": 4161,
+          "code_sha256": "c71f6cb35e01b02ea33eec2473c7a8e223e5ead0715eef4b34fbba7afe08cae2",
+          "code_length": 5
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "9b34ecefa51ed3503a60f3426204fba4485e096eafc8fa6c0b9b8aedcc665183",
+          "code_length": 6
+        },
+        {
+          "name": "putIfProbablyAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a8bb5d82cf464909309b25125f2a581c60da21a56cf34f590a34695b7f602db5",
+          "code_length": 7
+        },
+        {
+          "name": "putIfAbsent",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "4504fb23e234c1542e2c714ab3f9daf270b6ebbf9399d4f08c10370f3473e4ae",
+          "code_length": 7
+        },
+        {
+          "name": "put",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "2b03f5f6b92e454be05f79f2b78f240a9954552a9950de3c1f23b96733cb1255",
+          "code_length": 7
+        },
+        {
+          "name": "containsKey",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4161,
+          "code_sha256": "344ee21fea3e099ee1a16abea4a2d0610f9b1c63fa4f40504d86279ac5354253",
+          "code_length": 6
+        },
+        {
+          "name": "getIfPresent",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "d4823286ce8c75ec186937070be6d6296687ee10e5355709ff67cd32b0cb2bd4",
+          "code_length": 6
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "63056ebe0cfeea12fd5ab0abf3fbae2dfedae730a9d86ce1b503d29ad6fb61b9",
+          "code_length": 6
+        },
+        {
+          "name": "resetLookupKey",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 4164,
+          "code_sha256": "a511ed70c10eea115d74eba62c33365fc1a1bf63d4684e6477d8bee03c6d5925",
+          "code_length": 9
+        },
+        {
+          "name": "getLookupKey",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "667cfe34581aa3ca861886be635e1bfaf96d134baabe04ef40e9045aa84cbd9e",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "cc37b8004e01512e7b410702f5845df4d89e102e3026ceda64616af8b6eed996",
+          "code_length": 21
+        }
+      ],
+      "generic_signature": "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Lio/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap<TK;TV;Lio/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey<TK;>;>;",
+      "class_references": [
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/AbstractWeakConcurrentMap$WeakKey",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$1",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$LookupKey",
+        "io/opentelemetry/context/internal/shaded/WeakConcurrentMap$WithInlinedExpunction",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/ThreadLocal",
+        "java/lang/Throwable",
+        "java/util/concurrent/ConcurrentHashMap",
+        "java/util/concurrent/ConcurrentMap",
+        "java/util/concurrent/atomic/AtomicLong"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/ContextPropagators.class",
+      "occurrence": 0,
+      "sha256": "126a7b3632388e73b364f7bcd2c3442e9c82f4386edd5e7bd336e00bf93b3368",
+      "name": "io/opentelemetry/context/propagation/ContextPropagators",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "create",
+          "descriptor": "(Lio/opentelemetry/context/propagation/TextMapPropagator;)Lio/opentelemetry/context/propagation/ContextPropagators;",
+          "access": 9,
+          "code_sha256": "ce17a8df7698a9057356ed2ab619929810c0af811c5ccf7362785cef25bffbc0",
+          "code_length": 16
+        },
+        {
+          "name": "noop",
+          "descriptor": "()Lio/opentelemetry/context/propagation/ContextPropagators;",
+          "access": 9,
+          "code_sha256": "73eb7768c12422b26a3dbcf64c837c6209fe5599bfa91eb43a0d602600fa4fe7",
+          "code_length": 4
+        },
+        {
+          "name": "getTextMapPropagator",
+          "descriptor": "()Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/propagation/ContextPropagators",
+        "io/opentelemetry/context/propagation/DefaultContextPropagators",
+        "java/lang/Object",
+        "java/util/Objects"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/DefaultContextPropagators.class",
+      "occurrence": 0,
+      "sha256": "ddcc0f1b800280343b1055d8d73343002d0221e6cc9b74b99d2e8b7ad10f81ad",
+      "name": "io/opentelemetry/context/propagation/DefaultContextPropagators",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/propagation/ContextPropagators"
+      ],
+      "fields": [
+        {
+          "name": "NOOP",
+          "descriptor": "Lio/opentelemetry/context/propagation/ContextPropagators;",
+          "access": 26
+        },
+        {
+          "name": "textMapPropagator",
+          "descriptor": "Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "noop",
+          "descriptor": "()Lio/opentelemetry/context/propagation/ContextPropagators;",
+          "access": 8,
+          "code_sha256": "ff368472f62e74f69dbfff78e39f8b0455e3d0906ad70662754e822f17fc0fce",
+          "code_length": 4
+        },
+        {
+          "name": "getTextMapPropagator",
+          "descriptor": "()Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 1,
+          "code_sha256": "668501b084f2dc96265ceb4e39579391868136fffaeab12c3f93e3c91daee2e4",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lio/opentelemetry/context/propagation/TextMapPropagator;)V",
+          "access": 0,
+          "code_sha256": "15dd030fc2a073bba61066046a2abac0a84485a18159089e2a6682003263b903",
+          "code_length": 10
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "f8d3d6b7986880f4e522c4b8ce2b2228e55ffe8fc1752246d12efc8bb06471d7",
+          "code_length": 28
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e96fc07534057bb955b840f9e46a878fa313cf2f76b7faa8ad82f1b1648baa3f",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/propagation/ContextPropagators",
+        "io/opentelemetry/context/propagation/DefaultContextPropagators",
+        "io/opentelemetry/context/propagation/NoopTextMapPropagator",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/MultiTextMapPropagator.class",
+      "occurrence": 0,
+      "sha256": "538cc8a39ffd365df61eab5c0c4852d903a9da2b110ac6fd4057c0e250978318",
+      "name": "io/opentelemetry/context/propagation/MultiTextMapPropagator",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/propagation/TextMapPropagator"
+      ],
+      "fields": [
+        {
+          "name": "textMapPropagators",
+          "descriptor": "[Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 18
+        },
+        {
+          "name": "allFields",
+          "descriptor": "Ljava/util/Collection;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Collection<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Lio/opentelemetry/context/propagation/TextMapPropagator;)V",
+          "access": 128,
+          "code_sha256": "e8ca1d3dbada2a31a1fabcda8fdda577715b1cd972149e78a630802b18182ed4",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "7c0e598de8fa605531794f40e0ec64c6a2efaa3ed79526a4a8a2be80a34869f1",
+          "code_length": 43,
+          "generic_signature": "(Ljava/util/List<Lio/opentelemetry/context/propagation/TextMapPropagator;>;)V"
+        },
+        {
+          "name": "fields",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "15838c8c2da38de3025f9e7f6fa3ebb2e5822d1f333d1a7c1400b5a247d6bf55",
+          "code_length": 5,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getAllFields",
+          "descriptor": "([Lio/opentelemetry/context/propagation/TextMapPropagator;)Ljava/util/List;",
+          "access": 10,
+          "code_sha256": "db8d9b8f5dbb223e39ec54cc446f63a30d4c8c055e7eb1a3b5066bc66acf08ab",
+          "code_length": 57,
+          "generic_signature": "([Lio/opentelemetry/context/propagation/TextMapPropagator;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "inject",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapSetter;)V",
+          "access": 1,
+          "code_sha256": "c1b1ecf1ae8f64844361c8cfa90b888e87581ce22f29fee891967bfad69a692f",
+          "code_length": 54,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapSetter<TC;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapGetter;)Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "4883eb3c606602a6d8a75c7f5b90006a2857077b739c7a142942c16a6f147709",
+          "code_length": 61,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapGetter<TC;>;)Lio/opentelemetry/context/Context;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "819d49838e9c11a5a82c1640199975465c68f9f4b57e4a5a73935618d37784f6",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "[Lio/opentelemetry/context/propagation/TextMapPropagator;",
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/propagation/MultiTextMapPropagator",
+        "io/opentelemetry/context/propagation/TextMapPropagator",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/LinkedHashSet",
+        "java/util/List",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/NoopTextMapPropagator.class",
+      "occurrence": 0,
+      "sha256": "0151d36bd0787259003eca1d884b27bd62b841715cc690faee1f05fba28acb42",
+      "name": "io/opentelemetry/context/propagation/NoopTextMapPropagator",
+      "major": 52,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/propagation/TextMapPropagator"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lio/opentelemetry/context/propagation/NoopTextMapPropagator;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getInstance",
+          "descriptor": "()Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 8,
+          "code_sha256": "175d7611e15ddf94bc7b3a3d9cab3d8862f9215ade20028a78378158b9b8d0a7",
+          "code_length": 4
+        },
+        {
+          "name": "fields",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1,
+          "code_sha256": "0f838e3d483644a8593f02a4843758da850e22f35a0d1aa6ccf948db959dd267",
+          "code_length": 4,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "inject",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapSetter;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapSetter<TC;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapGetter;)Lio/opentelemetry/context/Context;",
+          "access": 1,
+          "code_sha256": "7f3a377f3642c7fca578c82ab55bb68582553782a9edf12a64039658344687b1",
+          "code_length": 10,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapGetter<TC;>;)Lio/opentelemetry/context/Context;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a9274cb1b9b0bc221b56c1383b4ead30e90b7088a9e0901a43e25aafac7eb61f",
+          "code_length": 3
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "938ce064190ea8673bb9b3203dc5dfdbc1f6617b18dea33707d3bf0f06f03cd6",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/Context",
+        "io/opentelemetry/context/propagation/NoopTextMapPropagator",
+        "io/opentelemetry/context/propagation/TextMapPropagator",
+        "java/lang/Object",
+        "java/util/Collections"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/TextMapGetter.class",
+      "occurrence": 0,
+      "sha256": "b02d8c315452d7928bfba5214cab84bb0965baa49bcdc56879f247b68ccd52f4",
+      "name": "io/opentelemetry/context/propagation/TextMapGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "keys",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Iterable;",
+          "access": 1025,
+          "generic_signature": "(TC;)Ljava/lang/Iterable<Ljava/lang/String;>;"
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025,
+          "generic_signature": "(TC;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "getAll",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "f4a08b684aa3deca3f0da804754eaf87e75e35beb47680ce6d775db13fd395d9",
+          "code_length": 27,
+          "generic_signature": "(TC;Ljava/lang/String;)Ljava/util/Iterator<Ljava/lang/String;>;"
+        }
+      ],
+      "generic_signature": "<C:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/context/propagation/TextMapGetter",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/Collections",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/TextMapPropagator.class",
+      "occurrence": 0,
+      "sha256": "a8275db53aa88380b2f605611c1b33a6639f824b73a30cb84a48f3b02579b9d5",
+      "name": "io/opentelemetry/context/propagation/TextMapPropagator",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "composite",
+          "descriptor": "([Lio/opentelemetry/context/propagation/TextMapPropagator;)Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 137,
+          "code_sha256": "99a3c867ff3b1f82f597bcf2f5b666bfc9c2d85e81a0fd6662bee1fddef5ffb4",
+          "code_length": 8
+        },
+        {
+          "name": "composite",
+          "descriptor": "(Ljava/lang/Iterable;)Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 9,
+          "code_sha256": "ea59a2148ece0b3b8d1ee4be403fcebd3bc5366f1ba62909d4d26cfc1ddbc3ca",
+          "code_length": 88,
+          "generic_signature": "(Ljava/lang/Iterable<Lio/opentelemetry/context/propagation/TextMapPropagator;>;)Lio/opentelemetry/context/propagation/TextMapPropagator;"
+        },
+        {
+          "name": "noop",
+          "descriptor": "()Lio/opentelemetry/context/propagation/TextMapPropagator;",
+          "access": 9,
+          "code_sha256": "6c58cf85b1a0be19ea813d9e315003d266b4a9822c2cd91b2f6ff803d0ebfaad",
+          "code_length": 4
+        },
+        {
+          "name": "fields",
+          "descriptor": "()Ljava/util/Collection;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/Collection<Ljava/lang/String;>;"
+        },
+        {
+          "name": "inject",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapSetter;)V",
+          "access": 1025,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapSetter<TC;>;)V"
+        },
+        {
+          "name": "extract",
+          "descriptor": "(Lio/opentelemetry/context/Context;Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapGetter;)Lio/opentelemetry/context/Context;",
+          "access": 1025,
+          "generic_signature": "<C:Ljava/lang/Object;>(Lio/opentelemetry/context/Context;TC;Lio/opentelemetry/context/propagation/TextMapGetter<TC;>;)Lio/opentelemetry/context/Context;"
+        }
+      ],
+      "class_references": [
+        "io/opentelemetry/context/propagation/MultiTextMapPropagator",
+        "io/opentelemetry/context/propagation/NoopTextMapPropagator",
+        "io/opentelemetry/context/propagation/TextMapPropagator",
+        "java/lang/Iterable",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/Iterator",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/TextMapSetter.class",
+      "occurrence": 0,
+      "sha256": "49b5e04d877294b6746b34721079104c96243c4ed04f2eb329ad75171df2de28",
+      "name": "io/opentelemetry/context/propagation/TextMapSetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1025,
+          "generic_signature": "(TC;Ljava/lang/String;Ljava/lang/String;)V"
+        }
+      ],
+      "generic_signature": "<C:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "io/opentelemetry/context/propagation/TextMapSetter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/package-info.class",
+      "occurrence": 0,
+      "sha256": "1c581304f2eb0cce19da3e72404a8be6b2b45e3c24e84f1a0baa3b6d17db7fbb",
+      "name": "io/opentelemetry/context/propagation/package-info",
+      "major": 52,
+      "minor": 0,
+      "access": 5632,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "io/opentelemetry/context/propagation/package-info",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "io/opentelemetry/context/propagation/internal/ExtendedTextMapGetter.class",
+      "occurrence": 0,
+      "sha256": "b341bfb8707ec221e19dbe32941851ff50df042c4863a8a71df18d25f519dcc1",
+      "name": "io/opentelemetry/context/propagation/internal/ExtendedTextMapGetter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "io/opentelemetry/context/propagation/TextMapGetter"
+      ],
+      "fields": [],
+      "methods": [],
+      "generic_signature": "<C:Ljava/lang/Object;>Ljava/lang/Object;Lio/opentelemetry/context/propagation/TextMapGetter<TC;>;",
+      "class_references": [
+        "io/opentelemetry/context/propagation/TextMapGetter",
+        "io/opentelemetry/context/propagation/internal/ExtendedTextMapGetter",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

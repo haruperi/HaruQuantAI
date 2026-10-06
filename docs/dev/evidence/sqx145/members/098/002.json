@@ -1,0 +1,4195 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/pngj.jar",
+  "archive_sha256": "6278c81c54106c78c0725718f73f80e5bfee2acea149eafab4c24a451cd6fc3c",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "ar/com/hjg/pngj/ImageLineSetDefault$1.class",
+      "occurrence": 0,
+      "sha256": "fe28e519c87777f91735c92a94571ddd8af1457c1b0c977d09e881f3c7a20fb7",
+      "name": "ar/com/hjg/pngj/ImageLineSetDefault$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "ar/com/hjg/pngj/IImageLineSetFactory"
+      ],
+      "fields": [
+        {
+          "name": "val$ifactory",
+          "descriptor": "Lar/com/hjg/pngj/IImageLineFactory;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLineFactory;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "create",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;ZIII)Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 1,
+          "code_sha256": "77068f6df1fe3077854209d3d01e52111be93af9e8ea3bb75fec7bf5bada0997",
+          "code_length": 17,
+          "generic_signature": "(Lar/com/hjg/pngj/ImageInfo;ZIII)Lar/com/hjg/pngj/IImageLineSet<TT;>;"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lar/com/hjg/pngj/IImageLineSetFactory<TT;>;",
+      "class_references": [
+        "ar/com/hjg/pngj/IImageLineSetFactory",
+        "ar/com/hjg/pngj/ImageLineSetDefault",
+        "ar/com/hjg/pngj/ImageLineSetDefault$1",
+        "ar/com/hjg/pngj/ImageLineSetDefault$1$1",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/ImageLineSetDefault.class",
+      "occurrence": 0,
+      "sha256": "2feaf1c8689975b565b4d9e0730fa456409b29cef64ab6673279ffd56a246df1",
+      "name": "ar/com/hjg/pngj/ImageLineSetDefault",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "ar/com/hjg/pngj/IImageLineSet"
+      ],
+      "fields": [
+        {
+          "name": "imgInfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 20
+        },
+        {
+          "name": "singleCursor",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "nlines",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "offset",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "step",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "imageLines",
+          "descriptor": "Ljava/util/List;",
+          "access": 4,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "imageLine",
+          "descriptor": "Lar/com/hjg/pngj/IImageLine;",
+          "access": 4,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "currentRow",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;ZIII)V",
+          "access": 1,
+          "code_sha256": "a2b46491813ef015a0b50c5e3f25933fe82297abbce02131420db3400ae73b87",
+          "code_length": 63
+        },
+        {
+          "name": "createImageLines",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "204b96bd7b6e3ff759400f18b59e89eadb773252b9b9a2a4518db9eb74e3fed3",
+          "code_length": 60
+        },
+        {
+          "name": "createImageLine",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLine;",
+          "access": 1028,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getImageLine",
+          "descriptor": "(I)Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "a09082497a2301be43013c40e0904b123a452f37b6a97ffd57661e051a9063cd",
+          "code_length": 51,
+          "generic_signature": "(I)TT;"
+        },
+        {
+          "name": "getImageLineRawNum",
+          "descriptor": "(I)Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "09d30d78c9c8bbef067c4ccdac670fa0d93e3607895e243f992342da3ae8abbe",
+          "code_length": 26,
+          "generic_signature": "(I)TT;"
+        },
+        {
+          "name": "hasImageLine",
+          "descriptor": "(I)Z",
+          "access": 1,
+          "code_sha256": "d408cfd255e63a25900ccf22dd1011224eb7847a05866fa1dada053e0307d9b2",
+          "code_length": 37
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "imageRowToMatrixRowStrict",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "d06e8157cb5f09a95a84c86f18259d40417683cb646e72f6b251bb3dc3a67180",
+          "code_length": 53
+        },
+        {
+          "name": "matrixRowToImageRow",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "87a8cfd10acf4595c6f26a00325cf29029908861880ae67b976efc89b7c9cc8e",
+          "code_length": 12
+        },
+        {
+          "name": "imageRowToMatrixRow",
+          "descriptor": "(I)I",
+          "access": 1,
+          "code_sha256": "349d82acc5d8a55be0407fb0523def352c413fc634be8ba565e5babdd4872bd9",
+          "code_length": 39
+        },
+        {
+          "name": "createImageLineSetFactoryFromImageLineFactory",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLineFactory;)Lar/com/hjg/pngj/IImageLineSetFactory;",
+          "access": 9,
+          "code_sha256": "1a9659fca4482acd5474126d328ee5a18caa12ec10fa0e93f8636ca0971535de",
+          "code_length": 9,
+          "generic_signature": "<T::Lar/com/hjg/pngj/IImageLine;>(Lar/com/hjg/pngj/IImageLineFactory<TT;>;)Lar/com/hjg/pngj/IImageLineSetFactory<TT;>;"
+        },
+        {
+          "name": "getFactoryInt",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLineSetFactory;",
+          "access": 9,
+          "code_sha256": "e4975647c425ade7ae131cdad46b8bfd9a47576808a98950409886c34e010c70",
+          "code_length": 7,
+          "generic_signature": "()Lar/com/hjg/pngj/IImageLineSetFactory<Lar/com/hjg/pngj/ImageLineInt;>;"
+        },
+        {
+          "name": "getFactoryByte",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLineSetFactory;",
+          "access": 9,
+          "code_sha256": "3cbd9027b7e310e3739fb5dcfa7f3bcd4e977286e775d06dee7aaa1d842a0464",
+          "code_length": 7,
+          "generic_signature": "()Lar/com/hjg/pngj/IImageLineSetFactory<Lar/com/hjg/pngj/ImageLineByte;>;"
+        }
+      ],
+      "generic_signature": "<T::Lar/com/hjg/pngj/IImageLine;>Ljava/lang/Object;Lar/com/hjg/pngj/IImageLineSet<TT;>;",
+      "class_references": [
+        "ar/com/hjg/pngj/IImageLine",
+        "ar/com/hjg/pngj/IImageLineSet",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/ImageLineByte",
+        "ar/com/hjg/pngj/ImageLineInt",
+        "ar/com/hjg/pngj/ImageLineSetDefault",
+        "ar/com/hjg/pngj/ImageLineSetDefault$1",
+        "ar/com/hjg/pngj/PngjException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/IPngWriterFactory.class",
+      "occurrence": 0,
+      "sha256": "b5f7a9af91df10702a63b4e92094b9df4b89838e051c17a9cf91b44d0813e77c",
+      "name": "ar/com/hjg/pngj/IPngWriterFactory",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createPngWriter",
+          "descriptor": "(Ljava/io/OutputStream;Lar/com/hjg/pngj/ImageInfo;)Lar/com/hjg/pngj/PngWriter;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/IPngWriterFactory",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/CompressorStream.class",
+      "occurrence": 0,
+      "sha256": "2bab4a43a65fe1cdb0ad403920d70fb1db0c88c151cdd5f543d95cc4fc86e5fb",
+      "name": "ar/com/hjg/pngj/pixels/CompressorStream",
+      "major": 50,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "idatChunkWriter",
+          "descriptor": "Lar/com/hjg/pngj/IDatChunkWriter;",
+          "access": 4
+        },
+        {
+          "name": "blockLen",
+          "descriptor": "I",
+          "access": 17
+        },
+        {
+          "name": "totalbytes",
+          "descriptor": "J",
+          "access": 17
+        },
+        {
+          "name": "closed",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "done",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "bytesIn",
+          "descriptor": "J",
+          "access": 4
+        },
+        {
+          "name": "bytesOut",
+          "descriptor": "J",
+          "access": 4
+        },
+        {
+          "name": "block",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "firstBytes",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "storeFirstByte",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJ)V",
+          "access": 1,
+          "code_sha256": "d0c0815a7503954eaa7c19c83160b5710b5d898aa0b8e3ff0670b3a6c1ac4851",
+          "code_length": 89
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e9c0d2441ad360373c77549198537723ed0038ef7bf348c89869059735917374",
+          "code_length": 24
+        },
+        {
+          "name": "done",
+          "descriptor": "()V",
+          "access": 1025
+        },
+        {
+          "name": "write",
+          "descriptor": "([B)V",
+          "access": 17,
+          "code_sha256": "b7039de008d3fda9b26a79d33001a40373d10776878e906ce6975af4eb468863",
+          "code_length": 9
+        },
+        {
+          "name": "write",
+          "descriptor": "([BII)V",
+          "access": 17,
+          "code_sha256": "1b0a73ec2489802fcfb98017a4a224660bf20773e5b640ed51eacdb19a7b5e10",
+          "code_length": 107
+        },
+        {
+          "name": "mywrite",
+          "descriptor": "([BII)V",
+          "access": 1025
+        },
+        {
+          "name": "getCompressionRatio",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "c1badeadf90b05dd4ac6cbe9754e168784cc5030e61dcb6ab5f7f84218b4720f",
+          "code_length": 25
+        },
+        {
+          "name": "getBytesRaw",
+          "descriptor": "()J",
+          "access": 17,
+          "code_sha256": "4f93aa121928940bdb8d3bafd3c34f970dcbc955ea8c8749a45ef4f5d1004767",
+          "code_length": 5
+        },
+        {
+          "name": "getBytesCompressed",
+          "descriptor": "()J",
+          "access": 17,
+          "code_sha256": "cf3fb887026e812e85fe2c3902663f4b4e0fcd88880847654181f21f9fd9c536",
+          "code_length": 5
+        },
+        {
+          "name": "isClosed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "isDone",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "17d2088447ccf826ece32e30a3768849a386734ae9eaa8712655f75cd4c67385",
+          "code_length": 5
+        },
+        {
+          "name": "getFirstBytes",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "setStoreFirstByte",
+          "descriptor": "(ZI)V",
+          "access": 1,
+          "code_sha256": "4d68c26e6b3052876b34b521a128700ce8220176054bf6a240d7a4bea1be3132",
+          "code_length": 44
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "7d5616d8d019c330dc25e26d1847f5fd6a1b32f11dd6a8e9c33249205df9d197",
+          "code_length": 25
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6dc3bbdae7a9dd3c14c75b1afb3b2be2223690fe84f9eb29a21ef037dc9b91b3",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/IDatChunkWriter",
+        "ar/com/hjg/pngj/pixels/CompressorStream",
+        "java/io/OutputStream",
+        "java/lang/Long",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/CompressorStreamDeflater.class",
+      "occurrence": 0,
+      "sha256": "d954bf2392c577e53f53127fe835118164ad666f9c037f7252cbab53857248d0",
+      "name": "ar/com/hjg/pngj/pixels/CompressorStreamDeflater",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/pixels/CompressorStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "deflater",
+          "descriptor": "Ljava/util/zip/Deflater;",
+          "access": 4
+        },
+        {
+          "name": "buf1",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "deflaterIsOwn",
+          "descriptor": "Z",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJLjava/util/zip/Deflater;)V",
+          "access": 1,
+          "code_sha256": "9c8876f47bbd24fe65a05c04e57bdd5505907a27183c82b3b8246d9b0382dea1",
+          "code_length": 48
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJ)V",
+          "access": 1,
+          "code_sha256": "f8ae91d8bf5aed58ac592d6111b96019de05415487b91837075a9590fc331641",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJII)V",
+          "access": 1,
+          "code_sha256": "3134ceb5c0750799799849b4f01354d404906fc17aa15afef707b0f27f6b1c92",
+          "code_length": 31
+        },
+        {
+          "name": "mywrite",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "b36a9c42b6a39a127a73e4cadb717afff63617a8666646876046e199a83202f7",
+          "code_length": 73
+        },
+        {
+          "name": "deflate",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "66c1e10ae50bfe76eac9d62d02ceaaab3828ec3fc775833820e0327c5e43c31c",
+          "code_length": 109
+        },
+        {
+          "name": "done",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "95e1ba208659faa49fd5278cc243f6ce9fd3dfe6a3dfece15dbe301607c70179",
+          "code_length": 62
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0b7f98a0f34b0a9d2fe65585e776f181e1be20d8fcf22cee0fb6e0c0d100c7f6",
+          "code_length": 27
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "99a9a2b67927f1e6223ead8c944f1bcbdc8401f52c631ca027ffae9094d61ac2",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "[B",
+        "ar/com/hjg/pngj/IDatChunkWriter",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "ar/com/hjg/pngj/pixels/CompressorStream",
+        "ar/com/hjg/pngj/pixels/CompressorStreamDeflater",
+        "java/lang/Exception",
+        "java/util/zip/Deflater"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/CompressorStreamLz4.class",
+      "occurrence": 0,
+      "sha256": "45365847c422654d832a80d19d0048f17c7d38272cfa061d7c5c3841857f674f",
+      "name": "ar/com/hjg/pngj/pixels/CompressorStreamLz4",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/pixels/CompressorStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "lz4",
+          "descriptor": "Lar/com/hjg/pngj/pixels/DeflaterEstimatorLz4;",
+          "access": 18
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "buffer_size",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "inbuf",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "MAX_BUFFER_SIZE",
+          "descriptor": "I",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJ)V",
+          "access": 1,
+          "code_sha256": "c0fc46bd2550465a36bcb5add5fac1611dba3ed7c13663df8a0eb5c305af62d1",
+          "code_length": 44
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJLjava/util/zip/Deflater;)V",
+          "access": 1,
+          "code_sha256": "82e4a2a6b76a0ecf11a466ec3f9323d5f145ac23a996e181631977c1566009cf",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/IDatChunkWriter;IJII)V",
+          "access": 1,
+          "code_sha256": "82e4a2a6b76a0ecf11a466ec3f9323d5f145ac23a996e181631977c1566009cf",
+          "code_length": 8
+        },
+        {
+          "name": "mywrite",
+          "descriptor": "([BII)V",
+          "access": 1,
+          "code_sha256": "68e3c1d38fc1a824c63029a7e5df5372c8b62d15f9cf067bbf66131e10faf720",
+          "code_length": 200
+        },
+        {
+          "name": "compressFromBuffer",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "6de0acd80cc741055e4cf8606e4f9850e6d62401079593edd38f0a67398d0048",
+          "code_length": 39
+        },
+        {
+          "name": "done",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6d5b0bcb59a912e73c037f4ca4bd0cca9b9431bc1497307563391964df399a4d",
+          "code_length": 17
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d1f35ff91df20f5b7d5bed34ecccedf3bebaf0526301e1ec426fb770269a6035",
+          "code_length": 21
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9fbe1b81bb78fd501d727034054001e89f98b4ceb41748486307dbe8279ca728",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/IDatChunkWriter",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "ar/com/hjg/pngj/pixels/CompressorStream",
+        "ar/com/hjg/pngj/pixels/CompressorStreamLz4",
+        "ar/com/hjg/pngj/pixels/DeflaterEstimatorLz4",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/DeflaterEstimatorHjg.class",
+      "occurrence": 0,
+      "sha256": "7293fd5858b028582a70cb75151883b50aea3556b4f36811a7567bdad1918c72",
+      "name": "ar/com/hjg/pngj/pixels/DeflaterEstimatorHjg",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MEMORY_USAGE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "NOT_COMPRESSIBLE_DETECTION_LEVEL",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MIN_MATCH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SKIP_STRENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "COPY_LENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LAST_LITERALS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MF_LIMIT",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MIN_LENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MAX_DISTANCE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ML_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ML_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "RUN_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "RUN_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LZ4_64K_LIMIT",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG_64K",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE_64K",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG_HC",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE_HC",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "OPTIMAL_ML",
+          "descriptor": "I",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compressEstim",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "57892c2b55e7e6b70504f9daeb357e409a400a2972a9db32bebf371bce173ee5",
+          "code_length": 173
+        },
+        {
+          "name": "compressEstim",
+          "descriptor": "([B)I",
+          "access": 1,
+          "code_sha256": "09d6bc5ce78d1f621d7b4b3f7523e2f805928c3eed97a23259e9aa40fece4d3c",
+          "code_length": 9
+        },
+        {
+          "name": "compress64k",
+          "descriptor": "([BII)I",
+          "access": 8,
+          "code_sha256": "cf7a9245013e5afa6de2099ba76c2dd4a2a745d71d243907b6e3c15d70cb2d93",
+          "code_length": 401
+        },
+        {
+          "name": "maxCompressedLength",
+          "descriptor": "(I)I",
+          "access": 24,
+          "code_sha256": "4347d0280f08798e1ad0e6ea1bf65539d8ab090fa725b5d1698182f223172c85",
+          "code_length": 42
+        },
+        {
+          "name": "hash",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "a1da8d5bcfecda29bdfe05c19a7e60da6f34b6d0bebdb228e6ba85a5856aaa54",
+          "code_length": 8
+        },
+        {
+          "name": "hash64k",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "10cbba0c7436b760a14237c88ad8e5f97ec48fa51eb54bb537ad43733c1482f2",
+          "code_length": 8
+        },
+        {
+          "name": "readShortLittleEndian",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "90af4cd0499e811932c6e370057895a5ba4a7e9e16e594f2eccc969ae74290fe",
+          "code_length": 21
+        },
+        {
+          "name": "readIntEquals",
+          "descriptor": "([BII)Z",
+          "access": 8,
+          "code_sha256": "3b8440ceac7d27c1df8b8bb41fd640b79f36187aec900565cc9a51b40f1ad3f4",
+          "code_length": 54
+        },
+        {
+          "name": "commonBytes",
+          "descriptor": "([BIII)I",
+          "access": 8,
+          "code_sha256": "5760f29b7805df6e0e9777cbd29080371163640a53547b82fd0d9130a3d44b7a",
+          "code_length": 32
+        },
+        {
+          "name": "commonBytesBackward",
+          "descriptor": "([BIIII)I",
+          "access": 8,
+          "code_sha256": "611bdb907ab2fbbb5e53da02cf1267af0167f041c25fad52961dd1eacf5d44cb",
+          "code_length": 38
+        },
+        {
+          "name": "readShort",
+          "descriptor": "([SI)I",
+          "access": 8,
+          "code_sha256": "292d1a1458b5cc7bb94597661792565687764e9531ab3c4ea7622119a9923bf7",
+          "code_length": 7
+        },
+        {
+          "name": "readByte",
+          "descriptor": "([BI)B",
+          "access": 8,
+          "code_sha256": "a08d4eb5c3c1c3f8fa7513c96993fef513d2cb5a6c0914e1469cdadc24cd9d85",
+          "code_length": 4
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "([BI)V",
+          "access": 8,
+          "code_sha256": "a9f824cb7f773a121f12c5db7e8cbca090ef972b2e4642b146250b793d34e613",
+          "code_length": 20
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "([BII)V",
+          "access": 8,
+          "code_sha256": "52201c95c89635663ff087a40615284c8d6209dfb3bb7ce8fa4cfffaf52c5681",
+          "code_length": 23
+        },
+        {
+          "name": "checkLength",
+          "descriptor": "(I)V",
+          "access": 8,
+          "code_sha256": "e97e17ee325178de68aa10136fa959c26f5992640887660a55451850bfe45dca",
+          "code_length": 15
+        },
+        {
+          "name": "readIntBE",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "1c12c3173ddf21f10ad291f4f2b244b99e095bc559f0771b77a5e1a98f9127f5",
+          "code_length": 47
+        },
+        {
+          "name": "readIntLE",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "9e8f12a76dbf2c30388b9401ca1008b30d935cb047a87450c278429c4c894cff",
+          "code_length": 47
+        },
+        {
+          "name": "readInt",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "c17f19c8412dc6973a410aed21e8eab6c92ba8371774838e24eb876cb9e2ba3f",
+          "code_length": 6
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "([SII)V",
+          "access": 8,
+          "code_sha256": "cda289d3070e377bf0f2630d7e580c08166bb947aa4f616ec6dd0c93a102f52d",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "0619e27c370c86dbec20bf7e38549b97e7a15edacd22fd450fe44a4e23b24c72",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[S",
+        "ar/com/hjg/pngj/pixels/DeflaterEstimatorHjg",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/DeflaterEstimatorLz4.class",
+      "occurrence": 0,
+      "sha256": "c95d39065974741b4b25e082bc7fe4a9bbf605a508f488569bc25aa2f10a3bb5",
+      "name": "ar/com/hjg/pngj/pixels/DeflaterEstimatorLz4",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "NATIVE_BYTE_ORDER",
+          "descriptor": "Ljava/nio/ByteOrder;",
+          "access": 24
+        },
+        {
+          "name": "MEMORY_USAGE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "NOT_COMPRESSIBLE_DETECTION_LEVEL",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MIN_MATCH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "SKIP_STRENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "COPY_LENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LAST_LITERALS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MF_LIMIT",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MIN_LENGTH",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "MAX_DISTANCE",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ML_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "ML_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "RUN_BITS",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "RUN_MASK",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "LZ4_64K_LIMIT",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG_64K",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE_64K",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_LOG_HC",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "HASH_TABLE_SIZE_HC",
+          "descriptor": "I",
+          "access": 24
+        },
+        {
+          "name": "OPTIMAL_ML",
+          "descriptor": "I",
+          "access": 24
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "compressEstim",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "57892c2b55e7e6b70504f9daeb357e409a400a2972a9db32bebf371bce173ee5",
+          "code_length": 173
+        },
+        {
+          "name": "compressEstim",
+          "descriptor": "([B)I",
+          "access": 1,
+          "code_sha256": "09d6bc5ce78d1f621d7b4b3f7523e2f805928c3eed97a23259e9aa40fece4d3c",
+          "code_length": 9
+        },
+        {
+          "name": "compress64k",
+          "descriptor": "([BII)I",
+          "access": 8,
+          "code_sha256": "cf7a9245013e5afa6de2099ba76c2dd4a2a745d71d243907b6e3c15d70cb2d93",
+          "code_length": 401
+        },
+        {
+          "name": "maxCompressedLength",
+          "descriptor": "(I)I",
+          "access": 24,
+          "code_sha256": "4347d0280f08798e1ad0e6ea1bf65539d8ab090fa725b5d1698182f223172c85",
+          "code_length": 42
+        },
+        {
+          "name": "hash",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "a1da8d5bcfecda29bdfe05c19a7e60da6f34b6d0bebdb228e6ba85a5856aaa54",
+          "code_length": 8
+        },
+        {
+          "name": "hash64k",
+          "descriptor": "(I)I",
+          "access": 8,
+          "code_sha256": "10cbba0c7436b760a14237c88ad8e5f97ec48fa51eb54bb537ad43733c1482f2",
+          "code_length": 8
+        },
+        {
+          "name": "readShortLittleEndian",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "90af4cd0499e811932c6e370057895a5ba4a7e9e16e594f2eccc969ae74290fe",
+          "code_length": 21
+        },
+        {
+          "name": "readIntEquals",
+          "descriptor": "([BII)Z",
+          "access": 8,
+          "code_sha256": "3b8440ceac7d27c1df8b8bb41fd640b79f36187aec900565cc9a51b40f1ad3f4",
+          "code_length": 54
+        },
+        {
+          "name": "commonBytes",
+          "descriptor": "([BIII)I",
+          "access": 8,
+          "code_sha256": "5760f29b7805df6e0e9777cbd29080371163640a53547b82fd0d9130a3d44b7a",
+          "code_length": 32
+        },
+        {
+          "name": "commonBytesBackward",
+          "descriptor": "([BIIII)I",
+          "access": 8,
+          "code_sha256": "611bdb907ab2fbbb5e53da02cf1267af0167f041c25fad52961dd1eacf5d44cb",
+          "code_length": 38
+        },
+        {
+          "name": "readShort",
+          "descriptor": "([SI)I",
+          "access": 8,
+          "code_sha256": "292d1a1458b5cc7bb94597661792565687764e9531ab3c4ea7622119a9923bf7",
+          "code_length": 7
+        },
+        {
+          "name": "readByte",
+          "descriptor": "([BI)B",
+          "access": 8,
+          "code_sha256": "a08d4eb5c3c1c3f8fa7513c96993fef513d2cb5a6c0914e1469cdadc24cd9d85",
+          "code_length": 4
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "([BI)V",
+          "access": 8,
+          "code_sha256": "a9f824cb7f773a121f12c5db7e8cbca090ef972b2e4642b146250b793d34e613",
+          "code_length": 20
+        },
+        {
+          "name": "checkRange",
+          "descriptor": "([BII)V",
+          "access": 8,
+          "code_sha256": "52201c95c89635663ff087a40615284c8d6209dfb3bb7ce8fa4cfffaf52c5681",
+          "code_length": 23
+        },
+        {
+          "name": "checkLength",
+          "descriptor": "(I)V",
+          "access": 8,
+          "code_sha256": "e97e17ee325178de68aa10136fa959c26f5992640887660a55451850bfe45dca",
+          "code_length": 15
+        },
+        {
+          "name": "readIntBE",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "1c12c3173ddf21f10ad291f4f2b244b99e095bc559f0771b77a5e1a98f9127f5",
+          "code_length": 47
+        },
+        {
+          "name": "readIntLE",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "9e8f12a76dbf2c30388b9401ca1008b30d935cb047a87450c278429c4c894cff",
+          "code_length": 47
+        },
+        {
+          "name": "readInt",
+          "descriptor": "([BI)I",
+          "access": 8,
+          "code_sha256": "bb370f227ee4ef4dd4b353ff4c29f61cbd2ba0ea904973b8e54545387e131b65",
+          "code_length": 21
+        },
+        {
+          "name": "writeShort",
+          "descriptor": "([SII)V",
+          "access": 8,
+          "code_sha256": "cda289d3070e377bf0f2630d7e580c08166bb947aa4f616ec6dd0c93a102f52d",
+          "code_length": 6
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d8c8548005a7734a6517d3f11cacfb650b13f7a886eef85e7514fd2e1e013961",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[S",
+        "ar/com/hjg/pngj/pixels/DeflaterEstimatorLz4",
+        "java/lang/ArrayIndexOutOfBoundsException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/nio/ByteOrder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/FiltersPerformance$1.class",
+      "occurrence": 0,
+      "sha256": "d71dba8111cbd52e260cc32409b0e2f2dbf0675a0b0ad9ed4686c670d63c5786",
+      "name": "ar/com/hjg/pngj/pixels/FiltersPerformance$1",
+      "major": 50,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$ar$com$hjg$pngj$FilterType",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "15768c4ed1d422a08ed567b1078dc6dcd44c97ee54333eaf8613e09b67842157",
+          "code_length": 85
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance$1",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/FiltersPerformance.class",
+      "occurrence": 0,
+      "sha256": "4f046740c6b46169fa46d5640fdd50e4f1dd67a4093986949110629c2d6d214c",
+      "name": "ar/com/hjg/pngj/pixels/FiltersPerformance",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "iminfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 18
+        },
+        {
+          "name": "memoryA",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "lastrow",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "absum",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "entropy",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "cost",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "histog",
+          "descriptor": "[I",
+          "access": 2
+        },
+        {
+          "name": "lastprefered",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "initdone",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "preferenceForNone",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "FILTER_WEIGHTS_DEFAULT",
+          "descriptor": "[D",
+          "access": 25
+        },
+        {
+          "name": "filter_weights",
+          "descriptor": "[D",
+          "access": 2
+        },
+        {
+          "name": "LOG2NI",
+          "descriptor": "D",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "8af46995b0354da6f2e82d186f2d0e5e343c0efb6c3a1c1d6f017d7a9a05ea06",
+          "code_length": 104
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "61196f1447f1df9a288345c72e2e5fa5e65d7d4329625147ad68e09fa00e0300",
+          "code_length": 121
+        },
+        {
+          "name": "updateFromFiltered",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;[BI)V",
+          "access": 1,
+          "code_sha256": "0c22b107d89c3a2583b5e605e2a4a7213e04474744603b006dbbdb659af2333f",
+          "code_length": 10
+        },
+        {
+          "name": "updateFromRaw",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;[B[BI)V",
+          "access": 1,
+          "code_sha256": "efdf192388678baa913ea8ebc52e5f17d59780959f7f28c6cdd17617448e270b",
+          "code_length": 11
+        },
+        {
+          "name": "updateFromRawOrFiltered",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;[B[B[BI)V",
+          "access": 2,
+          "code_sha256": "7de2c4c6904eca6242b39f6b6959f8146a479e83be7e0954b18ec2a3e04b54d1",
+          "code_length": 103
+        },
+        {
+          "name": "getPreferred",
+          "descriptor": "()Lar/com/hjg/pngj/FilterType;",
+          "access": 1,
+          "code_sha256": "cf61101163706461d132487bb348002992d5389fe44272623de3c8d37f8fa9e8",
+          "code_length": 154
+        },
+        {
+          "name": "computeHistogramForFilter",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;[B[B)V",
+          "access": 17,
+          "code_sha256": "28a848b67e3878a2e3edae11e979007e3f156f10564f4cb372bf29d39186030c",
+          "code_length": 490
+        },
+        {
+          "name": "computeHistogram",
+          "descriptor": "([B)V",
+          "access": 1,
+          "code_sha256": "1ba1af3a994a361a25dc2405dce94830a5a6838f883d4e4f81c53b2b4145850c",
+          "code_length": 44
+        },
+        {
+          "name": "computeAbsFromHistogram",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "a7a5d95c4b6437c66a3915796ee37557efb0580c4563ef2fe1801546d3de133a",
+          "code_length": 72
+        },
+        {
+          "name": "computeEntropyFromHistogram",
+          "descriptor": "()D",
+          "access": 17,
+          "code_sha256": "c0f507ed5d0c4aca49b221e4f115290301e532f5291c27c4087fd57358a32f66",
+          "code_length": 98
+        },
+        {
+          "name": "setPreferenceForNone",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "e5cf8cd4b88ce7ce6b4b3eb1fbdbe38a3fe162dced5a156c30a3c1104a6ed3ce",
+          "code_length": 6
+        },
+        {
+          "name": "tuneMemory",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "4724c5165a7a26847089e157f1fcfe3dbdf54bf0c37b602ba3472353b68e9072",
+          "code_length": 29
+        },
+        {
+          "name": "setFilterWeights",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "ac8baed11d4d394828a2bb2ad57f9688ceba0a89cbb5a6b031d9ebe6818ffc0f",
+          "code_length": 12
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "978156fc3d497ae21b691b99787306063464693be880c6927e0f8cc2e2b3a18f",
+          "code_length": 50
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[I",
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngjExceptionInternal",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance$1",
+        "java/lang/Double",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/PixelsWriter$1.class",
+      "occurrence": 0,
+      "sha256": "8f27bd6a4116bfd9a2d2a643fbc5f2373b5eaaa92f76bd7a089a34c16c061b20",
+      "name": "ar/com/hjg/pngj/pixels/PixelsWriter$1",
+      "major": 50,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$SwitchMap$ar$com$hjg$pngj$FilterType",
+          "descriptor": "[I",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "15768c4ed1d422a08ed567b1078dc6dcd44c97ee54333eaf8613e09b67842157",
+          "code_length": 85
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/pixels/PixelsWriter",
+        "ar/com/hjg/pngj/pixels/PixelsWriter$1",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/PixelsWriter.class",
+      "occurrence": 0,
+      "sha256": "49b71108fe4ff215d5d25eb34f23750e246f593f5ec20f204b897b4088463427",
+      "name": "ar/com/hjg/pngj/pixels/PixelsWriter",
+      "major": 52,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IDAT_MAX_SIZE_DEFAULT",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "imgInfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 20
+        },
+        {
+          "name": "buflen",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "bytesPixel",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "bytesRow",
+          "descriptor": "I",
+          "access": 20
+        },
+        {
+          "name": "compressorStream",
+          "descriptor": "Lar/com/hjg/pngj/pixels/CompressorStream;",
+          "access": 2
+        },
+        {
+          "name": "deflaterCompLevel",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "deflaterStrategy",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "initdone",
+          "descriptor": "Z",
+          "access": 4
+        },
+        {
+          "name": "filterType",
+          "descriptor": "Lar/com/hjg/pngj/FilterType;",
+          "access": 4
+        },
+        {
+          "name": "filtersUsed",
+          "descriptor": "[I",
+          "access": 2
+        },
+        {
+          "name": "os",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 2
+        },
+        {
+          "name": "idatMaxSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "currentRow",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "buffer",
+          "descriptor": "[B",
+          "access": 2
+        },
+        {
+          "name": "$SWITCH_TABLE$ar$com$hjg$pngj$FilterType",
+          "descriptor": "[I",
+          "access": 4106
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "2337f01cbfd9e2ff699aa961f020c7abbde20ac1d17feb6535cc3a5d19afc5c9",
+          "code_length": 78
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;[B)V",
+          "access": 1,
+          "code_sha256": "74df88bca161b39b1ebc364850a956249cd00012f3eb4bd0dcf274ce5d643c5e",
+          "code_length": 83
+        },
+        {
+          "name": "processRow",
+          "descriptor": "([B)V",
+          "access": 17,
+          "code_sha256": "ff62e307a8945b7f4aa189efd578a765db25875acf5c2f102068e026357c4a8e",
+          "code_length": 27
+        },
+        {
+          "name": "sendToCompressedStream",
+          "descriptor": "([B)V",
+          "access": 4,
+          "code_sha256": "187ca19d9acc897ad5dba7bf137494b68435a73add569666e26e8c65fd084c3e",
+          "code_length": 24
+        },
+        {
+          "name": "filterAndWrite",
+          "descriptor": "([B)V",
+          "access": 1028
+        },
+        {
+          "name": "filterRowWithFilterType",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;[B[B[B)[B",
+          "access": 20,
+          "code_sha256": "984921f94937675431ea41feacd084232321d35cded379b986db01d2a07b28f3",
+          "code_length": 411
+        },
+        {
+          "name": "getRowb",
+          "descriptor": "()[B",
+          "access": 1025
+        },
+        {
+          "name": "init",
+          "descriptor": "()V",
+          "access": 20,
+          "code_sha256": "aecbc14c796705765cdcb2e7da293e4fd4d435efbdc86954833e2362c1e689f1",
+          "code_length": 17
+        },
+        {
+          "name": "initParams",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "9be4741c050a1f12763b2713da227d20071445e27722474a3559db0b13db7ca9",
+          "code_length": 80
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "889da0a99bc6dfd94c6dc9128f68fbabbf457349dcec6c8cfc0f451a41e6d457",
+          "code_length": 15
+        },
+        {
+          "name": "setDeflaterStrategy",
+          "descriptor": "(Ljava/lang/Integer;)V",
+          "access": 1,
+          "code_sha256": "d0d4b8c46560ffba50b351cda0cbea624f13f9bb68d1894b5aa765a835e92328",
+          "code_length": 9
+        },
+        {
+          "name": "setDeflaterCompLevel",
+          "descriptor": "(Ljava/lang/Integer;)V",
+          "access": 1,
+          "code_sha256": "9396efc49dd65198bf77c246ecb7b749b2e3b8d444769c596ec61cf31f51de8e",
+          "code_length": 9
+        },
+        {
+          "name": "getDeflaterCompLevel",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "64872de76ad95fb5b520ff1ed37906d0f72562aeadf8b859348e4a1f07616707",
+          "code_length": 8
+        },
+        {
+          "name": "setOs",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 17,
+          "code_sha256": "a78b9e1266ed1ee8eb4318d721eefd175828808e05cffe7faa164b6f63e48dbe",
+          "code_length": 6
+        },
+        {
+          "name": "getOs",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "3e13abf59a1ec69a9fa84d254a4e4313face627e2732ac5a62985362ad5df0cc",
+          "code_length": 5
+        },
+        {
+          "name": "getFilterType",
+          "descriptor": "()Lar/com/hjg/pngj/FilterType;",
+          "access": 17,
+          "code_sha256": "7ef8b9545aa057222dc8b359ae3f43ff371bf735b6ef752a5c0675f872c1c32f",
+          "code_length": 5
+        },
+        {
+          "name": "setFilterType",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;)V",
+          "access": 17,
+          "code_sha256": "1bb57736b0f77a682b007f4bc9151fabd6592e6b5725a07db3a28094ca7ed84c",
+          "code_length": 6
+        },
+        {
+          "name": "getCompression",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "914099b22b258e0821bdd1c3884ed191797b61ec78ec1e47f35725baf8edeaee",
+          "code_length": 22
+        },
+        {
+          "name": "setCompressorStream",
+          "descriptor": "(Lar/com/hjg/pngj/pixels/CompressorStream;)V",
+          "access": 1,
+          "code_sha256": "87ccdbdcc0599b90c044be08db4be991eafbdcdabc2f68f3d928b22f60fb564b",
+          "code_length": 6
+        },
+        {
+          "name": "getTotalBytesToWrite",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "bce8158c4a2a738fded13d136f5750842cd62bcd6fa17d37c155058db6c647fc",
+          "code_length": 8
+        },
+        {
+          "name": "isDone",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f486546c5891c43562839fa99cef1b062ccad0b57f90c60b192def8338744a0d",
+          "code_length": 20
+        },
+        {
+          "name": "getDefaultFilter",
+          "descriptor": "()Lar/com/hjg/pngj/FilterType;",
+          "access": 4,
+          "code_sha256": "f9c3ad36daf171ca635f057fad32ee3ce1caa16c110ade1a643627b96835d5b5",
+          "code_length": 78
+        },
+        {
+          "name": "getFiltersUsed",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 17,
+          "code_sha256": "f040da603ec33cb63a609654a135f627aeace52c9edf104345c44d024b6098cb",
+          "code_length": 165
+        },
+        {
+          "name": "setIdatMaxSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6f675bdf6aafc0189b4ee093beda1d37f75090c5e8236942edadcccfacdd70fc",
+          "code_length": 6
+        },
+        {
+          "name": "$SWITCH_TABLE$ar$com$hjg$pngj$FilterType",
+          "descriptor": "()[I",
+          "access": 4104,
+          "code_sha256": "fa4ba5a037625c410727ab60c27c83d131a6c358ae6ce4c495149b178153ac33",
+          "code_length": 227
+        }
+      ],
+      "class_references": [
+        "[I",
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/IDatChunkWriter",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "ar/com/hjg/pngj/pixels/CompressorStream",
+        "ar/com/hjg/pngj/pixels/CompressorStreamDeflater",
+        "ar/com/hjg/pngj/pixels/PixelsWriter",
+        "java/lang/Integer",
+        "java/lang/NoSuchFieldError",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/PixelsWriterDefault.class",
+      "occurrence": 0,
+      "sha256": "f1fd81011b465ce758d4f8f9d1e0280b313adf1cef2528245229f5c00cebbfb2",
+      "name": "ar/com/hjg/pngj/pixels/PixelsWriterDefault",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/pixels/PixelsWriter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rowb",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "rowbprev",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "rowbfilter",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "filtersPerformance",
+          "descriptor": "Lar/com/hjg/pngj/pixels/FiltersPerformance;",
+          "access": 4
+        },
+        {
+          "name": "curfilterType",
+          "descriptor": "Lar/com/hjg/pngj/FilterType;",
+          "access": 4
+        },
+        {
+          "name": "adaptMaxSkip",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "adaptSkipIncreaseSinceRow",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "adaptSkipIncreaseFactor",
+          "descriptor": "D",
+          "access": 4
+        },
+        {
+          "name": "adaptNextRow",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "e2da366d7f510ded718a3caa941a56262fdfffe20f19f0350c79d4ccc88b6a16",
+          "code_length": 23
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;[B)V",
+          "access": 1,
+          "code_sha256": "4dbf2c90a697967330dac29f71cc32c8fc386e4d011ecc022f0bbf03c8dcca07",
+          "code_length": 24
+        },
+        {
+          "name": "initParams",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "cace9bee468eebffabbc1b91a979f36da7e7e252de69da043334e2d2b5b854cc",
+          "code_length": 329
+        },
+        {
+          "name": "filterAndWrite",
+          "descriptor": "([B)V",
+          "access": 4,
+          "code_sha256": "998f10a5755224c587d1cac86e4353a1f97f0299f609eda155f7158e9d67415d",
+          "code_length": 64
+        },
+        {
+          "name": "decideCurFilterType",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "0b6b136d0e2afd0c85393d00e6538168461e4dec7100c65ab784326085499b54",
+          "code_length": 314
+        },
+        {
+          "name": "getRowb",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "f2c2b95162c22ec160e7305974cb91ee44ddfe0e1c457c800d53e1b11fed992a",
+          "code_length": 16
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b9051a61f2700a59370a98dfdce0fabf0604a60f329767f5e21172bd9343669b",
+          "code_length": 5
+        },
+        {
+          "name": "setPreferenceForNone",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "ad2451c0a0d110b4d5cd6032ef54c545fb3daef650eda080b3c81d09cad0fb1b",
+          "code_length": 9
+        },
+        {
+          "name": "tuneMemory",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "41146d031cc0eb369ae84bc251d896f422138df1d9a5dd1228332c04dddbe003",
+          "code_length": 9
+        },
+        {
+          "name": "setFilterWeights",
+          "descriptor": "([D)V",
+          "access": 1,
+          "code_sha256": "73c90ab8d2da6fcd6359f137385c2f12a8a7dfa9a3d4e75eb2fbba97c086effc",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Lar/com/hjg/pngj/FilterType;",
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance",
+        "ar/com/hjg/pngj/pixels/PixelsWriter",
+        "ar/com/hjg/pngj/pixels/PixelsWriterDefault",
+        "java/lang/Math",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/util/Arrays"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/pixels/PixelsWriterMultiple.class",
+      "occurrence": 0,
+      "sha256": "c4b1bf01a99b7b69c3ff2f2bf37940c670ef15eae8053a6b77d51b4570c4ce6f",
+      "name": "ar/com/hjg/pngj/pixels/PixelsWriterMultiple",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/pixels/PixelsWriter",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rows",
+          "descriptor": "Ljava/util/LinkedList;",
+          "access": 4,
+          "generic_signature": "Ljava/util/LinkedList<[B>;"
+        },
+        {
+          "name": "filterBank",
+          "descriptor": "[Lar/com/hjg/pngj/pixels/CompressorStream;",
+          "access": 4
+        },
+        {
+          "name": "filteredRows",
+          "descriptor": "[[B",
+          "access": 4
+        },
+        {
+          "name": "filteredRowTmp",
+          "descriptor": "[B",
+          "access": 4
+        },
+        {
+          "name": "filtersPerf",
+          "descriptor": "Lar/com/hjg/pngj/pixels/FiltersPerformance;",
+          "access": 4
+        },
+        {
+          "name": "rowsPerBand",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "rowsPerBandCurrent",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "rowInBand",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "bandNum",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "firstRowInThisBand",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "lastRowInThisBand",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "tryAdaptive",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "HINT_MEMORY_DEFAULT_KB",
+          "descriptor": "I",
+          "access": 28
+        },
+        {
+          "name": "hintMemoryKb",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "hintRowsPerBand",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "useLz4",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "6e27ae5baffd7eaa391f07edfe015e32afcbaeb85c58398f112e02a32f8da651",
+          "code_length": 126
+        },
+        {
+          "name": "filterAndWrite",
+          "descriptor": "([B)V",
+          "access": 4,
+          "code_sha256": "f7bf18ac482667d9b6c61dc92d832d19552cc018cb39080202149a51616a3cb5",
+          "code_length": 456
+        },
+        {
+          "name": "getRowb",
+          "descriptor": "()[B",
+          "access": 1,
+          "code_sha256": "0ae1450d3ddfd712c28b971438183030a3e959169a10a3528aab7064a90efe51",
+          "code_length": 12
+        },
+        {
+          "name": "setBandFromNewRown",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "78186b84b2ac56d2e329d22e8d9be8d6c689b3b0e585716da81aa16d98cb4cb0",
+          "code_length": 191
+        },
+        {
+          "name": "rebuildFiltersBank",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "f5d6924431f2926dac423424ada9521e86360c2c48980d180547c756bc6c006b",
+          "code_length": 133
+        },
+        {
+          "name": "computeInitialRowsPerBand",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "9dcd1c283bfa8b8851765d7de73d2f21f5cd4ed8c45c3a732521828c48cc4473",
+          "code_length": 121
+        },
+        {
+          "name": "getBestCompressor",
+          "descriptor": "()I",
+          "access": 2,
+          "code_sha256": "aab1a28e25b43b07de2f13c2670f9473ba5c47094e4f35169f7a457f0c9e4230",
+          "code_length": 62
+        },
+        {
+          "name": "initParams",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "879bc3f3f6e0d8e8c2c235c658ae5f6932268c3abb8cf6c9e0c2d3ff8d476f62",
+          "code_length": 124
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a55fa758b887bf5b1ec959d2ca376f2b958e541125621382d9c8fac1accefc9c",
+          "code_length": 43
+        },
+        {
+          "name": "setHintMemoryKb",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "99cf060e93b8873eeca802ad0fcefa14042f017fa14ce7f11fcefd76ae5d4cbd",
+          "code_length": 28
+        },
+        {
+          "name": "setHintRowsPerBand",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "86b4733a3587c10a3fae65207b13ec07fd794aa774c8b8c1b85ffc55e889bb83",
+          "code_length": 6
+        },
+        {
+          "name": "setUseLz4",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "6cf6350477271f094d2f11b98e9e7873952cf51889d0d5626f0fc06d66ce08c1",
+          "code_length": 6
+        },
+        {
+          "name": "getFiltersPerf",
+          "descriptor": "()Lar/com/hjg/pngj/pixels/FiltersPerformance;",
+          "access": 1,
+          "code_sha256": "81c401d3b165002f08397c47f28abed78c3b534f9c49837b7bc8614c63222be8",
+          "code_length": 5
+        },
+        {
+          "name": "setTryAdaptive",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "e07b26bc84cb04399f939d9b1dcecf2d6e991d8f9d2200e8f6be20389f064821",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "[B",
+        "[Lar/com/hjg/pngj/FilterType;",
+        "[Lar/com/hjg/pngj/pixels/CompressorStream;",
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/pixels/CompressorStream",
+        "ar/com/hjg/pngj/pixels/CompressorStreamDeflater",
+        "ar/com/hjg/pngj/pixels/CompressorStreamLz4",
+        "ar/com/hjg/pngj/pixels/FiltersPerformance",
+        "ar/com/hjg/pngj/pixels/PixelsWriter",
+        "ar/com/hjg/pngj/pixels/PixelsWriterMultiple",
+        "java/lang/Double",
+        "java/lang/RuntimeException",
+        "java/util/LinkedList",
+        "java/util/zip/Deflater"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngHelperInternal$1.class",
+      "occurrence": 0,
+      "sha256": "de3f9515023ce7d6d9fc3573af9c7a5e73a88c5e0c49934a813d608e325a9b0a",
+      "name": "ar/com/hjg/pngj/PngHelperInternal$1",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/ThreadLocal",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "initialValue",
+          "descriptor": "()Ljava/lang/Boolean;",
+          "access": 4,
+          "code_sha256": "90b8570fedac873c770bbee531c9e004504dffaebf4119784fb459d521b67666",
+          "code_length": 4
+        },
+        {
+          "name": "initialValue",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4164,
+          "code_sha256": "1a23dbd02110184ffb76bf77bcade8e415f91c0551b7cc42d21a227c3e5beeda",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Boolean;>;",
+      "class_references": [
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngHelperInternal$1",
+        "java/lang/Boolean",
+        "java/lang/ThreadLocal"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngHelperInternal.class",
+      "occurrence": 0,
+      "sha256": "9a9b0af94c47b044eb3496b1c9a3f9ede3c190e92452aa4c06f6fe5b58eee40c",
+      "name": "ar/com/hjg/pngj/PngHelperInternal",
+      "major": 50,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "KEY_LOGGER",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "LOGGER",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 25
+        },
+        {
+          "name": "charsetLatin1name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 9
+        },
+        {
+          "name": "charsetLatin1",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 9
+        },
+        {
+          "name": "charsetUTF8name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 9
+        },
+        {
+          "name": "charsetUTF8",
+          "descriptor": "Ljava/nio/charset/Charset;",
+          "access": 9
+        },
+        {
+          "name": "DEBUG",
+          "descriptor": "Ljava/lang/ThreadLocal;",
+          "access": 10,
+          "generic_signature": "Ljava/lang/ThreadLocal<Ljava/lang/Boolean;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getPngIdSignature",
+          "descriptor": "()[B",
+          "access": 9,
+          "code_sha256": "5e6149643b93350a65a80f81a63db01d422261aaf338f47b3b1c46f6c7e9ebe1",
+          "code_length": 47
+        },
+        {
+          "name": "doubleToInt100000",
+          "descriptor": "(D)I",
+          "access": 9,
+          "code_sha256": "2152656a41029a1bd5ae7d6376b2890c3f52e5f746f155f46afbea72397c3156",
+          "code_length": 11
+        },
+        {
+          "name": "intToDouble100000",
+          "descriptor": "(I)D",
+          "access": 9,
+          "code_sha256": "de2e3b38c5d06edc8dee18cf7e8ff03b5f37622b8748ba4fbe2d57d33c7cf208",
+          "code_length": 7
+        },
+        {
+          "name": "readByte",
+          "descriptor": "(Ljava/io/InputStream;)I",
+          "access": 9,
+          "code_sha256": "ca0eeff97942b70b5e184ec82ec58efb0d14cec25b870eeb887c672052042fe3",
+          "code_length": 17
+        },
+        {
+          "name": "readInt2",
+          "descriptor": "(Ljava/io/InputStream;)I",
+          "access": 9,
+          "code_sha256": "144b2625dfe7f93bdc5ff0085df67d8b2669fbb907c1e3414a033c4bdc4e10e9",
+          "code_length": 41
+        },
+        {
+          "name": "readInt4",
+          "descriptor": "(Ljava/io/InputStream;)I",
+          "access": 9,
+          "code_sha256": "2da8c4554bd7bb2c45759c8f4d23bf2549d9b912108726f7dd29d378a19a5164",
+          "code_length": 74
+        },
+        {
+          "name": "readInt1fromByte",
+          "descriptor": "([BI)I",
+          "access": 9,
+          "code_sha256": "6fed19ea313fceb63c6464fcf8bfe98f36572886067443dd30046c3e2867ab64",
+          "code_length": 8
+        },
+        {
+          "name": "readInt2fromBytes",
+          "descriptor": "([BI)I",
+          "access": 9,
+          "code_sha256": "6a02a5f5c1733429f858597efca913a60d32ffa8ec10a7263c50a55c1e66d4d0",
+          "code_length": 21
+        },
+        {
+          "name": "readInt4fromBytes",
+          "descriptor": "([BI)I",
+          "access": 25,
+          "code_sha256": "1c12c3173ddf21f10ad291f4f2b244b99e095bc559f0771b77a5e1a98f9127f5",
+          "code_length": 47
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(Ljava/io/OutputStream;B)V",
+          "access": 9,
+          "code_sha256": "c246d5ae3f9c0f87e87a562d80c2f7ede7d1bc5dbdfa89c9e0da77a800202665",
+          "code_length": 19
+        },
+        {
+          "name": "writeByte",
+          "descriptor": "(Ljava/io/OutputStream;[B)V",
+          "access": 9,
+          "code_sha256": "c57faa0e9ac5900b43a0e2cb6dca7b890f5ad1077e1b7208bfcde014cf5be749",
+          "code_length": 19
+        },
+        {
+          "name": "writeInt2",
+          "descriptor": "(Ljava/io/OutputStream;I)V",
+          "access": 9,
+          "code_sha256": "dcf0996169e52d95eb779162ebf503f7666591ecdb0e8f1ce5b8b1554d04335d",
+          "code_length": 31
+        },
+        {
+          "name": "writeInt4",
+          "descriptor": "(Ljava/io/OutputStream;I)V",
+          "access": 9,
+          "code_sha256": "779b059734d7e63896cac1d7d8a2e557b5e06b0a29c4185cf0feb1bfa466face",
+          "code_length": 16
+        },
+        {
+          "name": "writeInt2tobytes",
+          "descriptor": "(I[BI)V",
+          "access": 9,
+          "code_sha256": "e69c371a3a1cad4ae09dedb2c10bb9fda1c5b557cc8976767922c746c35b3568",
+          "code_length": 24
+        },
+        {
+          "name": "writeInt4tobytes",
+          "descriptor": "(I[BI)V",
+          "access": 9,
+          "code_sha256": "cef66370ade217f97980e7a7ac4611bf160c90aecdcff33868f04f4762e34551",
+          "code_length": 52
+        },
+        {
+          "name": "readBytes",
+          "descriptor": "(Ljava/io/InputStream;[BII)V",
+          "access": 9,
+          "code_sha256": "0f95f2671e69ccced84058b1359cf4b282ce5fd46f10b77c901b0e6525291c51",
+          "code_length": 100
+        },
+        {
+          "name": "skipBytes",
+          "descriptor": "(Ljava/io/InputStream;J)V",
+          "access": 9,
+          "code_sha256": "0668a93e1b1d3163f3fca9480aa605707b9aee8f2613409a8e3e04c6fc3706e4",
+          "code_length": 76
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Ljava/io/OutputStream;[B)V",
+          "access": 9,
+          "code_sha256": "c57faa0e9ac5900b43a0e2cb6dca7b890f5ad1077e1b7208bfcde014cf5be749",
+          "code_length": 19
+        },
+        {
+          "name": "writeBytes",
+          "descriptor": "(Ljava/io/OutputStream;[BII)V",
+          "access": 9,
+          "code_sha256": "d2c2fe4581b769a581fe64b2eec46121872d9778b690c87f9cd5303de8b3eff1",
+          "code_length": 23
+        },
+        {
+          "name": "logdebug",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "752737fdda711fb8548ce4fff48122bea19c57135649a986016b334312798a0b",
+          "code_length": 32
+        },
+        {
+          "name": "filterRowNone",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "8fa1d0cedf5ac26de18e143993f80c5aeb2f6ed71f98d1b985c7721f27a0c581",
+          "code_length": 6
+        },
+        {
+          "name": "filterRowSub",
+          "descriptor": "(II)I",
+          "access": 9,
+          "code_sha256": "b628a998ab5dace94baede7b75f0afcf3be58ba74cf66107aef0f671d97d7705",
+          "code_length": 8
+        },
+        {
+          "name": "filterRowUp",
+          "descriptor": "(II)I",
+          "access": 9,
+          "code_sha256": "b628a998ab5dace94baede7b75f0afcf3be58ba74cf66107aef0f671d97d7705",
+          "code_length": 8
+        },
+        {
+          "name": "filterRowAverage",
+          "descriptor": "(III)I",
+          "access": 9,
+          "code_sha256": "21369ac04c3b33c65f6a2a63b58c2a6480df4d546849925a69fec81c9ab37c28",
+          "code_length": 12
+        },
+        {
+          "name": "filterRowPaeth",
+          "descriptor": "(IIII)I",
+          "access": 9,
+          "code_sha256": "e2b14800d549a3f5c4cc1d65bf2ac8487092e674cbbaeb4145ae0e051f46a166",
+          "code_length": 13
+        },
+        {
+          "name": "filterPaethPredictor",
+          "descriptor": "(III)I",
+          "access": 24,
+          "code_sha256": "f884b43cbaf3ae22a4f899b895e46a71e7bb27ccaf4e7831ecaa81f967a7abed",
+          "code_length": 81
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;)V",
+          "access": 9,
+          "code_sha256": "f256e32ca200485e64ea454a90ec94564c3f4b5244f6d513fcd5eaa4ea874c6d",
+          "code_length": 7
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;I)V",
+          "access": 8,
+          "code_sha256": "b01fdcb77a861876f50529b2dc27152bf00df5b66759fbf5b7e91709c230add1",
+          "code_length": 7
+        },
+        {
+          "name": "istreamFromFile",
+          "descriptor": "(Ljava/io/File;)Ljava/io/InputStream;",
+          "access": 9,
+          "code_sha256": "c304c12d72c74bc73bce92c6400889112c0f9efe90673accd21de58bb8dac9e0",
+          "code_length": 43
+        },
+        {
+          "name": "ostreamFromFile",
+          "descriptor": "(Ljava/io/File;)Ljava/io/OutputStream;",
+          "access": 8,
+          "code_sha256": "6175445665df70655951f1671e4488e41e743cf7bf6cc9d142824be8f9d79f94",
+          "code_length": 6
+        },
+        {
+          "name": "ostreamFromFile",
+          "descriptor": "(Ljava/io/File;Z)Ljava/io/OutputStream;",
+          "access": 8,
+          "code_sha256": "b9323df27a125ce0d6940c53beac222fc54fc5ae912e339a978080543b34ba74",
+          "code_length": 6
+        },
+        {
+          "name": "debug",
+          "descriptor": "(Ljava/lang/Object;IZ)V",
+          "access": 8,
+          "code_sha256": "ec1a880d3f14421ca324801f73a97aff279a24a38a1a5a212456fb9be6aaac2f",
+          "code_length": 111
+        },
+        {
+          "name": "setDebug",
+          "descriptor": "(Z)V",
+          "access": 9,
+          "code_sha256": "2a10b1cdfa7b51ef4343bebd3a35c2c2a637be92d43628a049a91a39d971cad7",
+          "code_length": 11
+        },
+        {
+          "name": "isDebug",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "98ae75e527d2efac797890929ca232a5d72da93e7f70cc3dffab40c1aa242cd0",
+          "code_length": 13
+        },
+        {
+          "name": "getDigest",
+          "descriptor": "(Lar/com/hjg/pngj/PngReader;)J",
+          "access": 9,
+          "code_sha256": "f3588af8cbb4c4943d87dce6de04b5b9671d84aa1905e05f63cad11eb830b12f",
+          "code_length": 5
+        },
+        {
+          "name": "initCrcForTests",
+          "descriptor": "(Lar/com/hjg/pngj/PngReader;)V",
+          "access": 9,
+          "code_sha256": "476b0ab85d9a4e376d1bcbed5cfedbbd599e519be18f630f51b9ce3c145de6b4",
+          "code_length": 5
+        },
+        {
+          "name": "getRawIdatBytes",
+          "descriptor": "(Lar/com/hjg/pngj/PngReader;)J",
+          "access": 9,
+          "code_sha256": "09410c85979c272afda2ac5f2e77556a69a79d85df0c1b2a00f33580ce932f0b",
+          "code_length": 28
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "d16c735db15c35dffd96d8ef275e610994b2aba91c37c9841cb228d5a1f0e10e",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/Deinterlacer",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngHelperInternal$1",
+        "ar/com/hjg/pngj/PngHelperInternal2",
+        "ar/com/hjg/pngj/PngReader",
+        "ar/com/hjg/pngj/PngjInputException",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "java/io/FileInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/io/PrintStream",
+        "java/lang/Boolean",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StackTraceElement",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/ThreadLocal",
+        "java/nio/charset/Charset",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngHelperInternal2.class",
+      "occurrence": 0,
+      "sha256": "8a7dcfa03a69acf813460619cfd223c276f52c7440c8897dad554308804fe937",
+      "name": "ar/com/hjg/pngj/PngHelperInternal2",
+      "major": 50,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "ostreamFromFile",
+          "descriptor": "(Ljava/io/File;Z)Ljava/io/OutputStream;",
+          "access": 8,
+          "code_sha256": "a7259957b3b58746aef2776c91a4bce1c6a0a337119ef9a6901aaab7bbc78844",
+          "code_length": 83
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngHelperInternal2",
+        "ar/com/hjg/pngj/PngjInputException",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "java/io/File",
+        "java/io/FileOutputStream",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjBadCrcException.class",
+      "occurrence": 0,
+      "sha256": "d4101de68d648ad56ee4eba6bb6ebddea5169955e22e9c88888279bc3378807c",
+      "name": "ar/com/hjg/pngj/PngjBadCrcException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngjInputException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjBadCrcException",
+        "ar/com/hjg/pngj/PngjInputException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjException.class",
+      "occurrence": 0,
+      "sha256": "d79973fb21670b8f845f0cb103bbd4a9fe1657810aafed45c629a95ac68cca1e",
+      "name": "ar/com/hjg/pngj/PngjException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjExceptionInternal.class",
+      "occurrence": 0,
+      "sha256": "ae22c75ca6b6d0102734cb5f6e9cf55dc361d113497d2927235b1aa09aa817a1",
+      "name": "ar/com/hjg/pngj/PngjExceptionInternal",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjExceptionInternal",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjInputException.class",
+      "occurrence": 0,
+      "sha256": "8c2f766d76c5394984ed9e4560ea18793c31b3ee941444a33ef9977a094cd4f5",
+      "name": "ar/com/hjg/pngj/PngjInputException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngjException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjException",
+        "ar/com/hjg/pngj/PngjInputException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjOutputException.class",
+      "occurrence": 0,
+      "sha256": "547438c1871792009d9fd46cb7795efaf16c3ff108a80609b3df64c55dd541ef",
+      "name": "ar/com/hjg/pngj/PngjOutputException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngjException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "c9756504eb86647f17f7c3673eb5662a089d87ac1c9f04fe03905f8ecfdc73df",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjException",
+        "ar/com/hjg/pngj/PngjOutputException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngjUnsupportedException.class",
+      "occurrence": 0,
+      "sha256": "82c42e5fbc52144a1decf00381c3c86007589f960463ab1fcdfec0b5ad992fe0",
+      "name": "ar/com/hjg/pngj/PngjUnsupportedException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/PngjUnsupportedException",
+        "java/lang/RuntimeException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReader.class",
+      "occurrence": 0,
+      "sha256": "c0efcdcd82e89f94dc6e0cb0c1571ecab4673d7f62569f32add453a43c8a83ff",
+      "name": "ar/com/hjg/pngj/PngReader",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "MAX_TOTAL_BYTES_READ_DEFAULT",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "MAX_BYTES_METADATA_DEFAULT",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "MAX_CHUNK_SIZE_SKIP",
+          "descriptor": "J",
+          "access": 25
+        },
+        {
+          "name": "imgInfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 17
+        },
+        {
+          "name": "interlaced",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "chunkseq",
+          "descriptor": "Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 20
+        },
+        {
+          "name": "streamFeeder",
+          "descriptor": "Lar/com/hjg/pngj/BufferedStreamFeeder;",
+          "access": 20
+        },
+        {
+          "name": "metadata",
+          "descriptor": "Lar/com/hjg/pngj/chunks/PngMetadata;",
+          "access": 20
+        },
+        {
+          "name": "rowNum",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "imlinesSet",
+          "descriptor": "Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 4,
+          "generic_signature": "Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "imageLineSetFactory",
+          "descriptor": "Lar/com/hjg/pngj/IImageLineSetFactory;",
+          "access": 2,
+          "generic_signature": "Lar/com/hjg/pngj/IImageLineSetFactory<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "idatCrca",
+          "descriptor": "Ljava/util/zip/CRC32;",
+          "access": 0
+        },
+        {
+          "name": "idatCrcb",
+          "descriptor": "Ljava/util/zip/Adler32;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "a572b843a556f0f3eeef3463c6940e4a5d2b6cffa6b13d4a70d26580227bd7f7",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Z)V",
+          "access": 1,
+          "code_sha256": "4a69a3c296a8efb55550e78cf42c79a782291bb78172735e07db4753dc0e06d4",
+          "code_length": 191
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "3ab9dfa3c78853fa2d8b9841c6c5b06bb0df72b4e97d1946fb9108764c972d27",
+          "code_length": 10
+        },
+        {
+          "name": "readFirstChunks",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "2d6c7ab031f044302954a709a314c6d180c4b27dee95645f9164856818f2fd36",
+          "code_length": 36
+        },
+        {
+          "name": "setChunkLoadBehaviour",
+          "descriptor": "(Lar/com/hjg/pngj/chunks/ChunkLoadBehaviour;)V",
+          "access": 1,
+          "code_sha256": "20ae6be9fcac3eb05764b88a855eaaa89d09193d91216ec0bd253a65752496dc",
+          "code_length": 9
+        },
+        {
+          "name": "getChunksList",
+          "descriptor": "()Lar/com/hjg/pngj/chunks/ChunksList;",
+          "access": 1,
+          "code_sha256": "be4fd6f585f4b50436901fea3acdc8abf9601dce9b8dffb1629cba52fb3a5d11",
+          "code_length": 6
+        },
+        {
+          "name": "getChunksList",
+          "descriptor": "(Z)Lar/com/hjg/pngj/chunks/ChunksList;",
+          "access": 1,
+          "code_sha256": "5b90cd868d60ed2fc038d0e94b1bc59a58326bef1d1f54682683d76965d0aa1d",
+          "code_length": 26
+        },
+        {
+          "name": "getCurrentChunkGroup",
+          "descriptor": "()I",
+          "access": 0,
+          "code_sha256": "6701b73edefa853567a02d3be28240ed018e56e46b3040753309bbd798613d81",
+          "code_length": 8
+        },
+        {
+          "name": "getMetadata",
+          "descriptor": "()Lar/com/hjg/pngj/chunks/PngMetadata;",
+          "access": 1,
+          "code_sha256": "366dd452d940ba5742118108d2d2caeece5c7de75a602e43ad84bb8c139db108",
+          "code_length": 19
+        },
+        {
+          "name": "readRow",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "b5790e8f6670f9228eb8baa76fa890fe2655581d8753aec1af4c3299be697b57",
+          "code_length": 11
+        },
+        {
+          "name": "hasMoreRows",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "4bb44ec7b635636683211456eb8e472de4f95954aa30f2399794d751c6119034",
+          "code_length": 22
+        },
+        {
+          "name": "readRow",
+          "descriptor": "(I)Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "ed38d55d9a7e9814041e176d80c1610bec2443d742d308f90f8bc0a6502534d9",
+          "code_length": 291
+        },
+        {
+          "name": "readRows",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 1,
+          "code_sha256": "0cd61536bc3ec63de2ff24beb48517eaa6dcee0b2f19d227c74c4bfb229c1a30",
+          "code_length": 14,
+          "generic_signature": "()Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "readRows",
+          "descriptor": "(III)Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 1,
+          "code_sha256": "22263a7d6ea6203dbfd8fcfaef68b584b3f5479b1479eb7d61d0173f661edf59",
+          "code_length": 312,
+          "generic_signature": "(III)Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "setLineSetFactory",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLineSetFactory;)V",
+          "access": 1,
+          "code_sha256": "c6d274a67b9390c29e3c8235f2736cd5f380c55038436acbc5a73e4b92e3da86",
+          "code_length": 6,
+          "generic_signature": "(Lar/com/hjg/pngj/IImageLineSetFactory<+Lar/com/hjg/pngj/IImageLine;>;)V"
+        },
+        {
+          "name": "createLineSet",
+          "descriptor": "(ZIII)Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 4,
+          "code_sha256": "8089de1750d4427fc7635d7580cf75f65849c02cf0d424e74cbd6a7e80355d69",
+          "code_length": 19,
+          "generic_signature": "(ZIII)Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "loadAllInterlaced",
+          "descriptor": "(III)V",
+          "access": 4,
+          "code_sha256": "d299c332a00873ce309976869cbae07b4f79b95c734b639600b3e6e20431b226",
+          "code_length": 235
+        },
+        {
+          "name": "readSkippingAllRows",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6ddbd0528f31a783de572e90557d7f755bd20ef34ec9f88aaadf2d1ee5f3878c",
+          "code_length": 37
+        },
+        {
+          "name": "setMaxTotalBytesRead",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "f95e98c187cd251e2387197b781bde0ddcf13d0cfe3a13679b3814d50fee46b2",
+          "code_length": 9
+        },
+        {
+          "name": "setMaxBytesMetadata",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "21e6bf775a47e2957b8fc132c4029dea0e5960415f4f4af90463d62026dfbf43",
+          "code_length": 9
+        },
+        {
+          "name": "setSkipChunkMaxSize",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "a65aafa8c1c7604e6b9383bcb56b56ced629535d5e60dc1747daf1af01a69838",
+          "code_length": 9
+        },
+        {
+          "name": "setChunksToSkip",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 129,
+          "code_sha256": "e74ba588c57c02de61364c4acd7ff19cf60c8333a85a91ccfef3a10fe90079ca",
+          "code_length": 9
+        },
+        {
+          "name": "addChunkToSkip",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9f63e3caba3d36e25f86da5b050fd2d9a0ad9e059028ad0e66bd8e36be71b8b1",
+          "code_length": 9
+        },
+        {
+          "name": "dontSkipChunk",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f4125cc5e66b24653e22e34e2b6a52a6ae52c5354cd4e2db0662891518419432",
+          "code_length": 9
+        },
+        {
+          "name": "setShouldCloseStream",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "f879ee7db3281669a3ec4b13385e00da1b1a96390993e7e134534400ca4e6832",
+          "code_length": 9
+        },
+        {
+          "name": "end",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "1fb0b3ea1669b228d4cb26aa45839d3f0a7b864b30e83811cf42e1b8954cd1fd",
+          "code_length": 89
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "28fe7a68bd06278d978f4dfecc72baa8af10fa2c06bb25e6fbe6eee40b434e84",
+          "code_length": 61
+        },
+        {
+          "name": "isInterlaced",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "0444c148c33d0a5fcdd7611423c76c9593fda8461d10034848ff0d1c1ff22193",
+          "code_length": 5
+        },
+        {
+          "name": "setCrcCheckDisabled",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "914e07b091114803f60adc85d5b8e53f521842abc68f4e9a57bb8908b2a79477",
+          "code_length": 9
+        },
+        {
+          "name": "getChunkseq",
+          "descriptor": "()Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 1,
+          "code_sha256": "b2e08cdc9daefc1804beba6325d79da5b11a0f54acbfd4dd233b1c223b1821c6",
+          "code_length": 5
+        },
+        {
+          "name": "createChunkSeqReader",
+          "descriptor": "()Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 4,
+          "code_sha256": "eb7a6b6fe6e3d25d8ee45b46e98506305fbabab667e6932f653071bce462cb62",
+          "code_length": 9
+        },
+        {
+          "name": "prepareSimpleDigestComputation",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "4323b668eeeb025eea420248fde38a765395072a9de63ee2d1070d7b1d19378f",
+          "code_length": 83
+        },
+        {
+          "name": "getSimpleDigest",
+          "descriptor": "()J",
+          "access": 0,
+          "code_sha256": "30b1ecb79f3a20ddc698a661542e5cf272de5d880f1b753a60f35486cde39983",
+          "code_length": 28
+        },
+        {
+          "name": "getSimpleDigestHex",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "46728ae8bf353bc494d32f444376a365b2cb7b0f1e3790ac4bc0fd54fcb9c1ad",
+          "code_length": 20
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "14b93e8c1ead976e449f4f224261ee0c9ecec1084aed853e7c9a17fe13dd0e03",
+          "code_length": 33
+        },
+        {
+          "name": "toStringCompact",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9f018c3cf37d62d6ef7782fbac4297a1c68d87ebf7ccaff83a56b9bc2c226cd1",
+          "code_length": 38
+        },
+        {
+          "name": "getImgInfo",
+          "descriptor": "()Lar/com/hjg/pngj/ImageInfo;",
+          "access": 1,
+          "code_sha256": "0eec0060b32fcb98482ec72288809eca9f97fb43dc33cd581f87ed7b3ed00525",
+          "code_length": 5
+        },
+        {
+          "name": "getCurImgInfo",
+          "descriptor": "()Lar/com/hjg/pngj/ImageInfo;",
+          "access": 1,
+          "code_sha256": "97dae25a34bfc631eac2b87f1c2506e04ea3447f7dd06c4019c324e81b26dd46",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/BufferedStreamFeeder",
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/IImageLine",
+        "ar/com/hjg/pngj/IImageLineSet",
+        "ar/com/hjg/pngj/IImageLineSetFactory",
+        "ar/com/hjg/pngj/IdatSet",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/ImageLineSetDefault",
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngReader",
+        "ar/com/hjg/pngj/PngjInputException",
+        "ar/com/hjg/pngj/RowInfo",
+        "ar/com/hjg/pngj/chunks/ChunksList",
+        "ar/com/hjg/pngj/chunks/PngChunkFCTL",
+        "ar/com/hjg/pngj/chunks/PngChunkFDAT",
+        "ar/com/hjg/pngj/chunks/PngChunkIDAT",
+        "ar/com/hjg/pngj/chunks/PngMetadata",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/logging/Logger",
+        "java/util/zip/Adler32",
+        "java/util/zip/CRC32",
+        "java/util/zip/Checksum"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderApng$1.class",
+      "occurrence": 0,
+      "sha256": "5e3c81e97f2beda2cdedd2c57f5ab898cf8b4fe8e7896a9478e9cea92d0bb997",
+      "name": "ar/com/hjg/pngj/PngReaderApng$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "ar/com/hjg/pngj/ChunkSeqReaderPng",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lar/com/hjg/pngj/PngReaderApng;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/PngReaderApng;Z)V",
+          "access": 0,
+          "code_sha256": "99e95681580398a1b8ec18b9b25a6b8bd3a3111b3d00366300aa99310f54767d",
+          "code_length": 11
+        },
+        {
+          "name": "shouldSkipContent",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "461b9c3b660f8edbba9579f17e0fe16802e912d742d5020c254603ba86bdae78",
+          "code_length": 7
+        },
+        {
+          "name": "isIdatKind",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "f36e337c1d5e8be33fac1806b39e9753b923c658a7a02239c06a7e40d73fd18c",
+          "code_length": 24
+        },
+        {
+          "name": "createIdatSet",
+          "descriptor": "(Ljava/lang/String;)Lar/com/hjg/pngj/DeflatedChunksSet;",
+          "access": 4,
+          "code_sha256": "8133b7f1cbad90070ba33ae7c50b871da976f6482995377b97a4b8e3671c5a52",
+          "code_length": 27
+        },
+        {
+          "name": "startNewChunk",
+          "descriptor": "(ILjava/lang/String;J)V",
+          "access": 4,
+          "code_sha256": "efef0b911c1de5ebc602b838a1fe0997aad8ea05e926300a00f8ff99f1be9691",
+          "code_length": 8
+        },
+        {
+          "name": "postProcessChunk",
+          "descriptor": "(Lar/com/hjg/pngj/ChunkReader;)V",
+          "access": 4,
+          "code_sha256": "4830b67aa5be167f7dc6c61d7e8a053be528266223085250cc527987ad610c84",
+          "code_length": 126
+        },
+        {
+          "name": "countChunkTypeAsAncillary",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "8eb8e14011ec31cdaa268bc9140ae3d4b6e4769835f4da54def7fa29cd78f0eb",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/ChunkReader",
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/IdatSet",
+        "ar/com/hjg/pngj/PngReaderApng",
+        "ar/com/hjg/pngj/PngReaderApng$1",
+        "ar/com/hjg/pngj/PngjInputException",
+        "ar/com/hjg/pngj/chunks/ChunkRaw",
+        "ar/com/hjg/pngj/chunks/PngChunkFCTL",
+        "ar/com/hjg/pngj/chunks/PngChunkFDAT",
+        "ar/com/hjg/pngj/chunks/PngChunkIDAT",
+        "java/lang/Boolean",
+        "java/lang/String",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderApng.class",
+      "occurrence": 0,
+      "sha256": "0a9bbdfcc0834db1d0a840337a3300e59cd8422e2616056bf9a604909a17bcfb",
+      "name": "ar/com/hjg/pngj/PngReaderApng",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngReaderByte",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "apngKind",
+          "descriptor": "Ljava/lang/Boolean;",
+          "access": 2
+        },
+        {
+          "name": "firsIdatApngFrame",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "actlChunk",
+          "descriptor": "Lar/com/hjg/pngj/chunks/PngChunkACTL;",
+          "access": 4
+        },
+        {
+          "name": "fctlChunk",
+          "descriptor": "Lar/com/hjg/pngj/chunks/PngChunkFCTL;",
+          "access": 2
+        },
+        {
+          "name": "frameNum",
+          "descriptor": "I",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "8f2d5de82c888fcccc1050f602c6e0603b8dec41364070269ee19cd6312329b7",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "403732ae7e5383461659113252fef4f968e3e9132942dfcc92fd76d58c022ed5",
+          "code_length": 27
+        },
+        {
+          "name": "isApng",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "85a6813bb2b28d0754be518f6be500abb2d18f7e41d231663d02f3452b1e681a",
+          "code_length": 66
+        },
+        {
+          "name": "advanceToFrame",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "198a912bb893ed6ebd8fd355b534a991451b32fb1077c8d91ebb8af209d692c6",
+          "code_length": 253
+        },
+        {
+          "name": "hasExtraStillImage",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d5d2e8051f34b6ef7b0cb4dfbdab27544c54a679b319caad4cc8fbae78726b69",
+          "code_length": 20
+        },
+        {
+          "name": "getApngNumFrames",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9ceab8c8a467ea2765ede8f4c7838cb7d06d12f85845dafd15d7c5508efa478c",
+          "code_length": 17
+        },
+        {
+          "name": "getApngNumPlays",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e5ee4049b7fee0d6e9c3070e33f34a3b0898c1c248f07bb449ef00347ebb6790",
+          "code_length": 17
+        },
+        {
+          "name": "readRow",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "283393e128247462f2c5ffb3e6fa30460e9ba79225a0c8ac5193d99bc6028b0e",
+          "code_length": 5
+        },
+        {
+          "name": "hasMoreRows",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "ba405b1ac6abf0ef660870c5752060eaa148b78c69065ccdcc2a0429dd334503",
+          "code_length": 5
+        },
+        {
+          "name": "readRow",
+          "descriptor": "(I)Lar/com/hjg/pngj/IImageLine;",
+          "access": 1,
+          "code_sha256": "2fe04db887eaaab40111fa7289b832919e143344438811bba4914c4366b1ed4a",
+          "code_length": 6
+        },
+        {
+          "name": "readRows",
+          "descriptor": "()Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 1,
+          "code_sha256": "22d366e94885ce6419e65edc60f0d68dafaa279124d78604a42343ec7ac4fcfb",
+          "code_length": 5,
+          "generic_signature": "()Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "readRows",
+          "descriptor": "(III)Lar/com/hjg/pngj/IImageLineSet;",
+          "access": 1,
+          "code_sha256": "e7e01c38e93816dfda90260867efd83c55b8c4d6b6e3ba81cc955fcb8758017c",
+          "code_length": 8,
+          "generic_signature": "(III)Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;"
+        },
+        {
+          "name": "readSkippingAllRows",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "810b1a9d8403434379bd11f0c35dca4fc60749a82d9c1c98716bc0979e7167f3",
+          "code_length": 5
+        },
+        {
+          "name": "createChunkSeqReader",
+          "descriptor": "()Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 4,
+          "code_sha256": "9c23c13d9acc1074624cec0d17c3f6cbf4fe4739677a2d238b32a52e417ae11e",
+          "code_length": 12
+        },
+        {
+          "name": "getFrameNum",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4e87c9fe351fd630631b8c2c11fde4a77d4cbc7a34bda59eecb5686ec0a54d34",
+          "code_length": 5
+        },
+        {
+          "name": "end",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "97d39a890676699cfe6eae187bc22a7e7a942343e8d8d588c05847f6391d025d",
+          "code_length": 5
+        },
+        {
+          "name": "getFctl",
+          "descriptor": "()Lar/com/hjg/pngj/chunks/PngChunkFCTL;",
+          "access": 1,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "access$002",
+          "descriptor": "(Lar/com/hjg/pngj/PngReaderApng;Lar/com/hjg/pngj/chunks/PngChunkFCTL;)Lar/com/hjg/pngj/chunks/PngChunkFCTL;",
+          "access": 4104,
+          "code_sha256": "218a5cdfcd4db8ebaf9f44f86cc7541d57127f3eccfdb633d942bda4a6ac7bbc",
+          "code_length": 7
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lar/com/hjg/pngj/PngReaderApng;)Lar/com/hjg/pngj/chunks/PngChunkFCTL;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/BufferedStreamFeeder",
+        "ar/com/hjg/pngj/ChunkReader",
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/IdatSet",
+        "ar/com/hjg/pngj/PngReaderApng",
+        "ar/com/hjg/pngj/PngReaderApng$1",
+        "ar/com/hjg/pngj/PngReaderByte",
+        "ar/com/hjg/pngj/PngjInputException",
+        "ar/com/hjg/pngj/chunks/ChunksList",
+        "ar/com/hjg/pngj/chunks/PngChunkACTL",
+        "ar/com/hjg/pngj/chunks/PngChunkFCTL",
+        "ar/com/hjg/pngj/chunks/PngChunkFDAT",
+        "ar/com/hjg/pngj/chunks/PngChunkIDAT",
+        "java/lang/Boolean",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderByte.class",
+      "occurrence": 0,
+      "sha256": "a565b9de3579221804f0a150bd140cffa88080151ab1487e7f7c00d825088957",
+      "name": "ar/com/hjg/pngj/PngReaderByte",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngReader",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "53688e43187128e149039d2047061356a730bd955ac9eba9f94e1f5e51d5fd00",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "663a412f3fa2f4b6611bb46b440cc5a75d29a50744921212426e56e3f76d43c6",
+          "code_length": 13
+        },
+        {
+          "name": "readRowByte",
+          "descriptor": "()Lar/com/hjg/pngj/ImageLineByte;",
+          "access": 1,
+          "code_sha256": "b76b8c224c673d20841095319a04fa0acc0b01828f73b59be3c12abc921195fd",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/ImageLineByte",
+        "ar/com/hjg/pngj/ImageLineSetDefault",
+        "ar/com/hjg/pngj/PngReader",
+        "ar/com/hjg/pngj/PngReaderByte"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderFilter$1.class",
+      "occurrence": 0,
+      "sha256": "f09ca9f2f8058d25518079a0947bbb3db75b807c2ce494475a84aac5d844ea6f",
+      "name": "ar/com/hjg/pngj/PngReaderFilter$1",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "ar/com/hjg/pngj/ChunkSeqReaderPng",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$0",
+          "descriptor": "Lar/com/hjg/pngj/PngReaderFilter;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/PngReaderFilter;Z)V",
+          "access": 0,
+          "code_sha256": "99e95681580398a1b8ec18b9b25a6b8bd3a3111b3d00366300aa99310f54767d",
+          "code_length": 11
+        },
+        {
+          "name": "shouldSkipContent",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "844526e8ade4366674a012b630e6c05774708f5a6fb0adc92b3c35387d40fef7",
+          "code_length": 24
+        },
+        {
+          "name": "shouldCheckCrc",
+          "descriptor": "(ILjava/lang/String;)Z",
+          "access": 4,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "postProcessChunk",
+          "descriptor": "(Lar/com/hjg/pngj/ChunkReader;)V",
+          "access": 4,
+          "code_sha256": "aa39b0556b09d563fc6c75fdf278c9047f7f08b846d8c6de20a35468445bcc11",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/PngReaderFilter",
+        "ar/com/hjg/pngj/PngReaderFilter$1",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderFilter.class",
+      "occurrence": 0,
+      "sha256": "c496b3101342af91078467560562820b2b9537d2002521aa6c3a8ea37ff4c530",
+      "name": "ar/com/hjg/pngj/PngReaderFilter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/FilterInputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "chunkseq",
+          "descriptor": "Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "a31cc031ede2dcc12002b539e9167f1ae290a44417a100df594c6b76bafc5369",
+          "code_length": 14
+        },
+        {
+          "name": "createChunkSequenceReader",
+          "descriptor": "()Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 4,
+          "code_sha256": "ae0f2a97be40b8dd5c057fd69832c91f1c2d9959791af8d7d6e4c2e57ba40f8f",
+          "code_length": 10
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3f78ca8ae8643295905bb5b04056a4015fa46aafffb30996ca5e2adb29b76992",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "050f8aeca9635c0df7d16b38ce2229b8d3c1f7c5114cd7fcf18a850a3ba34c26",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([BII)I",
+          "access": 1,
+          "code_sha256": "ec4593fa981a86d432dffbd35fb9d5fbcbd7ccb826031f73cc6cfa0e653531a6",
+          "code_length": 29,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "read",
+          "descriptor": "([B)I",
+          "access": 1,
+          "code_sha256": "a547ad0e9ae38b888e55f500e89cfdc65b7a8a69e74efb8d30d95cf8e16f1dd3",
+          "code_length": 23,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readUntilEndAndClose",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e50fa3532e52df7a27db81c6beef1e06997eb3e29d8f3ee5a7f16fc7000b6b03",
+          "code_length": 46,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getChunksList",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "9187cf7d53de0d68abf5168c2286d1dc9a47e0ca47b487aa9f2bdd42c39d2ebb",
+          "code_length": 8,
+          "generic_signature": "()Ljava/util/List<Lar/com/hjg/pngj/chunks/PngChunk;>;"
+        },
+        {
+          "name": "getChunkseq",
+          "descriptor": "()Lar/com/hjg/pngj/ChunkSeqReaderPng;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/BufferedStreamFeeder",
+        "ar/com/hjg/pngj/ChunkSeqReaderPng",
+        "ar/com/hjg/pngj/PngReaderFilter",
+        "ar/com/hjg/pngj/PngReaderFilter$1",
+        "java/io/FilterInputStream",
+        "java/io/IOException"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngReaderInt.class",
+      "occurrence": 0,
+      "sha256": "651ada838e53cf6b021b61098e8d9befb8e9729a5665294193044c492618cb59",
+      "name": "ar/com/hjg/pngj/PngReaderInt",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngReader",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "readRowInt",
+          "descriptor": "()Lar/com/hjg/pngj/ImageLineInt;",
+          "access": 1,
+          "code_sha256": "d86a00ff7918f32c598a1228b3a41602066395ef24ebb7929891cd2792007e9d",
+          "code_length": 47
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/IImageLine",
+        "ar/com/hjg/pngj/ImageLineInt",
+        "ar/com/hjg/pngj/PngReader",
+        "ar/com/hjg/pngj/PngReaderInt",
+        "ar/com/hjg/pngj/PngjException",
+        "java/lang/Object",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngWriter.class",
+      "occurrence": 0,
+      "sha256": "b0233178c40658866b9ce4141a0079a451b08c88322b3209ad3004f3a4b829c3",
+      "name": "ar/com/hjg/pngj/PngWriter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "imgInfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 17
+        },
+        {
+          "name": "rowNum",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "chunksList",
+          "descriptor": "Lar/com/hjg/pngj/chunks/ChunksListForWrite;",
+          "access": 18
+        },
+        {
+          "name": "metadata",
+          "descriptor": "Lar/com/hjg/pngj/chunks/PngMetadata;",
+          "access": 18
+        },
+        {
+          "name": "currentChunkGroup",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "passes",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "currentpass",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "shouldCloseStream",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "idatMaxSize",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "pixelsWriter",
+          "descriptor": "Lar/com/hjg/pngj/pixels/PixelsWriter;",
+          "access": 4
+        },
+        {
+          "name": "os",
+          "descriptor": "Ljava/io/OutputStream;",
+          "access": 18
+        },
+        {
+          "name": "copyFromPredicate",
+          "descriptor": "Lar/com/hjg/pngj/chunks/ChunkPredicate;",
+          "access": 2
+        },
+        {
+          "name": "copyFromList",
+          "descriptor": "Lar/com/hjg/pngj/chunks/ChunksList;",
+          "access": 2
+        },
+        {
+          "name": "debuginfo",
+          "descriptor": "Ljava/lang/StringBuilder;",
+          "access": 4
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Lar/com/hjg/pngj/ImageInfo;Z)V",
+          "access": 1,
+          "code_sha256": "07e0f7d8ed1886e8b9681c5f40d93dc9eade11220bfd21dd4d33e846d76f5dca",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "ce7572bfab726e3d8d9b2342552073ee6baad6bc4f7f911985cbf65ba30cec40",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "f4675bf7920783662f471b85a354cf37037446992da1c37e3c8d7a0a578eea30",
+          "code_length": 108
+        },
+        {
+          "name": "initIdat",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "1cb6f366d22e41d5b63d16309f36d4d44abe914dd3f7ecfad64c51cc65248f3a",
+          "code_length": 31
+        },
+        {
+          "name": "writeEndChunk",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0f49b85a4f1a29bdf047e9ede1bb4cd722367f795592024c7a075a6cfb3f77b3",
+          "code_length": 44
+        },
+        {
+          "name": "writeFirstChunks",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "2ca1cd238c4d84181c3ff8c076760d0a463908ad700b9caeb8b00556a75dcb08",
+          "code_length": 127
+        },
+        {
+          "name": "writeLastChunks",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "40ae6679ca8b0bb8c50c10644e8c841a702600e55732caa9adf33d4506e89a3f",
+          "code_length": 91
+        },
+        {
+          "name": "writeSignatureAndIHDR",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "88dccecf3cd01efa8155e895c25679f213e8a755497358ea81b6474ed1e9cfa5",
+          "code_length": 53
+        },
+        {
+          "name": "queueChunksFromOther",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "c790fcbcc5ebb52ef7155bd82e6ba8d6d31fbe58eab39114ccc36e6f5a26f7c7",
+          "code_length": 190
+        },
+        {
+          "name": "queueChunk",
+          "descriptor": "(Lar/com/hjg/pngj/chunks/PngChunk;)V",
+          "access": 1,
+          "code_sha256": "56db42b6cb0318c511ed60d3959eff4b816cedf569b49e97eaa101d4bb861fdb",
+          "code_length": 55
+        },
+        {
+          "name": "copyChunksFrom",
+          "descriptor": "(Lar/com/hjg/pngj/chunks/ChunksList;I)V",
+          "access": 1,
+          "code_sha256": "b9de61f7682b358c1b8f41fb4050864dc33ff687f0271ff03b471a9fab98daec",
+          "code_length": 14
+        },
+        {
+          "name": "copyChunksFrom",
+          "descriptor": "(Lar/com/hjg/pngj/chunks/ChunksList;)V",
+          "access": 1,
+          "code_sha256": "abb453307137f1a6eaa16847e9eca9a5a87c1ad48d76fcf79ee07c8a959ff828",
+          "code_length": 8
+        },
+        {
+          "name": "copyChunksFrom",
+          "descriptor": "(Lar/com/hjg/pngj/chunks/ChunksList;Lar/com/hjg/pngj/chunks/ChunkPredicate;)V",
+          "access": 1,
+          "code_sha256": "d53041e2ae0ccb57ace98c4ee7e916c84a6852e363f702d24710d354f40a04f6",
+          "code_length": 44
+        },
+        {
+          "name": "computeCompressionRatio",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "186dcd3ecccf5252570cdf940352ab6c1a4027d4c05bd6528798d1a3f4672218",
+          "code_length": 26
+        },
+        {
+          "name": "end",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "84dc120f1400a92baaed726ec01d9891af21d7d925613e24ca5ae9eebe687807",
+          "code_length": 90
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fe78831e2090382ebf74d6120502a31785a1105efc17fe01a71d5905cfeeef8d",
+          "code_length": 68
+        },
+        {
+          "name": "getChunksList",
+          "descriptor": "()Lar/com/hjg/pngj/chunks/ChunksListForWrite;",
+          "access": 1,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        },
+        {
+          "name": "getMetadata",
+          "descriptor": "()Lar/com/hjg/pngj/chunks/PngMetadata;",
+          "access": 1,
+          "code_sha256": "0fbdf12e3c14b4247d4a032174948df3d0189afc28989b2075c42b7c33cae81d",
+          "code_length": 5
+        },
+        {
+          "name": "setFilterType",
+          "descriptor": "(Lar/com/hjg/pngj/FilterType;)V",
+          "access": 1,
+          "code_sha256": "92aeb3a329dba92be6a94f943fe792c16b5087794cd7e9399c5a12e462abc3c1",
+          "code_length": 9
+        },
+        {
+          "name": "setCompLevel",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "e5c849d11768551da4752ee66757f2c0249a645bf55cb07111708fd89f3dae53",
+          "code_length": 12
+        },
+        {
+          "name": "setFilterPreserve",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "63e805bcc8770216104eceed52b8514f29bf8c3f52b321d4d790b4783eddf222",
+          "code_length": 38
+        },
+        {
+          "name": "setIdatMaxSize",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "5c6246d262e6798a3a2066d91fafc53bded277ef9cf167ecd50af07f6482dda5",
+          "code_length": 6
+        },
+        {
+          "name": "setShouldCloseStream",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "e07b26bc84cb04399f939d9b1dcecf2d6e991d8f9d2200e8f6be20389f064821",
+          "code_length": 6
+        },
+        {
+          "name": "writeRow",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLine;)V",
+          "access": 1,
+          "code_sha256": "024fb100ff95d7ff99b6e4928d12ab1965e67b0913e04ad05588e8717e597840",
+          "code_length": 12
+        },
+        {
+          "name": "writeRows",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLineSet;)V",
+          "access": 1,
+          "code_sha256": "729b90150944c02be10744e26dc0a61da3768eb48f53f4df04d117a6eba9e8ad",
+          "code_length": 31,
+          "generic_signature": "(Lar/com/hjg/pngj/IImageLineSet<+Lar/com/hjg/pngj/IImageLine;>;)V"
+        },
+        {
+          "name": "writeRow",
+          "descriptor": "(Lar/com/hjg/pngj/IImageLine;I)V",
+          "access": 1,
+          "code_sha256": "afde342f59b0d22ff3ee25373ed5e4bc4b451fd3af41fb44240d460358a766c3",
+          "code_length": 158
+        },
+        {
+          "name": "writeRowInt",
+          "descriptor": "([I)V",
+          "access": 1,
+          "code_sha256": "60696944cbff66869739206a071fdd23a5bba9f6cff46854f72fbcda637c361e",
+          "code_length": 17
+        },
+        {
+          "name": "createPixelsWriter",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)Lar/com/hjg/pngj/pixels/PixelsWriter;",
+          "access": 4,
+          "code_sha256": "0e0b54848169d6fca7e08f74f884a9abf9dd082704f5dded3031ed09a8a4d528",
+          "code_length": 11
+        },
+        {
+          "name": "getPixelsWriter",
+          "descriptor": "()Lar/com/hjg/pngj/pixels/PixelsWriter;",
+          "access": 17,
+          "code_sha256": "1ac2df7ba3a2c6e5813993ef99152a042e99a0448328ecb2bc980ff489723a92",
+          "code_length": 5
+        },
+        {
+          "name": "getDebuginfo",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "58f08e0cf6e6e2475debf3488be46973f55af50c61d6df536d1aea5ec659c9a0",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/IImageLine",
+        "ar/com/hjg/pngj/IImageLineSet",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/ImageLineInt",
+        "ar/com/hjg/pngj/PngHelperInternal",
+        "ar/com/hjg/pngj/PngWriter",
+        "ar/com/hjg/pngj/PngjOutputException",
+        "ar/com/hjg/pngj/chunks/ChunkCopyBehaviour",
+        "ar/com/hjg/pngj/chunks/ChunkPredicate",
+        "ar/com/hjg/pngj/chunks/ChunkRaw",
+        "ar/com/hjg/pngj/chunks/ChunksList",
+        "ar/com/hjg/pngj/chunks/ChunksListForWrite",
+        "ar/com/hjg/pngj/chunks/PngChunk",
+        "ar/com/hjg/pngj/chunks/PngChunkIEND",
+        "ar/com/hjg/pngj/chunks/PngChunkIHDR",
+        "ar/com/hjg/pngj/chunks/PngChunkPLTE",
+        "ar/com/hjg/pngj/chunks/PngMetadata",
+        "ar/com/hjg/pngj/pixels/PixelsWriter",
+        "ar/com/hjg/pngj/pixels/PixelsWriterDefault",
+        "java/io/OutputStream",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Throwable",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/PngWriterHc.class",
+      "occurrence": 0,
+      "sha256": "a7f50d5fc39d5cf05297c696efc1149f54cb4ae135a1742840477d22bc96a242",
+      "name": "ar/com/hjg/pngj/PngWriterHc",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "ar/com/hjg/pngj/PngWriter",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Lar/com/hjg/pngj/ImageInfo;Z)V",
+          "access": 1,
+          "code_sha256": "f981ee119f7a0277482dfb7dc3c6387db108c8ce39931b50d17e2e313e820980",
+          "code_length": 15
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "c7021e2ca5dee0584483fa6381b595bf98a0a6e5ad7f0ec86e051dbe7c77a1c3",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/OutputStream;Lar/com/hjg/pngj/ImageInfo;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7
+        },
+        {
+          "name": "createPixelsWriter",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;)Lar/com/hjg/pngj/pixels/PixelsWriter;",
+          "access": 4,
+          "code_sha256": "6b3152c863dc096ced084a281441e046e04b848518eb661b433ac10d506fe587",
+          "code_length": 11
+        },
+        {
+          "name": "getPixelWriterMultiple",
+          "descriptor": "()Lar/com/hjg/pngj/pixels/PixelsWriterMultiple;",
+          "access": 1,
+          "code_sha256": "349c89e8e7bec67a64bbd051f2ec933d27bbc081648c0722dd4f1cc27d37692e",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/FilterType",
+        "ar/com/hjg/pngj/PngWriter",
+        "ar/com/hjg/pngj/PngWriterHc",
+        "ar/com/hjg/pngj/pixels/PixelsWriterMultiple"
+      ]
+    },
+    {
+      "entry": "ar/com/hjg/pngj/RowInfo.class",
+      "occurrence": 0,
+      "sha256": "9beceee20ff9d231c685ad107275604d725399ff2a7c82527f191f0377713ead",
+      "name": "ar/com/hjg/pngj/RowInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "imgInfo",
+          "descriptor": "Lar/com/hjg/pngj/ImageInfo;",
+          "access": 17
+        },
+        {
+          "name": "deinterlacer",
+          "descriptor": "Lar/com/hjg/pngj/Deinterlacer;",
+          "access": 17
+        },
+        {
+          "name": "imode",
+          "descriptor": "Z",
+          "access": 17
+        },
+        {
+          "name": "dY",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "dX",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "oY",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "oX",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "rowNseq",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "rowNreal",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "rowNsubImg",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "rowsSubImg",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "colsSubImg",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "bytesRow",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "pass",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "buf",
+          "descriptor": "[B",
+          "access": 0
+        },
+        {
+          "name": "buflen",
+          "descriptor": "I",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lar/com/hjg/pngj/ImageInfo;Lar/com/hjg/pngj/Deinterlacer;)V",
+          "access": 1,
+          "code_sha256": "cbaaac53d2825985482bb7b04c3f05b52c94329fc5490ae5d7d807f2baafec5e",
+          "code_length": 28
+        },
+        {
+          "name": "update",
+          "descriptor": "(I)V",
+          "access": 0,
+          "code_sha256": "7d049c4809990d0617289081655dd72d2a88636aeccc8f647bd56ebf395d845a",
+          "code_length": 205
+        },
+        {
+          "name": "updateBuf",
+          "descriptor": "([BI)V",
+          "access": 0,
+          "code_sha256": "d0fff357e9898ef279ee56bfe168c6d7440c5fc794ea0446a7f04f682585a1f4",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "ar/com/hjg/pngj/Deinterlacer",
+        "ar/com/hjg/pngj/ImageInfo",
+        "ar/com/hjg/pngj/RowInfo",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/win32/Wtsapi32.class",
+      "occurrence": 0,
+      "sha256": "abd42fe212ca51353b1b1c200fdc32a4460a337ec6b80ec725671540e51cefbd",
+      "name": "com/sun/jna/platform/win32/Wtsapi32",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/win32/StdCallLibrary"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/win32/Wtsapi32;",
+          "access": 25
+        },
+        {
+          "name": "NOTIFY_FOR_ALL_SESSIONS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "NOTIFY_FOR_THIS_SESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_CONSOLE_CONNECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_CONSOLE_DISCONNECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_REMOTE_CONNECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_REMOTE_DISCONNECT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_SESSION_LOGON",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_SESSION_LOGOFF",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_SESSION_LOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_SESSION_UNLOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_SESSION_REMOTE_CONTROL",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_CURRENT_SERVER_HANDLE",
+          "descriptor": "Lcom/sun/jna/platform/win32/WinNT$HANDLE;",
+          "access": 25
+        },
+        {
+          "name": "WTS_CURRENT_SESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_ANY_SESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_PROCESS_INFO_LEVEL_0",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WTS_PROCESS_INFO_LEVEL_1",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "DOMAIN_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "USERNAME_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "WINSTATIONNAME_LENGTH",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "WTSEnumerateSessions",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;IILcom/sun/jna/ptr/PointerByReference;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "WTSQuerySessionInformation",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;IILcom/sun/jna/ptr/PointerByReference;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "WTSFreeMemory",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1025
+        },
+        {
+          "name": "WTSRegisterSessionNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;I)Z",
+          "access": 1025
+        },
+        {
+          "name": "WTSUnRegisterSessionNotification",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinDef$HWND;)Z",
+          "access": 1025
+        },
+        {
+          "name": "WTSEnumerateProcessesEx",
+          "descriptor": "(Lcom/sun/jna/platform/win32/WinNT$HANDLE;Lcom/sun/jna/ptr/IntByReference;ILcom/sun/jna/ptr/PointerByReference;Lcom/sun/jna/ptr/IntByReference;)Z",
+          "access": 1025
+        },
+        {
+          "name": "WTSFreeMemoryEx",
+          "descriptor": "(ILcom/sun/jna/Pointer;I)Z",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "71794af5c13b74db38fd26ca34c39f05cabf2e3fe71d5f4e2eb72fe681f7cf70",
+          "code_length": 28
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/WinDef",
+        "com/sun/jna/platform/win32/WinDef$HWND",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/win32/WinNT$HANDLE",
+        "com/sun/jna/platform/win32/Wtsapi32",
+        "com/sun/jna/platform/win32/Wtsapi32$WTSINFO",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_CLIENT_ADDRESS",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_CONNECTSTATE_CLASS",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_INFO_CLASS",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_PROCESS_INFO_EX",
+        "com/sun/jna/platform/win32/Wtsapi32$WTS_SESSION_INFO",
+        "com/sun/jna/win32/StdCallLibrary",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/wince/CoreDLL.class",
+      "occurrence": 0,
+      "sha256": "b82b40ec48bf048690b6dcc06d9bd309f5531a22e98bff2bec90af4a0b4c8f0b",
+      "name": "com/sun/jna/platform/wince/CoreDLL",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/wince/CoreDLL;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7426bde1f86167f0cb434285ef1d9e92f6886a903a543338594b13146836d18f",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/win32/WinNT",
+        "com/sun/jna/platform/wince/CoreDLL",
+        "com/sun/jna/win32/W32APIOptions",
+        "java/lang/Object"
+      ]
+    }
+  ]
+}

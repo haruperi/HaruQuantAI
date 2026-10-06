@@ -1,0 +1,115 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+  "sha256": "ad9b7062db2f6bc617a5e865b01b049f03f21d28f2db61b35976c122c0edbef7",
+  "class_count": 13,
+  "unique_class_entries": 13,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager.class": "d8bc29255472ab67ce96bb4e8c8de47bc2a4fab91c250b83086504cf988f8b83",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender.class": "088b22e09911623cf34be0522bf61b7c1462088116bf2b4783dd4926daad2aef",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorPlugin.class": "f7ea7c9cf15b8f5a9053b6f845d92d2c58a8713af3b3466efe35eecd545c48d0",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet.class": "58915c4d81006824c1a7b69a99cd0a2dd2ecda8c5fc24ecc5758ab41a8da8f11",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException.class": "c0418ea5b3807ac051d3926b4d30af85f076a9ca7ccfb28e59df436d20d4694e",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap.class": "688d4624d2824b14f7dc0976e38979312d875ad60d878658ba8922afabec0ed6",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles.class": "d0d8b3538465af8b3dd500020bbf165f8cbf8e8b099dfa6006824ee15b7be360",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult.class": "e606b33a896ce40067bb6387d8368cd7d4fe35841691cbd684de5e4823f214a2",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch.class": "792fe7aaccc47b0586f7069e25f78ce4f9d749a74da22d0b28e2c164d026a477",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches.class": "d68a7a7c3c7b4e59015c44011975042ddfdde09a547acbb97e40b45e512c3972",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template.class": "4e9a62a7d6a6d7230371e0909ed9e5eb3c3a08d5a39b8928132b557ce3f19e06",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException.class": "537436dad7026099903794d13872829d100452897bfc3a13828bdbba159c0019",
+    "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates.class": "6aa73afbea5e0bdb75f038415a69a5e9cdba80fc4d4d6998b87ae24cc8c19fdd"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager.class",
+      "occurrence": 0,
+      "sha256": "d8bc29255472ab67ce96bb4e8c8de47bc2a4fab91c250b83086504cf988f8b83",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorInfoSender.class",
+      "occurrence": 0,
+      "sha256": "088b22e09911623cf34be0522bf61b7c1462088116bf2b4783dd4926daad2aef",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorPlugin.class",
+      "occurrence": 0,
+      "sha256": "f7ea7c9cf15b8f5a9053b6f845d92d2c58a8713af3b3466efe35eecd545c48d0",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet.class",
+      "occurrence": 0,
+      "sha256": "58915c4d81006824c1a7b69a99cd0a2dd2ecda8c5fc24ecc5758ab41a8da8f11",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServletException.class",
+      "occurrence": 0,
+      "sha256": "c0418ea5b3807ac051d3926b4d30af85f076a9ca7ccfb28e59df436d20d4694e",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap.class",
+      "occurrence": 0,
+      "sha256": "688d4624d2824b14f7dc0976e38979312d875ad60d878658ba8922afabec0ed6",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFiles.class",
+      "occurrence": 0,
+      "sha256": "d0d8b3538465af8b3dd500020bbf165f8cbf8e8b099dfa6006824ee15b7be360",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchInFilesResult.class",
+      "occurrence": 0,
+      "sha256": "e606b33a896ce40067bb6387d8368cd7d4fe35841691cbd684de5e4823f214a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatch.class",
+      "occurrence": 0,
+      "sha256": "792fe7aaccc47b0586f7069e25f78ce4f9d749a74da22d0b28e2c164d026a477",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/searchInFiles/SearchMatches.class",
+      "occurrence": 0,
+      "sha256": "d68a7a7c3c7b4e59015c44011975042ddfdde09a547acbb97e40b45e512c3972",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Template.class",
+      "occurrence": 0,
+      "sha256": "4e9a62a7d6a6d7230371e0909ed9e5eb3c3a08d5a39b8928132b557ce3f19e06",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/TemplateException.class",
+      "occurrence": 0,
+      "sha256": "537436dad7026099903794d13872829d100452897bfc3a13828bdbba159c0019",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates.class",
+      "occurrence": 0,
+      "sha256": "6aa73afbea5e0bdb75f038415a69a5e9cdba80fc4d4d6998b87ae24cc8c19fdd",
+      "member_shard": "docs/dev/evidence/sqx145/members/230/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/230/001.json",
+      "sha256": "d45152218b294434b4c0b7e4571b51fbe38c54083aa9a99da0e286b9f807b6c8"
+    }
+  ]
+}

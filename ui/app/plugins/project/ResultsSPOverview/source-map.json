@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ResultsSPOverview bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsSPOverview",
-  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,244 +28,334 @@
   "source_catalog": [
     {
       "id": "sqx-resultsspoverview-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview",
       "family": "bounded installed frontend plugin artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/spOverviewList.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/spOverviewList.html",
       "relative_path": "directives/spOverviewList/spOverviewList.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "9e9aaac42e1e5c65a90f2f4fbb8be223b6c0675f7e260ef6a6de4c6e82603fb0",
+      "sha256": "12299bc0c2919a0d07283882b43b1f6318ba9b99828d0aeb22112a8e84bf423e",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewList.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewList.js",
       "relative_path": "directives/spOverviewList/SPOverviewList.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "8f895b734aadb51bc023e5da368ac18372e82cbbe482fb973a661cfcac59e689",
+      "sha256": "6be5ae0bcb4031e3ab7fa7e2769081df55ec978f0faede7ac1dcf37490adfa27",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewListCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewListCtrl.js",
       "relative_path": "directives/spOverviewList/SPOverviewListCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "012a995f4224a8a677ac355419055fe21e90aba28ab489cd0fe942191904a251",
+      "sha256": "5b40cfda56c2bc3dd675e81cacd303bef4b20392aed8bff049c83151c033bdb0",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/spOverviewStats.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/spOverviewStats.html",
       "relative_path": "directives/spOverviewStats/spOverviewStats.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "ffc02c5870044069c0cb5a9691a23013ffea17d70da70991fdcf0706799871fc",
+      "sha256": "51c7fcb1d196b884cf5f886b803d22d9533a6dc7e565f472a7aa0198ef121fba",
       "target": "directives/spOverviewStats/spOverviewStats.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStats.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStats.js",
       "relative_path": "directives/spOverviewStats/SPOverviewStats.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "1b76bbaa25afc941e168b0a19bb93708cc3f00ab157571979396c75370fc3b78",
+      "sha256": "be6a01e6d9d1ba3ffe9b9747ec4ebdf53e9fbe07891d705e7db58fedc683b5ad",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStatsCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewStats/SPOverviewStatsCtrl.js",
       "relative_path": "directives/spOverviewStats/SPOverviewStatsCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "1e43bb67542191694b64e285192a60294e81156f24f3a675a19410e15385fbec",
+      "sha256": "fdd4cf547d3c9c70b5ae0bb2c234a5a3fcd3586215dd713d44d544f1ab37e48e",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/spOverviewTopChart.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/spOverviewTopChart.html",
       "relative_path": "directives/spOverviewTopChart/spOverviewTopChart.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "8de1f745f5dded7f14c06b39a20434ad032a8bed2817175f97e3b86d78bb9008",
+      "sha256": "761e54a4f4509d5ca60d82f93a9d7d744957c6e86bde3921250a366948c0b0df",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChart.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChart.js",
       "relative_path": "directives/spOverviewTopChart/SPOverviewTopChart.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "08ba86976b7766520d181be763cd259d890c0b5cc06e267461c7876fbea37761",
+      "sha256": "670a027b7b18422ba63e8346b571987da34d8d6462849695f1a6bf1de79354b0",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChartCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTopChart/SPOverviewTopChartCtrl.js",
       "relative_path": "directives/spOverviewTopChart/SPOverviewTopChartCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "01b5c30de32e9fe4d7d9a8d81bd12adc30ba0a77e12aae01e40a74bb522636d8",
+      "sha256": "22c19e17a072aa98051a6213e31f6abed81685dbf42049465303d29ade80e1bf",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/spOverviewTreeMap.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/spOverviewTreeMap.html",
       "relative_path": "directives/spOverviewTreeMap/spOverviewTreeMap.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "020cd152e933ec09f04e9326450634199f7588d31821caa193cd9a9a08e9730e",
+      "sha256": "1bcf0bb17a9d836ca743f622494dd9eaea8e169b9b7151c3b6bd94746a9ecea1",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMap.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMap.js",
       "relative_path": "directives/spOverviewTreeMap/SPOverviewTreeMap.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "9cafca3415780bac6749f52059ca054c2b2a4e0e84246c1ea00b1fba06110de1",
+      "sha256": "e6ad3b37041bfb922d33d4937d938a21bb1171bd8be16cef7df5b8ec6210a05e",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMapCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewTreeMap/SPOverviewTreeMapCtrl.js",
       "relative_path": "directives/spOverviewTreeMap/SPOverviewTreeMapCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "dec54f55e2061c2b2cf3f30d6058eac1978355caa07d0f87d9541002c5f8d422",
+      "sha256": "3511e917ee2123503aceaa99a1b2a527bafcb66de4041ebe7596dc7c20ba004f",
       "target": null,
       "classification": "excluded",
-      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "430ad4c5e27963667be915d37763255257464a8286ac6c46ef203d5a7a35113e",
+      "sha256": "469280bfa0c2841111121317b76e22749243a66348d2afecd2160e58d36a5d00",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
       "relative_path": "ResultsSPOverview.jar",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "68c7cadc03dcd867ff506c74654b427e4de3d38f027ddcb458500ef60b99d34b",
+      "sha256": "73a05e6d594be525c4068892f3fdea77929b2740dba3338c4e212360e98067a9",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend binary excluded from frontend-only scope."
+      "limitation": "Backend binary excluded from frontend-only scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/spOverview.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/spOverview.html",
       "relative_path": "spOverview.html",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "6d930f0a9737265edf61d327b26f5da13facc92ddf8e38eaf81cc23b1d0f6340",
+      "sha256": "c0c19a8cc8c72a76241d91d48f9acc2129797efe8c0517c5a3771d2d78087a41",
       "target": "spOverview.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewCtrl.js",
       "relative_path": "SPOverviewCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "5421cc77c5abd19a9327b35b8bbd48cc327f50d3597defe7f3665f4b479c403f",
+      "sha256": "60ddc0a2b1460ecf18310a942e9ec53343d2250b2b3c8f6ca174fac7c477bff6",
       "target": "SPOverviewCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js",
       "relative_path": "SPOverviewService.js",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "explicit artifact exclusion",
       "access_date": "2026-10-06",
-      "sha256": "0cca8b2e60a3d2b3b00d60542db4dbd8f51b7a0a0518d00016cec71138e6787a",
+      "sha256": "768dc4abe97bf9544dec40a42f379ed0965f63c657d9501744d4cabcc101270d",
       "target": null,
       "classification": "excluded",
-      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-resultsspoverview-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored structural counterpart",
       "access_date": "2026-10-06",
       "sha256": "1687c16f55fd8a2a3b4729eb0ffe6ea30fcf249fb97dc842648fe278772f9a23",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -307,6 +397,9 @@
   "limitations": [
     "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
     "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
-    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
-  ]
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

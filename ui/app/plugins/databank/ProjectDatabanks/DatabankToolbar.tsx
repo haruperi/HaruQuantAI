@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
 /**
- * SQX-parity databanks toolbar (donor evidence SQX144-EV-000028).
+ * SQX-style databanks toolbar (donor evidence retained target UI; current donor equivalence unverified).
  * Button order and menu trees come from the installed action plugins:
  * Load(10) Save:(20) Delete(30) Clear all(40) Retest(50) Rename(55)
  * Filter by correlation(56) Portfolio:(60) Tools:(70), icon refresh(190),

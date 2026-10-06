@@ -1,0 +1,94 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
+  "sha256": "026673159e7365b15e877ecd9123bf4187f49218d4db3855a6c0fed6a3735bc5",
+  "class_count": 10,
+  "unique_class_entries": 10,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/Optimize/ConfigVerifier.class": "a22a72aea65c7dcf83621e06261a8600fce4ddb5a38d130acca731b714736a25",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1.class": "a2472a6b024520e81b8954da8a732e13a03e502116ff2fdeffb5fb53e34c1184",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2.class": "6a0bd132348766032a1f55cef96e91f11871b57b0859b3c08b3140f821d9c5e8",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3.class": "8239021218b643e3af377cb063249b97bcd2c2a6b52e9d0533075d46954bc381",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4.class": "d602fea00de389026ea25f2f174072fe9bf7ecbc3155443b52ea59d769a52496",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5.class": "795ca01dd010879807cfe27b24d7a1c66389ebbf3d4064f39fd4bb0049c46ae7",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6.class": "9e9402571d0f51dc9554b1085cb6524f26df7fcbd60dd5fcb51a85874ce446e3",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7.class": "6431d87a07d46e6a82a1624e6686a8fbddcfb083e2a69dbfe69fb4e12981876c",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData.class": "6acd3fc35bf43e904c518e5fb68bdbc14c6d5e37dde96f8b295a8e9ffab2a941",
+    "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask.class": "fc084a144fff13724cdbd648b1af949d6588481f2ce6c31739006472b8cf0496"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/ConfigVerifier.class",
+      "occurrence": 0,
+      "sha256": "a22a72aea65c7dcf83621e06261a8600fce4ddb5a38d130acca731b714736a25",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$1.class",
+      "occurrence": 0,
+      "sha256": "a2472a6b024520e81b8954da8a732e13a03e502116ff2fdeffb5fb53e34c1184",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$2.class",
+      "occurrence": 0,
+      "sha256": "6a0bd132348766032a1f55cef96e91f11871b57b0859b3c08b3140f821d9c5e8",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$3.class",
+      "occurrence": 0,
+      "sha256": "8239021218b643e3af377cb063249b97bcd2c2a6b52e9d0533075d46954bc381",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$4.class",
+      "occurrence": 0,
+      "sha256": "d602fea00de389026ea25f2f174072fe9bf7ecbc3155443b52ea59d769a52496",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$5.class",
+      "occurrence": 0,
+      "sha256": "795ca01dd010879807cfe27b24d7a1c66389ebbf3d4064f39fd4bb0049c46ae7",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$6.class",
+      "occurrence": 0,
+      "sha256": "9e9402571d0f51dc9554b1085cb6524f26df7fcbd60dd5fcb51a85874ce446e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$7.class",
+      "occurrence": 0,
+      "sha256": "6431d87a07d46e6a82a1624e6686a8fbddcfb083e2a69dbfe69fb4e12981876c",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask$StrategyData.class",
+      "occurrence": 0,
+      "sha256": "6acd3fc35bf43e904c518e5fb68bdbc14c6d5e37dde96f8b295a8e9ffab2a941",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask.class",
+      "occurrence": 0,
+      "sha256": "fc084a144fff13724cdbd648b1af949d6588481f2ce6c31739006472b8cf0496",
+      "member_shard": "docs/dev/evidence/sqx145/members/283/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/283/001.json",
+      "sha256": "6f9e0ee522b2ffe151a4c4977b6b93ab32666cb15469866cd4da7c342da4fcef"
+    }
+  ]
+}

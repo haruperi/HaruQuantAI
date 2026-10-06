@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar",
+  "sha256": "7b34d7fb9d20b96ae581200d4f6e950f71ea22bd35fe8448b40f6a876095d6d5",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/PartsToImprove/PartsToImproveSettingsPlugin.class": "c2db36b26bd2c510ed005098e72015eca62e981e0507e69c3cc5d388afa46280"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/PartsToImprove/PartsToImproveSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "c2db36b26bd2c510ed005098e72015eca62e981e0507e69c3cc5d388afa46280",
+      "member_shard": "docs/dev/evidence/sqx145/members/259/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/259/001.json",
+      "sha256": "529129f351eeb97dd626ca9097bc7d823b6414ed4aabb11f6b30aaf5c8136cf3"
+    }
+  ]
+}

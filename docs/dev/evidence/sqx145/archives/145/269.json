@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/TaskAutomaticRetest/TaskAutomaticRetest.jar",
+  "sha256": "be3c69292d3dd949a7324a7527d105ea1320c7b02493ee6be00b1cc013ac73b1",
+  "class_count": 6,
+  "unique_class_entries": 6,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob.class": "27cedbb6d1908f510803c1ab6794e1ac98e10f649e4f49c1fb6ac22b4697ca89",
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1.class": "398015d0b44d4a48c790c9bc10486110b43ca3bcc15577bf6a7e0939ca13fed3",
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2.class": "fede7ff3b8184b04701242822b8816698bccd6a3d7c3f891fc9663652376e30b",
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask.class": "3a1c0202d0d129722ec5070111800a02f56b7b9655d0bf2060875f047be6c3a9",
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation.class": "1bf19ac9ebade81942473ef5f63c7b55d31a8cdd82cd786272769add67d86622",
+    "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator.class": "75b13c86f60a02cfeab471106ec40c50db37db70fc5c720a593d4334efa49490"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestJob.class",
+      "occurrence": 0,
+      "sha256": "27cedbb6d1908f510803c1ab6794e1ac98e10f649e4f49c1fb6ac22b4697ca89",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$1.class",
+      "occurrence": 0,
+      "sha256": "398015d0b44d4a48c790c9bc10486110b43ca3bcc15577bf6a7e0939ca13fed3",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask$2.class",
+      "occurrence": 0,
+      "sha256": "fede7ff3b8184b04701242822b8816698bccd6a3d7c3f891fc9663652376e30b",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/AutomaticRetestTask.class",
+      "occurrence": 0,
+      "sha256": "3a1c0202d0d129722ec5070111800a02f56b7b9655d0bf2060875f047be6c3a9",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator$Variation.class",
+      "occurrence": 0,
+      "sha256": "1bf19ac9ebade81942473ef5f63c7b55d31a8cdd82cd786272769add67d86622",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/Task/impl/AutomaticRetest/XmlChartCombinator.class",
+      "occurrence": 0,
+      "sha256": "75b13c86f60a02cfeab471106ec40c50db37db70fc5c720a593d4334efa49490",
+      "member_shard": "docs/dev/evidence/sqx145/members/269/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/269/001.json",
+      "sha256": "92e3a2e0de9345bce20a30fa65b32a011e663c084f71e2c9ba5d32d9996be8b4"
+    }
+  ]
+}

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only ProjectResults bounded structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectResults",
-  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "version": 1,
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+    "version": 1
   },
   "owner": {
     "feature": "FEAT-UI-PROJECT_WORKBENCH",
@@ -28,75 +28,100 @@
   "source_catalog": [
     {
       "family": "bounded installed frontend plugin artifacts",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults",
       "id": "sqx-projectresults-ui"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-projectresults-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults/module.js",
       "relative_path": "module.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "3d5866cf4849d7160d9ac8785f1991597910864d0efbdbc68af2ed0e6d95df2e",
+      "sha256": "7072f092e100b952e0f890552e145179793f726b437afe91b00f3aa4e537234c",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectresults-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/newCustomPluginModal.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults/newCustomPluginModal.html",
       "relative_path": "newCustomPluginModal.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
       "sha256": "cad3fa81634142c93719e88e9694dce18ee8d0610050afc5d6f279fda84b1b14",
       "target": "newCustomPluginModal.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectresults-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/results.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults/results.html",
       "relative_path": "results.html",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
       "sha256": "0119886e9484e1b19165eb9c365fa75d5128e8b4073f98be4e6148a83a434e08",
       "target": "results.tsx",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectresults-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js",
       "relative_path": "ResultsCtrl.js",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "5b233c5b43300080460c642864ee68d5cd8529e41ed5dc0cbc8bd5d0df533e3c",
+      "sha256": "b78a17cbffffa7483ec45ee39a70beca714ebf43821e28b888522489c45f0758",
       "target": "ResultsCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-projectresults-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectResults/styles.css",
       "relative_path": "styles.css",
       "location": "whole-file structural identity",
-      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently authored target structural counterpart",
       "access_date": "2026-10-06",
-      "sha256": "aadf5fc926bbfcc68582653d904075758ab0b0277ab1dda330c49a1833808c13",
+      "sha256": "e056ad1b7134efe18229780002dc0db5675b48ff5ef88a7f4eb4fb0a335f75e6",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -138,7 +163,8 @@
   "limitations": [
     "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
     "Views/analyses remain session-only; reports/charts are precomputed approximations.",
-    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ],
   "external_dependencies": [
     {
@@ -161,5 +187,7 @@
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsSPOverview/module.ts",
       "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
     }
-  ]
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
 }

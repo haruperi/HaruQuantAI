@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "scope": "Frontend-only TickDownloader structural traceability",
-  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD",
   "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/TickDownloader",
-  "source_head": "30128b58bbc7ac495f33a860ba7d31d603eecec5",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_135038_data-source-td-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   },
@@ -28,101 +28,136 @@
   "source_catalog": [
     {
       "id": "sqx-td-ui",
-      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD",
       "family": "installed plugin UI artifacts"
     }
   ],
   "sources": [
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTD.jar",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTD.jar",
       "relative_path": "DataSourceTD.jar",
       "location": "whole-file binary identity",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "backend binary excluded",
       "access_date": "2026-10-06",
-      "sha256": "8db468d20ca5644cdec4aaa637be00542b2809298b3bd1e378d1e7e3b5d63496",
+      "sha256": "b3a965b9aed288cf77ff6c30c6a7a60719bae6593e65e415a8b8ac59691e9ea1",
       "target": null,
       "classification": "excluded",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js",
       "relative_path": "DataSourceTDService.js",
       "location": "lines 1-14; service discovery/import/action methods",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "112cdb715e18c980b104233390f23160f8993b84f3d812a17f0876cb4ac786c7",
+      "sha256": "fbe4fe0e2ae84ac542d767d058f83653ed13c2d3df29abe3701480b9b5b776f3",
       "target": "DataSourceTDService.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js",
       "relative_path": "import/DataSourceTDImportCtrl.js",
       "location": "lines 1-115; named controller state/picker/submit bindings",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "df3b396fc13078728b4e1ee82b0ce786adc9209f818ab15aa65b01c68925efb8",
+      "sha256": "ddde119b713cf5e36aeab0f5143c876dd3d5ed63ba7acf1dc079a80982da3b43",
       "target": "import/DataSourceTDImportCtrl.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/importPopup.html",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/importPopup.html",
       "relative_path": "import/importPopup.html",
       "location": "lines 1-50; import form controls",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "e57f70bc46a3c29c3739c233339b3f2426ea273b02076baa44c10ecf524ea129",
+      "sha256": "5a68195af0a4e22d91c93ab21afa2a1186652a2555045626a55ed7fc0ab08f2e",
       "target": "import/importPopup.tsx",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/module.js",
       "relative_path": "import/module.js",
       "location": "lines 1-10; module contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "5558968e440317dfce4f242d1d0159a7778860e2b021c488e4d18dddfedd87d3",
+      "sha256": "8b976728bb71e0e9c725896824eec1ac8c2ce128113686f68e2aad57b23587b3",
       "target": "import/module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/module.js",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/module.js",
       "relative_path": "module.js",
       "location": "lines 1-13; module contribution registration",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "cf45c0964fe8fbecb26000e6bff78ef4077a8f43efdcffe857311a70db268847",
+      "sha256": "b5df93099451aea5944d40d7670109f1ee348d515abeb3e6bf3b9ac6937b89e4",
       "target": "module.ts",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     },
     {
       "catalog_id": "sqx-td-ui",
-      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/styles.css",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/DataSourceTD/styles.css",
       "relative_path": "styles.css",
       "location": "lines 1-33; plugin stylesheet rules",
-      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
-      "sha256": "0cf947fdf7aa185b7af0f91d0606b04d1cc9172d6ba4dd0f07ac10b66c4576ce",
+      "sha256": "33116d97b761eb912df2c3fd2b3dca002905c85f495c4c10927528f51f4de9b7",
       "target": "styles.css",
       "classification": "counterpart",
-      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified."
+      "limitation": "Structural mapping only; backend parsing and donor runtime parity unverified. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
     }
   ],
   "target_only": [
@@ -138,5 +173,10 @@
       "path": "source-map.json",
       "reason": "Structural provenance manifest"
     }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
   ]
 }

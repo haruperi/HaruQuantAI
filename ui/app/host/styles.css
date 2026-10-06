@@ -135,10 +135,10 @@
 .status-actions>button.active{background:#173b4b;color:#69d1f7;box-shadow:inset 0 2px var(--accent)}
 .header-app{height:100%;min-height:0;background:var(--bg);display:flex;flex-direction:column}.header-app-title{height:49px;flex:none;padding:0 14px;display:flex;align-items:center;background:var(--panel);border-bottom:1px solid var(--line)}.header-app-title h1,.grid-control h1{margin:0;font-size:15px}.header-app-title span{display:block;color:var(--muted);font-size:10px;margin-top:2px}.debug-toolbar{height:48px;display:flex;align-items:center;gap:18px;padding:7px 12px;background:var(--panel2);border-bottom:1px solid var(--line)}.debug-toolbar label{display:flex;align-items:center;gap:7px;color:var(--muted)}.debug-toolbar select{width:170px}.debug-toolbar input{width:260px}.debug-log{flex:1;min-height:0;overflow:auto;background:#101419;border:1px solid var(--line);margin:10px 12px 5px;padding:8px;font:11px/1.55 Consolas,"Courier New",monospace}.debug-log>div{display:grid;grid-template-columns:75px 100px 1fr;gap:8px;padding:2px 4px;border-bottom:1px solid #1e252d}.debug-log time{color:#728293}.debug-log strong{color:#6bc5e8;font-weight:500}.debug-empty{height:100%;min-height:120px;margin:0;display:grid;place-items:center;color:var(--muted)}.clear-debug-log{align-self:flex-start;margin:2px 12px 10px;border:0;background:transparent;color:var(--accent);text-decoration:underline;cursor:pointer}.clear-debug-log:disabled{color:var(--muted);cursor:default;text-decoration:none}.grid-control{overflow:hidden}.grid-control-scroll{height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:12px}.grid-control>div>h1{margin:2px 0 0}.grid-control-panel{min-width:760px;margin:0;border:1px solid var(--line);background:var(--panel);padding:12px;position:relative}.grid-control-panel legend{padding:0 6px;font-weight:600}.grid-control-toolbar{min-height:67px;display:flex;align-items:center;gap:8px}.grid-control-toolbar>span{position:absolute;right:12px;top:9px;color:var(--muted)}.grid-control-toolbar label{display:flex;align-items:center;gap:8px}.grid-control-toolbar label select{width:190px}.grid-control-toolbar small{color:var(--muted);margin-left:4px}.grid-records{display:block;color:var(--muted);margin:-4px 0 7px}.grid-jobs{min-width:760px}.grid-jobs th{position:static}.grid-jobs .grid-empty{text-align:center;color:var(--muted);height:52px}.grid-job-error{color:#f09aa6}.grid-error-link{border:0;background:transparent;padding:0;color:var(--bad);text-decoration:underline;cursor:pointer}.grid-error-dialog{display:flex;gap:12px;align-items:flex-start;padding:4px}.grid-error-dialog>svg{color:var(--bad);flex:none}.grid-error-dialog p{margin:6px 0 0}.volume-profile-dialog{padding:12px 20px 10px}.volume-profile-dialog h3{margin:0 0 16px;font-size:15px}.volume-profile-dialog p{margin:0 0 8px}.volume-profile-dialog>a{display:inline-block;color:var(--accent);margin:12px 0 24px}.volume-profile-dialog .addon-inactive{margin-bottom:18px}.addon-actions{display:flex;gap:10px;flex-wrap:wrap}.addon-actions a{text-decoration:none}
 
-/* SQX-parity databanks panel content - theme-aware skin
+/* SQX-style databanks panel content - theme-aware skin
    (UI-BUILDER-DATABANK-003 iteration 3). Dark values from the donor SkinDark
    dark.skin.css; light values from the donor default skin; selected by the
-   app theme attribute. Evidence SQX144-EV-000028..031. */
+   app theme attribute. Evidence retained target UI; current donor equivalence unverified. */
 .databanks-body{position:relative}
 .sq-splitter,.pf-composer{
   --sqx-bar-bg:#292929;--sqx-bar-active-bg:#292929;--sqx-bar-text:#cccccc;
@@ -239,11 +239,11 @@
 .sqx-dialog-scope .dialog-note{background:var(--sqx-note-bg);border-left-color:#5897d4;color:var(--sqx-note-text)}
 .sqx-dialog-scope .section,.sqx-dialog-scope .section>header{background:var(--sqx-modal-bg);border-color:var(--sqx-fieldset-border);color:var(--sqx-text)}
 
-/* SQX-parity Builder Progress tab - theme-aware skin (UI-BUILDER-PROGRESS-004).
+/* SQX-style Builder Progress tab - theme-aware skin (UI-BUILDER-PROGRESS-004).
    Dark values from the donor SkinDark dark.skin.css; light values from the
    donor default skin; selected by the app theme attribute. Reuses the --sqx-*
    variable system defined on the databanks splitter scope.
-   Evidence SQX144-EV-000032..037. */
+   Evidence retained target UI; current donor equivalence unverified. */
 :is(.builder-workspace,.project-workspace){
   --sqd-dashboard-bg:#292929;--sqd-header-bg:#3b3b3b;--sqd-header-border:#888888;
   --sqd-stats-label:#888888;--sqd-log-bg:#292929;--sqd-log-text:#aaaaaa;
@@ -392,10 +392,10 @@
 .sqd-stats-grid-head span:first-child{text-align:left}
 .sqd-stats-grid-empty{padding:30px 10px;text-align:center;color:var(--sqx-empty,#9aa4b0)}
 
-/* SQX-parity Builder Full settings tab - theme-aware skin
+/* SQX-style Builder Full settings tab - theme-aware skin
    (UI-BUILDER-SETTINGS-005). Dark values from the donor SkinDark
    dark.skin.css; light values from the donor default skin. Reuses the
-   --sqx and --sqd variable systems. Evidence SQX144-EV-000038..043. */
+   --sqx and --sqd variable systems. Evidence retained target UI; current donor equivalence unverified. */
 .sqd-fullsettings{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;background:var(--sqd-dashboard-bg,#292929);position:relative}
 .sqd-advanced-title{margin:11px 0 0 14px;font-size:15px;font-weight:600;color:var(--sqx-text,#cccccc);flex:none}
 .sqd-settings-tabs{position:absolute;top:38px;left:10px;right:10px;bottom:10px;display:flex;flex-direction:column}

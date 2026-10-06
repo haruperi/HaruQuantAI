@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsGoToTask/SettingsGoToTask.jar",
+  "sha256": "a591e48eb3da111a334b8ab7b1a8aa2b6eb793d1336a51b86e2d74a9e8d9038b",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/Settings/impl/GoToTask/SettingsGoToTaskPlugin.class": "041a6ecaa00f868374d0d5436cad69f0ab3fc3363e317f0bc48a1cf3a5805675"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/GoToTask/SettingsGoToTaskPlugin.class",
+      "occurrence": 0,
+      "sha256": "041a6ecaa00f868374d0d5436cad69f0ab3fc3363e317f0bc48a1cf3a5805675",
+      "member_shard": "docs/dev/evidence/sqx145/members/251/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/251/001.json",
+      "sha256": "f77115e7833e125883fde9a8abb5fa2db64d9f95b0357ea5ff41c105c410c8cd"
+    }
+  ]
+}

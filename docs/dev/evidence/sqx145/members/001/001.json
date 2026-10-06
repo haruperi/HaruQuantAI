@@ -1,0 +1,3569 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/activation-1.1.1.jar",
+  "archive_sha256": "ae475120e9fcd99b4b00b38329bd61cdc5eb754eee03fe66c01f50e137724f99",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/activation/registries/LineTokenizer.class",
+      "occurrence": 0,
+      "sha256": "8bc05cf99192d7002e4f003523352e091924b66ea90cc07b71c59363156c34b5",
+      "name": "com/sun/activation/registries/LineTokenizer",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "currentPosition",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "maxPosition",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "str",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "stack",
+          "descriptor": "Ljava/util/Vector;",
+          "access": 2
+        },
+        {
+          "name": "singles",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f530f55293fe3d00b9369bb2b45789b2b36fd415c4af6aabfffcd6865a1bad92",
+          "code_length": 34
+        },
+        {
+          "name": "skipWhiteSpace",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "64ecc9d5936e9e27883f2452b2dbc7228aa4ae601ebbdcdc3c7c135cb58d5f79",
+          "code_length": 42
+        },
+        {
+          "name": "hasMoreTokens",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "87659a6e35c936a9f9161b29cb8d8856aa5d48d2d84f5eba463df0d179c3f779",
+          "code_length": 33
+        },
+        {
+          "name": "nextToken",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a768aab2dc9e3faea90fd4c36df4a8832551b0334fa62a17e84c06c02f832102",
+          "code_length": 340
+        },
+        {
+          "name": "pushToken",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4e5868740a6c59e0a2e1cd20575332905995acef4ddb5084baba1353d70408cb",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/LineTokenizer",
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/NoSuchElementException",
+        "java/util/Vector"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/LogSupport.class",
+      "occurrence": 0,
+      "sha256": "b1503911bfa31b89a0eae58be7484dc7f70354ef055b90833b4ec9263012b66b",
+      "name": "com/sun/activation/registries/LogSupport",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "debug",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "logger",
+          "descriptor": "Ljava/util/logging/Logger;",
+          "access": 10
+        },
+        {
+          "name": "level",
+          "descriptor": "Ljava/util/logging/Level;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "11328fcf0dd543a0e975fb53a8ff03f66e9603853cd6e13f2d554e30a45a4d9e",
+          "code_length": 24
+        },
+        {
+          "name": "log",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 9,
+          "code_sha256": "6db6a03d125da888accbf230c65bd53e1443a4fd0542de39d5ba92453ffa8aa9",
+          "code_length": 47
+        },
+        {
+          "name": "isLoggable",
+          "descriptor": "()Z",
+          "access": 9,
+          "code_sha256": "d1c94ef7125b666ec442cba5de3e5f248ac35ef8dbfd55d6d5be0907e23dfaf4",
+          "code_length": 24
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e2b9a12f56b350cd6c574b587be038a9534868e42800c5c920c301f88b21cfbb",
+          "code_length": 31
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/LogSupport",
+        "java/io/PrintStream",
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/util/logging/Level",
+        "java/util/logging/Logger"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapFile.class",
+      "occurrence": 0,
+      "sha256": "2a7be6fb9f795542558d71dbce4f7adec60b1d52f46b227e124d6c41b9c797ba",
+      "name": "com/sun/activation/registries/MailcapFile",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type_hash",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2
+        },
+        {
+          "name": "fallback_hash",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2
+        },
+        {
+          "name": "native_commands",
+          "descriptor": "Ljava/util/Map;",
+          "access": 2
+        },
+        {
+          "name": "addReverse",
+          "descriptor": "Z",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "47a1b1cb12ef0b9b7b01e4a564c753bf4942426d277bc2255d4a5a4c0cd2d0c6",
+          "code_length": 122,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "5bd3e34b694968df3706e61fa8bd58b862ab500d19cb1dadb149e330e66b189a",
+          "code_length": 70,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f6449b0d9e929246f4267b59c3bf3985de33fe980eae81d83a302375f59c95a7",
+          "code_length": 49
+        },
+        {
+          "name": "getMailcapList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "24d888e46956f931c1154ea2f5aa2053281cc037d2505f0acccf8f8179a3a544",
+          "code_length": 112
+        },
+        {
+          "name": "getMailcapFallbackList",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Map;",
+          "access": 1,
+          "code_sha256": "c82dea7487fc52a5defd437ce7b8696dddc88d9a8904f3b7a39791d6a16b7d92",
+          "code_length": 112
+        },
+        {
+          "name": "getMimeTypes",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ded15f73b55399050e5b8c84d2893254bbf8d5a078502e04f4b120c3722dfe29",
+          "code_length": 75
+        },
+        {
+          "name": "getNativeCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef980191bfcd52da34379fa4ee97d77f6d05da33e37a00dae8abbdce490094e2",
+          "code_length": 52
+        },
+        {
+          "name": "mergeResults",
+          "descriptor": "(Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;",
+          "access": 2,
+          "code_sha256": "cfd8829102f3f9a17be0d02d0c0fb002bedde97be20aa852e66d015eeb0cc78a",
+          "code_length": 134
+        },
+        {
+          "name": "appendToMailcap",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1c71c4165476e3cd5ffe3686ab9964135be67afd3b77f7330873ed7dea8a9771",
+          "code_length": 45
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/io/Reader;)V",
+          "access": 2,
+          "code_sha256": "b1d6a586fb9008a518c5a292768fb387284549c532bfb7baf2e61d950279c342",
+          "code_length": 173,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseLine",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "3962f2d27d404ebcf5365fa696e2636b2971ec1dccd41627d312039d34dd4d00",
+          "code_length": 958,
+          "throws": [
+            "com/sun/activation/registries/MailcapParseException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "reportParseError",
+          "descriptor": "(IILjava/lang/String;)V",
+          "access": 12,
+          "code_sha256": "7330dcd0667eb032fd60870818df341166b1297e5b871e23a964f6ca25d84c22",
+          "code_length": 56,
+          "throws": [
+            "com/sun/activation/registries/MailcapParseException"
+          ]
+        },
+        {
+          "name": "reportParseError",
+          "descriptor": "(IIILjava/lang/String;)V",
+          "access": 12,
+          "code_sha256": "1d73149fe05041a3360dc4aea39f53d6e0f8a25587f2639bb936eb3331797deb",
+          "code_length": 68,
+          "throws": [
+            "com/sun/activation/registries/MailcapParseException"
+          ]
+        },
+        {
+          "name": "reportParseError",
+          "descriptor": "(IIIILjava/lang/String;)V",
+          "access": 12,
+          "code_sha256": "6b858629e1f6c4ad0490117499417c20c38ad60502b529eac9e8b659c694fa1e",
+          "code_length": 163,
+          "throws": [
+            "com/sun/activation/registries/MailcapParseException"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "42c966c657518259801c8f2e2dd0971dc5c18b25a561f8e9b06611c2ed605607",
+          "code_length": 17
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/sun/activation/registries/LogSupport",
+        "com/sun/activation/registries/MailcapFile",
+        "com/sun/activation/registries/MailcapParseException",
+        "com/sun/activation/registries/MailcapTokenizer",
+        "java/io/BufferedReader",
+        "java/io/FileReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/StringReader",
+        "java/lang/Boolean",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/StringIndexOutOfBoundsException",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/HashSet",
+        "java/util/Iterator",
+        "java/util/LinkedHashMap",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapParseException.class",
+      "occurrence": 0,
+      "sha256": "0e6b930d20b92056d56cfa640124900edace398ab19c017ab85bb6c9b88430d7",
+      "name": "com/sun/activation/registries/MailcapParseException",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/MailcapParseException",
+        "java/lang/Exception"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/MailcapTokenizer.class",
+      "occurrence": 0,
+      "sha256": "15c9cebe18b30608d29474ff010bf49bc69723db31a9829191a22bc13274158a",
+      "name": "com/sun/activation/registries/MailcapTokenizer",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "UNKNOWN_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "START_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "STRING_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EOI_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SLASH_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SEMICOLON_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "EQUALS_TOKEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "data",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "dataIndex",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "dataLength",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "currentToken",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "currentTokenValue",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "isAutoquoting",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "autoquoteChar",
+          "descriptor": "C",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "73ce15c371223a5f30ff14aa8728c477a3d0b4585d5e6dd644ebc0e1913fa34e",
+          "code_length": 45
+        },
+        {
+          "name": "setIsAutoquoting",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "c7062452efbc8119e6431ccc80d9a89050da832ed7c1ec8d596b49a13c3326c6",
+          "code_length": 6
+        },
+        {
+          "name": "getCurrentToken",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "nameForToken",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "d22027647f0cd0f5773568bc80cb85eae2206bc6db5010ccc69ce814ed02f135",
+          "code_length": 113
+        },
+        {
+          "name": "getCurrentTokenValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "nextToken",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "73a75333d38a83926f8faac0bab2a6fe9f97a49844c105cd772a7a3944a67e8d",
+          "code_length": 260
+        },
+        {
+          "name": "processStringToken",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "db20985b9e6c858b82235ee132c1083674846ccd593940c7ce666d922193e1c7",
+          "code_length": 68
+        },
+        {
+          "name": "processAutoquoteToken",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "9d0fc8deb814d088a124cd3575e94add3a8d46b20755cde5a0fca9440935d679",
+          "code_length": 85
+        },
+        {
+          "name": "isSpecialChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "b052a7fb4a429d0bcf6e2dfcf14f9e01198bb8f6edec2e57b6ae105d459e60c2",
+          "code_length": 260
+        },
+        {
+          "name": "isControlChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "13169c53154570b7441d8efae4d8b1144a4f00a5b5528ec35b786b5a3a271f97",
+          "code_length": 5
+        },
+        {
+          "name": "isWhiteSpaceChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "7329590d575be4b2666bdd036380b9711fad6fc2c529eda039a2e578acce3eba",
+          "code_length": 5
+        },
+        {
+          "name": "isStringTokenChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "ee95b675acc18a756753f4c4eb2ff099b2ed6883987a342d7139acb776fef9d5",
+          "code_length": 27
+        },
+        {
+          "name": "fixEscapeSequences",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "bf18a63526adfdffe1c9b070c2fc1bf77a9d1dc79c8c9258d043eed456ee00a1",
+          "code_length": 96
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/MailcapTokenizer",
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/MimeTypeEntry.class",
+      "occurrence": 0,
+      "sha256": "72b1537846277997cd28a140023b2d436aeb8910eac7b39b9940ac465121b007",
+      "name": "com/sun/activation/registries/MimeTypeEntry",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "extension",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getMIMEType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getFileExtension",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cbfcc11f622235c8f660b5719482c56e95a9eb3d42cd11468c0ff1bd0ed06bc9",
+          "code_length": 35
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/MimeTypeEntry",
+        "java/lang/Object",
+        "java/lang/StringBuffer"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/registries/MimeTypeFile.class",
+      "occurrence": 0,
+      "sha256": "dce4cecdbc7c689cfb761deb9428dc84b0465ee11ce07106bc82abf7ec05d497",
+      "name": "com/sun/activation/registries/MimeTypeFile",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fname",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "type_hash",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9bfd15da1e3c39429539022fe3359237a43f8cd981257789ca18a81f52a8e520",
+          "code_length": 89,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "38194b3af1b6d0aa57261d96abefbad57a5c22448bd42976d9e5ebb1775c744f",
+          "code_length": 42,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "02112d5d037076a38447ac27ecbf58915f3c31dfb06831029dcb864a4f9b7dac",
+          "code_length": 21
+        },
+        {
+          "name": "getMimeTypeEntry",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/activation/registries/MimeTypeEntry;",
+          "access": 1,
+          "code_sha256": "d1fdc7f92e71a4a3effb9588f63f2dd8dea37f7d46db96ac8259844a7a58c948",
+          "code_length": 12
+        },
+        {
+          "name": "getMIMETypeString",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "2255adbbf434703f6de93145248e6c4396e9d80685b6ad6a9ad08c31ebd7f5c0",
+          "code_length": 17
+        },
+        {
+          "name": "appendToRegistry",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e6375c6f88d6764ab4386c2a9dfcc642c58fd5e3f24e264408778f3555c27f50",
+          "code_length": 24
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/io/BufferedReader;)V",
+          "access": 2,
+          "code_sha256": "e5eaae3e02cf63ecb5c46d85340717d31d7600aa5c6926ccbe165b2e8a8eab7c",
+          "code_length": 100,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "parseEntry",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "091758c8f3ce2c41013fa6c8976c8ab3bc7f3f1274ef146350ca95b2725aa1ed",
+          "code_length": 355
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/LineTokenizer",
+        "com/sun/activation/registries/LogSupport",
+        "com/sun/activation/registries/MimeTypeEntry",
+        "com/sun/activation/registries/MimeTypeFile",
+        "java/io/BufferedReader",
+        "java/io/File",
+        "java/io/FileReader",
+        "java/io/IOException",
+        "java/io/InputStreamReader",
+        "java/io/StringReader",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Hashtable",
+        "java/util/StringTokenizer"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/viewers/ImageViewer.class",
+      "occurrence": 0,
+      "sha256": "c84918127b00b227e95463fad4a1473ce48bcd43ccd00ca2a6cbe676c04cf54a",
+      "name": "com/sun/activation/viewers/ImageViewer",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/Panel",
+      "interfaces": [
+        "javax/activation/CommandObject"
+      ],
+      "fields": [
+        {
+          "name": "canvas",
+          "descriptor": "Lcom/sun/activation/viewers/ImageViewerCanvas;",
+          "access": 2
+        },
+        {
+          "name": "image",
+          "descriptor": "Ljava/awt/Image;",
+          "access": 2
+        },
+        {
+          "name": "_dh",
+          "descriptor": "Ljavax/activation/DataHandler;",
+          "access": 2
+        },
+        {
+          "name": "DEBUG",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "54183fc4472d3a29b51341a9179f23234fa3b468bb22c884f2cb949a3a8b1505",
+          "code_length": 45
+        },
+        {
+          "name": "setCommandContext",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataHandler;)V",
+          "access": 1,
+          "code_sha256": "b20685782e80d2bca9fbdd4b125e8e7c2777ebea1afb9b44beeb89def743bcb5",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setInputStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 2,
+          "code_sha256": "879be70c2b6820cd12fd35840324d8f7f7846ffc655cd391c3902f80775197c6",
+          "code_length": 170,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "addNotify",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e47469f26adf6ef053ffd9af2eff9b6959f7e56380dee46188ff829753edd3bd",
+          "code_length": 17
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "1278ad16f55592300ddc7969092e72644d2a6fbeb395ef92dd8284ec79938888",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/viewers/ImageViewer",
+        "com/sun/activation/viewers/ImageViewerCanvas",
+        "java/awt/MediaTracker",
+        "java/awt/Panel",
+        "java/awt/Toolkit",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/PrintStream",
+        "java/lang/InterruptedException",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "javax/activation/CommandObject",
+        "javax/activation/DataHandler"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/viewers/ImageViewerCanvas.class",
+      "occurrence": 0,
+      "sha256": "6f7261a6072bbcce41b44c19de4fd25ec943d61b00034fe39d787af93542716c",
+      "name": "com/sun/activation/viewers/ImageViewerCanvas",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/Canvas",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "canvas_image",
+          "descriptor": "Ljava/awt/Image;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "5aa8b1d788997e7d70ad6fa3292d3ef3697f4be437a6f16c2bcd1c7707462aa6",
+          "code_length": 10
+        },
+        {
+          "name": "setImage",
+          "descriptor": "(Ljava/awt/Image;)V",
+          "access": 1,
+          "code_sha256": "91a9376c9a56189cf8a83e864b063bc86bd525c903154132b47734e5169256e1",
+          "code_length": 14
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "4d85636ec2b74de3193d6d25b2a78ca128d628376ef1d60fee05df26a2988158",
+          "code_length": 52
+        },
+        {
+          "name": "paint",
+          "descriptor": "(Ljava/awt/Graphics;)V",
+          "access": 1,
+          "code_sha256": "26152faa19f98ccdf0edf7801a32e13e234ac0897110e64750c506593db84844",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/viewers/ImageViewerCanvas",
+        "java/awt/Canvas",
+        "java/awt/Dimension",
+        "java/awt/Graphics",
+        "java/awt/Image"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/viewers/TextEditor.class",
+      "occurrence": 0,
+      "sha256": "40a9f0cefd3735a9e377ca553f3948098e2e2163d920d84730691db229871bc9",
+      "name": "com/sun/activation/viewers/TextEditor",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/Panel",
+      "interfaces": [
+        "javax/activation/CommandObject",
+        "java/awt/event/ActionListener"
+      ],
+      "fields": [
+        {
+          "name": "text_area",
+          "descriptor": "Ljava/awt/TextArea;",
+          "access": 2
+        },
+        {
+          "name": "panel_gb",
+          "descriptor": "Ljava/awt/GridBagLayout;",
+          "access": 2
+        },
+        {
+          "name": "button_panel",
+          "descriptor": "Ljava/awt/Panel;",
+          "access": 2
+        },
+        {
+          "name": "save_button",
+          "descriptor": "Ljava/awt/Button;",
+          "access": 2
+        },
+        {
+          "name": "text_file",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        },
+        {
+          "name": "text_buffer",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "data_ins",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 2
+        },
+        {
+          "name": "fis",
+          "descriptor": "Ljava/io/FileInputStream;",
+          "access": 2
+        },
+        {
+          "name": "_dh",
+          "descriptor": "Ljavax/activation/DataHandler;",
+          "access": 2
+        },
+        {
+          "name": "DEBUG",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "b386536b0ec15b8e20f70232b09a4732e62f5cbfc8de69e4f4b84617d61d3328",
+          "code_length": 196
+        },
+        {
+          "name": "addGridComponent",
+          "descriptor": "(Ljava/awt/Container;Ljava/awt/Component;Ljava/awt/GridBagLayout;IIIIII)V",
+          "access": 2,
+          "code_sha256": "bdd30e1d90963340dde8cc8313051a0b52dac469e7d3f6651c6443721807fdeb",
+          "code_length": 80
+        },
+        {
+          "name": "setCommandContext",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataHandler;)V",
+          "access": 1,
+          "code_sha256": "ffa7487e00c60303833e58c1056757f3b168216fec783e0bec30927e08a8852e",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setInputStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "c553eca040c751accf5d174c3a1b4006c1b816918e48b3261aaee62fc51e86e4",
+          "code_length": 63,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "performSaveOperation",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "5ade93ef4896e0270f09364b65965e214550fa590d16cae0d963168b6b74eb4d",
+          "code_length": 89
+        },
+        {
+          "name": "addNotify",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "111b4c56201d95d4b644be21bcdce9ba67f266abb29159b33058d696efe66cce",
+          "code_length": 9
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "f99590d69369eb2a38f25b01d514086957d8d520962d80c682f65cc6aefa7685",
+          "code_length": 12
+        },
+        {
+          "name": "actionPerformed",
+          "descriptor": "(Ljava/awt/event/ActionEvent;)V",
+          "access": 1,
+          "code_sha256": "8233edac46c32ce66236461d4dde57f17fb322279450e7004567759bfcaa6f11",
+          "code_length": 16
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/viewers/TextEditor",
+        "java/awt/Button",
+        "java/awt/Container",
+        "java/awt/FlowLayout",
+        "java/awt/GridBagConstraints",
+        "java/awt/GridBagLayout",
+        "java/awt/Panel",
+        "java/awt/TextArea",
+        "java/awt/event/ActionEvent",
+        "java/awt/event/ActionListener",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/io/PrintStream",
+        "java/lang/Exception",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "javax/activation/CommandObject",
+        "javax/activation/DataHandler"
+      ]
+    },
+    {
+      "entry": "com/sun/activation/viewers/TextViewer.class",
+      "occurrence": 0,
+      "sha256": "0cf5dca57ed782d90d5a039e0cdeabd5ccaac839e4d532d589c95b9ad480e652",
+      "name": "com/sun/activation/viewers/TextViewer",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/Panel",
+      "interfaces": [
+        "javax/activation/CommandObject"
+      ],
+      "fields": [
+        {
+          "name": "text_area",
+          "descriptor": "Ljava/awt/TextArea;",
+          "access": 2
+        },
+        {
+          "name": "text_file",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        },
+        {
+          "name": "text_buffer",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "_dh",
+          "descriptor": "Ljavax/activation/DataHandler;",
+          "access": 2
+        },
+        {
+          "name": "DEBUG",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "f78d7391df736c82f957096ac54ee0bc573b886d016bf6fb60f0ea7597299a31",
+          "code_length": 78
+        },
+        {
+          "name": "setCommandContext",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataHandler;)V",
+          "access": 1,
+          "code_sha256": "6101a53a59f8f153015c8ece8ef2e4e6715a413e3d9a3f5dafded583c4aa130f",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setInputStream",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "c4ffe96e0fcd18b74c2d4af5da0a8e21351fe702aa30dd948a902652dd425c2c",
+          "code_length": 63,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "addNotify",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c77f850632857a21963088488d0e86aaeb1f6fc50c840804a0acee6ce6aa634c",
+          "code_length": 9
+        },
+        {
+          "name": "getPreferredSize",
+          "descriptor": "()Ljava/awt/Dimension;",
+          "access": 1,
+          "code_sha256": "c7579d51ae787348ef5fdd5cc54c2343278b458b871596d831efcbf2e259b1a2",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/viewers/TextViewer",
+        "java/awt/GridLayout",
+        "java/awt/Panel",
+        "java/awt/TextArea",
+        "java/io/ByteArrayOutputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "javax/activation/CommandObject",
+        "javax/activation/DataHandler"
+      ]
+    },
+    {
+      "entry": "javax/activation/ActivationDataFlavor.class",
+      "occurrence": 0,
+      "sha256": "13be8cbd37d0e5594c68f159be4259e4c412087f874984dab7ce87a663610209",
+      "name": "javax/activation/ActivationDataFlavor",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/awt/datatransfer/DataFlavor",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "mimeType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "mimeObject",
+          "descriptor": "Ljavax/activation/MimeType;",
+          "access": 2
+        },
+        {
+          "name": "humanPresentableName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "representationClass",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "329561927bbb186b5d3c2b7a77547129e452a2478740da528ffe388be52f21a2",
+          "code_length": 42
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e6ccce39b85eeccf778871348cd32fb494528667707d914ed9dd59f1e4a0e26d",
+          "code_length": 45
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "3d421debd4f2d58d1826fdbad0bda59d4bbea558f878bbc829a1eabe93d2976d",
+          "code_length": 50
+        },
+        {
+          "name": "getMimeType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getRepresentationClass",
+          "descriptor": "()Ljava/lang/Class;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "getHumanPresentableName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "setHumanPresentableName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "1c059b5fe325fde7d43b063306b8ea508a338bafb0f3efc8a9c0b94e3f6e422c",
+          "code_length": 6
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;)Z",
+          "access": 1,
+          "code_sha256": "2dbf63c0afb7a05cf7cd4fda0469dc503651c55c583c65f5856d1422c1abeda2",
+          "code_length": 25
+        },
+        {
+          "name": "isMimeTypeEqual",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "26e1f22d11054bcd48cbee801cb26aeaf686df4fe3df0b36d53f12c3c7611cc1",
+          "code_length": 55
+        },
+        {
+          "name": "normalizeMimeTypeParameter",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "bd67b655109b64ce86c0d2fff93da7638267d12f2c3c5c0530c722bc9538a007",
+          "code_length": 2
+        },
+        {
+          "name": "normalizeMimeType",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "java/awt/datatransfer/DataFlavor",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/String",
+        "javax/activation/ActivationDataFlavor",
+        "javax/activation/MimeType",
+        "javax/activation/MimeTypeParseException"
+      ]
+    },
+    {
+      "entry": "javax/activation/CommandInfo.class",
+      "occurrence": 0,
+      "sha256": "8e1aecc124cc1e0d34bad702f9924f18e98ca8c1ad7d61d8e3534dcda170d25b",
+      "name": "javax/activation/CommandInfo",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "verb",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "className",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15
+        },
+        {
+          "name": "getCommandName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "getCommandClass",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getCommandObject",
+          "descriptor": "(Ljavax/activation/DataHandler;Ljava/lang/ClassLoader;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "94561cea68aea0885a43c539b7a2a71303c93b7354790bf87b11d1acccda154f",
+          "code_length": 81,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/beans/Beans",
+        "java/io/Externalizable",
+        "java/io/IOException",
+        "java/io/ObjectInputStream",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Object",
+        "javax/activation/CommandInfo",
+        "javax/activation/CommandObject",
+        "javax/activation/DataHandler"
+      ]
+    },
+    {
+      "entry": "javax/activation/CommandMap.class",
+      "occurrence": 0,
+      "sha256": "91a58a53aaf908e9430c9d89402ba972daafeb74d54e915406bbd6034a881ad6",
+      "name": "javax/activation/CommandMap",
+      "major": 48,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defaultCommandMap",
+          "descriptor": "Ljavax/activation/CommandMap;",
+          "access": 10
+        },
+        {
+          "name": "class$javax$activation$CommandMap",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "getDefaultCommandMap",
+          "descriptor": "()Ljavax/activation/CommandMap;",
+          "access": 9,
+          "code_sha256": "c6a77eb42c7c54a48fae3845d1404f383b2214775c79da865991d1b287f913a7",
+          "code_length": 20
+        },
+        {
+          "name": "setDefaultCommandMap",
+          "descriptor": "(Ljavax/activation/CommandMap;)V",
+          "access": 9,
+          "code_sha256": "873999f0b1526df9ec933a06c1ec9ad04f8629a5c96e62adca9a90e11e448b1f",
+          "code_length": 57
+        },
+        {
+          "name": "getPreferredCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljavax/activation/CommandInfo;",
+          "access": 1025
+        },
+        {
+          "name": "getPreferredCommands",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataSource;)[Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "8b41df33e1e2b10576568bffe1b97efa4805aa5be5a0a1a32330ed002a820ebb",
+          "code_length": 6
+        },
+        {
+          "name": "getAllCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljavax/activation/CommandInfo;",
+          "access": 1025
+        },
+        {
+          "name": "getAllCommands",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataSource;)[Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "22f8da68662ddf5d2facf4d4adaed3c6086c57d8f889e6f22105ebeea5936375",
+          "code_length": 6
+        },
+        {
+          "name": "getCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/activation/CommandInfo;",
+          "access": 1025
+        },
+        {
+          "name": "getCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljavax/activation/DataSource;)Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "5348004074e0a3ed50a2650813af6608969e0a8d4fa71a66463a265ef56cf9cf",
+          "code_length": 7
+        },
+        {
+          "name": "createDataContentHandler",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataContentHandler;",
+          "access": 1025
+        },
+        {
+          "name": "createDataContentHandler",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataSource;)Ljavax/activation/DataContentHandler;",
+          "access": 1,
+          "code_sha256": "989615e13161bcd701c9e70e627ce1dd23c269d08e3e7c272762557289584ce2",
+          "code_length": 6
+        },
+        {
+          "name": "getMimeTypes",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c8a68704d07f854e62a285ae2351a5d769bd32be5640db83afd081df0134707e",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/SecurityManager",
+        "java/lang/System",
+        "javax/activation/CommandMap",
+        "javax/activation/MailcapCommandMap"
+      ]
+    },
+    {
+      "entry": "javax/activation/CommandObject.class",
+      "occurrence": 0,
+      "sha256": "424031852715a2a2abac4d5834fa5582feb1441bf5366e307e831f7755bb8f5e",
+      "name": "javax/activation/CommandObject",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "setCommandContext",
+          "descriptor": "(Ljava/lang/String;Ljavax/activation/DataHandler;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "javax/activation/CommandObject"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "7dd9e99167d025b3ff6130021f5baf7319dbed7dbd502bc5eddcdf7db6ae09ec",
+      "name": "javax/activation/DataContentHandler",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getTransferDataFlavors",
+          "descriptor": "()[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 1025
+        },
+        {
+          "name": "getTransferData",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/awt/datatransfer/UnsupportedFlavorException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContent",
+          "descriptor": "(Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeTo",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/io/OutputStream;)V",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/awt/datatransfer/UnsupportedFlavorException",
+        "java/io/IOException",
+        "java/lang/Object",
+        "javax/activation/DataContentHandler"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataContentHandlerFactory.class",
+      "occurrence": 0,
+      "sha256": "c52adaeb77b3a19e075db53b8c23dbf24cc96e69b66718137ab11adaf99992cd",
+      "name": "javax/activation/DataContentHandlerFactory",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "createDataContentHandler",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataContentHandler;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "javax/activation/DataContentHandlerFactory"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataHandler$1.class",
+      "occurrence": 0,
+      "sha256": "f8f0339f4828b7c60fed734598e9a945f1b311514b976acf7615171a7cff464a",
+      "name": "javax/activation/DataHandler$1",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Runnable"
+      ],
+      "fields": [
+        {
+          "name": "val$fdch",
+          "descriptor": "Ljavax/activation/DataContentHandler;",
+          "access": 18
+        },
+        {
+          "name": "val$pos",
+          "descriptor": "Ljava/io/PipedOutputStream;",
+          "access": 18
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Ljavax/activation/DataHandler;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/activation/DataHandler;Ljavax/activation/DataContentHandler;Ljava/io/PipedOutputStream;)V",
+          "access": 0,
+          "code_sha256": "6df851e594d2f852ca23f9b66080831cfbe8e8ae7cc0dbd69f721b0a005621df",
+          "code_length": 20
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9b5511a4ab47a61a26318071075144795dd14d4c031f6d45c9742cd09e8625b7",
+          "code_length": 71
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/io/PipedOutputStream",
+        "java/lang/Object",
+        "java/lang/Runnable",
+        "javax/activation/DataContentHandler",
+        "javax/activation/DataHandler",
+        "javax/activation/DataHandler$1"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataHandler.class",
+      "occurrence": 0,
+      "sha256": "ed4bd18b3fb348e838ae55d29ecbb49377972e708f4cbe7b6e63989a4b3114ce",
+      "name": "javax/activation/DataHandler",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/awt/datatransfer/Transferable"
+      ],
+      "fields": [
+        {
+          "name": "dataSource",
+          "descriptor": "Ljavax/activation/DataSource;",
+          "access": 2
+        },
+        {
+          "name": "objDataSource",
+          "descriptor": "Ljavax/activation/DataSource;",
+          "access": 2
+        },
+        {
+          "name": "object",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "objectMimeType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "currentCommandMap",
+          "descriptor": "Ljavax/activation/CommandMap;",
+          "access": 2
+        },
+        {
+          "name": "emptyFlavors",
+          "descriptor": "[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 26
+        },
+        {
+          "name": "transferFlavors",
+          "descriptor": "[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 2
+        },
+        {
+          "name": "dataContentHandler",
+          "descriptor": "Ljavax/activation/DataContentHandler;",
+          "access": 2
+        },
+        {
+          "name": "factoryDCH",
+          "descriptor": "Ljavax/activation/DataContentHandler;",
+          "access": 2
+        },
+        {
+          "name": "factory",
+          "descriptor": "Ljavax/activation/DataContentHandlerFactory;",
+          "access": 10
+        },
+        {
+          "name": "oldFactory",
+          "descriptor": "Ljavax/activation/DataContentHandlerFactory;",
+          "access": 2
+        },
+        {
+          "name": "shortType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "class$javax$activation$DataHandler",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/activation/DataSource;)V",
+          "access": 1,
+          "code_sha256": "5ffd489273c294be33d24bb20f79c4496bd302e0bb17289dacde7a9df17302bb",
+          "code_length": 69
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "e67bd9151c13ff5e0ce2122bbfe3a385860a835a717197bd513988346a80badb",
+          "code_length": 74
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 1,
+          "code_sha256": "fef6cc220ff0633da749b998c7e0ec0125f499236932b0458083d09079702dc7",
+          "code_length": 76
+        },
+        {
+          "name": "getCommandMap",
+          "descriptor": "()Ljavax/activation/CommandMap;",
+          "access": 34,
+          "code_sha256": "9702fc1e23cf74998fe9cdc1b65abaa7783d2e6c773d164ebbb48d688cfd2efb",
+          "code_length": 16
+        },
+        {
+          "name": "getDataSource",
+          "descriptor": "()Ljavax/activation/DataSource;",
+          "access": 1,
+          "code_sha256": "be8e841acbce51ef99c889bf58cd124a2ea937acc7a167b7ae7e65fc3b791ad4",
+          "code_length": 36
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "174a0a29e5011f9eb93e9ff7f163e93b7de43c94bb4f3480f97b9578ffa49567",
+          "code_length": 19
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "26e28576a6ec204b85383019e1b50c695d1b0b2bada2163d4193c9db62641e1b",
+          "code_length": 22
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "40c34f9eb2d21351d561137ff60445d9f97c0e870765c569144a9e31e915f055",
+          "code_length": 158,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeTo",
+          "descriptor": "(Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "5171ebb53ef62faa79dad7061bc91c52413b2f043ad65cc97fc3b4572bf407c6",
+          "code_length": 91,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "2e5a4d623e0bd2d491824d8f83ea3ba7f69f2b2bb598436ff16bb3da6bebfb2d",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getTransferDataFlavors",
+          "descriptor": "()[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 33,
+          "code_sha256": "3743df9d89f2fbaaf1834c4d7c45c190a633b8c203b32159486dec7c46187a91",
+          "code_length": 45
+        },
+        {
+          "name": "isDataFlavorSupported",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;)Z",
+          "access": 1,
+          "code_sha256": "2c0f3a0ca4d47a5428203bf82580b15461af5e25fbe948b3b932ffd7fd65979f",
+          "code_length": 33
+        },
+        {
+          "name": "getTransferData",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "d89601e0ddae71c5695034b2c38cfe6a1f7d8a1c84652251418c36de88802e7d",
+          "code_length": 15,
+          "throws": [
+            "java/awt/datatransfer/UnsupportedFlavorException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "setCommandMap",
+          "descriptor": "(Ljavax/activation/CommandMap;)V",
+          "access": 33,
+          "code_sha256": "bb64005376f81ac3908098e7266abeb08fa70987f5af351beca6502290dd12ea",
+          "code_length": 30
+        },
+        {
+          "name": "getPreferredCommands",
+          "descriptor": "()[Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "2f9df02af29a03ff745431aea6d9e2f95592192d9ca6a53d7d789a914571e8f0",
+          "code_length": 35
+        },
+        {
+          "name": "getAllCommands",
+          "descriptor": "()[Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "4e8da28f39f812fdf4310219d75890c0166d877d72b42a72f72564d980fdc475",
+          "code_length": 35
+        },
+        {
+          "name": "getCommand",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/CommandInfo;",
+          "access": 1,
+          "code_sha256": "8735e40efb7a5dcc00b2b5280fec260bb9ec2d9828118efdb2dae6d952dabeb5",
+          "code_length": 37
+        },
+        {
+          "name": "getContent",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "e25c27f2a14badc20c5a3522ca4bb00f66dc6c5b78e5f3e8e4587c4fdae2b8e7",
+          "code_length": 26,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getBean",
+          "descriptor": "(Ljavax/activation/CommandInfo;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "28549f10c60404b7f567657215b4f5007c459d2aa8e504778b084a7729b5ca5b",
+          "code_length": 37
+        },
+        {
+          "name": "getDataContentHandler",
+          "descriptor": "()Ljavax/activation/DataContentHandler;",
+          "access": 34,
+          "code_sha256": "949520938e55746ef30b477298f28f94df0f07132d632a80f10cb495144477d1",
+          "code_length": 194
+        },
+        {
+          "name": "getBaseType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 34,
+          "code_sha256": "f2f6518c0bab14df7b2849512def488ad3ea7472d7279699fb40d0fd9b3e7d8e",
+          "code_length": 43
+        },
+        {
+          "name": "setDataContentHandlerFactory",
+          "descriptor": "(Ljavax/activation/DataContentHandlerFactory;)V",
+          "access": 41,
+          "code_sha256": "be1c96a062368c112bb85510ae8ffd0fc0ebd03e975a298c72bc3aa1a5d7ddbe",
+          "code_length": 73
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Ljavax/activation/DataHandler;)Ljava/lang/Object;",
+          "access": 8,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "access$100",
+          "descriptor": "(Ljavax/activation/DataHandler;)Ljava/lang/String;",
+          "access": 8,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "302eaea7949837aba61a509d73c81762fe8ce7636d6b7dedc1d3a1f051a4e6dd",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "45e5fc84fdcef961c7e1f84c9cbc0fcb6c413f759508067f41f8d415942c5834",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "java/awt/datatransfer/DataFlavor",
+        "java/awt/datatransfer/Transferable",
+        "java/awt/datatransfer/UnsupportedFlavorException",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/io/PipedInputStream",
+        "java/io/PipedOutputStream",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Error",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/SecurityManager",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/lang/Thread",
+        "javax/activation/CommandInfo",
+        "javax/activation/CommandMap",
+        "javax/activation/DataContentHandler",
+        "javax/activation/DataContentHandlerFactory",
+        "javax/activation/DataHandler",
+        "javax/activation/DataHandler$1",
+        "javax/activation/DataHandlerDataSource",
+        "javax/activation/DataSource",
+        "javax/activation/DataSourceDataContentHandler",
+        "javax/activation/MimeType",
+        "javax/activation/MimeTypeParseException",
+        "javax/activation/ObjectDataContentHandler",
+        "javax/activation/SecuritySupport",
+        "javax/activation/URLDataSource",
+        "javax/activation/UnsupportedDataTypeException"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataHandlerDataSource.class",
+      "occurrence": 0,
+      "sha256": "c94d04fc865951ea001cd3903837ae4ade54e88f758b567c033178f04dbd8751",
+      "name": "javax/activation/DataHandlerDataSource",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataSource"
+      ],
+      "fields": [
+        {
+          "name": "dataHandler",
+          "descriptor": "Ljavax/activation/DataHandler;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/activation/DataHandler;)V",
+          "access": 1,
+          "code_sha256": "b38a861265f2a4a3349a288df8cf126a830e625aa0e146d3c75a047a06c22c76",
+          "code_length": 15
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "76ac1e4adf5662f17c6ebd42f6461b24bbaafe428c15d462787286de78ea82a1",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "c19ec94e121de2173b2be1cc58d2ba819cb96769cca9a1c9f7a028fc77141629",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fc952e06b26f683a6f4f933f0d04ac34d3f91f25fe9cbcd8f78a8f20c2356c85",
+          "code_length": 8
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "79ee51fde0769d1eae9c8849583c96051eaffd9d2b5477c6203e1eedc5bd5f0d",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "javax/activation/DataHandler",
+        "javax/activation/DataHandlerDataSource",
+        "javax/activation/DataSource"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataSource.class",
+      "occurrence": 0,
+      "sha256": "b82277efa549dab655608a7154582b93ca9434b8291b11cd98d7ffcc950c774f",
+      "name": "javax/activation/DataSource",
+      "major": 48,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1025,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "javax/activation/DataSource"
+      ]
+    },
+    {
+      "entry": "javax/activation/DataSourceDataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "7ce160862409628be14b4aa9c7249d74260e4eab6beeec65fe4b9d541a019cbf",
+      "name": "javax/activation/DataSourceDataContentHandler",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataContentHandler"
+      ],
+      "fields": [
+        {
+          "name": "ds",
+          "descriptor": "Ljavax/activation/DataSource;",
+          "access": 2
+        },
+        {
+          "name": "transferFlavors",
+          "descriptor": "[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 2
+        },
+        {
+          "name": "dch",
+          "descriptor": "Ljavax/activation/DataContentHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/activation/DataContentHandler;Ljavax/activation/DataSource;)V",
+          "access": 1,
+          "code_sha256": "250d34eaf946a7bb5d7c60543685dea0565b3ff5ec9bce4da30017449eeb9026",
+          "code_length": 30
+        },
+        {
+          "name": "getTransferDataFlavors",
+          "descriptor": "()[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 1,
+          "code_sha256": "71962ef233d00233596c4d4acee87f212cd599b7bd1dcad889eb31498911e5e6",
+          "code_length": 74
+        },
+        {
+          "name": "getTransferData",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "95e66bc553bc86653da1e857e93e52e415f93c465ea041d6dab346cb4b454a76",
+          "code_length": 48,
+          "throws": [
+            "java/awt/datatransfer/UnsupportedFlavorException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContent",
+          "descriptor": "(Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "263fc14b0ec2a4f9dd70ace864e21561b0a3443d1b143a7d75813dd824b512c3",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "writeTo",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "c4b3e576880e82cffa97fd30198ba7de709c4dcd8f553fddb2ccec1621677241",
+          "code_length": 58,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/awt/datatransfer/DataFlavor",
+        "java/awt/datatransfer/UnsupportedFlavorException",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/lang/StringBuffer",
+        "javax/activation/ActivationDataFlavor",
+        "javax/activation/DataContentHandler",
+        "javax/activation/DataSource",
+        "javax/activation/DataSourceDataContentHandler",
+        "javax/activation/UnsupportedDataTypeException"
+      ]
+    },
+    {
+      "entry": "javax/activation/FileDataSource.class",
+      "occurrence": 0,
+      "sha256": "d188891b5047ffbb0db120824a68b475a3b655b9a2396f72588709413af0dd0d",
+      "name": "javax/activation/FileDataSource",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataSource"
+      ],
+      "fields": [
+        {
+          "name": "_file",
+          "descriptor": "Ljava/io/File;",
+          "access": 2
+        },
+        {
+          "name": "typeMap",
+          "descriptor": "Ljavax/activation/FileTypeMap;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/File;)V",
+          "access": 1,
+          "code_sha256": "c00c71c1d5f20a9de3a4141bd0d0a2a64dc7905969f6aed741b55f9c4070bc70",
+          "code_length": 20
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a7cd3193a2535f17dd21c43215dc41501b4f03a36e212f09ad82666fae4f66b6",
+          "code_length": 13
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "ca1c5413363ea76ccc2209366a2fcac191ac5a23295f398404862f7c5a46021c",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "bf913b096e863fdf04f270f9246788c03194d5b79b6b0bd2524c74e5a13ae1a8",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "af4691852e3920e48cf00448fcb3363eb3ebf5458764d5175d631f1341271ee3",
+          "code_length": 30
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7ce9aef583407f2e76d34b7e568b7d8b392b0096e40695fad989be892e04c512",
+          "code_length": 8
+        },
+        {
+          "name": "getFile",
+          "descriptor": "()Ljava/io/File;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        },
+        {
+          "name": "setFileTypeMap",
+          "descriptor": "(Ljavax/activation/FileTypeMap;)V",
+          "access": 1,
+          "code_sha256": "69e52eac317680e748fa698b13b4527c910f3cd3f7436b5eb79b7a10eba51484",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/FileOutputStream",
+        "java/io/IOException",
+        "java/lang/Object",
+        "javax/activation/DataSource",
+        "javax/activation/FileDataSource",
+        "javax/activation/FileTypeMap"
+      ]
+    },
+    {
+      "entry": "javax/activation/FileTypeMap.class",
+      "occurrence": 0,
+      "sha256": "a9e656b2bd6c91a83a70be98e6a3eae7e7598fe7f25667f30d3d5788d25949d1",
+      "name": "javax/activation/FileTypeMap",
+      "major": 48,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defaultMap",
+          "descriptor": "Ljavax/activation/FileTypeMap;",
+          "access": 10
+        },
+        {
+          "name": "class$javax$activation$FileTypeMap",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "bf56481bf7686ab87bb9e376621a08672b6e15ce1fb420e4a5a134a94df336c6",
+          "code_length": 5
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "setDefaultFileTypeMap",
+          "descriptor": "(Ljavax/activation/FileTypeMap;)V",
+          "access": 9,
+          "code_sha256": "c2e902bfe1c491fbddbafcd0f785d52c22ecf4f2ceda05a7735712c5ac7258d6",
+          "code_length": 57
+        },
+        {
+          "name": "getDefaultFileTypeMap",
+          "descriptor": "()Ljavax/activation/FileTypeMap;",
+          "access": 9,
+          "code_sha256": "2f69ebac7b5fe3f5cd3836ac7cd52750df763e6b5e19a1cbde8cdda4eb6525cc",
+          "code_length": 20
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "469084fccd868fddeed73093ec1b86298f041b0db3c879528d02ac17763402e4",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/SecurityManager",
+        "java/lang/System",
+        "javax/activation/FileTypeMap",
+        "javax/activation/MimetypesFileTypeMap"
+      ]
+    },
+    {
+      "entry": "javax/activation/MailcapCommandMap.class",
+      "occurrence": 0,
+      "sha256": "19ad1f18e034a9393498c23c9995b891c03f8c631adf5bdbc8f6a40e703f9af5",
+      "name": "javax/activation/MailcapCommandMap",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/activation/CommandMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defDB",
+          "descriptor": "Lcom/sun/activation/registries/MailcapFile;",
+          "access": 10
+        },
+        {
+          "name": "DB",
+          "descriptor": "[Lcom/sun/activation/registries/MailcapFile;",
+          "access": 2
+        },
+        {
+          "name": "PROG",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "class$javax$activation$MailcapCommandMap",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0d4bed0c841574d7b49c4b6c1e733eb237e95a3e19e04ee7a1cbe5de9aa5d98d",
+          "code_length": 274
+        },
+        {
+          "name": "loadResource",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/activation/registries/MailcapFile;",
+          "access": 2,
+          "code_sha256": "ebbdba50c359647339e6587118feb74fbc8935aba021bf1d8c49ff0f89232f97",
+          "code_length": 224
+        },
+        {
+          "name": "loadAllResources",
+          "descriptor": "(Ljava/util/List;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "926c7839961c48b053aaa86bf78025833d78ac12f9c5f1a8b78a6ac750b7e96f",
+          "code_length": 439
+        },
+        {
+          "name": "loadFile",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/activation/registries/MailcapFile;",
+          "access": 2,
+          "code_sha256": "7d5c20996fb90169397b60965c0573e785ee68d6323b39d3e3f2fefed6b7d314",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "82528eb8815c45c36aa8996de938abc94c1c8a6d5a5707bc5c6c2fed69dc0e59",
+          "code_length": 56,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "fcf6fb7d70190253bacad71a5b9b6608d3b3e4f8643dc776fe0f9fea6e392cad",
+          "code_length": 37
+        },
+        {
+          "name": "getPreferredCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljavax/activation/CommandInfo;",
+          "access": 33,
+          "code_sha256": "a696ef97360147f395de93246ceeda6ff766dbff7554150b9084d6a1f1bd4a0b",
+          "code_length": 152
+        },
+        {
+          "name": "appendPrefCmdsToList",
+          "descriptor": "(Ljava/util/Map;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "11039889e8bcb387f9b06fc97155bda45c8a85425b96f7504e701a83954e5ad2",
+          "code_length": 90
+        },
+        {
+          "name": "checkForVerb",
+          "descriptor": "(Ljava/util/List;Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "8c815219a78c862f2fb7af292e8829dc19904cd0167423d7dcb010265c17c313",
+          "code_length": 46
+        },
+        {
+          "name": "getAllCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljavax/activation/CommandInfo;",
+          "access": 33,
+          "code_sha256": "82820e1874a6948997053a621ede3f1f67a5ecf8bb49d9116c1aaf09f4b26c4a",
+          "code_length": 152
+        },
+        {
+          "name": "appendCmdsToList",
+          "descriptor": "(Ljava/util/Map;Ljava/util/List;)V",
+          "access": 2,
+          "code_sha256": "5bb8d6ccab79889bcece9fc684adfe1c1f38b3baa2f5e37171878197b2729a96",
+          "code_length": 101
+        },
+        {
+          "name": "getCommand",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljavax/activation/CommandInfo;",
+          "access": 33,
+          "code_sha256": "308abdc39c6a6de3117231b243d55c85b0aab2bef8e9c64c2dd62416110a00dc",
+          "code_length": 200
+        },
+        {
+          "name": "addMailcap",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 33,
+          "code_sha256": "25e5d016be86ec3f1eafe46e7b410fe2f6d712a24bcd685190b029f365651156",
+          "code_length": 38
+        },
+        {
+          "name": "createDataContentHandler",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataContentHandler;",
+          "access": 33,
+          "code_sha256": "13402f05c9fd3edc5f2f7027e7648bfa889c774531f9423ed37ddae65edfbc9d",
+          "code_length": 280
+        },
+        {
+          "name": "getDataContentHandler",
+          "descriptor": "(Ljava/lang/String;)Ljavax/activation/DataContentHandler;",
+          "access": 2,
+          "code_sha256": "09bf3c127e870304524e20b630f05331fab0165f9397afbaebdb60c266d999a5",
+          "code_length": 188
+        },
+        {
+          "name": "getMimeTypes",
+          "descriptor": "()[Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "4d6c859708b8243c3317aa5e31bc5e8b53448f3b80fa3e14ff9b71b35f23c636",
+          "code_length": 117
+        },
+        {
+          "name": "getNativeCommands",
+          "descriptor": "(Ljava/lang/String;)[Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "5c0c90066d10041cad386fd62197f87544b0535065b881dfd85ffef660fdd9a3",
+          "code_length": 135
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "aa73e367865dd1663ba90fb02e6e56dde8ed99903eb925ce0e8190ded82696e1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "[Lcom/sun/activation/registries/MailcapFile;",
+        "[Ljava/lang/String;",
+        "[Ljavax/activation/CommandInfo;",
+        "com/sun/activation/registries/LogSupport",
+        "com/sun/activation/registries/MailcapFile",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassLoader",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/InstantiationException",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Locale",
+        "java/util/Map",
+        "java/util/Set",
+        "javax/activation/CommandInfo",
+        "javax/activation/CommandMap",
+        "javax/activation/DataContentHandler",
+        "javax/activation/MailcapCommandMap",
+        "javax/activation/SecuritySupport"
+      ]
+    },
+    {
+      "entry": "javax/activation/MimeType.class",
+      "occurrence": 0,
+      "sha256": "3801744b32f8abd18e62a3659e3503bc04822469619d717d7f26a90c53f3e3b5",
+      "name": "javax/activation/MimeType",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/io/Externalizable"
+      ],
+      "fields": [
+        {
+          "name": "primaryType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "subType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "parameters",
+          "descriptor": "Ljavax/activation/MimeTypeParameterList;",
+          "access": 2
+        },
+        {
+          "name": "TSPECIALS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9b88fe6b9ef37befc2bbded33c54b525ebe38032f880779fbaa86d4c5c666f61",
+          "code_length": 28
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "f754da86867d6a8c61093484251af47f93cd81c1740adf0353c05526199c2884",
+          "code_length": 10,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "4e56032bcc2a4ac287c50bf2dd77a1966109a19be902a7097276c9295af5bdc6",
+          "code_length": 80,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "f66588495347e13f1469da6352870ca34663ba22cb07f5b645f701c993da309a",
+          "code_length": 228,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "getPrimaryType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "setPrimaryType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a75e547104ec693848702b089043f779529a84a14d45815e95209fa1c48fb5fc",
+          "code_length": 33,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "getSubType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5
+        },
+        {
+          "name": "setSubType",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "efe50b42ce78844dac63d489cad3b4e25d863c54e9ceb31f1ec7e7083451e748",
+          "code_length": 33,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "getParameters",
+          "descriptor": "()Ljavax/activation/MimeTypeParameterList;",
+          "access": 1,
+          "code_sha256": "5fa52bee8d9ecaf9cc0dbb511c90d8e27e9656598177b730ca11725ba9764f76",
+          "code_length": 5
+        },
+        {
+          "name": "getParameter",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1bb4a8e48109db8fbd4ee4b28dbc33a4239c764659237d5f180b57b5665aaa5b",
+          "code_length": 9
+        },
+        {
+          "name": "setParameter",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "6c4ef5d8012a88b313ed62832983ba3de409c2dd240192a4902b0b33ea7dd0bd",
+          "code_length": 10
+        },
+        {
+          "name": "removeParameter",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "61e8395cd38f187aaca9ca019731140d2d97a3d0397b73159afa7445faab00f7",
+          "code_length": 9
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fe1f85742ea08ce2e48a497c7f2899577aefb5d469d110d33d69b71b438fe04b",
+          "code_length": 28
+        },
+        {
+          "name": "getBaseType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c9fff323a750b161454b728cf8de556cf10fcabcc99651d06aa5b3a312c863c6",
+          "code_length": 30
+        },
+        {
+          "name": "match",
+          "descriptor": "(Ljavax/activation/MimeType;)Z",
+          "access": 1,
+          "code_sha256": "69b0c264d58bc81aba7e52bf99e51ff36a71525c573e3a38e5641aadd68cbc43",
+          "code_length": 58
+        },
+        {
+          "name": "match",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "94cb9ffe223972dcf0415a7caa3c6a624f9ddd7ca9f82a66fde4fd23cf44f3b0",
+          "code_length": 13,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "writeExternal",
+          "descriptor": "(Ljava/io/ObjectOutput;)V",
+          "access": 1,
+          "code_sha256": "6d236aa1f447c8305da5f07ccd58394a2ff599cf2a8539ad1ee152e32e96e06d",
+          "code_length": 17,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "readExternal",
+          "descriptor": "(Ljava/io/ObjectInput;)V",
+          "access": 1,
+          "code_sha256": "046697fe16ad1f1e51ec2dfafd9588d988ebedeae17aedd20c2e76d19a69b578",
+          "code_length": 27,
+          "throws": [
+            "java/io/IOException",
+            "java/lang/ClassNotFoundException"
+          ]
+        },
+        {
+          "name": "isTokenChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "2cfab3e010a13be2ad0cc1fb7282cf42d4f29b7e06009e8e8baaf2e0158f44a7",
+          "code_length": 27
+        },
+        {
+          "name": "isValidToken",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 2,
+          "code_sha256": "91f74d7bb9c7a5db9937d550fe5ac826522bb266da6a3c699ed3b8551078dd86",
+          "code_length": 43
+        }
+      ],
+      "class_references": [
+        "java/io/Externalizable",
+        "java/io/IOException",
+        "java/io/ObjectInput",
+        "java/io/ObjectOutput",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Locale",
+        "javax/activation/MimeType",
+        "javax/activation/MimeTypeParameterList",
+        "javax/activation/MimeTypeParseException"
+      ]
+    },
+    {
+      "entry": "javax/activation/MimeTypeParameterList.class",
+      "occurrence": 0,
+      "sha256": "c04f3967ceadab43c94acf19dff5162e9c654cf04f8f8ea976b00182891d3dc3",
+      "name": "javax/activation/MimeTypeParameterList",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "parameters",
+          "descriptor": "Ljava/util/Hashtable;",
+          "access": 2
+        },
+        {
+          "name": "TSPECIALS",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "683378c5dca7e12452b97a2c22754e2fb597441b53d305faf7cffc15f3798b12",
+          "code_length": 16
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9d541c3b4468454e5c24674e1210457dfa25866f757c0e60ca122fab76c4f42f",
+          "code_length": 21,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "parse",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "07b414d586cc3a1962c727e97adb74f8ea235fcfa8b0dc8bd265e8dc0299954a",
+          "code_length": 384,
+          "throws": [
+            "javax/activation/MimeTypeParseException"
+          ]
+        },
+        {
+          "name": "size",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e35da4b0ddd1d7cd4d06c4bee7bc1dc912b4b89d361a9316bf86918957fb353b",
+          "code_length": 8
+        },
+        {
+          "name": "isEmpty",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "2e81d0afe224c63efe1ab149c8a53755be3af4703389fc9d0a224fde1fcc76ab",
+          "code_length": 8
+        },
+        {
+          "name": "get",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d5aed16297f62a5b6c870b42c1d5e5ddf9e1133496b4575f22066ced143f6227",
+          "code_length": 21
+        },
+        {
+          "name": "set",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "dc4408d439eddcdaee0674c5838ef97199409d63fa234348c6bc38b5e3da7bd9",
+          "code_length": 20
+        },
+        {
+          "name": "remove",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a6df4a7ce7d7497da88bf2772251014e7096f56a0afd81a0c5e91a33fe15048c",
+          "code_length": 19
+        },
+        {
+          "name": "getNames",
+          "descriptor": "()Ljava/util/Enumeration;",
+          "access": 1,
+          "code_sha256": "62130506bba0f79d64425ebcf3a816107b028fd5d242b04cea2e2c29d6fcc8b0",
+          "code_length": 8
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b693c18f5bea1c0459cc4158453a9c7bf6ccf66ae2ab4a05f46c8a8b93e9bfa3",
+          "code_length": 96
+        },
+        {
+          "name": "isTokenChar",
+          "descriptor": "(C)Z",
+          "access": 10,
+          "code_sha256": "29704ed01b65ebe4c9665a5649b8376be43260d908280af6bc329a822d06c93f",
+          "code_length": 27
+        },
+        {
+          "name": "skipWhiteSpace",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 10,
+          "code_sha256": "964e1daaeeb24e05733bce44cdb863ef3ddde906bba57286dce586c88b8d3b28",
+          "code_length": 29
+        },
+        {
+          "name": "quote",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "f3c9f24003b9a4b4616810bbe055df1b75d17598973588d19eaf7603df11596d",
+          "code_length": 136
+        },
+        {
+          "name": "unquote",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "c7b3380aa74424a188e34638d59bf4a8e7627c48ce53bee1efe8b6b38c70244d",
+          "code_length": 87
+        }
+      ],
+      "class_references": [
+        "java/lang/Character",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/util/Enumeration",
+        "java/util/Hashtable",
+        "java/util/Locale",
+        "javax/activation/MimeTypeParameterList",
+        "javax/activation/MimeTypeParseException"
+      ]
+    },
+    {
+      "entry": "javax/activation/MimeTypeParseException.class",
+      "occurrence": 0,
+      "sha256": "248a31e4f13b614ad6daefcd37a6e53c7c376ab353121f33e38f2751ba6df4d8",
+      "name": "javax/activation/MimeTypeParseException",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Exception",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Exception",
+        "javax/activation/MimeTypeParseException"
+      ]
+    },
+    {
+      "entry": "javax/activation/MimetypesFileTypeMap.class",
+      "occurrence": 0,
+      "sha256": "d162f5028f329337abf7ab5bc0c70edc42f045d01f57568f906df39fd0517241",
+      "name": "javax/activation/MimetypesFileTypeMap",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "javax/activation/FileTypeMap",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "defDB",
+          "descriptor": "Lcom/sun/activation/registries/MimeTypeFile;",
+          "access": 10
+        },
+        {
+          "name": "DB",
+          "descriptor": "[Lcom/sun/activation/registries/MimeTypeFile;",
+          "access": 2
+        },
+        {
+          "name": "PROG",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "defaultType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 10
+        },
+        {
+          "name": "class$javax$activation$MimetypesFileTypeMap",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 8
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "cfce9f03ff50962c71095066c9955a002bd16b78becf4b986dc33cf48ce0c4fd",
+          "code_length": 248
+        },
+        {
+          "name": "loadResource",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/activation/registries/MimeTypeFile;",
+          "access": 2,
+          "code_sha256": "90e8b4242228374c7b91cb98892da92e471b06e53b0bfbb6d0f20dcc4c9a0a17",
+          "code_length": 224
+        },
+        {
+          "name": "loadAllResources",
+          "descriptor": "(Ljava/util/Vector;Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "8bd9e38ca02962cb8360cdb44750cc477c192f2027a52ae09c4fa827ada2c41b",
+          "code_length": 427
+        },
+        {
+          "name": "loadFile",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/activation/registries/MimeTypeFile;",
+          "access": 2,
+          "code_sha256": "78f21039165f988ddcc26cd521afaaf7ee70f9fec1ff48f70f342d78b738cf3b",
+          "code_length": 17
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "bea2e91ed1b6aa5d429a52ece06d5c68c5a208e65eb0df3009c5e296da6646e8",
+          "code_length": 19,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;)V",
+          "access": 1,
+          "code_sha256": "e1fe9f872244d2a0837f462bede104097fa50345e6a4c98fca182f0888d17f4d",
+          "code_length": 23
+        },
+        {
+          "name": "addMimeTypes",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 33,
+          "code_sha256": "6a39a7ce15e3747f5ccb2a9329c2e520c8bad009c62a1c4e5a23b6212802ce47",
+          "code_length": 33
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "(Ljava/io/File;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "69fdf9872df02d9df9b618213f46bc0bcb7447659e83d311e0bcd36034b0dab8",
+          "code_length": 9
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 33,
+          "code_sha256": "8b2caf677d0a3090fb5a11b8e99eef60accbc71c93e4a3e9637468e25bb9100f",
+          "code_length": 91
+        },
+        {
+          "name": "class$",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Class;",
+          "access": 8,
+          "code_sha256": "dfd60d51b5b97aba60dbc6a897404cd653738cf7b4d382df415bf5ca0bcc1663",
+          "code_length": 18
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b671d816a9f17296054f93cd66dd49c0c7d4a36ae7677a196e5cf594f290d98a",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/activation/registries/LogSupport",
+        "com/sun/activation/registries/MimeTypeFile",
+        "java/io/File",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/NoClassDefFoundError",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "java/lang/System",
+        "java/util/Vector",
+        "javax/activation/FileTypeMap",
+        "javax/activation/MimetypesFileTypeMap",
+        "javax/activation/SecuritySupport"
+      ]
+    },
+    {
+      "entry": "javax/activation/ObjectDataContentHandler.class",
+      "occurrence": 0,
+      "sha256": "e126abff9c1fa67bedcfeb89cfe7b7f36237dba3fc09317892e9d3fab03e9cd5",
+      "name": "javax/activation/ObjectDataContentHandler",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataContentHandler"
+      ],
+      "fields": [
+        {
+          "name": "transferFlavors",
+          "descriptor": "[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 2
+        },
+        {
+          "name": "obj",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 2
+        },
+        {
+          "name": "mimeType",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "dch",
+          "descriptor": "Ljavax/activation/DataContentHandler;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljavax/activation/DataContentHandler;Ljava/lang/Object;Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "20d58c831152db0c90d9c59bb923068975637b6999a40127facf07ce3ae89123",
+          "code_length": 30
+        },
+        {
+          "name": "getDCH",
+          "descriptor": "()Ljavax/activation/DataContentHandler;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "getTransferDataFlavors",
+          "descriptor": "()[Ljava/awt/datatransfer/DataFlavor;",
+          "access": 33,
+          "code_sha256": "173fa5b538589c9047e47d2105fba5ab8f08c22c61b100db7c3bbbb9f3ee5cb2",
+          "code_length": 71
+        },
+        {
+          "name": "getTransferData",
+          "descriptor": "(Ljava/awt/datatransfer/DataFlavor;Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ae30c978770d29321632cb0d5d78d2cdcef18bd420c3b8bf1f1436b587137437",
+          "code_length": 46,
+          "throws": [
+            "java/awt/datatransfer/UnsupportedFlavorException",
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getContent",
+          "descriptor": "(Ljavax/activation/DataSource;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "50a94a34808085e9d9bc049e7d864135c84bb0cff502213e3534480e277d48d2",
+          "code_length": 5
+        },
+        {
+          "name": "writeTo",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/String;Ljava/io/OutputStream;)V",
+          "access": 1,
+          "code_sha256": "4ad59fec4bfa9bcc49a78d8085967079abebc5b0130ffabaadf887e809ee0b2b",
+          "code_length": 108,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[B",
+        "java/awt/datatransfer/DataFlavor",
+        "java/awt/datatransfer/UnsupportedFlavorException",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/OutputStreamWriter",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuffer",
+        "javax/activation/ActivationDataFlavor",
+        "javax/activation/DataContentHandler",
+        "javax/activation/ObjectDataContentHandler",
+        "javax/activation/UnsupportedDataTypeException"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$1.class",
+      "occurrence": 0,
+      "sha256": "3ab0a6185d8ae2ef2e9f47f94d1edb4a48c4cab0ed8d7983ca518fe0e334b353",
+      "name": "javax/activation/SecuritySupport$1",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "6e1aff27c95d07ee8826989fc4565d20ad635e8177f6b88ae98e5b695f69fe08",
+          "code_length": 15
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/lang/Thread",
+        "java/security/PrivilegedAction",
+        "javax/activation/SecuritySupport$1"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$2.class",
+      "occurrence": 0,
+      "sha256": "4ef8e871e55b541ae8b6f620bce437b904c7c722e943262bef0123f7ae345186",
+      "name": "javax/activation/SecuritySupport$2",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedExceptionAction"
+      ],
+      "fields": [
+        {
+          "name": "val$c",
+          "descriptor": "Ljava/lang/Class;",
+          "access": 18
+        },
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "eaa467e213cb8a308f8c29e45d01440da9167cbd24ee9dde90471136bc477120",
+          "code_length": 12,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Class",
+        "java/lang/Object",
+        "java/security/PrivilegedExceptionAction",
+        "javax/activation/SecuritySupport$2"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$3.class",
+      "occurrence": 0,
+      "sha256": "8800317d9399d13c0ea2ddbec86da061e284b2c335bf5e201c42bbe1cc119e90",
+      "name": "javax/activation/SecuritySupport$3",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$cl",
+          "descriptor": "Ljava/lang/ClassLoader;",
+          "access": 18
+        },
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "5621d5b708c74d653af03713f00df7a73049ff37c379850e7d46a77664a9e129",
+          "code_length": 15
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "431735423f4943ed6aeb33584d071ab4e45af169391a78db70082d3cf60ff749",
+          "code_length": 106
+        }
+      ],
+      "class_references": [
+        "[Ljava/net/URL;",
+        "java/io/IOException",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/net/URL",
+        "java/security/PrivilegedAction",
+        "java/util/ArrayList",
+        "java/util/Enumeration",
+        "java/util/List",
+        "javax/activation/SecuritySupport$3"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$4.class",
+      "occurrence": 0,
+      "sha256": "c6bdb5409491dcdcf35271ed387018c0f8d929c5f975c9af77fe3b014d380ab2",
+      "name": "javax/activation/SecuritySupport$4",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedAction"
+      ],
+      "fields": [
+        {
+          "name": "val$name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "8a3a54069787f7e04e383746c28c993f45639c36218ba6cefa61394da6bdf284",
+          "code_length": 102
+        }
+      ],
+      "class_references": [
+        "[Ljava/net/URL;",
+        "java/io/IOException",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/lang/SecurityException",
+        "java/net/URL",
+        "java/security/PrivilegedAction",
+        "java/util/ArrayList",
+        "java/util/Enumeration",
+        "java/util/List",
+        "javax/activation/SecuritySupport$4"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport$5.class",
+      "occurrence": 0,
+      "sha256": "349eb229801e3ccfcc27b133cc6ac671c3ca8c917791a162357befcb3120d194",
+      "name": "javax/activation/SecuritySupport$5",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/security/PrivilegedExceptionAction"
+      ],
+      "fields": [
+        {
+          "name": "val$url",
+          "descriptor": "Ljava/net/URL;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 0,
+          "code_sha256": "011957936790692f8681aa32e49828089b60c4ca43a4cb5f0814ef44dc71644d",
+          "code_length": 10,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "run",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "10a2dff2d9d1b1cb4caa682e4fa880669218a263e87feec5a73e292727d1720b",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/net/URL",
+        "java/security/PrivilegedExceptionAction",
+        "javax/activation/SecuritySupport$5"
+      ]
+    },
+    {
+      "entry": "javax/activation/SecuritySupport.class",
+      "occurrence": 0,
+      "sha256": "ec2ddcc6813255dfd179c08a4daba216a769830c05cb6d347eaac81804a2647e",
+      "name": "javax/activation/SecuritySupport",
+      "major": 48,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getContextClassLoader",
+          "descriptor": "()Ljava/lang/ClassLoader;",
+          "access": 9,
+          "code_sha256": "4eda1fd4d4caf248db3cc90b3b3e3675171f9069c06d04310b1359235ca9e926",
+          "code_length": 14
+        },
+        {
+          "name": "getResourceAsStream",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;)Ljava/io/InputStream;",
+          "access": 9,
+          "code_sha256": "972517d1082fa8843b6e59f1814e4f72f0b53061340e22a71272aee84c9d19f3",
+          "code_length": 25,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getResources",
+          "descriptor": "(Ljava/lang/ClassLoader;Ljava/lang/String;)[Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "f02f3f0cc59b544acde9b6e1f19e4391535ce851c8c1a5e937a195b31b5c539d",
+          "code_length": 19
+        },
+        {
+          "name": "getSystemResources",
+          "descriptor": "(Ljava/lang/String;)[Ljava/net/URL;",
+          "access": 9,
+          "code_sha256": "2ebc72fc4393b87be0ec38d2491355bacd8f87c2d0efb5b71e3025a7754e5dfe",
+          "code_length": 18
+        },
+        {
+          "name": "openStream",
+          "descriptor": "(Ljava/net/URL;)Ljava/io/InputStream;",
+          "access": 9,
+          "code_sha256": "cfd1185d1cebbf93681f5571d8da018462c8f10cf8af438109fb852e88c759f5",
+          "code_length": 24,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/net/URL;",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/lang/ClassLoader",
+        "java/lang/Object",
+        "java/security/AccessController",
+        "java/security/PrivilegedActionException",
+        "javax/activation/SecuritySupport",
+        "javax/activation/SecuritySupport$1",
+        "javax/activation/SecuritySupport$2",
+        "javax/activation/SecuritySupport$3",
+        "javax/activation/SecuritySupport$4",
+        "javax/activation/SecuritySupport$5"
+      ]
+    },
+    {
+      "entry": "javax/activation/URLDataSource.class",
+      "occurrence": 0,
+      "sha256": "15959ba53474fbfd410bddfea42d19e92aba3a8aca0a682b4fd9e182a3048811",
+      "name": "javax/activation/URLDataSource",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "javax/activation/DataSource"
+      ],
+      "fields": [
+        {
+          "name": "url",
+          "descriptor": "Ljava/net/URL;",
+          "access": 2
+        },
+        {
+          "name": "url_conn",
+          "descriptor": "Ljava/net/URLConnection;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/net/URL;)V",
+          "access": 1,
+          "code_sha256": "c00c71c1d5f20a9de3a4141bd0d0a2a64dc7905969f6aed741b55f9c4070bc70",
+          "code_length": 20
+        },
+        {
+          "name": "getContentType",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b868948c80049f43630473082462cff8d8237f8d8f449098cd1c7d675c165b2d",
+          "code_length": 48
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c1753d3b6b86734ae58c3c2db611ec0efdd6fbc2ff490498e8ddcbec8449c743",
+          "code_length": 8
+        },
+        {
+          "name": "getInputStream",
+          "descriptor": "()Ljava/io/InputStream;",
+          "access": 1,
+          "code_sha256": "a8b08bd64f23acf18de1579ed2e8f5475dd7fbf69b3101713d490b34928d64fc",
+          "code_length": 8,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getOutputStream",
+          "descriptor": "()Ljava/io/OutputStream;",
+          "access": 1,
+          "code_sha256": "400470880367c5b13b189c395d1355321332557493e8bb6c07c3e1b62cc11e6e",
+          "code_length": 36,
+          "throws": [
+            "java/io/IOException"
+          ]
+        },
+        {
+          "name": "getURL",
+          "descriptor": "()Ljava/net/URL;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/net/URL",
+        "java/net/URLConnection",
+        "javax/activation/DataSource",
+        "javax/activation/URLDataSource"
+      ]
+    },
+    {
+      "entry": "javax/activation/UnsupportedDataTypeException.class",
+      "occurrence": 0,
+      "sha256": "f9a0d1a8c59a37ca137dd7a074b72a02fbda1c089ce49168d334aa21291ffd90",
+      "name": "javax/activation/UnsupportedDataTypeException",
+      "major": 48,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/io/IOException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/io/IOException",
+        "javax/activation/UnsupportedDataTypeException"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/ConnectionTest/ConnectionTest.jar",
+  "archive_sha256": "175ebc8fc349e53672ad787cf9f873591b70695af8fbbd4dab05c0d8779e5e26",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1.class",
+      "occurrence": 0,
+      "sha256": "5d5ba898ab7d2da0dfe6c16419f3ac8beaf47f805356e43af9f70f0f21256a91",
+      "name": "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "count",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "val$tick",
+          "descriptor": "Lcom/strategyquant/datalib/TickEvent;",
+          "access": 4112
+        },
+        {
+          "name": "val$symbolHash",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "val$dataBuffer",
+          "descriptor": "Lcom/strategyquant/datalib/data/IDataBuffer;",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/strategyquant/plugin/Connection/impl/Test/TestConnection;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/plugin/Connection/impl/Test/TestConnection;Lcom/strategyquant/datalib/TickEvent;ILcom/strategyquant/datalib/data/IDataBuffer;)V",
+          "access": 0,
+          "code_sha256": "2e31bbf994d22a1dd2dcd052da86bd4e15c3ff3da18d5657ddc16c968e978c1d",
+          "code_length": 31
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fedb55957661d6e4e88663ce5635dd7531d643c82d17b954b5b408ef3020e41b",
+          "code_length": 97
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/datalib/data/IDataBuffer",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnection",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1",
+        "java/lang/InterruptedException",
+        "java/lang/Thread"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnection.class",
+      "occurrence": 0,
+      "sha256": "70c2ddbbf1d28b68a8f52818fd29fce97ac4bcbe8f6001b9659dd42f969b87e1",
+      "name": "com/strategyquant/plugin/Connection/impl/Test/TestConnection",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/tradinglib/connection/Connection",
+      "interfaces": [
+        "com/strategyquant/tradinglib/connection/IDataFeed",
+        "com/strategyquant/tradinglib/execution/IExecutionEngine"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "symbolsMap",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 2,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin;Lcom/strategyquant/tradinglib/connection/ConnectionManager;Ljava/lang/String;Lcom/strategyquant/lib/ValuesMap;)V",
+          "access": 1,
+          "code_sha256": "ab4d4864fe8b0c9bdaeb4ae7e939a24d0a2a8f4d4ee63cc97ac8913e97695e3a",
+          "code_length": 21,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "initializeEngines",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fd4a680e85a5459e2b79b84e41f4621ddaed3f8f5a04a8dbc9961d32edf31416",
+          "code_length": 11
+        },
+        {
+          "name": "connect",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "disconnect",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "registerSymbol",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "278de86d6e774121bc4bb51832bce50e3289c27d536b033795021c2216046904",
+          "code_length": 46
+        },
+        {
+          "name": "checkSymbolIsSupported",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "0b353b784d24b2ac4b59579a20ce7ec081a799bfb8a4eefccb6016301a36d9e0",
+          "code_length": 41
+        },
+        {
+          "name": "startSendingTestData",
+          "descriptor": "(I)V",
+          "access": 2,
+          "code_sha256": "a9dc40c169c23b3c879ef76bb010fae073972798dd7ac7835500642f4ba88162",
+          "code_length": 31
+        },
+        {
+          "name": "isConnected",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "getStatus",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "e901bec889c74090f9eece75a4a338e5d8e2426d7d9097adaf1e7cec963e6a4f",
+          "code_length": 3
+        },
+        {
+          "name": "getHistoryData",
+          "descriptor": "(Lcom/strategyquant/datalib/ChartDef;IJJ)Lcom/strategyquant/tradinglib/connection/HistoryData;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "initialize",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "orderOpen",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;ILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "orderClose",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;BILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "orderModify",
+          "descriptor": "(Lcom/strategyquant/tradinglib/StrategyBase;Lcom/strategyquant/tradinglib/ILiveOrder;ILcom/strategyquant/tradinglib/event/ITradingEventListener;)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOpenOrdersCount",
+          "descriptor": "(Z)I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getAccountBalance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getTotalPL",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getMainCurrency",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getHistoryOrders",
+          "descriptor": "()Lcom/strategyquant/tradinglib/OrdersList;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getOpenOrder",
+          "descriptor": "(IZ)Lcom/strategyquant/tradinglib/ILiveOrder;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getAccountEquity",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getInitialBalance",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2
+        },
+        {
+          "name": "getTickData",
+          "descriptor": "()Lcom/strategyquant/datalib/TickEvent;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getHistoryOrdersCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getHistoryOrder",
+          "descriptor": "(I)Lcom/strategyquant/tradinglib/Order;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "fillAtRealAskBidPrice",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "getWorstDailyEquity",
+          "descriptor": "()Lit/unimi/dsi/fastutil/longs/Long2FloatRBTreeMap;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "getAmbiguousTrades",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "reuseOpenOrder",
+          "descriptor": "(Lcom/strategyquant/tradinglib/strategy/LiveOrderObj;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "evaluateActionListeners",
+          "descriptor": "(ILcom/strategyquant/tradinglib/StrategyBase;)V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "supportsDuplicateTrades",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "IsMarketOpen",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "580e7a52c56b11e57734500d66602a82e9ea1f8a4f328c156898ff195ef37ff5",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/String;",
+        "com/strategyquant/datalib/TickEvent",
+        "com/strategyquant/lib/ValuesMap",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnection",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnection$1",
+        "com/strategyquant/tradinglib/connection/Connection",
+        "com/strategyquant/tradinglib/connection/ConnectionManager",
+        "com/strategyquant/tradinglib/connection/IDataFeed",
+        "com/strategyquant/tradinglib/execution/IExecutionEngine",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/String",
+        "java/util/HashMap",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Connection/impl/Test/TestConnectionPlugin.class",
+      "occurrence": 0,
+      "sha256": "2425f0f2928fed31ccb6e3a34ad1577d38d9025faa5292f12259ca0776ba6061",
+      "name": "com/strategyquant/plugin/Connection/impl/Test/TestConnectionPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a5d77aab77307f732217395bf83486bb6486f9dc5a4cf2bb17e6c209346fee7a",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "getPluginName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "287b50bd6b125350e996d2ad21dba5ad54c0f550f1dd29d0ad2c927f393cccba",
+          "code_length": 3
+        },
+        {
+          "name": "createConnection",
+          "descriptor": "(Lcom/strategyquant/tradinglib/connection/ConnectionManager;Ljava/lang/String;Lcom/strategyquant/lib/ValuesMap;)Lcom/strategyquant/tradinglib/connection/Connection;",
+          "access": 1,
+          "code_sha256": "c361cbac3583a9f9aa12625944c03e487e117e12996b086bef597f438e62e6fa",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "isDataFeed",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "isExecutionEngine",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1d6feaece89bc8249da4c47766ae74c78df440039a8f4504c904bcf05c6a4942",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnection",
+        "com/strategyquant/plugin/Connection/impl/Test/TestConnectionPlugin",
+        "com/strategyquant/tradinglib/plugindef/connection/IConnectionPlugin",
+        "java/lang/Exception",
+        "java/lang/Object",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

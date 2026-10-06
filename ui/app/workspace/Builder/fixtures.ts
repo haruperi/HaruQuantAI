@@ -8,9 +8,9 @@ export const rules: RuleNode[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// SQX-parity Builder "Progress" tab demo state (UI-BUILDER-PROGRESS-004).
+// SQX-style Builder "Progress" tab demo state (UI-BUILDER-PROGRESS-004).
 // Everything below is presentation fixture data reproducing the donor idle
-// and running look (evidence SQX144-EV-000032..037). Values are demo truth
+// and running look (evidence retained target UI; current donor equivalence unverified). Values are demo truth
 // only; no engine, metric, or chart equivalence is claimed.
 // ---------------------------------------------------------------------------
 

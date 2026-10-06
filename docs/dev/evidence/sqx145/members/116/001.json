@@ -1,0 +1,4719 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/watchmaker-framework-0.7.1.jar",
+  "archive_sha256": "f4d1ac73aa475bc403b6a6e8d5bce37f4d69a215e2deaa65ecc57d2e13368fb8",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "org/uncommons/util/concurrent/ConfigurableThreadFactory$1.class",
+      "occurrence": 0,
+      "sha256": "8b918e3c94c15ab5bb50a67a92f906d869dc43dcd1a6496b7c60e2c56259219c",
+      "name": "org/uncommons/util/concurrent/ConfigurableThreadFactory$1",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Thread$UncaughtExceptionHandler"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "uncaughtException",
+          "descriptor": "(Ljava/lang/Thread;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "bb9d88e953a9690ab548616ca8f0dd59746891dcfac4cd523954a84b25caab80",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler",
+        "java/lang/Throwable",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/concurrent/ConfigurableThreadFactory.class",
+      "occurrence": 0,
+      "sha256": "9d21cb34310f9cfa087a7b7d035184e65fc82056c056f584b036db8d3fc8577d",
+      "name": "org/uncommons/util/concurrent/ConfigurableThreadFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/ThreadFactory"
+      ],
+      "fields": [
+        {
+          "name": "DEFAULT_EXCEPTION_HANDLER",
+          "descriptor": "Ljava/lang/Thread$UncaughtExceptionHandler;",
+          "access": 26
+        },
+        {
+          "name": "nameGenerator",
+          "descriptor": "Lorg/uncommons/util/id/IDSource;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/util/id/IDSource<Ljava/lang/String;>;"
+        },
+        {
+          "name": "priority",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "daemon",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "uncaughtExceptionHandler",
+          "descriptor": "Ljava/lang/Thread$UncaughtExceptionHandler;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IZ)V",
+          "access": 1,
+          "code_sha256": "3fde7290e78c67250d2cf5761354ff223159eaf02fe553764f6ddbc0a7445943",
+          "code_length": 11
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;IZLjava/lang/Thread$UncaughtExceptionHandler;)V",
+          "access": 1,
+          "code_sha256": "719b04ebfaac857f82bcfffb32200ffdd4c8791e6e88ebf9fc316b9a1437f2e8",
+          "code_length": 58
+        },
+        {
+          "name": "newThread",
+          "descriptor": "(Ljava/lang/Runnable;)Ljava/lang/Thread;",
+          "access": 1,
+          "code_sha256": "c8b43dc90971368b13c09b049a571eef51cf1dc843960ba21ea9d7c891f0737b",
+          "code_length": 47
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1f221506a9174919fb20c06cb2030eb73e1653002d8273c7b7078df3092950eb",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/Thread",
+        "java/lang/Thread$UncaughtExceptionHandler",
+        "java/util/concurrent/ThreadFactory",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory$1",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IntSequenceIDSource",
+        "org/uncommons/util/id/StringPrefixIDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/CompositeIDSource.class",
+      "occurrence": 0,
+      "sha256": "f59eaf90bd2389d29ae26f18f67955e545710ff108667ca329aae4c180e10fe4",
+      "name": "org/uncommons/util/id/CompositeIDSource",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/util/id/IDSource"
+      ],
+      "fields": [
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "top32bits",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "sequence",
+          "descriptor": "Lorg/uncommons/util/id/IDSource;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/util/id/IDSource<Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "33d8b140d8764566c4b2c43e4d74ee6abbdc7bce9d5754bff11e951e2f2e91a6",
+          "code_length": 36
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "5bba011c5ae072f18b675629460813f7d1b2b0f737fcd98c140e700d6c6f083b",
+          "code_length": 57
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4161,
+          "code_sha256": "6cfa028ac65f30ccc477487d520b028bb6dac4c20320a066f887ba2b61e7d67b",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/util/id/IDSource<Ljava/lang/Long;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/util/id/CompositeIDSource",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IntSequenceIDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/IDSource.class",
+      "occurrence": 0,
+      "sha256": "f0275bad8678c845f4e963b000d63112a2bb60cc1986b7d689c42d16ca926db1",
+      "name": "org/uncommons/util/id/IDSource",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 1025,
+          "generic_signature": "()TT;"
+        }
+      ],
+      "generic_signature": "<T::Ljava/io/Serializable;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/util/id/IDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/IDSourceExhaustedException.class",
+      "occurrence": 0,
+      "sha256": "113c01a7ed39920953d8c54dd9301686ec598d035c843f269ec27a86ed69b359",
+      "name": "org/uncommons/util/id/IDSourceExhaustedException",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+          "access": 1,
+          "code_sha256": "cd0b413f8c4af031b9e03b8b0a1edc6e114c2c2e4ca5f0d8227dfc48d4de1c46",
+          "code_length": 7
+        }
+      ],
+      "class_references": [
+        "java/lang/RuntimeException",
+        "org/uncommons/util/id/IDSourceExhaustedException"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/IntSequenceIDSource.class",
+      "occurrence": 0,
+      "sha256": "0357ac7314998b944a9da9839fd24ac069b8763de2e8393554749f1af666fee2",
+      "name": "org/uncommons/util/id/IntSequenceIDSource",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/util/id/IDSource"
+      ],
+      "fields": [
+        {
+          "name": "SECONDS_IN_HOUR",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "startTime",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "lastID",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "073de7dea0b1151cf13673e5b2454d4e7afefa1ab88337a195b13b74d8239ec5",
+          "code_length": 49
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a684ce5278182d0ee43a9e10fd04766cacdace016274dd4d02292920356661e1",
+          "code_length": 6
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "5ce1f8a65fbd6ef5a22c9dd2cc799058bfa2da1ec9198b46e42d74bfea14ffd2",
+          "code_length": 104
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4161,
+          "code_sha256": "89de02e22fd2f05bd1f29fe2bc1ae407589a8211994b25d6b08d39d7d8c2025f",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/util/id/IDSource<Ljava/lang/Integer;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IDSourceExhaustedException",
+        "org/uncommons/util/id/IntSequenceIDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/LongSequenceIDSource.class",
+      "occurrence": 0,
+      "sha256": "869c8a808a36b78569c45f4450812ffd8eae0b654510c6f3e57c276da1500b8b",
+      "name": "org/uncommons/util/id/LongSequenceIDSource",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/util/id/IDSource"
+      ],
+      "fields": [
+        {
+          "name": "SECONDS_IN_DAY",
+          "descriptor": "I",
+          "access": 26
+        },
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "startTime",
+          "descriptor": "J",
+          "access": 18
+        },
+        {
+          "name": "lastID",
+          "descriptor": "J",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "352b6f94e7405075d5d49d095ce8beecbc77f16a58f915f8dc851a973cb51d37",
+          "code_length": 53
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6d3350bdc39d0b14ab587c2612f7b18ac1795040eb9a42fe262535406b217483",
+          "code_length": 6
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "125e6ae56f84c4ebd20178da25aac767742fe77aeab24eef6a25be12901c1067",
+          "code_length": 106
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4161,
+          "code_sha256": "f133b2eea9ba833dcdcbfdc561d1e034ef8f027c986cd9ee0b3ec7b34245d362",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/util/id/IDSource<Ljava/lang/Long;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IDSourceExhaustedException",
+        "org/uncommons/util/id/LongSequenceIDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/id/StringPrefixIDSource.class",
+      "occurrence": 0,
+      "sha256": "9a732e564d055204af6b74ca049db781e1f88d50d278dc54ec16d741b87cb935",
+      "name": "org/uncommons/util/id/StringPrefixIDSource",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/util/id/IDSource"
+      ],
+      "fields": [
+        {
+          "name": "lock",
+          "descriptor": "Ljava/util/concurrent/locks/Lock;",
+          "access": 18
+        },
+        {
+          "name": "prefix",
+          "descriptor": "Ljava/lang/String;",
+          "access": 18
+        },
+        {
+          "name": "source",
+          "descriptor": "Lorg/uncommons/util/id/IDSource;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/util/id/IDSource<*>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lorg/uncommons/util/id/IDSource;)V",
+          "access": 1,
+          "code_sha256": "c10b8c961bafaa1bdda6b09f30cbf7d7707ba96409a341322e4eccc57e568d5f",
+          "code_length": 26,
+          "generic_signature": "(Ljava/lang/String;Lorg/uncommons/util/id/IDSource<*>;)V"
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "7ed38187f933155f23e9a9f051f199326e0abf963a8608bcf25c72de30f48f5b",
+          "code_length": 63
+        },
+        {
+          "name": "nextID",
+          "descriptor": "()Ljava/io/Serializable;",
+          "access": 4161,
+          "code_sha256": "dd8d4caffcdfb115c9d3da77fe125ccfc663c270769542d84111ccd196c3ca7a",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/util/id/IDSource<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/concurrent/locks/Lock",
+        "java/util/concurrent/locks/ReentrantLock",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/StringPrefixIDSource"
+      ]
+    },
+    {
+      "entry": "org/uncommons/util/reflection/ReflectionUtils.class",
+      "occurrence": 0,
+      "sha256": "06a2990ecea6fe5f648be2e3b7f1c71c514448343e399528327bbae8d6970249",
+      "name": "org/uncommons/util/reflection/ReflectionUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "invokeUnchecked",
+          "descriptor": "(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 137,
+          "code_sha256": "1eff4a7f0f204bbe58534e581c98f070748dc24a53c811642b9f90ce5f238083",
+          "code_length": 73,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)TT;"
+        },
+        {
+          "name": "invokeUnchecked",
+          "descriptor": "(Ljava/lang/reflect/Constructor;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 137,
+          "code_sha256": "04e879fbcd64689cbd076bbecafd0c8416cafee672873b55dcee8506ca1f52cc",
+          "code_length": 57,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/reflect/Constructor<TT;>;[Ljava/lang/Object;)TT;"
+        },
+        {
+          "name": "findKnownMethod",
+          "descriptor": "(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;",
+          "access": 137,
+          "code_sha256": "af68b996fe6b45fa2063f9857db0ad8d83840d5427ae84cc76069551009b1f17",
+          "code_length": 48,
+          "generic_signature": "(Ljava/lang/Class<*>;Ljava/lang/String;[Ljava/lang/Class<*>;)Ljava/lang/reflect/Method;"
+        },
+        {
+          "name": "findKnownConstructor",
+          "descriptor": "(Ljava/lang/Class;[Ljava/lang/Class;)Ljava/lang/reflect/Constructor;",
+          "access": 137,
+          "code_sha256": "11bcd5b1c552599b566fe794dbc9b35b9ac0b2c82093f0f945558af83d776ce4",
+          "code_length": 38,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/lang/Class<TT;>;[Ljava/lang/Class<*>;)Ljava/lang/reflect/Constructor<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Error",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "org/uncommons/util/reflection/ReflectionUtils"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/AbstractEvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "b9e9dfc5d189ed510da1616dfebedd5a30ded8758191a0a343f2ae58646d421b",
+      "name": "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionEngine"
+      ],
+      "fields": [
+        {
+          "name": "concurrentWorker",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluationWorker;",
+          "access": 10
+        },
+        {
+          "name": "observers",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;>;"
+        },
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "candidateFactory",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/CandidateFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;"
+        },
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "singleThreaded",
+          "descriptor": "Z",
+          "access": 66
+        },
+        {
+          "name": "satisfiedTerminationConditions",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Ljava/util/Random;)V",
+          "access": 4,
+          "code_sha256": "962fb5f84371ea6622f3756647d84220d35d6da7eb9f9779ab3267cdf816c184",
+          "code_length": 36,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "37c17d53ad78f4a2318ecf5c0f93b185a98f58d53522a463885f916af5d72ec8",
+          "code_length": 11,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "b7f43a7f3d97dcba11d8c60d54a10d22c266f5e82e49a334a5352f139145ccd0",
+          "code_length": 22,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 129,
+          "code_sha256": "45d7b33db49152ac96fd2ede8e5c73facac67da24b6eef632961df85b290949e",
+          "code_length": 11,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 129,
+          "code_sha256": "8b0713c780f90d43d93850279fd099be208156db30fb410023b96782dc1e945e",
+          "code_length": 206,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "nextEvolutionStep",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 1028,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evaluatePopulation",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "5827b0241dacc5e3129eece7e3a9a9a627037245cf2f621c6dd49e15ce18d869",
+          "code_length": 229,
+          "generic_signature": "(Ljava/util/List<TT;>;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "getSatisfiedTerminationConditions",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8b5091cef9753227a98d866519a0c0c7c91bf59e02251abd287bad55fc549f11",
+          "code_length": 25,
+          "generic_signature": "()Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        },
+        {
+          "name": "addEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "b213e228ff0ddd94a6625c88bb5559374438025d6871749f4288e5929f724adb",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "removeEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "b1d886c50b7e326a4a37816499aacc34435f0511cfb7c569180e6b42f52184dc",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "notifyPopulationChange",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 2,
+          "code_sha256": "b5f574d30ea5adf90c095a764e74e09fb03f035c9d0ef8eb84fcd876dadb44e3",
+          "code_length": 40,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<TT;>;)V"
+        },
+        {
+          "name": "setSingleThreaded",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "59a70dcd638befe150432fa942f77d6dfd336b826c12bbb8826a287c9394b27d",
+          "code_length": 6
+        },
+        {
+          "name": "getSharedWorker",
+          "descriptor": "()Lorg/uncommons/watchmaker/framework/FitnessEvaluationWorker;",
+          "access": 42,
+          "code_sha256": "7c2186c33b37c402c0e9cd560e4d58f95ad17cd85a86ddd4834ce46ca5f3371c",
+          "code_length": 20
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b54d88e26d10c684b38b0665e6fdb34df91923048ab94bcef0198eb2f263bbeb",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/IllegalStateException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/concurrent/CopyOnWriteArraySet",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/Future",
+        "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+        "org/uncommons/watchmaker/framework/CandidateFactory",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvolutionObserver",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/FitnessEvaluationWorker",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/FitnessEvalutationTask"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/CachingFitnessEvaluator.class",
+      "occurrence": 0,
+      "sha256": "e65193b6334162d9a9c4f4fe6ceff31e08a0a57502ca3c3f0403e0491d8bc357",
+      "name": "org/uncommons/watchmaker/framework/CachingFitnessEvaluator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<TT;>;"
+        },
+        {
+          "name": "cache",
+          "descriptor": "Ljava/util/concurrent/ConcurrentMap;",
+          "access": 146,
+          "generic_signature": "Ljava/util/concurrent/ConcurrentMap<TT;Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator;)V",
+          "access": 1,
+          "code_sha256": "d97a85de3fbde311067a99598ce645fd1e3355be5ed52bda801d6ab615ab82bf",
+          "code_length": 27,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator<TT;>;)V"
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/List;)D",
+          "access": 1,
+          "code_sha256": "1627f17786fc3d9713682f84c3b8a4dee21bbc8f18ce9774d7cd0dc421c6ee32",
+          "code_length": 50,
+          "generic_signature": "(TT;Ljava/util/List<+TT;>;)D"
+        },
+        {
+          "name": "isNatural",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "f2e91378d0b6eee3295195ed72f6cf1e5969e0b54da682c5a6c567075b9ae92a",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<TT;>;",
+      "class_references": [
+        "com/google/common/collect/MapMaker",
+        "java/lang/Double",
+        "java/lang/Object",
+        "java/util/concurrent/ConcurrentMap",
+        "org/uncommons/watchmaker/framework/CachingFitnessEvaluator",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/CandidateFactory.class",
+      "occurrence": 0,
+      "sha256": "09986049bfbeecb6e47b36d9ddb97ee557c9b3c2ee840590a36d5b5582722489",
+      "name": "org/uncommons/watchmaker/framework/CandidateFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "generateInitialPopulation",
+          "descriptor": "(ILjava/util/Random;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(ILjava/util/Random;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateInitialPopulation",
+          "descriptor": "(ILjava/util/Collection;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(ILjava/util/Collection<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/Random;)TT;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/CandidateFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvaluatedCandidate.class",
+      "occurrence": 0,
+      "sha256": "b81257c3791d62040e6c6c2281a50f36c4b06afd3ff91207f0676afb0947a288",
+      "name": "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/lang/Comparable"
+      ],
+      "fields": [
+        {
+          "name": "candidate",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "fitness",
+          "descriptor": "D",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;D)V",
+          "access": 1,
+          "code_sha256": "061abccdd7a86d01e58b8d144c7f8e8f877f95a1cf6620ebe6906a10ff3c4253",
+          "code_length": 31,
+          "generic_signature": "(TT;D)V"
+        },
+        {
+          "name": "getCandidate",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "ef835e507bd4ea519107210e7bb65f3b42e6b56ba571981c71ee43aaf43ec38c",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "3c2c79f272c179eaf982cb90eb6f0619a2fb56fbe8762f0487b3ada2124e8ec9",
+          "code_length": 5
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvaluatedCandidate;)I",
+          "access": 1,
+          "code_sha256": "396198a0c339148c8ee35c490e2f08023ec5796f687e9277db9c607c3a2a82ae",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;)I"
+        },
+        {
+          "name": "equals",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 1,
+          "code_sha256": "f12da027ee50483baf4ea515b72b9e3372ec481eba25f74e6a68e87c78dfc521",
+          "code_length": 49
+        },
+        {
+          "name": "hashCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4def30d0fbfed0d0209aeebacd57c9b5bcf2fc1030e350d3b7cd64d4b39aad7c",
+          "code_length": 29
+        },
+        {
+          "name": "compareTo",
+          "descriptor": "(Ljava/lang/Object;)I",
+          "access": 4161,
+          "code_sha256": "c5bfc8db36cb159e47d2b403075b92392b8082dbeb4afdb214ee51a00001c358",
+          "code_length": 9
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Comparable<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;",
+      "class_references": [
+        "java/lang/Comparable",
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "1cc4c121d8975b32c503519ff6585c217bafeb84f04157acd779a52c32c986a5",
+      "name": "org/uncommons/watchmaker/framework/EvolutionEngine",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "evolve",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 1153,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 1153,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 1153,
+          "generic_signature": "(II[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "evolvePopulation",
+          "descriptor": "(IILjava/util/Collection;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 1153,
+          "generic_signature": "(IILjava/util/Collection<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "addEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1025,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "removeEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver;)V",
+          "access": 1025,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "getSatisfiedTerminationConditions",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "()Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/EvolutionEngine"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvolutionObserver.class",
+      "occurrence": 0,
+      "sha256": "c14ae708b7433efdacaf76b8e706ac2243242e22961c1972efc666ef56e68b7e",
+      "name": "org/uncommons/watchmaker/framework/EvolutionObserver",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "populationUpdate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 1025,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<+TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/EvolutionObserver"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvolutionStrategyEngine.class",
+      "occurrence": 0,
+      "sha256": "2b7a7d3eaa1f43ac1b45f3a23158fafced4f12ce66f847748ce0b07a3f0de1d5",
+      "name": "org/uncommons/watchmaker/framework/EvolutionStrategyEngine",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "evolutionScheme",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "plusSelection",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "offspringMultiplier",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;ZILjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "a3b11a7bcfa568c91df5347345dc913a112afa3e4a60d6ebaf0f5b64e3cd9a7c",
+          "code_length": 31,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;ZILjava/util/Random;)V"
+        },
+        {
+          "name": "nextEvolutionStep",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "b2d2bd191a055e71c6b15ac0e8f9d8b4709f8f2147fb65e42ab9c2ff2866980a",
+          "code_length": 157,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "6a99eaacddf92b586cce6d3c2f28b9ed253813f0018ff2f3bc5d1c00d552acaa",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/AbstractEvolutionEngine<TT;>;",
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionStrategyEngine",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvolutionUtils.class",
+      "occurrence": 0,
+      "sha256": "74051e850e20167a532ca1e71f4b99cc8667f1e9e8c009e7c178026d032b7c15",
+      "name": "org/uncommons/watchmaker/framework/EvolutionUtils",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "shouldContinue",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List;",
+          "access": 137,
+          "code_sha256": "f273ab53bde4ae035a83bb2bf47ef85fd177c23040f74e942e44a51ee1363ce7",
+          "code_length": 84,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lorg/uncommons/watchmaker/framework/PopulationData<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        },
+        {
+          "name": "sortEvaluatedPopulation",
+          "descriptor": "(Ljava/util/List;Z)V",
+          "access": 9,
+          "code_sha256": "df59fe5199b9a6497f65d7d70b5510db0ebe522e69dca74ffcdd0110f51a334b",
+          "code_length": 19,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;Z)V"
+        },
+        {
+          "name": "getPopulationData",
+          "descriptor": "(Ljava/util/List;ZIIJ)Lorg/uncommons/watchmaker/framework/PopulationData;",
+          "access": 9,
+          "code_sha256": "6c7e7a47561a6cd3d64c25bee8cd5de02517f71b218e946e4360a551309d4725",
+          "code_length": 116,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ZIIJ)Lorg/uncommons/watchmaker/framework/PopulationData<TT;>;"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/LinkedList",
+        "java/util/List",
+        "org/uncommons/maths/statistics/DataSet",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/EvolutionaryOperator.class",
+      "occurrence": 0,
+      "sha256": "d9c0f9e0245ce09f65218d279fcd8418e668c99318f3d1afac0a3bae0dc97a29",
+      "name": "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/FitnessEvaluationWorker.class",
+      "occurrence": 0,
+      "sha256": "dec3f85798a2e56babfbb64288bbf205a277be64427e66840929cec34ba7ffb7",
+      "name": "org/uncommons/watchmaker/framework/FitnessEvaluationWorker",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "WORKER_ID_SOURCE",
+          "descriptor": "Lorg/uncommons/util/id/IDSource;",
+          "access": 26,
+          "generic_signature": "Lorg/uncommons/util/id/IDSource<Ljava/lang/String;>;"
+        },
+        {
+          "name": "workQueue",
+          "descriptor": "Ljava/util/concurrent/LinkedBlockingQueue;",
+          "access": 18,
+          "generic_signature": "Ljava/util/concurrent/LinkedBlockingQueue<Ljava/lang/Runnable;>;"
+        },
+        {
+          "name": "executor",
+          "descriptor": "Ljava/util/concurrent/ThreadPoolExecutor;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Z)V",
+          "access": 2,
+          "code_sha256": "574b6d4ab36625e130fa52ce8a93a66146c427536344d7581782c02e99449c7c",
+          "code_length": 79
+        },
+        {
+          "name": "submit",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/FitnessEvalutationTask;)Ljava/util/concurrent/Future;",
+          "access": 1,
+          "code_sha256": "93ebeeab16471f46b1c92c9b7d2087554a73528114fad5494a585f46c611c029",
+          "code_length": 9,
+          "generic_signature": "<T:Ljava/lang/Object;>(Lorg/uncommons/watchmaker/framework/FitnessEvalutationTask<TT;>;)Ljava/util/concurrent/Future<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "main",
+          "descriptor": "([Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "fcea03577ef082adec682a73cda92e9312fd875383cf35a25b2d8927e1a06ff0",
+          "code_length": 10
+        },
+        {
+          "name": "finalize",
+          "descriptor": "()V",
+          "access": 4,
+          "code_sha256": "d6e24120d10592cc478c5112da9e9bc81a199d21e39f2ba8b27e2b27bd9aa279",
+          "code_length": 12,
+          "throws": [
+            "java/lang/Throwable"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "231b1219d4740816baa6286f604cd5e622edf2ec31045a987b09a036ebd62206",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/lang/Runtime",
+        "java/lang/String",
+        "java/lang/Throwable",
+        "java/util/concurrent/LinkedBlockingQueue",
+        "java/util/concurrent/ThreadPoolExecutor",
+        "java/util/concurrent/TimeUnit",
+        "org/uncommons/util/concurrent/ConfigurableThreadFactory",
+        "org/uncommons/util/id/IDSource",
+        "org/uncommons/util/id/IntSequenceIDSource",
+        "org/uncommons/util/id/StringPrefixIDSource",
+        "org/uncommons/watchmaker/framework/FitnessEvaluationWorker"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/FitnessEvaluator.class",
+      "occurrence": 0,
+      "sha256": "5fc845b5ec0ba4198c27e69c2a4d256670383eea87d9ccd0aa9cb2e9762bd1b7",
+      "name": "org/uncommons/watchmaker/framework/FitnessEvaluator",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "getFitness",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/List;)D",
+          "access": 1025,
+          "generic_signature": "(TT;Ljava/util/List<+TT;>;)D"
+        },
+        {
+          "name": "isNatural",
+          "descriptor": "()Z",
+          "access": 1025
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/FitnessEvalutationTask.class",
+      "occurrence": 0,
+      "sha256": "9a97f7d3cf8699de823cd35650dcfadb59698f4ba3f3a65ddaf49be07f873b2f",
+      "name": "org/uncommons/watchmaker/framework/FitnessEvalutationTask",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "candidate",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "population",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Ljava/lang/Object;Ljava/util/List;)V",
+          "access": 0,
+          "code_sha256": "149c4b3509deaaf1168d35401f0507b348b74ec910d90c7af51b99a243c44e6e",
+          "code_length": 20,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;TT;Ljava/util/List<TT;>;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Lorg/uncommons/watchmaker/framework/EvaluatedCandidate;",
+          "access": 1,
+          "code_sha256": "2d262760e3671c23fc5b683c2db78db46e8b3ed74b835b094c04bacb69c50323",
+          "code_length": 29,
+          "generic_signature": "()Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Callable<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/concurrent/Callable",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/FitnessEvalutationTask"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/GenerationalEvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "eb3f1f18a57ca7495b9c0a3aac4628e431dbb2c7b3c07a990c91c7bdb9e64968",
+      "name": "org/uncommons/watchmaker/framework/GenerationalEvolutionEngine",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "evolutionScheme",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "selectionStrategy",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/SelectionStrategy;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Lorg/uncommons/watchmaker/framework/SelectionStrategy;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "47f799d93230a593658a642073960fb269919dd6309eda2e8410959fe9db257b",
+          "code_length": 25,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/interactive/InteractiveSelection;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "b944f1351b076f56b8be9800f126588af012e6607d24a64a661687bf3afb6459",
+          "code_length": 17,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/interactive/InteractiveSelection<TT;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "nextEvolutionStep",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "a6463ecdc6cfb4b35eedaeb7246b799737ad5825a12c1cdfea9a84ab2e8366e6",
+          "code_length": 135,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/AbstractEvolutionEngine<TT;>;",
+      "class_references": [
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/GenerationalEvolutionEngine",
+        "org/uncommons/watchmaker/framework/NullFitnessEvaluator",
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/NullFitnessEvaluator.class",
+      "occurrence": 0,
+      "sha256": "df5d9ef7a2d8f3c1fc6f8473d4b1d41c0ac255e28a1c70ca2012958024e46a8a",
+      "name": "org/uncommons/watchmaker/framework/NullFitnessEvaluator",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/FitnessEvaluator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(Ljava/lang/Object;Ljava/util/List;)D",
+          "access": 1,
+          "code_sha256": "8f37da9e67a6f82818175c330e697e348534a412a882fa3aa00b962e7520ed71",
+          "code_length": 2,
+          "generic_signature": "(Ljava/lang/Object;Ljava/util/List<*>;)D"
+        },
+        {
+          "name": "isNatural",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/NullFitnessEvaluator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/PopulationData.class",
+      "occurrence": 0,
+      "sha256": "94a9ab6fd8c63a293adcb13940af63c4aeadece704bee2367b3d341d76c76006",
+      "name": "org/uncommons/watchmaker/framework/PopulationData",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "bestCandidate",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "TT;"
+        },
+        {
+          "name": "bestCandidateFitness",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "meanFitness",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "fitnessStandardDeviation",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "naturalFitness",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "populationSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "eliteCount",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "generationNumber",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "elapsedTime",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/Object;DDDZIIIJ)V",
+          "access": 1,
+          "code_sha256": "f73755ae2333e149487672d2858c94852b0dc2436c6ef3779b8477fbb1f915f5",
+          "code_length": 57,
+          "generic_signature": "(TT;DDDZIIIJ)V"
+        },
+        {
+          "name": "getBestCandidate",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "782c755a6559c9c784ec6a8895753b6c4ba93dffc13fc0bf367002be5c73d37b",
+          "code_length": 5,
+          "generic_signature": "()TT;"
+        },
+        {
+          "name": "getBestCandidateFitness",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "6e41223bc0dac49176e0b6b316d4922afc6d2168c97a9bd8c2f9942eb2161984",
+          "code_length": 5
+        },
+        {
+          "name": "getMeanFitness",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "d597389f2e9fe5026d1e931d1bab67f79df11355c373758e804456fcf8d76bfa",
+          "code_length": 5
+        },
+        {
+          "name": "getFitnessStandardDeviation",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "7cb397cd266479a99b83f7bec4befae5853aec2b7fcb1765d4d236caa5c08604",
+          "code_length": 5
+        },
+        {
+          "name": "isNaturalFitness",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "d03bff06aea6fbfedf180457f4b392f70eb91875e68a3f00828aa68dcd339072",
+          "code_length": 5
+        },
+        {
+          "name": "getPopulationSize",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "55c3aec14ab0022b0eee6c40b7da6cc9e9eefbc1127e154a35a5ad79427fd854",
+          "code_length": 5
+        },
+        {
+          "name": "getEliteCount",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "a28e7b692c91b70e79af8e400c2e9b52bdbb4dceb93b8402f699cef2a52cf3aa",
+          "code_length": 5
+        },
+        {
+          "name": "getGenerationNumber",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "c87f96dbb49f50d33ea5ae1c87f642b0f834951625df3f77894f3f2d7265b108",
+          "code_length": 5
+        },
+        {
+          "name": "getElapsedTime",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "2474113f7501d5e7cd5b9ebd0ab070a0d48b112ed2356fcc1bae4e93e27bac39",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/PopulationData"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/SelectionStrategy.class",
+      "occurrence": 0,
+      "sha256": "531e7fa4eefe1ac86dc9e8babfcbc6200edad4afbccbcc2b8251eba867c510f0",
+      "name": "org/uncommons/watchmaker/framework/SelectionStrategy",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1025,
+          "generic_signature": "<S:TT;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/SteadyStateEvolutionEngine.class",
+      "occurrence": 0,
+      "sha256": "af04641a9ba2a64fa90b5f47c0762c05d31b4d2bb513d17abfcd60966485b946",
+      "name": "org/uncommons/watchmaker/framework/SteadyStateEvolutionEngine",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "evolutionScheme",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "fitnessEvaluator",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;"
+        },
+        {
+          "name": "selectionStrategy",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/SelectionStrategy;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;"
+        },
+        {
+          "name": "selectionSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "forceSingleCandidateUpdate",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Lorg/uncommons/watchmaker/framework/SelectionStrategy;IZLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "bc36785008b6be8b73bdb17126b82fa8c700994db092fe124cd5ecff41f03dc1",
+          "code_length": 37,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;IZLjava/util/Random;)V"
+        },
+        {
+          "name": "nextEvolutionStep",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "f2ac23e3cb092cdefc990bf4e8df583693b0a664da084973861d516fd2543bbe",
+          "code_length": 68,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "doReplacement",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;ILjava/util/Random;)V",
+          "access": 4,
+          "code_sha256": "8d434ed473a7f9f2a0c541729fededc3ef03ff5844d5ced89f750efaae1ee79a",
+          "code_length": 150,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;ILjava/util/Random;)V"
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "9f8cbfe462b9d12288ca2b5967c4af1bbeb13c7499986a55039480a2c69a06f1",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/AbstractEvolutionEngine<TT;>;",
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/AbstractEvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/SteadyStateEvolutionEngine"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/TerminationCondition.class",
+      "occurrence": 0,
+      "sha256": "9040286008a8cf7d654cc994883c95dc1a8dd020a29efb74b9500c6b435ae1d0",
+      "name": "org/uncommons/watchmaker/framework/TerminationCondition",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1025,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory.class",
+      "occurrence": 0,
+      "sha256": "cc83e567ed9123072c13dbb9187f9c8cea5f02387da36dabef496690c8cda51a",
+      "name": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/CandidateFactory"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "generateInitialPopulation",
+          "descriptor": "(ILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "14707a79ebae274da96b4f7aaf6902b19a436e1a21d4bbdf2293133a17a87e70",
+          "code_length": 41,
+          "generic_signature": "(ILjava/util/Random;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateInitialPopulation",
+          "descriptor": "(ILjava/util/Collection;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "46b6f949b1f3fe5cd79ef833ddce024af7569acfbcc8fdae26a00108ceaebb36",
+          "code_length": 78,
+          "generic_signature": "(ILjava/util/Collection<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collection",
+        "java/util/Collections",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/CandidateFactory",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/factories/BitStringFactory.class",
+      "occurrence": 0,
+      "sha256": "49091e5c0926605f351372f182a70e8e6c9e121b216ed19303541ef8b507189e",
+      "name": "org/uncommons/watchmaker/framework/factories/BitStringFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "length",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "d28b759818dc43f39901f3f3a0822389056e047916d83f350dcf949d436efd69",
+          "code_length": 10
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Lorg/uncommons/maths/binary/BitString;",
+          "access": 1,
+          "code_sha256": "249f87fc5f598b7a8288296eb7daaf90cdef558b10e59bd26dea1b8bdbb94b51",
+          "code_length": 13
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "41a8a25429cec42292e1b8210264639e1f3bc4c601ebabc7ece4395c994cef11",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/factories/AbstractCandidateFactory<Lorg/uncommons/maths/binary/BitString;>;",
+      "class_references": [
+        "org/uncommons/maths/binary/BitString",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+        "org/uncommons/watchmaker/framework/factories/BitStringFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/factories/ListPermutationFactory.class",
+      "occurrence": 0,
+      "sha256": "5d706171afa7d4e1ab0b2f4b94847e6ff98c1b1793ac7bcd7bf9640d95805601",
+      "name": "org/uncommons/watchmaker/framework/factories/ListPermutationFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "elements",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Ljava/util/List<TT;>;)V"
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8f01eceb7a6d4dad4906cce9d6749098d5af8745326b4e6f3c8169cd73f24f67",
+          "code_length": 19,
+          "generic_signature": "(Ljava/util/Random;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "3b376d3d24f160707753e02c35bb764bfa01b00a34eaae38c65b011e697960e1",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/factories/AbstractCandidateFactory<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+        "org/uncommons/watchmaker/framework/factories/ListPermutationFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/factories/ObjectArrayPermutationFactory.class",
+      "occurrence": 0,
+      "sha256": "d3faa9e23173114620e982e25ff1043fd7fb4507ef415aed93416d51ee3b370a",
+      "name": "org/uncommons/watchmaker/framework/factories/ObjectArrayPermutationFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "elements",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 18,
+          "generic_signature": "[TT;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([Ljava/lang/Object;)V",
+          "access": 1,
+          "code_sha256": "fc88da7dfca55b8c39c103f9c4c088301943e6d993e71b346558cfc8274285bd",
+          "code_length": 16,
+          "generic_signature": "([TT;)V"
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)[Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "efd8890ece41861384e0845824e918429370201ffd3e889097e32c59e6d3d914",
+          "code_length": 29,
+          "generic_signature": "(Ljava/util/Random;)[TT;"
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a6abce8859f5af34f371c96211e18e45a19cadc1fa940c1083b44792343c0bf9",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/factories/AbstractCandidateFactory<[TT;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/util/Arrays",
+        "java/util/Collections",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+        "org/uncommons/watchmaker/framework/factories/ObjectArrayPermutationFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/factories/StringFactory.class",
+      "occurrence": 0,
+      "sha256": "ea807fa0f3faee6144dbd0ed59a76569f763a9c1482150b8b4cde4b46d5c2eb2",
+      "name": "org/uncommons/watchmaker/framework/factories/StringFactory",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "alphabet",
+          "descriptor": "[C",
+          "access": 18
+        },
+        {
+          "name": "stringLength",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([CI)V",
+          "access": 1,
+          "code_sha256": "4ea5405b3413659de5722bbf1c240252397d343f8cf6753b05003dc76e3ea99d",
+          "code_length": 21
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "cc3566342d1ffff96d7efd5e3c7cf3ad1861b86eed0c0bcc63d7c25807729a1e",
+          "code_length": 49
+        },
+        {
+          "name": "generateRandomCandidate",
+          "descriptor": "(Ljava/util/Random;)Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "a6abce8859f5af34f371c96211e18e45a19cadc1fa940c1083b44792343c0bf9",
+          "code_length": 6
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/factories/AbstractCandidateFactory<Ljava/lang/String;>;",
+      "class_references": [
+        "[C",
+        "java/lang/String",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/factories/AbstractCandidateFactory",
+        "org/uncommons/watchmaker/framework/factories/StringFactory"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/Console.class",
+      "occurrence": 0,
+      "sha256": "18071046e36fa68f243813fb20dee081fcdd638310d84fd5a99cd57277adfb91",
+      "name": "org/uncommons/watchmaker/framework/interactive/Console",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;)I",
+          "access": 1025,
+          "generic_signature": "(Ljava/util/List<+TT;>;)I"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/interactive/Console"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$1.class",
+      "occurrence": 0,
+      "sha256": "a91949c36c9fc58ef83a9159a35f360e8323952f8f857386fb86feabe7efaab6",
+      "name": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$1",
+      "major": 49,
+      "minor": 0,
+      "access": 4128,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$1"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$NoOpRenderer.class",
+      "occurrence": 0,
+      "sha256": "436f39d02d6981c846504ae9e01409840b0dff0f3f26972cfe4225d755d83f36",
+      "name": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$NoOpRenderer",
+      "major": 49,
+      "minor": 0,
+      "access": 48,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/interactive/Renderer"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "render",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "cce4905627dfe2246bbd708ff7a501be2c9c6626293732704a356f3d2d4bc859",
+          "code_length": 2,
+          "generic_signature": "(TT;)TT;"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/interactive/InteractiveSelection$1;)V",
+          "access": 4096,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$1",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$NoOpRenderer",
+        "org/uncommons/watchmaker/framework/interactive/Renderer"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection.class",
+      "occurrence": 0,
+      "sha256": "42237f332b6509639beafa0e9f41f2f08cb3fe2e317fe8a2ada8bd770983eadf",
+      "name": "org/uncommons/watchmaker/framework/interactive/InteractiveSelection",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [
+        {
+          "name": "console",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/interactive/Console;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/interactive/Console<*>;"
+        },
+        {
+          "name": "renderer",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/interactive/Renderer;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;*>;"
+        },
+        {
+          "name": "groupSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "maxSelectionsPerGeneration",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/interactive/Console;Lorg/uncommons/watchmaker/framework/interactive/Renderer;II)V",
+          "access": 1,
+          "code_sha256": "323b46e7185efb6213403b6384ba47270e14ee4a693ddd64f30b307d4982fd0b",
+          "code_length": 57,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lorg/uncommons/watchmaker/framework/interactive/Console<TR;>;Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;TR;>;II)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/interactive/Console;II)V",
+          "access": 1,
+          "code_sha256": "5e9b429a9c27e93b3ad2be2204961faa88acbb06923332734a37cf074286797d",
+          "code_length": 16,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/interactive/Console<TT;>;II)V"
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "79a5a161b7dfe3b82dfcb6c51a28a82859cf92b581aa880d6d9811f470ce57be",
+          "code_length": 245,
+          "generic_signature": "<S:TT;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;)Ljava/lang/Object;",
+          "access": 2,
+          "code_sha256": "d3004480b3340ee30c702be7e3ea24a5c9ad132d6601349bb26e90642686d8db",
+          "code_length": 111,
+          "generic_signature": "<S:TT;>(Ljava/util/List<TS;>;)TS;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<TT;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/util/reflection/ReflectionUtils",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/interactive/Console",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$1",
+        "org/uncommons/watchmaker/framework/interactive/InteractiveSelection$NoOpRenderer",
+        "org/uncommons/watchmaker/framework/interactive/Renderer"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/Renderer.class",
+      "occurrence": 0,
+      "sha256": "1f7457b1b38d698c03b6b3b5942fe905baface171365f6b1e0678bbcdea31493",
+      "name": "org/uncommons/watchmaker/framework/interactive/Renderer",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "render",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1025,
+          "generic_signature": "(TT;)TS;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;S:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/interactive/Renderer"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/interactive/RendererAdapter.class",
+      "occurrence": 0,
+      "sha256": "e231d89351159ec27133b229d96c171822d613fa99ada508554297a9c96a34c5",
+      "name": "org/uncommons/watchmaker/framework/interactive/RendererAdapter",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/interactive/Renderer"
+      ],
+      "fields": [
+        {
+          "name": "renderer1",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/interactive/Renderer;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;*>;"
+        },
+        {
+          "name": "renderer2",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/interactive/Renderer;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/interactive/Renderer<*TS;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/interactive/Renderer;Lorg/uncommons/watchmaker/framework/interactive/Renderer;)V",
+          "access": 1,
+          "code_sha256": "9056741af9e82f95189a464f65caafb2b54a85678474df60237a4c02a5058b18",
+          "code_length": 15,
+          "generic_signature": "<R:Ljava/lang/Object;>(Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;+TR;>;Lorg/uncommons/watchmaker/framework/interactive/Renderer<TR;TS;>;)V"
+        },
+        {
+          "name": "render",
+          "descriptor": "(Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "3b54c87b38c3a67b63889c128ddf7f5721cbc28f353b4dad30f1c504d69ca1a4",
+          "code_length": 45,
+          "generic_signature": "(TT;)TS;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;S:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/interactive/Renderer<TT;TS;>;",
+      "class_references": [
+        "java/lang/Class",
+        "java/lang/Object",
+        "org/uncommons/util/reflection/ReflectionUtils",
+        "org/uncommons/watchmaker/framework/interactive/Renderer",
+        "org/uncommons/watchmaker/framework/interactive/RendererAdapter"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/Epoch.class",
+      "occurrence": 0,
+      "sha256": "99100a10f509f4de72206af5e358aa5087f741f362098bbe161c4d2170428125",
+      "name": "org/uncommons/watchmaker/framework/islands/Epoch",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/concurrent/Callable"
+      ],
+      "fields": [
+        {
+          "name": "island",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionEngine;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;"
+        },
+        {
+          "name": "populationSize",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "eliteCount",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "seedCandidates",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "terminationConditions",
+          "descriptor": "[Lorg/uncommons/watchmaker/framework/TerminationCondition;",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionEngine;IILjava/util/List;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)V",
+          "access": 128,
+          "code_sha256": "ae0099cb670a0e54d46ecef397308652f297422b9448a1ccfdda0410e9b40541",
+          "code_length": 32,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;IILjava/util/List<TT;>;[Lorg/uncommons/watchmaker/framework/TerminationCondition;)V"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "b9ed57b455eb392d505940813728b553d658311d8c7f65e6259379028bc11864",
+          "code_length": 26,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "()Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;"
+        },
+        {
+          "name": "call",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 4161,
+          "code_sha256": "f555ed8d5ba4af4fd4ee7c4cc8bdc56693c24d5057b34ccde4dbb3c78495cdda",
+          "code_length": 5,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/concurrent/Callable<Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;>;",
+      "class_references": [
+        "java/lang/Exception",
+        "java/lang/Object",
+        "java/util/concurrent/Callable",
+        "org/uncommons/watchmaker/framework/EvolutionEngine",
+        "org/uncommons/watchmaker/framework/islands/Epoch"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/IslandEvolution$1.class",
+      "occurrence": 0,
+      "sha256": "9128f5ee5b60eb7f562aac2d6b8a448493d514fb7b8226a5056fa8801ca5b247",
+      "name": "org/uncommons/watchmaker/framework/islands/IslandEvolution$1",
+      "major": 49,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionObserver"
+      ],
+      "fields": [
+        {
+          "name": "val$islandIndex",
+          "descriptor": "I",
+          "access": 4112
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/islands/IslandEvolution;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolution;I)V",
+          "access": 0,
+          "code_sha256": "c4e57a04a8b4d721e9da9ba2df9c892509ad812b41ce26591c0447aeb8773ff7",
+          "code_length": 15
+        },
+        {
+          "name": "populationUpdate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 1,
+          "code_sha256": "7f8bc9faf23078a7a2e9aecd32471c9bc6ecf54e9bde13b2c10c703be60abacf",
+          "code_length": 47,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<+TT;>;)V"
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionObserver<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/Iterator",
+        "java/util/Set",
+        "org/uncommons/watchmaker/framework/EvolutionObserver",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolution",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolution$1",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolutionObserver"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/IslandEvolution.class",
+      "occurrence": 0,
+      "sha256": "e6c949a9afa59f46a4a75b40705f059194aeb87a7616078a85e85cec9e6627d8",
+      "name": "org/uncommons/watchmaker/framework/islands/IslandEvolution",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "islands",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;>;"
+        },
+        {
+          "name": "migration",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/islands/Migration;",
+          "access": 18
+        },
+        {
+          "name": "naturalFitness",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "rng",
+          "descriptor": "Ljava/util/Random;",
+          "access": 18
+        },
+        {
+          "name": "observers",
+          "descriptor": "Ljava/util/Set;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Set<Lorg/uncommons/watchmaker/framework/islands/IslandEvolutionObserver<-TT;>;>;"
+        },
+        {
+          "name": "satisfiedTerminationConditions",
+          "descriptor": "Ljava/util/List;",
+          "access": 2,
+          "generic_signature": "Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/watchmaker/framework/islands/Migration;Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Lorg/uncommons/watchmaker/framework/SelectionStrategy;Ljava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "eac108fee3aff11e2097cefe2153e692872dcad52fe181d5cf6d7212c883d889",
+          "code_length": 28,
+          "generic_signature": "(ILorg/uncommons/watchmaker/framework/islands/Migration;Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;Ljava/util/Random;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;Lorg/uncommons/watchmaker/framework/islands/Migration;ZLjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "6e551a6444fdb9d1626684b899ca19e89764c9067f5c511e8b752b6fb779e399",
+          "code_length": 91,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;>;Lorg/uncommons/watchmaker/framework/islands/Migration;ZLjava/util/Random;)V"
+        },
+        {
+          "name": "createIslands",
+          "descriptor": "(ILorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/FitnessEvaluator;Lorg/uncommons/watchmaker/framework/SelectionStrategy;Ljava/util/Random;)Ljava/util/List;",
+          "access": 10,
+          "code_sha256": "db89451509ae6c4ed89200ad4607714fb1e21f046d140406ccb4b91d659c7d26",
+          "code_length": 60,
+          "generic_signature": "<T:Ljava/lang/Object;>(ILorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/FitnessEvaluator<-TT;>;Lorg/uncommons/watchmaker/framework/SelectionStrategy<-TT;>;Ljava/util/Random;)Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvolutionEngine<TT;>;>;"
+        },
+        {
+          "name": "evolve",
+          "descriptor": "(IIII[Lorg/uncommons/watchmaker/framework/TerminationCondition;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "ba6b1e1a1b122438564fe234989d0fa2956d840dec32c40e72fcb47d7df72816",
+          "code_length": 345,
+          "generic_signature": "(IIII[Lorg/uncommons/watchmaker/framework/TerminationCondition;)TT;"
+        },
+        {
+          "name": "createEpochTasks",
+          "descriptor": "(IIILjava/util/List;)Ljava/util/List;",
+          "access": 2,
+          "code_sha256": "56e1d67f62c36a428fa631b3a36b89329ff851218e19c1bcc8fb88761f474814",
+          "code_length": 118,
+          "generic_signature": "(IIILjava/util/List<Ljava/util/List<TT;>;>;)Ljava/util/List<Ljava/util/concurrent/Callable<Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;>;>;"
+        },
+        {
+          "name": "toCandidateList",
+          "descriptor": "(Ljava/util/List;)Ljava/util/List;",
+          "access": 10,
+          "code_sha256": "f93d6c138d500bc00d97fc60b6ed83e6f311903dd8d37de67eb322d7b1fd526f",
+          "code_length": 56,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "getSatisfiedTerminationConditions",
+          "descriptor": "()Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "4de4792a73397a2cedd1209f8e12841b3c4cd76bb64060ad8e04d92eae475ad2",
+          "code_length": 25,
+          "generic_signature": "()Ljava/util/List<Lorg/uncommons/watchmaker/framework/TerminationCondition;>;"
+        },
+        {
+          "name": "addEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "89c089ffcc3a285697091c68c43c31f0b2cbb8ab7e964e21f08b04e758e4aa10",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "removeEvolutionObserver",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolutionObserver;)V",
+          "access": 1,
+          "code_sha256": "6d9ad3e49f037c3e2fe72b817fd689b2cc2e45c2478adb9955463306ac54354f",
+          "code_length": 12,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolutionObserver<-TT;>;)V"
+        },
+        {
+          "name": "notifyPopulationChange",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 2,
+          "code_sha256": "79a46c10c0ec14c07399d607c211e808db23c745892954227209add654553e25",
+          "code_length": 40,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<TT;>;)V"
+        },
+        {
+          "name": "access$000",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/islands/IslandEvolution;)Ljava/util/Set;",
+          "access": 4104,
+          "code_sha256": "8d1865bd647c076749233fa03b80b1af1f6aac4e3f3d452b92461ff796c58a7c",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;",
+      "class_references": [
+        "java/lang/IllegalStateException",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Set",
+        "java/util/concurrent/CopyOnWriteArraySet",
+        "java/util/concurrent/ExecutionException",
+        "java/util/concurrent/ExecutorService",
+        "java/util/concurrent/Executors",
+        "java/util/concurrent/Future",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/EvolutionEngine",
+        "org/uncommons/watchmaker/framework/EvolutionUtils",
+        "org/uncommons/watchmaker/framework/FitnessEvaluator",
+        "org/uncommons/watchmaker/framework/GenerationalEvolutionEngine",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/islands/Epoch",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolution",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolution$1",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolutionObserver",
+        "org/uncommons/watchmaker/framework/islands/Migration",
+        "org/uncommons/watchmaker/framework/termination/GenerationCount"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/IslandEvolutionObserver.class",
+      "occurrence": 0,
+      "sha256": "b857a3ab8703bcd5e057f7745a7e772349d93bd0da6daa351d1570337611ac38",
+      "name": "org/uncommons/watchmaker/framework/islands/IslandEvolutionObserver",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionObserver"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "islandPopulationUpdate",
+          "descriptor": "(ILorg/uncommons/watchmaker/framework/PopulationData;)V",
+          "access": 1025,
+          "generic_signature": "(ILorg/uncommons/watchmaker/framework/PopulationData<+TT;>;)V"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionObserver<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/EvolutionObserver",
+        "org/uncommons/watchmaker/framework/islands/IslandEvolutionObserver"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/Migration.class",
+      "occurrence": 0,
+      "sha256": "7da2ee8defe25fe1b174d8ced65b5b31fb3e06d423853678bb9c8a710d10e510",
+      "name": "org/uncommons/watchmaker/framework/islands/Migration",
+      "major": 49,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "migrate",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)V",
+          "access": 1025,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;>;ILjava/util/Random;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/islands/Migration"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/islands/RingMigration.class",
+      "occurrence": 0,
+      "sha256": "5f7f3adb1440587b00255cf04f03dfdbec7ff9d91a0e45e531453cfe7ba71e68",
+      "name": "org/uncommons/watchmaker/framework/islands/RingMigration",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/islands/Migration"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "migrate",
+          "descriptor": "(Ljava/util/List;ILjava/util/Random;)V",
+          "access": 1,
+          "code_sha256": "00fd96dfbe21c51ede40bf23667194c0fa97e173634a4f5c89abe4289ab4128d",
+          "code_length": 183,
+          "generic_signature": "<T:Ljava/lang/Object;>(Ljava/util/List<Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TT;>;>;>;ILjava/util/Random;)V"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/islands/Migration",
+        "org/uncommons/watchmaker/framework/islands/RingMigration"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/AbstractCrossover.class",
+      "occurrence": 0,
+      "sha256": "7ba6d90af56123e9498b497c3e905201f035331afe0f6e5b71f42437f3e4fce8",
+      "name": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 1057,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "crossoverPointsVariable",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "crossoverProbabilityVariable",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 4,
+          "code_sha256": "89632de48125b1f77f36252c60fd167f781bab3514dd234947384876b3e0f0bf",
+          "code_length": 9
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 4,
+          "code_sha256": "37026e637601ac5cf3c790feba4f7cc33154f16ee1c6e6f7f721e7b8ad34f18f",
+          "code_length": 38
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 4,
+          "code_sha256": "39dc4ab3fb22d4af67e38decd506eec34835a54f33949e691cf05ec2956d3de7",
+          "code_length": 16,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 4,
+          "code_sha256": "4e8af99dd5f76d952caca6eca1e7457ed9cbe10d4278809132a89a99ee39886c",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "5382b64f81f4e65c3504e978a6ec5bd846184c41a8b279a53e9c28723429ad16",
+          "code_length": 181,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 1028,
+          "generic_signature": "(TT;TT;ILjava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/BitStringCrossover.class",
+      "occurrence": 0,
+      "sha256": "dc6140febb7d4506f685a4ec284311b6086886fca2077475826c7f574c8d2339",
+      "name": "org/uncommons/watchmaker/framework/operators/BitStringCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Lorg/uncommons/maths/binary/BitString;Lorg/uncommons/maths/binary/BitString;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "fac8ad460613ec789f5ec9b2d6627bacf419eb7c1c5e611b4e53b0539ce55416",
+          "code_length": 106,
+          "generic_signature": "(Lorg/uncommons/maths/binary/BitString;Lorg/uncommons/maths/binary/BitString;ILjava/util/Random;)Ljava/util/List<Lorg/uncommons/maths/binary/BitString;>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "476e4f3a915e26945d8306bf6e7e9b8a25080a73788c6c6cef8206c383c53e54",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<Lorg/uncommons/maths/binary/BitString;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/binary/BitString",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/BitStringCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/BitStringMutation.class",
+      "occurrence": 0,
+      "sha256": "792b8fefd6d46987859640b0983b513e8b54a9d087a8bd46212f7dfa09bf23e5",
+      "name": "org/uncommons/watchmaker/framework/operators/BitStringMutation",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "mutationProbability",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        },
+        {
+          "name": "mutationCount",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "14d32ae0a87426f8435eeff83dee1feb3dfafdc4ffd58dfc45fc432c135222de",
+          "code_length": 24
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "0ebd13a3cad62c60260169dbe4dd3b3ebbac226f45b392686fe8ddadc1bc3e07",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "4bd05e60746f525fb8d9247a4f0074e445f1c2f1a8ac09057d8fb952532c9c87",
+          "code_length": 63,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/maths/binary/BitString;>;Ljava/util/Random;)Ljava/util/List<Lorg/uncommons/maths/binary/BitString;>;"
+        },
+        {
+          "name": "mutateBitString",
+          "descriptor": "(Lorg/uncommons/maths/binary/BitString;Ljava/util/Random;)Lorg/uncommons/maths/binary/BitString;",
+          "access": 2,
+          "code_sha256": "4a2d369101ad2f0ec6c84b07d34edbebf0a9b17a1a3315d0a86c0ddd2a003734",
+          "code_length": 73
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Lorg/uncommons/maths/binary/BitString;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/binary/BitString",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/BitStringMutation"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ByteArrayCrossover.class",
+      "occurrence": 0,
+      "sha256": "458b3f74c9b452e307348f860988357b20af34b0f522d1761f9fc993e900bf36",
+      "name": "org/uncommons/watchmaker/framework/operators/ByteArrayCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "([B[BILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "f8a2272dece5ebaf39b7d443845feec32dbf3bee0fa8fd9f9426b0e89b7b804a",
+          "code_length": 149,
+          "generic_signature": "([B[BILjava/util/Random;)Ljava/util/List<[B>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "9f307afd8718b5651606fcce85edfcbbfc49a2b7be18a708e7fe300bf8b2609b",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<[B>;",
+      "class_references": [
+        "[B",
+        "java/lang/IllegalArgumentException",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/ByteArrayCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/CharArrayCrossover.class",
+      "occurrence": 0,
+      "sha256": "9af9be08357aa499e75b3ee4ea66f5b06313bdcba030c1c301ef24423fbe47a1",
+      "name": "org/uncommons/watchmaker/framework/operators/CharArrayCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "([C[CILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "07820e2e762ee9ef28ac4b8ee341bcd32284d64809ba511de8bfff44b3e2b6c7",
+          "code_length": 149,
+          "generic_signature": "([C[CILjava/util/Random;)Ljava/util/List<[C>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "9f307afd8718b5651606fcce85edfcbbfc49a2b7be18a708e7fe300bf8b2609b",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<[C>;",
+      "class_references": [
+        "[C",
+        "java/lang/IllegalArgumentException",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/CharArrayCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/DoubleArrayCrossover.class",
+      "occurrence": 0,
+      "sha256": "a01540c92494d1c7e58c0cb440b2ef051abb5360756c9cd492dffb7e898669d6",
+      "name": "org/uncommons/watchmaker/framework/operators/DoubleArrayCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "([D[DILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "e79b6fa1d24ee4a2dd9402f9c2ae6dbb29b9c03688533c5a200ee2c20eae3cc5",
+          "code_length": 149,
+          "generic_signature": "([D[DILjava/util/Random;)Ljava/util/List<[D>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "9f307afd8718b5651606fcce85edfcbbfc49a2b7be18a708e7fe300bf8b2609b",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<[D>;",
+      "class_references": [
+        "[D",
+        "java/lang/IllegalArgumentException",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/DoubleArrayCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/EvolutionPipeline.class",
+      "occurrence": 0,
+      "sha256": "39f689d28b7f1f4a472d1e3b71110f7b52dd706c76c33723cee9226c72d7a977",
+      "name": "org/uncommons/watchmaker/framework/operators/EvolutionPipeline",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "pipeline",
+          "descriptor": "Ljava/util/List;",
+          "access": 18,
+          "generic_signature": "Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/util/List;)V",
+          "access": 1,
+          "code_sha256": "95b4ef2b7acc6a04d7766b8852023168667ba61c489d4dd8a60ba1d61eb52b9e",
+          "code_length": 36,
+          "generic_signature": "(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c8cd7d6a7ac8bc9a56f41a76696fbab7c228fe99a71e39d0ab439c74b9b32e5e",
+          "code_length": 50,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/EvolutionPipeline"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/IdentityOperator.class",
+      "occurrence": 0,
+      "sha256": "6bb1aed7099862652eb212f73a3d07a6ccc17349eaf24f49be983e6bfc7e3754",
+      "name": "org/uncommons/watchmaker/framework/operators/IdentityOperator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "8916d8144941c6249f7321bf8391c541451ea6d80600bf609e7e70e35bd4f5f6",
+          "code_length": 9,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/IdentityOperator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/IntArrayCrossover.class",
+      "occurrence": 0,
+      "sha256": "b4a5128639ec7d1ed06e51539713a0b4d56c36725e6bccc0f0371fcccc624fdb",
+      "name": "org/uncommons/watchmaker/framework/operators/IntArrayCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "([I[IILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "5761f886736d68ed137dbec0eecc86b28960660cea044c8e214b04539ff13ea0",
+          "code_length": 149,
+          "generic_signature": "([I[IILjava/util/Random;)Ljava/util/List<[I>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "9f307afd8718b5651606fcce85edfcbbfc49a2b7be18a708e7fe300bf8b2609b",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<[I>;",
+      "class_references": [
+        "[I",
+        "java/lang/IllegalArgumentException",
+        "java/lang/System",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/IntArrayCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ListCrossover.class",
+      "occurrence": 0,
+      "sha256": "edf3c0a307730cd746dae3c501bf6cd0bf720ed2bb600f94a1a342ca2f1b9c00",
+      "name": "org/uncommons/watchmaker/framework/operators/ListCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "e35f4e9c3aa783233b97265aec0234d46f08b4b3de9d83b8e919198ddd1fe1a4",
+          "code_length": 162,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/List<TT;>;ILjava/util/Random;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "081e907cbceafe4a3fa6b3f60c554baf99f53c8f23f3c57d32bcc0fe21d67108",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Math",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/ListCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ListInversion.class",
+      "occurrence": 0,
+      "sha256": "e897056d917fac6854e62fa59e40c311eda116767fe02f48cb6d515c6549d96f",
+      "name": "org/uncommons/watchmaker/framework/operators/ListInversion",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "inversionProbability",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d8f146a9b9611ea29426f4e321c202ef8c33243a885c65c9aadf6a7669be3807",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "94fd53187f855976600c6c4f7325eb202c464decd4fac2c62bb1a6c40de54c23",
+          "code_length": 10,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0f5447dde2fa3ee725f2e60aab7e3d5487c141bd6a718231cf6eed98cb113597",
+          "code_length": 200,
+          "generic_signature": "(Ljava/util/List<Ljava/util/List<TT;>;>;Ljava/util/Random;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/ListInversion"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ListOperator.class",
+      "occurrence": 0,
+      "sha256": "37c3a67a44d2985cbf1548a7f9ceafd2f02ffe29734d9d499d01a82926a34d0c",
+      "name": "org/uncommons/watchmaker/framework/operators/ListOperator",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;)V",
+          "access": 1,
+          "code_sha256": "dbe06fd5a9f459fc7533db3abb06f7e06645befcd7b2fc63f717e4034ba5312b",
+          "code_length": 10,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "168b716f41ab0fbea8aa697a2b6cd4efe0e074fe739548e0613ee61087bf8257",
+          "code_length": 68,
+          "generic_signature": "(Ljava/util/List<Ljava/util/List<TT;>;>;Ljava/util/Random;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/ListOperator"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ListOrderCrossover.class",
+      "occurrence": 0,
+      "sha256": "b2579c90280332d5b6fd578bf2156a19dcbac6ed1ef0994d416233dad4e9c43a",
+      "name": "org/uncommons/watchmaker/framework/operators/ListOrderCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "bd873409218da1f1528d3b77f6af3b230589db6b227f872dd76ead1ffd96827b",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "283f0d39cee51480a5918b0a4134c7eac1706cc5f024f7838b07ec3d6562e517",
+          "code_length": 17,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/util/List;Ljava/util/List;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "4674ab051eb1ec1d8f4e0da85b186fc9bae595c4fc978a237499b17ded4059ab",
+          "code_length": 298,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/List<TT;>;ILjava/util/Random;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        },
+        {
+          "name": "checkUnmappedElements",
+          "descriptor": "(Ljava/util/List;Ljava/util/Map;II)V",
+          "access": 2,
+          "code_sha256": "9fa4fd4d2b009a5acd913c0f50acbbb9578a9ef965974b63a40d06b5b05d404e",
+          "code_length": 78,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Map<TT;TT;>;II)V"
+        },
+        {
+          "name": "isInsideMappedRegion",
+          "descriptor": "(III)Z",
+          "access": 2,
+          "code_sha256": "563d63cfa55e39b9edc8de3eb71d563127c4e581f6576c9d8f6793205c408f39",
+          "code_length": 55
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "18c35bb61e48877dda87c2aef8c0491ce19647440f923c8341573b61734352e0",
+          "code_length": 16
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7913ffecc6e1ff7838c223e6a2c5540cb6e1430b9d283725f3c07a45789db8db",
+          "code_length": 18
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/util/ArrayList",
+        "java/util/HashMap",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/ListOrderCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ListOrderMutation.class",
+      "occurrence": 0,
+      "sha256": "18a281ec8a9f8a52d6333f764146ca941749ecdda960121bf35b55cc3e10d07c",
+      "name": "org/uncommons/watchmaker/framework/operators/ListOrderMutation",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "mutationCountVariable",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;"
+        },
+        {
+          "name": "mutationAmountVariable",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "024d54397d66462cb9cb3b597ef6876bb26401fe5fee8d51f94cdf074215a71f",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(II)V",
+          "access": 1,
+          "code_sha256": "9bfff0f90ac4c4137a8ddb5d6e1ec043b7b5ed81d3b628abb217dd4f59b450e4",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "c9b41b0ed7dca6d1b4ba136c9b2f5d51cc7a6a4ff71deef5a7523dd4c10e6857",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c07d988ab366aa1d349f9ef803f2e14160fa4563636cc6bb4ab04afe4d8391ee",
+          "code_length": 176,
+          "generic_signature": "(Ljava/util/List<Ljava/util/List<TT;>;>;Ljava/util/Random;)Ljava/util/List<Ljava/util/List<TT;>;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Ljava/util/List<TT;>;>;",
+      "class_references": [
+        "java/lang/Integer",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/ListOrderMutation"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/ObjectArrayCrossover.class",
+      "occurrence": 0,
+      "sha256": "757fe8243fff68d1284448199395b58d54c1142890f0303b14dbad9c70d9f4dc",
+      "name": "org/uncommons/watchmaker/framework/operators/ObjectArrayCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "([Ljava/lang/Object;[Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "ba2210945ea76ae6f871edb338da133510a72f78bbd0b9c0a711aeeb09286d8e",
+          "code_length": 178,
+          "generic_signature": "([TT;[TT;ILjava/util/Random;)Ljava/util/List<[TT;>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "84e0a76e5893e875d270c8517c19fc7cf1b19c6a7cf02d2fcd95711091dedc05",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<[TT;>;",
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "java/lang/Class",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/System",
+        "java/lang/reflect/Array",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/ObjectArrayCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/Replacement.class",
+      "occurrence": 0,
+      "sha256": "5f20c078d6c14869d697eb622b51808c59ed2532902884f709a448edc6f2454d",
+      "name": "org/uncommons/watchmaker/framework/operators/Replacement",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "factory",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/CandidateFactory;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;"
+        },
+        {
+          "name": "replacementProbability",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "e793bf4157067953be5d54bb65e8e49010be6c549af440505a2c1a203641db30",
+          "code_length": 14,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/maths/random/Probability;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/CandidateFactory;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "089f737249fda83e92d70786d060c87fa1b24de8bf19c2377ca95e402e94e9df",
+          "code_length": 15,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/CandidateFactory<TT;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "25d057bfeda8ba5c62b02403a45b0559e57310f89f58be910cc51ac9d415aa96",
+          "code_length": 87,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/CandidateFactory",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/Replacement"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/SplitEvolution.class",
+      "occurrence": 0,
+      "sha256": "ccbae0fd16c2e6682e3b5e62c2625c99e79a670a4a89fa1e281a58a251a9e081",
+      "name": "org/uncommons/watchmaker/framework/operators/SplitEvolution",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "operator1",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "operator2",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;"
+        },
+        {
+          "name": "weightVariable",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;D)V",
+          "access": 1,
+          "code_sha256": "c11f83f7ccaa0a0c2e736e64e7a911134e6fe8a284a87cd68737e389503d9a19",
+          "code_length": 40,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;D)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "70e2a987b6a41b53bc01cce29fdc1119150c568fd54b987664d61df08d268701",
+          "code_length": 20,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "e3f32181fbe8680e3b70e9fc38fa164eb29012005c6d6be9fac471bd296eeba5",
+          "code_length": 134,
+          "generic_signature": "(Ljava/util/List<TT;>;Ljava/util/Random;)Ljava/util/List<TT;>;"
+        }
+      ],
+      "generic_signature": "<T:Ljava/lang/Object;>Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<TT;>;",
+      "class_references": [
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Collections",
+        "java/util/List",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/SplitEvolution"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/StringCrossover.class",
+      "occurrence": 0,
+      "sha256": "8418e03a85a85f5d3ecc69afe6ca94400516ea8f895da2e02b5f61c08e79c2f3",
+      "name": "org/uncommons/watchmaker/framework/operators/StringCrossover",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e6ced8ea2ade384bdfec4a5e003c3ac095145e865e20aae0ccd5fcc3cc060ccd",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "6a4abf185641075546aa8fcd90c76ba22cb6aab05cc54126fff5fea807d6e1b0",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "d319f3f2e52f614e1b40ec8fa381a3a29e051ea281c2278d03553e1d014af9e8",
+          "code_length": 7
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "6d7039953d912e668d477f3b2ae59d52598bcbc3ebe7f581c19a2a9c05739d1e",
+          "code_length": 6,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "26fc6e3ad3eb80ebb0db7db24c5817cc892b6f347489f1c82c5409cf4bf20f10",
+          "code_length": 7,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Integer;>;Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4,
+          "code_sha256": "78fc6c34612d9d4c219500f663b508bec3753cc10fe52844c8c891cc69026dba",
+          "code_length": 158,
+          "generic_signature": "(Ljava/lang/String;Ljava/lang/String;ILjava/util/Random;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "mate",
+          "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;ILjava/util/Random;)Ljava/util/List;",
+          "access": 4164,
+          "code_sha256": "448a7170309c96d73207ef9011acdcfc9caed49c7391786dfee7e6248f5f34a0",
+          "code_length": 16
+        }
+      ],
+      "generic_signature": "Lorg/uncommons/watchmaker/framework/operators/AbstractCrossover<Ljava/lang/String;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/operators/AbstractCrossover",
+        "org/uncommons/watchmaker/framework/operators/StringCrossover"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/operators/StringMutation.class",
+      "occurrence": 0,
+      "sha256": "08f4d5ec99eaea328f7086837380c0c04701bda2d522b289be9b47713ac30ec8",
+      "name": "org/uncommons/watchmaker/framework/operators/StringMutation",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator"
+      ],
+      "fields": [
+        {
+          "name": "alphabet",
+          "descriptor": "[C",
+          "access": 18
+        },
+        {
+          "name": "mutationProbability",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "([CLorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "e793bf4157067953be5d54bb65e8e49010be6c549af440505a2c1a203641db30",
+          "code_length": 14
+        },
+        {
+          "name": "<init>",
+          "descriptor": "([CLorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "c28f45160c13b02497a8a1a93389f036b12c8f7db7f63722a0ae1c16eaf6d627",
+          "code_length": 21,
+          "generic_signature": "([CLorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "apply",
+          "descriptor": "(Ljava/util/List;Ljava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "d262f28db96e6a4cbee4f65be5752debcd454647554b239d670f879820b4fb6c",
+          "code_length": 63,
+          "generic_signature": "(Ljava/util/List<Ljava/lang/String;>;Ljava/util/Random;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "mutateString",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Random;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "9cf0ef8b7dff937cebff3a7393d84b617c21217b6e384f20db8171fb0f6db8b2",
+          "code_length": 71
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/EvolutionaryOperator<Ljava/lang/String;>;",
+      "class_references": [
+        "[C",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvolutionaryOperator",
+        "org/uncommons/watchmaker/framework/operators/StringMutation"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/RankSelection.class",
+      "occurrence": 0,
+      "sha256": "a7eb3c4d427c7cfc38a2c90a54e64650e778406094c71248f3f3b14d90cb2076",
+      "name": "org/uncommons/watchmaker/framework/selection/RankSelection",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/SelectionStrategy;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/SelectionStrategy;)V",
+          "access": 1,
+          "code_sha256": "94fd53187f855976600c6c4f7325eb202c464decd4fac2c62bb1a6c40de54c23",
+          "code_length": 10,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0efe721e7df6bee56cc734ab110aef67ba786e7f956ab0d122d0e3b209a19383",
+          "code_length": 102,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "mapRankToScore",
+          "descriptor": "(II)D",
+          "access": 4,
+          "code_sha256": "c366fb579f21a1b805d45b5b2cf439932ae54d1d6cf054577a6d152ec49f213c",
+          "code_length": 5
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4c720e486c1a0f9f51f3cf99fe968623a963afb24c1e69c66287d3bd71e932b2",
+          "code_length": 3
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/RankSelection",
+        "org/uncommons/watchmaker/framework/selection/StochasticUniversalSampling"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/RouletteWheelSelection.class",
+      "occurrence": 0,
+      "sha256": "a6c7f66a77a92109ab2205aa6e8ccb818c88f205028e480a6669b002c05ecb19",
+      "name": "org/uncommons/watchmaker/framework/selection/RouletteWheelSelection",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "c250daa1e4a549fd3fe2a050bb908ead9cdc1fc84c4c264646c9f292fe98b629",
+          "code_length": 177,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "getAdjustedFitness",
+          "descriptor": "(DZ)D",
+          "access": 2,
+          "code_sha256": "8f8fa23ea74a0c691734be3f3584a3c31eb9fb50cdeb36a6a494b8bab5a4cb5f",
+          "code_length": 22
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "74df402478ec2f9d2a653db8b0238cfaf8e2cdc86b0f3dab63b365b2c2c31d18",
+          "code_length": 3
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Arrays",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/RouletteWheelSelection"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/SigmaScaling.class",
+      "occurrence": 0,
+      "sha256": "237b8df57afb4fb7767e7043e9e91c003263c55310e644f4a1a097d4c0c5fd4e",
+      "name": "org/uncommons/watchmaker/framework/selection/SigmaScaling",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [
+        {
+          "name": "delegate",
+          "descriptor": "Lorg/uncommons/watchmaker/framework/SelectionStrategy;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "895e96292d5fb5c9868b636ca1f444d4b5f15dd1d7d3136a24fcf541c706470e",
+          "code_length": 12
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/SelectionStrategy;)V",
+          "access": 1,
+          "code_sha256": "94fd53187f855976600c6c4f7325eb202c464decd4fac2c62bb1a6c40de54c23",
+          "code_length": 10,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;)V"
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0b818ae1997c3b25e59e9940cb45480d3a9680921bd3e4998ea7428dd09f9d83",
+          "code_length": 165,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "getSigmaScaledFitness",
+          "descriptor": "(DDD)D",
+          "access": 2,
+          "code_sha256": "a31125929c2177dba9c0f26a1bd34687b31df5a2f6b9a1b23e488813e680263a",
+          "code_length": 39
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8fdd8b3f26fdcf19216323bbbfcc67c5dcc4d527614fadc5fdd0e29257d54340",
+          "code_length": 3
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "org/uncommons/maths/statistics/DataSet",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/SigmaScaling",
+        "org/uncommons/watchmaker/framework/selection/StochasticUniversalSampling"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/StochasticUniversalSampling.class",
+      "occurrence": 0,
+      "sha256": "f125130b7750832ac1849202f40a4be06ac3644dcebc9d381fce0f9b4661ce17",
+      "name": "org/uncommons/watchmaker/framework/selection/StochasticUniversalSampling",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "a5bc7692b668effa7679a919bd78cf28b1560e6f1e8ce0521ed6eded5d55e4d2",
+          "code_length": 162,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "getAdjustedFitness",
+          "descriptor": "(DZ)D",
+          "access": 2,
+          "code_sha256": "73991cabd974bebe7100fedcd8a66a6b2e57b653d749e3045fd661e3e0996d2e",
+          "code_length": 22
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "431034cbe64ce7aa669460b922771c46e391bad78e1f55810986f31765f72009",
+          "code_length": 3
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/Object",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/StochasticUniversalSampling"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/TournamentSelection.class",
+      "occurrence": 0,
+      "sha256": "fa0b80494d5d0a07a4639876c0dacc2dcf9e443bdaa02b983e3083276febd557",
+      "name": "org/uncommons/watchmaker/framework/selection/TournamentSelection",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [
+        {
+          "name": "selectionProbability",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;"
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "615cce6197baab6da254b5ccd584433e571900875e3d8b4ff495380ae4a46e30",
+          "code_length": 16,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Lorg/uncommons/maths/random/Probability;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/random/Probability;)V",
+          "access": 1,
+          "code_sha256": "aea0743ff4c574c293afaf7f4f0416c2a15ea16d0b2acc766ed0bdf4c8d2e5f8",
+          "code_length": 65
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "10b2777525ebec066c2e6839e47023d622b05e4c605e347a25fb542c83c073e0",
+          "code_length": 170,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List",
+        "java/util/Random",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/maths/random/Probability",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/TournamentSelection"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/selection/TruncationSelection.class",
+      "occurrence": 0,
+      "sha256": "05851d8bbc6027865536474becc221e47ca616aadc6fae8f56c201fe5032f725",
+      "name": "org/uncommons/watchmaker/framework/selection/TruncationSelection",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/SelectionStrategy"
+      ],
+      "fields": [
+        {
+          "name": "PERCENT_FORMAT",
+          "descriptor": "Ljava/text/DecimalFormat;",
+          "access": 26
+        },
+        {
+          "name": "selectionRatio",
+          "descriptor": "Lorg/uncommons/maths/number/NumberGenerator;",
+          "access": 18,
+          "generic_signature": "Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;"
+        },
+        {
+          "name": "description",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "$assertionsDisabled",
+          "descriptor": "Z",
+          "access": 4120
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/uncommons/maths/number/NumberGenerator;)V",
+          "access": 1,
+          "code_sha256": "615cce6197baab6da254b5ccd584433e571900875e3d8b4ff495380ae4a46e30",
+          "code_length": 16,
+          "generic_signature": "(Lorg/uncommons/maths/number/NumberGenerator<Ljava/lang/Double;>;)V"
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(D)V",
+          "access": 1,
+          "code_sha256": "9dcb9e425230ae04c8a26019ab56d5b3e16260289beb747ee3c3d5e62f877f75",
+          "code_length": 72
+        },
+        {
+          "name": "select",
+          "descriptor": "(Ljava/util/List;ZILjava/util/Random;)Ljava/util/List;",
+          "access": 1,
+          "code_sha256": "0abd419d37fbf5f5c6d51ea7c7e8cabf47ce0f7e1f935894f605668a30cd414c",
+          "code_length": 173,
+          "generic_signature": "<S:Ljava/lang/Object;>(Ljava/util/List<Lorg/uncommons/watchmaker/framework/EvaluatedCandidate<TS;>;>;ZILjava/util/Random;)Ljava/util/List<TS;>;"
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c3c2dd5b1474b9c55e245ba84fd6afb6b1002efdd064cf2cf508b60044fb0d92",
+          "code_length": 5
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "3ef0b2ac3c38b5dfc2c31c73b89fdab6ca1ba857d98d6c404d4106880c85b545",
+          "code_length": 30
+        }
+      ],
+      "generic_signature": "Ljava/lang/Object;Lorg/uncommons/watchmaker/framework/SelectionStrategy<Ljava/lang/Object;>;",
+      "class_references": [
+        "java/lang/AssertionError",
+        "java/lang/Class",
+        "java/lang/Double",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Math",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/text/DecimalFormat",
+        "java/util/ArrayList",
+        "java/util/List",
+        "org/uncommons/maths/number/ConstantGenerator",
+        "org/uncommons/maths/number/NumberGenerator",
+        "org/uncommons/watchmaker/framework/EvaluatedCandidate",
+        "org/uncommons/watchmaker/framework/SelectionStrategy",
+        "org/uncommons/watchmaker/framework/selection/TruncationSelection"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/termination/ElapsedTime.class",
+      "occurrence": 0,
+      "sha256": "9173f2cdc20c78cc61a7d7ee9aa0b3e9abb25973dac28ce7b9879f6e879bab37",
+      "name": "org/uncommons/watchmaker/framework/termination/ElapsedTime",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ],
+      "fields": [
+        {
+          "name": "maxDuration",
+          "descriptor": "J",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "f7257d73a4d461c292e5c12e426c91ee56682e0486d55c41b8ad6daa1a64a95a",
+          "code_length": 26
+        },
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1,
+          "code_sha256": "933a5d2013160cde06a673ae481ec34953461126984dd8eed076e68bdf1b1163",
+          "code_length": 18,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/termination/ElapsedTime"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/termination/GenerationCount.class",
+      "occurrence": 0,
+      "sha256": "6507aedd7a2ea2ab38b75ff09924e84cca2dfe2506b079824bdab329720922a9",
+      "name": "org/uncommons/watchmaker/framework/termination/GenerationCount",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ],
+      "fields": [
+        {
+          "name": "generationCount",
+          "descriptor": "I",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "87217416557aeb9fc784ca847b4717ffaf121a262a14b5a15730b59e133ec4ec",
+          "code_length": 24
+        },
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1,
+          "code_sha256": "d91cb1c056a8691f17de8682fa5f8ffc1916bbfe1cbd74b15e755dea19461895",
+          "code_length": 19,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        }
+      ],
+      "class_references": [
+        "java/lang/IllegalArgumentException",
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/termination/GenerationCount"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/termination/Stagnation.class",
+      "occurrence": 0,
+      "sha256": "debec4dce0c9a81cb2f501e50e835eeae7bf19154504f579ba931e2eda6e4e2e",
+      "name": "org/uncommons/watchmaker/framework/termination/Stagnation",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ],
+      "fields": [
+        {
+          "name": "generationLimit",
+          "descriptor": "I",
+          "access": 18
+        },
+        {
+          "name": "naturalFitness",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "usePopulationAverage",
+          "descriptor": "Z",
+          "access": 18
+        },
+        {
+          "name": "bestFitness",
+          "descriptor": "D",
+          "access": 2
+        },
+        {
+          "name": "fittestGeneration",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(IZ)V",
+          "access": 1,
+          "code_sha256": "b05ae8ed23e7ad5784aa1883a8755423f8987f57ea38e57164f3be3b73e05eed",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(IZZ)V",
+          "access": 1,
+          "code_sha256": "d710b1150e8b204507bc1ebb09e97a57abb99df1bb22fe4dad4044e21693dd24",
+          "code_length": 20
+        },
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1,
+          "code_sha256": "4ddea06274e9e299eb93acc0ae6575a32ebe9a11de457b8f6b781ae6d7f4ce32",
+          "code_length": 56,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        },
+        {
+          "name": "getFitness",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)D",
+          "access": 2,
+          "code_sha256": "4bfe52eca859df9a322b615762b5b2565f57b683907c97697ffbfb075d9f664f",
+          "code_length": 19,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)D"
+        },
+        {
+          "name": "hasFitnessImproved",
+          "descriptor": "(D)Z",
+          "access": 2,
+          "code_sha256": "001ccca74b2ccbdb8d4ac0f026e50a32deabf79af2b7d82826c8919d32ff8ec8",
+          "code_length": 38
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/termination/Stagnation"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/termination/TargetFitness.class",
+      "occurrence": 0,
+      "sha256": "f5a97d15732ec86f10888e13c6b2cc4318b4a0ea0d152fb2f50051e8807dd272",
+      "name": "org/uncommons/watchmaker/framework/termination/TargetFitness",
+      "major": 49,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ],
+      "fields": [
+        {
+          "name": "targetFitness",
+          "descriptor": "D",
+          "access": 18
+        },
+        {
+          "name": "natural",
+          "descriptor": "Z",
+          "access": 18
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(DZ)V",
+          "access": 1,
+          "code_sha256": "a76df3d95ace251f53638235b44632ebb42d7e70287d06f37941ae70aa31721d",
+          "code_length": 15
+        },
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1,
+          "code_sha256": "7d33bd1086d2524c6e11593d4db3f751f20a341bb685a5066e251b0eea53d180",
+          "code_length": 43,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/PopulationData",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/termination/TargetFitness"
+      ]
+    },
+    {
+      "entry": "org/uncommons/watchmaker/framework/termination/UserAbort.class",
+      "occurrence": 0,
+      "sha256": "d1fa97cbecc47d370a52cf88f027755c400785e6b649fe7187b2159460fa5a14",
+      "name": "org/uncommons/watchmaker/framework/termination/UserAbort",
+      "major": 49,
+      "minor": 0,
+      "access": 49,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "org/uncommons/watchmaker/framework/TerminationCondition"
+      ],
+      "fields": [
+        {
+          "name": "aborted",
+          "descriptor": "Z",
+          "access": 66
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c775df3366625224ea511bd03f3485fa55677acf7a53568b6214c4f878ec6ae3",
+          "code_length": 10
+        },
+        {
+          "name": "shouldTerminate",
+          "descriptor": "(Lorg/uncommons/watchmaker/framework/PopulationData;)Z",
+          "access": 1,
+          "code_sha256": "dd165de82354a26255913fedef017ea2306b948f9514df2393c6b39449f3cb26",
+          "code_length": 5,
+          "generic_signature": "(Lorg/uncommons/watchmaker/framework/PopulationData<*>;)Z"
+        },
+        {
+          "name": "abort",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3c113358064f968376ab2c8164735835a6133e9d40ff915eed954f93f9693263",
+          "code_length": 6
+        },
+        {
+          "name": "isAborted",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "03413414f76d87055da213e92a79728041e6e47e1b1c52781787269c57cba44d",
+          "code_length": 5
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "33c85776517ece10d6486889ed9706f91e73e9d2ac77c13d51ce09aa720cbf1b",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "java/lang/Object",
+        "org/uncommons/watchmaker/framework/TerminationCondition",
+        "org/uncommons/watchmaker/framework/termination/UserAbort"
+      ]
+    }
+  ]
+}

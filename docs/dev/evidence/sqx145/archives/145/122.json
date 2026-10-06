@@ -1,0 +1,846 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/xz-1.9.jar",
+  "sha256": "211b306cfc44f8f96df3a0a3ddaf75ba8c5289eed77d60d72f889bb855f535e5",
+  "class_count": 117,
+  "unique_class_entries": 117,
+  "resource_count": 1,
+  "duplicate_entries": [],
+  "classes": {
+    "org/tukaani/xz/ARMOptions.class": "e7e6e8dafe1e1a425724ba8d70f6c84a6d0e20a1b2f02f3908b61d9e1858c75f",
+    "org/tukaani/xz/ARMThumbOptions.class": "92e2702a0cac4747570fa3410eebf001c7a52fb6c1b7ed2f04b8c8fd7bd3c866",
+    "org/tukaani/xz/ArrayCache.class": "5de72ee79815b42dde2670f3d6e9dea88bd5be6cb59495c5d49f3453536b5b84",
+    "org/tukaani/xz/BCJCoder.class": "0ce6d979ee795e0dcb651ccc7d345222d56135e739560a6984f05c6d35007c69",
+    "org/tukaani/xz/BCJDecoder.class": "130776f84f2c6c8c23d86ddb138ea3a52bae99b742528b6c8f5527d13ff831c6",
+    "org/tukaani/xz/BCJEncoder.class": "020c419dbb05b926d3a4aea3e4242cf44fb531a36b88a1d90a022a2b41d45de2",
+    "org/tukaani/xz/BCJOptions.class": "54cbe481c51f486c8bdabd6d88c9b1c9f06416d3174a2889299a2326880fa711",
+    "org/tukaani/xz/BasicArrayCache$1.class": "ea653eef62fbac05e6fca8b767957f5165b770c1782357d5afc2fede64e9569a",
+    "org/tukaani/xz/BasicArrayCache$CacheMap.class": "429313a2e90793ea0ed87e69b384391f28175e05cf8dc527ba5c2c3a1c157c30",
+    "org/tukaani/xz/BasicArrayCache$CyclicStack.class": "f67e78cad5ae07afdb731d936cb5ef31149bed1f1fa755dc21e77866d2cfee1e",
+    "org/tukaani/xz/BasicArrayCache$LazyHolder.class": "1a477fce5ffc72a83c08492311c8b7c34d0e171d62c15ee010a594655b3ac45d",
+    "org/tukaani/xz/BasicArrayCache.class": "ec50e241d3d394514ab9d2b2c8c96ac4b02d52e179015161aaf24c1d5c011193",
+    "org/tukaani/xz/BlockInputStream.class": "060c89454d970435190239179e20d902d7f32adfad5121ed6cb4360ebafc9973",
+    "org/tukaani/xz/BlockOutputStream.class": "21850b3ddd45799a0f7b0ede80a7742d55b2bcf401e5dc9c43f0e1b5d438ffba",
+    "org/tukaani/xz/CloseIgnoringInputStream.class": "fa580a78a6daa405c336467ba4c66bb0b426d10be7d5f917bf07e77dac859a79",
+    "org/tukaani/xz/CorruptedInputException.class": "b3da7ddf1816c6ce2c81547dbc90770de45c40fbbfba772390c59fbd5ee9ff53",
+    "org/tukaani/xz/CountingInputStream.class": "c728a13003fea1c8a0707f3ac1ddcbc3275b82e766b6418cb777d68a90037884",
+    "org/tukaani/xz/CountingOutputStream.class": "1da85002efea967e9df22ac84562d82192530ec821168962fec156ff761a204d",
+    "org/tukaani/xz/DeltaCoder.class": "2279f15db3a4dd3fb79d2aa939a641de3902c7a782ae5e4153b82a0925303e9b",
+    "org/tukaani/xz/DeltaDecoder.class": "6273dd5284104b81ff3cb66401c233d5625500d29334d59005a6a583d0ff0ff1",
+    "org/tukaani/xz/DeltaEncoder.class": "918278a44efc77e34c0c2d60239a943e6006f0cf97d8271a7a1d0bc659008d98",
+    "org/tukaani/xz/DeltaInputStream.class": "fccda847b18b445e4eb85a0d2753d1bbcac158da763ea9eeada0ecd53c45c635",
+    "org/tukaani/xz/DeltaOptions.class": "02786d86f80be1c5439f34107d4b997338e038aff257d5a93d1f32916445bd48",
+    "org/tukaani/xz/DeltaOutputStream.class": "1f4b1290b9d4731e237aef3b647661ea99013db9055369d936fb84b80eead180",
+    "org/tukaani/xz/FilterCoder.class": "7f00c50d05a40ee8fbec5d196fdb59bcc5692ac990fd7702be86d11a0f170f62",
+    "org/tukaani/xz/FilterDecoder.class": "68a20c68b4ae784a35eedd80afdc7f6a84bd9d74f3d211a3b31121afef622bc2",
+    "org/tukaani/xz/FilterEncoder.class": "98b66623e3beee0f4280c7636e15365ec7c681181962bc53117dbcb550172980",
+    "org/tukaani/xz/FilterOptions.class": "7130467f809967fd899d8e6ba98218b28bd6ad57abc8cdc00da3f10d0d94a461",
+    "org/tukaani/xz/FinishableOutputStream.class": "ee95deafc7854aa629ea24481a4cc4ca0b1ad7c5ff9f22f9fd1186969060f1b4",
+    "org/tukaani/xz/FinishableWrapperOutputStream.class": "9808377c4470d877a0365d4b6e3e00dc52592e36558e5cb1f0a991126c9dd6e3",
+    "org/tukaani/xz/IA64Options.class": "bfd5b2188bedb1f9d1dbb366a57051c667f30a3a4bac51d09bd25959e0f73dc9",
+    "org/tukaani/xz/IndexIndicatorException.class": "2e6d0cff8b0252add2dadd784bc1361c423b5a172aa06d02135a6f6657d6b162",
+    "org/tukaani/xz/LZMA2Coder.class": "67272c5bec17a367e2a2157e0bc01b083729087d6be0072baee43c7175704532",
+    "org/tukaani/xz/LZMA2Decoder.class": "d5c770939cd0a9bad49ea427f501a1fa397a718319ef59d5f392aea21564fd6d",
+    "org/tukaani/xz/LZMA2Encoder.class": "bc1a36f7882dc0179f778f68c9565d54e16d98954d204b87e4519cd441a50a0b",
+    "org/tukaani/xz/LZMA2InputStream.class": "9c0cdab4933f7d12d6ebcd2b472c2c824ffa66eece1b9c2335e755c3b645ac07",
+    "org/tukaani/xz/LZMA2Options.class": "a6a5b018f35df4df27c5023cce4c4b783a121e1424a1932f173759b0aa4193c0",
+    "org/tukaani/xz/LZMA2OutputStream.class": "9b11f7e8eef978bff656486b7868fd123ed78ea5e1814f0179d2bc9acde93cd3",
+    "org/tukaani/xz/LZMAInputStream.class": "f88ac1119e7591e273bdccbab6d29cb9b608a199b86f86d02b4083d083a8cdc1",
+    "org/tukaani/xz/LZMAOutputStream.class": "0e7996c398d36424ff5977240a32b115cddc2e34be6d9c92cf7de95a3afacb1d",
+    "org/tukaani/xz/MemoryLimitException.class": "c970c118cbd7edeca33c0105375676a83a2557c812ddd3bc5e80d72da4b285da",
+    "org/tukaani/xz/PowerPCOptions.class": "c2e30e12d0f55a3ef42dbe1201cb0e00edb340ad3f3ad9beb840f84462e76615",
+    "org/tukaani/xz/RawCoder.class": "03e1fbbad31c2cb1c25df582452ac85a9c06934d42365e04c50b95341a8bb246",
+    "org/tukaani/xz/ResettableArrayCache.class": "c1683e050b459b586fcae1574cb9f6d453b4bab0cb549da3b5d5826f4ff6b8d6",
+    "org/tukaani/xz/SPARCOptions.class": "8f8d61dffb83458cb58e4b561e629602b1ed052a7cc8c683ef68de6ec8d8df87",
+    "org/tukaani/xz/SeekableFileInputStream.class": "6ed3fb02cc029e70969af4ddd0e7ca6a6b5ce1cae2aa2e3bee8fa5f7228d446e",
+    "org/tukaani/xz/SeekableInputStream.class": "a0d87dd1712defbf96ea43a7d89cde183cf4462179ed3de266e2d9a76100ce8c",
+    "org/tukaani/xz/SeekableXZInputStream.class": "506ba94a68160b4ab6d5ec81d74e5ffa3b758fda512b97300c12f437203668a2",
+    "org/tukaani/xz/SimpleInputStream.class": "738812f072baa0b5a325485ab788d288caba2aa8feba220c7b9262fd618f1d09",
+    "org/tukaani/xz/SimpleOutputStream.class": "beba92187409175052d48c73c18514ddb7e1948d0990218e8bfe83f930566c6d",
+    "org/tukaani/xz/SingleXZInputStream.class": "172df85bf08418d0d56415bc3ea66680f031ce2ca9485e3f5ed805c7d7ddf360",
+    "org/tukaani/xz/UncompressedLZMA2OutputStream.class": "7f43f07b1c0c123023077ad2b39dd896f2e0deb19a65ece6d06e0d35c9164854",
+    "org/tukaani/xz/UnsupportedOptionsException.class": "6053babf420b0bf5352e79e4f9ec3f770590be8b249dad9d0338cb78811d2cb6",
+    "org/tukaani/xz/X86Options.class": "55ed8586ba400149634725dc529c1ea68072b3e93c6bd62bae4b47b724faf29b",
+    "org/tukaani/xz/XZ.class": "7d388db555c0d45abecbc57ebbcc7bf1303c6b9c16ff336472a73ff6c23774bc",
+    "org/tukaani/xz/XZFormatException.class": "1b6da211b47da6f656f1b63b35c49429b681f4de14cc31e53b9ae95f80e08cbf",
+    "org/tukaani/xz/XZIOException.class": "461366974d1dc76f67549f5173af638f9ca306964a0765e170fc966be6f3870d",
+    "org/tukaani/xz/XZInputStream.class": "698e088db8433d7b8f705d89c9cafb467ba328bb0ae2085794445e22869e3ab6",
+    "org/tukaani/xz/XZOutputStream.class": "25e8eca82ce3b1447d70ba6625b2195b33472be5b4ba8767d8c77e5bafc4d5b3",
+    "org/tukaani/xz/check/CRC32.class": "9d9cc3f0ff39dce4eb3d154b5850be26ec70d72de7819ad34fd8e341accbfb89",
+    "org/tukaani/xz/check/CRC64.class": "8cf6086f19c1cbe257b7e6d6b6e8db48f52e82e09804f3d13c62476de0b50c49",
+    "org/tukaani/xz/check/Check.class": "fb9024e5717bbf5e4e3770d52e1c231cbcb6005a2d85fec82c8c7819e4e923bc",
+    "org/tukaani/xz/check/None.class": "435a325f3593ac0b7d2267ee4ce953fdce334500b8020a3ac7a1f76353e7c1fa",
+    "org/tukaani/xz/check/SHA256.class": "66d6ba3296039263bb294d66f130f7ac66b18bd50195e6e58b9980d7ceb2edd6",
+    "org/tukaani/xz/common/DecoderUtil.class": "c2fef385097e05cf50599c6a96ca4a77075f58b90721647a74abe3937d1b91e1",
+    "org/tukaani/xz/common/EncoderUtil.class": "e8f52f49aa6e39e94e1404aba187ec08e8766af7040afb1ba0520388f74daa4e",
+    "org/tukaani/xz/common/StreamFlags.class": "2ea09729294aa60bd7e16de03f645c1f71b30acba89011f7da578f00f14b4fb5",
+    "org/tukaani/xz/common/Util.class": "c51d8b55fd361e731fbd9ee999776db1a8080b39780ff4b23cc32400197fe8fc",
+    "org/tukaani/xz/delta/DeltaCoder.class": "a100a19021a2c29f474824f70a7dc175af7e03da16bac81605346db5c2704c13",
+    "org/tukaani/xz/delta/DeltaDecoder.class": "f737e64ce22f866572185e2bdcf9e3cd5d85a7b72caf6d5c91e808aa13589c74",
+    "org/tukaani/xz/delta/DeltaEncoder.class": "9997a4dc591686a0dc090a25c73396a4b87a72ed1e6618a6a32180d383d67c85",
+    "org/tukaani/xz/index/BlockInfo.class": "8f0c56a3e5480e3d84fd47f7f1dbf0c254d104cd89836cf97ac9ac3dc3db84b5",
+    "org/tukaani/xz/index/IndexBase.class": "1cbdd871f843feded1876009fbeed3ab38a2c86be979d64b41892010fa095377",
+    "org/tukaani/xz/index/IndexDecoder.class": "3fbe536363261053576f37ea515f5d2c78e02570f1e13162d654115b3817db5c",
+    "org/tukaani/xz/index/IndexEncoder.class": "c5cf70b5ba8e9aeeca2bf53f2f1534814b7da9bc1111cf7213dc88773e6811f6",
+    "org/tukaani/xz/index/IndexHash.class": "7b9de358db3a8210cc39d01760871ca31f648da7748102ff7ffb724e9d128363",
+    "org/tukaani/xz/index/IndexRecord.class": "28e03d26fae36e2de723aea58d2497f4ef7968dba0541cbd737e4d5019b99a5b",
+    "org/tukaani/xz/lz/BT4.class": "fa9f836e8afa2ba0a9703555dff3154426354a4bf6ea67d2164ecd52a6a38229",
+    "org/tukaani/xz/lz/CRC32Hash.class": "83e2638d74147bc9b27a0f87bfa8aee117c771915ba309b4b6a860dbe073030c",
+    "org/tukaani/xz/lz/HC4.class": "d6301511343582955c4d18cd8563e6be1a9480be4e49c539adf88fbb15b9c14d",
+    "org/tukaani/xz/lz/Hash234.class": "188f7e10eea97820114b7cc50249ab2e0a07f6ef8d2532142716a098c453c374",
+    "org/tukaani/xz/lz/LZDecoder.class": "3e4ea627b40e41a40d9b958f932fea1f8592e81653a176b29fd0148e2067ae31",
+    "org/tukaani/xz/lz/LZEncoder.class": "e64ce1791ce213a25830341c76f2c8c554e76ee57eb426e9f0d94dfde2800b24",
+    "org/tukaani/xz/lz/Matches.class": "7b3665f440eb3ff9bb6726e43619a6d9e7c53bad176ca132855eadd95d61eafb",
+    "org/tukaani/xz/lzma/LZMACoder$LengthCoder.class": "8daee14358b76886683d5a48a45f6bf81a4b9768ddc80ad5c9b8b8c86c1d438a",
+    "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder.class": "cd1b421cb9e6aac03422c211e6836c2e4fb34237344d14d9070125b5d3289c01",
+    "org/tukaani/xz/lzma/LZMACoder$LiteralCoder.class": "3e77f20d3be9510e35552381018add39d49643c39a14e3d46c06c84e51b590a1",
+    "org/tukaani/xz/lzma/LZMACoder.class": "81d35671719dd41a1ce1b41bf5b51607ba2f4c98d3247fdceac26af600350b33",
+    "org/tukaani/xz/lzma/LZMADecoder$1.class": "8f3483429d2f087cd0ee90bb84452bc61105c8fa6ff1aad713d3d36925e8a11d",
+    "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder.class": "ae3d88e988b6e66cb939f74b09fc21c9b5a0860aa212c6e996e9ce4aa040098e",
+    "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder.class": "bf17263935ffd3092e8b5dc8d6a9e06d6711dc31db5f5fa421963c589648f67e",
+    "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder.class": "45816380d3feed0453f84d7145e9041aa8e36600be4da0bcbd59e8117aed0524",
+    "org/tukaani/xz/lzma/LZMADecoder.class": "7e1f4aae3c291448f2b39fedb2fe082afb0e7f11dbf02dd35da7250b6563405e",
+    "org/tukaani/xz/lzma/LZMAEncoder$1.class": "6ad33d09a46f04f7811474032d750afa580009c063e7209b736d9f34a86ea948",
+    "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder.class": "9f9b51d25de95297e51f97cd20a9e301cb600aba5bd5c6413a157a0279323047",
+    "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder.class": "13f8175993d7e5dee4c3b4cd0ed53cfc14b4ac64b6ec0e0f44a88dd14c41ed0d",
+    "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder.class": "8c77ee62b9d61f6b6ceb882ba061d8263b3d1869d18ceeb15be49520588883a0",
+    "org/tukaani/xz/lzma/LZMAEncoder.class": "10d894be35e4bcd08980c2fedbc45609f92ebb28895916678b8b2211b7127645",
+    "org/tukaani/xz/lzma/LZMAEncoderFast.class": "31ec15cf5e10fd8598f3d374d8a2867467a1ec7518b1715e5f74e00acb7b84bc",
+    "org/tukaani/xz/lzma/LZMAEncoderNormal.class": "3347240e2ef0438c2fca6e82c9184edf7fd2a4ad756cc814cf40865342645457",
+    "org/tukaani/xz/lzma/Optimum.class": "e53f8024e312d1c4c1df95f10d23d7645fcf9bc4333a9f472ea524002096a3d1",
+    "org/tukaani/xz/lzma/State.class": "3852ad2d286e4c8e86efaf8ff5f85ae6ab5e9147f54421e1c060453d2bf51c45",
+    "org/tukaani/xz/rangecoder/RangeCoder.class": "f1b2363adb2079073b523b4084afb54031001d7e543765c8beb91c1cf39d41f4",
+    "org/tukaani/xz/rangecoder/RangeDecoder.class": "1d74d1d94e77f82d1d746ddd9314ba2ac186433d62ac0077f717eb92895b1a43",
+    "org/tukaani/xz/rangecoder/RangeDecoderFromBuffer.class": "7548cfc236b1098588cab487d44b0a103289a52fd1dae74638548e8b4b3e34d5",
+    "org/tukaani/xz/rangecoder/RangeDecoderFromStream.class": "12a22c8222aa152f274e641681f009f2f149f73c7ade87170c3bb2ccf08e7e51",
+    "org/tukaani/xz/rangecoder/RangeEncoder.class": "d8419eed71a755fc41f640dfa464e016311cc3e6a5a0fa28f7ee97847d00d097",
+    "org/tukaani/xz/rangecoder/RangeEncoderToBuffer.class": "2ff1f2616fc92e2750c1e70d198bf0453207b80cb86cb0fe368c05937c9d0350",
+    "org/tukaani/xz/rangecoder/RangeEncoderToStream.class": "2c6573e0bee0340e76803bacc84964a59e962a7dbdb4d1ae766f5b489b172391",
+    "org/tukaani/xz/simple/ARM.class": "4c8156fe11ac86e7b694ef90311c564679b3e66f8b98ee1288af3eab7c99d38f",
+    "org/tukaani/xz/simple/ARMThumb.class": "ed19607bfac913349a7ff9c4d526bf7f6ea9368b98187f0e2b99e7e76759a1d5",
+    "org/tukaani/xz/simple/IA64.class": "ed3411eb531370e8b1806b22c478bbe3d4b8499392a1140214d4b9fadc8e814a",
+    "org/tukaani/xz/simple/PowerPC.class": "416c992e71f92f9cd06c8fe92c8470f98394730d3041170e7639b2bc04ce3314",
+    "org/tukaani/xz/simple/SPARC.class": "1a3a86bd3768ff28038ad6145a07279a8c92dac0c1f2a2e654e2c0034536bd7a",
+    "org/tukaani/xz/simple/SimpleFilter.class": "7ffac74562205d0975ae6c870922b727df8af72bd33f7f85421f105874f87eeb",
+    "org/tukaani/xz/simple/X86.class": "aefecdad9b2f638cefa1c86e24d323f98ea0acbd31b20890fdf74af83f8215e3",
+    "META-INF/versions/9/module-info.class": "f31a01a09e6d3ae36489134c1701f3fdce6874e716ed271f563ef67c9c6e3924"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "d1496673d66aa4e30daf0aa8cb11f28a3cc2bcef5f8969627dbe4d29da612faf"
+  },
+  "class_occurrences": [
+    {
+      "entry": "org/tukaani/xz/ARMOptions.class",
+      "occurrence": 0,
+      "sha256": "e7e6e8dafe1e1a425724ba8d70f6c84a6d0e20a1b2f02f3908b61d9e1858c75f",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/ARMThumbOptions.class",
+      "occurrence": 0,
+      "sha256": "92e2702a0cac4747570fa3410eebf001c7a52fb6c1b7ed2f04b8c8fd7bd3c866",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/ArrayCache.class",
+      "occurrence": 0,
+      "sha256": "5de72ee79815b42dde2670f3d6e9dea88bd5be6cb59495c5d49f3453536b5b84",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BCJCoder.class",
+      "occurrence": 0,
+      "sha256": "0ce6d979ee795e0dcb651ccc7d345222d56135e739560a6984f05c6d35007c69",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BCJDecoder.class",
+      "occurrence": 0,
+      "sha256": "130776f84f2c6c8c23d86ddb138ea3a52bae99b742528b6c8f5527d13ff831c6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BCJEncoder.class",
+      "occurrence": 0,
+      "sha256": "020c419dbb05b926d3a4aea3e4242cf44fb531a36b88a1d90a022a2b41d45de2",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BCJOptions.class",
+      "occurrence": 0,
+      "sha256": "54cbe481c51f486c8bdabd6d88c9b1c9f06416d3174a2889299a2326880fa711",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BasicArrayCache$1.class",
+      "occurrence": 0,
+      "sha256": "ea653eef62fbac05e6fca8b767957f5165b770c1782357d5afc2fede64e9569a",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BasicArrayCache$CacheMap.class",
+      "occurrence": 0,
+      "sha256": "429313a2e90793ea0ed87e69b384391f28175e05cf8dc527ba5c2c3a1c157c30",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BasicArrayCache$CyclicStack.class",
+      "occurrence": 0,
+      "sha256": "f67e78cad5ae07afdb731d936cb5ef31149bed1f1fa755dc21e77866d2cfee1e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BasicArrayCache$LazyHolder.class",
+      "occurrence": 0,
+      "sha256": "1a477fce5ffc72a83c08492311c8b7c34d0e171d62c15ee010a594655b3ac45d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BasicArrayCache.class",
+      "occurrence": 0,
+      "sha256": "ec50e241d3d394514ab9d2b2c8c96ac4b02d52e179015161aaf24c1d5c011193",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BlockInputStream.class",
+      "occurrence": 0,
+      "sha256": "060c89454d970435190239179e20d902d7f32adfad5121ed6cb4360ebafc9973",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/BlockOutputStream.class",
+      "occurrence": 0,
+      "sha256": "21850b3ddd45799a0f7b0ede80a7742d55b2bcf401e5dc9c43f0e1b5d438ffba",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/CloseIgnoringInputStream.class",
+      "occurrence": 0,
+      "sha256": "fa580a78a6daa405c336467ba4c66bb0b426d10be7d5f917bf07e77dac859a79",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/CorruptedInputException.class",
+      "occurrence": 0,
+      "sha256": "b3da7ddf1816c6ce2c81547dbc90770de45c40fbbfba772390c59fbd5ee9ff53",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/CountingInputStream.class",
+      "occurrence": 0,
+      "sha256": "c728a13003fea1c8a0707f3ac1ddcbc3275b82e766b6418cb777d68a90037884",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/CountingOutputStream.class",
+      "occurrence": 0,
+      "sha256": "1da85002efea967e9df22ac84562d82192530ec821168962fec156ff761a204d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaCoder.class",
+      "occurrence": 0,
+      "sha256": "2279f15db3a4dd3fb79d2aa939a641de3902c7a782ae5e4153b82a0925303e9b",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaDecoder.class",
+      "occurrence": 0,
+      "sha256": "6273dd5284104b81ff3cb66401c233d5625500d29334d59005a6a583d0ff0ff1",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaEncoder.class",
+      "occurrence": 0,
+      "sha256": "918278a44efc77e34c0c2d60239a943e6006f0cf97d8271a7a1d0bc659008d98",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaInputStream.class",
+      "occurrence": 0,
+      "sha256": "fccda847b18b445e4eb85a0d2753d1bbcac158da763ea9eeada0ecd53c45c635",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaOptions.class",
+      "occurrence": 0,
+      "sha256": "02786d86f80be1c5439f34107d4b997338e038aff257d5a93d1f32916445bd48",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/DeltaOutputStream.class",
+      "occurrence": 0,
+      "sha256": "1f4b1290b9d4731e237aef3b647661ea99013db9055369d936fb84b80eead180",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FilterCoder.class",
+      "occurrence": 0,
+      "sha256": "7f00c50d05a40ee8fbec5d196fdb59bcc5692ac990fd7702be86d11a0f170f62",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FilterDecoder.class",
+      "occurrence": 0,
+      "sha256": "68a20c68b4ae784a35eedd80afdc7f6a84bd9d74f3d211a3b31121afef622bc2",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FilterEncoder.class",
+      "occurrence": 0,
+      "sha256": "98b66623e3beee0f4280c7636e15365ec7c681181962bc53117dbcb550172980",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FilterOptions.class",
+      "occurrence": 0,
+      "sha256": "7130467f809967fd899d8e6ba98218b28bd6ad57abc8cdc00da3f10d0d94a461",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FinishableOutputStream.class",
+      "occurrence": 0,
+      "sha256": "ee95deafc7854aa629ea24481a4cc4ca0b1ad7c5ff9f22f9fd1186969060f1b4",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/FinishableWrapperOutputStream.class",
+      "occurrence": 0,
+      "sha256": "9808377c4470d877a0365d4b6e3e00dc52592e36558e5cb1f0a991126c9dd6e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/IA64Options.class",
+      "occurrence": 0,
+      "sha256": "bfd5b2188bedb1f9d1dbb366a57051c667f30a3a4bac51d09bd25959e0f73dc9",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/IndexIndicatorException.class",
+      "occurrence": 0,
+      "sha256": "2e6d0cff8b0252add2dadd784bc1361c423b5a172aa06d02135a6f6657d6b162",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2Coder.class",
+      "occurrence": 0,
+      "sha256": "67272c5bec17a367e2a2157e0bc01b083729087d6be0072baee43c7175704532",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2Decoder.class",
+      "occurrence": 0,
+      "sha256": "d5c770939cd0a9bad49ea427f501a1fa397a718319ef59d5f392aea21564fd6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2Encoder.class",
+      "occurrence": 0,
+      "sha256": "bc1a36f7882dc0179f778f68c9565d54e16d98954d204b87e4519cd441a50a0b",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2InputStream.class",
+      "occurrence": 0,
+      "sha256": "9c0cdab4933f7d12d6ebcd2b472c2c824ffa66eece1b9c2335e755c3b645ac07",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2Options.class",
+      "occurrence": 0,
+      "sha256": "a6a5b018f35df4df27c5023cce4c4b783a121e1424a1932f173759b0aa4193c0",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMA2OutputStream.class",
+      "occurrence": 0,
+      "sha256": "9b11f7e8eef978bff656486b7868fd123ed78ea5e1814f0179d2bc9acde93cd3",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMAInputStream.class",
+      "occurrence": 0,
+      "sha256": "f88ac1119e7591e273bdccbab6d29cb9b608a199b86f86d02b4083d083a8cdc1",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/LZMAOutputStream.class",
+      "occurrence": 0,
+      "sha256": "0e7996c398d36424ff5977240a32b115cddc2e34be6d9c92cf7de95a3afacb1d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/MemoryLimitException.class",
+      "occurrence": 0,
+      "sha256": "c970c118cbd7edeca33c0105375676a83a2557c812ddd3bc5e80d72da4b285da",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/PowerPCOptions.class",
+      "occurrence": 0,
+      "sha256": "c2e30e12d0f55a3ef42dbe1201cb0e00edb340ad3f3ad9beb840f84462e76615",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/RawCoder.class",
+      "occurrence": 0,
+      "sha256": "03e1fbbad31c2cb1c25df582452ac85a9c06934d42365e04c50b95341a8bb246",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/ResettableArrayCache.class",
+      "occurrence": 0,
+      "sha256": "c1683e050b459b586fcae1574cb9f6d453b4bab0cb549da3b5d5826f4ff6b8d6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SPARCOptions.class",
+      "occurrence": 0,
+      "sha256": "8f8d61dffb83458cb58e4b561e629602b1ed052a7cc8c683ef68de6ec8d8df87",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SeekableFileInputStream.class",
+      "occurrence": 0,
+      "sha256": "6ed3fb02cc029e70969af4ddd0e7ca6a6b5ce1cae2aa2e3bee8fa5f7228d446e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SeekableInputStream.class",
+      "occurrence": 0,
+      "sha256": "a0d87dd1712defbf96ea43a7d89cde183cf4462179ed3de266e2d9a76100ce8c",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SeekableXZInputStream.class",
+      "occurrence": 0,
+      "sha256": "506ba94a68160b4ab6d5ec81d74e5ffa3b758fda512b97300c12f437203668a2",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SimpleInputStream.class",
+      "occurrence": 0,
+      "sha256": "738812f072baa0b5a325485ab788d288caba2aa8feba220c7b9262fd618f1d09",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SimpleOutputStream.class",
+      "occurrence": 0,
+      "sha256": "beba92187409175052d48c73c18514ddb7e1948d0990218e8bfe83f930566c6d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/SingleXZInputStream.class",
+      "occurrence": 0,
+      "sha256": "172df85bf08418d0d56415bc3ea66680f031ce2ca9485e3f5ed805c7d7ddf360",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/UncompressedLZMA2OutputStream.class",
+      "occurrence": 0,
+      "sha256": "7f43f07b1c0c123023077ad2b39dd896f2e0deb19a65ece6d06e0d35c9164854",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/UnsupportedOptionsException.class",
+      "occurrence": 0,
+      "sha256": "6053babf420b0bf5352e79e4f9ec3f770590be8b249dad9d0338cb78811d2cb6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/X86Options.class",
+      "occurrence": 0,
+      "sha256": "55ed8586ba400149634725dc529c1ea68072b3e93c6bd62bae4b47b724faf29b",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/XZ.class",
+      "occurrence": 0,
+      "sha256": "7d388db555c0d45abecbc57ebbcc7bf1303c6b9c16ff336472a73ff6c23774bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/XZFormatException.class",
+      "occurrence": 0,
+      "sha256": "1b6da211b47da6f656f1b63b35c49429b681f4de14cc31e53b9ae95f80e08cbf",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/XZIOException.class",
+      "occurrence": 0,
+      "sha256": "461366974d1dc76f67549f5173af638f9ca306964a0765e170fc966be6f3870d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/XZInputStream.class",
+      "occurrence": 0,
+      "sha256": "698e088db8433d7b8f705d89c9cafb467ba328bb0ae2085794445e22869e3ab6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/XZOutputStream.class",
+      "occurrence": 0,
+      "sha256": "25e8eca82ce3b1447d70ba6625b2195b33472be5b4ba8767d8c77e5bafc4d5b3",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/check/CRC32.class",
+      "occurrence": 0,
+      "sha256": "9d9cc3f0ff39dce4eb3d154b5850be26ec70d72de7819ad34fd8e341accbfb89",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/check/CRC64.class",
+      "occurrence": 0,
+      "sha256": "8cf6086f19c1cbe257b7e6d6b6e8db48f52e82e09804f3d13c62476de0b50c49",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/check/Check.class",
+      "occurrence": 0,
+      "sha256": "fb9024e5717bbf5e4e3770d52e1c231cbcb6005a2d85fec82c8c7819e4e923bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/check/None.class",
+      "occurrence": 0,
+      "sha256": "435a325f3593ac0b7d2267ee4ce953fdce334500b8020a3ac7a1f76353e7c1fa",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/check/SHA256.class",
+      "occurrence": 0,
+      "sha256": "66d6ba3296039263bb294d66f130f7ac66b18bd50195e6e58b9980d7ceb2edd6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/common/DecoderUtil.class",
+      "occurrence": 0,
+      "sha256": "c2fef385097e05cf50599c6a96ca4a77075f58b90721647a74abe3937d1b91e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/common/EncoderUtil.class",
+      "occurrence": 0,
+      "sha256": "e8f52f49aa6e39e94e1404aba187ec08e8766af7040afb1ba0520388f74daa4e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/common/StreamFlags.class",
+      "occurrence": 0,
+      "sha256": "2ea09729294aa60bd7e16de03f645c1f71b30acba89011f7da578f00f14b4fb5",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/common/Util.class",
+      "occurrence": 0,
+      "sha256": "c51d8b55fd361e731fbd9ee999776db1a8080b39780ff4b23cc32400197fe8fc",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/delta/DeltaCoder.class",
+      "occurrence": 0,
+      "sha256": "a100a19021a2c29f474824f70a7dc175af7e03da16bac81605346db5c2704c13",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/delta/DeltaDecoder.class",
+      "occurrence": 0,
+      "sha256": "f737e64ce22f866572185e2bdcf9e3cd5d85a7b72caf6d5c91e808aa13589c74",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/delta/DeltaEncoder.class",
+      "occurrence": 0,
+      "sha256": "9997a4dc591686a0dc090a25c73396a4b87a72ed1e6618a6a32180d383d67c85",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/BlockInfo.class",
+      "occurrence": 0,
+      "sha256": "8f0c56a3e5480e3d84fd47f7f1dbf0c254d104cd89836cf97ac9ac3dc3db84b5",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/IndexBase.class",
+      "occurrence": 0,
+      "sha256": "1cbdd871f843feded1876009fbeed3ab38a2c86be979d64b41892010fa095377",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/IndexDecoder.class",
+      "occurrence": 0,
+      "sha256": "3fbe536363261053576f37ea515f5d2c78e02570f1e13162d654115b3817db5c",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/IndexEncoder.class",
+      "occurrence": 0,
+      "sha256": "c5cf70b5ba8e9aeeca2bf53f2f1534814b7da9bc1111cf7213dc88773e6811f6",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/IndexHash.class",
+      "occurrence": 0,
+      "sha256": "7b9de358db3a8210cc39d01760871ca31f648da7748102ff7ffb724e9d128363",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/index/IndexRecord.class",
+      "occurrence": 0,
+      "sha256": "28e03d26fae36e2de723aea58d2497f4ef7968dba0541cbd737e4d5019b99a5b",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/BT4.class",
+      "occurrence": 0,
+      "sha256": "fa9f836e8afa2ba0a9703555dff3154426354a4bf6ea67d2164ecd52a6a38229",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/CRC32Hash.class",
+      "occurrence": 0,
+      "sha256": "83e2638d74147bc9b27a0f87bfa8aee117c771915ba309b4b6a860dbe073030c",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/HC4.class",
+      "occurrence": 0,
+      "sha256": "d6301511343582955c4d18cd8563e6be1a9480be4e49c539adf88fbb15b9c14d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/001.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/Hash234.class",
+      "occurrence": 0,
+      "sha256": "188f7e10eea97820114b7cc50249ab2e0a07f6ef8d2532142716a098c453c374",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/LZDecoder.class",
+      "occurrence": 0,
+      "sha256": "3e4ea627b40e41a40d9b958f932fea1f8592e81653a176b29fd0148e2067ae31",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/LZEncoder.class",
+      "occurrence": 0,
+      "sha256": "e64ce1791ce213a25830341c76f2c8c554e76ee57eb426e9f0d94dfde2800b24",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lz/Matches.class",
+      "occurrence": 0,
+      "sha256": "7b3665f440eb3ff9bb6726e43619a6d9e7c53bad176ca132855eadd95d61eafb",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LengthCoder.class",
+      "occurrence": 0,
+      "sha256": "8daee14358b76886683d5a48a45f6bf81a4b9768ddc80ad5c9b8b8c86c1d438a",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder$LiteralSubcoder.class",
+      "occurrence": 0,
+      "sha256": "cd1b421cb9e6aac03422c211e6836c2e4fb34237344d14d9070125b5d3289c01",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder$LiteralCoder.class",
+      "occurrence": 0,
+      "sha256": "3e77f20d3be9510e35552381018add39d49643c39a14e3d46c06c84e51b590a1",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMACoder.class",
+      "occurrence": 0,
+      "sha256": "81d35671719dd41a1ce1b41bf5b51607ba2f4c98d3247fdceac26af600350b33",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$1.class",
+      "occurrence": 0,
+      "sha256": "8f3483429d2f087cd0ee90bb84452bc61105c8fa6ff1aad713d3d36925e8a11d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LengthDecoder.class",
+      "occurrence": 0,
+      "sha256": "ae3d88e988b6e66cb939f74b09fc21c9b5a0860aa212c6e996e9ce4aa040098e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder$LiteralSubdecoder.class",
+      "occurrence": 0,
+      "sha256": "bf17263935ffd3092e8b5dc8d6a9e06d6711dc31db5f5fa421963c589648f67e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder$LiteralDecoder.class",
+      "occurrence": 0,
+      "sha256": "45816380d3feed0453f84d7145e9041aa8e36600be4da0bcbd59e8117aed0524",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMADecoder.class",
+      "occurrence": 0,
+      "sha256": "7e1f4aae3c291448f2b39fedb2fe082afb0e7f11dbf02dd35da7250b6563405e",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$1.class",
+      "occurrence": 0,
+      "sha256": "6ad33d09a46f04f7811474032d750afa580009c063e7209b736d9f34a86ea948",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LengthEncoder.class",
+      "occurrence": 0,
+      "sha256": "9f9b51d25de95297e51f97cd20a9e301cb600aba5bd5c6413a157a0279323047",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder$LiteralSubencoder.class",
+      "occurrence": 0,
+      "sha256": "13f8175993d7e5dee4c3b4cd0ed53cfc14b4ac64b6ec0e0f44a88dd14c41ed0d",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder$LiteralEncoder.class",
+      "occurrence": 0,
+      "sha256": "8c77ee62b9d61f6b6ceb882ba061d8263b3d1869d18ceeb15be49520588883a0",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoder.class",
+      "occurrence": 0,
+      "sha256": "10d894be35e4bcd08980c2fedbc45609f92ebb28895916678b8b2211b7127645",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoderFast.class",
+      "occurrence": 0,
+      "sha256": "31ec15cf5e10fd8598f3d374d8a2867467a1ec7518b1715e5f74e00acb7b84bc",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/LZMAEncoderNormal.class",
+      "occurrence": 0,
+      "sha256": "3347240e2ef0438c2fca6e82c9184edf7fd2a4ad756cc814cf40865342645457",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/Optimum.class",
+      "occurrence": 0,
+      "sha256": "e53f8024e312d1c4c1df95f10d23d7645fcf9bc4333a9f472ea524002096a3d1",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/lzma/State.class",
+      "occurrence": 0,
+      "sha256": "3852ad2d286e4c8e86efaf8ff5f85ae6ab5e9147f54421e1c060453d2bf51c45",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeCoder.class",
+      "occurrence": 0,
+      "sha256": "f1b2363adb2079073b523b4084afb54031001d7e543765c8beb91c1cf39d41f4",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoder.class",
+      "occurrence": 0,
+      "sha256": "1d74d1d94e77f82d1d746ddd9314ba2ac186433d62ac0077f717eb92895b1a43",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoderFromBuffer.class",
+      "occurrence": 0,
+      "sha256": "7548cfc236b1098588cab487d44b0a103289a52fd1dae74638548e8b4b3e34d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeDecoderFromStream.class",
+      "occurrence": 0,
+      "sha256": "12a22c8222aa152f274e641681f009f2f149f73c7ade87170c3bb2ccf08e7e51",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoder.class",
+      "occurrence": 0,
+      "sha256": "d8419eed71a755fc41f640dfa464e016311cc3e6a5a0fa28f7ee97847d00d097",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoderToBuffer.class",
+      "occurrence": 0,
+      "sha256": "2ff1f2616fc92e2750c1e70d198bf0453207b80cb86cb0fe368c05937c9d0350",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/rangecoder/RangeEncoderToStream.class",
+      "occurrence": 0,
+      "sha256": "2c6573e0bee0340e76803bacc84964a59e962a7dbdb4d1ae766f5b489b172391",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/ARM.class",
+      "occurrence": 0,
+      "sha256": "4c8156fe11ac86e7b694ef90311c564679b3e66f8b98ee1288af3eab7c99d38f",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/ARMThumb.class",
+      "occurrence": 0,
+      "sha256": "ed19607bfac913349a7ff9c4d526bf7f6ea9368b98187f0e2b99e7e76759a1d5",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/IA64.class",
+      "occurrence": 0,
+      "sha256": "ed3411eb531370e8b1806b22c478bbe3d4b8499392a1140214d4b9fadc8e814a",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/PowerPC.class",
+      "occurrence": 0,
+      "sha256": "416c992e71f92f9cd06c8fe92c8470f98394730d3041170e7639b2bc04ce3314",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/SPARC.class",
+      "occurrence": 0,
+      "sha256": "1a3a86bd3768ff28038ad6145a07279a8c92dac0c1f2a2e654e2c0034536bd7a",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/SimpleFilter.class",
+      "occurrence": 0,
+      "sha256": "7ffac74562205d0975ae6c870922b727df8af72bd33f7f85421f105874f87eeb",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "org/tukaani/xz/simple/X86.class",
+      "occurrence": 0,
+      "sha256": "aefecdad9b2f638cefa1c86e24d323f98ea0acbd31b20890fdf74af83f8215e3",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    },
+    {
+      "entry": "META-INF/versions/9/module-info.class",
+      "occurrence": 0,
+      "sha256": "f31a01a09e6d3ae36489134c1701f3fdce6874e716ed271f563ef67c9c6e3924",
+      "member_shard": "docs/dev/evidence/sqx145/members/122/002.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/122/001.json",
+      "sha256": "a31c231ef14e52d28b51990e9229a06fcbdd1b7ad1a62cef0ad3275104d606e3"
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/members/122/002.json",
+      "sha256": "bb0900015bcfc8cf3a9c03cd211e1d1cbffa8918894a670a8cfddf910a70c541"
+    }
+  ]
+}

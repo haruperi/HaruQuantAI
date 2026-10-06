@@ -1,0 +1,2667 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jfx_2.4.9_sq.jar",
+  "archive_sha256": "b05ca416555206d0dc5282431cd690c088d6481cf07c1d4a24ec91737bd8b2d5",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalStrategy$1.class",
+      "occurrence": 0,
+      "sha256": "80b0cb2351ee7cffc4eba6334c4e37320b94a4944f0ae88a324e6e8e9c6394ab",
+      "name": "com/jfx/strategy/Strategy$TerminalStrategy$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/jfx/strategy/Strategy$TickListenerChart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$1",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TerminalStrategy;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$TerminalStrategy;Ljava/lang/String;Lcom/jfx/strategy/Strategy$TickListener;)V",
+          "access": 0,
+          "code_sha256": "1349d97bc397eadd72dbaa6584a5ab203ff3a5fa3d541f94f04c340e8ec8d919",
+          "code_length": 12
+        },
+        {
+          "name": "getTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "766a08362a6ab5558cd2e4e2870bf0a71284c2556338d88d658ff9c0b7de22cd",
+          "code_length": 8
+        },
+        {
+          "name": "getParentTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "60f5361cd00ad198586acd2980a7b7b0f24d8c0593b0db6257a21dea54c22f8a",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$Terminal",
+        "com/jfx/strategy/Strategy$TerminalStrategy",
+        "com/jfx/strategy/Strategy$TerminalStrategy$1",
+        "com/jfx/strategy/Strategy$TickListener",
+        "com/jfx/strategy/Strategy$TickListenerChart"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalStrategy.class",
+      "occurrence": 0,
+      "sha256": "0e0b597549ed0cf7fd5f6a535724aaf54060d3e2aab17fe08a619875c2156167",
+      "name": "com/jfx/strategy/Strategy$TerminalStrategy",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/jfx/strategy/Strategy",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "terminal",
+          "descriptor": "Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 2
+        },
+        {
+          "name": "this$0",
+          "descriptor": "Lcom/jfx/strategy/Strategy;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "getTerminal",
+          "descriptor": "()Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 1,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        },
+        {
+          "name": "init",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/strategy/StrategyRunner;)V",
+          "access": 33,
+          "throws": [
+            "com/jfx/ErrUnknownSymbol",
+            "java/io/IOException"
+          ],
+          "code_sha256": "f9b808a48190dfc44a40c31b7ff8c3a2ec9db626ddf32942db47a13df680b598",
+          "code_length": 19
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3d5716002cfd83efc0810d8e28363087dedde79b847cac850fe91ac351a6ac23",
+          "code_length": 51
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;Lcom/jfx/strategy/Strategy$Terminal;)V",
+          "access": 2,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "e6425fb353112bb8c94cfbf6397259e670d1b8e01d26caa71bd3ae8f4062bd29",
+          "code_length": 151
+        },
+        {
+          "name": "getTermServerHost",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "60325d078399cbe900c34acbecb5f1478d4966ba1172da014c9313ee9dfd1432",
+          "code_length": 8
+        },
+        {
+          "name": "getTermServerPort",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "fa3500869de1f7280d23aff571152c3bc14d947b22dc356952739583a47ac9ad",
+          "code_length": 8
+        },
+        {
+          "name": "getMt4Server",
+          "descriptor": "()Lcom/jfx/Broker;",
+          "access": 1,
+          "code_sha256": "1a883cf5c614a0830a321d592429ef7586e3e5a26637a6ca29d71fdc85216ece",
+          "code_length": 8
+        },
+        {
+          "name": "getMt4User",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "c787d60eec4bd352e85d213472d0d5eb252e0fcd9851fdbab079149478fc2318",
+          "code_length": 8
+        },
+        {
+          "name": "getMt4Password",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "80eb8d2a5b5bfcda5f546ba481acc9b3d860e2e28c67cd4b0eba00acba832883",
+          "code_length": 8
+        },
+        {
+          "name": "coordinationIntervalMillis",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "7f3d8978bc73867a9e6f50197b269da38463c57e6c0363caa88693d2f8c824c1",
+          "code_length": 25
+        },
+        {
+          "name": "coordinate",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0a62d1659cac8c1101848ea35193f2bf681544be840770484034fcfb30f799ca",
+          "code_length": 24
+        },
+        {
+          "name": "getTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "c2a511456fb51300d2bbaa512baafd9ea5d5bd29e6d8116aa39c2146f77b6e29",
+          "code_length": 8
+        },
+        {
+          "name": "getParentTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "8ef18fadde29b7f413ca93cfe1f918b8c45890a30c335e5123769836e635b4bc",
+          "code_length": 8
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;Lcom/jfx/strategy/Strategy$Terminal;Lcom/jfx/strategy/Strategy$TerminalStrategy;)V",
+          "access": 4096,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "b32de89dcb0dc1367d8bd89b01adac1523e4d30c918054828bf2ac93b0fec106",
+          "code_length": 7
+        },
+        {
+          "name": "access$1",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$TerminalStrategy;)Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 4104,
+          "code_sha256": "0282736b001c184934bad7b700477e9fe30eb3584aa4b9c01483e925173a877c",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/Broker",
+        "com/jfx/ErrUnknownSymbol",
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$Chart",
+        "com/jfx/strategy/Strategy$Terminal",
+        "com/jfx/strategy/Strategy$TerminalStrategy",
+        "com/jfx/strategy/Strategy$TerminalStrategy$1",
+        "com/jfx/strategy/Strategy$TickListener",
+        "com/jfx/strategy/Strategy$TimerListener",
+        "java/io/IOException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/Map",
+        "java/util/Map$Entry",
+        "java/util/Set"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TerminalType.class",
+      "occurrence": 0,
+      "sha256": "15c54a7780bbed58fa5028eaf3d092d859cc634a7e56ee835f67a7a5cb9e2d13",
+      "name": "com/jfx/strategy/Strategy$TerminalType",
+      "major": 52,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "FREE_WORKER",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 16409
+        },
+        {
+          "name": "ORDERS_WORKER",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 16409
+        },
+        {
+          "name": "TICK_WORKER",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 16409
+        },
+        {
+          "name": "ENUM$VALUES",
+          "descriptor": "[Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "a330a9b50221b82faa2976763e64367f47af4fa7a4bf8d705cb51f1a8e26c682",
+          "code_length": 65
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "50abdb519c0d06294e8f7564afb160c5fc2abaf94ade49719aa310c5d409b216",
+          "code_length": 7
+        },
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 9,
+          "code_sha256": "faf8af47f417792d8b9fcd06f69e7dbf0972d5c6890885f70fd5327770055dd1",
+          "code_length": 22
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/strategy/Strategy$TerminalType;",
+          "access": 9,
+          "code_sha256": "f60ef462bead08585bc31bd8cffde5d126a0da426f8299251257d56503b86998",
+          "code_length": 10
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/jfx/strategy/Strategy$TerminalType;>;",
+      "class_references": [
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$TerminalType",
+        "java/lang/Enum",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TickListener.class",
+      "occurrence": 0,
+      "sha256": "f4baf023fcd954a8682c74023df9e448b6ff30a801ffc447cc3112126e87bb7b",
+      "name": "com/jfx/strategy/Strategy$TickListener",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onTick",
+          "descriptor": "(Lcom/jfx/TickInfo;Lcom/jfx/MT4;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$TickListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TickListenerChart.class",
+      "occurrence": 0,
+      "sha256": "d0410cb06e8fce75576ede94d76f59d796a81083033a455774ce194b7461ccd0",
+      "name": "com/jfx/strategy/Strategy$TickListenerChart",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "com/jfx/strategy/Strategy$Chart",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "_tickListener",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TickListener;",
+          "access": 18
+        },
+        {
+          "name": "_bulkTickListener",
+          "descriptor": "Lcom/jfx/strategy/Strategy$BulkTickListener;",
+          "access": 18
+        },
+        {
+          "name": "lastTick",
+          "descriptor": "Lcom/jfx/TickInfo;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/strategy/Strategy$TickListener;)V",
+          "access": 1,
+          "code_sha256": "b9d141aaa466c17417e6487bdf32533e3446e5626cd95b6f29edd40c14bdb7f7",
+          "code_length": 27
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/strategy/Strategy$BulkTickListener;)V",
+          "access": 1,
+          "code_sha256": "4294d39e63b0b557118e61f758629cbf7cc4082680695e682e6a14ffc9b2494b",
+          "code_length": 27
+        },
+        {
+          "name": "coordinationIntervalMillis",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "fa28529b9aa7ac7d02554a1218a08984c0fd85098f6cb7b17e70262583c32960",
+          "code_length": 2
+        },
+        {
+          "name": "coordinate",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "9c13c6fb37221b630f256305eff888b86bcb2e5eabbed510e534df665b79e5ac",
+          "code_length": 64
+        },
+        {
+          "name": "isTickListenerStrategy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        }
+      ],
+      "class_references": [
+        "com/jfx/ErrUnknownSymbol",
+        "com/jfx/TickInfo",
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$BulkTickListener",
+        "com/jfx/strategy/Strategy$Chart",
+        "com/jfx/strategy/Strategy$TickListener",
+        "com/jfx/strategy/Strategy$TickListenerChart"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy$TimerListener.class",
+      "occurrence": 0,
+      "sha256": "3dd8f69a3525e0a98324e948704411c5c39b43f7bb5190ff61343a15d45838ba",
+      "name": "com/jfx/strategy/Strategy$TimerListener",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "onTimer",
+          "descriptor": "(Lcom/jfx/MT4;)V",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$TimerListener",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jfx/strategy/Strategy.class",
+      "occurrence": 0,
+      "sha256": "1676f4edc01d8f13762d12d0f0ed4227f031c9f6d5b8a33cdd650bd00ab991cd",
+      "name": "com/jfx/strategy/Strategy",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/jfx/MT4",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LOGGER",
+          "descriptor": "Lorg/apache/log4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "MT4_CONNECTION_WAIT_SECONDS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "SPCH",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "MINIMUM_TS_VERSION",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "disconnectSynch",
+          "descriptor": "Ljava/lang/Object;",
+          "access": 18
+        },
+        {
+          "name": "symbol",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "period",
+          "descriptor": "I",
+          "access": 4
+        },
+        {
+          "name": "isAlive",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "termServerHost",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "termServerHostName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "termServerVersion",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "termServerPort",
+          "descriptor": "I",
+          "access": 2
+        },
+        {
+          "name": "mt4Server",
+          "descriptor": "Lcom/jfx/Broker;",
+          "access": 2
+        },
+        {
+          "name": "mt4User",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "mt4Password",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "asynchOrderOperations",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "id",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4
+        },
+        {
+          "name": "isLimitedFunctionality",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "tsClient",
+          "descriptor": "Lcom/jfx/net/TSClient;",
+          "access": 4
+        },
+        {
+          "name": "groupsMap",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 1,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Ljava/util/ArrayList<Ljava/lang/String;>;>;"
+        },
+        {
+          "name": "groups",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "symbols",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "srv",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        },
+        {
+          "name": "instruments",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 1,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/jfx/strategy/Strategy$Instrument;>;"
+        },
+        {
+          "name": "positionListener",
+          "descriptor": "Lcom/jfx/strategy/Strategy$Chart;",
+          "access": 2
+        },
+        {
+          "name": "timerListener",
+          "descriptor": "Lcom/jfx/strategy/Strategy$Chart;",
+          "access": 2
+        },
+        {
+          "name": "ordersWorker",
+          "descriptor": "Lcom/jfx/strategy/Strategy$Chart;",
+          "access": 2
+        },
+        {
+          "name": "timeZoneCorrectionOffset",
+          "descriptor": "J",
+          "access": 0
+        },
+        {
+          "name": "isCorrectionOffsetCalculated",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "isReconnect",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "registeredStrategies",
+          "descriptor": "Ljava/util/HashMap;",
+          "access": 26,
+          "generic_signature": "Ljava/util/HashMap<Ljava/lang/String;Lcom/jfx/strategy/Strategy;>;"
+        },
+        {
+          "name": "charts",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/jfx/strategy/Strategy$Chart;>;"
+        },
+        {
+          "name": "terminal",
+          "descriptor": "Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 2
+        },
+        {
+          "name": "bulkTickListenerChart",
+          "descriptor": "Lcom/jfx/strategy/Strategy$TickListenerChart;",
+          "access": 2
+        },
+        {
+          "name": "jfxServerHost",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "historyPeriod",
+          "descriptor": "Lcom/jfx/strategy/Strategy$HistoryPeriod;",
+          "access": 2
+        },
+        {
+          "name": "terminals",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 18,
+          "generic_signature": "Ljava/util/ArrayList<Lcom/jfx/strategy/Strategy$Terminal;>;"
+        },
+        {
+          "name": "orderTerminals",
+          "descriptor": "Ljava/util/Stack;",
+          "access": 18,
+          "generic_signature": "Ljava/util/Stack<Lcom/jfx/strategy/Strategy$Terminal;>;"
+        },
+        {
+          "name": "isOrderTerminalsPresent",
+          "descriptor": "Z",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "e2e126b17b9fd9953fc62ed396df54d071fb075658a1602011ac19d111e48288",
+          "code_length": 19
+        },
+        {
+          "name": "getVersion",
+          "descriptor": "()Lcom/jfx/Version;",
+          "access": 1,
+          "code_sha256": "f4cbff6cc0a0b4fcad26e08d89cfba865f4b8cd593275d0a2bbcf43613b5ad6f",
+          "code_length": 28
+        },
+        {
+          "name": "isLimitedFunctionality",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7fbba92540e346631824ddf7982542c524655ccc889b8c85123d0f827977cd62",
+          "code_length": 5
+        },
+        {
+          "name": "setLimitedFunctionality",
+          "descriptor": "(Z)V",
+          "access": 0,
+          "code_sha256": "5b676c920b4d86a34d19ffb2d3fd4ef7eb2f94047d369455ddd8c100718902e6",
+          "code_length": 6
+        },
+        {
+          "name": "isAlive",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7f340a417e30248e27b2fe922006a9ddbefe655cd5bb6daf2986f64397d2e383",
+          "code_length": 5
+        },
+        {
+          "name": "getSymbol",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "02bb8669dbb2372576c88ce570de244b1913ce02ea5974e7bc5fa9f684659923",
+          "code_length": 5
+        },
+        {
+          "name": "setPeriod",
+          "descriptor": "(Lcom/jfx/Timeframe;)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "18d7c8615c7d4b1af7076d36184472703f37a6f73e164b671d289e59d9db8d82",
+          "code_length": 10
+        },
+        {
+          "name": "getPeriod",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "dc53c883c447eb2008f0ed4d87fc4ef91d5f96c37c08689a11b156585507067e",
+          "code_length": 5
+        },
+        {
+          "name": "getTimeframe",
+          "descriptor": "()Lcom/jfx/Timeframe;",
+          "access": 1,
+          "code_sha256": "bb5eac431fb34ffa96cd7c772b9e7f22a98789051535bb145af1e5548affebad",
+          "code_length": 8
+        },
+        {
+          "name": "getPrevTimeframe",
+          "descriptor": "(Lcom/jfx/Timeframe;)Lcom/jfx/Timeframe;",
+          "access": 1,
+          "code_sha256": "0257bbdbbb76e8bf9c29b4b2276fc96b7768debc88bec8d65e251ffddca44dc6",
+          "code_length": 141
+        },
+        {
+          "name": "getNextTimeframe",
+          "descriptor": "(Lcom/jfx/Timeframe;)Lcom/jfx/Timeframe;",
+          "access": 1,
+          "code_sha256": "dc06ae5902f7c986813a38639f087200d8d2906197bfbcb562d3af034a0decb8",
+          "code_length": 142
+        },
+        {
+          "name": "getSlippage",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "72f9f6552e6d197350c5e3c69c75db7cd11b8ade64063263572b423eb5c535ad",
+          "code_length": 2
+        },
+        {
+          "name": "getSymbols",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 33,
+          "generic_signature": "()Ljava/util/ArrayList<Ljava/lang/String;>;",
+          "code_sha256": "e6437b4ce7b6841b2a49f23a477d0e54d3c10dc610d59ca152ba0602bee5896c",
+          "code_length": 9
+        },
+        {
+          "name": "getInstruments",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 33,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/jfx/strategy/Strategy$Instrument;>;",
+          "code_sha256": "3fc0355cb125208558de145c6f7899a46a5d78249cd81ea0010dcf39baedd886",
+          "code_length": 9
+        },
+        {
+          "name": "init",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/strategy/StrategyRunner;)V",
+          "access": 1,
+          "throws": [
+            "com/jfx/ErrUnknownSymbol",
+            "java/io/IOException"
+          ],
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "initSymbols",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "4a63a3d20190dca8c0e41db0068a81e09284d8c2b7ebd0f83fa1cc99abb1dc28",
+          "code_length": 224
+        },
+        {
+          "name": "init",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 32,
+          "throws": [
+            "com/jfx/ErrUnknownSymbol",
+            "java/io/IOException"
+          ],
+          "code_sha256": "8ad0fcd9dfab3dcd37555f0c2736568d72f5cb04f09657a07ddfc77e5d6b8c22",
+          "code_length": 96
+        },
+        {
+          "name": "getBindHost",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "bb19febaf8402e30cbbc5be5c81137ee1bd841346ffad92abb51f603235e0c7a",
+          "code_length": 31
+        },
+        {
+          "name": "setTimeZoneCorrectionOffset",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "1f781d53677fe17b0647f1004e90bb593eedff43572ecaf51a7b5a92e6357adf",
+          "code_length": 11
+        },
+        {
+          "name": "getTZCorrectionOffset",
+          "descriptor": "(J)J",
+          "access": 4,
+          "code_sha256": "34a75784298ed8f2df6e4a14a3ef279ef26d27e415537c679ffa75c714997512",
+          "code_length": 11
+        },
+        {
+          "name": "signum",
+          "descriptor": "(J)I",
+          "access": 10,
+          "code_sha256": "00ef158425a25bd3d7777bf69198fb118eff531b0ed5a00dd3b79e5c220e5499",
+          "code_length": 22
+        },
+        {
+          "name": "isReconnect",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "46a6fc43d3b1e67a676e84ab93536d11446f83ff5ddade41276f26c8d26cd3e2",
+          "code_length": 5
+        },
+        {
+          "name": "setReconnect",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "fcc95ab43853552bec42379ba119015830ee83e753cd755f9aeb790b2641ce16",
+          "code_length": 6
+        },
+        {
+          "name": "deinit",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "6b3c979cef585f17f21727f1db243923805f6c6cbb73a0f7047aba239aca436b",
+          "code_length": 92
+        },
+        {
+          "name": "setTermServerHost",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "0f9dfc834243acbd85bc29b094f71f2c2cd4d29286bb5479725809b8dc3ba49b",
+          "code_length": 6
+        },
+        {
+          "name": "setTermServerPort",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "c2bb185bff8f2ad4332f5e9abc0330afdfd06437caca958114442a9339dd6fc3",
+          "code_length": 6
+        },
+        {
+          "name": "setMt4Server",
+          "descriptor": "(Lcom/jfx/Broker;)V",
+          "access": 1,
+          "code_sha256": "0a795c45263e3b4499841c5f2a48e496797c558cd3022631620cb1ef98f6d052",
+          "code_length": 6
+        },
+        {
+          "name": "setMt4User",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "9096275e5b7655f2cbb3945285d5b08777648055aae277072662e344f34c4b6a",
+          "code_length": 6
+        },
+        {
+          "name": "setMt4Password",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "774328bfaea3e3a68c00d4c31c200752a8e4df4f0ef5a89ed5c6f94faf64f903",
+          "code_length": 6
+        },
+        {
+          "name": "terminalServerOk",
+          "descriptor": "()Z",
+          "access": 2,
+          "code_sha256": "7a868b3b14cff1c474fed35e5ec6a4565ad5a3801971afa419c36feb7edfa505",
+          "code_length": 32
+        },
+        {
+          "name": "coordinationIntervalMillis",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "9598cf68d21926826862dee6eac322a2f19759287817ea3f8ea04eb0ad6c168f",
+          "code_length": 4
+        },
+        {
+          "name": "coordinate",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "registerStrategyGetRegID",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "da0e95379c31aa0dad38a49202747a4768645aa5352541986b4593b63eb7d0bf",
+          "code_length": 522
+        },
+        {
+          "name": "calcId",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "81615762aa7e52db4f00e90bf6116121296bb40b850a54ef767073dd984be392",
+          "code_length": 66
+        },
+        {
+          "name": "getTenants",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "a07818522bcf30aea009f7d727e6ec94fc9f7fe0496346c79a1be5cd9116b6d1",
+          "code_length": 29
+        },
+        {
+          "name": "getParentTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "314475255350e3aa5b0f09e3cbba2bd82a18639d8a3d365d86836a9b1f4bf1c0",
+          "code_length": 5
+        },
+        {
+          "name": "getTenant",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "f72bd8e350b95f7c2bf1e789a09961d188161a55b966dec755dc654d4ed927ea",
+          "code_length": 135
+        },
+        {
+          "name": "registerStrategy",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)V",
+          "access": 12,
+          "code_sha256": "b1081616c56c756fde1410c6a61601bd19525aee3b4fb7a6b3bb080779dec3c4",
+          "code_length": 608
+        },
+        {
+          "name": "registerStrategy",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/strategy/Strategy;)V",
+          "access": 9,
+          "code_sha256": "b8fcf7e1d09b302cfafe31a5a7acdaa4df8214be17b6ff45725165182e0a55a0",
+          "code_length": 24
+        },
+        {
+          "name": "getStrategy",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/strategy/Strategy;",
+          "access": 9,
+          "code_sha256": "305228c0908fdea1fa91d6c08ab3486bc3047faaf72020f3b00a45f7e75e9c46",
+          "code_length": 22
+        },
+        {
+          "name": "removeStrategy",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/strategy/Strategy;",
+          "access": 9,
+          "code_sha256": "dd11f4aa71848f1890b5f8db0148bdb1485b79ee7a2529792ff663751cf1921f",
+          "code_length": 22
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "484eddad2cda191fd76c1c0571433953ae6a39d42430ec8b86133d58d8ae40b9",
+          "code_length": 53
+        },
+        {
+          "name": "disconnect",
+          "descriptor": "()V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "9bed9592d35a34f39ae31d213b233e95ba5fc9b6b9a0e3a0083dd45c6501050a",
+          "code_length": 5
+        },
+        {
+          "name": "close",
+          "descriptor": "()V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "3f8cb2d29f94b5faa8b4f264f43e88b9e190cfeafad20fa3424333767f265d96",
+          "code_length": 6
+        },
+        {
+          "name": "tryCloseTerminalGracefully",
+          "descriptor": "(Z)V",
+          "access": 2,
+          "code_sha256": "af823feb6a5f25f97e4e514d0f8063a448e2e84c8ff52b540ec304b2c758ea57",
+          "code_length": 109
+        },
+        {
+          "name": "close",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "358628d6cc5fdf7d6fcd429d6634cadf7307053c1fbe587bce7eacc51eed74ba",
+          "code_length": 502
+        },
+        {
+          "name": "stopCharts",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "629b3535167deee659d5d17c9be3ae626cb362241c9402cc3b81f97a1dbb23b1",
+          "code_length": 68
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/Broker;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "aa01f5f74e3e570533285da326199b191542d28fca4080f94ec1ab62b7a97e18",
+          "code_length": 14
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/Broker;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "7d3f300e5df033ec34bd7b15361d649a60c28f572315072e5aa9e8e9ee65419c",
+          "code_length": 15
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/Broker;Ljava/lang/String;Ljava/lang/String;Z)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "dedfd7c0280aa395fdee6b7d8330c57c482463143e0f1e47637dd4ef70f8e560",
+          "code_length": 15
+        },
+        {
+          "name": "addChart",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$Chart;)V",
+          "access": 4,
+          "code_sha256": "5bb93f5b2889b49e974c35e8c9e5224cca41847d8c18c0b56b9abfe7ba9470b8",
+          "code_length": 35
+        },
+        {
+          "name": "getCharts",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 2,
+          "generic_signature": "()Ljava/util/ArrayList<Lcom/jfx/strategy/Strategy$Chart;>;",
+          "code_sha256": "e1a2cb83b8fb9cd54e1daf1427775a923a59f651ca7b10189ebadb3b3be3e5fc",
+          "code_length": 5
+        },
+        {
+          "name": "addTickListener",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/strategy/Strategy$TickListener;)Lcom/jfx/strategy/Strategy;",
+          "access": 33,
+          "code_sha256": "24af43ab25079c9c42549c927fe99e9c40882c92a0ba6752eebf3689c387e892",
+          "code_length": 35
+        },
+        {
+          "name": "setBulkTickListener",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$BulkTickListener;)Lcom/jfx/strategy/Strategy;",
+          "access": 33,
+          "code_sha256": "6392f0502e17ef9159b0e9ea1e4d1f8ccd6e3227d5f0e2b3f31320de6ce91c02",
+          "code_length": 44
+        },
+        {
+          "name": "setPositionListener",
+          "descriptor": "(Lcom/jfx/strategy/PositionListener;)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "211b67eb5ef73e3d68ebff2e0249dc734120e30bbc76e3c65882e55164954bbf",
+          "code_length": 11
+        },
+        {
+          "name": "setPositionListener",
+          "descriptor": "(Lcom/jfx/strategy/PositionListener;II)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "25e8a83acca364a7ec20f13246a124f9506593993b03471d4ef35b5b461caa3f",
+          "code_length": 86
+        },
+        {
+          "name": "setTimerListener",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$TimerListener;I)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "c6ce0ede16b33ea601af692894969802ddeb99b43e76b1c0cc21b0acbbf17408",
+          "code_length": 85
+        },
+        {
+          "name": "withDedicatedInstrumentOrdersWorker",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "0233c6937c02ae2a453775290e998993afd38734cd9e9adee1869d157a7f3832",
+          "code_length": 103
+        },
+        {
+          "name": "withJfxServerHost",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "acda6813543a687c7a4fa0cb9bef8d86a2621f31b69673782d1cd8a0c5b1e78a",
+          "code_length": 7
+        },
+        {
+          "name": "withHistoryPeriod",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$HistoryPeriod;)Lcom/jfx/strategy/Strategy;",
+          "access": 1,
+          "code_sha256": "da4896c6d524216b87e29ab4b307ebb33f7ff0fcae71a77eef69858f04f59414",
+          "code_length": 7
+        },
+        {
+          "name": "connect",
+          "descriptor": "(Ljava/lang/String;ILcom/jfx/Broker;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)V",
+          "access": 33,
+          "throws": [
+            "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException",
+            "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException",
+            "com/jfx/strategy/NJ4XNoConnectionToServerException",
+            "java/io/IOException"
+          ],
+          "code_sha256": "4e649e715472a63dd53ab10eaaaf32e9b16472eafd45b09bfb7c0e180b229e18",
+          "code_length": 1532
+        },
+        {
+          "name": "processFailedConnResp",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "fcc4103a32f584be52c2c22437a8f9b57859233a81851ce02c7fce2c3fa7d36e",
+          "code_length": 66
+        },
+        {
+          "name": "getNj4xParams",
+          "descriptor": "()Lcom/jfx/net/tsapi/Nj4XParams;",
+          "access": 2,
+          "code_sha256": "773e7a7158020564c5edbcf1022781262c5ed99f8cd542ab5859f55d8fcf4255",
+          "code_length": 255
+        },
+        {
+          "name": "startCoordination",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "502c62b5a3aa89540d3226ca69fa6b38f8f61bd45fc4397dd1bd6d14c5298175",
+          "code_length": 182
+        },
+        {
+          "name": "checkStrategyRegistration",
+          "descriptor": "()Lcom/jfx/strategy/Strategy;",
+          "access": 2,
+          "code_sha256": "77fecc8b8f0743e2c7b36873d91241a6a189c4189869c3fab350c103fb8445c8",
+          "code_length": 164
+        },
+        {
+          "name": "getTermServerHost",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "1c93046c980f7ebbf6e37d01fd97b8900cc8f8136786653e051c69bc14069fad",
+          "code_length": 5
+        },
+        {
+          "name": "getTermServerPort",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "93ad251c2cceef384e899dacfe696d5da258718037f616ef53c3d5be92486a91",
+          "code_length": 5
+        },
+        {
+          "name": "getMt4Server",
+          "descriptor": "()Lcom/jfx/Broker;",
+          "access": 1,
+          "code_sha256": "35a8257b6ef28a14345718b4f4df33522416adf5cd13392fbf22a419d988443b",
+          "code_length": 5
+        },
+        {
+          "name": "getMType",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "86c4921ec69d82e66faff9b81dc73ea5f86e623f264253f4e117636cb7a49273",
+          "code_length": 19
+        },
+        {
+          "name": "getMt4User",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "3016925ae75ef2ac12c40b3a925c65becdc191e86549a82b194e0b76cdac6a99",
+          "code_length": 5
+        },
+        {
+          "name": "getMt4Password",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "11fea1333d6d29aaa4bd19e12579b33d19724c63dd1d37468f440b7525b9721f",
+          "code_length": 5
+        },
+        {
+          "name": "_ordersProcessingChannel",
+          "descriptor": "()Lcom/jfx/strategy/StrategyRunner;",
+          "access": 0,
+          "code_sha256": "79366ba26360644050a5b3ad81a7afe537cbc9b3b70295fb40b27f073d926f1f",
+          "code_length": 5
+        },
+        {
+          "name": "getOrdersManipulationConnection",
+          "descriptor": "()Lcom/jfx/MT4;",
+          "access": 4,
+          "code_sha256": "7796758debfa159b8e156f41b849cf44657b979363cdc643d0e67d6862c31b66",
+          "code_length": 74
+        },
+        {
+          "name": "returnOrdersManipulationConnection",
+          "descriptor": "(Lcom/jfx/MT4;)V",
+          "access": 4,
+          "code_sha256": "334337b7e20b514b1291ffbd2a6944341260e54a52504a913e28af990c668f76",
+          "code_length": 29
+        },
+        {
+          "name": "addTerminal",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/strategy/Strategy$TickListener;)Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 1,
+          "code_sha256": "1df304952cea6e5213053ad728541321c2fd1706d79b660fbac9d9bc47fd71fc",
+          "code_length": 14
+        },
+        {
+          "name": "addTerminal",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$TimerListener;I)Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 1,
+          "code_sha256": "db89bbf1a8666ff5611f2a42a2e8853d851062914daba08b89ac8b165152017b",
+          "code_length": 14
+        },
+        {
+          "name": "addTerminal",
+          "descriptor": "(Lcom/jfx/strategy/Strategy$TerminalType;)Lcom/jfx/strategy/Strategy$Terminal;",
+          "access": 1,
+          "code_sha256": "ad46b016acc3a235ea3576588e750c57ca95126d5b4dacaa70c00eddf90be4b1",
+          "code_length": 13
+        },
+        {
+          "name": "isTickListenerStrategy",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "access$0",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Ljava/util/ArrayList;",
+          "access": 4104,
+          "code_sha256": "af1199bf3b6678f1910aa14e89cdaf02a85754d5f740b50595f40fa4c91b3b09",
+          "code_length": 5
+        },
+        {
+          "name": "access$1",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Ljava/util/Stack;",
+          "access": 4104,
+          "code_sha256": "c8e32f7d52a7ff184dd8e753338fe8f7803a7331e5ec3eb2fcfb780171486639",
+          "code_length": 5
+        },
+        {
+          "name": "access$2",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;Z)V",
+          "access": 4104,
+          "code_sha256": "b3ecdf2dad58b779cc644d03e4179a09b10118767333d767c7ed5e533924de3b",
+          "code_length": 6
+        },
+        {
+          "name": "access$3",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;Z)V",
+          "access": 4104,
+          "code_sha256": "c6c9e84552a32794b2572753b62cce662c2cfe794b8f128caa2e2ad02be6591d",
+          "code_length": 6
+        },
+        {
+          "name": "access$4",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Ljava/lang/String;",
+          "access": 4104,
+          "code_sha256": "3016925ae75ef2ac12c40b3a925c65becdc191e86549a82b194e0b76cdac6a99",
+          "code_length": 5
+        },
+        {
+          "name": "access$5",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Lcom/jfx/Broker;",
+          "access": 4104,
+          "code_sha256": "35a8257b6ef28a14345718b4f4df33522416adf5cd13392fbf22a419d988443b",
+          "code_length": 5
+        },
+        {
+          "name": "access$6",
+          "descriptor": "(Lcom/jfx/strategy/Strategy;)Z",
+          "access": 4104,
+          "code_sha256": "7f340a417e30248e27b2fe922006a9ddbefe655cd5bb6daf2986f64397d2e383",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/Broker",
+        "com/jfx/ErrUnknownSymbol",
+        "com/jfx/MT4",
+        "com/jfx/Timeframe",
+        "com/jfx/Version",
+        "com/jfx/io/Log4JUtil",
+        "com/jfx/md5/MD5",
+        "com/jfx/mt5/Broker",
+        "com/jfx/net/JFXServer",
+        "com/jfx/net/TSClient",
+        "com/jfx/net/tsapi/Nj4XChartParams",
+        "com/jfx/net/tsapi/Nj4XMT4Account",
+        "com/jfx/net/tsapi/Nj4XParams",
+        "com/jfx/net/tsapi/Nj4XTSInfo",
+        "com/jfx/strategy/BasicStrategyRunner",
+        "com/jfx/strategy/NJ4XInvalidUserNameOrPasswordException",
+        "com/jfx/strategy/NJ4XMaxNumberOfTerminalsExceededException",
+        "com/jfx/strategy/NJ4XNoConnectionToServerException",
+        "com/jfx/strategy/Strategy",
+        "com/jfx/strategy/Strategy$1",
+        "com/jfx/strategy/Strategy$2",
+        "com/jfx/strategy/Strategy$3",
+        "com/jfx/strategy/Strategy$BulkTickListener",
+        "com/jfx/strategy/Strategy$Chart",
+        "com/jfx/strategy/Strategy$HistoryPeriod",
+        "com/jfx/strategy/Strategy$Instrument",
+        "com/jfx/strategy/Strategy$Terminal",
+        "com/jfx/strategy/Strategy$TerminalStrategy",
+        "com/jfx/strategy/Strategy$TerminalType",
+        "com/jfx/strategy/Strategy$TickListener",
+        "com/jfx/strategy/Strategy$TickListenerChart",
+        "com/jfx/strategy/Strategy$TimerListener",
+        "com/jfx/strategy/StrategyRunner",
+        "java/io/IOException",
+        "java/io/PrintStream",
+        "java/lang/Exception",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Date",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Stack",
+        "java/util/concurrent/locks/LockSupport",
+        "org/apache/log4j/Logger"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$1.class",
+      "occurrence": 0,
+      "sha256": "cb7b0bc679785cac59fc299dfb48d5bf3ee0625628abf800a1f6026e01134159",
+      "name": "com/jfx/xml/DOMUtil$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/InputStream",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "fis",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 0
+        },
+        {
+          "name": "val$fName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "throws": [
+            "java/io/FileNotFoundException"
+          ],
+          "code_sha256": "ef7cf8b0cff1728d8f01bb286a3b2e11eb5c80c47276a31de4058e490371eb7c",
+          "code_length": 29
+        },
+        {
+          "name": "read",
+          "descriptor": "()I",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "7a3222e4debc7b3e47400518bb3674cec1de3270e9d8647c73e7aa8c54973759",
+          "code_length": 8
+        },
+        {
+          "name": "reset",
+          "descriptor": "()V",
+          "access": 33,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "85a010a2bda489a6fb67356de1cce306075c4e7b5b0b76177c7f04da2d6848af",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$1",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "java/io/BufferedInputStream",
+        "java/io/FileInputStream",
+        "java/io/FileNotFoundException",
+        "java/io/IOException",
+        "java/io/InputStream"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$2.class",
+      "occurrence": 0,
+      "sha256": "b63dca015eae1700fb7c8a8342d27b3c5033d40990d05bdf741e541aa8da224b",
+      "name": "com/jfx/xml/DOMUtil$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/io/OutputStream",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 0,
+          "code_sha256": "4cb6a0ce460da5ed2a4bdd3559ce5cf34fb5c05f2f1946cc486824a646cdf287",
+          "code_length": 5
+        },
+        {
+          "name": "write",
+          "descriptor": "(I)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException"
+          ],
+          "code_sha256": "b73fa688d93354523cdf4f168bf12014a4b41986e9e0893936c7e6acbeca3c01",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$2",
+        "java/io/IOException",
+        "java/io/OutputStream",
+        "java/io/PrintStream",
+        "java/lang/System"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$3.class",
+      "occurrence": 0,
+      "sha256": "b51a51dcf6bdf00d6cdd4044e3a2db00b2d35a9daa8f74a56b4b0cf05bb99967",
+      "name": "com/jfx/xml/DOMUtil$3",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/jfx/xml/DOMUtil$NodeFilter"
+      ],
+      "fields": [
+        {
+          "name": "val$elementNodeName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "113e681092031b44773b08fea90b59dfe6ee19ee8822420a2b8b30b1a2527a2b",
+          "code_length": 10
+        },
+        {
+          "name": "isOk",
+          "descriptor": "(Lorg/w3c/dom/Node;)Z",
+          "access": 1,
+          "code_sha256": "8d176c6711ce78e2f5539dea700c33e1b6d7a2755ea9d718e82e7be3cf2f2e4a",
+          "code_length": 37
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$3",
+        "com/jfx/xml/DOMUtil$NodeFilter",
+        "java/lang/Object",
+        "java/lang/String",
+        "org/w3c/dom/Node"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$ElementIterator.class",
+      "occurrence": 0,
+      "sha256": "e4c7fea03b5f000e602435ea4b2be80620875d45decdf00b1dd5a9d1c74b954b",
+      "name": "com/jfx/xml/DOMUtil$ElementIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "nl",
+          "descriptor": "Lorg/w3c/dom/NodeList;",
+          "access": 0
+        },
+        {
+          "name": "max",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "current",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "next",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "hasNextCalled",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "hasNextResult",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "filter",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$NodeFilter;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/w3c/dom/Node;Lcom/jfx/xml/DOMUtil$NodeFilter;)V",
+          "access": 0,
+          "code_sha256": "14d50b31073e9b15b5f165905691d23d48d322fa7df42b622b75ac80ca435930",
+          "code_length": 43
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "599b616a5fab824f99d7df799705e2240cf694686fddcceebbef087840b79f8d",
+          "code_length": 110
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "throws": [
+            "java/util/NoSuchElementException"
+          ],
+          "code_sha256": "c137323c748ced32ac7af8afea2742dd3adf3e14b0f82c8b8e596ba31facba93",
+          "code_length": 66
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "throws": [
+            "java/lang/UnsupportedOperationException",
+            "java/lang/IllegalStateException"
+          ],
+          "code_sha256": "8f79a473d851a24751436cc1169fc27accd9c2f6b79cb9a57639f7055106cebe",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$ElementIterator",
+        "com/jfx/xml/DOMUtil$NodeFilter",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/w3c/dom/Node",
+        "org/w3c/dom/NodeList"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$NoElementIterator.class",
+      "occurrence": 0,
+      "sha256": "3ffe666c8a04f42b3750f94fd6534492ff9f83241816be825fe6fbef7a732a0c",
+      "name": "com/jfx/xml/DOMUtil$NoElementIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "8896539f287b998e729c647434c756c34343aac77b5f723ad14b251137b4f61b",
+          "code_length": 5
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "42ca1f85243342bd41983ab86f2235408fa46ded7466d4525196f66b9dbb5f3e",
+          "code_length": 2
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "146cb1bd5c639e50589db67598e4a3f423eb736f7911d3b8329f72e0f5cd5fac",
+          "code_length": 2
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$NoElementIterator;)V",
+          "access": 4096,
+          "code_sha256": "9e7b0361adba602985634eafa2424b1497bf4df38802a5a8b980cc2c34bfda46",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$NoElementIterator",
+        "java/lang/Object",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$NodeFilter.class",
+      "occurrence": 0,
+      "sha256": "63af8e399319ff638cc57ba160140e0c44bb61d8380cf3e0d0119b3c1fad174e",
+      "name": "com/jfx/xml/DOMUtil$NodeFilter",
+      "major": 52,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "isOk",
+          "descriptor": "(Lorg/w3c/dom/Node;)Z",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$NodeFilter",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$1.class",
+      "occurrence": 0,
+      "sha256": "404563c1cc7b263c19578f458332d6ae055eddb210a66f74e9a645008f3abec5",
+      "name": "com/jfx/xml/DOMUtil$SAXDocument$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/xml/sax/helpers/DefaultHandler",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "distFromTop",
+          "descriptor": "S",
+          "access": 0
+        },
+        {
+          "name": "lastName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "this$1",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 4112
+        },
+        {
+          "name": "val$readAttributes",
+          "descriptor": "Z",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument;Z)V",
+          "access": 0,
+          "code_sha256": "85d4bc4310e5b46528038ef0071e395505247760c92a84994d7b18e54db9fffe",
+          "code_length": 15
+        },
+        {
+          "name": "startElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V",
+          "access": 1,
+          "throws": [
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "4ee8996643dadb2e00979ca66fa50413712232bf87d97de1f5f0b68a7238d1fc",
+          "code_length": 124
+        },
+        {
+          "name": "endElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "throws": [
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "e164c4d91f5b728d8da3049f12df8a61ef5e3bcc0ee4546f7f732d54dc2a7d2d",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXDocument$1",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "java/lang/String",
+        "org/xml/sax/Attributes",
+        "org/xml/sax/SAXException",
+        "org/xml/sax/helpers/DefaultHandler"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2$1$1.class",
+      "occurrence": 0,
+      "sha256": "784fe0638683de059fc58e9b4a3c1cc83e0c53f05db70f8ccf2b7d35724bd368",
+      "name": "com/jfx/xml/DOMUtil$SAXDocument$2$1$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "org/xml/sax/helpers/DefaultHandler",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "distFromTop",
+          "descriptor": "S",
+          "access": 0
+        },
+        {
+          "name": "lastName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "_root",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 0
+        },
+        {
+          "name": "ix",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "fNode",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 0
+        },
+        {
+          "name": "stack",
+          "descriptor": "Ljava/util/Stack;",
+          "access": 0
+        },
+        {
+          "name": "this$3",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXDocument$2$1;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument$2$1;)V",
+          "access": 0,
+          "code_sha256": "d2a1d2221076be7434154bbc3ed2dd6de67dd21ade2c6cf7be5501bad5776acd",
+          "code_length": 21
+        },
+        {
+          "name": "startElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V",
+          "access": 1,
+          "throws": [
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "a7b5e0de2e01f86a0698bd50cc96b5f10e72e4aec405f320539b2d6487cb53e2",
+          "code_length": 202
+        },
+        {
+          "name": "endElement",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 1,
+          "throws": [
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "42020fa3e28051ee74275f31b4afa9c23a2a99b7c88d3aaa6aaecc7f9dd2994e",
+          "code_length": 118
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXDocument$2",
+        "com/jfx/xml/DOMUtil$SAXDocument$2$1",
+        "com/jfx/xml/DOMUtil$SAXDocument$2$1$1",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Stack",
+        "org/xml/sax/SAXException",
+        "org/xml/sax/helpers/DefaultHandler"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2$1.class",
+      "occurrence": 0,
+      "sha256": "112c50d7a62ed2cbc029382f9d2d76fbdfaf7ec69f843c43a6ecd7c2257bb9be",
+      "name": "com/jfx/xml/DOMUtil$SAXDocument$2$1",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Thread",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "this$2",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXDocument$2;",
+          "access": 4112
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument$2;)V",
+          "access": 0,
+          "code_sha256": "18369817df4785fa583a168583e0e7980632e00f5fb1bd65cfd5a97e1fc085bb",
+          "code_length": 10
+        },
+        {
+          "name": "run",
+          "descriptor": "()V",
+          "access": 33,
+          "code_sha256": "fe237586ee0fb11859e998868d1411dd175691a87966400f084186a64b7fd771",
+          "code_length": 53
+        },
+        {
+          "name": "access$0",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument$2$1;)Lcom/jfx/xml/DOMUtil$SAXDocument$2;",
+          "access": 4104,
+          "code_sha256": "82ee7056b04c640a38c7cc175235331dde4a32bc219c075e81f79d2aaa90b4db",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXDocument$2",
+        "com/jfx/xml/DOMUtil$SAXDocument$2$1",
+        "com/jfx/xml/DOMUtil$SAXDocument$2$1$1",
+        "java/io/InputStream",
+        "java/lang/Exception",
+        "java/lang/Thread",
+        "javax/xml/parsers/SAXParser",
+        "javax/xml/parsers/SAXParserFactory"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument$2.class",
+      "occurrence": 0,
+      "sha256": "326789814d701c1ab9076bfdb7bee6b5852b77a54b8b47aae69ce9ab96f1e167",
+      "name": "com/jfx/xml/DOMUtil$SAXDocument$2",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "pos",
+          "descriptor": "I",
+          "access": 0
+        },
+        {
+          "name": "lastName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 0
+        },
+        {
+          "name": "node",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 0
+        },
+        {
+          "name": "thread",
+          "descriptor": "Ljava/lang/Thread;",
+          "access": 2
+        },
+        {
+          "name": "this$1",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 4112
+        },
+        {
+          "name": "val$elementName",
+          "descriptor": "Ljava/lang/String;",
+          "access": 4114
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument;Ljava/lang/String;)V",
+          "access": 0,
+          "code_sha256": "aca9a6e2a9e27420d6c45011c4c50531ccb8879b67cb903cd0efd67d842645db",
+          "code_length": 20
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "7041a80b889c2e88ac77775cefb65569e672ae6791e46aca1c1a906546a78dfb",
+          "code_length": 177
+        },
+        {
+          "name": "initParserThread",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "92ffd7ce9d90e0b39fde2633198946c5aceec0d64fd38b25892d09dbee97cf45",
+          "code_length": 94
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "b64aa21a12b270e8b7fae93584980bed7c72a118612ceffe40dbf3cefc15e979",
+          "code_length": 5
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "149488d869cbef080602a371ab0d39d97af103fb726aaeb02ccd36c06f494e5d",
+          "code_length": 1
+        },
+        {
+          "name": "access$0",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument$2;)Ljava/lang/Thread;",
+          "access": 4104,
+          "code_sha256": "60db55391a6466ebc49545e902b0d9ac996bb19340987f0dec9887cf3b5384c4",
+          "code_length": 5
+        },
+        {
+          "name": "access$1",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXDocument$2;)Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 4104,
+          "code_sha256": "f66e8250518af8e7eba2e824a653290c86670b3fe30fd9f290298cfd4523f135",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXDocument$2",
+        "com/jfx/xml/DOMUtil$SAXDocument$2$1",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "java/lang/InterruptedException",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/Thread",
+        "java/lang/Throwable",
+        "java/util/ArrayList",
+        "java/util/Iterator"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXDocument.class",
+      "occurrence": 0,
+      "sha256": "1568bea8636bb278cc0532e0f886c45d4bf096a5f5cc623ddac39b9334566ef7",
+      "name": "com/jfx/xml/DOMUtil$SAXDocument",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "is",
+          "descriptor": "Ljava/io/InputStream;",
+          "access": 0
+        },
+        {
+          "name": "root",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/io/InputStream;Z)V",
+          "access": 1,
+          "throws": [
+            "java/io/IOException",
+            "org/xml/sax/SAXException",
+            "javax/xml/parsers/ParserConfigurationException"
+          ],
+          "code_sha256": "5e169cfab45af6471fecacd7572cd8c32148a3f3767884e581ed7fc53257b32c",
+          "code_length": 35
+        },
+        {
+          "name": "getChildNode",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 1,
+          "code_sha256": "b97b3c10bdf8bdd2224696e4ef873a47d6f136d1c7b8ee523525932b2065870a",
+          "code_length": 40
+        },
+        {
+          "name": "getChildNodes",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 1,
+          "code_sha256": "72216adac387748104773b017fc5412d553255edbf96f25e750525343e36a411",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXDocument$1",
+        "com/jfx/xml/DOMUtil$SAXDocument$2",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "java/io/IOException",
+        "java/lang/Object",
+        "java/util/Iterator",
+        "javax/xml/parsers/ParserConfigurationException",
+        "javax/xml/parsers/SAXParser",
+        "javax/xml/parsers/SAXParserFactory",
+        "org/xml/sax/SAXException"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SAXNode.class",
+      "occurrence": 0,
+      "sha256": "fbc3caf4bf6c87f6df3a453f583d42976f554132d80aa0b6060c3d2c0fde159a",
+      "name": "com/jfx/xml/DOMUtil$SAXNode",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "childNodes",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 2
+        },
+        {
+          "name": "attributes",
+          "descriptor": "[Ljava/lang/String;",
+          "access": 2
+        },
+        {
+          "name": "isPreserving",
+          "descriptor": "Z",
+          "access": 2
+        },
+        {
+          "name": "NO_SUCH_ATTRIBUTE",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "setPreserving",
+          "descriptor": "(Z)V",
+          "access": 1,
+          "code_sha256": "547a46c6acda423e550b4f3b1a4c377bc3a80992a8c8731a099b66de1b8740dd",
+          "code_length": 6
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "8e311fa7f0ae41a122db52991ee979586673c05d2cfae754db277f1211ba80ef",
+          "code_length": 52
+        },
+        {
+          "name": "setName",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 1,
+          "code_sha256": "d3368919a37755e36e276a8beea896c06ade3cbbced9bcb5ff19fe728ca9e439",
+          "code_length": 6
+        },
+        {
+          "name": "clean",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e0f5282ee70fb8f23de584955b57d611663884d260def90943d7f49964796ff1",
+          "code_length": 23
+        },
+        {
+          "name": "setAttributes",
+          "descriptor": "(Lorg/xml/sax/Attributes;)V",
+          "access": 2,
+          "code_sha256": "db47acf14530ade7d606046697d2a23a1cece7f3eff966b3c6e593d427c9fc78",
+          "code_length": 63
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;)V",
+          "access": 2,
+          "code_sha256": "9db54926f9ce6629ab5ca6825cf278089b5b534fe92320d1388de91880a2b5cd",
+          "code_length": 15
+        },
+        {
+          "name": "addChild",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXNode;)V",
+          "access": 1,
+          "code_sha256": "8af1ec7db1f174ca519e887ddd4e989993c2e89915f7a9626754a9f50d80266a",
+          "code_length": 32
+        },
+        {
+          "name": "getChildNodes",
+          "descriptor": "()Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "0545a0c5a226fde48bfcf2d09d73aa4e4c7ad42116e8a36cc320ce1e38ccd9e3",
+          "code_length": 5
+        },
+        {
+          "name": "getElementsByTagName",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/ArrayList;",
+          "access": 1,
+          "code_sha256": "f1ba2be0de97447c7470d1be8c35008e53bc6cf3f8640c33a76373c8b9f01683",
+          "code_length": 81
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "a91d890976fe2c888e0abca7a49d2153194d61007974b138f321f40f2d006787",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;Lcom/jfx/xml/DOMUtil$SAXNode;)V",
+          "access": 4096,
+          "code_sha256": "4b6341c5365e12339bc0365140dd7d1a5bb55c9575e21fe9062a0c16722d1d92",
+          "code_length": 6
+        },
+        {
+          "name": "access$1",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXNode;Lorg/xml/sax/Attributes;)V",
+          "access": 4104,
+          "code_sha256": "0f98b1081d4fa9a867420791e1fa3954a41afe764e8b513fb692cb5c7d7f7065",
+          "code_length": 6
+        },
+        {
+          "name": "access$2",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXNode;)Ljava/util/ArrayList;",
+          "access": 4104,
+          "code_sha256": "0545a0c5a226fde48bfcf2d09d73aa4e4c7ad42116e8a36cc320ce1e38ccd9e3",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/util/ArrayList",
+        "org/xml/sax/Attributes"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil$SiblingIterator.class",
+      "occurrence": 0,
+      "sha256": "95bc62eb3ad54973c43dc6a255bdb715ee5c026fa66f9d4d9ebe244d0b254a8a",
+      "name": "com/jfx/xml/DOMUtil$SiblingIterator",
+      "major": 52,
+      "minor": 0,
+      "access": 32,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "java/util/Iterator"
+      ],
+      "fields": [
+        {
+          "name": "currentNode",
+          "descriptor": "Lorg/w3c/dom/Node;",
+          "access": 0
+        },
+        {
+          "name": "filter",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$NodeFilter;",
+          "access": 0
+        },
+        {
+          "name": "hasNextCalled",
+          "descriptor": "Z",
+          "access": 0
+        },
+        {
+          "name": "hasNextResult",
+          "descriptor": "Z",
+          "access": 0
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lorg/w3c/dom/Node;Lcom/jfx/xml/DOMUtil$NodeFilter;)V",
+          "access": 0,
+          "code_sha256": "2634ff5fb8fb933970ac65b9cabcd95662e71a672cd783aeb8bac320e34d7cc1",
+          "code_length": 20
+        },
+        {
+          "name": "hasNext",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "5fd6a69144a015cbc80f5d57667d92b478f8106d9c6e05283bddf87cc163b341",
+          "code_length": 81
+        },
+        {
+          "name": "next",
+          "descriptor": "()Ljava/lang/Object;",
+          "access": 1,
+          "throws": [
+            "java/util/NoSuchElementException"
+          ],
+          "code_sha256": "28dbcb4169689a7db5b587d5aee6658d6062395cef45ff5ff2323d581235eb78",
+          "code_length": 47
+        },
+        {
+          "name": "remove",
+          "descriptor": "()V",
+          "access": 1,
+          "throws": [
+            "java/lang/UnsupportedOperationException",
+            "java/lang/IllegalStateException"
+          ],
+          "code_sha256": "fed70cfa8b5a72d20456f04d07c42cde1126578eef05b94db072c52f36c88190",
+          "code_length": 8
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$NodeFilter",
+        "com/jfx/xml/DOMUtil$SiblingIterator",
+        "java/lang/IllegalStateException",
+        "java/lang/Object",
+        "java/lang/Throwable",
+        "java/lang/UnsupportedOperationException",
+        "java/util/Iterator",
+        "java/util/NoSuchElementException",
+        "org/w3c/dom/Node"
+      ]
+    },
+    {
+      "entry": "com/jfx/xml/DOMUtil.class",
+      "occurrence": 0,
+      "sha256": "bb13b5686f69ea4d4b1c34e3fbaedeebf91ebcc1d8cc73122eaa2b13e3b3f169",
+      "name": "com/jfx/xml/DOMUtil",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "PARAMETER_TYPES",
+          "descriptor": "[Ljava/lang/Class;",
+          "access": 26
+        },
+        {
+          "name": "INITARGS",
+          "descriptor": "[Ljava/lang/Object;",
+          "access": 26
+        },
+        {
+          "name": "NO_ELEMENT_ITERATOR",
+          "descriptor": "Lcom/jfx/xml/DOMUtil$NoElementIterator;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "68828a898c6fd663ec8dec437a1280bcf730f974bc8f8f27e2c479f1a871ddce",
+          "code_length": 26
+        },
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2416ec83eb9d9e34f4d7563978a9b308d498aa42b6a0edda8162ce456d6a55eb",
+          "code_length": 5
+        },
+        {
+          "name": "getDocument",
+          "descriptor": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "04966bf859bb4f6a6853a40b138102be8cc89898f71c5550f0c91ed2d06e4d9d",
+          "code_length": 73
+        },
+        {
+          "name": "validateXMLFile",
+          "descriptor": "(Ljava/lang/String;Ljava/io/InputStream;)V",
+          "access": 9,
+          "throws": [
+            "org/xml/sax/SAXException",
+            "java/io/IOException"
+          ],
+          "code_sha256": "0b4acf195501872b746d138c9e17e250302051322ad9941e4f7f8e98d2a56ff2",
+          "code_length": 54
+        },
+        {
+          "name": "getSAXDocument",
+          "descriptor": "(Ljava/lang/String;)Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 9,
+          "throws": [
+            "java/io/IOException",
+            "javax/xml/parsers/ParserConfigurationException",
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "3558287e5327f0a2c9392e67a91f78cacf724a6d42d3e4bbbf61a6b5893633b6",
+          "code_length": 6
+        },
+        {
+          "name": "getSAXDocument",
+          "descriptor": "(Ljava/lang/String;Z)Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 9,
+          "throws": [
+            "java/io/IOException",
+            "javax/xml/parsers/ParserConfigurationException",
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "94d652253c34ef6bf174cc3bde8c9bdd56de1f2395bb20a3c37db2a6ec7c8e5d",
+          "code_length": 12
+        },
+        {
+          "name": "getSAXDocument",
+          "descriptor": "(Ljava/io/InputStream;)Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 9,
+          "throws": [
+            "java/io/IOException",
+            "javax/xml/parsers/ParserConfigurationException",
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "3850b361e6f94ca4cbc655cce9517ad2f054f9ec0f7e25e783a36bd65dee2026",
+          "code_length": 6
+        },
+        {
+          "name": "getSAXDocument",
+          "descriptor": "(Ljava/io/InputStream;Z)Lcom/jfx/xml/DOMUtil$SAXDocument;",
+          "access": 9,
+          "throws": [
+            "java/io/IOException",
+            "javax/xml/parsers/ParserConfigurationException",
+            "org/xml/sax/SAXException"
+          ],
+          "code_sha256": "9ed92890cc9256d11a214a133a13b5f93ba8875ebc9bbed449de8193c347ec11",
+          "code_length": 10
+        },
+        {
+          "name": "getDocument",
+          "descriptor": "(Ljava/io/InputStream;)Lorg/w3c/dom/Document;",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "cb0b59908b2599825f7ea15d11eb83a5a39042405f481d5746702468253c2324",
+          "code_length": 62
+        },
+        {
+          "name": "getDocumentFromString",
+          "descriptor": "(Ljava/lang/String;)Lorg/w3c/dom/Document;",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "cc34ce6d14627147aac5a719bb05c6dbbcfb764628aa21483b5031053f0f2299",
+          "code_length": 73
+        },
+        {
+          "name": "createDocument",
+          "descriptor": "()Lorg/w3c/dom/Document;",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "2ae3fd3100a1723f56939240b9bc8f200f029a0c5d8acc826fce2e557a68a4a0",
+          "code_length": 29
+        },
+        {
+          "name": "getFactory",
+          "descriptor": "()Ljavax/xml/parsers/DocumentBuilderFactory;",
+          "access": 10,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "d3d60690b8893205fee744acd987cac36f0b1672ab2b1d41c0e6dd50f12eb5f9",
+          "code_length": 144
+        },
+        {
+          "name": "serializeDocumentToByteArray",
+          "descriptor": "(Lorg/w3c/dom/Document;)[B",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "8d9d877354c011f54e9ee7dac6d9a07f18fd3357b5df478e8ec4c59f780a4f56",
+          "code_length": 18
+        },
+        {
+          "name": "serializeDocumentToString",
+          "descriptor": "(Lorg/w3c/dom/Document;)Ljava/lang/String;",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "74300019e8605545abefcbdd139b3a1c082c8042fec98be2f47289b8d4876101",
+          "code_length": 12
+        },
+        {
+          "name": "serializeDocument",
+          "descriptor": "(Lorg/w3c/dom/Document;Ljava/io/OutputStream;)V",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "a2042e972c2549b3c29ec0dfad0e6d0b6c0b8a65ab150e7bcee7091f618e41b8",
+          "code_length": 9
+        },
+        {
+          "name": "printDocument",
+          "descriptor": "(Lorg/w3c/dom/Document;)V",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "328a7f1c614ebf99901028451da71b3236d5f8b7c9c7d8943f6ea12f76ec950f",
+          "code_length": 12
+        },
+        {
+          "name": "serializeDocument",
+          "descriptor": "(Lorg/w3c/dom/Document;Ljava/io/OutputStream;Ljava/lang/String;)V",
+          "access": 9,
+          "throws": [
+            "java/lang/RuntimeException"
+          ],
+          "code_sha256": "521fd1a3e5e2613b0f0ff6c57b872349ca9254031f7073db1ad113e620991ccf",
+          "code_length": 422
+        },
+        {
+          "name": "getTopElements",
+          "descriptor": "(Lorg/w3c/dom/Node;)Ljava/util/Iterator;",
+          "access": 9,
+          "code_sha256": "2745d6764c8b130a7d40f714cf6067552fec8b95ffdcf1c070b81f0b36b44da3",
+          "code_length": 6
+        },
+        {
+          "name": "getTopElements",
+          "descriptor": "(Lorg/w3c/dom/Node;Ljava/lang/String;)Ljava/util/Iterator;",
+          "access": 9,
+          "code_sha256": "a4766b2dbd542e441a7894a6a87ff9c450ec00fcb954af4b12488c3f0a69456c",
+          "code_length": 25
+        },
+        {
+          "name": "getTopElements",
+          "descriptor": "(Lorg/w3c/dom/Node;Lcom/jfx/xml/DOMUtil$NodeFilter;)Ljava/util/Iterator;",
+          "access": 9,
+          "code_sha256": "cd7206c772ce5f2320c832630bdaab265681e3081b84daa4af41bd2a79fdce72",
+          "code_length": 10
+        },
+        {
+          "name": "getSiblingElements",
+          "descriptor": "(Lorg/w3c/dom/Node;Lcom/jfx/xml/DOMUtil$NodeFilter;)Ljava/util/Iterator;",
+          "access": 9,
+          "code_sha256": "615d3f33598fda9d1294c378a60a914c786916e4780cf52edea973134f7aef8e",
+          "code_length": 10
+        },
+        {
+          "name": "getNextSiblingElement",
+          "descriptor": "(Lorg/w3c/dom/Node;Lcom/jfx/xml/DOMUtil$NodeFilter;)Lorg/w3c/dom/Node;",
+          "access": 9,
+          "code_sha256": "bc5df88494d36e6be2c5992b0a88f0c93fe068ba5073e306cd68f10db8844e5f",
+          "code_length": 27
+        },
+        {
+          "name": "getCDATAChild",
+          "descriptor": "(Lorg/w3c/dom/Element;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "e69851d085830434d2f6917b6f63aa18dc34a9d165b988b18ad90a1dc376b67d",
+          "code_length": 50
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Lorg/w3c/dom/Node;Ljava/lang/String;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "871b771686bfffd6e210400940586aa1e620189ca29729656447890f18f38421",
+          "code_length": 8
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Lorg/w3c/dom/Node;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "fbe1344ea23591c2e29d07d41916f2e7731889bcd9288464ab746a384bbacf5a",
+          "code_length": 17
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Lorg/w3c/dom/NodeList;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;",
+          "access": 9,
+          "code_sha256": "13b45ff59c2cf08b3f0f953c98e51a3f7783f18d66cf4c4dc712f5958691d6bc",
+          "code_length": 147
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXNode;Ljava/lang/String;)Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 9,
+          "code_sha256": "e66e1362fb50ecc00c86bc7f2df1cdde166dffeac37b61da1855eb0ba02f5ac1",
+          "code_length": 8
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Lcom/jfx/xml/DOMUtil$SAXNode;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 9,
+          "code_sha256": "6b314a461a1ccbbcdf626b9ee7e3674649008ff06f85e4bc6477f6625e8d9c60",
+          "code_length": 15
+        },
+        {
+          "name": "findElement",
+          "descriptor": "(Ljava/util/ArrayList;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/jfx/xml/DOMUtil$SAXNode;",
+          "access": 9,
+          "code_sha256": "5d5d4ffb2ddc165ae4d68b20ba75337dc834a3f6fd979f27b08271f2a96e27bb",
+          "code_length": 123
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "94c9bbc2f130c4f95d5e8ed8aa0ad80f816eb71b4768ff1a974be893f8b7d49a",
+          "code_length": 25
+        },
+        {
+          "name": "getAttributeAsInt",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;I)I",
+          "access": 9,
+          "code_sha256": "6abc659e3d958040a520533534729ddbc8dfcea87e5c7316b88561d32a11ea4b",
+          "code_length": 28
+        },
+        {
+          "name": "getAttributeAsBoolean",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Z)Z",
+          "access": 9,
+          "code_sha256": "0a069dd60a0111e92020a040ba421d9b648a9c93c1cd14e9b5b6187afa31fdd2",
+          "code_length": 31
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "41fe97bd5cd1cf4654160d7bcf526d73bcbc475e5dc3cbb76368e52c8f5b3261",
+          "code_length": 21
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;I)I",
+          "access": 9,
+          "code_sha256": "30b99d4d823ad1be3588f6271d686b84150a222156c267a206c7f647a8a7aa71",
+          "code_length": 26
+        },
+        {
+          "name": "getAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;Z)Z",
+          "access": 9,
+          "code_sha256": "c1b25a61b7ad55699b9714bbed41b1e6bd1fac20f99c7260e3d3361ce62c7352",
+          "code_length": 29
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;II)V",
+          "access": 9,
+          "code_sha256": "a19863fd8f64be2e6baa6fdddc8dc0e7eb528c2b55d175d80b9c81f4844ce92b",
+          "code_length": 27
+        },
+        {
+          "name": "setAttribute",
+          "descriptor": "(Lorg/w3c/dom/Element;Ljava/lang/String;ZZ)V",
+          "access": 9,
+          "code_sha256": "f2ec214f13cee73dda624f3582f09e8b71f8cd18db83bcdf80801c36a22eebf6",
+          "code_length": 27
+        },
+        {
+          "name": "getNodeValue",
+          "descriptor": "(Lorg/w3c/dom/Document;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "6fbbb6818f3a21e2bbb84b495a735c01e71b838d533aa81c433bb4dd6fa8eb31",
+          "code_length": 92
+        }
+      ],
+      "class_references": [
+        "com/jfx/xml/DOMUtil",
+        "com/jfx/xml/DOMUtil$1",
+        "com/jfx/xml/DOMUtil$2",
+        "com/jfx/xml/DOMUtil$3",
+        "com/jfx/xml/DOMUtil$ElementIterator",
+        "com/jfx/xml/DOMUtil$NoElementIterator",
+        "com/jfx/xml/DOMUtil$NodeFilter",
+        "com/jfx/xml/DOMUtil$SAXDocument",
+        "com/jfx/xml/DOMUtil$SAXNode",
+        "com/jfx/xml/DOMUtil$SiblingIterator",
+        "java/io/ByteArrayOutputStream",
+        "java/io/File",
+        "java/io/FileInputStream",
+        "java/io/IOException",
+        "java/io/InputStream",
+        "java/io/OutputStream",
+        "java/io/PrintStream",
+        "java/io/StringReader",
+        "java/lang/Boolean",
+        "java/lang/Class",
+        "java/lang/ClassNotFoundException",
+        "java/lang/Exception",
+        "java/lang/IllegalAccessException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/InstantiationException",
+        "java/lang/Integer",
+        "java/lang/NoSuchMethodException",
+        "java/lang/Object",
+        "java/lang/RuntimeException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/System",
+        "java/lang/Throwable",
+        "java/lang/reflect/Constructor",
+        "java/lang/reflect/InvocationTargetException",
+        "java/lang/reflect/Method",
+        "java/util/ArrayList",
+        "javax/xml/parsers/DocumentBuilder",
+        "javax/xml/parsers/DocumentBuilderFactory",
+        "javax/xml/parsers/ParserConfigurationException",
+        "javax/xml/transform/sax/SAXResult",
+        "javax/xml/transform/sax/SAXSource",
+        "javax/xml/transform/stream/StreamSource",
+        "javax/xml/validation/Schema",
+        "javax/xml/validation/SchemaFactory",
+        "javax/xml/validation/Validator",
+        "org/w3c/dom/Document",
+        "org/w3c/dom/Element",
+        "org/w3c/dom/Node",
+        "org/w3c/dom/NodeList",
+        "org/xml/sax/InputSource",
+        "org/xml/sax/SAXException",
+        "org/xml/sax/helpers/DefaultHandler"
+      ]
+    }
+  ]
+}

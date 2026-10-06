@@ -1,0 +1,66 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
+  "sha256": "84d9f257022e864c7fd738ef335783557b059f3367e61fedc2de3d5982af0c45",
+  "class_count": 6,
+  "unique_class_entries": 6,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1.class": "6cd4ef50c31efd36d5fb6d22fa1e765d5c97726c971a0c3b609173ced3a6bfe4",
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2.class": "989461f8d4134b976b9525c94bf1631fcdb1eba07ba4cba57dfae740c92d2ae5",
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3.class": "e731412b92573f76ee9fe697beb58f525b85e4cc3868041316c99b38fe8f8c88",
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet.class": "03f93f4628ce2d4764495e06c4c2dc5082a259ff980ae37d6f4a878ba44312e1",
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServletPlugin.class": "2ba8e5938571bb845cb7d4299fe1abc9f0013d025a1619dcc96ae330e6537a0c",
+    "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter.class": "62247e4de211c5b5cd42cf7d8a01ab0d9814b2df931261826d5b17cb94e2d835"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$1.class",
+      "occurrence": 0,
+      "sha256": "6cd4ef50c31efd36d5fb6d22fa1e765d5c97726c971a0c3b609173ced3a6bfe4",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$2.class",
+      "occurrence": 0,
+      "sha256": "989461f8d4134b976b9525c94bf1631fcdb1eba07ba4cba57dfae740c92d2ae5",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet$3.class",
+      "occurrence": 0,
+      "sha256": "e731412b92573f76ee9fe697beb58f525b85e4cc3868041316c99b38fe8f8c88",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet.class",
+      "occurrence": 0,
+      "sha256": "03f93f4628ce2d4764495e06c4c2dc5082a259ff980ae37d6f4a878ba44312e1",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServletPlugin.class",
+      "occurrence": 0,
+      "sha256": "2ba8e5938571bb845cb7d4299fe1abc9f0013d025a1619dcc96ae330e6537a0c",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    },
+    {
+      "entry": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerXmlImporter.class",
+      "occurrence": 0,
+      "sha256": "62247e4de211c5b5cd42cf7d8a01ab0d9814b2df931261826d5b17cb94e2d835",
+      "member_shard": "docs/dev/evidence/sqx145/members/166/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/166/001.json",
+      "sha256": "63adb8c9552503acd5ec01b0b87e690eab552b7779aee4fd13ba914030ee3463"
+    }
+  ]
+}

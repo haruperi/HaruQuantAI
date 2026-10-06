@@ -1,0 +1,31 @@
+{
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
+  "sha256": "aaaf875f1a4897aa3ea0a415bdca4da672b166bd0ea117bad9f5276723330394",
+  "class_count": 1,
+  "unique_class_entries": 1,
+  "resource_count": 2,
+  "duplicate_entries": [],
+  "classes": {
+    "com/strategyquant/plugin/App/impl/DebugConsole/DebugConsoleAppPlugin.class": "fc02d688eaa04d743c4bf563fd2195155abb9734a43a9e3172ff1c89dba5f64b"
+  },
+  "resources": {
+    "META-INF/MANIFEST.MF": "566ad1a80220026d05099562645ce968ff0e7c36cde22634332605bb34cc3eff",
+    ".keep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "class_occurrences": [
+    {
+      "entry": "com/strategyquant/plugin/App/impl/DebugConsole/DebugConsoleAppPlugin.class",
+      "occurrence": 0,
+      "sha256": "fc02d688eaa04d743c4bf563fd2195155abb9734a43a9e3172ff1c89dba5f64b",
+      "member_shard": "docs/dev/evidence/sqx145/members/127/001.json"
+    }
+  ],
+  "member_shards": [
+    {
+      "locator": "docs/dev/evidence/sqx145/members/127/001.json",
+      "sha256": "f3fb78add44358cf593b74e71fc73c7fb732393295fc4b35eba4acc06b614bdd"
+    }
+  ]
+}

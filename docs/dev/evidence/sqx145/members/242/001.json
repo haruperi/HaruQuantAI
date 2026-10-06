@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/plugins/SettingsBlocks/SettingsBlocks.jar",
+  "archive_sha256": "3fab494fec49c6d86e898f1c0e2dfe359496b41f79b607ef071bd9a8fdf1640b",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Blocks/BlocksServlet.class",
+      "occurrence": 0,
+      "sha256": "0ab2794b8838d36af0322df04379cd276537bdae2d8e30708f95893c3f5301ce",
+      "name": "com/strategyquant/plugin/Settings/impl/Blocks/BlocksServlet",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 26
+        },
+        {
+          "name": "signalKeys",
+          "descriptor": "Ljava/util/ArrayList;",
+          "access": 26,
+          "generic_signature": "Ljava/util/ArrayList<Ljava/lang/String;>;"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "execute",
+          "descriptor": "(Ljava/lang/String;Ljava/util/Map;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 4,
+          "code_sha256": "329d0b89da537ea37687ae782ffb008d1f2fc937e766b07d4f6fd45f3295ac79",
+          "code_length": 165,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/lang/String;Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;Ljava/lang/String;)Ljava/lang/String;"
+        },
+        {
+          "name": "onList",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "2eed49155a0a0a400883f48c63d34eb8acbcfe018cf9ca4824ed6e3a461b1745",
+          "code_length": 187,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "onLoadFromFile",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b0ca401e9d1fc52e80af3782573284e5e2031ba629328e32870d1ec7bf2f4318",
+          "code_length": 66,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "onSaveToFile",
+          "descriptor": "(Ljava/util/Map;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "34b1b33c6d6329cf5034d90530d3a9ab7080bf2f7e6fbfd70fbd7007e2e01d50",
+          "code_length": 71,
+          "throws": [
+            "java/lang/Exception"
+          ],
+          "generic_signature": "(Ljava/util/Map<Ljava/lang/String;[Ljava/lang/String;>;)Ljava/lang/String;"
+        },
+        {
+          "name": "getOrderTypes",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "17373a1a4cc348b109d61ede55845cb7669c8aa08714007ea46285c12570d4fa",
+          "code_length": 55,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getIndicators",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "f302978b963947eab0f14a0c53c0ab643ec54c421214ba907f91b044f7b69f4f",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getPriceRanges",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "0c8b7b02af8f75cca0d64de5991a624dce1caf53c86a3c4ea82fe6e53ae4d909",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getPriceValues",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "d305798ada109f5c208e5f7011f6be6d6cd514077b8d2a47bda723b29d5761cc",
+          "code_length": 56,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getOperators",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "d02aa1ea7177a3def50d4751da3b2aa2916b5a43b6fbe9aa622fd097b4c3b683",
+          "code_length": 177,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getSimpleRules",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "252b09528e14c28f93b3aae61073efe835f3ed64cc74fd3a0005b0058fe13b81",
+          "code_length": 75,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getOthers",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "3d81e375375ca4ceeeb10ffbc134db4a8fe95861b9859899b5882c5e5989ce0b",
+          "code_length": 153,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getExitTypes",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "9bbb011b5f4cdc4c8c9b6812da4dcdc64e7d83637af1d07d60fb222bcc4feafb",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getFormulas",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "ac8bf64c3db4387a375423759b862f4bc209d131f52e2487521b38fd6b501272",
+          "code_length": 85,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "getParameterSets",
+          "descriptor": "(Lorg/jdom2/Element;)Lorg/json/JSONArray;",
+          "access": 2,
+          "code_sha256": "e0053562b9fb08ad122db68022f6d320a7e56e0e65762d749a3c85eeacb4b43e",
+          "code_length": 301,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "loadStockpickerDefaultBlocks",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "bb0c0da8282e6029dc9804288a459d5e7a1ca09ed0ec403d904eb3e0035c45a3",
+          "code_length": 114
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "de1c64400b78d24be419fd952744a435f33c28f6a3d04a8870eab7b025b83224",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQPaths",
+        "com/strategyquant/lib/utils/WizardConfigWorker",
+        "com/strategyquant/plugin/Settings/impl/Blocks/BlocksServlet",
+        "com/strategyquant/tradinglib/blocks/CustomBlocks",
+        "com/strategyquant/tradinglib/file/SQFileManager",
+        "com/strategyquant/webguilib/servlet/HttpJSONServlet",
+        "java/io/File",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    },
+    {
+      "entry": "com/strategyquant/plugin/Settings/impl/Blocks/BlocksSettingsPlugin.class",
+      "occurrence": 0,
+      "sha256": "e0d851ad6282eb7d548d1cee154c8bf98269151ecd3c06e12fc714d01cf85273",
+      "name": "com/strategyquant/plugin/Settings/impl/Blocks/BlocksSettingsPlugin",
+      "major": 52,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/pluginlib/program/IProgram"
+      ],
+      "fields": [
+        {
+          "name": "Log",
+          "descriptor": "Lorg/slf4j/Logger;",
+          "access": 25
+        },
+        {
+          "name": "tabTitle",
+          "descriptor": "Ljava/lang/String;",
+          "access": 26
+        },
+        {
+          "name": "dataContext",
+          "descriptor": "Lorg/eclipse/jetty/servlet/ServletContextHandler;",
+          "access": 2
+        },
+        {
+          "name": "servlet",
+          "descriptor": "Lcom/strategyquant/plugin/Settings/impl/Blocks/BlocksServlet;",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getHandler",
+          "descriptor": "()Lorg/eclipse/jetty/server/Handler;",
+          "access": 1,
+          "code_sha256": "5499f85027406b494f0f8e754d6691820a883f74985c846eb2a1a3f8c7429ee9",
+          "code_length": 71
+        },
+        {
+          "name": "getProduct",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "403d3e8dd35e53075d24ae58bb64e523fdfc8cf579bb1c8d808b70800c6df414",
+          "code_length": 3
+        },
+        {
+          "name": "getPreferredPosition",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "e28311ad178db1780ff82ec4dc57012479f9f1121fc5ff7bccdfbaabd013b99c",
+          "code_length": 3
+        },
+        {
+          "name": "initPlugin",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "554dc4c610e23e25f5e51d821452e9edada41d5b1b907d30b0b0e7a56435788b",
+          "code_length": 18,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "call",
+          "descriptor": "(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/Object;",
+          "access": 129,
+          "code_sha256": "cbd94457f39834f9366d5632d52cd4d787199b375e80b577d2c3181052da7a1b",
+          "code_length": 53,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "fixSettings",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "cf527a931842bbefe0c1f8c301c09b5dd4fd23abb64a1dd25d1e69cf7c4e27b6",
+          "code_length": 6
+        },
+        {
+          "name": "fixCustomBlocks",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "7ba353cabe01b6831714fa168cbc92860c117997a28c906bfb661a0009e7ea99",
+          "code_length": 404
+        },
+        {
+          "name": "disableVPBlocksIfInactive",
+          "descriptor": "(Lorg/jdom2/Element;)V",
+          "access": 2,
+          "code_sha256": "370db18905b229a7516391cee142678c85b932d8f547cdb5a9cf54db887116da",
+          "code_length": 109
+        },
+        {
+          "name": "readSettings",
+          "descriptor": "(Ljava/lang/String;Lcom/strategyquant/tradinglib/taskImpl/ISQTask;Lorg/jdom2/Element;Lcom/strategyquant/tradinglib/task/settings/TaskSettingsData;)V",
+          "access": 1,
+          "code_sha256": "7bbeafe17e2d55f426e59aca6e21cd6f16c8d434527923ab5c74fca4e4fd09f9",
+          "code_length": 299
+        },
+        {
+          "name": "generateBlockDescription",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/jdom2/Element;Lorg/jdom2/Element;)Ljava/lang/String;",
+          "access": 2,
+          "code_sha256": "b50ec10fb11c187e584113b6292cac3d5918cd6d64fae48a854be0bc38a74990",
+          "code_length": 45
+        },
+        {
+          "name": "getSettingName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "4ec4538f290b6919295d15bfe23e7ba7cb3a7bde68a043281c0c83a7326038b0",
+          "code_length": 3
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "d1adb93f469f41d03153a4e8bed7e38dd121f47b40f22bd5515f9c3632ef27b8",
+          "code_length": 7
+        },
+        {
+          "name": "getStrategyConfigSettings",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;)V",
+          "access": 1,
+          "code_sha256": "e94b559fa272ad11f91d30df8e7320213e937497e35684c7f6c95db2c95c6948",
+          "code_length": 113,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "addBlocks",
+          "descriptor": "(Lorg/jdom2/Element;Lorg/json/JSONArray;Lcom/strategyquant/tradinglib/blocks/random/BlocksConfig;)V",
+          "access": 2,
+          "code_sha256": "afa2ce38e7a5469692cdbe0aa5a178507e13466e1a636b2aa2ce5da86f363527",
+          "code_length": 121
+        },
+        {
+          "name": "getInitializationData",
+          "descriptor": "()Lorg/json/JSONObject;",
+          "access": 1,
+          "code_sha256": "31863d6d2e008b9670781717bedad02d4f7066550e44a6f5fa153fa0db8b2adf",
+          "code_length": 25,
+          "throws": [
+            "java/lang/Exception"
+          ]
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "afcbd76e7ad03ff0242a97c9f43b60f362e68f8dfaf2a56348546bc68ca70e19",
+          "code_length": 9
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/strategyquant/lib/L",
+        "com/strategyquant/lib/XMLUtil",
+        "com/strategyquant/lib/constants/SQConst",
+        "com/strategyquant/lib/volumeProfile/VolumeProfileBlocks",
+        "com/strategyquant/lib/volumeProfile/VolumeProfileSubscription",
+        "com/strategyquant/plugin/Settings/impl/Blocks/BlocksServlet",
+        "com/strategyquant/plugin/Settings/impl/Blocks/BlocksSettingsPlugin",
+        "com/strategyquant/pluginlib/program/IProgram",
+        "com/strategyquant/pluginlib/program/Program",
+        "com/strategyquant/tradinglib/SettingsKeys",
+        "com/strategyquant/tradinglib/blocks/CustomBlocks",
+        "com/strategyquant/tradinglib/blocks/random/BlockDefinition",
+        "com/strategyquant/tradinglib/blocks/random/BlocksConfig",
+        "com/strategyquant/tradinglib/servlet/IServletPlugin",
+        "com/strategyquant/tradinglib/task/settings/ISettingTabPlugin",
+        "com/strategyquant/tradinglib/task/settings/TaskSettingsData",
+        "com/strategyquant/tradinglib/task/settings/blocks/ConfigVerifier",
+        "com/strategyquant/tradinglib/taskImpl/ISQTask",
+        "java/lang/Exception",
+        "java/lang/Integer",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/util/HashMap",
+        "java/util/Iterator",
+        "java/util/List",
+        "java/util/Map",
+        "java/util/Set",
+        "org/eclipse/jetty/servlet/ServletContextHandler",
+        "org/eclipse/jetty/servlet/ServletHolder",
+        "org/jdom2/Element",
+        "org/json/JSONArray",
+        "org/json/JSONObject",
+        "org/slf4j/Logger",
+        "org/slf4j/LoggerFactory"
+      ]
+    }
+  ]
+}

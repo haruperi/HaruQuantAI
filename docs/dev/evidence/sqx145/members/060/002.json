@@ -1,0 +1,6052 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "root": "SQX_145_REFERENCE_ROOT",
+  "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
+  "archive_sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "classes": [
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFDataRef.class",
+      "occurrence": 0,
+      "sha256": "e64a65a7893234d62e5b75d12d481bbf421ca392c7ea9490ff9e87d52d039de1",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFDataRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "76f28c418babbe03f1490be35820ff4b9c50bff12eaa210eac73210ad28ae279",
+          "code_length": 46
+        },
+        {
+          "name": "getLength",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "9cb3e4843119baf92b43a3370c527bc4f4f390667a804a95ecd73ef61bacb5c0",
+          "code_length": 13
+        },
+        {
+          "name": "getBytePtr",
+          "descriptor": "()Lcom/sun/jna/Pointer;",
+          "access": 1,
+          "code_sha256": "26d87e518872ac70df6f87b75442a66bb6339b5e48549715a8c8db5d9b59b5ae",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDataRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "java/lang/ClassCastException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef$ByReference.class",
+      "occurrence": 0,
+      "sha256": "bac04835fda7565b7dcc81c4740a4c03e3cdfc52f7376154fe4ea144be49d506",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/PointerByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;)V",
+          "access": 1,
+          "code_sha256": "c8ea34d9756a7fa9cfc57241e9187a5d11b80509f058df676d7309bc4f3b37ce",
+          "code_length": 17
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "7834042619b40514ab2fde94af276631337ca1f5a1cd7ca09fcc374515393f1b",
+          "code_length": 57
+        },
+        {
+          "name": "getDictionaryRefValue",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;",
+          "access": 1,
+          "code_sha256": "74467791b613f261f2e7ebc8264340521204633467e7b5109589d95c978ad29f",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef$ByReference",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/ClassCastException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef.class",
+      "occurrence": 0,
+      "sha256": "4c187ea2b563360c6d5047543ef2542d8ea175c58fa26fe0f8669ca484d55aef",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "76f28c418babbe03f1490be35820ff4b9c50bff12eaa210eac73210ad28ae279",
+          "code_length": 46
+        },
+        {
+          "name": "getValue",
+          "descriptor": "(Lcom/sun/jna/PointerType;)Lcom/sun/jna/Pointer;",
+          "access": 1,
+          "code_sha256": "85f7883dd62e4c3bc7b49a444c8d3bd2c252233e4a21105601489e00671d87c8",
+          "code_length": 11
+        },
+        {
+          "name": "getCount",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "30f56e5fd074325098093dafda2828ca1f2f948d5bafe5617aabb4904de53800",
+          "code_length": 13
+        },
+        {
+          "name": "getValueIfPresent",
+          "descriptor": "(Lcom/sun/jna/PointerType;Lcom/sun/jna/ptr/PointerByReference;)Z",
+          "access": 1,
+          "code_sha256": "d679fc419218469998e3e8f3f151830e1842250638867676480f5de00aa70d68",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef$ByReference",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "java/lang/ClassCastException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFIndex.class",
+      "occurrence": 0,
+      "sha256": "930a8cd578f976decca2a281b0c863eef7ac1941da75570c8a19d99a250fe83e",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/NativeLong",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef.class",
+      "occurrence": 0,
+      "sha256": "c7437956071862742c58f85d56fcade9edd38622e251c5b2ae9fda9817dccb1c",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/PointerType;Lcom/sun/jna/PointerType;)V",
+          "access": 1,
+          "code_sha256": "11e6b20baae4ae3fcb47da2ceb404f0e4e7bbd7edfc7151e652c8e520581ea21",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFNumberRef.class",
+      "occurrence": 0,
+      "sha256": "62829c02a0a8a4c8d271c8b4fddc1125cc8d6a17bfebae1288e7b99f8346b3a4",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFNumberRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "76f28c418babbe03f1490be35820ff4b9c50bff12eaa210eac73210ad28ae279",
+          "code_length": 46
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "ef61e1e7658f7a2ecf2db458d8c310afec9baf7e49de208dc78b89f89a8e59f7",
+          "code_length": 30
+        },
+        {
+          "name": "intValue",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "95bcc5f097a73afba44a0ab35d186d3421e01570402a628e5f17d9a9f9fa9903",
+          "code_length": 30
+        },
+        {
+          "name": "shortValue",
+          "descriptor": "()S",
+          "access": 1,
+          "code_sha256": "8eadc9f5ec55ee28f249986f3662baf109dd434c75bf100589e243456106f57e",
+          "code_length": 30
+        },
+        {
+          "name": "byteValue",
+          "descriptor": "()B",
+          "access": 1,
+          "code_sha256": "408cd4303e13253d904be079f1edecd858d57691197d8caa12329b3531427ebc",
+          "code_length": 30
+        },
+        {
+          "name": "doubleValue",
+          "descriptor": "()D",
+          "access": 1,
+          "code_sha256": "3b170a1b647eb89def35c5ecd182b5a05d1408aeda919d5c93879757599e3add",
+          "code_length": 30
+        },
+        {
+          "name": "floatValue",
+          "descriptor": "()F",
+          "access": 1,
+          "code_sha256": "f1bd924372bc179546cd4aae3a7d90ed543946df2654eef712199d4f1d7b0e0b",
+          "code_length": 30
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberType",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "com/sun/jna/ptr/ByteByReference",
+        "com/sun/jna/ptr/DoubleByReference",
+        "com/sun/jna/ptr/FloatByReference",
+        "com/sun/jna/ptr/IntByReference",
+        "com/sun/jna/ptr/LongByReference",
+        "com/sun/jna/ptr/ShortByReference",
+        "java/lang/ClassCastException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFNumberType.class",
+      "occurrence": 0,
+      "sha256": "95720aaaff5bdefa69fca396e7d1df847dc6484f0db2e17877fa57290d2276d6",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFNumberType",
+      "major": 50,
+      "minor": 0,
+      "access": 16433,
+      "superclass": "java/lang/Enum",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "unusedZero",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberSInt8Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberSInt16Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberSInt32Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberSInt64Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberFloat32Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberFloat64Type",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberCharType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberShortType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberIntType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberLongType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberLongLongType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberFloatType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberDoubleType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberCFIndexType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberNSIntegerType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberCGFloatType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "kCFNumberMaxType",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 16409
+        },
+        {
+          "name": "$VALUES",
+          "descriptor": "[Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 4122
+        }
+      ],
+      "methods": [
+        {
+          "name": "values",
+          "descriptor": "()[Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 9,
+          "code_sha256": "edd1b04d9774be56f8636f5ebf6e4282c6c2bf4bd134138179936685c5578fa6",
+          "code_length": 10
+        },
+        {
+          "name": "valueOf",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+          "access": 9,
+          "code_sha256": "14c62cd0dfbbce4885900c41f83386b06a6baeab7c519b953fd819c7b50fb850",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Ljava/lang/String;I)V",
+          "access": 2,
+          "code_sha256": "465f428a68e127afe1b328a6c114f41423634d0cb72de6cafe0ade7c542f476e",
+          "code_length": 7,
+          "generic_signature": "()V"
+        },
+        {
+          "name": "typeIndex",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1,
+          "code_sha256": "9017368bc1907c9d329b6c4e0612062ba35342b23048928553e87b64cd9714c3",
+          "code_length": 13
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "bfdc7791511ee979d8ab9a97df834f41376842ef09e15b403be6d5cb870e3688",
+          "code_length": 375
+        }
+      ],
+      "generic_signature": "Ljava/lang/Enum<Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;>;",
+      "class_references": [
+        "[Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberType;",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberType",
+        "java/lang/Enum"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFStringRef$ByReference.class",
+      "occurrence": 0,
+      "sha256": "87b8ae58f69b1235e1e41173631468ecad3e750ea5b186db07cecca1cb1a615c",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFStringRef$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/PointerByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "67b68b62b2acedbaa64eb55b720e0259915f62e0cc42436844e79438a974292e",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;)V",
+          "access": 1,
+          "code_sha256": "c8ea34d9756a7fa9cfc57241e9187a5d11b80509f058df676d7309bc4f3b37ce",
+          "code_length": 17
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "7834042619b40514ab2fde94af276631337ca1f5a1cd7ca09fcc374515393f1b",
+          "code_length": 57
+        },
+        {
+          "name": "getStringRefValue",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;",
+          "access": 1,
+          "code_sha256": "74467791b613f261f2e7ebc8264340521204633467e7b5109589d95c978ad29f",
+          "code_length": 20
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef$ByReference",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/ClassCastException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFStringRef.class",
+      "occurrence": 0,
+      "sha256": "b0fc95239fe1c366bcfadf978b0b4cf76f09155fe2449750f862c691b3ee59fd",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a1d1678642d1db080dd34d0f89608e616293d99c82d922d2b43c79a6e94ab863",
+          "code_length": 46
+        },
+        {
+          "name": "createCFString",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;",
+          "access": 9,
+          "code_sha256": "4c0c329194042ea4d94b6320d303cb205c8c45403ce28f7632eb41f3466b0902",
+          "code_length": 26
+        },
+        {
+          "name": "stringValue",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "b5fb8cd3c73fd64838a4b9d75a364a3e0b001f9bed52b8f5b12e08ea8aab0700",
+          "code_length": 109
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef$ByReference",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "java/lang/ClassCastException",
+        "java/lang/IllegalArgumentException",
+        "java/lang/String",
+        "java/lang/StringBuilder",
+        "java/lang/StringIndexOutOfBoundsException"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFTypeID.class",
+      "occurrence": 0,
+      "sha256": "a6962b6007431136e98e57e3bd86d988353be7ba07bd111e9f3bfbcbf4042527",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/NativeLong",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "fb1e979ca535bd8994a1de7138a52aae8913767eded700ab43275a313654e8a3",
+          "code_length": 96
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef.class",
+      "occurrence": 0,
+      "sha256": "6e9c897adcaf11baade4573bb9563c763d3f67590f38adf9b4567e59fffd1c7c",
+      "name": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "getTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1,
+          "code_sha256": "dcd62e438161d2437aee4a749cf8374db58e5542a0f910df3a2bbb70f403a800",
+          "code_length": 26
+        },
+        {
+          "name": "isTypeID",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;)Z",
+          "access": 1,
+          "code_sha256": "2add5b2ea42ef17b23f64d2c2e19111452c3f1b00dc98f718928c571bdd2a6b7",
+          "code_length": 9
+        },
+        {
+          "name": "retain",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "3abc2a5e914694398639c49e78761ccda076f35c769510f52e2668588d08489b",
+          "code_length": 11
+        },
+        {
+          "name": "release",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "395bcf8bfe2691b53fabbec11afa6298109e6e4e2a17df50a0ed5898068e8585",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/CoreFoundation.class",
+      "occurrence": 0,
+      "sha256": "56e0f6b1f417bc53b63012bed5fbe13c6cfeeacf23f2d0dac008d52e8724a5d1",
+      "name": "com/sun/jna/platform/mac/CoreFoundation",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation;",
+          "access": 25
+        },
+        {
+          "name": "kCFNotFound",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kCFStringEncodingASCII",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kCFStringEncodingUTF8",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "ARRAY_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "BOOLEAN_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "DATA_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "DATE_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "DICTIONARY_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "NUMBER_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        },
+        {
+          "name": "STRING_TYPE_ID",
+          "descriptor": "Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "CFStringCreateWithCharacters",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;[CLcom/sun/jna/platform/mac/CoreFoundation$CFIndex;)Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFNumberCreate",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;Lcom/sun/jna/ptr/ByReference;)Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFArrayCreate",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/mac/CoreFoundation$CFArrayRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFDataCreate",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;)Lcom/sun/jna/platform/mac/CoreFoundation$CFDataRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionaryCreateMutable",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;Lcom/sun/jna/Pointer;Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFCopyDescription",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFRelease",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)V",
+          "access": 1025
+        },
+        {
+          "name": "CFRetain",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFGetRetainCount",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionaryGetCount",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionaryGetValue",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;Lcom/sun/jna/PointerType;)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionaryGetValueIfPresent",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;Lcom/sun/jna/PointerType;Lcom/sun/jna/ptr/PointerByReference;)B",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionarySetValue",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;Lcom/sun/jna/PointerType;Lcom/sun/jna/PointerType;)V",
+          "access": 1025
+        },
+        {
+          "name": "CFStringGetCString",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;I)B",
+          "access": 1025
+        },
+        {
+          "name": "CFBooleanGetValue",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFBooleanRef;)B",
+          "access": 1025
+        },
+        {
+          "name": "CFArrayGetCount",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFArrayRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFArrayGetValueAtIndex",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFArrayRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "CFNumberGetType",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFNumberGetValue",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFNumberRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;Lcom/sun/jna/ptr/ByReference;)B",
+          "access": 1025
+        },
+        {
+          "name": "CFStringGetLength",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFStringGetMaximumSizeForEncoding",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;I)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFEqual",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Z",
+          "access": 1025
+        },
+        {
+          "name": "CFAllocatorGetDefault",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;",
+          "access": 1025
+        },
+        {
+          "name": "CFDataGetLength",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDataRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFIndex;",
+          "access": 1025
+        },
+        {
+          "name": "CFDataGetBytePtr",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDataRef;)Lcom/sun/jna/Pointer;",
+          "access": 1025
+        },
+        {
+          "name": "CFGetTypeID",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFGetTypeID",
+          "descriptor": "(Lcom/sun/jna/Pointer;)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFArrayGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFBooleanGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFDateGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFDataGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFDictionaryGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFNumberGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "CFStringGetTypeID",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeID;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ebbc045564f2070701c87576f6cc854f125de90553f514eeac9c708ef6422c73",
+          "code_length": 91
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFArrayRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFBooleanRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDataRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFIndex",
+        "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberType",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeID",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/DiskArbitration$DADiskRef.class",
+      "occurrence": 0,
+      "sha256": "ad18036e44fcac60480b79e3c420674c59aac97786c4b3669746457149cfbd7d",
+      "name": "com/sun/jna/platform/mac/DiskArbitration$DADiskRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "com/sun/jna/platform/mac/DiskArbitration",
+        "com/sun/jna/platform/mac/DiskArbitration$DADiskRef"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/DiskArbitration$DASessionRef.class",
+      "occurrence": 0,
+      "sha256": "c1b0ed6bfe525caca607401db7ac79f17957f14fee3fb56ef58db7aefec1a016",
+      "name": "com/sun/jna/platform/mac/DiskArbitration$DASessionRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "com/sun/jna/platform/mac/DiskArbitration",
+        "com/sun/jna/platform/mac/DiskArbitration$DASessionRef"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/DiskArbitration.class",
+      "occurrence": 0,
+      "sha256": "9b6c3236b4a0714d68158da039da32c728b6b8a1fccf7d6874e53e75f33427d7",
+      "name": "com/sun/jna/platform/mac/DiskArbitration",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/DiskArbitration;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "DASessionCreate",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;)Lcom/sun/jna/platform/mac/DiskArbitration$DASessionRef;",
+          "access": 1025
+        },
+        {
+          "name": "DADiskCreateFromBSDName",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/platform/mac/DiskArbitration$DASessionRef;Ljava/lang/String;)Lcom/sun/jna/platform/mac/DiskArbitration$DADiskRef;",
+          "access": 1025
+        },
+        {
+          "name": "DADiskCreateFromIOMedia",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;Lcom/sun/jna/platform/mac/DiskArbitration$DASessionRef;Lcom/sun/jna/platform/mac/IOKit$IOObject;)Lcom/sun/jna/platform/mac/DiskArbitration$DADiskRef;",
+          "access": 1025
+        },
+        {
+          "name": "DADiskCopyDescription",
+          "descriptor": "(Lcom/sun/jna/platform/mac/DiskArbitration$DADiskRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "DADiskGetBSDName",
+          "descriptor": "(Lcom/sun/jna/platform/mac/DiskArbitration$DADiskRef;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/DiskArbitration",
+        "com/sun/jna/platform/mac/DiskArbitration$DADiskRef",
+        "com/sun/jna/platform/mac/DiskArbitration$DASessionRef",
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOObject",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit$IOConnect.class",
+      "occurrence": 0,
+      "sha256": "19b48ee949884ac33c40fe7d608fc0c1f2b2bb7185c7e25e53ecf48ad3bcf880",
+      "name": "com/sun/jna/platform/mac/IOKit$IOConnect",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/IOKit$IOService",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOConnect",
+        "com/sun/jna/platform/mac/IOKit$IOService"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit$IOIterator.class",
+      "occurrence": 0,
+      "sha256": "97eed902a5d716b7a35422136f7b0aa8671d10123278a6345e15f898de6ff090",
+      "name": "com/sun/jna/platform/mac/IOKit$IOIterator",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/IOKit$IOObject",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "next",
+          "descriptor": "()Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 1,
+          "code_sha256": "7e8dde1903fc02068b6483afdfd66d41128b07e9e98cb6910038244ff6d97c14",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOIterator",
+        "com/sun/jna/platform/mac/IOKit$IOObject",
+        "com/sun/jna/platform/mac/IOKit$IORegistryEntry"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit$IOObject.class",
+      "occurrence": 0,
+      "sha256": "b7b2207eb911bc18d7f80e0f08d06de4f1358020b9b105500cef00e881ae88ee",
+      "name": "com/sun/jna/platform/mac/IOKit$IOObject",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        },
+        {
+          "name": "conformsTo",
+          "descriptor": "(Ljava/lang/String;)Z",
+          "access": 1,
+          "code_sha256": "6d4f35355eb7e564c77cdb7eb61e9c8e3427eb1ffa4ea3b5890acb7fada3d42d",
+          "code_length": 11
+        },
+        {
+          "name": "release",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "6eab3ea0ddcf1d2c16d28fd77ea6c042eb502a4c5417712411174534c9f5eae3",
+          "code_length": 10
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOObject"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit$IORegistryEntry.class",
+      "occurrence": 0,
+      "sha256": "aa57208e14893e8d5eb6f649f1f846612826ab069834cf95184ec7aee92c30e2",
+      "name": "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/IOKit$IOObject",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0e2f5f810e07cf446ca30ddf7c158c6dd9e1399f67f4f1dc7b5709f0f6d52640",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a228c461b26f0b040da8d8a3ca13d8ed94b69304fe23971b1ff66a5195b704c5",
+          "code_length": 6
+        },
+        {
+          "name": "getRegistryEntryID",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "db1d220d8aa8435988145c05a52e0f0822481e8aa25811174b2d535b5bb11145",
+          "code_length": 37
+        },
+        {
+          "name": "getName",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "9990092cce1f4598c7c524204b0ef33b587262d07c4d22c0fd68c38e1ae1100d",
+          "code_length": 41
+        },
+        {
+          "name": "getChildIterator",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/IOKit$IOIterator;",
+          "access": 1,
+          "code_sha256": "353147ad35bb9f28b7818fd8f6babc36ec79e89089c849f4b4f31e817daff1fa",
+          "code_length": 45
+        },
+        {
+          "name": "getChildEntry",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 1,
+          "code_sha256": "e19c982f89c297e6e1007e216d5d34f4f7d67af72dbb83718decbeaad90043b2",
+          "code_length": 53
+        },
+        {
+          "name": "getParentEntry",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 1,
+          "code_sha256": "8219c52a0b178fe4de0e12524ad9d5d651b255c47c5b13b9999b6a8b067e7e80",
+          "code_length": 53
+        },
+        {
+          "name": "createCFProperty",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 1,
+          "code_sha256": "a40b2f0a739d655705f9133f2b3dac3a105c6b787baa02baf247a675d57180ea",
+          "code_length": 20
+        },
+        {
+          "name": "createCFProperties",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 1,
+          "code_sha256": "68c65e48e2ebb39d9d266a3092c0cc98a5d0d5b73823a75be4e0d2e97b8c7049",
+          "code_length": 53
+        },
+        {
+          "name": "searchCFProperty",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;I)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 0,
+          "code_sha256": "a331a20a7c5b04845ea5692842509478bff6220cec9c8a9cdce1e217d98f4054",
+          "code_length": 21
+        },
+        {
+          "name": "getStringProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "748454ba52ff988fd4fef217bf8e36d07644123b3d1cccc75257b8f331f5d407",
+          "code_length": 50
+        },
+        {
+          "name": "getLongProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Long;",
+          "access": 1,
+          "code_sha256": "e604c2f1597d2368f93f11c508472efd4aaedf12f3932d1c8f86f6eb28c982e2",
+          "code_length": 53
+        },
+        {
+          "name": "getIntegerProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Integer;",
+          "access": 1,
+          "code_sha256": "d89865836d806265b884a9130050616dc657b32b47428224225c08abd94395cc",
+          "code_length": 53
+        },
+        {
+          "name": "getDoubleProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Double;",
+          "access": 1,
+          "code_sha256": "6e8203d221d1db97b97514eb7c3ffc586c578f5dc4ef035bd8356cb6a3c726a6",
+          "code_length": 53
+        },
+        {
+          "name": "getBooleanProperty",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/Boolean;",
+          "access": 1,
+          "code_sha256": "0991e2109835a97a253ad6f1a45d919dcb0727d9cf8345635715d00f23ea855b",
+          "code_length": 53
+        },
+        {
+          "name": "getByteArrayProperty",
+          "descriptor": "(Ljava/lang/String;)[B",
+          "access": 1,
+          "code_sha256": "4eb00a472612d7fbdea512b9745d1bb0629bf02a3fa1f3511b429acb397275e5",
+          "code_length": 67
+        }
+      ],
+      "class_references": [
+        "[B",
+        "com/sun/jna/Memory",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFBooleanRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDataRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFNumberRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOIterator",
+        "com/sun/jna/platform/mac/IOKit$IOObject",
+        "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+        "com/sun/jna/platform/mac/IOReturnException",
+        "com/sun/jna/ptr/LongByReference",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/Boolean",
+        "java/lang/Double",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/String"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit$IOService.class",
+      "occurrence": 0,
+      "sha256": "8b5826c164020d4abe18fa3a3b6f0f7ad5adad018dbb43825db20fad09daa951",
+      "name": "com/sun/jna/platform/mac/IOKit$IOService",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+        "com/sun/jna/platform/mac/IOKit$IOService"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKit.class",
+      "occurrence": 0,
+      "sha256": "9a632cc1eca34ec6a850f88f2199933c8c61dc9b0c2c54dbc38ae441be83b2fb",
+      "name": "com/sun/jna/platform/mac/IOKit",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/IOKit;",
+          "access": 25
+        },
+        {
+          "name": "kIORegistryIterateRecursively",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kIORegistryIterateParents",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kIOReturnNoDevice",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kIOPSTimeRemainingUnlimited",
+          "descriptor": "D",
+          "access": 25
+        },
+        {
+          "name": "kIOPSTimeRemainingUnknown",
+          "descriptor": "D",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "IOMasterPort",
+          "descriptor": "(ILcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceMatching",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceNameMatching",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOBSDNameMatching",
+          "descriptor": "(IILjava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceGetMatchingService",
+          "descriptor": "(ILcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;)Lcom/sun/jna/platform/mac/IOKit$IOService;",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceGetMatchingServices",
+          "descriptor": "(ILcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;Lcom/sun/jna/ptr/PointerByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOIteratorNext",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOIterator;)Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryCreateCFProperty",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;I)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryCreateCFProperties",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Lcom/sun/jna/ptr/PointerByReference;Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;I)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntrySearchCFProperty",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Ljava/lang/String;Lcom/sun/jna/platform/mac/CoreFoundation$CFStringRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef;I)Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryGetRegistryEntryID",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Lcom/sun/jna/ptr/LongByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryGetName",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Lcom/sun/jna/Pointer;)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryGetChildIterator",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Ljava/lang/String;Lcom/sun/jna/ptr/PointerByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryGetChildEntry",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Ljava/lang/String;Lcom/sun/jna/ptr/PointerByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryEntryGetParentEntry",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;Ljava/lang/String;Lcom/sun/jna/ptr/PointerByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IORegistryGetRootEntry",
+          "descriptor": "(I)Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 1025
+        },
+        {
+          "name": "IOObjectConformsTo",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOObject;Ljava/lang/String;)Z",
+          "access": 1025
+        },
+        {
+          "name": "IOObjectRelease",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOObject;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceOpen",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOService;IILcom/sun/jna/ptr/PointerByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceGetBusyState",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOService;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOServiceClose",
+          "descriptor": "(Lcom/sun/jna/platform/mac/IOKit$IOConnect;)I",
+          "access": 1025
+        },
+        {
+          "name": "IOPSCopyPowerSourcesInfo",
+          "descriptor": "()Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOPSCopyPowerSourcesList",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFArrayRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOPSGetPowerSourceDescription",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;Lcom/sun/jna/platform/mac/CoreFoundation$CFTypeRef;)Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;",
+          "access": 1025
+        },
+        {
+          "name": "IOPSGetTimeRemainingEstimate",
+          "descriptor": "()D",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFAllocatorRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFArrayRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFStringRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFTypeRef",
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOConnect",
+        "com/sun/jna/platform/mac/IOKit$IOIterator",
+        "com/sun/jna/platform/mac/IOKit$IOObject",
+        "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+        "com/sun/jna/platform/mac/IOKit$IOService",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOKitUtil.class",
+      "occurrence": 0,
+      "sha256": "f548dd56f4dbc0a0a1d1497145047ab27bc8062189d67bf26ba361f1dd244c2d",
+      "name": "com/sun/jna/platform/mac/IOKitUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "IO",
+          "descriptor": "Lcom/sun/jna/platform/mac/IOKit;",
+          "access": 26
+        },
+        {
+          "name": "SYS",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB;",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getMasterPort",
+          "descriptor": "()I",
+          "access": 9,
+          "code_sha256": "d883337ded4fe0151c7ab2630542a976ad83c27181ccc0fcd7d3d9ef6a2d2c0b",
+          "code_length": 24
+        },
+        {
+          "name": "getRoot",
+          "descriptor": "()Lcom/sun/jna/platform/mac/IOKit$IORegistryEntry;",
+          "access": 9,
+          "code_sha256": "71b0483d95c87e4ea416d0042238f78959043bfa09bcc7fad65a2471fa3ae6ff",
+          "code_length": 34
+        },
+        {
+          "name": "getMatchingService",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/IOKit$IOService;",
+          "access": 9,
+          "code_sha256": "27ba743a93091f863809c70bfd9d360837c41cd03dc74fd00075384002ab581a",
+          "code_length": 21
+        },
+        {
+          "name": "getMatchingService",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;)Lcom/sun/jna/platform/mac/IOKit$IOService;",
+          "access": 9,
+          "code_sha256": "c3cfda60de4f7cf9332433e05f4ee3e04fa2423163347528ec6b43ab1a7677ad",
+          "code_length": 35
+        },
+        {
+          "name": "getMatchingServices",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/IOKit$IOIterator;",
+          "access": 9,
+          "code_sha256": "74257033b992879737fa4dfc27a6dd1352b8fead60d8ba86b9d16d6540230729",
+          "code_length": 21
+        },
+        {
+          "name": "getMatchingServices",
+          "descriptor": "(Lcom/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef;)Lcom/sun/jna/platform/mac/IOKit$IOIterator;",
+          "access": 9,
+          "code_sha256": "e3f8c5d55c4d792be1962a344db031c6792606bdd490531981855307fbfe90ad",
+          "code_length": 67
+        },
+        {
+          "name": "getBSDNameMatchingDict",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef;",
+          "access": 9,
+          "code_sha256": "c4c57b4745156a703975d22ec64e38fe4d348ea92a13c0a1826c06aa1857f50e",
+          "code_length": 36
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c651731fe337ee91dd0b1e98a28035faa9e3059ec56ebb2256c3efb9775e6dcf",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/CoreFoundation",
+        "com/sun/jna/platform/mac/CoreFoundation$CFDictionaryRef",
+        "com/sun/jna/platform/mac/CoreFoundation$CFMutableDictionaryRef",
+        "com/sun/jna/platform/mac/IOKit",
+        "com/sun/jna/platform/mac/IOKit$IOIterator",
+        "com/sun/jna/platform/mac/IOKit$IORegistryEntry",
+        "com/sun/jna/platform/mac/IOKit$IOService",
+        "com/sun/jna/platform/mac/IOKitUtil",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/ptr/IntByReference",
+        "com/sun/jna/ptr/PointerByReference",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/IOReturnException.class",
+      "occurrence": 0,
+      "sha256": "69720debb2cb4cb63ed9b9884bfe31f269a1e78534e8bd6fc79dbefbf4955cda",
+      "name": "com/sun/jna/platform/mac/IOReturnException",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/RuntimeException",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "ioReturn",
+          "descriptor": "I",
+          "access": 2
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(I)V",
+          "access": 1,
+          "code_sha256": "5fa7fadb5551f95646f4694acb3b9969b8d69f99e0b0157d09d75a6edcbe55b6",
+          "code_length": 10
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(ILjava/lang/String;)V",
+          "access": 4,
+          "code_sha256": "4dda31736c1a3302c047f73967f56f4f28e6b1da9fd3de70ae6e1ec5f801630f",
+          "code_length": 11
+        },
+        {
+          "name": "getIOReturnCode",
+          "descriptor": "()I",
+          "access": 1,
+          "code_sha256": "4dd1035ec1cdb196745dea2916d5c6e3af003ec14aa125cf9edf87088b1251af",
+          "code_length": 5
+        },
+        {
+          "name": "getSystem",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "2b6f695ad6f551a8730767480c5299f4c05a2e76417c76dfed430eda2136209e",
+          "code_length": 8
+        },
+        {
+          "name": "getSubSystem",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "cd4f477b9ce3bd0bad6cf13866905b2e90fc088628cd95cf5c5bf167f5931da7",
+          "code_length": 9
+        },
+        {
+          "name": "getCode",
+          "descriptor": "(I)I",
+          "access": 9,
+          "code_sha256": "0ad5e72bddfe71bb09b081ccb89d80b996b133eaab6649b032e88baedd7c378b",
+          "code_length": 6
+        },
+        {
+          "name": "formatMessage",
+          "descriptor": "(I)Ljava/lang/String;",
+          "access": 10,
+          "code_sha256": "86baa68919d4113dbe8bff94000764234ac7f410d7437c996ece0bdb44f37d47",
+          "code_length": 61
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/mac/IOReturnException",
+        "java/lang/RuntimeException",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef.class",
+      "occurrence": 0,
+      "sha256": "54cb149a6db9cf915da481c784dae7767d79312377823e4da4767fbfc4b68236",
+      "name": "com/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "hidden",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "e5e2523ba902f320ac0da7a599fd6ab307f4b87595fbb676250b023b6542c1bc",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/MacFileUtils",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/MacFileUtils$FileManager.class",
+      "occurrence": 0,
+      "sha256": "28299feb079508aa8822018055b8b7cf14df85f6842e9236b9b881204209d540",
+      "name": "com/sun/jna/platform/mac/MacFileUtils$FileManager",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/MacFileUtils$FileManager;",
+          "access": 25
+        },
+        {
+          "name": "kFSFileOperationDefaultOptions",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSFileOperationsOverwrite",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSFileOperationsSkipSourcePermissionErrors",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSFileOperationsDoNotMoveAcrossVolumes",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSFileOperationsSkipPreflight",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSPathDefaultOptions",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "kFSPathMakeRefDoNotFollowLeafSymlink",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "FSRefMakePath",
+          "descriptor": "(Lcom/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef;[BI)I",
+          "access": 1025
+        },
+        {
+          "name": "FSPathMakeRef",
+          "descriptor": "(Ljava/lang/String;ILcom/sun/jna/ptr/ByteByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "FSPathMakeRefWithOptions",
+          "descriptor": "(Ljava/lang/String;ILcom/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef;Lcom/sun/jna/ptr/ByteByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "FSPathMoveObjectToTrashSync",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/ptr/PointerByReference;I)I",
+          "access": 1025
+        },
+        {
+          "name": "FSMoveObjectToTrashSync",
+          "descriptor": "(Lcom/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef;Lcom/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef;I)I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "7b6f7cc212441c668881ffcfecdb8f7e9bf8c2f3f98e5434740730aaa715f9bf",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/MacFileUtils",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/MacFileUtils.class",
+      "occurrence": 0,
+      "sha256": "ed04b966d1682af0c72b3dbb0482c65c90709562e702e3eb56ad5cdf8a7e3cfb",
+      "name": "com/sun/jna/platform/mac/MacFileUtils",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/FileUtils",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "hasTrash",
+          "descriptor": "()Z",
+          "access": 1,
+          "code_sha256": "95ef737cd8a13db65e3eb3c18e8816a5179dcbdf341309522ab00e95d5aae6d2",
+          "code_length": 2
+        },
+        {
+          "name": "moveToTrash",
+          "descriptor": "([Ljava/io/File;)V",
+          "access": 129,
+          "code_sha256": "e2f027fde82a7ce4c8516a9194f13b39152786647ec2e32c1b42a2c52f489758",
+          "code_length": 202,
+          "throws": [
+            "java/io/IOException"
+          ]
+        }
+      ],
+      "class_references": [
+        "[Ljava/io/File;",
+        "com/sun/jna/platform/FileUtils",
+        "com/sun/jna/platform/mac/MacFileUtils",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager",
+        "com/sun/jna/platform/mac/MacFileUtils$FileManager$FSRef",
+        "java/io/File",
+        "java/io/IOException",
+        "java/lang/StringBuilder",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$Group.class",
+      "occurrence": 0,
+      "sha256": "6ae7b95cc7d1b4d5b3be6b047d4d731f49d6e6bb4581c4630b547130799640c9",
+      "name": "com/sun/jna/platform/mac/SystemB$Group",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "gr_name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "gr_passwd",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "gr_gid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "gr_mem",
+          "descriptor": "Lcom/sun/jna/ptr/PointerByReference;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Group"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$HostCpuLoadInfo.class",
+      "occurrence": 0,
+      "sha256": "257ef9cc8b4a7b85755d4547ba69db88f6a23d0a356e86ec170cc54d2f1c2f25",
+      "name": "com/sun/jna/platform/mac/SystemB$HostCpuLoadInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "cpu_ticks",
+          "descriptor": "[I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "75351335b88e618f7f706f64b9d02d194b52bbe018dd0050203bb7313fdd05d5",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$HostCpuLoadInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$HostLoadInfo.class",
+      "occurrence": 0,
+      "sha256": "9a3697a781d7379c97f5581b640e2b24916acd39fe146d7d3a71779ff2932411",
+      "name": "com/sun/jna/platform/mac/SystemB$HostLoadInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "avenrun",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "mach_factor",
+          "descriptor": "[I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "2b766896d6e656cf74bbe47b0c1b09ef7acb28d23d062c8df5a200ecd4e96bd4",
+          "code_length": 19
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$HostLoadInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$IFdata.class",
+      "occurrence": 0,
+      "sha256": "599a22552bdb4f34882ecbfbebb74c3a714f503e82e646d749495556554b8e41",
+      "name": "com/sun/jna/platform/mac/SystemB$IFdata",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ifi_type",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_typelen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_physical",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_addrlen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_hdrlen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_recvquota",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_xmitquota",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_unused1",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_mtu",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_metric",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_baudrate",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_ipackets",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_ierrors",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_opackets",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_oerrors",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_collisions",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_ibytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_obytes",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_imcasts",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_omcasts",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_iqdrops",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_noproto",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_recvtiming",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_xmittiming",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_lastchange",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$Timeval;",
+          "access": 1
+        },
+        {
+          "name": "ifi_unused2",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_hwassist",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_reserved1",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_reserved2",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$IFdata",
+        "com/sun/jna/platform/mac/SystemB$Timeval"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$IFdata64.class",
+      "occurrence": 0,
+      "sha256": "a4e7e92c2fbd590f3409175cb288d355429b71f94c11ceec3deb8f03263e0cb6",
+      "name": "com/sun/jna/platform/mac/SystemB$IFdata64",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ifi_type",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_typelen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_physical",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_addrlen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_hdrlen",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_recvquota",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_xmitquota",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_unused1",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifi_mtu",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_metric",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_baudrate",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_ipackets",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_ierrors",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_opackets",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_oerrors",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_collisions",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_ibytes",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_obytes",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_imcasts",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_omcasts",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_iqdrops",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_noproto",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ifi_recvtiming",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_xmittiming",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifi_lastchange",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$Timeval;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$IFdata64",
+        "com/sun/jna/platform/mac/SystemB$Timeval"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$IFmsgHdr.class",
+      "occurrence": 0,
+      "sha256": "93553ec4995904aebe337d30f63fcab32c83d8c8457710d41631b5fb2dd5abf3",
+      "name": "com/sun/jna/platform/mac/SystemB$IFmsgHdr",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ifm_msglen",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "ifm_version",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifm_type",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifm_addrs",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_index",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "ifm_data",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$IFdata;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "a481c4af199626b5aa43f2f03851303d89d6bd4640e40f414a9478bc415067a5",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$IFdata",
+        "com/sun/jna/platform/mac/SystemB$IFmsgHdr"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$IFmsgHdr2.class",
+      "occurrence": 0,
+      "sha256": "75f4a6dfcdcf4221ca26f199554804b855cceb352b60c0c6c56ab4c9f461e099",
+      "name": "com/sun/jna/platform/mac/SystemB$IFmsgHdr2",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ifm_msglen",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "ifm_version",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifm_type",
+          "descriptor": "B",
+          "access": 1
+        },
+        {
+          "name": "ifm_addrs",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_index",
+          "descriptor": "S",
+          "access": 1
+        },
+        {
+          "name": "ifm_snd_len",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_snd_maxlen",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_snd_drops",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_timer",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "ifm_data",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$IFdata64;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/Pointer;)V",
+          "access": 1,
+          "code_sha256": "405f81f0b51683db4ab14a729fb164a2c889439967d0bfe6248ebe8183a4873d",
+          "code_length": 6
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$IFdata64",
+        "com/sun/jna/platform/mac/SystemB$IFmsgHdr2"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$Passwd.class",
+      "occurrence": 0,
+      "sha256": "3860fe73d7fd0d1e7eaf212f6ba64a88e513586ff8f4741d5cf0610da8bb4205",
+      "name": "com/sun/jna/platform/mac/SystemB$Passwd",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pw_name",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_passwd",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_uid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pw_gid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pw_change",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "pw_class",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_gecos",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_dir",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_shell",
+          "descriptor": "Ljava/lang/String;",
+          "access": 1
+        },
+        {
+          "name": "pw_expire",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "pw_fields",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Passwd"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$ProcBsdInfo.class",
+      "occurrence": 0,
+      "sha256": "5fdd451bf731b5c9596d5a1a8c1198c94add3d1ab63b06a000cf8023e3ff1339",
+      "name": "com/sun/jna/platform/mac/SystemB$ProcBsdInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pbi_flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_status",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_xstatus",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_pid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_ppid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_uid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_gid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_ruid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_rgid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_svuid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_svgid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "rfu_1",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_comm",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "pbi_name",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "pbi_nfiles",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_pgid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_pjobc",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "e_tdev",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "e_tpgid",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_nice",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pbi_start_tvsec",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pbi_start_tvusec",
+          "descriptor": "J",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "a007b0309a7bd2a5a4e017b8a537ea668abd523e865b25f76068ae3ce15be9cf",
+          "code_length": 21
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$ProcBsdInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$ProcTaskAllInfo.class",
+      "occurrence": 0,
+      "sha256": "b91bf04b2778f6b9a733f798685dacf02ab1ae5226729f532666a6ab5d99be7b",
+      "name": "com/sun/jna/platform/mac/SystemB$ProcTaskAllInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pbsd",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$ProcBsdInfo;",
+          "access": 1
+        },
+        {
+          "name": "ptinfo",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$ProcTaskInfo;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$ProcBsdInfo",
+        "com/sun/jna/platform/mac/SystemB$ProcTaskAllInfo",
+        "com/sun/jna/platform/mac/SystemB$ProcTaskInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$ProcTaskInfo.class",
+      "occurrence": 0,
+      "sha256": "f3d169ad97f2da3822fe53d43ee6a0b530e9eb7e0a1a9c69e4cf6979faad7e51",
+      "name": "com/sun/jna/platform/mac/SystemB$ProcTaskInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pti_virtual_size",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_resident_size",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_total_user",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_total_system",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_threads_user",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_threads_system",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pti_policy",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_pageins",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_cow_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_messages_sent",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_messages_received",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_syscalls_mach",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_syscalls_unix",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_csw",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_threadnum",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_numrunning",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pti_priority",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$ProcTaskInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$RUsageInfoV2.class",
+      "occurrence": 0,
+      "sha256": "2ca44d5e1ffed9d174ebb497f9ad32e68b8869f4775ee8ccf6895ae167e7be2f",
+      "name": "com/sun/jna/platform/mac/SystemB$RUsageInfoV2",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ri_uuid",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "ri_user_time",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_system_time",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_pkg_idle_wkups",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_interrupt_wkups",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_pageins",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_wired_size",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_resident_size",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_phys_footprint",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_proc_start_abstime",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_proc_exit_abstime",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_user_time",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_system_time",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_pkg_idle_wkups",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_interrupt_wkups",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_pageins",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_child_elapsed_abstime",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_diskio_bytesread",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "ri_diskio_byteswritten",
+          "descriptor": "J",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "c5f15bbced42c908de5e8cdb1d3a05189543e9fbc96170e3f5291901a60937b8",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$RUsageInfoV2"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$Statfs.class",
+      "occurrence": 0,
+      "sha256": "f8b84155e393911618c240c2cc5d7d1044f1dbb5afd65d4af04cc5b2907b95f6",
+      "name": "com/sun/jna/platform/mac/SystemB$Statfs",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "f_bsize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_iosize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_blocks",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "f_bfree",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "f_bavail",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "f_files",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "f_ffree",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "f_fsid",
+          "descriptor": "[I",
+          "access": 1
+        },
+        {
+          "name": "f_owner",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_flags",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_fssubtype",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "f_fstypename",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "f_mntonname",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "f_mntfromname",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "f_reserved",
+          "descriptor": "[I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "61e795624a32513d9f9b499f7dbe81423cc2e7c81b6ea8eb147874bc493421c5",
+          "code_length": 46
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Statfs"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$Timeval.class",
+      "occurrence": 0,
+      "sha256": "8316039c9198beae65f857b713a4c7ce63919d231b9219df26197689f13cd0a0",
+      "name": "com/sun/jna/platform/mac/SystemB$Timeval",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tv_sec",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "tv_usec",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Timeval"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$Timezone.class",
+      "occurrence": 0,
+      "sha256": "508feaf7deb7d8451a35945e5e18162f2d74144c231daed1e38ac6fbddad7397",
+      "name": "com/sun/jna/platform/mac/SystemB$Timezone",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "tz_minuteswest",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "tz_dsttime",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Timezone"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$VMMeter.class",
+      "occurrence": 0,
+      "sha256": "34617f3014cb759f8ed023746f5144c2253a0cdcc98e8f4f7dbc01170e835971",
+      "name": "com/sun/jna/platform/mac/SystemB$VMMeter",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "v_swtch",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_trap",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_syscall",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_intr",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_soft",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_lookups",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_hits",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_vm_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_cow_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_swpin",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_swpout",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pswpin",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pswpout",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pageins",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pageouts",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pgpgin",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pgpgout",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_intrans",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_reactivated",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_rev",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_scan",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_dfree",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_pfree",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_zfod",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_nzfod",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_page_size",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_kernel_pages",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_free_target",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_free_min",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_free_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_wire_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_active_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_inactive_target",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "v_inactive_count",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$VMMeter"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$VMStatistics.class",
+      "occurrence": 0,
+      "sha256": "ae29081cf87641b534357789261f7997e151be32d88e0cd9f4662b827ecdde11",
+      "name": "com/sun/jna/platform/mac/SystemB$VMStatistics",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "free_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "active_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "inactive_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "wire_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "zero_fill_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "reactivations",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pageins",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "pageouts",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "cow_faults",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "lookups",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "hits",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "purgeable_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "purges",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "speculative_count",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$VMStatistics"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$VMStatistics64.class",
+      "occurrence": 0,
+      "sha256": "3deeac186664cb3d1b2a356990b67d6a36bc1b06969bc32fcb1d64e02d222a63",
+      "name": "com/sun/jna/platform/mac/SystemB$VMStatistics64",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "free_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "active_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "inactive_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "wire_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "zero_fill_count",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "reactivations",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pageins",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "pageouts",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "faults",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "cow_faults",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "lookups",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "hits",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "purges",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "purgeable_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "speculative_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "decompressions",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "compressions",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "swapins",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "swapouts",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "compressor_page_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "throttled_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "external_page_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "internal_page_count",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "total_uncompressed_pages_in_compressor",
+          "descriptor": "J",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$VMStatistics64"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$VnodeInfoPath.class",
+      "occurrence": 0,
+      "sha256": "7e82bca46f7baef68463022753ef5af84f3d94582d2fe3a492b3f3a3eebb9497",
+      "name": "com/sun/jna/platform/mac/SystemB$VnodeInfoPath",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "vip_vi",
+          "descriptor": "[B",
+          "access": 1
+        },
+        {
+          "name": "vip_path",
+          "descriptor": "[B",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "0aa3b2b5f1e5f07f70bf934e59d8dbdfe333945054ca6933434f0ec909905944",
+          "code_length": 23
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$VnodeInfoPath"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$VnodePathInfo.class",
+      "occurrence": 0,
+      "sha256": "83faa9ef6a71df09bc6d7396cf325cf50c00c2b5c67db73188af2fef66a19ce3",
+      "name": "com/sun/jna/platform/mac/SystemB$VnodePathInfo",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "pvi_cdir",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$VnodeInfoPath;",
+          "access": 1
+        },
+        {
+          "name": "pvi_rdir",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB$VnodeInfoPath;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$VnodeInfoPath",
+        "com/sun/jna/platform/mac/SystemB$VnodePathInfo"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB$XswUsage.class",
+      "occurrence": 0,
+      "sha256": "0e52554de0ecc59013fcb49bce7d22c2025c4e2d8d2375e737e46b3c8bb0574f",
+      "name": "com/sun/jna/platform/mac/SystemB$XswUsage",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "xsu_total",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "xsu_avail",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "xsu_used",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "xsu_pagesize",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "xsu_encrypted",
+          "descriptor": "Z",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$XswUsage"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/SystemB.class",
+      "occurrence": 0,
+      "sha256": "dff10e10031b974dbf525f18a43b69be53a32285fbeabb7ebbdf452e93ab1c2d",
+      "name": "com/sun/jna/platform/mac/SystemB",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/SystemB;",
+          "access": 25
+        },
+        {
+          "name": "HOST_LOAD_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HOST_VM_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HOST_CPU_LOAD_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "HOST_VM_INFO64",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CPU_STATE_MAX",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CPU_STATE_USER",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CPU_STATE_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CPU_STATE_IDLE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "CPU_STATE_NICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROCESSOR_BASIC_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROCESSOR_CPU_LOAD_INFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "UINT64_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "INT_SIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAXCOMLEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MAXPATHLEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_PIDPATHINFO_MAXSIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_ALL_PIDS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_PIDTASKALLINFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_PIDTBSDINFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_PIDTASKINFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "PROC_PIDVNODEPATHINFO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MFSTYPENAMELEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MNAMELEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MNT_WAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MNT_NOWAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "MNT_DWAIT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RUSAGE_INFO_V2",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "gettimeofday",
+          "descriptor": "(Lcom/sun/jna/platform/mac/SystemB$Timeval;Lcom/sun/jna/platform/mac/SystemB$Timezone;)I",
+          "access": 1025
+        },
+        {
+          "name": "mach_host_self",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "mach_task_self",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "mach_port_deallocate",
+          "descriptor": "(II)I",
+          "access": 1025
+        },
+        {
+          "name": "host_page_size",
+          "descriptor": "(ILcom/sun/jna/ptr/LongByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "host_statistics",
+          "descriptor": "(IILcom/sun/jna/Structure;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "host_statistics64",
+          "descriptor": "(IILcom/sun/jna/Structure;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctl",
+          "descriptor": "([IILcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t$ByReference;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t;)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctl",
+          "descriptor": "([IILcom/sun/jna/Pointer;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/Pointer;I)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctlbyname",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t$ByReference;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t;)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctlbyname",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/Pointer;Lcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/Pointer;I)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctlnametomib",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t$ByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "sysctlnametomib",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/Pointer;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "host_processor_info",
+          "descriptor": "(IILcom/sun/jna/ptr/IntByReference;Lcom/sun/jna/ptr/PointerByReference;Lcom/sun/jna/ptr/IntByReference;)I",
+          "access": 1025
+        },
+        {
+          "name": "getpwuid",
+          "descriptor": "(I)Lcom/sun/jna/platform/mac/SystemB$Passwd;",
+          "access": 1025
+        },
+        {
+          "name": "getgrgid",
+          "descriptor": "(I)Lcom/sun/jna/platform/mac/SystemB$Group;",
+          "access": 1025
+        },
+        {
+          "name": "proc_listpids",
+          "descriptor": "(II[II)I",
+          "access": 1025
+        },
+        {
+          "name": "proc_pidinfo",
+          "descriptor": "(IIJLcom/sun/jna/Structure;I)I",
+          "access": 1025
+        },
+        {
+          "name": "proc_pidpath",
+          "descriptor": "(ILcom/sun/jna/Pointer;I)I",
+          "access": 1025
+        },
+        {
+          "name": "proc_pid_rusage",
+          "descriptor": "(IILcom/sun/jna/platform/mac/SystemB$RUsageInfoV2;)I",
+          "access": 1025
+        },
+        {
+          "name": "getfsstat64",
+          "descriptor": "([Lcom/sun/jna/platform/mac/SystemB$Statfs;II)I",
+          "access": 1025
+        },
+        {
+          "name": "getpid",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "1cae119e642bf8bf1202e22c7266360e23c8aa0006b2a8d1de694a09b9828909",
+          "code_length": 32
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/SystemB",
+        "com/sun/jna/platform/mac/SystemB$Group",
+        "com/sun/jna/platform/mac/SystemB$HostCpuLoadInfo",
+        "com/sun/jna/platform/mac/SystemB$HostLoadInfo",
+        "com/sun/jna/platform/mac/SystemB$IFdata",
+        "com/sun/jna/platform/mac/SystemB$IFdata64",
+        "com/sun/jna/platform/mac/SystemB$IFmsgHdr",
+        "com/sun/jna/platform/mac/SystemB$IFmsgHdr2",
+        "com/sun/jna/platform/mac/SystemB$Passwd",
+        "com/sun/jna/platform/mac/SystemB$ProcBsdInfo",
+        "com/sun/jna/platform/mac/SystemB$ProcTaskAllInfo",
+        "com/sun/jna/platform/mac/SystemB$ProcTaskInfo",
+        "com/sun/jna/platform/mac/SystemB$RUsageInfoV2",
+        "com/sun/jna/platform/mac/SystemB$Statfs",
+        "com/sun/jna/platform/mac/SystemB$Timeval",
+        "com/sun/jna/platform/mac/SystemB$Timezone",
+        "com/sun/jna/platform/mac/SystemB$VMMeter",
+        "com/sun/jna/platform/mac/SystemB$VMStatistics",
+        "com/sun/jna/platform/mac/SystemB$VMStatistics64",
+        "com/sun/jna/platform/mac/SystemB$VnodeInfoPath",
+        "com/sun/jna/platform/mac/SystemB$VnodePathInfo",
+        "com/sun/jna/platform/mac/SystemB$XswUsage",
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/platform/unix/LibCAPI$size_t",
+        "com/sun/jna/platform/unix/LibCAPI$size_t$ByReference",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/XAttr.class",
+      "occurrence": 0,
+      "sha256": "cd3ad6e266097d21f0ce6427930b2d3885037d5066438ff213a3cd7f563aa546",
+      "name": "com/sun/jna/platform/mac/XAttr",
+      "major": 50,
+      "minor": 0,
+      "access": 1536,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/mac/XAttr;",
+          "access": 25
+        },
+        {
+          "name": "XATTR_NOFOLLOW",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_CREATE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_REPLACE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_NOSECURITY",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_NODEFAULT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_SHOWCOMPRESSION",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_MAXNAMELEN",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "XATTR_FINDERINFO_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "XATTR_RESOURCEFORK_NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "getxattr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/Pointer;JII)J",
+          "access": 1025
+        },
+        {
+          "name": "setxattr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Lcom/sun/jna/Pointer;JII)I",
+          "access": 1025
+        },
+        {
+          "name": "removexattr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "listxattr",
+          "descriptor": "(Ljava/lang/String;Lcom/sun/jna/Pointer;JI)J",
+          "access": 1025
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "100293116a71f4e69d7cdf6262a30a6c0e78d9acc94d0e6131289a06e6d117c3",
+          "code_length": 13
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/XAttr",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/mac/XAttrUtil.class",
+      "occurrence": 0,
+      "sha256": "2c38948a49638b450929adbb4f0726a0ca6ddaf559e502d331aec825db59a0a7",
+      "name": "com/sun/jna/platform/mac/XAttrUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "listXAttr",
+          "descriptor": "(Ljava/lang/String;)Ljava/util/List;",
+          "access": 9,
+          "code_sha256": "013db16060f6ca122fd51cb3dde16647e645cb2fdc76bc6286f9dbe66b84b82a",
+          "code_length": 79,
+          "generic_signature": "(Ljava/lang/String;)Ljava/util/List<Ljava/lang/String;>;"
+        },
+        {
+          "name": "getXAttr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
+          "access": 9,
+          "code_sha256": "b2e0dde1b11de71607a002669c935f5c83fbd5d83600a31287ef51d12a2c7aec",
+          "code_length": 87
+        },
+        {
+          "name": "setXAttr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "3a87f14d58414aa01a46f571af520b05259a0106c3e3f1ace8c4c44057481dbc",
+          "code_length": 23
+        },
+        {
+          "name": "removeXAttr",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;)I",
+          "access": 9,
+          "code_sha256": "4109f38caf209e196a00536f284edb7d700525f496f75a6146c41d5b622c65fd",
+          "code_length": 12
+        },
+        {
+          "name": "encodeString",
+          "descriptor": "(Ljava/lang/String;)Lcom/sun/jna/Memory;",
+          "access": 12,
+          "code_sha256": "9843407f15a1a61026a5638ede555444a63e59015f36f37b7663a1652fc63ae7",
+          "code_length": 32
+        },
+        {
+          "name": "decodeString",
+          "descriptor": "(Ljava/nio/ByteBuffer;)Ljava/lang/String;",
+          "access": 12,
+          "code_sha256": "45bba559091903b166f4effda7ff827d533ddf651d6380aebacc880829fb7c44",
+          "code_length": 13
+        },
+        {
+          "name": "decodeStringSequence",
+          "descriptor": "(Ljava/nio/ByteBuffer;)Ljava/util/List;",
+          "access": 12,
+          "code_sha256": "5b216a5f64860c6256ee14503952a2dc82456b0fb2199819748fdca931cbcb20",
+          "code_length": 75,
+          "generic_signature": "(Ljava/nio/ByteBuffer;)Ljava/util/List<Ljava/lang/String;>;"
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Memory",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/mac/XAttr",
+        "com/sun/jna/platform/mac/XAttrUtil",
+        "java/lang/Object",
+        "java/lang/String",
+        "java/nio/Buffer",
+        "java/nio/ByteBuffer",
+        "java/nio/CharBuffer",
+        "java/nio/charset/Charset",
+        "java/util/ArrayList",
+        "java/util/List"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibC.class",
+      "occurrence": 0,
+      "sha256": "3d78bcd01aa641ac7e9943809712e1ab3c326c0b880b5e6ab5867ac51c88910d",
+      "name": "com/sun/jna/platform/unix/LibC",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/Library"
+      ],
+      "fields": [
+        {
+          "name": "NAME",
+          "descriptor": "Ljava/lang/String;",
+          "access": 25
+        },
+        {
+          "name": "INSTANCE",
+          "descriptor": "Lcom/sun/jna/platform/unix/LibC;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "49eb0994b2a6f7b08497f586ed5f841aabf6e5dffeb5515cb5122d2e8d0a8d4b",
+          "code_length": 14
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Library",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/unix/LibC",
+        "com/sun/jna/platform/unix/LibCAPI",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibCAPI$size_t$ByReference.class",
+      "occurrence": 0,
+      "sha256": "e77087c935bfcf1582dfaa4597a16e83b5f04b31c45b88dc21aa870dffb2b98c",
+      "name": "com/sun/jna/platform/unix/LibCAPI$size_t$ByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "aed7e83e67378270f28dae9909c7a1fcfc93fee6d84575142ff352cee845c513",
+          "code_length": 13
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(Lcom/sun/jna/platform/unix/LibCAPI$size_t;)V",
+          "access": 1,
+          "code_sha256": "81747feb633e68019b4f533a4a46c55a7b1ac9e72e8f5ca8a678ee4cebe931ea",
+          "code_length": 13
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "540aff79a1fc2de41ec1e9c52ddf2bee8f9369aa23d035a1241725b468a51d35",
+          "code_length": 13
+        },
+        {
+          "name": "setValue",
+          "descriptor": "(Lcom/sun/jna/platform/unix/LibCAPI$size_t;)V",
+          "access": 1,
+          "code_sha256": "788e810b8bf327af2a557caa22b777b775bfe359520503af7415c3c5dd854f37",
+          "code_length": 35
+        },
+        {
+          "name": "longValue",
+          "descriptor": "()J",
+          "access": 1,
+          "code_sha256": "272dd5743f21e3196e071566d2836c1efbaf358e553882bfc2d7a642e62b05c2",
+          "code_length": 28
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/unix/LibCAPI$size_t;",
+          "access": 1,
+          "code_sha256": "f1e02036362d22b6e7d0d791271de27cb59463fa40df6fa9f49874ce3a3ffb9d",
+          "code_length": 12
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/platform/unix/LibCAPI$size_t",
+        "com/sun/jna/platform/unix/LibCAPI$size_t$ByReference",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibCAPI$size_t.class",
+      "occurrence": 0,
+      "sha256": "d689ce02f848f1855113d127dd3a303be3d16be98e208f8a5a183a1a95928716",
+      "name": "com/sun/jna/platform/unix/LibCAPI$size_t",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/IntegerType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Lcom/sun/jna/platform/unix/LibCAPI$size_t;",
+          "access": 25
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "d5ae95b9fd3791737d39baa8a5319d53ea22142daf5a650f9e79857dcd12adef",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ae306cf026389d4d33b1de029f81e4b997091849f231825a8ac312ca2653fb00",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/IntegerType",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/platform/unix/LibCAPI$size_t",
+        "com/sun/jna/platform/unix/LibCAPI$size_t$ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibCAPI$ssize_t.class",
+      "occurrence": 0,
+      "sha256": "45b7e38167c1b9b328b34a50612e5fe0bca2570994728ecb14726851ab477f66",
+      "name": "com/sun/jna/platform/unix/LibCAPI$ssize_t",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/IntegerType",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "ZERO",
+          "descriptor": "Lcom/sun/jna/platform/unix/LibCAPI$ssize_t;",
+          "access": 25
+        },
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "777ae274cf3ead3ab25d51feb963ba275ab849e7f73e792251f99ab2e458567f",
+          "code_length": 10
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "ae306cf026389d4d33b1de029f81e4b997091849f231825a8ac312ca2653fb00",
+          "code_length": 11
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/IntegerType",
+        "com/sun/jna/Native",
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/platform/unix/LibCAPI$ssize_t"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibCAPI.class",
+      "occurrence": 0,
+      "sha256": "be175e438412418e7efc954dcf684a611297c44252b62a11c65cbde5ccc471b9",
+      "name": "com/sun/jna/platform/unix/LibCAPI",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [
+        "com/sun/jna/platform/unix/Reboot",
+        "com/sun/jna/platform/unix/Resource"
+      ],
+      "fields": [
+        {
+          "name": "HOST_NAME_MAX",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "getuid",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "geteuid",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getgid",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "getegid",
+          "descriptor": "()I",
+          "access": 1025
+        },
+        {
+          "name": "setuid",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "seteuid",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "setgid",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "setegid",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "gethostname",
+          "descriptor": "([BI)I",
+          "access": 1025
+        },
+        {
+          "name": "sethostname",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "getdomainname",
+          "descriptor": "([BI)I",
+          "access": 1025
+        },
+        {
+          "name": "setdomainname",
+          "descriptor": "(Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "getenv",
+          "descriptor": "(Ljava/lang/String;)Ljava/lang/String;",
+          "access": 1025
+        },
+        {
+          "name": "setenv",
+          "descriptor": "(Ljava/lang/String;Ljava/lang/String;I)I",
+          "access": 1025
+        },
+        {
+          "name": "unsetenv",
+          "descriptor": "(Ljava/lang/String;)I",
+          "access": 1025
+        },
+        {
+          "name": "getloadavg",
+          "descriptor": "([DI)I",
+          "access": 1025
+        },
+        {
+          "name": "close",
+          "descriptor": "(I)I",
+          "access": 1025
+        },
+        {
+          "name": "msync",
+          "descriptor": "(Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t;I)I",
+          "access": 1025
+        },
+        {
+          "name": "munmap",
+          "descriptor": "(Lcom/sun/jna/Pointer;Lcom/sun/jna/platform/unix/LibCAPI$size_t;)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/LibCAPI",
+        "com/sun/jna/platform/unix/LibCAPI$size_t",
+        "com/sun/jna/platform/unix/LibCAPI$ssize_t",
+        "com/sun/jna/platform/unix/Reboot",
+        "com/sun/jna/platform/unix/Resource",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/LibCUtil.class",
+      "occurrence": 0,
+      "sha256": "13e6ff5257b720244beff7ebd140d05508307ef8ec2af9adfcddd8f2dd2a4f01",
+      "name": "com/sun/jna/platform/unix/LibCUtil",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "LIBC",
+          "descriptor": "Lcom/sun/jna/NativeLibrary;",
+          "access": 26
+        },
+        {
+          "name": "mmap",
+          "descriptor": "Lcom/sun/jna/Function;",
+          "access": 10
+        },
+        {
+          "name": "mmap64",
+          "descriptor": "Z",
+          "access": 10
+        },
+        {
+          "name": "ftruncate",
+          "descriptor": "Lcom/sun/jna/Function;",
+          "access": 10
+        },
+        {
+          "name": "ftruncate64",
+          "descriptor": "Z",
+          "access": 10
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 2,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "mmap",
+          "descriptor": "(Lcom/sun/jna/Pointer;JIIIJ)Lcom/sun/jna/Pointer;",
+          "access": 9,
+          "code_sha256": "4579b3d42e56ef40a4d724da20f54a8902cae8878edc3075b2a5928db85921f3",
+          "code_length": 122
+        },
+        {
+          "name": "ftruncate",
+          "descriptor": "(IJ)I",
+          "access": 9,
+          "code_sha256": "52ca5da035ad311b338ee0ff163032eef86c2879d9e5556ef59ea178359dacff",
+          "code_length": 57
+        },
+        {
+          "name": "require32Bit",
+          "descriptor": "(JLjava/lang/String;)V",
+          "access": 9,
+          "code_sha256": "940c424627b2afb45280a3e8681985b17f2c18b1494a6258b9aad9c37549a03a",
+          "code_length": 36
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "facdf8d3c8bfb0bcd2061fccf961adca3a96d17949853146d5a60c26a04f68da",
+          "code_length": 93
+        }
+      ],
+      "class_references": [
+        "[Ljava/lang/Object;",
+        "com/sun/jna/Function",
+        "com/sun/jna/Native",
+        "com/sun/jna/NativeLibrary",
+        "com/sun/jna/platform/unix/LibCUtil",
+        "java/lang/IllegalArgumentException",
+        "java/lang/Integer",
+        "java/lang/Long",
+        "java/lang/Object",
+        "java/lang/StringBuilder",
+        "java/lang/UnsatisfiedLinkError"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/Reboot.class",
+      "occurrence": 0,
+      "sha256": "80b338930da8a9c4be2b8e7da281f476f8b183022816184e4a767f37d8595915",
+      "name": "com/sun/jna/platform/unix/Reboot",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RB_AUTOBOOT",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_HALT_SYSTEM",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_ENABLE_CAD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_DISABLE_CAD",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_POWER_OFF",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_SW_SUSPEND",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RB_KEXEC",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "reboot",
+          "descriptor": "(I)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/Reboot",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/Resource$Rlimit.class",
+      "occurrence": 0,
+      "sha256": "ae95b59a85c2a89c62e8d44374abddff97ac39e22a27957495dbd21e4bfc6e87",
+      "name": "com/sun/jna/platform/unix/Resource$Rlimit",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "rlim_cur",
+          "descriptor": "J",
+          "access": 1
+        },
+        {
+          "name": "rlim_max",
+          "descriptor": "J",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/unix/Resource",
+        "com/sun/jna/platform/unix/Resource$Rlimit"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/Resource.class",
+      "occurrence": 0,
+      "sha256": "5dee127a37db9fc97d0bc1efc51f1d7efe019c9da1031b7595d82facd4dcce52",
+      "name": "com/sun/jna/platform/unix/Resource",
+      "major": 50,
+      "minor": 0,
+      "access": 1537,
+      "superclass": "java/lang/Object",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "RLIMIT_CPU",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_FSIZE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_DATA",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_STACK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_CORE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_RSS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_NOFILE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_AS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_NPROC",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_MEMLOCK",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_LOCKS",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_SIGPENDING",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_MSGQUEUE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_NICE",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_RTPRIO",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_RTTIME",
+          "descriptor": "I",
+          "access": 25
+        },
+        {
+          "name": "RLIMIT_NLIMITS",
+          "descriptor": "I",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "getrlimit",
+          "descriptor": "(ILcom/sun/jna/platform/unix/Resource$Rlimit;)I",
+          "access": 1025
+        },
+        {
+          "name": "setrlimit",
+          "descriptor": "(ILcom/sun/jna/platform/unix/Resource$Rlimit;)I",
+          "access": 1025
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/Resource",
+        "com/sun/jna/platform/unix/Resource$Rlimit",
+        "java/lang/Object"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Atom.class",
+      "occurrence": 0,
+      "sha256": "49ca8d6eaed9c16365ba7b87fe7289b8ea6d2e9ddb9d4dea530b12f3b52a4f29",
+      "name": "com/sun/jna/platform/unix/X11$Atom",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Atom;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "88dc47c42798f5a1dad7bd0ab3faf3ce1932286bf9e13c8f694cfa44a7d586a2",
+          "code_length": 593
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "b70b73bd1ad6813adf6f5df3f4585f1f2cd652c211cd19acf06a90b7818344d1",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Atom",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Integer",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$AtomByReference.class",
+      "occurrence": 0,
+      "sha256": "9488959ed82329e868ed116e70f203ca56b8952946679708d431074930282e6a",
+      "name": "com/sun/jna/platform/unix/X11$AtomByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/unix/X11$Atom;",
+          "access": 1,
+          "code_sha256": "79ef0da33c278641d5dfc70d5b2349feb42736d03017c938fd1940bc46664d59",
+          "code_length": 25
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Atom",
+        "com/sun/jna/platform/unix/X11$AtomByReference",
+        "com/sun/jna/platform/unix/X11$XID",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Colormap.class",
+      "occurrence": 0,
+      "sha256": "c4aa5d52375ae79cb94521123e7c97eb0eb7a987e62483fa77ed9d7215989a26",
+      "name": "com/sun/jna/platform/unix/X11$Colormap",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Colormap;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Colormap",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Cursor.class",
+      "occurrence": 0,
+      "sha256": "88ced403d4f0b388e4f32868b01c9a2fa0ffbd4c27ae48f776af74a10430d48d",
+      "name": "com/sun/jna/platform/unix/X11$Cursor",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Cursor;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Cursor",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Display.class",
+      "occurrence": 0,
+      "sha256": "cedd151072d8155c5a0156de8269df48600a4c9a02fa3597b30aaa1b60a60613",
+      "name": "com/sun/jna/platform/unix/X11$Display",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Display"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Drawable.class",
+      "occurrence": 0,
+      "sha256": "6f9ac649215059df6d25228f08ceb501643595bedadf7d2d9d5cf63eec1ce47e",
+      "name": "com/sun/jna/platform/unix/X11$Drawable",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Drawable;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Drawable",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Font.class",
+      "occurrence": 0,
+      "sha256": "5cf436941ec04f65641cd6ba0aee0d589f865545fae5912fb6d8642c8222bddc",
+      "name": "com/sun/jna/platform/unix/X11$Font",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Font;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Font",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$GC.class",
+      "occurrence": 0,
+      "sha256": "e3d42be4aa6e645b99f2029db9ac7aa55b031395d753788bd00cbdbec85d3dab",
+      "name": "com/sun/jna/platform/unix/X11$GC",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$GC"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$KeySym.class",
+      "occurrence": 0,
+      "sha256": "a82b668856734aa4067b3a6ec09a9027aa637aeaad236194510a12a0a6863f93",
+      "name": "com/sun/jna/platform/unix/X11$KeySym",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XID",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$KeySym;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$KeySym",
+        "com/sun/jna/platform/unix/X11$XID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Pixmap.class",
+      "occurrence": 0,
+      "sha256": "dfda3519ccbb9cb5391c4c8f05816beeff6190937d7a31cd305cfa51e0bb3afb",
+      "name": "com/sun/jna/platform/unix/X11$Pixmap",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$Drawable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Pixmap;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Drawable",
+        "com/sun/jna/platform/unix/X11$Pixmap",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Screen.class",
+      "occurrence": 0,
+      "sha256": "db2bf8e36d7afb7a5d72bd517aa9a8f2929a370eab769eeabcf9c1fa099e846f",
+      "name": "com/sun/jna/platform/unix/X11$Screen",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Screen"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Visual.class",
+      "occurrence": 0,
+      "sha256": "cee0a1104ec61dbd26f3b62db890b731128bd21e0e77d573fafa3921bdb3295c",
+      "name": "com/sun/jna/platform/unix/X11$Visual",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/PointerType",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "getVisualID",
+          "descriptor": "()Lcom/sun/jna/platform/unix/X11$VisualID;",
+          "access": 1,
+          "code_sha256": "1d83ce226cfef2c379638c0823c57b0728e78632565633520d7c6832f04b42b7",
+          "code_length": 39
+        },
+        {
+          "name": "toString",
+          "descriptor": "()Ljava/lang/String;",
+          "access": 1,
+          "code_sha256": "25dd095f538a3dc5f7cc386637a998689417497ebac8bba620a9b0d7af1bd4d0",
+          "code_length": 29
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Native",
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/PointerType",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Visual",
+        "com/sun/jna/platform/unix/X11$VisualID",
+        "java/lang/IllegalStateException",
+        "java/lang/Long",
+        "java/lang/StringBuilder"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$VisualID.class",
+      "occurrence": 0,
+      "sha256": "e32ff59b7463cd624af155b4be8a20062478b08592a4ea4e626b4da686ffdf86",
+      "name": "com/sun/jna/platform/unix/X11$VisualID",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/NativeLong",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$VisualID;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "89a2dac461dfb44ef3eacd33770d5674c693ce9e72afae9a9b4780057b6de88d",
+          "code_length": 6
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "385d3641af39a7536fa0d8faaf79dab5be958eda1fb1028b2840d2ae3ce1e035",
+          "code_length": 7
+        },
+        {
+          "name": "isNone",
+          "descriptor": "(Ljava/lang/Object;)Z",
+          "access": 4,
+          "code_sha256": "4303d62b0fb0ba8348965a4690aabb67b5ec2b1274c053dd17bc03c83f378964",
+          "code_length": 29
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "84fb4a089798a278b6c0a6b688c97fbb56beb26089c156f76db4eca2f5af0afd",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "c8a68704d07f854e62a285ae2351a5d769bd32be5640db83afd081df0134707e",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$VisualID",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$Window.class",
+      "occurrence": 0,
+      "sha256": "a985d7e598d5ec59ebacce173f317f1d58dfbc78f87d37d764c15516930f67d9",
+      "name": "com/sun/jna/platform/unix/X11$Window",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$Drawable",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "serialVersionUID",
+          "descriptor": "J",
+          "access": 26
+        },
+        {
+          "name": "None",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 25
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        },
+        {
+          "name": "<init>",
+          "descriptor": "(J)V",
+          "access": 1,
+          "code_sha256": "970308c1335b3ff78e03fde3e5af32f52471f3bf3ed2e45bb1a569880432b55d",
+          "code_length": 6
+        },
+        {
+          "name": "fromNative",
+          "descriptor": "(Ljava/lang/Object;Lcom/sun/jna/FromNativeContext;)Ljava/lang/Object;",
+          "access": 1,
+          "code_sha256": "be2ae8c1e7a6a2013fef15f9941985b663e155a59aa1cb7e2f2f5cdc5ba71ffb",
+          "code_length": 27
+        },
+        {
+          "name": "<clinit>",
+          "descriptor": "()V",
+          "access": 8,
+          "code_sha256": "fc01762d97d60141c3feb424793ea637f57680513d925a7125c8f0dc62f8eaee",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Drawable",
+        "com/sun/jna/platform/unix/X11$Window",
+        "java/lang/Number"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$WindowByReference.class",
+      "occurrence": 0,
+      "sha256": "bb6fca96912a42a64a059b083ec94a818b9264e00c312b4ee939bfe21036b2c6",
+      "name": "com/sun/jna/platform/unix/X11$WindowByReference",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/ptr/ByReference",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "fc2254230fd870f0b743cc82dc8247e48837eea9315f9e2e21cb4ebd397f243e",
+          "code_length": 8
+        },
+        {
+          "name": "getValue",
+          "descriptor": "()Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1,
+          "code_sha256": "381bf8cb0a61ea67e64f3d91e0a05a2111a933440c3c78435df43208875d3532",
+          "code_length": 36
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/NativeLong",
+        "com/sun/jna/Pointer",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Window",
+        "com/sun/jna/platform/unix/X11$WindowByReference",
+        "com/sun/jna/platform/unix/X11$XID",
+        "com/sun/jna/ptr/ByReference"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XAnyEvent.class",
+      "occurrence": 0,
+      "sha256": "88b223d6900f976d107d1082e3a4466552d045730b0a3f17c718441ffca461f0",
+      "name": "com/sun/jna/platform/unix/X11$XAnyEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "serial",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "send_event",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "display",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Display;",
+          "access": 1
+        },
+        {
+          "name": "window",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Display",
+        "com/sun/jna/platform/unix/X11$Window",
+        "com/sun/jna/platform/unix/X11$XAnyEvent"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XButtonEvent.class",
+      "occurrence": 0,
+      "sha256": "6f29637232e1b00d23858eabd9f191c7c9eb42a9f1a471e2746496f772024c6d",
+      "name": "com/sun/jna/platform/unix/X11$XButtonEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "serial",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "send_event",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "display",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Display;",
+          "access": 1
+        },
+        {
+          "name": "window",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "root",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "subwindow",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "time",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "x",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "y",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "x_root",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "y_root",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "state",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "button",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "same_screen",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Display",
+        "com/sun/jna/platform/unix/X11$Window",
+        "com/sun/jna/platform/unix/X11$XButtonEvent"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XButtonPressedEvent.class",
+      "occurrence": 0,
+      "sha256": "027579c73dea20462c939a5fb5a1bb010dc80a71a16869f98c008727d808cffe",
+      "name": "com/sun/jna/platform/unix/X11$XButtonPressedEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XButtonEvent",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$XButtonEvent",
+        "com/sun/jna/platform/unix/X11$XButtonPressedEvent"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XButtonReleasedEvent.class",
+      "occurrence": 0,
+      "sha256": "92b4b7d05862dd37b1b62f9303a331a8c10f6401efc7b30b19148305dff93dfb",
+      "name": "com/sun/jna/platform/unix/X11$XButtonReleasedEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/platform/unix/X11$XButtonEvent",
+      "interfaces": [],
+      "fields": [],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$XButtonEvent",
+        "com/sun/jna/platform/unix/X11$XButtonReleasedEvent"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XCirculateEvent.class",
+      "occurrence": 0,
+      "sha256": "bc16b81f9ef3ea0750d258d605e9d7261159e85bd891668cf59013a7fc06c4c8",
+      "name": "com/sun/jna/platform/unix/X11$XCirculateEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "serial",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "send_event",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "display",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Display;",
+          "access": 1
+        },
+        {
+          "name": "event",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "window",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "place",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Display",
+        "com/sun/jna/platform/unix/X11$Window",
+        "com/sun/jna/platform/unix/X11$XCirculateEvent"
+      ]
+    },
+    {
+      "entry": "com/sun/jna/platform/unix/X11$XCirculateRequestEvent.class",
+      "occurrence": 0,
+      "sha256": "9032d8d2a53b2e6beae9117791f8a21f1f7de0b298036d367dce7883202c21fb",
+      "name": "com/sun/jna/platform/unix/X11$XCirculateRequestEvent",
+      "major": 50,
+      "minor": 0,
+      "access": 33,
+      "superclass": "com/sun/jna/Structure",
+      "interfaces": [],
+      "fields": [
+        {
+          "name": "type",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "serial",
+          "descriptor": "Lcom/sun/jna/NativeLong;",
+          "access": 1
+        },
+        {
+          "name": "send_event",
+          "descriptor": "I",
+          "access": 1
+        },
+        {
+          "name": "display",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Display;",
+          "access": 1
+        },
+        {
+          "name": "parent",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "window",
+          "descriptor": "Lcom/sun/jna/platform/unix/X11$Window;",
+          "access": 1
+        },
+        {
+          "name": "place",
+          "descriptor": "I",
+          "access": 1
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "descriptor": "()V",
+          "access": 1,
+          "code_sha256": "d6f7264189858f154b120ac2e9b76f4b4dae9ddb629e4ec627af7810207e1a24",
+          "code_length": 5
+        }
+      ],
+      "class_references": [
+        "com/sun/jna/Structure",
+        "com/sun/jna/Structure$FieldOrder",
+        "com/sun/jna/platform/unix/X11",
+        "com/sun/jna/platform/unix/X11$Display",
+        "com/sun/jna/platform/unix/X11$Window",
+        "com/sun/jna/platform/unix/X11$XCirculateRequestEvent"
+      ]
+    }
+  ]
+}

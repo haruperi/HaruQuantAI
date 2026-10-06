@@ -1,0 +1,689 @@
+{
+  "reference_cohort": "145-dev1",
+  "captured_at": "2026-10-06T18:54:51.906614+00:00",
+  "missing_definitions": [
+    {
+      "symbol": "com/strategyquant/ailib/agent/SQAIAgentLoop",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/agent/SQAIAgentLoop$StepSink",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/agent/SQAIHarness",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/agent/SQAIWakeup",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/QProduct",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIBackendUrls",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIExtensionCommands",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIHttp",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIPathGrants",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIProgressPublisher",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIProjectStore",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAISessionStore",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAITerms",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAITurns",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAITurns$Turn",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/chat/SQAIUploads",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/extensions/AIExtensions",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/model/SQAIConfig",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/model/SQAIModelFactory",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/reports/AIReports",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/tools/MCPTools",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/AlgoCloud/AlgoCloudServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/ui/SQAIUiContext",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/ailib/ui/SQAIUiGate",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/lib/app/AppSettings",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/DashboardResults/DashboardResults.jar",
+          "class": "com/strategyquant/plugin/Dashboard/impl/Results/DashboardResultsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+          "class": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+          "class": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "class": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "class": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "class": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "class": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+          "class": "com/strategyquant/plugin/Results/impl/SourceCode/SourceCodeServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+          "class": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "class": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "class": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+          "class": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+          "class": "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/lib/app/MainApp",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "class": "SQ/Blocks/Indicators/Other/DataLoggingIndy"
+        },
+        {
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "class": "SQ/Internal/AbstractChart"
+        },
+        {
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "class": "SQ/Strategies/TestIndyStrategy"
+        },
+        {
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "class": "SQ/Strategies/TestOHLCDailyStrategy"
+        },
+        {
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "class": "SQ/Strategies/TestStrategyAskBid"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
+          "class": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
+          "class": "com/strategyquant/plugin/App/impl/DebugConsole/DebugConsoleAppPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "class": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "class": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "class": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
+          "class": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+          "class": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+          "class": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
+          "class": "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/DashboardResults/DashboardResults.jar",
+          "class": "com/strategyquant/plugin/Dashboard/impl/Results/DashboardResultsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet$4"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
+          "class": "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+          "class": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
+          "class": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark"
+        },
+        {
+          "artifact_locator": "internal/plugins/HomeAbout/HomeAbout.jar",
+          "class": "com/strategyquant/plugin/Home/impl/About/AboutServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/LoaderSQ3/LoaderSQ3.jar",
+          "class": "com/strategyquant/plugin/Loader/impl/SQ3/SQ3FileLoaderOldXml"
+        },
+        {
+          "artifact_locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
+          "class": "com/strategyquant/plugin/Loader/impl/SQ4/SQ4LoaderPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
+          "class": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+          "class": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+          "class": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "class": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "class": "com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "class": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "class": "com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+          "class": "com/strategyquant/plugin/Results/impl/SourceCode/SourceCodeServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+          "class": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+          "class": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "class": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "class": "com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/SaverHTML/SaverHTML.jar",
+          "class": "com/strategyquant/plugin/Saver/impl/HTML/HTMLReportPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/SaverPDF/SaverPDF.jar",
+          "class": "com/strategyquant/plugin/Saver/impl/PDF/PDFReportPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/SaverSQ3/SaverSQ3.jar",
+          "class": "com/strategyquant/plugin/Saver/impl/SQ3/SQ3FileSaver"
+        },
+        {
+          "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+          "class": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings"
+        },
+        {
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "class": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet"
+        },
+        {
+          "artifact_locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+          "class": "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+          "class": "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar",
+          "class": "com/strategyquant/plugin/Settings/impl/WhatToBuild/WhatToBuildSettingsPlugin"
+        },
+        {
+          "artifact_locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
+          "class": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder"
+        },
+        {
+          "artifact_locator": "internal/plugins/TaskBuild/TaskBuild.jar",
+          "class": "com/strategyquant/plugin/Task/impl/Build/BuildTask"
+        },
+        {
+          "artifact_locator": "internal/plugins/TaskBuild/TaskBuild.jar",
+          "class": "com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine"
+        },
+        {
+          "artifact_locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
+          "class": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    },
+    {
+      "symbol": "com/strategyquant/lib/memory/CpuInfo",
+      "definition_status": "not_found_in_current_standalone_archives",
+      "consumers": [
+        {
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "class": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer"
+        },
+        {
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "class": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer"
+        }
+      ],
+      "limitation": "Constant-pool class references identify structural consumers, not executed calls or hidden implementation bodies."
+    }
+  ],
+  "selection": "Referenced StrategyQuant MainApp, AppSettings, CpuInfo and com.strategyquant.ailib symbols only.",
+  "limitations": [
+    "This selection is not an exhaustive list of absent data/trading/engine callees.",
+    "No definitions in standalone archives does not rule out embedded/native/encrypted or runtime-provided implementations."
+  ]
+}

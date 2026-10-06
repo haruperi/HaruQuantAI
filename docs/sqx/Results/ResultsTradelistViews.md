@@ -1,123 +1,41 @@
 # ResultsTradelistViews.jar
 
-[Workspace/group index](README.md)  |  [All workspaces](../README.md)
+[Group index](README.md) | [All archives](../README.md)
 
 ## Scope and provenance
 
-- Artifact: `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar`.
-- SHA-256: `f0b240c1d0907dc879d423d426dff448569f01d2e7b6c67427f4b21fc4feddd7`.
-- Inspected: 2026-10-05; generation timestamp `2026-10-05T19:04:16.344170+00:00`.
-- Archive class entries: **2**; non-nested: **2**; nested/anonymous: **0**.
-- Inspection: ZIP entry/manifest enumeration and `javap -p` declarations for every listed class.
-- Repository source HEAD: `8a92c705183a6702eaf62037ccb202ed028aa899`; review state: generated, pending owner review.
-- Installed SQX build number is unverified. No method bodies are reproduced.
-- Confidence: high for declared structure; workspace ownership inferred except where registration evidence is separately stated. Runtime reachability, call order, formulas and parity remain unverified.
+- **Donor:** `SQX_145_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar`.
+- **SHA-256:** `f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e`; accessed 2026-10-06; captured `2026-10-06T18:54:51.906614+00:00`.
+- **Classes:** 2 raw entries; 2 unique entry names. Duplicate occurrence indices are zero-based.
+- **Inspection:** read-only ZIP hashing and class-file structural parsing; signatures/descriptors, modifiers, hierarchy and references only. Bytecode bodies are hashed, not published.
+- **Allocation:** proposed `FEAT-RESULTS-RESULTS-TRADELIST-VIEWS`, P08; [roadmap](../../dev/sqx-full-application-roadmap.md). Domain README registration remains required.
+- **Repository:** `01067f00031428613c6394064ca1bcadc1ba00ee`; review state unreviewed. Download label 145-dev1; installed build/activation and runtime equivalence unverified.
+- **Limit:** every class/member is inventoried; declaration coverage does not establish consumed calls, defaults, formulas, failure semantics or algorithm parity.
+- **Archive/resource index:** [221.json](../../dev/evidence/sqx145/archives/145/221.json).
 
-The `Results` folder is a navigation/research grouping, not an exclusive backend owner. Shared consumers may use this JAR.
+## Complete member declarations
 
-Target mapping: no verified owning HaruQuantAI feature/requirement/decision IDs are assigned by this document. Register or resolve ownership through the normal repository plan before implementation.
+Member shards contain exact JVM names/descriptors, access flags, generic signatures, throws types, declared fields/methods, superclass/interfaces and referenced class names. All classes, nested/synthetic members and overloads are retained. Code length/hash is structural evidence, not a normalized algorithm comparison.
 
-## Diagram reading guide
+- [001.json](../../dev/evidence/sqx145/members/221/001.json) — SHA-256 `3d995f56cda5291de53535661a5246b765c8dfda4254e5aa504c2e745369cc87`.
 
-`Parent <|-- Child` means declared inheritance; `Interface <|.. Class` means declared implementation. Interface extension uses the inheritance arrow. `A ..> B : field type` is a declared type dependency, not composition, object ownership or a runtime call. External nodes are referenced types, not fabricated local implementations. Selected fields/method names aid navigation: `+` is public, `#` protected and `-` private. Diagram method names omit parameter/return types and collapse overloads; use the exact inspected declarations below before implementing an API.
+## Focused structural diagram
 
-Detailed graphs include non-nested classes in package-sized groups of at most 12. Nested/anonymous classes are inventoried and their declarations/relationships are retained below, but omitted from overview graphs. Relationships not drawn for readability remain in the complete declaration-relationship table. Constructors, synthetic bridges and overloads may be collapsed in diagram member lists only. Standard `java.lang.Object` inheritance is omitted from diagrams.
-
-## UML class diagrams
-
-### 1. `com.strategyquant.plugin.Results.impl.TradelistViews`
+Up to twelve non-nested classes; arrows show declared inheritance/interfaces only. External type names are not evidence of an available body or an executed dependency.
 
 ```mermaid
 classDiagram
-    class C213c64f425d1["TradelistViewsPlugin"] {
-        -dataContext
-        +getProduct()
-        +getPreferredPosition()
-        +initPlugin()
-        +getHandler()
-    }
-    class C0069cd262268["TradelistViewsServlet"] {
-        -Log
-        #execute()
-    }
-    class C249b5c671b1a["IServletPlugin"]
-    class C8900f90ae594["HttpJSONServlet"]
-    C249b5c671b1a <|.. C213c64f425d1 : declared interface
-    C8900f90ae594 <|-- C0069cd262268 : declared extends
+    class C0["TradelistViewsPlugin"]
+    class C1["TradelistViewsServlet"]
+    class E0["IServletPlugin"]
+    E0 <|.. C0
+    class E1["HttpJSONServlet"]
+    E1 <|-- C1
 ```
 
-| Diagram identifier | Exact type | Location |
-| --- | --- | --- |
-| `C213c64f425d1` | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` (this JAR) | this diagram |
-| `C0069cd262268` | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` (this JAR) | this diagram |
-| `C249b5c671b1a` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | referenced external type |
-| `C8900f90ae594` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | referenced external type |
+## Class inventory
 
-## Complete class inventory
-
-| Fully qualified class | Kind | Entry |
-| --- | --- | --- |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | class | non-nested |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | class | non-nested |
-
-## Declared relationships and evidence locations
-
-Every row is supported by the named class declaration/member in `javap -p`, inside the artifact recorded above. Signature dependencies may include return, parameter, generic-argument and throws types; they do not imply execution.
-
-| Declaring class | Referenced type | Relationship | Narrow inspection location |
-| --- | --- | --- | --- |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | [`com.strategyquant.tradinglib.servlet.IServletPlugin`](../Shared/SQTradingLib.md) | implements | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` / class declaration: `public class com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | `org.eclipse.jetty.servlet.ServletContextHandler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` / field declaration: `private org.eclipse.jetty.servlet.ServletContextHandler dataContext;` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` / method signature: `public java.lang.String getProduct();` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | `java.lang.Exception` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` / method signature: `public void initPlugin() throws java.lang.Exception;` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` | `org.eclipse.jetty.server.Handler` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin` / method signature: `public org.eclipse.jetty.server.Handler getHandler();` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | [`com.strategyquant.webguilib.servlet.HttpJSONServlet`](../Shared/SQWebGUILib.md) | extends | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` / class declaration: `public class com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | `org.slf4j.Logger` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` / field declaration: `private static final org.slf4j.Logger Log;` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | `java.lang.String` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String);`<br>`private java.lang.String onGetColumns();`<br>`private java.lang.String onGetViews();`<br>`private java.lang.String onAddView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onUpdateView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onRemoveView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onChangeView(java.util.Map<java.lang.String, java.lang.String[]>);` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | `java.util.Map` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` / method signature: `protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String);`<br>`private java.lang.String onAddView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onUpdateView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onRemoveView(java.util.Map<java.lang.String, java.lang.String[]>);`<br>`private java.lang.String onChangeView(java.util.Map<java.lang.String, java.lang.String[]>);` |
-| `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` | `org.json.JSONArray` (not resolved in scoped archives) | type dependency | `com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet` / method signature: `private org.json.JSONArray getColumns();` |
-
-## Inspected declaration reference
-
-These are structural API/member declarations, not proprietary implementation bodies. Private members and nested classes are retained to make diagram omissions explicit; declarations do not prove behavior.
-
-<details>
-<summary>com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin</summary>
-
-```text
-public class com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin implements com.strategyquant.tradinglib.servlet.IServletPlugin
-    private org.eclipse.jetty.servlet.ServletContextHandler dataContext;
-    public com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsPlugin();
-    public java.lang.String getProduct();
-    public int getPreferredPosition();
-    public void initPlugin() throws java.lang.Exception;
-    public org.eclipse.jetty.server.Handler getHandler();
-```
-
-</details>
-
-<details>
-<summary>com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet</summary>
-
-```text
-public class com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet extends com.strategyquant.webguilib.servlet.HttpJSONServlet
-    private static final org.slf4j.Logger Log;
-    public com.strategyquant.plugin.Results.impl.TradelistViews.TradelistViewsServlet();
-    protected java.lang.String execute(java.lang.String, java.util.Map<java.lang.String, java.lang.String[]>, java.lang.String);
-    private java.lang.String onGetColumns();
-    private java.lang.String onGetViews();
-    private org.json.JSONArray getColumns();
-    private void sendWSUpdate();
-    private java.lang.String onAddView(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onUpdateView(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onRemoveView(java.util.Map<java.lang.String, java.lang.String[]>);
-    private java.lang.String onChangeView(java.util.Map<java.lang.String, java.lang.String[]>);
-```
-
-</details>
-
-## Validation and unresolved gaps
-
-Archive hash and complete class inventory were checked against the inspected local artifact. Declaration extraction accounts for every inventoried class. Documentation/link/diagram structural verification is recorded in the master index and task walkthrough; no SQX runtime validation was performed.
-
-The canonical reimplementation ledger/schema are absent, so no evidence IDs or validation-passed ledger claims are created. This is a donor structural reference. Exact behavior, default values, failure semantics, algorithms, runtime calls and target architectural choices require separate research. No aggregation/composition or cardinalities are inferred.
+| Archive entry | Occurrence | Class SHA-256 | Fields | Methods |
+| --- | ---: | --- | ---: | ---: |
+| `com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsPlugin.class` | 0 | `da22bcb2d70490f30d2b70dd8661df033fb37100fb7dfd3048d86e8c3946cec9` | 1 | 5 |
+| `com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet.class` | 0 | `7821216b00cb3d457ff9c5e08cee05eae7db5b6eed103142a1a5b76ae5dbabd2` | 1 | 11 |
